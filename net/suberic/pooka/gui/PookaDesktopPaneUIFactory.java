@@ -131,6 +131,10 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
 	messagePanel.setUIComponent(messageScrollPane);
 	
+	java.awt.Dimension mspSize = new java.awt.Dimension(Integer.parseInt(Pooka.getProperty("Pooka.messagePanel.hsize", "600")), Integer.parseInt(Pooka.getProperty("Pooka.messagePanel.vsize", Pooka.getProperty("Pooka.vsize","570"))));
+
+	messageScrollPane.setPreferredSize(mspSize);
+	messageScrollPane.setSize(mspSize);
 	((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
 	return messagePanel;
     }

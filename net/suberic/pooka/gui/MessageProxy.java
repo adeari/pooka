@@ -620,7 +620,7 @@ public class MessageProxy {
       final PrinterJob externalJob = job;
       
       if (job.printDialog ()) {
-	Thread t = new Thread(new net.suberic.util.swing.RunnableAdapter() {
+	Thread t = new Thread(new Runnable() {
 	    public void run() {
 	      try {
 		externalJob.print ();
@@ -629,7 +629,7 @@ public class MessageProxy {
 		ex.printStackTrace ();
 	      }
 	    }
-	  });
+	  }, "printing thread");
 	t.start();
 	
       }

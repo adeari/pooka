@@ -111,7 +111,7 @@ public class MultiMessageProxy extends MessageProxy {
 	job.setPageable (book);
 	final PrinterJob externalJob = job;
 	if (job.printDialog ()) {
-	    Thread printThread = new Thread(new net.suberic.util.swing.RunnableAdapter() {
+	    Thread printThread = new Thread(new Runnable() {
 		public void run() {
 		    try {
 			externalJob.print ();
@@ -120,7 +120,7 @@ public class MultiMessageProxy extends MessageProxy {
 			ex.printStackTrace ();
 		    }
 		}
-	    });
+	    }, "printing thread");
 	    printThread.start();
 	    
 	}

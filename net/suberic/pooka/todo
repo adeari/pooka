@@ -1,16 +1,8 @@
-
-*) bug:  the ReadMessageDisplayPanel always uses both EditorPanes.  this is
-	probably extremely inefficient.  
-
 *) fix it so no tableInfos are ever loaded on the awt even thread.  this
 	means that we'll probably have to either a) load all of the 
 	tableInfos before we add the messages to the FolderTable, or b)
 	have a way to display unloaded infos, and an event system that will
 	update the table when the tableInfo is loaded.
-
-*) fix the window size--it's possible that if you change the foldertree
-size and the desktop pane size, but not the main window size, your main
-window size will end up changing anyway.
 
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
@@ -18,6 +10,8 @@ possible folders, nor just the ones that are open.
 
 *) fix it so the file (and font and so forth?) editor actually includes
 	the '...' icon.
+
+*) fix the window placement for the desktop pane.
 
 *) test the following:  open a folder.  do right click->close folder.
 	try reopening the folder and reading from it.

@@ -204,7 +204,27 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * At the moment it just returns 0,0.  :)
    */
   public Point getNewWindowLocation(JComponent c) {
-    return new Point(0,0);
+    // first, figure out what the top left corner of the viewable area is.
+
+    JViewport viewport = ((JScrollPane)getUIComponent()).getViewport();
+    
+    Point p = viewport.getViewPosition();
+
+    // second, see what the minimum/maximum x and y coordinate would be.
+
+    Dimension componentSize = c.getSize();
+    
+    Dimension viewportSize = viewport.getViewSize();
+    
+    int maxX = (Math.max(0, viewportSize.width - componentSize.width) + p.x);
+    int maxY = (Math.max(0, viewportSize.height - componentSize.height) + p.y);
+    
+    if (maxX == p.x && maxY == p.y)
+      return p;
+
+    Point returnValue = new Point(p.x, p.y);
+
+    return returnValue;
   }
   
   /**
@@ -256,7 +276,9 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       Runnable openWindowCommand = new Runnable() {
 	  public void run() {
 	    if (isNew) {
+	      
 	      MessagePanel.this.add(newMessageWindow);
+	      newMessageWindow.setLocation(getNewWindowLocation(newMessageWindow));
 	      newMessageWindow.setVisible(true);
 	    } else {
 	      if (newMessageWindow.isIcon())

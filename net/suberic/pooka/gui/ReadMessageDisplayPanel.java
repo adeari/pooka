@@ -142,7 +142,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       StringBuffer messageText = new StringBuffer();
       
       String content = null;
-      
+
+      String contentType = "text/plain";
+
       if ((Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().isHtml()) || (Pooka.getProperty("Pooka.displayHtmlAsDefault", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().containsHtml())) {
 	
 	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
@@ -151,8 +153,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	  content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
 	}
 	
-	editorPane.setContentType("text/html");
-	otherEditorPane.setContentType("text/html");
+	contentType = "text/html";
 	
       } else {
 	
@@ -170,38 +171,42 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders());
 	}
 
-	editorPane.setContentType("text/plain");
-        otherEditorPane.setContentType("text/plain");
+	contentType = "text/plain";
       }
       
       if (content != null) {
-	try {
-	  messageText.append(content);
-
-	  editorPane.setEditable(false);
-	  editorPane.setText(messageText.toString());
-	  editorPane.setCaretPosition(0);
+	messageText.append(content);
+	
+	if (getMessageProxy().hasAttachments()) {
+	  try {
+	    otherEditorPane.setContentType(contentType);
+	    otherEditorPane.setEditable(false);
+	    otherEditorPane.setText(messageText.toString());
+	    otherEditorPane.setCaretPosition(0);
+	  } catch (Exception e) {
+	    // if we can't show the html, just set the type as text/plain.
+	    otherEditorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
 	    
-	  otherEditorPane.setEditable(false);
-	  otherEditorPane.setText(messageText.toString());
-	  otherEditorPane.setCaretPosition(0);
-	} catch (Exception e) {
-	  // if we can't show the html, just set the type as text/plain.
-
-	  // oops--can't do it that way.  :)
-	  //editorPane.setContentType("text/plain");
-	  //otherEditorPane.setContentType("text/plain");
-
-	  editorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
-	  otherEditorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
-
-	  editorPane.setEditable(false);
-	  editorPane.setText(messageText.toString());
-	  editorPane.setCaretPosition(0);
+	    otherEditorPane.setEditable(false);
+	    otherEditorPane.setText(messageText.toString());
+	    otherEditorPane.setCaretPosition(0);
+	  }
+	} else {
+	  try {
+	    editorPane.setContentType(contentType);
+	    editorPane.setEditable(false);
+	    editorPane.setText(messageText.toString());
+	    editorPane.setCaretPosition(0);
+	  } catch (Exception e) {
+	    // if we can't show the html, just set the type as text/plain.
 	    
-	  otherEditorPane.setEditable(false);
-	  otherEditorPane.setText(messageText.toString());
-	  otherEditorPane.setCaretPosition(0);
+	    editorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
+	    
+	    editorPane.setEditable(false);
+	    editorPane.setText(messageText.toString());
+	    editorPane.setCaretPosition(0);
+	    
+	  }
 	}
       } 
       
@@ -233,6 +238,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       otherEditorPane.setEditable(false);
       otherEditorPane.setText("");
       otherEditorPane.setCaretPosition(0);
+
       ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
       editorStatus = WITHOUT_ATTACHMENTS;
 
