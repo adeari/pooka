@@ -22,6 +22,18 @@ up for top-level folders?).
 
 *) fix marc's ClassCastException.
 
+*) add a way to notify users of 'new' messages.
+
+*) add keyboard control for everything, including switching between internal
+frames and the folderPanel.  oh, and making it so you can get at the menus.
+
+*) fix the addNotify problems--i'm honestly not sure exactly how they need
+to be fixed, but they certainly do.
+
+*) add the ability to keep track of which folders are to be opened on 
+startup.  also add a flag to the startup to override this, so that nothing
+gets opened on start for that session.
+
 ?????? alpha 2 or not ??????
 ----------------------------
 
