@@ -112,30 +112,29 @@ public class MessageInfo {
 	Message msg = getMessage();
 	if (prop.equals("From")) {
 	    Address[] fromAddr = msg.getFrom();
-	    return MailUtilities.getAddressString(fromAddr);
+	    return MailUtilities.decodeAddressString(fromAddr);
 	} else if (prop.equalsIgnoreCase("receivedDate")) {
 	    return msg.getReceivedDate();
 	} else if (prop.equalsIgnoreCase("recipients")) {
 	    return msg.getAllRecipients();
 	} else if (prop.equalsIgnoreCase("to")) {
-	    return MailUtilities.getAddressString(msg.getRecipients(Message.RecipientType.TO));
+	    return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.TO));
 	} else if (prop.equalsIgnoreCase("cc")) {
-	    return MailUtilities.getAddressString(msg.getRecipients(Message.RecipientType.CC));
+	    return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.CC));
 	} else if (prop.equalsIgnoreCase("bcc")) {
-	    return MailUtilities.getAddressString(msg.getRecipients(Message.RecipientType.BCC));
+	    return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.BCC));
 	} else if (prop.equalsIgnoreCase("Date")) {
 	    return msg.getSentDate();
 	} else if (prop.equalsIgnoreCase("Subject")) {
-	    return msg.getSubject();
+	    return MailUtilities.decodeText(msg.getSubject());
 	} 
 	
 	if (msg instanceof MimeMessage) {
-	    String hdrVal = ((MimeMessage)msg).getHeader(prop, ",");
-	    if (hdrVal != null && hdrVal.length() > 0)
-		return hdrVal;
+	  String hdrVal = ((MimeMessage)msg).getHeader(prop, ",");
+	  if (hdrVal != null && hdrVal.length() > 0)
+	    return MailUtilities.decodeText(hdrVal);
 	}
 	return "";
-	
     }
 
     /**
@@ -411,7 +410,7 @@ public class MessageInfo {
 
 		      Address[] fromAddresses = m.getFrom();
 		      if (fromAddresses.length > 0 && fromAddresses[0] != null)
-			intro.replace(index, index +2, MailUtilities.getAddressString(fromAddresses));
+			intro.replace(index, index +2, MailUtilities.decodeAddressString(fromAddresses));
 		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
 		      intro.replace(index, index + 2, Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate()));
 		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {

@@ -161,54 +161,54 @@ class AttachmentBundle {
 	headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
     }
 
-    /**
-     * This returns the formatted header information for a message.
-     */
-    public StringBuffer getHeaderInformation (boolean showFullHeaders, boolean useHtml) {
-	if (headers != null) {
-	    StringBuffer headerText = new StringBuffer();
-	    
-	    if (showFullHeaders) {
-		Enumeration allHdrs = headers.getAllHeaderLines();
-		while (allHdrs.hasMoreElements()) {
-		    headerText.append((String) allHdrs.nextElement());
-		}		
+  /**
+   * This returns the formatted header information for a message.
+   */
+  public StringBuffer getHeaderInformation (boolean showFullHeaders, boolean useHtml) {
+    if (headers != null) {
+      StringBuffer headerText = new StringBuffer();
+      
+      if (showFullHeaders) {
+	Enumeration allHdrs = headers.getAllHeaderLines();
+	while (allHdrs.hasMoreElements()) {
+	  headerText.append(MailUtilities.decodeText((String) allHdrs.nextElement()));
+	}		
+      } else {
+	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
+	String hdrLabel,currentHeader = null;
+	String hdrValue = null;
+	
+	while (tokens.hasMoreTokens()) {
+	  currentHeader=tokens.nextToken();
+	  hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
+	  hdrValue = MailUtilities.decodeText((String) headers.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader), ":"));
+	  if (hdrValue != null) {
+	    if (useHtml) {
+	      headerText.append("<b>" + hdrLabel + ":</b><nbsp><nbsp>");
+	      headerText.append(MailUtilities.escapeHtml(hdrValue));
+	      
+	      headerText.append("<br>\n");
 	    } else {
-		StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
-		String hdrLabel,currentHeader = null;
-		String hdrValue = null;
-		
-		while (tokens.hasMoreTokens()) {
-		    currentHeader=tokens.nextToken();
-		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		    hdrValue = (String) headers.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader), ":");
-		    if (hdrValue != null) {
-			if (useHtml) {
-			    headerText.append("<b>" + hdrLabel + ":</b><nbsp><nbsp>");
-			    headerText.append(MailUtilities.escapeHtml(hdrValue));
-			    
-			    headerText.append("<br>\n");
-			} else {
-			    headerText.append(hdrLabel + ":  ");
-			    headerText.append(hdrValue);
-			    
-			    headerText.append("\n");
-			}
-		    }
-		}
-	    } 
-	    String separator = Pooka.getProperty("MessageWindow.separator", "");
-	    if (separator.equals(""))
-		headerText.append("\n\n");
-	    else
-		headerText.append(separator);
-	    
-	    return headerText;
-	} else {
-	    return new StringBuffer();
+	      headerText.append(hdrLabel + ":  ");
+	      headerText.append(hdrValue);
+	      
+	      headerText.append("\n");
+	    }
+	  }
 	}
+      } 
+      String separator = Pooka.getProperty("MessageWindow.separator", "");
+      if (separator.equals(""))
+	headerText.append("\n\n");
+      else
+	headerText.append(separator);
+      
+      return headerText;
+    } else {
+      return new StringBuffer();
     }
-
+  }
+  
     /**
      * Parses the Enumeration of Header objects into a HashMap.
      */

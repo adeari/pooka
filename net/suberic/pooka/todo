@@ -3,9 +3,8 @@ beta 1
 
 *) add address book/ldap support.
 	now:
-	1)  add editor for address list.
-	2)  add ldap support
-	3)  make it support aliases/lists properly
+	1)  add ldap support
+	2)  make it support aliases/lists properly
 
 	later:
 	1)  make sure the matches go with the entry--i.e. if you match the
@@ -49,13 +48,7 @@ old
 last time you ran the client and this time) aren't marked as recent--only
 ones that come in while you're already connected are labelled like that.
 
-*) add address book and alias support -- jph
-
 *) incorrect number of messages/unread messages when in disconnected mode.
-
---
-
-*) add copying messages.
 
 ui engine
 ---------
@@ -68,8 +61,6 @@ ui engine
 	       window larger and then detach it, or if you move the split
 		pane divider, then it reverts to its original state when you
 		detach/attach the window.
-
-*) fix all of the thread issues that i've introduced.  :)
 
 general ui
 ----------
@@ -165,8 +156,6 @@ window at -5, -5.
 
 *) add ability to edit received messages, so you can do things like remove
 attachments that you don't want to keep (?)
-
-*) fix sorting of the from field--make it case-insensitive.
 
 *) name all of your threads.
 

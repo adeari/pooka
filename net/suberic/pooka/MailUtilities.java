@@ -16,7 +16,7 @@ public class MailUtilities {
   /**
    * This returns the value of an array of Address objects as a String.
    */
-  public static String getAddressString(Address[] addresses) {
+  public static String decodeAddressString(Address[] addresses) {
     if (addresses == null)
       return null;
 
@@ -33,6 +33,24 @@ public class MailUtilities {
     }
 
     return returnValue.toString();
+  }
+
+  /**
+   * This decoded an RFC 2047 encoded string.  If there are any errors
+   * in decoding the string, the raw string is returned.
+   */
+  public static String decodeText(String encodedString) {
+    if (encodedString == null)
+      return null;
+
+    String  value = null;
+    try {
+      value = javax.mail.internet.MimeUtility.decodeText(encodedString);
+    } catch (UnsupportedEncodingException e) {
+      // Don't care
+      value = encodedString;
+    }
+    return value;
   }
 
     /**
