@@ -57,8 +57,24 @@ public class EntryTextArea extends JTextArea {
      * TextArea. 
      */
     protected void processComponentKeyEvent(KeyEvent e) {
-	if (!isManagingFocus() || (e.getKeyCode() != KeyEvent.VK_TAB || e.getKeyChar() != '\t')) {
+	if (!isManagingFocus() || (e.getKeyCode() != KeyEvent.VK_TAB || e.getKeyChar() != '\t' || e.getID() != KeyEvent.KEY_PRESSED)) {
 	    super.processComponentKeyEvent(e);
+	} else {
+	    if (e.getModifiers() == 0) {
+		FocusManager fm = FocusManager.getCurrentManager();
+		if (fm != null) {
+		    fm.focusNextComponent(this);
+		    e.consume();
+		}
+	    } else if (e.getModifiers() == java.awt.event.InputEvent.SHIFT_MASK) {
+		FocusManager fm = FocusManager.getCurrentManager();
+		if (fm != null) {
+		    fm.focusPreviousComponent(this);
+		    e.consume();
+		}
+	    } else {
+		super.processComponentKeyEvent(e);
+	    }
 	}
     }
 }

@@ -36,7 +36,7 @@ public class MailWrappedView extends WrappedPlainView {
 	super.calculateBreakPosition(p0, p1);
 	try {
 	    String text = getDocument().getText(p0, p1 - p0);
-	    int offset = MailUtilities.getBreakOffset(text, getCharacterLength()); 
+	    int offset = MailUtilities.getBreakOffset(text, getCharacterLength(), getTabSize()); 
 	    return p0 + offset;
 	} catch (javax.swing.text.BadLocationException ble) {
 	    return p1;

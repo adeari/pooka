@@ -280,7 +280,23 @@ public class MailUtilities {
      * 
      */
 
-    public static int getBreakOffset(String buffer, int breakLength) {
+    public static int getBreakOffset(String buffer, int breakLength, int tabSize) {
+	// what we'll do is to modify the break length to make it fit tabs.
+	
+	int nextTab = buffer.indexOf('\t');
+	int tabAccumulator = 0;
+	int tabAddition = 0;
+	while (nextTab >=0 && nextTab < breakLength) {
+	    tabAddition = tabSize - ((tabSize +  nextTab + tabAccumulator + 1) % tabSize);
+	    breakLength=breakLength - tabAddition;
+	    tabAccumulator = tabAccumulator + tabAddition;
+	    if (nextTab + 1 < buffer.length())
+		nextTab = buffer.indexOf('\t', nextTab + 1);
+	    else
+		nextTab = -1;
+	}
+
+
 	if ( buffer.length() <= breakLength ) {
 	    return buffer.length();
 	}
@@ -301,7 +317,7 @@ public class MailUtilities {
     /**
      * This takes a String and words wraps it at length wrapLength.
      */
-    public static String wrapText(String originalText, int wrapLength, char lineBreak) {
+    public static String wrapText(String originalText, int wrapLength, char lineBreak, int tabSize) {
 	if (originalText == null)
 	    return null;
 
@@ -315,7 +331,7 @@ public class MailUtilities {
 	    if (nextReal == -1)
 		nextReal = wrappedText.length();
 	    while ( newBreak < nextReal ) {
-		newBreak = getBreakOffset(wrappedText.substring(lastReal +1, nextReal), wrapLength) + lastReal + 1;
+		newBreak = getBreakOffset(wrappedText.substring(lastReal +1, nextReal), wrapLength, tabSize) + lastReal + 1;
 		if (newBreak < nextReal) {
 		    wrappedText.insert(newBreak, lineBreak); 
 		    nextReal++;
@@ -349,6 +365,7 @@ public class MailUtilities {
      */
     public static String wrapText(String originalText) {
 	int wrapLength;
+	int tabSize;
 	try {
 	    String wrapLengthString = Pooka.getProperty("Pooka.lineLength");
 	    wrapLength = Integer.parseInt(wrapLengthString);
@@ -356,6 +373,12 @@ public class MailUtilities {
 	    wrapLength = 72;
 	}
 
-	return wrapText(originalText, wrapLength, '\n');
+	try {
+	    String tabSizeString = Pooka.getProperty("Pooka.tabSize", "8");
+	    tabSize = Integer.parseInt(tabSizeString);
+	} catch (Exception e) {
+	    tabSize = 8;
+	}
+	return wrapText(originalText, wrapLength, '\n', tabSize);
     }
 }
