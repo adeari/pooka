@@ -15,7 +15,10 @@
 
 *) printing right now truncates long lines.
 	-- try new jdk1.4 printing system?
-
+	   - first get printing to work on correct threads
+	   - then modify MessagePrinter to break lines at the correct space
+	   - and then make it work with strangely-formatted html
+	   - and make it display what's happening as we print.
 *) bug:  on startup, FolderSelectorPane is empty; have to unselect and 
 	reselect to get info.
 
