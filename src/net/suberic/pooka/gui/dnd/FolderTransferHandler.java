@@ -29,6 +29,11 @@ public class FolderTransferHandler extends TransferHandler {
 	try {
 	  mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	  if (mp != null) {
+	    // check to see if we're moving to the same folder.  if so,
+	    // don't allow it.
+	    if (mp.getFolderInfo() == fi) {
+	      return false;
+	    }
 	    mp.getMessageInfo().copyMessage(fi);
 	    mp.setImportDone(true);
 	    if (mp.removeMessageOnCompletion()) {
@@ -95,7 +100,6 @@ public class FolderTransferHandler extends TransferHandler {
   }
 
   public boolean canImport(JComponent c, DataFlavor[] flavors) {
-    
     boolean returnValue = (DndUtils.matchDataFlavor(acceptableFlavors, flavors) != null);
     return returnValue;
   }

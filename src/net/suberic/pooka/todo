@@ -4,12 +4,12 @@
      *) fix file export for attachments
      *) test with desktop/external apps.
 
+   *) fix naming of dragged/copied file.
    *) error:  fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
-   *) make sure folderwindow cut/paste is enabled everywhere; add to 
-	keybindings list; give tooltips in toolbar.
-   *) don't allow drag-and-drop into the same folder.
-   *) fix naming of dragged/copied file.
+
+*) fix disconnected imap so that it shows when it's downloading lots
+	of messages.
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.
@@ -18,6 +18,10 @@
 header.
 
 *) make status icon for store itself.
+
+*) test w/gnu javamail
+
+-----
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -37,8 +41,6 @@ header.
 
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
-
-*) test w/gnu javamail
 
 *) check too many open files error on opening large cached folder?
 
