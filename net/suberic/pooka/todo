@@ -11,6 +11,22 @@ have deleted messages update properly.
 
 5)  Add the ability to subscribe to/add new folders.
 
+6)  add ability to attach files to the sent messages.
+
+7)  add context-sensitive menus (right-click menus)
+
+8)  add send buttons and other appropriate commands to MessageWindow.
+
+9)  enable cut & paste
+
+10)  make the windows detachable.
+
+11)  implement a way to make a custom FolderCellRenderer for a property.
+
+12)  implement (likely similar) way to put constraints/checks on the values
+entered through a propertyEditor.
+
+
 open messages from the FolderWindow
 	can do.  todo on this:
 	customize settings--headers, window size.
@@ -23,6 +39,9 @@ create and send message
 	add ability of setting return values by hand (not by UserProfile)
 	make a sent folder?
 	add ability to attach files (should be easy)	
+	make it so that if there are any errors sending the message, that it's
+		saved and editable.  not quite sure what to do there with a 
+		send thread, but....
 
 move messages between folders
 	can do.  todo on this:
@@ -40,6 +59,8 @@ user profiles/information
 	make it actually get the correct default profile.
 	make entry lists the right size.
 	make entry list defaults not editable.
+	make sure that the sendMailURL is properly updated as soon as it's
+		entered.
 
 Editing Profiles/Stores
 	can do.  todo:
