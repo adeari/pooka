@@ -84,8 +84,10 @@ public class MailUtilities {
 	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment((MimeMessage)m);
 	
 	bundle.addAttachment(newAttach);
+      } else {
+	// FIXME
+	bundle.addAttachment(new Attachment((MimeMessage)m));
       }
-
     } else {
       String contentType = ((MimeMessage) m).getContentType().toLowerCase();
       
@@ -137,6 +139,9 @@ public class MailUtilities {
 	  Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
 	
 	  bundle.addAttachment(newAttach);
+	} else {
+	  // FIXME
+	  bundle.addAttachment(new Attachment(mbp));
 	}
       
       } else {

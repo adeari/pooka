@@ -308,7 +308,8 @@ public class NewMessageProxy extends MessageProxy {
     new EncryptAction(),
     new SelectEncryptionKeyAction(),
     new SignAction(),
-    new SelectSignatureKeyAction()
+    new SelectSignatureKeyAction(),
+    new AttachKeyAction()
       };
   
   public Action getAction(String name) {
@@ -407,6 +408,21 @@ public class NewMessageProxy extends MessageProxy {
     
     public void actionPerformed(ActionEvent e) {
       //selectPrivateKey();
+    }
+  }
+
+  class AttachKeyAction extends AbstractAction {
+    AttachKeyAction() {
+      super("message-attach-crypt-key");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      try {
+	java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
+	getNewMessageInfo().attachEncryptionKey(cryptKey);
+      } catch (Exception ex) {
+	getMessageUI().showError(ex.getMessage(), ex);
+      }
     }
   }
   

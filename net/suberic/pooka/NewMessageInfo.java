@@ -7,6 +7,8 @@ import javax.activation.*;
 import javax.mail.internet.*;
 
 import net.suberic.pooka.crypto.*;
+import net.suberic.crypto.*;
+
 import java.security.Key;
 
 /**
@@ -33,6 +35,8 @@ public class NewMessageInfo extends MessageInfo {
   // key for the recipient(s).
   Key mKey = null;
 
+  // public keys to attach to this message.
+  Key[] mAttachKeys = null;
 
   /**
    * Creates a NewMessageInfo to wrap the given Message.
@@ -72,13 +76,31 @@ public class NewMessageInfo extends MessageInfo {
     if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
       messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
     
-    if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
+    MimeBodyPart publicKeyPart = null;
+    if (mAttachKeys != null && mAttachKeys.length > 0) {
+      java.security.Key firstKey = mAttachKeys[0];
+      if (firstKey instanceof EncryptionKey) {
+	try {
+	  EncryptionUtils utils = ((EncryptionKey) firstKey).getEncryptionUtils();
+	  publicKeyPart = utils.createPublicKeyPart(mAttachKeys);
+	} catch (Exception e) {
+	  // FIXME ignore for now.
+	}
+      }
+    }
+
+    if (publicKeyPart != null || (attachments.getAttachments() != null && attachments.getAttachments().size() > 0)) {
       MimeBodyPart mbp = new MimeBodyPart();
       mbp.setContent(messageText, messageContentType);
       MimeMultipart multipart = new MimeMultipart();
       multipart.addBodyPart(mbp);
-      for (int i = 0; i < attachments.getAttachments().size(); i++) 
+      for (int i = 0; attachments.getAttachments() != null && i < attachments.getAttachments().size(); i++) {
 	multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
+      }
+
+      if (publicKeyPart != null)
+	multipart.addBodyPart(publicKeyPart);
+
       multipart.setSubType("mixed");
       getMessage().setContent(multipart);
       getMessage().saveChanges();
@@ -302,6 +324,20 @@ public class NewMessageInfo extends MessageInfo {
    */
   public Key getEncryptionKey() {
     return mKey;
+  }
+
+  /**
+   * Attaches an encryption key to this message.
+   */
+  public synchronized void attachEncryptionKey(Key key) {
+    if (mAttachKeys == null) {
+      mAttachKeys = new Key[] { key };
+    } else {
+      Key[] newKeys = new Key[mAttachKeys.length + 1];
+      System.arraycopy(mAttachKeys, 0, newKeys, 0, mAttachKeys.length);
+      newKeys[mAttachKeys.length] = key;
+      mAttachKeys = newKeys;
+    }
   }
 
   /**
