@@ -454,12 +454,14 @@ public class UIDFolderInfo extends FolderInfo {
 	    getFolderDisplayUI().closeFolderDisplay();
 
 	if (isLoaded() && isAvailable()) {
-	    setStatus(CLOSED);
-	    try {
-		getFolder().close(expunge);
-	    } catch (java.lang.IllegalStateException ise) {
-		throw new MessagingException(ise.getMessage(), ise);
+	    if (isConnected()) {
+		try {
+		    getFolder().close(expunge);
+		} catch (java.lang.IllegalStateException ise) {
+		    throw new MessagingException(ise.getMessage(), ise);
+		}
 	    }
+	    setStatus(CLOSED);
 	}
 
     }
