@@ -6,6 +6,9 @@
 *) sign up for doc and release-engineering tasks
 
 -----
+*) make attachments openable from the messge panel.
+*) check opening attachments from preview pane 
+*) windows attachments associated with correct item (icemail lib)
 
 *) queuing of outgoing mails
 	todo on this:
@@ -329,9 +332,6 @@ icons changing?  test.
 	in foo/bar would show up on foo as well as bar.
 
 *) add icons for connecting to folder/store
-
-*) attachments available from message list (like actually being able to
-	click on and view/save without opening the message).
 
 *) make it so we only get one connection failed message for a store.
 
