@@ -15,7 +15,7 @@ disconnected mode.
 	 *)  need to add support for keeping the messages in the mailbox
 	     while you have them on disk.
 	 *)  bug:  messages currently aren't being deleted off the pop
-	     server.
+	     server. -- fixed?
 	 *)  update the ui so that you can properly configure pop/mbox/imap
 	     store separately.
 

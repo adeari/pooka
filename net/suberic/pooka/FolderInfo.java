@@ -26,19 +26,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // folder is disconnected, but should be open; try to reopen at first
     // opportunity
-    public static int LOST_CONNECTION = 1;
+    public static int LOST_CONNECTION = 5;
 
     // folder is available, but only should be accessed during the checkFolder
     // phase.
 
-    public static int PASSIVE = 2;
+    public static int PASSIVE = 10;
 
     // folder is running in disconnected mode; only act on the cached 
     // messages.
-    public static int DISCONNECTED = 3;
+    public static int DISCONNECTED = 15;
+
+    // Folder doesn't seem to exist on server, but exists in cache.
+    public static int CACHE_ONLY = 20;
 
     // folder does not exist on server
-    public static int INVALID = 4;
+    public static int INVALID = 25;
     
     protected int status;
 
@@ -54,12 +57,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private EventListenerList messageChangedListeners = new EventListenerList();
     
     // Information for the FolderNode
-    private FolderNode folderNode;
-    private Vector children;
+    protected FolderNode folderNode;
+    protected Vector children;
 
     // Information for the FolderTable.
     private FolderTableModel folderTableModel;
-    private Hashtable messageToInfoTable = new Hashtable();
+    protected Hashtable messageToInfoTable = new Hashtable();
     private Vector columnValues;
     private Vector columnNames;
     private Vector columnSizes;
@@ -71,7 +74,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     //filters
     private MessageFilter[] filters = null;
 
-    private LoadMessageThread loaderThread;
+    protected LoadMessageThread loaderThread;
     private FolderTracker folderTracker = null;
 
     private boolean loaded = false;
@@ -366,20 +369,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
 
     /**
-     * Loads all Messages into a new FolderTableModel, sets this 
-     * FolderTableModel as the current FolderTableModel, and then returns
-     * said FolderTableModel.  This is the basic way to populate a new
-     * FolderTableModel.
+     * Loads the column names and sizes.
      */
-    public FolderTableModel loadAllMessages() {
+    protected FetchProfile createColumnInformation() {
 	String tableType;
 
 	if (isSentFolder())
 	    tableType="SentFolderTable";
 	else
 	    tableType="FolderTable";
-
-	Vector messageProxies = new Vector();
 
 	FetchProfile fp = new FetchProfile();
 	fp.add(FetchProfile.Item.FLAGS);
@@ -427,14 +425,28 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    setColumnSizes(colsizes);
 	}
 	    
+	return fp;
+    }
+
+    /**
+     * Loads all Messages into a new FolderTableModel, sets this 
+     * FolderTableModel as the current FolderTableModel, and then returns
+     * said FolderTableModel.  This is the basic way to populate a new
+     * FolderTableModel.
+     */
+    public FolderTableModel loadAllMessages() {
+	Vector messageProxies = new Vector();
+
+	FetchProfile fp = createColumnInformation();
 	if (loaderThread == null) 
 	    loaderThread = createLoaderThread();
-
+	
 	try {
 	    if (!(getFolder().isOpen())) {
 		openFolder(Folder.READ_WRITE);
 	    }
-
+	    
+	    
 	    Message[] msgs = folder.getMessages();
 	    folder.fetch(msgs, fp);
 	    MessageInfo mi;
@@ -532,39 +544,39 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     
     public int getFirstUnreadMessage() {
-
-	// one part brute, one part force, one part ignorance.
-
 	if (Pooka.isDebug())
-	    System.out.println("getting first unread message");
-
-	if (getFolderTableModel() == null)
-	    return -1;
-
-	try {
-	    int countUnread = 0;
-	    int i;
-	    if (unreadCount > 0) {
+ 	    System.out.println("getting first unread message");
+	
+ 	if (getFolderTableModel() == null)
+ 	    return -1;
+	
+ 	try {
+ 	    int countUnread = 0;
+ 	    int i;
+ 	    if (unreadCount > 0) {
+		
+		// one part brute, one part force, one part ignorance.
+		
 		Message[] messages = getFolder().getMessages();
 		for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
 		    if (!(messages[i].isSet(Flags.Flag.SEEN))) 
-		    countUnread++;
+			countUnread++;
 		}
 		if (Pooka.isDebug())
 		    System.out.println("Returning " + i);
 		return i + 1;
-	    } else { 
-		if (Pooka.isDebug())
-		    System.out.println("Returning -1");
-		return -1;
-	    }
+    } else { 
+	if (Pooka.isDebug())
+	    System.out.println("Returning -1");
+	return -1;
+    }
 	} catch (MessagingException me) {
 	    if (Pooka.isDebug())
 		System.out.println("Messaging Exception.  Returning -1");
 	    return -1;
 	}
     }
-
+    
     /**
      * This updates the children of the current folder.  Generally called
      * when the folderList property is changed.
@@ -999,7 +1011,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		
 	    }
 	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
-				     }
+    }
 	
     public void messagesRemoved(MessageCountEvent e) {
 	if (Pooka.isDebug())

@@ -66,8 +66,10 @@ public class PopInboxFolderInfo extends FolderInfo {
 	    sysProps.setProperty("mail.mbox.userhome", userHomeName);
 	    Session session = javax.mail.Session.getInstance(sysProps, Pooka.defaultAuthenticator);
 
-	    System.out.println("session.getProperty(mail.mbox.inbox) = " + session.getProperty("mail.mbox.inbox"));
-	    System.out.println("url is " + url);
+	    if (Pooka.isDebug()) {
+		System.out.println("session.getProperty(mail.mbox.inbox) = " + session.getProperty("mail.mbox.inbox"));
+		System.out.println("url is " + url);
+	    }
 	    popStore = session.getStore(url);
 	} catch (NoSuchProviderException nspe) {
 	    nspe.printStackTrace();
