@@ -433,6 +433,18 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   }
 
 
+  /**
+   * Returns the current EditorPane being used.
+   */
+  public JTextPane getCurrentEditorPane() {
+    if (editorStatus == WITHOUT_ATTACHMENTS) {
+      return editorPane;
+    } else {
+      return otherEditorPane;
+    }
+  }
+  
+
   
   //------- Actions ----------//
   

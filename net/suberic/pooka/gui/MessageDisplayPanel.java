@@ -66,9 +66,10 @@ public abstract class MessageDisplayPanel extends JPanel {
     if (matchSucceeded) {
       int start = currentMatcher.start();
       int end = currentMatcher.end();
-      editorPane.setCaretPosition(start);
+      JTextPane currentPane = getCurrentEditorPane();
+      currentPane.setCaretPosition(start);
       System.out.println("moving caret position to " + start);
-      editorPane.moveCaretPosition(end);
+      currentPane.moveCaretPosition(end);
       System.out.println("moving carent position to " + end);
     }
   }
@@ -81,8 +82,9 @@ public abstract class MessageDisplayPanel extends JPanel {
     if (matchSucceeded) {
       int start = currentMatcher.start();
       int end = currentMatcher.end();
-      editorPane.setCaretPosition(start);
-      editorPane.moveCaretPosition(end);
+      JTextPane currentPane = getCurrentEditorPane();
+      currentPane.setCaretPosition(start);
+      currentPane.moveCaretPosition(end);
     }
   }
 
@@ -100,7 +102,7 @@ public abstract class MessageDisplayPanel extends JPanel {
     // otherwise make a new pattern/matcher.
 
     Pattern p = Pattern.compile(regString);
-    javax.swing.text.Document currentDoc = editorPane.getDocument();
+    javax.swing.text.Document currentDoc = getCurrentEditorPane().getDocument();
 
     try {
       currentMatcher = p.matcher(currentDoc.getText(0, currentDoc.getLength()));
@@ -218,6 +220,14 @@ public abstract class MessageDisplayPanel extends JPanel {
   }
   
   public JTextPane getEditorPane() {
+    return editorPane;
+  }
+  
+
+  /**
+   * Returns the current EditorPane being used.
+   */
+  public JTextPane getCurrentEditorPane() {
     return editorPane;
   }
   
