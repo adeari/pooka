@@ -12,6 +12,7 @@ import java.util.*;
 import net.suberic.util.gui.*;
 import net.suberic.util.event.*;
 import net.suberic.util.thread.*;
+import net.suberic.util.swing.*;
 
 /**
  * This basically is just the GUI representation of the Messages in
@@ -59,12 +60,16 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
 
 	public void updateMessageCount() {
-	    try {
-		messageCount.setText(getFolderInfo().getFolder().getUnreadMessageCount() + " " + Pooka.getProperty("FolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getFolder().getMessageCount() + " " + Pooka.getProperty("FolderStatusBar.totalMessages", "Total"));
-	    } catch (MessagingException me) {
-	    }
+	    SwingUtilities.invokeLater(new RunnableAdapter() {
+		    public void run() {
+			try {
+			    messageCount.setText(getFolderInfo().getFolder().getUnreadMessageCount() + " " + Pooka.getProperty("FolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getFolder().getMessageCount() + " " + Pooka.getProperty("FolderStatusBar.totalMessages", "Total"));
+			} catch (MessagingException me) {
+			}
+		    }
+		});
 	}
-    } // end internal class StatusBar
+	} // end internal class StatusBar
 
     /**
      * Creates a Folder window from the given Folder.
@@ -176,6 +181,12 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
     }
 
+    /**
+     * This method takes the currently selected row(s) and returns the
+     * appropriate MessageProxy object.
+     *
+     * If no rows are selected, null is returned.
+     */
     public MessageProxy getSelectedMessage() {
 	int rowsSelected = messageTable.getSelectedRowCount();
 
@@ -192,10 +203,16 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
     }
 
+    /**
+     * This resets the size to that of the parent component.
+     */
     public void resize() {
 	this.setSize(getParent().getSize());
     }
 
+    /**
+     * This closes the FolderWindow.
+     */
     public void closeFolderWindow(){
 	try {
 	    this.setClosed(true);
@@ -203,6 +220,9 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
     }
 
+    /**
+     * This expunges all the messages marked as deleted in the folder.
+     */
     public void expungeMessages() {
 	try {
 	    getFolderInfo().getFolder().expunge();

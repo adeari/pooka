@@ -37,8 +37,6 @@ a menu option and from the 'open with' dialog.
 
 *) create a Trash folder.
 
-*) make the DesktopPane scroll/resize properly. -- almost done.
-
 after alpha 2
 ----------------
 
@@ -62,6 +60,9 @@ entered through a propertyEditor.
 *) delete for multiple messages takes way too long.
 
 *) takes too long to open a window where there are a lot of new messages.
+
+*) make the scrolling work properly for all border cases, such as a single new
+window at -5, -5.
 
 *) fix the display of the messages in the FolderWindow--right now, you get
 too much date info, not enough Subject.

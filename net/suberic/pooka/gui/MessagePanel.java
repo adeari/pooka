@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
+import net.suberic.util.swing.RunnableAdapter;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -122,26 +123,37 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * de-iconified (if necessary) and selected.
      */
     public void openMessageWindow(MessageProxy m) {
-	
-	MessageWindow newMessageWindow;
-	newMessageWindow = m.getMessageWindow();
-	if (newMessageWindow == null) {
-	    newMessageWindow = new ReadMessageWindow(this, m);
-	    m.setMessageWindow(newMessageWindow);
-	    this.add(newMessageWindow);
-	    newMessageWindow.setVisible(true);
-	} else {
-	    if (newMessageWindow.isIcon())
-		try {
-		    newMessageWindow.setIcon(false);
-		} catch (java.beans.PropertyVetoException e) {
-		} 
+	boolean newMessage = false;
+	MessageWindow messageWindow = m.getMessageWindow();
+	if (messageWindow == null) {
+	    messageWindow = new ReadMessageWindow(this, m);
+	    m.setMessageWindow(messageWindow);
+	    newMessage = true;
 	}
 
-	try {
-	    newMessageWindow.setSelected(true);
-	} catch (java.beans.PropertyVetoException e) {
-	}
+	final MessageWindow newMessageWindow = messageWindow;
+	final boolean isNew = newMessage;
+
+	SwingUtilities.invokeLater(new RunnableAdapter() {
+		public void run() {
+		    if (isNew) {
+			MessagePanel.this.add(newMessageWindow);
+			newMessageWindow.setVisible(true);
+		    } else {
+			if (newMessageWindow.isIcon())
+			    try {
+				newMessageWindow.setIcon(false);
+			    } catch (java.beans.PropertyVetoException e) {
+			    } 
+		    }
+		    
+		    try {
+			newMessageWindow.setSelected(true);
+		    } catch (java.beans.PropertyVetoException e) {
+		    }
+		}
+	    });
+	
     }
 
     public void createNewMessage() {
@@ -194,8 +206,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public Action[] defaultActions = {
-	new newMessageAction(), 
-	new testAction()
+	new newMessageAction()
     };
 
     public Action[] getDefaultActions() {
@@ -225,16 +236,6 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
     }
 
-    public class testAction extends AbstractAction {
-	testAction() {
-	    super("test");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    ((net.suberic.util.swing.ScrollingDesktopManager)MessagePanel.this.getDesktopManager()).printstats((MessagePanel.this), Pooka.getMainPanel().getMessageScrollPane(), "test" );
-	}
-
-    }
 }
 
 

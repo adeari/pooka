@@ -1,5 +1,7 @@
 package net.suberic.pooka.gui;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.SwingUtilities;
+import net.suberic.util.swing.RunnableAdapter;
 import java.util.Vector;
 
 /**
@@ -85,21 +87,48 @@ public class FolderTableModel extends AbstractTableModel {
      */
     
     public synchronized void addOrRemoveRows(Vector changedMsg, int addOrRem) {
-	int firstRow, lastRow;
-
+	final int firstRow, lastRow;
+	
 	if (changedMsg != null && changedMsg.size() > 0) {
 	    if (addOrRem == FolderTableModel.ADD_MESSAGES) {
 		firstRow = data.size() + 1;
 		lastRow = firstRow + changedMsg.size() -1;
 		
 		data.addAll(changedMsg);
-		fireTableRowsInserted(firstRow, lastRow);
+		if (! SwingUtilities.isEventDispatchThread())
+		    try {
+			SwingUtilities.invokeAndWait(new RunnableAdapter() {
+				public void run() {
+				    
+				    fireTableRowsInserted(firstRow, lastRow);
+				}
+			    });
+		    } catch (Exception e) {
+		    }
+		else 
+		    fireTableRowsInserted(firstRow, lastRow);
+		    
+		
 	    } else if (addOrRem == FolderTableModel.REMOVE_MESSAGES) {
 		for (int i = 0; i < changedMsg.size() ; i++) {
-		    int rowNumber = data.indexOf(changedMsg.elementAt(i));
+		    final int rowNumber = data.indexOf(changedMsg.elementAt(i));
 		    if (rowNumber > -1) {
-			fireTableRowsDeleted(rowNumber, rowNumber);
 			data.removeElement(changedMsg.elementAt(i));
+
+			if ( ! SwingUtilities.isEventDispatchThread())
+			    try {
+				SwingUtilities.invokeAndWait(new RunnableAdapter() {
+					public void run() {
+					    
+					    fireTableRowsDeleted(rowNumber, rowNumber);
+					}
+				    });
+			    } catch (Exception e) {
+			    }
+			else
+			    fireTableRowsDeleted(rowNumber, rowNumber);
+			
+			
 		    }
 		}
 	    }
@@ -107,8 +136,6 @@ public class FolderTableModel extends AbstractTableModel {
 	    System.out.println("got an empty/null added or deleted event.");
 	}
     }
-    
-
 }
 
 
