@@ -4,6 +4,9 @@ import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
+import javax.swing.*;
+
+import net.suberic.pooka.FolderInfo;
 
 /**
  * A set of utility methods to use with drag and drop.
@@ -82,5 +85,26 @@ public class DndUtils {
     }
     
     return null;
+  }
+
+  /**
+   * Gets the FolderInfo from the given Component.
+   */
+  public static FolderInfo getFolderInfo(JComponent c) {
+    try {
+	Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
+	if (o != null) {
+	  return ((net.suberic.pooka.gui.FolderDisplayPanel) o).getFolderInfo();
+	} 
+
+      o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
+      if (o != null) {
+	System.err.println("got FolderPanel...");
+      } else {
+      }
+      return null;
+    } catch (Exception e) {
+      return null;
+    }
   }
 }

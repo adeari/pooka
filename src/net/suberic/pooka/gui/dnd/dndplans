@@ -1,4 +1,4 @@
-read message window
+read message window (attachment panel)
   export;  attachment(s) (as filelist)
 	   default swing editor stuff (text)
   import:  nothing
@@ -19,4 +19,12 @@ folder node
 
 attachment panel
 	see read message window.
+
+testing:
+
+1)  drag and drop for all.
+	move and copy
+2)  cut, copy, and paste for all.
+3)  enable/disable drag and drop.
+
 

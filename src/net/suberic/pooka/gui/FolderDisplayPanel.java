@@ -96,7 +96,7 @@ public class FolderDisplayPanel extends JPanel {
     
     Pooka.getHelpBroker().enableHelpKey(this, "ui.folderWindow", Pooka.getHelpBroker().getHelpSet());
 
-    setTransferHandler(new net.suberic.pooka.gui.dnd.MessageTransferHandler());
+    setTransferHandler(new net.suberic.pooka.gui.dnd.FolderTableTransferHandler());
 
   }
   

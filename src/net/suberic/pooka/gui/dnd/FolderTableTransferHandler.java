@@ -11,9 +11,9 @@ import net.suberic.pooka.*;
 import net.suberic.pooka.gui.*;
 
 /**
- * A TransferHandler for a MessageProxy object.
+ * A TransferHandler for a FolderTable.
  */
-public class MessageTransferHandler extends TransferHandler {
+public class FolderTableTransferHandler extends TransferHandler {
   private DataFlavor messageFlavor;
   private boolean shouldRemove;
   
@@ -23,7 +23,7 @@ public class MessageTransferHandler extends TransferHandler {
       return false;
     } else {
       System.err.println("trying to import...");
-      FolderInfo fi = getFolderInfo(c);
+      FolderInfo fi = DndUtils.getFolderInfo(c);
       if (fi != null) {
 	System.err.println("got folder " + fi);
 	try {
@@ -119,24 +119,4 @@ public class MessageTransferHandler extends TransferHandler {
     return false;
   }
 
-  /**
-   * Gets the FolderInfo from the given Component.
-   */
-  public FolderInfo getFolderInfo(JComponent c) {
-    try {
-      Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
-      if (o != null) {
-	return ((FolderDisplayPanel) o).getFolderInfo();
-      } 
-      
-      o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderNode"), c);
-      if (o != null) {
-	return ((FolderNode) o).getFolderInfo();
-      } 
-      
-      return null;
-    } catch (Exception e) {
-      return null;
-    }
-  }
 }

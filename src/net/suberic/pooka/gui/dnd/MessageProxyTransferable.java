@@ -4,6 +4,7 @@ import net.suberic.pooka.*;
 import net.suberic.pooka.gui.*;
 
 import java.awt.datatransfer.*;
+
 import java.io.IOException;
 
 public class MessageProxyTransferable implements Transferable {
@@ -19,7 +20,8 @@ public class MessageProxyTransferable implements Transferable {
   }
 
   MessageProxy mMessageProxy = null;
-  
+  int mActionType = javax.swing.TransferHandler.COPY;
+
   public MessageProxyTransferable(MessageProxy pMessageProxy) {
     setMessageProxy(pMessageProxy);
   }
@@ -57,5 +59,19 @@ public class MessageProxyTransferable implements Transferable {
    */
   public void setMessageProxy(MessageProxy pMessageProxy) {
     mMessageProxy = pMessageProxy;
+  }
+
+  /**
+   * Sets move or copy value.
+   */
+  public void setActionType(int pActionType) {
+    mActionType = pActionType;
+  }
+
+  /**
+   * Gets the action type for this Transferable.
+   */
+  public int getActionType() {
+    return mActionType;
   }
 }
