@@ -44,14 +44,21 @@ public class MessagePanel extends JDesktopPane {
 	this.setDesktopManager(new ExtendedDesktopManager());
     }
 
+    /**
+     * This opens a new FolderWindow for the given FolderInfo.
+     */
     public void openFolderWindow(FolderInfo f) {
+
+	getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	FolderWindow newFolderWindow = new FolderWindow(f, this);
 	newFolderWindow.pack();
 	this.add(newFolderWindow);
 	try {
 	    newFolderWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
-	}
+	} 
+
+	getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
     public void openMessageWindow(MessageProxy m) {
