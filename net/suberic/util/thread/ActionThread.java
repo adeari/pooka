@@ -11,73 +11,81 @@ import java.util.Vector;
  */
 public class ActionThread extends Thread {
 
-    boolean stopMe = false;
+  boolean stopMe = false;
 
-    public ActionThread(String threadName) {
-	super(threadName);
-    }
-
-    public class ActionEventPair {
-	public Action action;
-	public ActionEvent event;
-
-	public ActionEventPair(Action newAction, ActionEvent newEvent) {
-	    action=newAction;
-	    event=newEvent;
-	}
-    }
-
-    // the action queue.
-    private Vector actionQueue = new Vector();
+  Object runLock = new Object();
+  
+  public ActionThread(String threadName) {
+    super(threadName);
+  }
+  
+  public class ActionEventPair {
+    public Action action;
+    public ActionEvent event;
     
-    private boolean sleeping;
-
-    public void run() {
-	while(! stopMe ) {
-	    sleeping = false;
-	    ActionEventPair pair = popQueue();
-	    while (pair != null) {
-		try {
-		    pair.action.actionPerformed(pair.event);
-		} catch (Exception e) {
-		    e.printStackTrace();
-		}
-		pair = popQueue();
-	    }
-	    try {
-		sleeping = true;
-		while (true)
-		    Thread.sleep(100000000);
-	    } catch (InterruptedException ie) {
-		sleeping = false;
-	    }
-	}
+    public ActionEventPair(Action newAction, ActionEvent newEvent) {
+      action=newAction;
+      event=newEvent;
     }
-
-    /**
-     * This returns the top item in the action queue, if one is available.
-     * If not, the method returns null.
-     */
-    public synchronized ActionEventPair popQueue() {
-	if (actionQueue.size() > 0) {
-	    return (ActionEventPair)actionQueue.remove(0);
+  }
+  
+  // the action queue.
+  private Vector actionQueue = new Vector();
+  
+  private boolean sleeping;
+  
+  public void run() {
+    while(! stopMe ) {
+      sleeping = false;
+      ActionEventPair pair = popQueue();
+      while (pair != null) {
+	try {
+	  synchronized(runLock) {
+	    pair.action.actionPerformed(pair.event);
+	  }
+	} catch (Exception e) {
+	  e.printStackTrace();
 	}
-	else {
-	    return null;
-	}
+	pair = popQueue();
+      }
+      try {
+	sleeping = true;
+	while (true)
+	  Thread.sleep(100000000);
+      } catch (InterruptedException ie) {
+	sleeping = false;
+      }
     }
-
-    /**
-     * This adds an item to the queue.  It also starts up the Thread if it's
-     * not already running.
-     */
-    public synchronized void addToQueue(Action action, ActionEvent event) {
-	actionQueue.addElement(new ActionEventPair(action, event));
-	if (sleeping)
-	    this.interrupt();
-    } 	
-
-    public void setStop(boolean newValue) {
-	stopMe = newValue;
+  }
+  
+  /**
+   * This returns the top item in the action queue, if one is available.
+   * If not, the method returns null.
+   */
+  public synchronized ActionEventPair popQueue() {
+    if (actionQueue.size() > 0) {
+      return (ActionEventPair)actionQueue.remove(0);
     }
+    else {
+      return null;
+    }
+  }
+  
+  /**
+   * This adds an item to the queue.  It also starts up the Thread if it's
+   * not already running.
+   */
+  public synchronized void addToQueue(Action action, ActionEvent event) {
+    actionQueue.addElement(new ActionEventPair(action, event));
+    if (sleeping)
+      this.interrupt();
+  } 	
+  
+  public void setStop(boolean newValue) {
+    stopMe = newValue;
+  }
+
+  public Object getRunLock() {
+    return runLock;
+  }
 }
