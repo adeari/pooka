@@ -27,117 +27,110 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
   Session session;
   ConfigurableKeyBinding keyBindings;
   MetalTheme currentTheme = null;
+  DropTarget mDropTarget = null;
+  TransferHandler mTransferHandler = null;
 
-    /**
-     * This creates and configures a new FolderPanel.
-     */
-    public FolderPanel(MainPanel newMainPanel) {
-	mainPanel=newMainPanel;
+  /**
+   * This creates and configures a new FolderPanel.
+   */
+  public FolderPanel(MainPanel newMainPanel) {
+    mainPanel=newMainPanel;
+    
+    setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.hsize", "200")), Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
 
-	setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.hsize", "200")), Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
-
-	folderModel = new DefaultTreeModel(createTreeRoot());
-	folderTree = new JTree(folderModel);
-
-	this.getViewport().add(folderTree);
-
-	folderTree.addMouseListener(new MouseAdapter() {
-		
-	    public void mouseClicked(MouseEvent e) {
-		if (e.getClickCount() == 2) {
-		    MailTreeNode tmpNode = getSelectedNode();
-		    if (tmpNode != null) {
-			String actionCommand = Pooka.getProperty("FolderPanel.2xClickAction", "file-open");
-			Action clickAction = getSelectedNode().getAction(actionCommand);
-			if (clickAction != null ) {
-			    clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
-			} 
-
-		    }
-		}
+    folderModel = new DefaultTreeModel(createTreeRoot());
+    folderTree = new JTree(folderModel);
+    
+    this.getViewport().add(folderTree);
+    
+    folderTree.addMouseListener(new MouseAdapter() {
+	
+	public void mouseClicked(MouseEvent e) {
+	  if (e.getClickCount() == 2) {
+	    MailTreeNode tmpNode = getSelectedNode();
+	    if (tmpNode != null) {
+	      String actionCommand = Pooka.getProperty("FolderPanel.2xClickAction", "file-open");
+	      Action clickAction = getSelectedNode().getAction(actionCommand);
+	      if (clickAction != null ) {
+		clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+	      } 
+	      
 	    }
-
-	    public void mousePressed(MouseEvent e) {
-	      if (e.isPopupTrigger()) {
-		// see if anything is selected
-		TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
-		if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
-		  // this means that we're clicking on a node.  make
-		  // sure that it's selected.
-		  
-		  if (!folderTree.isPathSelected(path))
-		    folderTree.setSelectionPath(path);
-		}
-		
-		MailTreeNode tmpNode = getSelectedNode();
-		if (tmpNode != null) {
-		  tmpNode.showPopupMenu(folderTree, e);
-		  
-		}
-	      }
+	  }
+	}
+	
+	public void mousePressed(MouseEvent e) {
+	  if (e.isPopupTrigger()) {
+	    // see if anything is selected
+	    TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
+	    if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
+	      // this means that we're clicking on a node.  make
+	      // sure that it's selected.
+	      
+	      if (!folderTree.isPathSelected(path))
+		folderTree.setSelectionPath(path);
 	    }
 	    
-	    public void mouseReleased(MouseEvent e) {
-	      if (e.isPopupTrigger()) {
-		// see if anything is selected
-		TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
-		if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
-		  // this means that we're clicking on a node.  make
-		  // sure that it's selected.
-		  
-		  if (!folderTree.isPathSelected(path))
-		    folderTree.setSelectionPath(path);
-		}
-		
-		MailTreeNode tmpNode = getSelectedNode();
-		if (tmpNode != null) {
-		  tmpNode.showPopupMenu(folderTree, e);
-		  
-		}
-	      }
+	    MailTreeNode tmpNode = getSelectedNode();
+	    if (tmpNode != null) {
+	      tmpNode.showPopupMenu(folderTree, e);
+	      
 	    }
-	  });
-
-	folderTree.addTreeSelectionListener(new TreeSelectionListener() {
-	    public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
-	      getMainPanel().refreshActiveMenus();
-	      getMainPanel().refreshCurrentUser();
-	      keyBindings.setActive(getActions());
-	    }
-	  });
+	  }
+	}
 	
-	folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
-
-	folderTree.setDropTarget(new DropTarget() {
-	    public void dragOver(DropTargetDragEvent dtde) {
-	      Point e = dtde.getLocation();
-
-	      TreePath path = folderTree.getClosestPathForLocation(e.x, e.y);
-	      if (folderTree.getPathBounds(path).contains(e.x, e.y)) {
-		// this means that we're over a node.  make it selected.
-		
-		if (!folderTree.isPathSelected(path))
-		  folderTree.setSelectionPath(path);
-
-	      }
+	public void mouseReleased(MouseEvent e) {
+	  if (e.isPopupTrigger()) {
+	    // see if anything is selected
+	    TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
+	    if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
+	      // this means that we're clicking on a node.  make
+	      // sure that it's selected.
+	      
+	      if (!folderTree.isPathSelected(path))
+		folderTree.setSelectionPath(path);
 	    }
-	  });
+	    
+	    MailTreeNode tmpNode = getSelectedNode();
+	    if (tmpNode != null) {
+	      tmpNode.showPopupMenu(folderTree, e);
+	      
+	    }
+	  }
+	}
+      });
+    
+    folderTree.addTreeSelectionListener(new TreeSelectionListener() {
+	public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
+	  getMainPanel().refreshActiveMenus();
+	  getMainPanel().refreshCurrentUser();
+	  keyBindings.setActive(getActions());
+	}
+      });
+    
+    folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
+    
+    mDropTarget = new FolderTreeDropTarget();
+    mTransferHandler = new net.suberic.pooka.gui.dnd.FolderNodeTransferHandler();
+    folderTree.setDropTarget(mDropTarget);
 
-	keyBindings = new ConfigurableKeyBinding(this, "FolderPanel.keyBindings", Pooka.getResources());
-	keyBindings.setActive(getActions());
+    folderTree.setTransferHandler(mTransferHandler);
 
-	// if the FolderPanel itself ever gets focus, pass it on to the
-	// folderTree.
-
-	this.addFocusListener(new FocusAdapter() {
-		public void focusGained(FocusEvent e) {
-		    folderTree.requestFocus();
-		}
-	    });
+    keyBindings = new ConfigurableKeyBinding(this, "FolderPanel.keyBindings", Pooka.getResources());
+    keyBindings.setActive(getActions());
+    
+    // if the FolderPanel itself ever gets focus, pass it on to the
+    // folderTree.
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  folderTree.requestFocus();
+	}
+      });
     
     Pooka.getHelpBroker().enableHelpKey(this, "ui.folderPanel", Pooka.getHelpBroker().getHelpSet());
 
-	this.configureInterfaceStyle();
+    this.configureInterfaceStyle();
     }
 
   /**
@@ -165,16 +158,16 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 	  }
 	}
       };
-
+    
     if (! SwingUtilities.isEventDispatchThread()) {
       SwingUtilities.invokeLater(runMe);
     } else {
       runMe.run();
     }
-
+    
   }
 
- /**
+  /**
    * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
@@ -193,6 +186,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
   public MetalTheme getCurrentTheme() {
     return currentTheme;
   }
+
   /**
    * Sets the Theme that this component is currently using.
    */
@@ -222,52 +216,52 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     }
   }
 
-    /**
-     * This returns the currently highlighted node on the FolderTree.
-     */
-    public MailTreeNode getSelectedNode() {
-	TreePath tp = folderTree.getSelectionPath();
-
-	if (tp != null) {
-	    return (MailTreeNode)tp.getLastPathComponent();
-	} else {
-	    return null;
-	}
+  /**
+   * This returns the currently highlighted node on the FolderTree.
+   */
+  public MailTreeNode getSelectedNode() {
+    TreePath tp = folderTree.getSelectionPath();
+    
+    if (tp != null) {
+      return (MailTreeNode)tp.getLastPathComponent();
+    } else {
+      return null;
     }
-
-    /**
-     * This creates the tree root from the StoreList of the StoreManager.
-     */
-    private MailTreeNode createTreeRoot() {
-	MailTreeNode root = new MailTreeNode("Pooka", this);
-
-	// Get the stores we have listed.
-	String storeID = null;
-
-	Vector allStoreInfos = Pooka.getStoreManager().getStoreList();
-	for (int i = 0; i < allStoreInfos.size(); i++) {
-	    StoreNode storenode = new StoreNode((StoreInfo)allStoreInfos.elementAt(i), this);
-	    root.add(storenode);
-	}
-	
-	Pooka.getStoreManager().addItemListChangeListener(this);
-
-	return root;
+  }
+  
+  /**
+   * This creates the tree root from the StoreList of the StoreManager.
+   */
+  private MailTreeNode createTreeRoot() {
+    MailTreeNode root = new MailTreeNode("Pooka", this);
+    
+    // Get the stores we have listed.
+    String storeID = null;
+    
+    Vector allStoreInfos = Pooka.getStoreManager().getStoreList();
+    for (int i = 0; i < allStoreInfos.size(); i++) {
+      StoreNode storenode = new StoreNode((StoreInfo)allStoreInfos.elementAt(i), this);
+      root.add(storenode);
     }
-
-    /**
-     * refreshStores(e) goes through the list of registered stores and 
-     * compares these to the value of the "Store" property.  If any
-     * stores are no longer listed in that property, they are removed
-     * from the FolderPanel.  If any new stores are found, they are
-     * added to the FolderPanel.
-     *
-     * This function does not add new subfolders to already existing 
-     * Stores.  Use refreshStore(Store) for that.
-     *
-     * This function is usually called in response to a ValueChanged
-     * action on the "Store" property.
-     */
+    
+    Pooka.getStoreManager().addItemListChangeListener(this);
+    
+    return root;
+  }
+  
+  /**
+   * refreshStores(e) goes through the list of registered stores and 
+   * compares these to the value of the "Store" property.  If any
+   * stores are no longer listed in that property, they are removed
+   * from the FolderPanel.  If any new stores are found, they are
+   * added to the FolderPanel.
+   *
+   * This function does not add new subfolders to already existing 
+   * Stores.  Use refreshStore(Store) for that.
+   *
+   * This function is usually called in response to a ValueChanged
+   * action on the "Store" property.
+   */
   public void refreshStores(ItemListChangeEvent e) {
     Item[] removed = e.getRemoved();
     Item[] added = e.getAdded();
@@ -284,37 +278,37 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     for (int i = 0; added != null && i < added.length ; i++) {
       this.addStore((StoreInfo)added[i] , root);
     }
-
+    
     currentTheme = null;
     configureInterfaceStyle();
   }
-
-
-    /**
-     * This creates a new StoreNode from the StoreInfo, and adds that
-     * StoreNode to the root of the FolderTree.
-     */
-    public void addStore(StoreInfo store, MailTreeNode root) {
-	StoreNode storenode = new StoreNode(store, this);
-	root.add(storenode);
-    }
-
-    public MainPanel getMainPanel() {
-	return mainPanel;
-    }
-
-    public JTree getFolderTree() {
-	return folderTree;
-    }
-
-    /**
-     * Specified by interface net.suberic.util.ItemListChangeListener
-     *
-     */
+  
+  
+  /**
+   * This creates a new StoreNode from the StoreInfo, and adds that
+   * StoreNode to the root of the FolderTree.
+   */
+  public void addStore(StoreInfo store, MailTreeNode root) {
+    StoreNode storenode = new StoreNode(store, this);
+    root.add(storenode);
+  }
+  
+  public MainPanel getMainPanel() {
+    return mainPanel;
+  }
+  
+  public JTree getFolderTree() {
+    return folderTree;
+  }
+  
+  /**
+   * Specified by interface net.suberic.util.ItemListChangeListener
+   *
+   */
   public void itemListChanged(ItemListChangeEvent e) {
     refreshStores(e);
   }
-
+  
   /**
    * Gets all of the children of the tree.
    */
@@ -322,7 +316,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     Object root = folderModel.getRoot();
     return parseTree(folderModel, root);
   }
-
+  
   /**
    * parses the tree.
    */
@@ -339,26 +333,85 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     returnValue.add(root);
     return returnValue;
   }
-    /**
-     * Specified by interface net.suberic.pooka.UserProfileContainer
-     */
-   
-    public UserProfile getDefaultProfile() {
-	MailTreeNode selectedNode = getSelectedNode();
 
-	if (selectedNode != null && selectedNode instanceof UserProfileContainer) 
-	    return ((UserProfileContainer)selectedNode).getDefaultProfile();
-	else
-	    return null;
+  /**
+   * Specified by interface net.suberic.pooka.UserProfileContainer
+   */
+  public UserProfile getDefaultProfile() {
+    MailTreeNode selectedNode = getSelectedNode();
+    
+    if (selectedNode != null && selectedNode instanceof UserProfileContainer) 
+      return ((UserProfileContainer)selectedNode).getDefaultProfile();
+    else
+      return null;
+  }
+  
+  public Action[] getActions() {
+    if (getSelectedNode() != null) {
+      return (getSelectedNode().getActions());
+    } else {
+      return null;
     }
+  }
+  
+  /**
+   * Handles drag and drop events over the JTree.
+   */
+  class FolderTreeDropTarget extends DropTarget {
+    public void dragOver(DropTargetDragEvent dtde) {
+      // first see if we accept this drag.
+      if (mTransferHandler.canImport(folderTree, dtde.getCurrentDataFlavors())) {
 
-    public Action[] getActions() {
-	if (getSelectedNode() != null) {
-	    return (getSelectedNode().getActions());
-	} else {
-	    return null;
+	Point e = dtde.getLocation();
+	
+	TreePath path = folderTree.getClosestPathForLocation(e.x, e.y);
+
+	if (folderTree.getPathBounds(path).contains(e.x, e.y)) {
+	  // check to see if this is a folder node or not.  at the moment,
+	  // we only support dropping into folder nodes.
+	  if (path.getLastPathComponent() instanceof FolderNode) {
+	    // this means that we're over a node.  make it selected.
+	    if (!folderTree.isPathSelected(path))
+	      folderTree.setSelectionPath(path);
+
+	    // and, since we can support dropping here, offer this as a
+	    // drop target.
+
+	    
+	  }
 	}
+      }
     }
+
+    public void drop(DropTargetDropEvent dtde) {
+      boolean accept = false;
+      // first see if we accept this drag.
+      if (mTransferHandler.canImport(folderTree, dtde.getCurrentDataFlavors())) {
+	
+	Point e = dtde.getLocation();
+	
+	TreePath path = folderTree.getClosestPathForLocation(e.x, e.y);
+	
+	if (folderTree.getPathBounds(path).contains(e.x, e.y)) {
+	  // check to see if this is a folder node or not.  at the moment,
+	  // we only support dropping into folder nodes.
+	  if (path.getLastPathComponent() instanceof FolderNode) {
+	    // this means that we're over a node.  make it selected.
+	    if (!folderTree.isPathSelected(path))
+	      folderTree.setSelectionPath(path);
+	    
+	    // and now drop here.
+	    accept = true;
+	    dtde.acceptDrop(dtde.getDropAction());
+	  }
+	}
+      }
+
+      if (! accept)
+	dtde.rejectDrop();
+    }
+  }
+
 }
 
 
