@@ -16,6 +16,8 @@ public class UserProfile extends Object implements ValueChangeListener {
     public boolean signatureFirst = true;
     private SignatureGenerator sigGenerator;
 
+    private Vector excludeAddresses;
+
     static Vector profileList = new Vector();
     static Vector mailPropertiesMap = null;
 
@@ -59,6 +61,11 @@ public class UserProfile extends Object implements ValueChangeListener {
 	    sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
 	    sigGenerator=createSignatureGenerator();
 
+	    String fromAddr = (String)mailProperties.get("From");
+	    excludeAddresses = new Vector();
+	    excludeAddresses.add(fromAddr);
+	    Vector excludeProp = mainProperties.getPropertyAsVector("UserProfile." + name + ".excludeAddresses", "");
+	    excludeAddresses.addAll(excludeProp);
 	}
 
     }
@@ -139,6 +146,52 @@ public class UserProfile extends Object implements ValueChangeListener {
 		throw new MessagingException("", uee);
 	    }
 	}
+    }
+
+    /**
+     * This removes the email addresses that define this user from the
+     * given message's to fields.
+     */
+    public void removeFromAddress(Message m) {
+	System.out.println("removing from address.");
+	try {
+	    Address[] toRecs = m.getRecipients(Message.RecipientType.TO);
+	    Address[] ccRecs = m.getRecipients(Message.RecipientType.CC);
+	    Address[] bccRecs = m.getRecipients(Message.RecipientType.BCC);
+	    toRecs = filterAddressArray(toRecs);
+	    ccRecs = filterAddressArray(ccRecs);
+	    bccRecs = filterAddressArray(bccRecs);
+	    
+	    m.setRecipients(Message.RecipientType.TO, toRecs);
+	    m.setRecipients(Message.RecipientType.CC, ccRecs);
+	    m.setRecipients(Message.RecipientType.BCC, bccRecs);
+	} catch (MessagingException me) {
+	}
+    }
+
+    private Address[] filterAddressArray(Address[] addresses) {
+	if (addresses != null && addresses.length > 0) {
+	    Vector returnVector = new Vector();
+	    for (int i = 0; i < addresses.length; i++) {
+		String currentAddress = ((InternetAddress) addresses[i]).getAddress();
+		boolean found = false;
+		for (int j = 0; j < excludeAddresses.size() && found == false ; j++) {
+		    String excludeAddr = (String)excludeAddresses.elementAt(j);
+		    if (currentAddress.equals(excludeAddr))
+			found = true;
+		}
+		if (!found)
+		    returnVector.add(addresses[i]);
+	    }
+	    
+	    Object[] retArr = returnVector.toArray();
+	    Address[] returnValue = new Address[retArr.length];
+	    for (int i = 0; i < retArr.length; i++)
+		returnValue[i] = (Address) retArr[i];
+	    
+	    return returnValue;
+	} else
+	    return addresses;
     }
 
     /**

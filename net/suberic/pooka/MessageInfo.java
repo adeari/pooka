@@ -324,6 +324,10 @@ public class MessageInfo {
 	parsedText = prefixMessage(textPart, replyPrefix, parsedIntro);
 	newMsg.setText(parsedText);
 	
+	if (replyAll && Pooka.getProperty("Pooka.excludeSelfInReply", "true").equalsIgnoreCase("true")) {
+	    getDefaultProfile().removeFromAddress(newMsg); 
+	}
+
 	return newMsg;
     }
 

@@ -3,8 +3,6 @@ beta 1
 
 *) add ability to reply/forward with attachments, or as inline, and so forth
 
-*) add the ability for reply-all to exclude your own email address.
-
 *) bug:  send mail seems to be on the awt event thread.
 
 *) bug:  no dialog is shown when you do a save-as for an attachment.
