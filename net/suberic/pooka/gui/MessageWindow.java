@@ -187,10 +187,6 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	inputRow.add(profileCombo);
 	
 	UserProfile selectedProfile = getParentContainer().getMainPanel().getCurrentUser();
-	if (selectedProfile != null)
-	    System.out.println("MessageWindow:  got default Profile " + selectedProfile.getName());
-	else
-	    System.out.println("MessageWindow:  got default Profile null.");
 
 	profileCombo.setSelectedItem(selectedProfile);
 	//	profileCombo.setSelectedItem(getParentContainer().getMainPanel().getDefaultProfile());
@@ -314,7 +310,6 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 	jfc.setMultiSelectionEnabled(false);
 	int a = jfc.showDialog(this, buttonText);
-	System.out.println("filechooser returned " + a + ".  approve-option = " + JFileChooser.APPROVE_OPTION + ".  The file selected (singular) was " + jfc.getSelectedFile() + ".  The length of the file array was " + jfc.getSelectedFiles().length);
 
 	if (a == JFileChooser.APPROVE_OPTION)
 	    return new File[] {jfc.getSelectedFile()};
