@@ -11,9 +11,12 @@
 
 *) fix error display with exception so that you can see the stack trace.
 
-*) printing right now truncates long lines.
-	-- try new jdk1.4 printing system?
-	   - then modify MessagePrinter to break lines at the correct space
+*) printing
+	timing--jtextpane creation should happen after dialog
+		should also show status - loading message, paginating,
+		printing page 1 of...  etc.  should be able to cancel
+		during that.  maybe even a progress bar?
+
 
 *) bug:  on startup, FolderSelectorPane is empty; have to unselect and 
 	reselect to get info.
