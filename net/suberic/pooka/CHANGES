@@ -1,3 +1,9 @@
+020918 release
+--------------
+
+removed a lot of unused image files.  this should make the download at least
+a bit smaller.
+
 fixed the AddressBookEditor so that newly created AddressBooks are 
 editable.  you still have to hit 'apply' first to create the address book,
 though.
