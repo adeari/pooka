@@ -7,7 +7,6 @@ import java.util.Vector;
 import java.io.*;
 import javax.mail.*;
 import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
 
 /**
  * A simple cache.
@@ -419,9 +418,17 @@ public class SimpleFileCache implements MessageCache {
      */
     protected DataHandler getHandlerFromCache(long uid) {
 	File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
-	if (f.exists())
-	    return new DataHandler(new FileDataSource(f));
-	else
+	if (f.exists()) {
+	    try {
+		FileInputStream fis = new FileInputStream(f);
+		MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
+		javax.activation.DataSource source = new MimePartDataSource (mm);
+		return new DataHandler(source);
+	    } catch (Exception e) {
+		return null;
+	    } 
+	    //return new DataHandler(new FileDataSource(f));
+	} else
 	    return null;
     }
 
