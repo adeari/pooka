@@ -31,7 +31,10 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     sourceBundle = bundle;
 
     property=newProperty;
-    book = Pooka.getAddressBookManager().getAddressBook(property);
+    // we're going to have "AddressBook." at the beginning, and 
+    // ".addressListEditor" at the end...
+    String bookName = property.substring(12, property.length() - 18);
+    book = Pooka.getAddressBookManager().getAddressBook(bookName);
 
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.setBorder(BorderFactory.createEtchedBorder());
@@ -128,7 +131,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    * Brings up an editor for the current entry.
    */
   public void editEntry(AddressBookEntry entry) {
-
+    
   }
 
   /**

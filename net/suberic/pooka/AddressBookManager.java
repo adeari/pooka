@@ -154,8 +154,8 @@ public class AddressBookManager implements ValueChangeListener {
    * Creates an address book.
    */
   public AddressBook createAddressBook(String id) {
-    String type = Pooka.getProperty(id + ".type", "");
-    if (type.equalsIgnoreCase("vcard")) {
+    String type = Pooka.getProperty("AddressBook." + id + ".type", "");
+    if (type.equalsIgnoreCase("file")) {
       AddressBook returnValue = new net.suberic.pooka.vcard.VcardAddressBook();
       returnValue.configureAddressBook(id);
       return returnValue;
@@ -168,6 +168,15 @@ public class AddressBookManager implements ValueChangeListener {
    * This returns the AddressBook which corresponds to the given name.
    */
   public AddressBook getAddressBook(String name) {
+    if (addressBookList == null)
+      return null;
+
+    for (int i = 0; i < addressBookList.size(); i++) {
+      AddressBook currentBook = (AddressBook) addressBookList.elementAt(i);
+      if (currentBook.getAddressBookID().equals(name))
+	return currentBook;
+    }
+
     return null;
   }
   

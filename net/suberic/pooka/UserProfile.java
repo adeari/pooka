@@ -69,10 +69,10 @@ public class UserProfile extends Object implements ValueChangeListener {
       excludeAddresses.addAll(excludeProp);
     }
     
-    String addressBookId = mainProperties.getProperty("UserProfile." + name + ".AddressBook", "");
-    if (!addressBookId.equals(""))
+    String addressBookId = mainProperties.getProperty("UserProfile." + name + ".addressBook", "");
+    if (!addressBookId.equals("")) {
       addressBook = Pooka.getAddressBookManager().getAddressBook(addressBookId);
-    else
+    } else
       addressBook = null;
   }
   

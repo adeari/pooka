@@ -44,7 +44,7 @@ public interface AddressBookEntry {
   /**
    * Gets the PersonalName property associated with this AddressBookEntry.
    */
-  public void  setPersonalName(String newName);
+  public void setPersonalName(String newName);
 
   /**
    * Gets the FirstName property associated with this AddressBookEntry.

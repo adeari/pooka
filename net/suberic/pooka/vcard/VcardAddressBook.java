@@ -38,7 +38,8 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   
   public void configureAddressBook(String newAddressBookID) {
     addressBookID = newAddressBookID;
-    fileName = Pooka.getProperty(addressBookID + ".fileName", "");
+    fileName = Pooka.getProperty("AddressBook." + addressBookID + ".filename", "");
+
     try {
       loadAddressBook();
     } catch (Exception e) {
@@ -156,6 +157,9 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns all of the InternetAddresses which match the given String.
    */
   public AddressBookEntry[] match(String matchString) {
+    if (orderedList.length < 1)
+      return new AddressBookEntry[0];
+
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
@@ -214,6 +218,9 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns the InternetAddress which follows the given String alphabetically.
    */
   public AddressBookEntry getNextMatch(String matchString) {
+    if (orderedList.length < 1)
+      return null;
+
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
@@ -234,6 +241,9 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * alphabetically.
    */
   public AddressBookEntry getPreviousMatch(String matchString) {
+    if (orderedList.length < 1)
+      return null;
+
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
