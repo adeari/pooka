@@ -4,6 +4,7 @@ import net.suberic.util.gui.*;
 import net.suberic.util.VariableBundle;
 
 import javax.swing.*;
+import java.awt.Color;
 
 import java.util.Hashtable;
 
@@ -47,6 +48,13 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
   ImageIcon signatureVerifiedIcon;
   ImageIcon signatureBadIcon;
   ImageIcon signatureFailedVerificationIcon;
+
+  // the various status colors
+  Color signedEncryptedColor = Color.MAGENTA;
+  Color signedColor = Color.GREEN;
+  Color encryptedColor = Color.BLUE;
+  Color uncheckedColor = Color.YELLOW;
+  Color failedColor = Color.RED;
 
   // the current status
   int currentCryptStatus = NOT_ENCRYPTED;
@@ -267,30 +275,70 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
 
     if (currentCryptStatus == NOT_ENCRYPTED || currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
       if (currentSigStatus == NOT_SIGNED) {
-	if (currentCryptStatus == NOT_ENCRYPTED)
+	if (currentCryptStatus == NOT_ENCRYPTED) {
 	  setIcon(notEncryptedIcon);
-	else
+	} else {
 	  setIcon(decryptedSuccessfullyIcon);
+	  setToolBarColor(encryptedColor);
+	}
       } else if (currentSigStatus == UNCHECKED_SIGNED) {
 	setIcon(uncheckedSignedIcon);
+	  setToolBarColor(uncheckedColor);
       } else if (currentSigStatus == SIGNATURE_VERIFIED) {
 	setIcon(signatureVerifiedIcon);
+	if (currentCryptStatus == NOT_ENCRYPTED)
+	  setToolBarColor(signedColor);
+	else 
+	  setToolBarColor(signedEncryptedColor);
       } else if (currentSigStatus == SIGNATURE_BAD) {
 	setIcon(signatureBadIcon);
+	setToolBarColor(failedColor);
       } else if (currentSigStatus == SIGNATURE_FAILED_VERIFICATION) {
 	setIcon(signatureFailedVerificationIcon);
+	setToolBarColor(failedColor);
       }
     } else if (currentCryptStatus == UNCHECKED_ENCRYPTED) {
       setIcon(uncheckedEncryptedIcon);
+      setToolBarColor(uncheckedColor);
     } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
       setIcon(decryptedSuccessfullyIcon);
+      setToolBarColor(encryptedColor);
     } else if (currentCryptStatus == DECRYPTED_UNSUCCESSFULLY) {
       setIcon(decryptedUnsuccessfullyIcon);
+      setToolBarColor(failedColor);
     } else {
       setIcon(notEncryptedIcon);
     }
 
     repaint();
   }
+
+  /**
+   * Sets the toolbar color.
+   */
+  public void setToolBarColor(Color newColor) {
+    /*
+    JToolBar tb = getToolBar();
+    if (tb != null) {
+      tb.setBackground(newColor);
+    } else {
+      System.err.println("toolbar = null.");
+    }
+    */
+    this.setBackground(newColor);
+  }
+
+  /**
+   * Gets the toolbar this Button belongs to.
+   */
+  public JToolBar getToolBar() {
+    try {
+      return (JToolBar) SwingUtilities.getAncestorOfClass(Class.forName("javax.swing.JToolBar"), this);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+  }
+
 }
     

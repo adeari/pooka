@@ -286,7 +286,7 @@ NewMessageWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:Crypto:DisplayStyle:HeaderStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle:Crypto
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
