@@ -221,9 +221,9 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 			int rowsSelected = messageTable.getSelectedRowCount();
 
 			if (rowsSelected == 1) 
-			    selectedMessage = getFolderInfo().getMessageInfo(messageTable.getSelectedRow()).getMessageProxy();
+			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
 			else if (rowsSelected > 1)
-			    selectedMessage = getFolderInfo().getMessageInfo(messageTable.getSelectedRows()[0]).getMessageProxy();
+			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
 
 			((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
 
@@ -310,14 +310,14 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	int rowsSelected = messageTable.getSelectedRowCount();
 
 	if (rowsSelected == 1) 
-	    return (MessageProxy)messageTable.getSelectedRow();
+	    return getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
 	else if (rowsSelected < 1) 
 	    return null;
 	else {
 	    int[] selectedRows = messageTable.getSelectedRows();
 	    MessageProxy[] msgSelected= new MessageProxy[selectedRows.length];
 	    for (int i = 0; i < selectedRows.length; i++) 
-		msgSelected[i] = getFolderInfo().getMessageInfo(selectedRows[i]).getMessageProxy();
+		msgSelected[i] = getFolderInfo().getMessageProxy(selectedRows[i]);
 	    return new MultiMessageProxy(selectedRows, msgSelected, this);
 	}
     }
@@ -462,8 +462,6 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	Action[] returnValue;
 	MessageProxy m = getSelectedMessage();
 
-	System.out.println("got selected message : " + m);
-	
 	if (m != null) 
 	    returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
 	else 

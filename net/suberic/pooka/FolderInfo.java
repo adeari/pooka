@@ -761,12 +761,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // semi-accessor methods.
 
-    public MessageInfo getMessageInfo(int rowNumber) {
-	MessageProxy mp = getFolderTableModel().getMessageProxy(rowNumber);
-	if (mp != null)
-	    return mp.getMessageInfo();
-	else
-	    return null;
+    public MessageProxy getMessageProxy(int rowNumber) {
+	return getFolderTableModel().getMessageProxy(rowNumber);
     }
 
     public MessageInfo getMessageInfo(Message m) {
