@@ -56,6 +56,11 @@ public interface PookaUIFactory extends ErrorHandler {
      */
     public int showConfirmDialog(String message, String title, int type);
 
+   /**
+     * Shows a Confirm dialog with the given Object[] as the Message.
+     */
+    public int showConfirmDialog(Object[] messageComponents, String title, int type);
+
     /**
      * This shows an Input window.
      */

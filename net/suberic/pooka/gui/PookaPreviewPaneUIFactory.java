@@ -134,6 +134,14 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 	return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), messageText, title, type);
     }
 
+
+    /**
+     * Shows a Confirm dialog with the given Object[] as the Message.
+     */
+    public int showConfirmDialog(Object[] messageComponents, String title, int type) {
+	return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), messageComponents, title, type);
+    }
+
     /**
      * This shows an Error Message window.  We include this so that
      * the MessageProxy can call the method without caring abou the

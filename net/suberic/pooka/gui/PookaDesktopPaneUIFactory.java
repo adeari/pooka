@@ -160,6 +160,13 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * Shows a Confirm dialog with the given Object[] as the Message.
+     */
+    public int showConfirmDialog(Object[] messageComponents, String title, int type) {
+	return JOptionPane.showInternalConfirmDialog(messagePanel, messageComponents, title, type);
+    }
+
+    /**
      * This shows an Error Message window.
      */
     public void showError(String errorMessage, String title) {
