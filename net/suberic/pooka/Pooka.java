@@ -6,7 +6,7 @@ import javax.swing.*;
 public class Pooka {
     static public net.suberic.util.VariableBundle resources;
     static public String localrc;
-    static public java.text.SimpleDateFormat dateFormatter;
+    static public DateFormatter dateFormatter;
     static public javax.activation.CommandMap mailcap;
     static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
     static public net.suberic.pooka.gui.MainPanel panel;
@@ -22,7 +22,7 @@ public class Pooka {
 	    resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
 	}
 
-	dateFormatter = new java.text.SimpleDateFormat(Pooka.getProperty("DateFormat", "EEE, MMM dd, yyyy, hh:mm"));
+	dateFormatter = new DateFormatter();
 
 	UserProfile.createProfiles(resources);
 	resources.addValueChangeListener(UserProfile.vcl, "UserProfile");
@@ -75,7 +75,7 @@ public class Pooka {
 	    return false;
     }
 
-    static public java.text.SimpleDateFormat getDateFormatter() {
+    static public DateFormatter getDateFormatter() {
 	return dateFormatter;
     }
 

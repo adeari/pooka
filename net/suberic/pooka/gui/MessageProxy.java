@@ -155,7 +155,7 @@ public class MessageProxy {
      * This gets a particular property (From, To, Date, Subject, or just
      * about any Email Header) from the Message.
      */
-    public String getMessageProperty(String prop, Message msg) {
+    public Object getMessageProperty(String prop, Message msg) {
 	try {
 	    if (prop.equals("From")) {
 		Address[] fromAddr = msg.getFrom();
@@ -164,11 +164,11 @@ public class MessageProxy {
 		else 
 		    return null;
 	    } else if (prop.equals("receivedDate")) {
-		return msg.getReceivedDate().toString();
+		return msg.getReceivedDate();
 	    } else if (prop.equals("recipients")) {
 		return msg.getRecipients(Message.RecipientType.TO).toString();
-	    } else if (prop.equals("sentDate")) {
-		return msg.getSentDate().toString();
+	    } else if (prop.equals("Date")) {
+		return msg.getSentDate();
 	    } else if (prop.equals("Subject")) {
 		return msg.getSubject();
 	    } 
@@ -303,7 +303,7 @@ public class MessageProxy {
 			if (fromAddresses.length > 0 && fromAddresses[0] != null)
 			    intro.replace(index, index +2, fromAddresses[0].toString());
 		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
-			intro.replace(index, index + 2, Pooka.getDateFormatter().format(m.getSentDate()));
+			intro.replace(index, index + 2, Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate()));
 		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
 			intro.replace(index, index + 2, m.getSubject());
 		    } else if (nextChar == '%') {

@@ -3,6 +3,8 @@ import net.suberic.pooka.*;
 import javax.swing.table.*;
 import java.awt.*;
 import javax.swing.*;
+import java.util.Date;
+import java.util.Calendar;
 
 /**
  * This class overrides the default TableCellRenderer in order to
@@ -33,12 +35,49 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 		}
 		return icon;
 	    }
+	} 
+
+	if (value instanceof Date) {
+	    Date displayDate = (Date)value; 
+	    String dateText = null;
+	    Calendar current = Calendar.getInstance();
+	    current.set(Calendar.HOUR_OF_DAY, 0);
+	    current.set(Calendar.MINUTE, 0);
+	    if (current.before(displayDate)) {
+		dateText = Pooka.getDateFormatter().todayFormat.format(displayDate);
+	    } else {
+		current.add(Calendar.DAY_OF_YEAR, (current.getMaximum(Calendar.DAY_OF_WEEK) - 1) * -1);
+		if (current.before(displayDate)) {
+		    dateText = Pooka.getDateFormatter().thisWeekFormat.format(displayDate);
+		} else {
+		    dateText = Pooka.getDateFormatter().shortFormat.format(displayDate);
+		}
+	    }
+
+	    if (returnValue instanceof JLabel)
+		((JLabel)returnValue).setText(dateText);
+	    else {
+		JLabel label = new JLabel(dateText);
+		label.setBackground(returnValue.getBackground());
+		label.setForeground(returnValue.getForeground());
+		label.setFont(returnValue.getFont());
+		returnValue = label;
+	    }
 	}
 
 
+	boolean goodTable = false;
+	FolderTableModel ftm = null;
+
 	if (table.getModel() instanceof FolderTableModel) {
-	    FolderTableModel ftm = (FolderTableModel) table.getModel();
-	    
+	    ftm = (FolderTableModel) table.getModel();
+	    goodTable = true;
+	} else if (table.getModel() instanceof contrib.TableSorter && ((contrib.TableSorter)table.getModel()).getModel() instanceof FolderTableModel) {
+	    ftm = (FolderTableModel)((contrib.TableSorter)table.getModel()).getModel();
+	    goodTable = true;
+	}
+	 
+	if (goodTable) {
 	    if (!(ftm.getMessageProxy(row).isSeen())) {
 		if (getUnreadFont() != null) {
 		    returnValue.setFont(getUnreadFont());
