@@ -64,13 +64,29 @@ public class ThemeManager implements ValueChangeListener, ItemCreator, ItemListC
    * ThemeSupporter.
    */
   public void updateUI(ThemeSupporter ui, java.awt.Component component) throws UnsupportedLookAndFeelException {
+    updateUI(ui, component, false);
+  }
+
+  /**
+   * updates the given Component with the configuration from the given
+   * ThemeSupporter.
+   */
+  public void updateUI(ThemeSupporter ui, java.awt.Component component, boolean force) throws UnsupportedLookAndFeelException {
     MetalTheme newTheme = ui.getTheme(this);
     MetalTheme oldTheme = ui.getCurrentTheme();
-    if (newTheme != oldTheme) {
+    if (! force) {
+      if (newTheme != oldTheme) {
+	applyTheme(newTheme, component);
+	ui.setCurrentTheme(newTheme);
+      }
+    } else {
       applyTheme(newTheme, component);
-      ui.setCurrentTheme(newTheme);
+      if (newTheme != oldTheme) {
+	ui.setCurrentTheme(newTheme);
+      }
     }
   }
+
 
   /**
    * Gets the default configuration for the system.

@@ -223,6 +223,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	      popupMenu.configureComponent("OutboxFolderNode.popupMenu", Pooka.getResources());
 	    else
 		popupMenu.configureComponent("FolderNode.popupMenu", Pooka.getResources());
+
+	    updatePopupTheme();
+
 	}
 
 	popupMenu.setActive(getActions());

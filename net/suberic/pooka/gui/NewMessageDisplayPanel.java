@@ -86,103 +86,6 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
   }
 
-  /**
-   * Configures the style of this DisplayPanel.
-   */
-  public void configureInterfaceStyle(HashMap editorStyle, HashMap labelStyle) {
-
-    /*
-    LinkedList editorList = new LinkedList();
-    LinkedList labelList = new LinkedList();
-    editorList.add(editorPane);
-
-    Enumeration  keys = inputTable.keys();
-    while (keys.hasMoreElements()) {
-      Object value = inputTable.get(keys.nextElement());
-      if (value != null && value instanceof JTextComponent) {
-	editorList.add(value);
-      } else if (value != null && value instanceof JComponent) {
-	labelList.add(value);
-      }
-    }
-
-    // now go through the items in the headerPanel.
-    Component[] inputRows = headerPanel.getComponents();
-    for (int i = 0; i < inputRows.length; i++) {
-      if (inputRows[i] != null && inputRows[i] instanceof Box) {
-	Box currentRow = (Box) inputRows[i];
-	Component[] rowItems = currentRow.getComponents();
-	for (int j = 0; j < rowItems.length; j++) {
-	  if (rowItems[j] != null && rowItems[j] instanceof JLabel) {
-	    labelList.add(rowItems[j]);
-	  }
-	}
-      }
-    }
-    
-
-    sortComponents(this, editorList, labelList);
-    applyStyle(editorList, editorStyle);
-    //applyStyle(labelList, labelStyle);
-    //splitPane.updateUI();
-    //tabbedPane.updateUI();
-    */
-  }
-
-  /**
-   * Apply the given style to the components in the given List
-   */
-  private void applyStyle(LinkedList componentList, HashMap uiStyle) {
-    /*
-    Color backgroundColor = (Color) uiStyle.get("background");
-    Color foregroundColor = (Color) uiStyle.get("foreground");
-    Font f = (Font) uiStyle.get("font");
-
-    for (int i = 0; i < componentList.size(); i++) {
-      Component currentComponent = (Component) componentList.get(i);
-      if (backgroundColor != null && currentComponent.getBackground() != backgroundColor) 
-	currentComponent.setBackground(backgroundColor);
-      if (foregroundColor != null && currentComponent.getForeground() != foregroundColor) 
-	currentComponent.setForeground(foregroundColor);
-      if (f != null && currentComponent.getFont() != f) 
-	currentComponent.setFont(f);
-    }
-    */
-
-    /*
-    System.err.println("doing updates and such.");
-    Hashtable oldDefaults = new Hashtable();
-    oldDefaults.put("TabbedPane.tabAreaBackground", UIManager.get("TabbedPane.tabAreaBackground"));
-    UIManager.put("TabbedPane.tabAreaBackground", Color.red);
-
-    oldDefaults.put("TabbedPane.background", UIManager.get("TabbedPane.background"));
-    UIManager.put("TabbedPane.background", Color.blue);
-
-    oldDefaults.put("TabbedPane.selected",UIManager.get("TabbedPane.selected"));
-    UIManager.put("TabbedPane.selected", Color.yellow);
-
-    SwingUtilities.updateComponentTreeUI(this);
-
-    UIManager.put("TabbedPane.tabAreaBackground", oldDefaults.get("TabbedPane.tabAreaBackground"));
-    UIManager.put("TabbedPane.background", oldDefaults.get("TabbedPane.background"));
-    UIManager.put("TabbedPane.selected", oldDefaults.get("TabbedPane.selected"));
-    */
-  }
-
-  private void sortComponents(Container parentContainer, LinkedList editorList, LinkedList labelList) {
-    Component[] children = parentContainer.getComponents();
-    for (int i = 0; i < children.length; i++) {
-      if (children[i] instanceof JTextComponent) {
-	editorList.add(children[i]);
-      } else if (children[i] instanceof Container) {
-	sortComponents((Container) children[i], editorList, labelList);
-	labelList.add(children[i]);
-      } else {
-	labelList.add(children[i]);
-      }
-    }
-  }
-
     /**
      * Sets the window to its preferred size.
      */
@@ -416,6 +319,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     public void addAttachmentPane() {
 	attachmentPanel = new AttachmentPane(getMessageProxy());
 	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+	  try {
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentScrollPane, true);
+	  } catch (Exception e) {
+	    System.err.println("error setting theme:  " + e);
+	  }
+	}
 	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentScrollPane);
     }
 
@@ -480,6 +391,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
 	popupMenu.configureComponent("NewMessageWindow.popupMenu", Pooka.getResources());	
 	popupMenu.setActive(getActions());
+	NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+	  try {
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, popupMenu, true);
+	  } catch (Exception etwo) {
+	    System.err.println("error setting theme:  " + etwo);
+	  }
+	}
 	popupMenu.show(component, e.getX(), e.getY());
 	    
     }

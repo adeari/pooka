@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
+import net.suberic.util.swing.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -17,7 +18,7 @@ import javax.swing.plaf.metal.MetalTheme;
 /**
  * A top-level window for displaying a message.
  */
-public abstract class MessageFrame extends JFrame implements MessageUI, net.suberic.util.swing.ThemeSupporter {
+public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSupporter, ThemeListener {
 
     protected MessageProxy msg;
     protected MessageDisplayPanel messageDisplay;
@@ -76,7 +77,33 @@ public abstract class MessageFrame extends JFrame implements MessageUI, net.sube
    * Sets the Theme that this component is currently using.
    */
   public void setCurrentTheme(MetalTheme newTheme) {
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).removeThemeListener(this);
+    }
     currentTheme = newTheme;
+    
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).addThemeListener(this);
+    }
+  }
+
+  /**
+   * Called when the specifics of a Theme change.
+   */
+  public void themeChanged(ConfigurableMetalTheme theme) {
+    // we should really only be getting messages from our own curren themes,
+    // but, hey, it never hurts to check.
+    if (currentTheme != null && currentTheme == theme) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    try {
+	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
+	    } catch (Exception e) {
+	    }
+
+	  }
+	});
+    }
   }
 
 

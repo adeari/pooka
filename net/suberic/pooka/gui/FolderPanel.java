@@ -13,12 +13,13 @@ import javax.swing.tree.*;
 import javax.swing.plaf.metal.MetalTheme;
 import net.suberic.pooka.gui.*;
 import java.util.Vector;
+import java.util.LinkedList;
 
 
 /**
  * This class displays the Stores and Folders for Pooka.
  */
-public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer, net.suberic.util.swing.ThemeSupporter {
+public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer, ThemeSupporter, ThemeListener {
   MainPanel mainPanel=null;
   JTree folderTree;
   DefaultTreeModel folderModel;
@@ -103,8 +104,19 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
    * Configures the interfaceStyle for this Pane.
    */
   public void configureInterfaceStyle() {
+    configureInterfaceStyle(false);
+  }
+
+  private void configureInterfaceStyle(boolean force) {
     try {
-      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this, force);
+      LinkedList allNodes = getAllNodes();
+      for (int i = 0; i < allNodes.size(); i++) {
+	Object currentNode = allNodes.get(i);
+	if (currentNode instanceof MailTreeNode) {
+	  ((MailTreeNode) currentNode).updatePopupTheme();
+	}
+      }
     } catch (Exception e) {
       
     }
@@ -130,14 +142,34 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
   public MetalTheme getCurrentTheme() {
     return currentTheme;
   }
-
   /**
    * Sets the Theme that this component is currently using.
    */
   public void setCurrentTheme(MetalTheme newTheme) {
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).removeThemeListener(this);
+    }
     currentTheme = newTheme;
+    
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).addThemeListener(this);
+    }
   }
 
+  /**
+   * Called when the specifics of a Theme change.
+   */
+  public void themeChanged(ConfigurableMetalTheme theme) {
+    // we should really only be getting messages from our own current themes,
+    // but, hey, it never hurts to check.
+    if (currentTheme != null && currentTheme == theme) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    configureInterfaceStyle(true);
+	  }
+	});
+    }
+  }
 
     /**
      * This returns the currently highlighted node on the FolderTree.
@@ -232,6 +264,30 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     refreshStores(e);
   }
 
+  /**
+   * Gets all of the children of the tree.
+   */
+  public LinkedList getAllNodes() {
+    Object root = folderModel.getRoot();
+    return parseTree(folderModel, root);
+  }
+
+  /**
+   * parses the tree.
+   */
+  public LinkedList parseTree(TreeModel tm, Object root) {
+    LinkedList returnValue = new LinkedList();
+    if (! tm.isLeaf(root)) {
+      int numChild = tm.getChildCount(root);
+      for (int i = 0; i < numChild; i++) {
+	Object child = tm.getChild(root, i);
+	returnValue.addAll(parseTree(tm, child));
+      }
+    }
+    
+    returnValue.add(root);
+    return returnValue;
+  }
     /**
      * Specified by interface net.suberic.pooka.UserProfileContainer
      */

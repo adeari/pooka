@@ -20,7 +20,7 @@ import javax.swing.plaf.metal.MetalTheme;
  *
  */
 
-public class MessagePanel extends JDesktopPane implements ContentPanel, net.suberic.util.swing.ThemeSupporter {
+public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSupporter, ThemeListener {
   /**
    * ExtendedDesktopManager is just a Desktop Manager which also
    * calls refreshActiveMenus() and refreshCurrentUser()  when the 
@@ -506,7 +506,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, net.sube
    * Configures the interfaceStyle for this Pane.
    */
   public void configureInterfaceStyle() {
-        
+     
     try {
       Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
     } catch (Exception e) {
@@ -539,7 +539,32 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, net.sube
    * Sets the Theme that this component is currently using.
    */
   public void setCurrentTheme(MetalTheme newTheme) {
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).removeThemeListener(this);
+    }
     currentTheme = newTheme;
+    
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).addThemeListener(this);
+    }
+  }
+
+  /**
+   * Called when the specifics of a Theme change.
+   */
+  public void themeChanged(ConfigurableMetalTheme theme) {
+    // we should really only be getting messages from our own curren themes,
+    // but, hey, it never hurts to check.
+    if (currentTheme != null && currentTheme == theme) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    try {
+	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessagePanel.this, MessagePanel.this);
+	    } catch (Exception e) {
+	    }
+	  }
+	});
+    }
   }
 
   /**

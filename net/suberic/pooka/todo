@@ -2,14 +2,7 @@ top todo:
 
 *) add color and font support
 	begun.  todo:
-	*) test the folderPanel, messagePanel, and Folder settings.
-	  folderPanel looks ok except for the JPopupMenus.
-	  messagePanel looks fine.
-	  Folder -- read messages need to honor the font and font color.
-	*) Themes don't change immediately after you edit them; rather,
-	  they wait until you restart.
-	*) Changing a Theme should notify everything that's using that
-		theme, and they should update appropriately.
+	*) Folder -- read messages need to honor the font and font color.
 	*) The font for new messages doesn't update using the themes.
 	*) Add places to configure all of these settings. -- and check
 	  the labels for these properties.

@@ -194,7 +194,6 @@ public class AttachmentPane extends JPanel {
 
     JTable table;
     AttachmentTableModel tableModel;
-    JPopupMenu popupMenu;
     MessageProxy message;
     Action[] defaultActions;
 
@@ -203,8 +202,6 @@ public class AttachmentPane extends JPanel {
 
 	message=msg;
 	defaultActions = createDefaultActions();
-
-	popupMenu = createPopupMenu();
 
 	tableModel = new AttachmentTableModel(message);
 
@@ -231,7 +228,7 @@ public class AttachmentPane extends JPanel {
 		  if (! getTable().isRowSelected(rowIndex)) {
 		    getTable().setRowSelectionInterval(rowIndex, rowIndex);
 		  }
-		  getPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
+		  createPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
 		}
 		
 	      } 
@@ -413,10 +410,6 @@ public class AttachmentPane extends JPanel {
 	((NewMessageProxy)message).detachFile(attachmentToRemove);
     }
 
-    public JPopupMenu getPopupMenu() {
-	return popupMenu;
-    }
-
     public AttachmentTableModel getTableModel() {
 	return tableModel;
     }
@@ -426,6 +419,25 @@ public class AttachmentPane extends JPanel {
     }
 
     protected JPopupMenu createPopupMenu() {
+      net.suberic.util.gui.ConfigurablePopupMenu popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
+      String key;
+      if (message instanceof NewMessageProxy)
+	key = "AttachmentPane.NewMsgActions";
+      else 
+	key = "AttachmentPane.Actions";
+      popupMenu.configureComponent(key, Pooka.getResources());	
+      popupMenu.setActive(getActions());
+      MessageUI mui = ((MessageProxy)message).getMessageUI();
+      if (mui instanceof net.suberic.util.swing.ThemeSupporter) {
+	try {
+	  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
+	} catch (Exception etwo) {
+	  System.err.println("error setting theme:  " + etwo);
+	}
+      }
+      return popupMenu;
+      /*
+
 	String key;
 	if (message instanceof NewMessageProxy)
 	    key = "AttachmentPane.NewMsgActions";
@@ -460,6 +472,7 @@ public class AttachmentPane extends JPanel {
 	    }
 	}
 	return menu;
+      */
     }
 
     protected JMenuItem createMenuItem(String menuID, String menuItemID) {

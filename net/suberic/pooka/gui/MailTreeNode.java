@@ -39,6 +39,24 @@ public class MailTreeNode extends DefaultMutableTreeNode {
 	    
     }
 
+  /**
+   * This updates the popupMenu's Theme, if necessary.
+   */
+  public void updatePopupTheme() {
+    if (popupMenu != null) {
+      SwingUtilities.invokeLater( new Runnable() {
+	  public void run() {
+	    try {
+	      FolderPanel fp =  ((FolderPanel)getParentContainer());
+	      Pooka.getUIFactory().getPookaThemeManager().updateUI(fp, popupMenu, true);
+	    } catch (Exception e) {
+	
+	    }
+	  }
+	});
+    }
+  }
+
     /**
      * This creates the current PopupMenu if there is not one.  It then
      * will configure the PopupMenu with the current actions.

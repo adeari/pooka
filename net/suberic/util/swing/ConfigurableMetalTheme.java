@@ -1,18 +1,24 @@
 package net.suberic.util.swing;
 
 import net.suberic.util.*;
+import java.util.LinkedList;
 import javax.swing.*;
 import javax.swing.plaf.metal.*;
 import javax.swing.plaf.*;
+
 
 /**
  * A Theme which allows you to set all of your colors for a Metal
  * application.
  */
-public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item {
+public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, ValueChangeListener {
 
   private String itemId;
   private String resourceString;  
+
+  private VariableBundle bundle = null;
+
+  private LinkedList themeListenerList = new LinkedList();
 
   protected ColorUIResource subPrimary1 = null;
   protected ColorUIResource subPrimary2 = null;
@@ -39,7 +45,11 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item {
     itemId = newItemId;
     resourceString = newResourceString;
     
+    bundle = sourceBundle;
+
     loadTheme(getItemProperty(), sourceBundle);
+
+    sourceBundle.addValueChangeListener(this, getItemProperty() + ".*");
   }
   
   /**
@@ -52,12 +62,45 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item {
   
   /**
    * The Item property.  For example, if you were to have a list of users, a
-   * given user's itemPropertymay be "Users.defaultUser".
+   * given user's itemProperty may be "Users.defaultUser".
    */
   public String getItemProperty() {
     return  resourceString + "." + itemId;
   }
+
+  /**
+   * Called when a ui value changes.
+   */
+  public void valueChanged(String changedValue) {
+    loadTheme(getItemProperty(), bundle);
+    fireThemeChangedEvent();
+  }
+
+  /**
+   * Adds a ThemeListener to the ListenerList.
+   */
+  public void addThemeListener(ThemeListener tl) {
+    if (! themeListenerList.contains(tl))
+      themeListenerList.add(tl);
+  }
   
+  /**
+   * Removes a ThemeListener from the ListenerList.
+   */
+  public void removeThemeListener(ThemeListener tl) {
+    themeListenerList.remove(tl);
+  }
+
+  /**
+   * Notifies all registered ThemeListeners that this Theme has changed.
+   */
+  public void fireThemeChangedEvent() {
+    for (int i = 0; i < themeListenerList.size(); i++) {
+      ThemeListener current = (ThemeListener) themeListenerList.get(i);
+      current.themeChanged(this);
+    }
+  }
+
   /**
    * This loads the theme from the given property and bundle.
    */

@@ -206,9 +206,11 @@ public class StoreNode extends MailTreeNode {
 	if (popupMenu == null) {
 	    popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
 	    popupMenu.configureComponent("StoreNode.popupMenu", Pooka.getResources());
+	    updatePopupTheme();
 	}
 
 	popupMenu.setActive(getActions());
+	
     }
 
     public String getStoreID() {
