@@ -16,10 +16,12 @@ import java.util.*;
 public class FolderTableModel extends AbstractTableModel {
   static int ADD_MESSAGES = 0;
   static int REMOVE_MESSAGES = 1;
-  
+
   private Vector data;
   private Vector columnNames;
   private Vector columnSizes;
+  private int currentSortColumn = -1;
+  private boolean currentAscending = true;
   //private Vector displayData;
   
   public FolderTableModel(Vector newData, Vector newColumnNames, Vector newColumnSizes) {
@@ -323,11 +325,21 @@ public class FolderTableModel extends AbstractTableModel {
       
       this.fireTableChanged(new javax.swing.event.TableModelEvent(this)); 
       
+      currentSortColumn = column;
+      currentAscending = ascending;
     }
   
-  
+
+  /**
+   * Sorts by the given column.  If the column is already the one that 
+   * is sorted by, then reverses the sort.
+   */
   public void sortByColumn(int column) {
-    sortByColumn(column, true);
+    if (column == currentSortColumn) {
+      sortByColumn(column, !currentAscending);
+    } else {
+      sortByColumn(column, true);
+    }
   }
   
   /**

@@ -15,8 +15,6 @@ preview:
 
 *) fix the connection order.  it's too painful right now.
 
-*) fix reverse sorting.
-
 --------
 
 *) document keybindings

@@ -347,7 +347,11 @@ public class FolderDisplayPanel extends JPanel {
 	    else if (rowsSelected > 1)
 	      selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
 	    
-	    ((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
+	    if (! ascending) {
+	      ((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
+	    } else {
+	      ((FolderTableModel)messageTable.getModel()).sortByColumn(column ); 
+	    }
 	    
 	    if (selectedMessage != null) {
 	      int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
