@@ -318,7 +318,7 @@ public class SimpleFileCache implements MessageCache {
 	int addedCount = 0;
 	
 	for (int i = 0; i < uids.length; i++) {
-	    if (cachedMessages.contains(new Long(uids[i]))) {
+	    if (! cachedMessages.contains(new Long(uids[i]))) {
 		added[addedCount++]=uids[i];
 	    }
 	}
@@ -559,8 +559,8 @@ public class SimpleFileCache implements MessageCache {
 	// sigh.
 	int unreadCount = 0;
 	for (int i = 0; i < cachedMessages.size(); i++) {
-	    Message m = (Message) cachedMessages.elementAt(i);
-	    if (m.isSet(Flags.Flag.SEEN))
+	    Flags f = getFlags(((Long) cachedMessages.elementAt(i)).longValue(), false);
+	    if (f.contains(Flags.Flag.SEEN))
 		unreadCount++;
 	}
 
