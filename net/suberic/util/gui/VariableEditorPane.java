@@ -41,11 +41,9 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 	String remove = sourceBundle.getProperty(template + ".removeString", "");
 	if (! remove.equals(""))
 	    property = property.substring(0, property.lastIndexOf(remove));
-	System.out.println("property is " + property);
 
 	scoped = sourceBundle.getProperty(template + ".scoped", "false").equalsIgnoreCase("true");
 	if (scoped) {
-	    System.out.println("keyProperty is " + property + "." + sourceBundle.getProperty(template + ".keyProperty", ""));
 	    keyProperty = property + "." + sourceBundle.getProperty(template + ".keyProperty", "");
 	} else {
 	    keyProperty =  sourceBundle.getProperty(template + ".keyProperty", "");
@@ -54,9 +52,7 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 	Vector allowedValues = sourceBundle.getPropertyAsVector(template + ".allowedValues", "");
 	for (int i = 0; i < allowedValues.size(); i++) {
 	    String value = (String) allowedValues.elementAt(i);
-	    System.out.println("for " + value + ", getting value for " + template + ".allowedValues." + value);
 	    String editValue = sourceBundle.getProperty(template + ".allowedValues." + value,  "");
-	    System.out.println("adding " + value + ", " + editValue);
 	    valueToTemplateMap.put(value, editValue);
 	}
 
@@ -79,7 +75,6 @@ public class VariableEditorPane extends DefaultPropertyEditor {
      */
     public void showEditorWindow() {
 	String currentValue = sourceBundle.getProperty(keyProperty, "");
-	System.out.println("currentValue is " + currentValue);
 
 	/*
 	String editValue = (String) valueToTemplateMap.get(currentValue);
@@ -97,7 +92,6 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 	Vector templateVector = new Vector();
 	templateVector.add(editValue);
 
-	System.out.println("making a new editor out of " + property + " plus " + editValue);
 	Container container = factory.createEditorWindow(sourceBundle.getProperty(editValue + ".title", editValue), propertyVector, templateVector);
 	if (container instanceof JFrame)
 	    ((JFrame) container).show();

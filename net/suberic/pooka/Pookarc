@@ -407,10 +407,22 @@ Store.editableFields.mailCheckTime=5
 
 Store.editableFields.storeConfig.removeString=.storeConfig
 Store.editableFields.storeConfig.allowedValues.imap=Store.editableFields.storeConfig.imap
-Store.editableFields.storeConfig.imap.propertyType=Composite
-Store.editableFields.storeConfig.imap.scoped=true
-Store.editableFields.storeConfig.imap.scopeRoot=Store.editableFields
-Store.editableFields.storeConfig.imap=server:user:password:SSL:cachingEnabled:expungeOnExit
+
+Store.editableFields.storeConfig.imap.propertyType=Tabbed
+Store.editableFields.storeConfig.imap.propertyScoped=true
+Store.editableFields.storeConfig.imap.templateScoped=true
+#Store.editableFields.storeConfig.imap.scopeRoot=Store.editableFields
+#Store.editableFields.storeConfig.imap=server:user:password:SSL:cachingEnabled:expungeOnExit
+Store.editableFields.storeConfig.imap=IMAP:caching:options
+Store.editableFields.storeConfig.imap.IMAP=server:user:password:SSL
+Store.editableFields.storeConfig.imap.IMAP.scoped=true
+Store.editableFields.storeConfig.imap.IMAP.scopeRoot=Store.editableFields
+Store.editableFields.storeConfig.imap.caching=cachingEnabled
+Store.editableFields.storeConfig.imap.caching.scoped=true
+Store.editableFields.storeConfig.imap.caching.scopeRoot=Store.editableFields
+Store.editableFields.storeConfig.imap.options=expungeOnExit
+Store.editableFields.storeConfig.imap.options.scoped=true
+Store.editableFields.storeConfig.imap.options.scopeRoot=Store.editableFields
 
 Store.editableFields.storeConfig.allowedValues.pop3=Store.editableFields.storeConfig.pop3
 Store.editableFields.storeConfig.pop3.propertyType=Composite
@@ -440,7 +452,8 @@ Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
 Preferences=UI:Reply:Startup:Signature:HTML
-Preferences.scoped=true
+Preferences.propertyScoped=false
+Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
 
 Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge

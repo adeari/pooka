@@ -16,6 +16,8 @@ import net.suberic.util.VariableBundle;
  * TabbedList.tabTwo=prop5:prop6
  * TabbedList.tabThree=prop7:prop8:prop9
  *
+ * Note that you can also set this up to have the 
+ *
  */
 public class TabbedEditorPane extends DefaultPropertyEditor {
     Vector editors;
@@ -25,6 +27,9 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
     String template;
     JTabbedPane tabbedPane;
     VariableBundle sourceBundle;
+
+    boolean templateScoped = false;
+    boolean propertyScoped = false;
 
     public TabbedEditorPane(String newProperty, String newTemplate, PropertyEditorFactory newFactory) {
 	configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), true);
@@ -41,6 +46,9 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
 	sourceBundle = bundle;
 	enabled=isEnabled;
 
+	templateScoped = sourceBundle.getProperty(template + ".templateScoped", "false").equalsIgnoreCase("true");
+	propertyScoped = sourceBundle.getProperty(template + ".propertyScoped", "false").equalsIgnoreCase("true");
+
 	tabbedPane = new JTabbedPane();
 
 	// first, get the strings that we're going to edit.
@@ -53,7 +61,13 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
 
 	for (int i = 0; i < propsToEdit.size(); i++) {
 	    String currentProperty = template + "." + (String)propsToEdit.elementAt(i);
-	    currentEditor = createEditorPane(currentProperty, currentProperty);
+
+	    if (propertyScoped) {
+		currentEditor = createEditorPane(property, currentProperty);
+	    } else {
+		currentEditor = createEditorPane(currentProperty, currentProperty);
+	    }
+
 	    editors.add(currentEditor);
 	    tabbedPane.add(factory.getBundle().getProperty(currentProperty + ".label", currentProperty), currentEditor);
 	}
