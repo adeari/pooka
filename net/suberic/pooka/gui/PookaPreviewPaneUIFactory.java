@@ -274,6 +274,13 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 
     }
 
+  /**
+   * Creates a ProgressDialog using the given values.
+   */
+  public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
+    return new ProgressDialogImpl(min, max, initialValue, title, content);
+  }
+
     /**
      * Clears the main status message panel.
      */

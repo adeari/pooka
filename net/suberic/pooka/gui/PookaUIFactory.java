@@ -99,7 +99,12 @@ public interface PookaUIFactory extends ErrorHandler {
    * Shows a message.
    */
   public void showMessage(String newMessage, String title);
-  
+
+  /**
+   * Creates a ProgressDialog using the given values.
+   */
+  public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content);
+
   /**
    * Clears the main status message panel.
    */

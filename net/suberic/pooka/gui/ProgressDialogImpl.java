@@ -16,20 +16,32 @@ public class ProgressDialogImpl implements ProgressDialog {
   String mTitle;
   String mMessage;
 
+  JLabel nameLabel;
+  JPanel buttonPanel;
+
   /**
    * Creates a ProgressDialogImpl with the given minimum, maximum, and
    * current values.
    */
   public ProgressDialogImpl(int min, int max, int current, String title, String message) {
-    progressBar = new JProgressBar(min, max);
+    initDialog(min, max, current,title, message);
+  }
+  
+  /**
+   * For subclasses.
+   */
+  protected ProgressDialogImpl() {
 
+  }
+
+  protected void initDialog(int min, int max, int current, String title, String message) {
+    progressBar = new JProgressBar(min, max);
+    
     mTitle = title;
     mMessage = message;
-
-    dialog = new JDialog();
-    dialog.getContentPane().setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
-    JLabel nameLabel = new JLabel(mTitle);
-    JPanel buttonPanel = new JPanel();
+    
+    nameLabel = new JLabel(mTitle);
+    buttonPanel = new JPanel();
     JButton cancelButton = new JButton(net.suberic.pooka.Pooka.getProperty("button.cancel", "Cancel"));
     cancelButton.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
@@ -38,13 +50,24 @@ public class ProgressDialogImpl implements ProgressDialog {
       });
     buttonPanel.add(cancelButton);
     
+    createDialog();
+    
+    setValue(current);
+  }
+
+  /**
+   * Creates the Dialog in which the ProgressBar will be shown.
+   */
+  protected void createDialog() {
+    dialog = new JDialog();
+    dialog.getContentPane().setLayout(new BoxLayout(dialog.getContentPane(), BoxLayout.Y_AXIS));
+
     dialog.getContentPane().add(nameLabel);
     dialog.getContentPane().add(progressBar);
     dialog.getContentPane().add(buttonPanel);
     
     dialog.pack();
     
-    setValue(current);
   }
 
   /**

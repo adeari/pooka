@@ -1664,13 +1664,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	fireMessageChangedEvent(mce);
     }
 
-    /**
-     * This puts up the gui for the Search.
-     */
-    public void showSearchFolder() {
-	Pooka.getUIFactory().showSearchForm(new FolderInfo[] { this });
-    }
-
+  /**
+   * This puts up the gui for the Search.
+   */
+  public void showSearchFolder() {
+    Pooka.getUIFactory().showSearchForm(new FolderInfo[] { this });
+  }
+  
   /**
    * This is a static calls which searches the given FolderInfo objects,
    * collects the results into a VirtualFolderInfo, and then displays
@@ -1679,13 +1679,18 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public static void searchFolders(Vector folderList, javax.mail.search.SearchTerm term) {
     final javax.mail.search.SearchTerm searchTerm = term;
     final Vector selectedFolders = folderList;
-    
+
     Pooka.getSearchThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  Vector matchingValues = new Vector();
 	  if (Pooka.isDebug()) 
 	    System.out.println("init:  matchingValues.size() = " + matchingValues.size());
-	  for (int i = 0; i < selectedFolders.size(); i++) {
+
+	  ProgressDialog dialog = Pooka.getUIFactory().createProgressDialog(0,100,0,"Search","Searching");
+	  dialog.show();
+	  boolean cancelled = dialog.isCancelled();
+
+	  for (int i = 0; ! cancelled && i < selectedFolders.size(); i++) {
 	    if (Pooka.isDebug())
 	      System.out.println("trying selected folder number " + i);
 	    try {
@@ -1701,34 +1706,38 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    } catch (MessagingException me) {
 	      System.out.println("caught exception " + me);
 	    }
+	    cancelled = dialog.isCancelled();
 	  }
 	  
 	  if (Pooka.isDebug())
 	    System.out.println("got " + matchingValues.size() + " matches.");
 	  
-	  FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
-	  for (int i = 0; i < selectedFolders.size(); i++) {
-	    parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
+	  if (! cancelled) {
+	    FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
+	    for (int i = 0; i < selectedFolders.size(); i++) {
+	      parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
+	    }
+	    
+	    MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
+	    for (int i = 0; i < matchingValues.size(); i++) {
+	      if (Pooka.isDebug())
+		System.out.println("matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
+	      matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
+	    }
+	    
+	    final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
+	    
+	    Runnable runMe = new Runnable() {
+		public void run() {
+		  FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
+		  fdui.openFolderDisplay();
+		}
+	      };
+	    
+	    javax.swing.SwingUtilities.invokeLater(runMe);
 	  }
-	  
-	  MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
-	  for (int i = 0; i < matchingValues.size(); i++) {
-	    if (Pooka.isDebug())
-	      System.out.println("matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
-	    matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
-	  }
-	  
-	  final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
-	  
-	  Runnable runMe = new Runnable() {
-	      public void run() {
-		FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
-		fdui.openFolderDisplay();
-	      }
-	    };
-	  
-	  javax.swing.SwingUtilities.invokeLater(runMe);
-	  
+
+	  dialog.dispose();
 	}
       }, Pooka.getSearchThread()), new java.awt.event.ActionEvent(FolderInfo.class, 1, "search"));
     

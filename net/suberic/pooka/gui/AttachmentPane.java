@@ -362,7 +362,13 @@ public class AttachmentPane extends JPanel {
    * Opens either a JFrame or a JInternalFrame, whichever is appropriate,
    * with the given Component as a content pane and the given title.
    */
-  private void openAttachmentWindow(Component content, String title, boolean resize) {
+  private void openAttachmentWindow(Component pContent, String pTitle, boolean pResize) {
+    final Component content = pContent;
+    final String title = pTitle;
+    final boolean resize = pResize;
+
+    SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
     MessageUI mui = message.getMessageUI();
     if (mui != null && mui instanceof JInternalFrame) {
       JDesktopPane desktop = ((JInternalFrame) mui).getDesktopPane();
@@ -420,6 +426,8 @@ public class AttachmentPane extends JPanel {
       }
       frame.show();
     }
+      }
+      });
   }
   
   /**

@@ -132,7 +132,7 @@ public class MultiMessageInfo extends MessageInfo {
    */
   public void cacheMessage() throws MessagingException {
 
-    net.suberic.pooka.gui.ProgressDialog pd = new net.suberic.pooka.gui.ProgressDialogImpl(0, messages.length, 0, Pooka.getProperty("message.cachingMessages", "Caching Messages..."), Pooka.getProperty("message.cachingMessages", "Caching Messages..."));
+    net.suberic.pooka.gui.ProgressDialog pd = Pooka.getUIFactory().createProgressDialog(0, messages.length, 0, Pooka.getProperty("message.cachingMessages", "Caching Messages..."), Pooka.getProperty("message.cachingMessages", "Caching Messages..."));
     
     pd.show();
     try {

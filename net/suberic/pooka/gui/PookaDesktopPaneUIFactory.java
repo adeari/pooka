@@ -285,58 +285,65 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     else
       SwingUtilities.invokeLater(runMe);
   }
-
-    /**
-     * Clears the main status message panel.
-     */
-    public void clearStatus() {
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    Pooka.getMainPanel().getInfoPanel().clear();
-	  }
-	};
-      if (SwingUtilities.isEventDispatchThread())
-	runMe.run();
-      else
-	SwingUtilities.invokeLater(runMe);
-    }   
-
-    /**
-     * Shows a SearchForm with the given FolderInfos selected from the list
-     * of the given allowedValues.
-     */
-    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
-	SearchForm sf = null;
-	if (allowedValues != null)
-	    sf = new SearchForm(selectedFolders, allowedValues);
-	else
-	    sf = new SearchForm(selectedFolders);
-	
-	boolean ok = false;
-	int returnValue = -1;
-	java.util.Vector tmpSelectedFolders = null;
-	javax.mail.search.SearchTerm tmpSearchTerm = null;
-
-	while (! ok ) {
-	    returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
-	    if (returnValue == JOptionPane.OK_OPTION) {
-	        tmpSelectedFolders = sf.getSelectedFolders();
-		try {
-		    tmpSearchTerm = sf.getSearchTerm();
-		    ok = true;
-		} catch (java.text.ParseException pe) {
-		    showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
-		    ok = false;
-		}
-	    } else {
-		ok = true;
-	    }
+  
+  /**
+   * Clears the main status message panel.
+   */
+  public void clearStatus() {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  Pooka.getMainPanel().getInfoPanel().clear();
 	}
-	
-	if (returnValue == JOptionPane.OK_OPTION) {
-	    FolderInfo.searchFolders(tmpSelectedFolders, tmpSearchTerm);
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
+  }   
+  
+  /**
+   * Creates a ProgressDialog using the given values.
+   */
+  public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
+    return new ProgressInternalDialog(min, max, initialValue, title, content, getMessagePanel());
+  }
+
+  /**
+   * Shows a SearchForm with the given FolderInfos selected from the list
+   * of the given allowedValues.
+   */
+  public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
+    SearchForm sf = null;
+    if (allowedValues != null)
+      sf = new SearchForm(selectedFolders, allowedValues);
+    else
+      sf = new SearchForm(selectedFolders);
+    
+    boolean ok = false;
+    int returnValue = -1;
+    java.util.Vector tmpSelectedFolders = null;
+    javax.mail.search.SearchTerm tmpSearchTerm = null;
+    
+    while (! ok ) {
+      returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
+      if (returnValue == JOptionPane.OK_OPTION) {
+	tmpSelectedFolders = sf.getSelectedFolders();
+	try {
+	  tmpSearchTerm = sf.getSearchTerm();
+	  ok = true;
+	} catch (java.text.ParseException pe) {
+	  showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
+	  ok = false;
 	}
+      } else {
+	ok = true;
+      }
     }
+    
+    if (returnValue == JOptionPane.OK_OPTION) {
+      FolderInfo.searchFolders(tmpSelectedFolders, tmpSearchTerm);
+    }
+  }
 
     /**
      * Shows a SearchForm with the given FolderInfos selected.  The allowed

@@ -770,9 +770,16 @@ public class MessageInfo {
 	if (getAttachments() != null && getAttachments().size() > 0)
 	  mHasAttachments = true;
       } else {
-	javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
-	if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
-	  mHasAttachments = true;
+	try {
+	  javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
+	  if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
+	    mHasAttachments = true;
+	  }
+	} catch (javax.mail.internet.ParseException pe) {
+	  if (Pooka.isDebug()) {
+	    System.out.println("unable to parse content-type:  " + getMessage().getContentType());
+	  }
+	  mHasAttachments = false;
 	}
       }
       mHasCheckedAttachments = true;

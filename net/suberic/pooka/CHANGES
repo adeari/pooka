@@ -1,3 +1,9 @@
+fixed a possible deadlock in manipulating messages that are the results
+of a search.
+
+added a search in progress dialog so that you can see that something's
+happening while waiting for search results.
+
 added an attachment icon to the main folder/message table.
 
 020810 release
