@@ -1,6 +1,6 @@
 <project name="Pooka" default="compile" basedir=".">
   <property name="builddir" value="Build"/>
-  <property name="sourcedir" value="net"/>
+  <property name="sourcedir" value="src"/>
   <property name="imagesdir" value="images"/>
   <property name="helpdir" value="help"/>
   <property name="distdir" value="Dist"/>
@@ -72,23 +72,23 @@
     </tstamp>
     <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true"/>
     <copy todir="${builddir}/net/suberic/pooka">
-      <fileset dir="${sourcedir}/suberic/pooka">
+      <fileset dir="${sourcedir}/net/suberic/pooka">
         <include name="Pookarc"/>
         <include name="*.properties"/>
       </fileset>
     </copy>
     <copy todir="${builddir}/net/suberic/pooka/gui/images">
-      <fileset dir="${sourcedir}/suberic/pooka/gui/images">
+      <fileset dir="${sourcedir}/net/suberic/pooka/gui/images">
         <include name="**/*"/>
       </fileset>
     </copy>
     <copy todir="${builddir}/net/suberic/util/gui/propedit/images">
-      <fileset dir="${sourcedir}/suberic/util/gui/propedit/images">
+      <fileset dir="${sourcedir}/net/suberic/util/gui/propedit/images">
         <include name="**/*"/>
       </fileset>
     </copy>
     <copy todir="${builddir}/net/suberic/util/gui/images">
-      <fileset dir="${sourcedir}/suberic/util/gui/images">
+      <fileset dir="${sourcedir}/net/suberic/util/gui/images">
         <include name="**/*"/>
       </fileset>
     </copy>
@@ -97,10 +97,10 @@
         <include name="**/*"/>
       </fileset>
     </copy>
-    <copy file="${sourcedir}/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+    <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
     <copy file="${importdir}/ICE_JNIDDE.dll" todir="${builddir}"/>
     <copy todir="${builddir}/net/suberic/pooka/doc">
-      <fileset dir="${sourcedir}/suberic/pooka/doc"/>
+      <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
     </copy>
     <replace file="${builddir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
   </target>
@@ -168,7 +168,7 @@
   </target>
 
   <target name="dist-jnlp-noFile" depends="compile-jnlp">
-    <copy file="${sourcedir}/suberic/pooka/Pookarc.noFile" tofile="${builddir}/net/suberic/pooka/Pookarc" overwrite="yes"/>
+    <copy file="${sourcedir}/net/suberic/pooka/Pookarc.noFile" tofile="${builddir}/net/suberic/pooka/Pookarc" overwrite="yes"/>
     <jar jarfile="${distdir}/pooka_11_noFile.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
     </jar>
   </target>
@@ -187,27 +187,27 @@
   <target name="compile-jnlp" depends="clean,init">
     <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true"/>
     <copy todir="${builddir}/net/suberic/pooka">
-      <fileset dir="${sourcedir}/suberic/pooka">
+      <fileset dir="${sourcedir}/net/suberic/pooka">
         <include name="Pookarc"/>
         <include name="*.properties"/>
       </fileset>
     </copy>
-    <copy file="${sourcedir}/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+    <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
   </target>
 
   <target name="images-jnlp" depends="clean-images,init-images">
     <copy todir="${imagesdir}/net/suberic/pooka/gui/images">
-      <fileset dir="${sourcedir}/suberic/pooka/gui/images">
+      <fileset dir="${sourcedir}/net/suberic/pooka/gui/images">
         <include name="**/*"/>
       </fileset>
     </copy>
     <copy todir="${imagesdir}/net/suberic/util/gui/propedit/images">
-      <fileset dir="${sourcedir}/suberic/util/gui/propedit/images">
+      <fileset dir="${sourcedir}/net/suberic/util/gui/propedit/images">
         <include name="**/*"/>
       </fileset>
     </copy>
     <copy todir="${imagesdir}/net/suberic/util/gui/images">
-      <fileset dir="${sourcedir}/suberic/util/gui/images">
+      <fileset dir="${sourcedir}/net/suberic/util/gui/images">
         <include name="**/*"/>
       </fileset>
     </copy>
@@ -226,7 +226,7 @@
 
   <target name="help-jnlp" depends="clean-help,init-help">
     <copy todir="${helpdir}/net/suberic/pooka/doc">
-      <fileset dir="${sourcedir}/suberic/pooka/doc"/>
+      <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
     </copy>
     <jar jarfile="${distdir}/pooka_help.jar" basedir="${helpdir}"/> 
   </target>

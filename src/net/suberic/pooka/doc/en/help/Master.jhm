@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='ISO-8859-1' ?>
+<!DOCTYPE map
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN"
+         "http://java.sun.com/products/javahelp/map_1_0.dtd">
+
+<map version="1.0">
+	<mapID target="pooka.intro" url="pooka/intro.html" />
+	<mapID target="gpl" url="pooka/copying.html" />
+	<mapID target="pooka.starting" url="pooka/starting.html" />
+	<mapID target="pooka.configuring" url="pooka/newAccount.html" />
+	<mapID target="reading.intro" url="pooka/reading.html" />
+	<mapID target="composing.intro" url="pooka/composing.html" />
+	<mapID target="search.intro" url="pooka/search.html" />
+	<mapID target="protocol.imap" url="pooka/store/protocol.html#imap" />
+	<mapID target="protocol.pop" url="pooka/store/protocol.html#pop" />
+	<mapID target="store.intro" url="pooka/store/intro.html" />
+	<mapID target="addressBook.intro" url="pooka/addressbook/intro.html" />
+	<mapID target="encryption.intro" url="pooka/encryption/intro.html" />
+	<mapID target="ui.folderPanel" url="pooka/ui/folderpanel.html" />
+	<mapID target="ui.messagePanel" url="pooka/ui/messagepanel.html" />
+	<mapID target="ui.folderWindow" url="pooka/ui/folderwindow.html" />
+</map>
