@@ -19,17 +19,19 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     public static int HEADERS_DEFAULT = 0;
     public static int HEADERS_FULL = 1;
 
+    private static String WITH_ATTACHMENTS = "with";
+    private static String WITHOUT_ATTACHMENTS = "without";
+
     int headerStyle = ReadMessageDisplayPanel.HEADERS_DEFAULT;
     boolean showFullHeaders = false;
 
-    JComponent currentComponent;
-    
     /**
      * Creates an empty MessageDisplayPanel.
      */
     public ReadMessageDisplayPanel() {
 	super();
 
+	this.setLayout(new CardLayout());
     }
 
     /**
@@ -45,51 +47,40 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
      * from the MessageProxy.
      */
     public void configureMessageDisplay() throws MessagingException {
-	if (msg != null) {
-	    editorPane = new JTextPane();
+	editorPane = new JTextPane();
+	editorPane.setEditable(false);
+	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-	    setDefaultFont(editorPane);
+	setDefaultFont(editorPane);
 
-	    resetEditorText();
-	    
-	    editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	    
-	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
-		attachmentPanel = new AttachmentPane(msg);
-		attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	
+	attachmentScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	
+	splitPane.setTopComponent(editorScrollPane);
+	splitPane.setBottomComponent(attachmentScrollPane);
+	
+	this.add(WITH_ATTACHMENTS, splitPane);
+	this.add(WITHOUT_ATTACHMENTS, editorScrollPane);
+	
+	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+	keyBindings.setActive(getActions());
+	
+	editorPane.addMouseListener(new MouseAdapter() {
 		
-		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		
-		splitPane.setTopComponent(editorScrollPane);
-		splitPane.setBottomComponent(attachmentScrollPane);
-		this.add("Center", splitPane);
-		currentComponent = splitPane;
-		this.repaint();
-	    } else {
-		this.add("Center", editorScrollPane);
-		currentComponent = editorScrollPane;
-		this.repaint();
-	    }
-	    
-	    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
-	    keyBindings.setActive(getActions());
-	    
-	    editorPane.addMouseListener(new MouseAdapter() {
-		    
-		    public void mousePressed(MouseEvent e) {
-			if (SwingUtilities.isRightMouseButton(e)) {
-			    showPopupMenu(editorPane, e);
-			}
+		public void mousePressed(MouseEvent e) {
+		    if (SwingUtilities.isRightMouseButton(e)) {
+			showPopupMenu(editorPane, e);
 		    }
-		});
+		}
+	    });
+	
+	if (msg != null) {
+	    resetEditorText();
 	} else {
-	    editorPane = new JTextPane();
-	    editorPane.setEditable(false);
-	    splitPane = null;
-	    editorScrollPane = null;
-	    this.add("Center", editorPane);
-	    currentComponent=editorPane;
+	    ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
 	}
+	    
     }
 	
     /**
@@ -111,8 +102,18 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		messageText.append(content);
 		editorPane.setEditable(false);
 		editorPane.setText(messageText.toString());
+		editorPane.setCaretPosition(0);
 	    } 
 	}
+
+	if (getMessageProxy() != null && getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
+	    attachmentPanel = new AttachmentPane(msg);
+	    attachmentScrollPane.setViewportView(attachmentPanel);
+	    ((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
+	} else {
+	    ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
+	}
+	this.repaint();
     }
 
     public boolean showFullHeaders() {
