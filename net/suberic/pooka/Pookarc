@@ -466,7 +466,7 @@ Store.editableFields.storeConfig.imap.propertyScoped=true
 Store.editableFields.storeConfig.imap.templateScoped=true
 
 Store.editableFields.storeConfig.imap=IMAP:caching:options
-Store.editableFields.storeConfig.imap.IMAP=server:user:password:SSL
+Store.editableFields.storeConfig.imap.IMAP=server:user:password:SSL:port
 Store.editableFields.storeConfig.imap.IMAP.scoped=true
 Store.editableFields.storeConfig.imap.IMAP.scopeRoot=Store.editableFields
 Store.editableFields.storeConfig.imap.caching=cachingEnabled
@@ -481,7 +481,7 @@ Store.editableFields.storeConfig.pop3.propertyType=Tabbed
 Store.editableFields.storeConfig.pop3.propertyScoped=true
 Store.editableFields.storeConfig.pop3.templateScoped=true
 Store.editableFields.storeConfig.pop3=POP3:options
-Store.editableFields.storeConfig.pop3.POP3=server:user:password
+Store.editableFields.storeConfig.pop3.POP3=server:user:password:port
 Store.editableFields.storeConfig.pop3.POP3.scoped=true
 Store.editableFields.storeConfig.pop3.POP3.scopeRoot=Store.editableFields
 Store.editableFields.storeConfig.pop3.options=leaveMessagesOnServer:deleteOnServerOnLocalDelete

@@ -8,6 +8,7 @@ beta 1
 *) add queuing of outgoing emails.
 
 *) make disconnected imap use LoadMessageTracker.
+	make disconnected imap not show messages that aren't there!
 
 *) bug:  search window shows new messages as they come in.
 
@@ -20,6 +21,11 @@ error:  filterfoldercellrenderer has problems with search forms.
 *) no way to cache messages as they come in.
 
 *) no way to connect to all of your subscribed folders.
+
+*) new messages come into the search window even if they don't match.
+
+*) searches don't show a busy icon, or give any other notification that
+they're running.
 
 ---------------
 

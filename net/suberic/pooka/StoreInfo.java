@@ -41,6 +41,7 @@ public class StoreInfo implements ValueChangeListener {
     private String password;
     private String server;
     private String protocol;
+    private int port;
     private URLName url;
 
     // the Thread for connections to this Store.
@@ -74,17 +75,27 @@ public class StoreInfo implements ValueChangeListener {
 	    password = "";
 	    server = "localhost";
 	    protocol = "mbox";
+	    port = -1;
 	    popStore = true;
 	} else {
 	    popStore = false;
 	    user = Pooka.getProperty("Store." + storeID + ".user", "");
 	    password = Pooka.getProperty("Store." + storeID + ".password", "");
+	    String portValue = Pooka.getProperty("Store." + storeID + ".port", "");
+	    port = -1;
+	    if (!portValue.equals("")) {
+	      try {
+		port = Integer.parseInt(portValue);
+	      } catch (Exception e) {
+	      }
+	    }
 	    if (!password.equals(""))
 		password = net.suberic.util.gui.PasswordEditorPane.descrambleString(password);
 	    server = Pooka.getProperty("Store." + storeID + ".server", "");
 	}
 	
-	url = new URLName(protocol, server, -1, "", user, password);
+	
+	url = new URLName(protocol, server, port, "", user, password);
 	
 	try {
 	    Properties p = loadProperties();
@@ -107,6 +118,7 @@ public class StoreInfo implements ValueChangeListener {
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".user");
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".password");
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".server");
+	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".port");
 
 	
 	if (available) {
@@ -275,7 +287,7 @@ public class StoreInfo implements ValueChangeListener {
 	    updateChildren();
 	} else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
 	    defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
-	} else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server")) {
+	} else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
 
 	    if (storeNode != null) {
 		Enumeration enum = storeNode.children();
