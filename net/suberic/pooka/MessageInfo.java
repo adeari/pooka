@@ -31,6 +31,10 @@ public class MessageInfo {
     // the attachments on the message.
     AttachmentBundle attachments;
 
+    public static int FORWARD_AS_ATTACHMENT = 0;
+    public static int FORWARD_QUOTED = 1;
+    public static int FORWARD_AS_INLINE = 2;
+
     protected MessageInfo() {
     }
 
@@ -450,26 +454,27 @@ public class MessageInfo {
 	throws MessagingException {
 	return populateReply(replyAll, false);
     }
+
     /**
      * This populates a new message which is a forwarding of the
      * current message.
      */
-    public Message populateForward() 
+    public NewMessageInfo populateForward(boolean withAttachments, int method) 
 	throws MessagingException {
 	MimeMessage mMsg = (MimeMessage) getMessage();
 	MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
 
-	String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
+	String parsedText = "";
 
-	UserProfile up = getDefaultProfile();
-
-	String parsedText = null;
-	String forwardPrefix;
-	String parsedIntro;
-	String forwardStyle = Pooka.getProperty("Pooka.forwardStle", "prefixed");
-
-	if (up != null && up.getMailProperties() != null) {
-	    if (forwardStyle.equals("prefixed")) {
+	if (method == FORWARD_QUOTED) {
+	    String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
+	    
+	    UserProfile up = getDefaultProfile();
+	    
+	    String forwardPrefix;
+	    String parsedIntro;
+	
+	    if (up != null && up.getMailProperties() != null) {
 		forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
 		parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")), true);
 	    } else { 
@@ -477,12 +482,45 @@ public class MessageInfo {
 		parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"), true);
 	    }
 	    parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
+
+	} else if (method == FORWARD_AS_INLINE) {
+
+	    String textPart = getTextPart(true, false, getMaxMessageDisplayLength(), getTruncationMessage());
+	    
+	    parsedText = Pooka.getProperty("Pooka.forwardInlineIntro", "----------  Original Message  ----------\n") + textPart;
+	    
 	}
 
-	    newMsg.setText(parsedText);
-	    newMsg.setSubject(parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
+	newMsg.setText(parsedText);
+	newMsg.setSubject(parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
+	
+	NewMessageInfo returnValue = new NewMessageInfo(newMsg);
 
-	    return newMsg;
+	// handle attachments.
+	if (method == FORWARD_AS_ATTACHMENT) {
+	    try {
+		returnValue.addAttachment(new MBPAttachment(new javax.mail.internet.MimeBodyPart(getRealMessage().getInputStream())));
+	    } catch (java.io.IOException ioe) {
+		MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
+		me.setNextException(ioe);
+		throw me;
+	    }
+	} else if (withAttachments) {
+	    returnValue.attachments = new AttachmentBundle();
+	    returnValue.attachments.addAll(attachments);
+	    returnValue.attachmentsLoaded=true;
+	}
+
+	return returnValue;
+    }
+
+    /**
+     * This populates a new message which is a forwarding of the
+     * current message.
+     */
+    public NewMessageInfo populateForward() 
+	throws MessagingException {
+	return populateForward(false, FORWARD_QUOTED);
     }
 
     /**

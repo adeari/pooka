@@ -1,13 +1,6 @@
 beta 1
 ---------------
 
-*) fix the startup bugs:  
-	1)  windows take too long to show up
-	2)  sometimes the mailboxes are marked as broken when they shouldn't
-		be.
-
-*) add ability to reply/forward with attachments, or as inline, and so forth
-
 *) bug:  new message notification doesn't work for folders with both messages
 and subfolders.
 
@@ -95,6 +88,11 @@ other
 
 after beta 1
 ----------------
+
+*) fix the startup bugs:  
+	1)  windows take too long to show up
+	2)  sometimes the mailboxes are marked as broken when they shouldn't
+		be. * note:  i put in a possible workaround for this.
 
 *) enable voice control
 

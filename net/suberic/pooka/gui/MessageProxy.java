@@ -110,6 +110,10 @@ public class MessageProxy {
 	    new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
 	    new ActionWrapper(new ReplyAllWithAttachmentsAction(), folderThread),
 	    new ActionWrapper(new ForwardAction(), folderThread),
+	    new ActionWrapper(new ForwardWithAttachmentsAction(), folderThread),
+	    new ActionWrapper(new ForwardAsInlineAction(), folderThread),
+	    new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
+	    new ActionWrapper(new ForwardQuotedAction(), folderThread),
 	    new ActionWrapper(new DeleteAction(), folderThread),
 	    new ActionWrapper(new PrintAction(), folderThread)
 		};
@@ -253,6 +257,33 @@ public class MessageProxy {
 	} catch (MessagingException me) {
 	    showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
 	}
+	if (fw != null)
+	    fw.setBusy(false);
+	if (getMessageUI() != null)
+	    getMessageUI().setBusy(true);;
+	
+    }
+
+    private void forwardMessage(boolean withAttachments) {
+	//forwardMessage(withAttachments, getDefaultProfile().getDefaultForwardMethod());
+	forwardMessage(withAttachments, MessageInfo.FORWARD_QUOTED);
+    }
+
+    private void forwardMessage(boolean withAttachments, int method) {
+	if (getMessageUI() != null)
+	    getMessageUI().setBusy(true);
+	FolderDisplayUI fw = getFolderDisplayUI();
+	if (fw != null)
+	    fw.setBusy(true);;
+	try {
+	    NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateForward(withAttachments, method));
+	    MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+	    nmui.openMessageUI();
+	    
+	} catch (MessagingException me) {
+	    getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+	}
+	
 	if (fw != null)
 	    fw.setBusy(false);
 	if (getMessageUI() != null)
@@ -569,27 +600,54 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageUI() != null)
-		getMessageUI().setBusy(true);
-	    FolderDisplayUI fw = getFolderDisplayUI();
-	    if (fw != null)
-		fw.setBusy(true);;
-	    try {
-		javax.mail.internet.MimeMessage m = (MimeMessage) getMessageInfo().populateForward();
-		NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
-		MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
-		nmui.openMessageUI();
-
-	    } catch (MessagingException me) {
-		getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
-	    }
-
-	    if (fw != null)
-		fw.setBusy(false);
-	    if (getMessageUI() != null)
-		getMessageUI().setBusy(true);;
+	    forwardMessage(false);
 	}
     }
+
+    public class ForwardWithAttachmentsAction extends AbstractAction {
+
+	ForwardWithAttachmentsAction() {
+	    super("message-forward-with-attachments");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    forwardMessage(true);
+	}
+    }
+
+    public class ForwardAsInlineAction extends AbstractAction {
+
+	ForwardAsInlineAction() {
+	    super("message-forward-as-inline");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    forwardMessage(false, MessageInfo.FORWARD_AS_INLINE);
+	}
+    }
+
+    public class ForwardAsAttachmentAction extends AbstractAction {
+
+	ForwardAsAttachmentAction() {
+	    super("message-forward-as-attachment");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    forwardMessage(false, MessageInfo.FORWARD_AS_ATTACHMENT);
+	}
+    }
+
+    public class ForwardQuotedAction extends AbstractAction {
+
+	ForwardQuotedAction() {
+	    super("message-forward-quoted");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    forwardMessage(false, MessageInfo.FORWARD_QUOTED);
+	}
+    }
+
 
     public class DeleteAction extends AbstractAction {
 	DeleteAction() {

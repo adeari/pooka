@@ -38,6 +38,7 @@ public class LoadMessageThread extends Thread {
      */
     
     public LoadMessageThread(FolderInfo newFolderInfo) {
+	super("Load Message Thread - " + newFolderInfo.getFolderID());
 	folderInfo = newFolderInfo;
 	this.setPriority(1);
     }
