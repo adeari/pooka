@@ -255,7 +255,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
-	
+	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".displayFilters");
+	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".backendFilters");
+
 	folder.addConnectionListener(this);
 	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
 	if (!defProfile.equals(""))
@@ -585,7 +587,24 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void unloadAllMessages() {
 	folderTableModel = null;
     }
-    
+
+
+    /**
+     * Unloads all of the tableInfos of the MessageInfo objects.  This
+     * should be used either when the message information is stale, or when
+     * the display rules have changed.
+     */
+    public void unloadTableInfos() {
+	
+    }
+
+    /**
+     * Unloads the matching filters.
+     */
+    public void unloadMatchingFilters() {
+	
+    }
+
     /**
      * Refreshes all the MessageInfo objects by the UID, if any.
      */
@@ -911,6 +930,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		defaultProfile = null;
 	    else 
 		defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
+	} else if (changedValue.equals(getFolderProperty() + ".backendFilters") || changedValue.equals(getFolderProperty() + ".displayFilters")) {
+	    createFilters();
 	}
     }
 
@@ -1420,13 +1441,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * the backendMessageFilters and displayMessageFilters arrays.
      */
     public void createFilters() {
+	BackendMessageFilter[] tmpBackendFilters = null;
+	MessageFilter[] tmpDisplayFilters = null;
 	Vector backendFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".backendFilters", "");
+
 	if (backendFilterNames != null && backendFilterNames.size() > 0) {
-	    backendFilters = new BackendMessageFilter[backendFilterNames.size()];
+
+	    tmpBackendFilters = new BackendMessageFilter[backendFilterNames.size()];
 	    for (int i = 0; i < backendFilterNames.size(); i++) {
 		System.out.println("creating filter from " + getFolderProperty() + ".backendFitlers." + (String) backendFilterNames.elementAt(i));
-		backendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
+		tmpBackendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
 	    }
+
+	    backendFilters = tmpBackendFilters;
 	}
 
 	Vector foundFilters = new Vector();
@@ -1441,9 +1468,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    foundFilters.add(new MessageFilter(getFolderProperty() + ".displayFilters." + (String) displayFilterNames.elementAt(i)));
 	}
 
-	displayFilters = new MessageFilter[foundFilters.size()];
+	tmpDisplayFilters = new MessageFilter[foundFilters.size()];
 	for (int i = 0; i < foundFilters.size(); i++)
-	    displayFilters[i] = (MessageFilter) foundFilters.elementAt(i);
+	    tmpDisplayFilters[i] = (MessageFilter) foundFilters.elementAt(i);
+
+	displayFilters = tmpDisplayFilters;
     }
     
     /**

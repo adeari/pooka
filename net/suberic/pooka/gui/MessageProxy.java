@@ -117,6 +117,9 @@ public class MessageProxy {
     // if the tableInfo has been loaded yet.
     boolean loaded = false;
 
+    // if the display filters have been run
+    boolean filtersMatched = false;
+
     // commands for the GUI
     Hashtable commands;
 
@@ -255,26 +258,30 @@ public class MessageProxy {
 		
 		getMessageInfo().isSeen();
 	    
-		// match the given filters for the FolderInfo.
-		
-		MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
-		if (folderFilters != null) {
-		    Vector tmpMatches = new Vector();
-		    for (int i = 0; i < folderFilters.length; i++) {
-			if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
-			    tmpMatches.add(folderFilters[i].getAction());
-		    }
-		    
-		    matchingFilters = new DisplayFilter[tmpMatches.size()];
-		    for (int i = 0; i < tmpMatches.size(); i++) {
-			//System.out.println("adding a matching filter.");
-			matchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
-		    }
-		}
-
 		loaded=true;
 	    } catch (MessagingException me) {
 	    }
+	}
+
+	if (! filtersMatched ) {
+	    // match the given filters for the FolderInfo.
+	    
+	    MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
+	    if (folderFilters != null) {
+		Vector tmpMatches = new Vector();
+		for (int i = 0; i < folderFilters.length; i++) {
+		    if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
+			tmpMatches.add(folderFilters[i].getAction());
+		}
+		
+		matchingFilters = new DisplayFilter[tmpMatches.size()];
+		for (int i = 0; i < tmpMatches.size(); i++) {
+		    //System.out.println("adding a matching filter.");
+		    matchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
+		}
+	    }
+	    
+	    filtersMatched=true;
 	}
     }	
 

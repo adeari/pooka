@@ -30,6 +30,9 @@ public class VirtualFolderInfo extends FolderInfo {
 	originalMessages = newMessages;
 	setStatus(CONNECTED);
 	initializeFolderInfo();
+
+	createFilters();
+
 	resetDefaultActions();
     }
 

@@ -202,26 +202,45 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	if (Pooka.isDebug())
 	    System.out.println("SearchEntryForm:  setting SearchTerm value to that defined by " + rootProperty);
 	
-	String searchProperty = bundle.getProperty(rootProperty, "Search.searchTerms.Subject");
+	String searchProperty = bundle.getProperty(rootProperty + ".searchTerm", "Search.searchTerms.Subject");
+	if (Pooka.isDebug())
+	    System.out.println("getting searchProperty from " + rootProperty + ".searchTerm; value is " + searchProperty);
+	
 	String selectedType = Pooka.getProperty(searchProperty + ".type", "");
+	if (Pooka.isDebug())
+	    System.out.println("getting selectedType from " + searchProperty + ".type; value is " + selectedType);
 	String typeLabel = Pooka.getProperty(searchProperty + ".label", "Subject");
-	String operationProperty = bundle.getProperty(rootProperty + ".operationProperty", "Search.operations.Contains");
+	if (Pooka.isDebug())
+	    System.out.println("getting typeLabel from " + searchProperty + ".label; value is " + typeLabel);
+	String operationProperty = bundle.getProperty(rootProperty + ".operation", "Search.operations.Contains");
+	if (Pooka.isDebug())
+	    System.out.println("getting operationProperty from " + rootProperty + ".operation; value is " + operationProperty);
 	String operationLabel = Pooka.getProperty(operationProperty + ".label");
-	    
+	if (Pooka.isDebug())
+	    System.out.println("got operationLabel:  " + operationLabel);
+	
 	String pattern = bundle.getProperty(rootProperty + ".pattern", "");
+	if (Pooka.isDebug())
+	    System.out.println("got pattern from " + rootProperty + ".pattern; value is " + pattern);
 	
 	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	    if (Pooka.isDebug())
+		System.out.println("selectedType is string_match.");
 	    operationCombo.setSelectedItem(operationLabel);
 	    textField.setText(pattern);
 	} else if (selectedType.equalsIgnoreCase(SearchTermManager.BOOLEAN_MATCH)) {
+	    if (Pooka.isDebug())
+		System.out.println("selectedType is boolean_match.");
 	    booleanValueCombo.setSelectedItem(operationLabel);
 	} else	if (selectedType.equalsIgnoreCase(SearchTermManager.DATE_MATCH)) {
+	    if (Pooka.isDebug())
+		System.out.println("selectedType is date_match.");
 	    dateComparisonCombo.setSelectedItem(operationLabel);
-	    dateField.setText("pattern");
+	    dateField.setText(pattern);
 	}
-
+	
 	searchFieldCombo.setSelectedItem(typeLabel);
-
+	
     }
 
     /**

@@ -317,6 +317,12 @@ public class FolderTableModel extends AbstractTableModel {
         sortByColumn(column, true);
     }
 
+    /**
+     * Returns all of the MessageProxies in this FolderTableModel.
+     */
+    public Vector getAllProxies() {
+	return new Vector(data);
+    }
 }
 
 
