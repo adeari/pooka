@@ -2395,7 +2395,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       return parentStore.getDefaultProfile();
     }
     else {
-      return null;
+      return UserProfile.getDefaultProfile();
     }
   }
   

@@ -1,3 +1,9 @@
+fixed the handling of incorrectly-formed multipart/alternative messages so 
+that we display the content.
+
+changed the default UserProfile handling so that if a message doesn't have 
+a default UserProfile set, we use the default instead of returning null.
+
 put in another check to try to avoid sending multiple copies of one message.
 
 modified the resizing code for message tables so that we now just resize
@@ -14,7 +20,7 @@ emails a little bit better.
 no longer have to restart for change in IMAP synch with subscribed folders
 setting.
 
-added support for IMAP shared folders.
+added support for IMAP shared folders. -- tentative on javamail fix.
 
 fixed the StoreInfo so that we now properly use the custom port for
 IMAP/SSL.

@@ -691,15 +691,15 @@ public class MessageInfo {
    * As specified by interface net.suberic.pooka.UserProfileContainer.
    *
    * If the MessageProxy's folderInfo is set, this returns the 
-   * DefaultProfile of that folderInfo.  If the folderInfo isn't set
-   * (should that happen?), this returns null.
+   * DefaultProfile of that folderInfo.  If not, returns the default 
+   * UserProfile, if any.
    */
   
   public UserProfile getDefaultProfile() {
     if (getFolderInfo() != null) {
       return getFolderInfo().getDefaultProfile();
     } else 
-      return null;
+      return UserProfile.getDefaultProfile();
   }
   
   /**

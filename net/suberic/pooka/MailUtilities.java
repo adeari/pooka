@@ -124,10 +124,10 @@ public class MailUtilities {
       if (contentType.startsWith("multipart")) {
 	ContentType ct = new ContentType(contentType);
 	
-	if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	  parseAlternativeAttachment(bundle, (MimeMessage) m);
+	if (ct.getSubType().equalsIgnoreCase("alternative") && mp.getContent() instanceof Multipart) {
+	parseAlternativeAttachment(bundle, (MimeMessage) m);
 	} else if (m.getContent() instanceof Multipart) {
-	  bundle.addAll(parseAttachments((Multipart)m.getContent()));
+	bundle.addAll(parseAttachments((Multipart)m.getContent()));
 	} else {
 	  Attachment attachment = new Attachment((MimeMessage)m);
 	  bundle.addAttachment(attachment);
@@ -220,7 +220,7 @@ public class MailUtilities {
     } else {
       ContentType ct = new ContentType(mp.getContentType());
       if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-	if (ct.getSubType().equalsIgnoreCase("alternative")) {
+	if (ct.getSubType().equalsIgnoreCase("alternative") && mp.getContent() instanceof Multipart) {
 	  parseAlternativeAttachment(bundle, mp);
 	} else if (mp.getContent() instanceof Multipart) {
 	  bundle.addAll(parseAttachments((Multipart)mp.getContent()));
