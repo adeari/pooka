@@ -235,9 +235,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
      * location of the cursor.
      */
     public void addSignature(JEditorPane editor) {
-	System.out.println("calling addSignature() method itself.");
 	String sig = getSelectedProfile().getSignature();
-	System.out.println("sig is " + sig);
 	if (sig != null) {
 	    try {
 		editor.getDocument().insertString(editor.getCaretPosition(), sig, null);
@@ -571,7 +569,6 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    System.out.println("adding signature");
 	    addSignature(editorPane);
 	}
     }
@@ -616,7 +613,6 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    System.out.println("wrapped text is:");
 	    System.out.println(net.suberic.pooka.MailUtilities.wrapText(getMessageText()));
 	}
     }

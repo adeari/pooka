@@ -69,7 +69,10 @@ public class AttachmentPane extends JPanel {
 		    }
 		else if (column == 1)
 		    try {
-			return (((MimeBodyPart)v.elementAt(row)).getContentType());    
+			String contentType = (((MimeBodyPart)v.elementAt(row)).getContentType());    
+			if (contentType.indexOf(';') != -1)
+			    contentType = contentType.substring(0, contentType.indexOf(';'));			
+			return contentType;
 		    } catch (MessagingException me) {
 			return Pooka.getProperty("AttachmentPane.error.FileTypeUnavailable", "Unavailable");
 		    }
@@ -183,7 +186,7 @@ public class AttachmentPane extends JPanel {
 		    }
 		}
 		CommandInfo[] cmds = dh.getPreferredCommands();
-		if (cmds != null && cmds[0] != null) {
+		if (cmds != null && cmds[cmds.length -1] != null) {
 		    Object beanViewer = dh.getBean(cmds[0]);
 		    if (beanViewer instanceof Frame) {
 			Frame frameViewer = (Frame)beanViewer;
@@ -220,115 +223,53 @@ public class AttachmentPane extends JPanel {
     public void openWith() {
 	if (Pooka.isDebug())
 	    System.out.println("calling AttachmentPane.openWith()");
-
 	
 	MimeBodyPart mbp = getSelectedPart();
 	String mType;
 	try {
 	    mType = mbp.getContentType();
+	    if (mType.indexOf(';') != -1)
+		mType = mType.substring(0, mType.indexOf(';'));
+
 	    String inputMessage = Pooka.getProperty("AttchmentPane.openWith.message", "Enter the command with which \nto open the attchment.");
 	    String inputTitle = Pooka.getProperty("AttachmentPane.openWith.title", "Open Attachment With");
 	    String makeDefaultLabel = Pooka.getProperty("AttachmentPane.openWith.makeDefaultMessage", "Make default command?");
 	    
-	    OpenWithWindow oww = new OpenWithWindow(inputMessage, inputTitle, makeDefaultLabel, mbp, mType);
-	    oww.show(message.getMessageWindow().getDesktopPane());
+	    JLabel toggleMsgLabel = new JLabel(makeDefaultLabel);
+	    toggleMsgLabel.setForeground(Color.getColor("Black"));
+	    JRadioButton toggleButton = new JRadioButton();
+	    JPanel togglePanel = new JPanel();
+	    togglePanel.add(toggleMsgLabel);
+	    togglePanel.add(toggleButton);
+
+	    Object[] messageArray = new Object[2];
+	    messageArray[0] = inputMessage;
+	    messageArray[1] = togglePanel;
+	    String cmd = JOptionPane.showInternalInputDialog(message.getMessageWindow().getDesktopPane(), messageArray, inputTitle, JOptionPane.QUESTION_MESSAGE);
 	    
-	} catch (MessagingException me) {
-	}
-	
-    }
-    
-    public String getCommandString(String newCmd) {
-	if (newCmd.indexOf("%s") == -1)
-	    newCmd = newCmd.concat(" %s");
-	return newCmd;
-    }
-    
-    private void openWith(MimeBodyPart mbp, String cmd) {
-	if (mbp != null && cmd != null && !cmd.equals("")) {
-	    try {
-		
+	    if (cmd != null) {
+		if (cmd.indexOf("%s") == -1)
+		    cmd = cmd.concat(" %s");
+
+		if (toggleButton.isSelected()) {
+		    String newMailcap = new String(mType.toLowerCase() + ";" + cmd);
+		    ((FullMailcapCommandMap)Pooka.getMailcap()).addMailcap(newMailcap);
+		}
+
 		DataHandler dh = null;
 		
 		dh = mbp.getDataHandler();
 		if (dh != null) {
 		    dh.setCommandMap(Pooka.getMailcap());
-		    try {
-			ExternalLauncher el = new ExternalLauncher();
-			el.setCommandContext(cmd, dh);
-			el.show();
-		    } catch (IOException ioe) {
-				//
-		    }
+		    ExternalLauncher el = new ExternalLauncher();
+		    el.setCommandContext(cmd, dh);
+		    el.show();
+		    
 		}
-	    } catch (MessagingException me) {
+		
 	    }
-	}
-    }
-
-    private class OpenWithWindow {
-
-	public int returnValue = 0;
-	public JInternalFrame jif;
-	public JTextField inputField;
-	public JToggleButton toggleButton;
-	public MimeBodyPart mbp;
-	public String mimeType;
-	
-	public OpenWithWindow(String message, String title, String defaultMsg, MimeBodyPart bodyPart, String partMimeType) {
-	    mbp = bodyPart;
-	    mimeType = partMimeType;
-
-	    jif = new JInternalFrame(title, false, false, false);
-	    JLabel inputLabel = new JLabel(message);
-	    System.out.println("creating label with message " + inputLabel);
-
-	    inputField = new JTextField();
-	
-	    toggleButton = new JToggleButton(defaultMsg);
-
-	    JPanel buttonPanel = new JPanel();
-	    JButton okButton = new JButton(Pooka.getProperty("button.ok", "Ok"));
-	    okButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-			try {
-			    jif.setClosed(true);
-			} catch (java.beans.PropertyVetoException pve) {}
-			String cmd = getCommandString(inputField.getText());
-			if (toggleButton.isSelected()) {
-			    String newMailcap = new String(mimeType + ";" + cmd);
-			    ((FullMailcapCommandMap)Pooka.getMailcap()).addMailcap(newMailcap);
-			}
-			openWith(mbp, cmd);
-			
-		    }
-		});
-	    
-	    JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
-	    cancelButton.addActionListener(new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-			try {
-			    jif.setClosed(true);
-			} catch (java.beans.PropertyVetoException pve) {}
-		    }
-		});
-
-	    buttonPanel.add(okButton);
-	    buttonPanel.add(cancelButton);
-	    
-	    jif.getContentPane().setLayout(new BoxLayout(jif.getContentPane(), BoxLayout.Y_AXIS));
-	    jif.getContentPane().add(inputLabel);
-	    jif.getContentPane().add(toggleButton);
-	    jif.getContentPane().add(buttonPanel);
-	    jif.pack();
-	}
-
-	public void show(JDesktopPane parent) {
-	    parent.add(jif);
-	    jif.setVisible(true);
-	    try {
-		jif.setSelected(true);
-	    } catch (java.beans.PropertyVetoException e) {}
+	} catch (Exception e) {
+	    //
 	}
     }
 	    

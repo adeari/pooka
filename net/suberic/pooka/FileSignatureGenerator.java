@@ -16,11 +16,9 @@ public class FileSignatureGenerator extends SignatureGeneratorImpl {
      */
     
     public String generateSignature(String text) {
-	System.out.println("calling generateSignature on FileSignatureGenerator.");
 	if (profile != null) {
 	    String fileName = Pooka.getProperty("UserProfile." + profile.getName() + ".signatureFile", "");
 	    if (!fileName.equals("")) {
-		System.out.println("got a file.");
 		File f = new File(fileName);
 		if (f.exists() && f.canRead()) {
 		    try {

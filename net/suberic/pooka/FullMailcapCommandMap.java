@@ -126,7 +126,7 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
     private void writeEntryToSourceFile(String mail_cap) {
 	int semicolonIndex = mail_cap.indexOf(';');
 	if (semicolonIndex > -1) {
-	    String mimeType = mail_cap.substring(0, semicolonIndex +1);
+	    String mimeType = mail_cap.substring(0, semicolonIndex);
 	    try {
 		if (!sourceFile.exists())
 		    sourceFile.createNewFile();
@@ -140,12 +140,16 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 		    int equalsLoc = currentLine.indexOf(';');
 		    if (equalsLoc != -1) {
 			String key = currentLine.substring(0, equalsLoc);
-			if (!mimeType.equals(key)) {
+			System.out.println("comparing:  mimeType = " + mimeType + ", key = " + key);
+			if (!mimeType.equalsIgnoreCase(key)) {
+			    System.out.println("mimeType does not equal key.");
 			    writeSourceFile.write(currentLine);
 			    writeSourceFile.newLine();
 			}
 		    }
+		    currentLine = readSourceFile.readLine();
 		}
+	    
 
 		writeSourceFile.write(mail_cap);
 		writeSourceFile.newLine();
