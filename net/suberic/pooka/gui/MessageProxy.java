@@ -490,7 +490,7 @@ public class MessageProxy {
     if (info != null) {
       if (info.hasEncryption()) {
 
-	net.suberic.pooka.crypto.EncryptionKey key = getDefaultProfile().getEncryptionKey();
+	java.security.Key key = getDefaultProfile().getEncryptionKey();
 
 	try {
 	  if (key == null) {
@@ -563,7 +563,7 @@ public class MessageProxy {
     if (info != null) {
       if (info.hasEncryption()) {
 
-	net.suberic.pooka.crypto.EncryptionKey key = getDefaultProfile().getEncryptionKey();
+	java.security.Key key = getDefaultProfile().getEncryptionKey();
 
 	MessageCryptoInfo cInfo = info.getCryptoInfo();
 	int sigStatus = 0;

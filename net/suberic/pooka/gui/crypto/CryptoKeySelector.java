@@ -1,7 +1,7 @@
 package net.suberic.pooka.gui.crypto;
 
 import net.suberic.pooka.*;
-import net.suberic.pooka.crypto.*;
+import net.suberic.crypto.*;
 
 import javax.swing.*;
 
@@ -15,7 +15,8 @@ public class CryptoKeySelector {
   /**
    * Selects a public key.
    */
-  public static EncryptionKey selectPublicKey() throws java.security.KeyStoreException, EncryptionException {
+  public static java.security.Key selectPublicKey() throws java.security.KeyStoreException {
+    /*
     EncryptionKeyManager mgr = Pooka.getCryptoManager().getKeyManager();
     if (mgr != null) {
       Set publicKeys = mgr.publicKeyAliases();
@@ -28,12 +29,16 @@ public class CryptoKeySelector {
       System.out.println("crypto manager == null.");
       return null;
     }
+    */
+    // FIXME
+    return null;
   }
 
   /**
    * Selects a private key.
    */
-  public static EncryptionKey selectPrivateKey()  throws java.security.KeyStoreException, EncryptionException {
+  public static java.security.Key selectPrivateKey()  throws java.security.KeyStoreException {
+    /*
     EncryptionKeyManager mgr = Pooka.getCryptoManager().getKeyManager();
     if (mgr != null) {
       Set privateKeys = mgr.privateKeyAliases();
@@ -46,7 +51,10 @@ public class CryptoKeySelector {
     } else {
       System.out.println("crypto manager == null.");
       return null;
-    }  
+    } 
+    */
+    // FIXME
+    return null;
   }
     
   /**
