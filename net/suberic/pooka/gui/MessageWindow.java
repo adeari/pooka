@@ -73,9 +73,12 @@ public class MessageWindow extends JInternalFrame {
 	bodyPanel = createBodyPanel(msg);
 
 	headerPanel.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	//	headerPanel.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200"))));
 	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	headerScrollPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	headerScrollPane.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200"))));
 	tabbedPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	tabbedPane.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200"))));
 	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
 
 	if (!getMessageProxy().hasLoadedAttachments())
@@ -88,7 +91,7 @@ public class MessageWindow extends JInternalFrame {
 	splitPane.setBottomComponent(bodyPanel);
 	this.getContentPane().add("Center", splitPane);
 	
-	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "200")));
+	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500")));
 	
 	newMsgProxy.setMessageWindow(this);
 
@@ -234,7 +237,8 @@ public class MessageWindow extends JInternalFrame {
 		editorPane.setText(origText);
 	    
 	    //	    bodyInputPane.setContentType("text");
-	    editorPane.setSize(200,300);
+	    editorPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "300")));	    
+	    editorPane.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "300"))));	    
 	    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	} else {
 	    if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
@@ -243,7 +247,8 @@ public class MessageWindow extends JInternalFrame {
 		if (content != null) {
 		    editorPane.setEditable(false);
 		    editorPane.setText(content);
-		    editorPane.setSize(200,300);
+		    editorPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "300")));	    
+		    editorPane.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "300"))));	    
 		    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		} else { 
 		    
@@ -351,6 +356,7 @@ public class MessageWindow extends JInternalFrame {
 	attachmentPanel = new AttachmentPane(getMessageProxy());
 	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	attachmentScrollPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	attachmentScrollPane.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200"))));
 	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentScrollPane);
     }
 
