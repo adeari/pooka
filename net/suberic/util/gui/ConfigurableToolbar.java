@@ -4,6 +4,7 @@ import net.suberic.util.VariableBundle;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.MissingResourceException;
+import javax.swing.Action;
 
 /**
  * This is a JToolbar which implements the ConfigurableUI interface, and
@@ -96,6 +97,28 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
 	}
     }
 
+    /**
+     * This updates the Actions on the Toolbar.
+     *
+     * As defined in interface net.suberic.util.gui.ConfigurableUI.
+     */
+    public void setActive(Action[] newActions) {
+	clearListeners();
+	Hashtable tmpHash = new Hashtable();
+	if (newActions != null && newActions.length > 0) {
+	    for (int i = 0; i < newActions.length; i++) {
+		String cmdName = (String)newActions[i].getValue(Action.NAME);
+		tmpHash.put(cmdName, newActions[i]);
+	    }
+	}
+	setActive(tmpHash);
+    }
+
+    /**
+     * This clears the current listeners.  I think this shouldn't be
+     * necessary--I think that you can only have one listener at a time,
+     * so this shouldn't really be necessary.  Still...
+     */
     private void clearListeners() {
 	for (int i = 0; i < this.getComponentCount(); i++) {
 	    if ((this.getComponentAtIndex(i)) instanceof JButton) {

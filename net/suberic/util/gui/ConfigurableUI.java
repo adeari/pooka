@@ -1,6 +1,7 @@
 package net.suberic.util.gui;
 import java.util.Hashtable;
 import net.suberic.util.VariableBundle;
+import javax.swing.Action;
 
 /**
  * This defines a UI component which may be built dynamically using a 
@@ -47,5 +48,12 @@ public interface ConfigurableUI {
      */
 
     public void setActive(Hashtable commands);
+
+    /**
+     * This updates the Actions on the UI Component.
+     *
+     */
+
+    public void setActive(Action[] newActions);
 }
     
