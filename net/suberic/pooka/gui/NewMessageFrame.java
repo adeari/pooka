@@ -40,30 +40,31 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	
     }
 
-    public NewMessageFrame(NewMessageInternalFrame source) {
-	this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
-	messageDisplay = source.getMessageDisplay();
-	msg = source.getMessageProxy();
-	toolbar = source.getToolbar();
-	keyBindings = source.getKeyBindings();
-
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", messageDisplay);
-	
-	toolbar.setActive(this.getActions());
-
-	configureInterfaceStyle();
-
-	this.setLocation(source.getLocationOnScreen());
-
-	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	this.addWindowListener(new WindowAdapter() {
-	    public void windowClosing(WindowEvent we) {
-	      handleClose();
-	    }
-	  });
-	
-    }
+  public NewMessageFrame(NewMessageInternalFrame source) {
+    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
+    messageDisplay = source.getMessageDisplay();
+    messageDisplay.setMessageUI(this);
+    msg = source.getMessageProxy();
+    toolbar = source.getToolbar();
+    keyBindings = source.getKeyBindings();
+    
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", messageDisplay);
+    
+    toolbar.setActive(this.getActions());
+    
+    configureInterfaceStyle();
+    
+    this.setLocation(source.getLocationOnScreen());
+    
+    this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new WindowAdapter() {
+	public void windowClosing(WindowEvent we) {
+	  handleClose();
+	}
+      });
+    
+  }
 
     /**
      * This configures the MessageFrame.  This means that here is 
@@ -77,7 +78,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	    
 	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
 	    
-	    messageDisplay = new NewMessageDisplayPanel((NewMessageProxy)msg);
+	    messageDisplay = new NewMessageDisplayPanel(this);
 	    messageDisplay.configureMessageDisplay();
 	    
 	    toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
@@ -169,19 +170,19 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
     }
   }
 
-    /**
-     * Reattaches the window to the MessagePanel, if there is one.
-     */
-    public void attachWindow() {
-	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
-            MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
-            NewMessageInternalFrame nmif = new NewMessageInternalFrame(mp, this);
-	    getMessageProxy().setMessageUI(nmif);
-            nmif.openMessageUI();
-	    this.setModified(false);
-            this.dispose();
-        }
+  /**
+   * Reattaches the window to the MessagePanel, if there is one.
+   */
+  public void attachWindow() {
+    if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
+      MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+      NewMessageInternalFrame nmif = new NewMessageInternalFrame(mp, this);
+      getMessageProxy().setMessageUI(nmif);
+      nmif.openMessageUI();
+      this.setModified(false);
+      this.dispose();
     }
+  }
 
     /**
      * This returns the values in the MesssageWindow as a set of 

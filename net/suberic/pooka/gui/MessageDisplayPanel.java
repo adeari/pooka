@@ -19,7 +19,7 @@ import java.io.File;
  * or full frame), and as part of a preview pane.
  */
 public abstract class MessageDisplayPanel extends JPanel {
-    protected MessageProxy msg;
+    protected MessageUI msgUI;
     protected JSplitPane splitPane = null;
     protected AttachmentPane attachmentPanel = null;
     protected JTextPane editorPane = null;
@@ -38,12 +38,12 @@ public abstract class MessageDisplayPanel extends JPanel {
     }
 
     /**
-     * Creates a MessageDisplayPanel for the given MessageProxy.
+     * Creates a MessageDisplayPanel for the given MessageUI.
      */
-    public MessageDisplayPanel(MessageProxy newMsgProxy) {
-	msg = newMsgProxy;
-
-	this.setLayout(new BorderLayout());
+    public MessageDisplayPanel(MessageUI newMsgUI) {
+      msgUI = newMsgUI;
+      
+      this.setLayout(new BorderLayout());
 
     }
 
@@ -111,7 +111,7 @@ public abstract class MessageDisplayPanel extends JPanel {
     public void setDefaultFont(JEditorPane jep) {
       Font f = null;
       try {
-	net.suberic.util.swing.ThemeSupporter ts = (net.suberic.util.swing.ThemeSupporter)getMessageProxy().getMessageUI();
+	net.suberic.util.swing.ThemeSupporter ts = (net.suberic.util.swing.ThemeSupporter)getMessageUI();
 	net.suberic.util.swing.ConfigurableMetalTheme cmt = (net.suberic.util.swing.ConfigurableMetalTheme) ts.getTheme(Pooka.getUIFactory().getPookaThemeManager());
 	if (cmt != null) {
 	  f = cmt.getMonospacedFont();
@@ -152,11 +152,18 @@ public abstract class MessageDisplayPanel extends JPanel {
     }
 
     public MessageProxy getMessageProxy() {
-	return msg;
+      if (msgUI != null)
+	return msgUI.getMessageProxy();
+      else
+	return null;
     }
 
-    public void setMessageProxy(MessageProxy newValue) {
-	msg = newValue;
+    public MessageUI getMessageUI() {
+	return msgUI;
+    }
+
+    public void setMessageUI(MessageUI newValue) {
+	msgUI = newValue;
     }
 
     public String getMessageText() {

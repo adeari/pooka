@@ -34,8 +34,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Creates a NewMessageDisplayPanel from the given Message.
    */
   
-  public NewMessageDisplayPanel(NewMessageProxy newMsgProxy) {
-    super(newMsgProxy);
+  public NewMessageDisplayPanel(NewMessageUI newMsgUI) {
+    super(newMsgUI);
     
   }
   
@@ -51,8 +51,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     
     inputTable = new Hashtable();
     
-    headerPanel = createHeaderInputPanel(msg, inputTable);
-    editorPane = createMessagePanel(msg);
+    headerPanel = createHeaderInputPanel(getMessageProxy(), inputTable);
+    editorPane = createMessagePanel(getMessageProxy());
     
     headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
@@ -119,7 +119,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	Pooka.getMainPanel().refreshCurrentUser();
 	SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {
-	      NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	      NewMessageUI nmui = getNewMessageUI();
 	      if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
 		try {
 		  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
@@ -129,7 +129,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 		  if (currentFont != newFont) {
 		    sizeToDefault();
 		  }
-                  MessageUI mui = getMessageProxy().getMessageUI();
+                  MessageUI mui = getMessageUI();
                   if (mui instanceof MessageInternalFrame) {
                     ((MessageInternalFrame) mui).resizeByWidth();
                   } else if (mui instanceof MessageFrame) {
@@ -186,13 +186,13 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
 	    if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") && Pooka.getProperty("Pooka.useAddressCompletion", "false").equalsIgnoreCase("true")) {
 	      try {
-		inputField = new AddressEntryTextArea(((NewMessageProxy)msg).getNewMessageUI(), ((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+		inputField = new AddressEntryTextArea(getNewMessageUI(), getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 	      } catch (MessagingException me) {
 		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	      }
 	    } else {
 	      try {
-		inputField = new net.suberic.util.swing.EntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+		inputField = new net.suberic.util.swing.EntryTextArea(getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 	      } catch (MessagingException me) {
 		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	      }
@@ -322,7 +322,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      */
     public void attachmentRemoved(int index) {
 	try {
-	    Vector attach = ((NewMessageProxy)getMessageProxy()).getAttachments();
+	    Vector attach = getNewMessageProxy().getAttachments();
 	    if (attach == null || attach.size() == 0) {
 		removeAttachmentPane();
 	    } else {
@@ -340,7 +340,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     public void addAttachmentPane() {
 	attachmentPanel = new AttachmentPane(getMessageProxy());
 	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	NewMessageUI nmui = getNewMessageUI();
 	if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
 	  try {
 	    Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentScrollPane, true);
@@ -412,7 +412,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
 	popupMenu.configureComponent("NewMessageWindow.popupMenu", Pooka.getResources());	
 	popupMenu.setActive(getActions());
-	NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	NewMessageUI nmui = getNewMessageUI();
 	if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
 	  try {
 	    Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, popupMenu, true);
@@ -483,6 +483,20 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    modified=mod;
     }
 
+  /**
+   * Returns the MessageProxy as a NewMessageProxy.
+   */
+  public NewMessageProxy getNewMessageProxy() {
+    return (NewMessageProxy) getMessageProxy();
+  }
+
+  /**
+   * Returns the MessageUI as a NewMessageUI.
+   */
+  public NewMessageUI getNewMessageUI() {
+    return (NewMessageUI) getMessageUI();
+  }
+
     //------- Actions ----------//
 
     /**
@@ -544,11 +558,11 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     public Action[] getActions() {
 	Action[] returnValue = getDefaultActions();
 	
-	if (msg.getActions() != null) { 
+	if (getMessageProxy().getActions() != null) { 
 	    if (returnValue != null) {
-		returnValue = TextAction.augmentList(msg.getActions(), returnValue);
+		returnValue = TextAction.augmentList(getMessageProxy().getActions(), returnValue);
 	    } else {
-		returnValue = msg.getActions();
+		returnValue = getMessageProxy().getActions();
 	    }
 	}
 	    

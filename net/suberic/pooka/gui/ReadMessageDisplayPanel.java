@@ -55,8 +55,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   /**
    * Creates a MessageDisplayPanel from the given Message.
    */    
-  public ReadMessageDisplayPanel(MessageProxy newMsgProxy) {
-    super(newMsgProxy);
+  public ReadMessageDisplayPanel(MessageUI newMsgUI) {
+    super(newMsgUI);
     
     this.setLayout(new CardLayout());
     
@@ -129,7 +129,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	}
       });
     
-    if (msg != null) {
+    if (getMessageProxy() != null) {
       resetEditorText();
     } else {
       ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
@@ -217,7 +217,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       } 
       
       if (getMessageProxy().hasAttachments()) {
-	attachmentPanel = new AttachmentPane(msg);
+	attachmentPanel = new AttachmentPane(getMessageProxy());
 	attachmentScrollPane.setViewportView(attachmentPanel);
 	((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
 	editorStatus = WITH_ATTACHMENTS;
@@ -305,7 +305,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
     popupMenu.configureComponent("ReadMessageWindow.popupMenu", Pooka.getResources());	
     popupMenu.setActive(getActions());
-    MessageUI mui = getMessageProxy().getMessageUI();
+    MessageUI mui = getMessageUI();
     if (mui instanceof net.suberic.util.swing.ThemeSupporter) {
       try {
 	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
@@ -360,8 +360,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     Action[] actionList = null;
 	
-    if (msg != null)
-      actionList = msg.getActions();
+    if (getMessageProxy() != null)
+      actionList = getMessageProxy().getActions();
     
     if (actionList != null) {
       if (editorPane != null && editorPane.getActions() != null) 

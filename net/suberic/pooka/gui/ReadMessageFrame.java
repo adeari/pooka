@@ -36,74 +36,75 @@ public class ReadMessageFrame extends MessageFrame {
 	  });
     }
 
-    /**
-     * Creates a ReadMessageFrame from an existing ReadMessageInternalFrame.
-     */
-    ReadMessageFrame(ReadMessageInternalFrame source) {
-	messageDisplay = source.getMessageDisplay();
-	msg = source.getMessageProxy();
-	toolbar = source.getToolbar();
-	keyBindings = source.getKeyBindings();
-
-	try {
-	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
-	} catch (MessagingException me) {
-	    this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
-	}
-
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", messageDisplay);
-	
-	toolbar.setActive(this.getActions());
-
-	this.setLocation(source.getLocationOnScreen());
-
-	this.addFocusListener(new FocusAdapter() {
-	    public void focusGained(FocusEvent e) {
-	      if (getMessageDisplay() != null)
-		getMessageDisplay().requestFocus();
-	    }
-	  });
-
-	configureInterfaceStyle();
+  /**
+   * Creates a ReadMessageFrame from an existing ReadMessageInternalFrame.
+   */
+  ReadMessageFrame(ReadMessageInternalFrame source) {
+    messageDisplay = source.getMessageDisplay();
+    messageDisplay.setMessageUI(this);
+    msg = source.getMessageProxy();
+    toolbar = source.getToolbar();
+    keyBindings = source.getKeyBindings();
+    
+    try {
+      this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+    } catch (MessagingException me) {
+      this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
     }
-
-    protected void configureMessageFrame() {
-	try {
-	    try {
-		this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
-	    } catch (MessagingException me) {
-		this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
-	    }
-	    
-	    messageDisplay = new ReadMessageDisplayPanel(msg);
-	    messageDisplay.configureMessageDisplay();
-	    
-	    toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
-	    
-	    this.getContentPane().add("North", toolbar);
-	    this.getContentPane().add("Center", messageDisplay);
-
-	    toolbar.setActive(this.getActions());
-
-	    keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "ReadMessageWindow.keyBindings", Pooka.getResources());
-	    keyBindings.setActive(getActions());
-
-	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
-	    me.printStackTrace();
+    
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", messageDisplay);
+    
+    toolbar.setActive(this.getActions());
+    
+    this.setLocation(source.getLocationOnScreen());
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (getMessageDisplay() != null)
+	    getMessageDisplay().requestFocus();
 	}
-
-	configureInterfaceStyle();
-
-	this.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e) {
-		    if (getMessageProxy().getMessageUI() == ReadMessageFrame.this)
-			getMessageProxy().setMessageUI(null);
-		}
-	    });
-
+      });
+    
+    configureInterfaceStyle();
+  }
+  
+  protected void configureMessageFrame() {
+    try {
+      try {
+	this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+      } catch (MessagingException me) {
+	this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
+      }
+      
+      messageDisplay = new ReadMessageDisplayPanel(this);
+      messageDisplay.configureMessageDisplay();
+      
+      toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
+      
+      this.getContentPane().add("North", toolbar);
+      this.getContentPane().add("Center", messageDisplay);
+      
+      toolbar.setActive(this.getActions());
+      
+      keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "ReadMessageWindow.keyBindings", Pooka.getResources());
+      keyBindings.setActive(getActions());
+      
+    } catch (MessagingException me) {
+      showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
+      me.printStackTrace();
     }
+    
+    configureInterfaceStyle();
+    
+    this.addWindowListener(new WindowAdapter() {
+	public void windowClosing(WindowEvent e) {
+	  if (getMessageProxy().getMessageUI() == ReadMessageFrame.this)
+	    getMessageProxy().setMessageUI(null);
+	}
+      });
+    
+  }
 
  /**
    * Gets the Theme object from the ThemeManager which is appropriate

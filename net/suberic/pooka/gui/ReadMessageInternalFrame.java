@@ -44,6 +44,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
 	parentContainer = newParentContainer;
     	messageDisplay = source.getMessageDisplay();
+	messageDisplay.setMessageUI(this);
 	msg = source.getMessageProxy();
 	toolbar = source.getToolbar();
 	keyBindings = source.getKeyBindings();
@@ -90,7 +91,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	    this.setTitle(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.noSubject", "<no subject>"));
 	}
 	
-	messageDisplay = new ReadMessageDisplayPanel(msg);
+	messageDisplay = new ReadMessageDisplayPanel(this);
 	messageDisplay.configureMessageDisplay();
 	
 	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());

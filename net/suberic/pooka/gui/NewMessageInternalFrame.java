@@ -42,6 +42,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
     public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageFrame source) {
 	parentContainer = newParentContainer;
     	messageDisplay = source.getMessageDisplay();
+	messageDisplay.setMessageUI(this);
 	msg = source.getMessageProxy();
 	toolbar = source.getToolbar();
 	keyBindings = source.getKeyBindings();
@@ -78,7 +79,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	    
 	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
 	    
-	    messageDisplay = new NewMessageDisplayPanel((NewMessageProxy)msg);
+	    messageDisplay = new NewMessageDisplayPanel(this);
 	    messageDisplay.configureMessageDisplay();
 	    
 	    toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
