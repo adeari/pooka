@@ -74,6 +74,11 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
 		this.add(mi);
 	    }
 	}
+
+	String keyBinding = vars.getProperty(key + ".KeyBinding", "");
+	if (!keyBinding.equals("")) {
+	    this.setMnemonic(keyBinding.charAt(0));
+	}
     }
     /**
      * And this actually creates the menu items themselves.
@@ -106,6 +111,10 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
 	    
 	    mi.setActionCommand(cmd);	
 	    
+	    String keyBinding = vars.getProperty(menuID + "." + menuItemID + ".KeyBinding", "");
+	    if (!keyBinding.equals(""))
+		mi.setMnemonic(keyBinding.charAt(0));
+
 	    return mi;
 	} else {
 	    // this means that we have a submenu.
