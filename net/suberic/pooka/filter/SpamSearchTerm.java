@@ -13,8 +13,8 @@ public class SpamSearchTerm extends SearchTerm {
   /**
    * Creates the given SpamSearchTerm.  
    */
-  public SpamSearchTerm (SpamFilter sf) {
-    filter = sf;
+  public SpamSearchTerm () {
+    //filter = new SpamAssassinSpamFilter();
   }
   
   /**

@@ -173,6 +173,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	  
 	  if (msgs != null && msgs.length > 0) {
 	    MimeMessage[] msgsToAppend = new MimeMessage[msgs.length];
+	    Pooka.getUIFactory().showStatusMessage(getFolderID() + ":  loading " + msgs.length + " messages...");
 	    for (int i = 0; i < msgs.length; i++) {
 	      msgsToAppend[i] = new MimeMessage((MimeMessage) msgs[i]);
 	      String uid = getUID(msgs[i], f);
@@ -181,12 +182,18 @@ public class PopInboxFolderInfo extends FolderInfo {
 	      uidsRead.add(uid);
 	      if (Pooka.isDebug())
 		System.out.println("adding " + uid + " to read list.");
+	      Pooka.getUIFactory().showStatusMessage(getFolderID() + ":  loading " + i + " of " + msgs.length + " messages...");
+
 	    }
 	    if (Pooka.isDebug()) 
 	      System.out.println(Thread.currentThread() + ":  running appendMessages; # of added messages is " + msgsToAppend.length);
+
+	      Pooka.getUIFactory().showStatusMessage(getFolderID() + ":  appending " + msgs.length + " messages to local folder...");
 	    
 	    getFolder().appendMessages(msgsToAppend);
 	    
+	    Pooka.getUIFactory().clearStatus();
+
 	    if (! leaveMessagesOnServer()) {
 	      if (Pooka.isDebug())
 		System.out.println("removing all messages.");

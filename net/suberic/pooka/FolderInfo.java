@@ -1099,17 +1099,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
     if (! targetFolder.isAvailable()) 
       targetFolder.loadFolder();
-    
-    Folder target = targetFolder.getFolder();
-    if (target != null) {
-      Message[] m = new Message[msgs.length];
-      for (int i = 0; i < msgs.length; i++) {
-	m[i] = msgs[i].getRealMessage();
+
+    synchronized(targetFolder.getFolderThread().getRunLock()) {
+      Folder target = targetFolder.getFolder();
+      if (target != null) {
+	Message[] m = new Message[msgs.length];
+	for (int i = 0; i < msgs.length; i++) {
+	  m[i] = msgs[i].getRealMessage();
+	}
+	
+	getFolder().copyMessages(m, target);
+      } else {
+	targetFolder.appendMessages(msgs);
       }
-      
-      getFolder().copyMessages(m, target);
-    } else {
-      targetFolder.appendMessages(msgs);
     }
   }
 
@@ -1876,7 +1878,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       
       tmpBackendFilters = new BackendMessageFilter[backendFilterNames.size()];
       for (int i = 0; i < backendFilterNames.size(); i++) {
-	System.out.println("creating filter from " + getFolderProperty() + ".backendFitlers." + (String) backendFilterNames.elementAt(i));
 	tmpBackendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
       }
       

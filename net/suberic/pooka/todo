@@ -1,7 +1,12 @@
 *) change over from mbox to maildir or something like it.
-	-- add configs for both.
+	-- tag new messages as recent. -- sent to az
+	-- test for large mailboxes.
+	    -- make Pop3FolderInfo put up info about loading large numbers
+		of messages.
 
-	-- tag new messages as recent.
+*) add at least one more piece of documentation.
+
+*) check why the bcc field sometimes doesn't show the address book icon.
 
 --
 
@@ -12,8 +17,6 @@
 *) fix the problem with things like MissingStartBoundary by getting the
 raw input stream.
 
-*) check why the bcc field sometimes doesn't show the address book icon.
-
 ------
 
 *) add plugin for spam checker?
@@ -21,6 +24,20 @@ raw input stream.
 *) add mrpostman support(?)
 
 ------
+
+*) MoveFilter on closed imap folder:
+java.lang.ArrayIndexOutOfBoundsException: 0
+        at net.suberic.pooka.gui.filechooser.MailFileSystemView.getDefaultRoot(MailFileSystemView.java:461)
+        at net.suberic.pooka.gui.filechooser.MailFileSystemView.getHomeDirectory(MailFileSystemView.java:238)
+        at javax.swing.plaf.metal.MetalFileChooserUI.installComponents(MetalFileChooserUI.java:213)
+        at javax.swing.plaf.basic.BasicFileChooserUI.installUI(BasicFileChooserUI.java:130)
+        at javax.swing.plaf.metal.MetalFileChooserUI.installUI(MetalFileChooserUI.java:152)
+        at javax.swing.JComponent.setUI(JComponent.java:449)
+        at javax.swing.JFileChooser.updateUI(JFileChooser.java:1700)
+        at javax.swing.JFileChooser.setup(JFileChooser.java:345)
+        at javax.swing.JFileChooser.<init>(JFileChooser.java:329)
+        at net.suberic.pooka.gui.propedit.FolderSelectorPane.selectNewFolder(FolderSelectorPane.java:120)
+        at net.suberic.pooka.gui.propedit.FolderSelectorPane$1.actionPerformed(FolderSelectorPane.java:83)
 
 *) make it so folder windows save their settings (column width, sort order)
 

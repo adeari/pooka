@@ -1,3 +1,5 @@
+fixed a deadlock in FolderInfo.copyMessages().
+
 made opening folders in the background the default.
 
 removed the old code that messed with the scroll move during internal pane
