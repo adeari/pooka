@@ -196,6 +196,18 @@ public class StoreManager implements ValueChangeListener {
 	return null;
     }
 
+    /**
+     * Gets all of the open and available folders known by the system.
+     */
+    public Vector getAllOpenFolders() {
+	Vector returnValue = new Vector();
+	Vector currentStores = getStoreList();
+	for (int i = 0; i < currentStores.size(); i++) {
+	    returnValue.addAll(((StoreInfo) currentStores.elementAt(i)).getAllFolders());
+	}
+
+	return returnValue;
+    }
     
     /**
      * This returns the StoreInfo with the given storeName if it exists
