@@ -43,7 +43,7 @@ public class SearchTermManager {
 	if (keys != null) {
 	    labelToPropertyMap = new HashMap();
 	    for (int i = 0; i < keys.size(); i++) {
-		String thisValue = propName + (String) keys.elementAt(i);
+		String thisValue = propName + "." + (String) keys.elementAt(i);
 		String thisLabel = Pooka.getProperty(thisValue + ".label", (String)keys.elementAt(i));
 		labelToPropertyMap.put(thisLabel, thisValue);
 		termLabels.add(thisLabel);
@@ -61,7 +61,7 @@ public class SearchTermManager {
 	if (keys != null) {
 	    labelToOperationMap = new HashMap();
 	    for (int i = 0; i < keys.size(); i++) {
-		String thisValue = propName + (String) keys.elementAt(i);
+		String thisValue = propName + "." + (String) keys.elementAt(i);
 		String thisLabel = Pooka.getProperty(thisValue + ".label", (String)keys.elementAt(i));
 		labelToOperationMap.put(thisLabel, thisValue);
 		operationLabels.add(thisLabel);
