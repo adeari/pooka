@@ -93,6 +93,7 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
     this.setPreferredSize(new java.awt.Dimension(minWidth, minHeight));
   }
 
+
   /**
    * And this actually creates the menu items themselves.
    */

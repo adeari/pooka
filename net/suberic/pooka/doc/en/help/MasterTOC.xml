@@ -7,7 +7,7 @@
     <tocitem text="Introduction" target="pooka.intro"/>
     <tocitem text="Copyright Information" target="gpl"/>
     <tocitem text="Getting Started" target="pooka.starting"/>
-    <tocitem text="Configuring Your Email Account" target="store.intro"/>
+    <tocitem text="Configuring Your Email Account" target="pooka.configuring"/>
     <tocitem text="Reading Your Mail" target="reading.intro"/>
     <tocitem text="Composing New Mail" target="composing.intro"/>
     <tocitem text="Searches" target="search.intro"/>

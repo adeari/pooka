@@ -20,21 +20,13 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   
   public boolean firstShow = true;
   
-  public static int HEADERS_DEFAULT = 0;
-  public static int HEADERS_FULL = 1;
-  public static int RFC822_STYLE = 2;
-
   private static String WITH_ATTACHMENTS = "with";
   private static String WITHOUT_ATTACHMENTS = "without";
   
   private String editorStatus = WITHOUT_ATTACHMENTS;
   
   Action[] defaultActions = new Action[] {
-    new AttachmentPanelAction(),
-    new EditorPanelAction(),
-    new RawStreamDisplayModeAction(),
-    new DefaultDisplayModeAction(),
-    new FullDisplayModeAction()
+    new AttachmentPanelAction()
   };
 
   /**
@@ -165,6 +157,62 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
       String contentType = "text/plain";
 
+      boolean displayHtml = false;
+
+      int msgDisplayMode = getMessageProxy().getDisplayMode();
+
+      // figure out html vs. text
+      if (Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true")) {
+	System.err.println("we do display html...");
+	if (getMessageProxy().getMessageInfo().isHtml()) {
+	  System.err.println("and the message is html.");
+	  if (msgDisplayMode > MessageProxy.TEXT_ONLY) 
+	    displayHtml = true;
+	  
+	} else if (getMessageProxy().getMessageInfo().containsHtml()) {
+	  System.err.println("and the message contains html.");
+	  if (msgDisplayMode >= MessageProxy.HTML_PREFERRED)
+	    displayHtml = true;
+	  
+	} else {
+	  // if we don't have any html, just display as text.
+	}
+      }
+
+      System.err.println("redisplaying; displayHtml = " + displayHtml);
+
+      // set the content
+      if (msgDisplayMode == MessageProxy.RFC_822) {
+	content = getMessageProxy().getMessageInfo().getRawText();
+      } else {
+	if (displayHtml) {
+	  contentType = "text/html";
+
+	  if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	    content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
+	  } else {
+	    content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
+	  }
+	} else {
+	  if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	    // Is there only an HTML part?  Regardless, we've determined that 
+	    // we will still display it as text.
+	    if (getMessageProxy().getMessageInfo().isHtml())
+	      content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
+	    else
+	      content = getMessageProxy().getMessageInfo().getTextAndTextInlines(true, showFullHeaders());
+	  } else {
+	    // Is there only an HTML part?  Regardless, we've determined that 
+	    // we will still display it as text.
+	    if (getMessageProxy().getMessageInfo().isHtml())
+	      content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
+	    else
+	      content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders());
+	  }
+	}
+      }
+	    
+      /*
       if ((Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().isHtml()) || (Pooka.getProperty("Pooka.displayHtmlAsDefault", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().containsHtml())) {
 	
 	if (getMessageProxy().getDisplayMode() == RFC822_STYLE) {
@@ -197,6 +245,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
 	contentType = "text/plain";
       }
+      */
 
       if (content != null)
 	messageText.append(content);
@@ -291,9 +340,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       });
   }
   
+  /**
+   * Shows whether or now we want to show the full headers.
+   */
   public boolean showFullHeaders() {
     if (getMessageProxy() != null)
-      return (getMessageProxy().getDisplayMode() == HEADERS_FULL);
+      return (getMessageProxy().getHeaderMode() == MessageProxy.HEADERS_FULL);
     else
       return false;
   }
@@ -453,63 +505,4 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
   }
 
-  /**
-   * Abstract action which changes the display mode.
-   */
-  public abstract class DisplayModeAction extends AbstractAction {
-    protected int newDisplayMode;
-
-    public DisplayModeAction(String id) {
-      super(id);
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      MessageProxy mp = getMessageProxy();
-      if (mp != null) {
-	if (mp.getDisplayMode() != newDisplayMode) {
-	  mp.setDisplayMode(newDisplayMode);
-	  try {
-	    resetEditorText();
-	  } catch (MessagingException me) {
-	    final Exception finalE = me;
-	    SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		  msgUI.showError("Error changing display", finalE);
-		}
-	      });
-	  }
-	}
-      }
-    }
-  }
-
-  /**
-   * Abstract action which changes the display mode.
-   */
-  public class RawStreamDisplayModeAction extends DisplayModeAction {
-    public RawStreamDisplayModeAction() {
-      super("message-display-raw");
-      newDisplayMode=RFC822_STYLE;
-    }
-  }
-
-  /**
-   * Abstract action which changes the display mode.
-   */
-  public class DefaultDisplayModeAction extends DisplayModeAction {
-    public DefaultDisplayModeAction() {
-      super("message-display-default");
-      newDisplayMode=HEADERS_DEFAULT;
-    }
-  }
-
-  /**
-   * Abstract action which changes the display mode.
-   */
-  public class FullDisplayModeAction extends DisplayModeAction {
-    public FullDisplayModeAction() {
-      super("message-display-full");
-      newDisplayMode=HEADERS_FULL;
-    }
-  }
 }

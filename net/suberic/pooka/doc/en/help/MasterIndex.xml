@@ -8,4 +8,5 @@
     <indexitem text="POP" target="protocol.pop"/>
     <indexitem text="Messages, searching" target="message.search"/>
     <indexitem text="Address Book" target="addressBook"/>
+    <indexitem text="Pooka, starting" target="pooka.configuring"/>
 </index>

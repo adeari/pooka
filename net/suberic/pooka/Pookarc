@@ -252,7 +252,7 @@ NewMessageWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/net/suberic/pooka/gui/images/Object.gif
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:SelectAll:|:SaveAddress:|:Detach:|:DisplayStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:SelectAll:|:SaveAddress:|:Detach:|:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/net/suberic/pooka/gui/images/Reply.gif
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -269,14 +269,22 @@ MessageWindowToolbar.SaveAddress.Action=message-save-address
 MessageWindowToolbar.SaveAddress.Image=/net/suberic/pooka/gui/images/DataStore.gif
 MessageWindowToolbar.Detach.Action=window-detach
 MessageWindowToolbar.Detach.Image=/net/suberic/pooka/gui/images/Object.gif
+#MessageWindowToolbar.DisplayStyle.class=net.suberic.pooka.gui.DisplayStyleComboBox
 MessageWindowToolbar.DisplayStyle.class=net.suberic.util.gui.ConfigurableComboBox
-MessageWindowToolbar.DisplayStyle=ShowDefault:ShowFull:ShowRaw
-MessageWindowToolbar.DisplayStyle.ShowDefault.Action=message-display-default
-MessageWindowToolbar.DisplayStyle.ShowDefault.Image=/net/suberic/pooka/gui/images/Object.gif
-MessageWindowToolbar.DisplayStyle.ShowFull.Action=message-display-full
-MessageWindowToolbar.DisplayStyle.ShowFull.Image=/net/suberic/pooka/gui/images/Forward.gif
-MessageWindowToolbar.DisplayStyle.ShowRaw.Action=message-display-raw
-MessageWindowToolbar.DisplayStyle.ShowRaw.Image=/net/suberic/pooka/gui/images/Reply.gif
+MessageWindowToolbar.DisplayStyle=Text:Html:Raw
+MessageWindowToolbar.DisplayStyle.Text.Action=file-open-textdisplay
+MessageWindowToolbar.DisplayStyle.Text.Image=/net/suberic/pooka/gui/images/Object.gif
+MessageWindowToolbar.DisplayStyle.Html.Action=file-open-htmldisplay
+MessageWindowToolbar.DisplayStyle.Html.Image=/net/suberic/pooka/gui/images/Forward.gif
+MessageWindowToolbar.DisplayStyle.Raw.Action=file-open-rawdisplay
+MessageWindowToolbar.DisplayStyle.Raw.Image=/net/suberic/pooka/gui/images/Reply.gif
+
+MessageWindowToolbar.HeaderStyle.class=net.suberic.util.gui.ConfigurableComboBox
+MessageWindowToolbar.HeaderStyle=Default:Full
+MessageWindowToolbar.HeaderStyle.Default.Action=file-open-defaultdisplay
+MessageWindowToolbar.HeaderStyle.Default.Image=/net/suberic/pooka/gui/images/Object.gif
+MessageWindowToolbar.HeaderStyle.Full.Action=file-open-fulldisplay
+MessageWindowToolbar.HeaderStyle.Full.Image=/net/suberic/pooka/gui/images/Forward.gif
 
 FolderPanel.2xClickAction=file-open
 
@@ -358,10 +366,12 @@ StoreNode.popupMenu.Edit.Action=file-edit
 
 MessageProxy.popupMenu=Open:OpenMulti:Move:Copy:Reply:ReplyAll:Forward:Delete
 MessageProxy.popupMenu.Open.Action=file-open
-MessageProxy.popupMenu.OpenMulti=TextDefault:TextFull:Raw
-MessageProxy.popupMenu.OpenMulti.TextDefault.Action=file-open-defaultdisplay
-MessageProxy.popupMenu.OpenMulti.TextFull.Action=file-open-fulldisplay
-MenuBar.Mail.OpenMulti.Raw.Action=file-open-rawdisplay
+MessageProxy.popupMenu.OpenMulti=Text:Html:Default:Full:Raw
+MessageProxy.popupMenu.OpenMulti.Text.Action=file-open-textdisplay
+MessageProxy.popupMenu.OpenMulti.Html.Action=file-open-htmldisplay
+MessageProxy.popupMenu.OpenMulti.Default.Action=file-open-defaultdisplay
+MessageProxy.popupMenu.OpenMulti.Full.Action=file-open-fulldisplay
+MessageProxy.popupMenu.OpenMulti.Raw.Action=file-open-rawdisplay
 MessageProxy.popupMenu.Move.Action=message-move
 MessageProxy.popupMenu.Move.class=net.suberic.pooka.gui.FolderMenu
 MessageProxy.popupMenu.Copy.Action=message-copy

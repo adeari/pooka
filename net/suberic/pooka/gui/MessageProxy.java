@@ -136,9 +136,25 @@ public class MessageProxy {
   // The Window associated with this MessageProxy.
   MessageUI msgWindow;
 
-  // the display mode for this MessageProxy.
-  int displayMode = ReadMessageDisplayPanel.HEADERS_DEFAULT;
+  // the display modes.
+  public static int RFC_822 = -1;
+  public static int TEXT_ONLY = 0;
+  public static int TEXT_PREFERRED = 5;
+  public static int HTML_PREFERRED = 10;
+  public static int HTML_ONLY = 15;
 
+  // the header modes
+  public static int HEADERS_DEFAULT = 0;
+  public static int HEADERS_FULL = 1;
+  public static int RFC822_STYLE = 2;
+
+  // the types of headers to show for this Message.
+  int headerMode = HEADERS_DEFAULT;
+
+  // whether this should be displayed as html, text, or raw RFC822.
+  int displayMode = getDefaultDisplayMode();
+
+  // the default actions for this MessageProxy.
   public Action[] defaultActions;
   
   /**
@@ -272,6 +288,8 @@ public class MessageProxy {
       new ActionWrapper(new OpenDefaultDisplayAction(), folderThread),
       new ActionWrapper(new OpenFullDisplayAction(), folderThread),
       new ActionWrapper(new OpenRawDisplayAction(), folderThread),
+      new ActionWrapper(new OpenTextDisplayAction(), folderThread),
+      new ActionWrapper(new OpenHtmlDisplayAction(), folderThread),
       new ActionWrapper(new DefaultOpenAction(), folderThread),
       new ActionWrapper(new MoveAction(), folderThread),
       new ActionWrapper(new CopyAction(), folderThread),
@@ -534,42 +552,34 @@ public class MessageProxy {
    * this opens a MessageUI for this Message.
    */
   public void openWindow() {
-    openWindow(-1);
+    openWindow(getDefaultDisplayMode(), HEADERS_DEFAULT);
   }
 
   /**
    * this opens a MessageUI for this Message.
    */
-  public void openWindow(int newDisplayMode) {
-
-    boolean changeDisplayMode = false;
+  public void openWindow(int newDisplayMode, int newHeaderMode) {
+    System.err.println("opening window with mode " + newDisplayMode + ", " + newHeaderMode);
 
     try {
       if (getMessageUI() == null) {
-	if (newDisplayMode >= 0)
-	  setDisplayMode(newDisplayMode);
-	else
-	  setDisplayMode(ReadMessageDisplayPanel.HEADERS_DEFAULT);
-
+	setDisplayMode(newDisplayMode);
+	setHeaderMode(newHeaderMode);
+	
 	MessageUI newUI = Pooka.getUIFactory().createMessageUI(this);
 	setMessageUI(newUI);
-      } else if (newDisplayMode >= 0 && newDisplayMode != getDisplayMode()) {
-	changeDisplayMode = true;
-      }
-      
-      if (newDisplayMode >= 0)
+      } else if (newDisplayMode != getDisplayMode() || newHeaderMode != getHeaderMode()) {
 	setDisplayMode(newDisplayMode);
-
-      if (changeDisplayMode) { 
+	setHeaderMode(newHeaderMode);
 	getMessageUI().refreshDisplay();
       }
-
+      
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    getMessageUI().openMessageUI();
 	  }
 	});
-
+      
       getMessageInfo().setSeen(true);
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
@@ -979,8 +989,8 @@ public class MessageProxy {
 
   /**
    * Returns the current displayMode.  Valid values are the following
-   * constants on ReadMessageDisplayPanel:
-   *   HEADERS_DEFAULT, HEADERS_FULL, and RFC822_STYLE.
+   * constants:
+   *   RFC_822, TEXT_ONLY, TEXT_PREFERRED, HTML_PREFERRED, HTML_ONLY
    */
   public int getDisplayMode() {
     return displayMode;
@@ -992,6 +1002,34 @@ public class MessageProxy {
    */
   public void setDisplayMode(int newDisplayMode) {
     displayMode = newDisplayMode;
+  }
+
+  /**
+   * Returns the default display mode.
+   */
+  public static int getDefaultDisplayMode() {
+    if (Pooka.getProperty("Pooka.displayHtmlAsDefault", "false").equalsIgnoreCase("true"))
+      return HTML_PREFERRED;
+    else
+      return TEXT_PREFERRED;
+  }
+
+  /**
+   * Returns the current headerMode.  Valid values are the following
+   * constants:
+   *   HEADERS_DEFAULT, HEADERS_FULL, and RFC822_STYLE.
+   */
+  public int getHeaderMode() {
+    return headerMode;
+  }
+  /**
+   * Sets the headerMode.  Note that you will still need to calls something
+   * like ReadMessageDisplayPanel.resetEditorText() in order to have the
+   * change take effect.
+   */
+  public void setHeaderMode(int newHeaderMode) {
+    System.err.println("setting header mode to " + newHeaderMode);
+    headerMode = newHeaderMode;
   }
 
   public FolderDisplayUI getFolderDisplayUI() {
@@ -1028,22 +1066,55 @@ public class MessageProxy {
   }
   
   public class OpenAction extends AbstractAction {
-    protected int displayModeValue;
-    
+    protected int displayModeValue = 999;
+    protected int headerModeValue = 999;
+
+    public int getDisplayModeValue() {
+      return displayModeValue;
+    }
+    public int getHeaderModeValue() {
+      return headerModeValue;
+    }
+    protected String cmd = "";
+    public String getCommand() {
+      // i should probably actually get this using getValue()...
+      return cmd;
+    }
+    public MessageProxy getMessageProxy() {
+      return MessageProxy.this;
+    }
     OpenAction() {
       super("file-open");
+      cmd = "file-open";
     }
 
     OpenAction(String id) {
       super(id);
+      cmd = id;
     }
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-	fw.setBusy(true);;
-      openWindow(displayModeValue);
+	fw.setBusy(true);
+
+      int newDisplayMode;
+      if (displayModeValue != 999)
+	newDisplayMode = displayModeValue;
+      else
+	newDisplayMode = getDisplayMode();
+
+      int newHeaderMode;
+      if (headerModeValue != 999)
+	newHeaderMode = headerModeValue;
+      else
+	newHeaderMode = getHeaderMode();
+
+      System.err.println("getHeaderMode() = " + getHeaderMode());
+
+      openWindow(newDisplayMode, newHeaderMode);
+
       if (fw != null)
 	fw.setBusy(false);
     }
@@ -1053,7 +1124,7 @@ public class MessageProxy {
 
     OpenDefaultDisplayAction() {
       super("file-open-defaultdisplay");
-      displayModeValue = ReadMessageDisplayPanel.HEADERS_DEFAULT;
+      headerModeValue = HEADERS_DEFAULT;
     }
   }
 
@@ -1061,14 +1132,28 @@ public class MessageProxy {
 
     OpenFullDisplayAction() {
       super("file-open-fulldisplay");
-      displayModeValue = ReadMessageDisplayPanel.HEADERS_FULL;
+      headerModeValue = HEADERS_FULL;
     }
   }
 
   public class OpenRawDisplayAction extends OpenAction {
     OpenRawDisplayAction() {
       super("file-open-rawdisplay");
-      displayModeValue = ReadMessageDisplayPanel.RFC822_STYLE;
+      displayModeValue = RFC_822;
+    }
+  }
+  
+  public class OpenTextDisplayAction extends OpenAction {
+    OpenTextDisplayAction() {
+      super("file-open-textdisplay");
+      displayModeValue = TEXT_ONLY;
+    }
+  }
+  
+  public class OpenHtmlDisplayAction extends OpenAction {
+    OpenHtmlDisplayAction() {
+      super("file-open-htmldisplay");
+      displayModeValue = HTML_ONLY;
     }
   }
   
