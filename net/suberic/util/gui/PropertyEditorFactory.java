@@ -40,6 +40,20 @@ public class PropertyEditorFactory {
     }
 
     /**
+     * This method returns an EditorWindow (a JFrame in this
+     * implementation) which has an editor for each property in the
+     * properties Vector.  The title string is the title of the 
+     * JInternalFrame.
+     */
+    public Container createEditorWindow(String title, Vector properties, Vector templateTypes ) {
+	JFrame jf = new JFrame(title);
+	jf.getContentPane().add(new PropertyEditorPane(this, properties, templateTypes, jf));
+	jf.setSize(200,200);
+	jf.pack();
+	return jf;
+    }
+
+    /**
      * This returns a DefaultPropertyEditor for the property passed.
      * If there is a value set for property.propertyType, it will return
      * the proper editor for that property type.  If there is no such

@@ -19,9 +19,32 @@ public interface PookaUIFactory extends ErrorHandler {
     public ContentPanel createContentPanel();
 
     /**
-     * Shows an Editor Window.
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the values in the properties Vector.
      */
     public void showEditorWindow(String title, java.util.Vector properties);
+
+    /**
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the values in the properties Vector.  The given properties
+     * will be shown according to the values in the templates Vector.
+     * Note that there should be an entry in the templates Vector for
+     * each entry in the properties Vector.
+     */
+    public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates);
+
+    /**
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the given property.
+     */
+    public void showEditorWindow(String title, String property);
+
+    /**
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the given property, which is in turn defined by the 
+     * given template.
+     */
+    public void showEditorWindow(String title, String property, String template);
 
     /**
      * Returns the PropertyEditorFactory used by this component.

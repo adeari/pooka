@@ -26,6 +26,20 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     }
 
     /**
+     * This method returns an EditorWindow (a JInternalFrame in this 
+     * implementation) which has an editor for each property in the
+     * properties Vector.  The title string is the title of the 
+     * JInternalFrame.
+     */
+    public Container createEditorWindow(String title, Vector properties, Vector templateTypes) {
+	JInternalFrame jif = new JInternalFrame(title, false, false, false, false);
+	jif.getContentPane().add(new PropertyEditorPane(this, properties, templateTypes, jif));
+	jif.setSize(100,100);
+	jif.pack();
+	return jif;
+    }
+
+    /**
      * This shows an input Dialog.
      */
     public String showInputDialog(DefaultPropertyEditor dpe, String query) {

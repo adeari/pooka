@@ -70,12 +70,46 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     }
 
     /**
-     * Shows an Editor Window for the properties in the properties 
-     * Vector with the given title.
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the values in the properties Vector.  The given properties
+     * will be shown according to the values in the templates Vector.
+     * Note that there should be an entry in the templates Vector for
+     * each entry in the properties Vector.
+     */
+    public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
+	JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
+	jf.show();
+    }
+
+    /**
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the values in the properties Vector.
      */
     public void showEditorWindow(String title, java.util.Vector properties) {
-	JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties);
-	jf.show();
+	showEditorWindow(title, properties, properties);
+    }
+
+    /**
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the given property.
+     */
+    public void showEditorWindow(String title, String property) {
+	java.util.Vector v = new java.util.Vector();
+	v.add(property);
+	showEditorWindow(title, v, v);
+    }
+
+    /**
+     * Shows an Editor Window with the given title, which allows the user
+     * to edit the given property, which is in turn defined by the 
+     * given template.
+     */
+    public void showEditorWindow(String title, String property, String template) {
+	java.util.Vector prop = new java.util.Vector();
+	prop.add(property);
+	java.util.Vector templ = new java.util.Vector();
+	templ.add(template);
+	showEditorWindow(title, prop, templ);
     }
 
     /**
