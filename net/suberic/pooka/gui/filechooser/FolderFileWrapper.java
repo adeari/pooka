@@ -14,18 +14,25 @@ import net.suberic.pooka.Pooka;
 public class FolderFileWrapper extends File {
     private Folder folder;
     private FolderFileWrapper parent;
-    private FolderFileWrapper[] children;
+    private FolderFileWrapper[] children = null;
     private String path;
-    
+    private Store parentStore;
+
     /**
      * Creates a new FolderFileWrapper from a Folder.  This should only
      * be used for direct children of the Folder.  
      */
-    public FolderFileWrapper(Folder f, FolderFileWrapper p) {
+    public FolderFileWrapper(Folder f, FolderFileWrapper p, Store pStore) {
 	super(f.getName());
+	parentStore = pStore;
 	folder = f;
 	parent = p;
 	path = f.getName();
+	if (Pooka.isDebug())
+	    if (p != null)
+		System.out.println("creating FolderFileWrapper from parent '" + p.getAbsolutePath() + "' from folder '" + f.getName() + "'");
+	    else
+		System.out.println("creating FolderFileWrapper from parent 'null' from folder '" + f.getName() + "'");
     }
 
     /**
@@ -33,11 +40,17 @@ public class FolderFileWrapper extends File {
      * and parent.  This is used for making relative paths to files, i.e.
      * a child of '/foo' called 'bar/baz'.
      */
-    public FolderFileWrapper(Folder f, FolderFileWrapper p, String filePath) {
+    public FolderFileWrapper(Folder f, FolderFileWrapper p, String filePath, Store pStore) {
 	super(f.getName());
+	parentStore = pStore;
 	folder = f;
 	parent = p;
 	path = filePath;
+	if (Pooka.isDebug())
+	    if (p != null)
+		System.out.println("creating FolderFileWrapper from parent '" + p.getAbsolutePath() + "' called '" + filePath + "'");
+	    else
+		System.out.println("creating FolderFileWrapper from parent 'null' called '" + filePath + "'");
     }
 
     /**
@@ -122,7 +135,7 @@ public class FolderFileWrapper extends File {
 	if (this.isAbsolute())
 	    return this;
 	else 
-	    return new FolderFileWrapper(getFolder(), getRoot(), getAbsolutePath());
+	    return new FolderFileWrapper(getFolder(), getRoot(), getAbsolutePath(), parentStore);
     }
 
     /**
@@ -144,9 +157,14 @@ public class FolderFileWrapper extends File {
 	if (isAbsolute())
 	    return getPath();
 	else {
-	    if (parent != null)
-		return parent.getAbsolutePath() + "/" + getPath();
-	    else
+	    if (parent != null) {
+		String parentPath = parent.getAbsolutePath();
+		if (parentPath != "/")
+		    return parentPath + "/" + getPath();
+		else
+		    return "/" + getPath();
+		
+	    } else
 		return "/";
 	}
     }
@@ -284,9 +302,19 @@ public class FolderFileWrapper extends File {
      * This returns the children of the File as Files.
      */
     public File[] listFiles() {
+	if (Pooka.isDebug()) {
+	    System.out.println("Running listFiles() on '" + getAbsolutePath() + "'");
+	    //Thread.dumpStack();
+	}
+
 	if (isDirectory()) {
-	    if (children == null)
+	    if (children == null) {
+		if (Pooka.isDebug()) {
+		    System.out.println("about to load children.");
+		}
 		loadChildren();
+	    }
+
 	    if (children != null)
 		return children;
 	}
@@ -295,6 +323,9 @@ public class FolderFileWrapper extends File {
     }
 
     public File[] listFiles(FileFilter filter) {
+	if (Pooka.isDebug())
+	    System.out.println("Running listFiles(FileFilter) on '" + getAbsolutePath() + "'");
+
 	File[] children = listFiles();
 	File[] matching = new File[children.length];
 	int retValueCounter = 0;
@@ -313,6 +344,9 @@ public class FolderFileWrapper extends File {
     }
 
     public File[] listFiles(FilenameFilter filter) {
+	if (Pooka.isDebug())
+	    System.out.println("Running listFiles(FilenameFilter) on '" + getAbsolutePath() + "'");
+
 	File[] children = listFiles();
 	File[] matching = new File[children.length];
 	int retValueCounter = 0;
@@ -391,27 +425,43 @@ public class FolderFileWrapper extends File {
 	return folder;
     }
 
-    private void loadChildren() {
-	if (isDirectory() ||  ! exists()) {
-	    try {
-		/*
-		if (!folder.getStore().isConnected()) {
-		    if (Pooka.isDebug()) {
-			System.out.println("parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
-			folder.getStore().connect();
-		    }
-		}
-		*/
+    private synchronized void loadChildren() {
+	if (Pooka.isDebug()) {
+	    System.out.println(Thread.currentThread().getName() + ":  calling loadChildren() on " + getAbsolutePath());
+	    //Thread.dumpStack();
+	}
 
-		Folder[] childList = folder.list();
-		children = new FolderFileWrapper[childList.length];
-		for (int i = 0; i < childList.length; i++) {
-		    children[i] = new FolderFileWrapper(childList[i], this);
-		}
-	    } catch (MessagingException me) {
-		me.printStackTrace();
+	if (children == null) {
+	    if (Pooka.isDebug()) {
+		System.out.println(Thread.currentThread().getName() + ":  children is null on " + getAbsolutePath() + ".  loading children.");
 	    }
+	    if (isDirectory() ||  ! exists()) {
+		try {
+		    if (Pooka.isDebug())
+			System.out.println(Thread.currentThread().getName() + ":  checking for connection.");
 
+		    if (!parentStore.isConnected()) {
+			if (Pooka.isDebug()) {
+			    System.out.println(Thread.currentThread().getName() + ":  parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
+			}
+			parentStore.connect();
+		    } else {
+			if (Pooka.isDebug())
+			    System.out.println(Thread.currentThread().getName() + ":  connection is ok.");
+		    }
+		    
+		    
+		    Folder[] childList = folder.list();
+		    children = new FolderFileWrapper[childList.length];
+		    for (int i = 0; i < childList.length; i++) {
+			children[i] = new FolderFileWrapper(childList[i], this, parentStore);
+		    }
+		} catch (MessagingException me) {
+		    if (Pooka.isDebug())
+			System.out.println("caught exception during FolderFileWrapper.loadChildren() on " + getAbsolutePath() + ".");
+		    me.printStackTrace();
+		}
+	    }
 	}
     }
 
@@ -423,6 +473,8 @@ public class FolderFileWrapper extends File {
 
 	String origFilename = new String(filename);
 	if (filename == null || filename.length() < 1) {
+	    if (Pooka.isDebug())
+		System.out.println("returning this for getFileByName()");
 	    return this;
 	}
 
@@ -482,7 +534,7 @@ public class FolderFileWrapper extends File {
 		newChildren[i] = children[i];
 
 	    try {
-		newChildren[children.length] = new FolderFileWrapper(folder.getFolder(filename), this);
+		newChildren[children.length] = new FolderFileWrapper(folder.getFolder(filename), this, parentStore);
 	    } catch (MessagingException me) {
 	    }
 

@@ -28,7 +28,7 @@ public class StoreNode extends MailTreeNode {
 	defaultActions = new Action[] {
 	    new ActionWrapper(new OpenAction(), getStoreInfo().getStoreThread()),
 	    new ActionWrapper(new SubscribeAction(), getStoreInfo().getStoreThread()),
-	    new ActionWrapper(new TestAction(), getStoreInfo().getStoreThread()),
+	    new TestAction(),
 	    new ActionWrapper(new DisconnectAction(), getStoreInfo().getStoreThread())
 		};
 	
@@ -200,6 +200,31 @@ public class StoreNode extends MailTreeNode {
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
 
+	    try {
+		Store s = getStoreInfo().getStore();
+		System.out.println("got store.");
+		if (!s.isConnected()) {
+		    if (Pooka.isDebug()) {
+			System.out.println("store is disconnected.  reconnecting.");
+			s.connect();
+		    }
+		}
+		if (!s.isConnected()) {
+		    if (Pooka.isDebug()) {
+			System.out.println("store is disconnected.  reconnecting.");
+			s.connect();
+		    }
+		}
+		Folder defaultFolder = s.getDefaultFolder();
+		System.out.println("got default folder.");
+		defaultFolder.list();
+		System.out.println("called list.");
+	    } catch (MessagingException me) {
+		System.out.println("got messaging exception.");
+		me.printStackTrace();
+	    }
+
+	    /*
 	    JInternalFrame jif = new JInternalFrame();
 	    
 	    SearchEntryForm sef = new SearchEntryForm(Pooka.getSearchManager());
@@ -212,6 +237,7 @@ public class StoreNode extends MailTreeNode {
 	    try {
 		jif.setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) { }
+	    */
 	}
     }
 

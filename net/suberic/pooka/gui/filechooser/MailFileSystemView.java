@@ -28,9 +28,15 @@ public class MailFileSystemView
      */
     public MailFileSystemView(Store newStore) {
 	store = newStore;
+	if (Pooka.isDebug())
+	    System.out.println("creating new MailFileSystemView for store " + store.getURLName());
+
 	try {
-	    if (!store.isConnected())
+	    if (!store.isConnected()) {
+		if (Pooka.isDebug())
+		    System.out.println("store is not connected.  connecting.");
 		store.connect();
+	    }
 	    getRoots();
 	} catch (MessagingException me) {
 	    System.out.println("caught messagingException : "
@@ -70,7 +76,7 @@ public class MailFileSystemView
 	// to the root directory) always.
 
 	if (Pooka.isDebug())
-	    System.out.println("running createFileObject2 on filename" + filename);
+	    System.out.println("running createFileObject2 on filename '" + filename + "'");
 
 	FolderFileWrapper rootFile = ((FolderFileWrapper) getRoot());
 	if (rootFile == null) {
@@ -82,7 +88,7 @@ public class MailFileSystemView
 	if (Pooka.isDebug())
 	    System.out.println("root != null");
 
-	if (filename.equals("/")) {
+	if (filename.equals("/") || filename.equals("")) {
 	    return rootFile;
 	}
 	
@@ -106,7 +112,7 @@ public class MailFileSystemView
 		
 		newFolder.create(Folder.HOLDS_FOLDERS);
 		
-		return new FolderFileWrapper(newFolder, (FolderFileWrapper)containingDir);
+		return new FolderFileWrapper(newFolder, (FolderFileWrapper)containingDir, store);
 	    } else {
 		return null;
 
@@ -172,11 +178,18 @@ public class MailFileSystemView
 	if (Pooka.isDebug())
 	    System.out.println("calling getRoots() on MailFileSystemView.");
 
-	if (root != null)
+	if (root != null) {
+	    if (Pooka.isDebug())
+		System.out.println("root has already been set.");
 	    return new File[] { root };
+	}
 	try {
+	    if (Pooka.isDebug())
+		System.out.println("setting folder f to store.getDefaultFolder().");
 	    Folder f = store.getDefaultFolder();
-	    root = new FolderFileWrapper(f, null);
+	    if (Pooka.isDebug())
+		System.out.println("done setting f.");
+	    root = new FolderFileWrapper(f, null, "/", store);
 	    return new File[] { root };
 	} catch (MessagingException me) {
 	    return null; // FIXME: throw this on
