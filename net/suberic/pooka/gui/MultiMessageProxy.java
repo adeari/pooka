@@ -7,6 +7,7 @@ import java.awt.event.MouseEvent;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.Pooka;
 import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.thread.*;
 
 /**
  * This class represents a group of Messages all selected.
@@ -20,6 +21,8 @@ public class MultiMessageProxy extends MessageProxy{
 
     Hashtable commands;
 
+    public Action[] defaultAction;
+
     /**
      * This creates a new MultiMessageProxy from the MessageProxys in 
      * the newMessages Vector.  These should be the MessageProxy objects
@@ -30,6 +33,15 @@ public class MultiMessageProxy extends MessageProxy{
 	rowNumbers=newRowNumbers;
 	messages=newMessages;
 	folderWindow=newFolderWindow;
+
+	
+	ActionThread storeThread = folderWindow.getFolderInfo().getParentStore().getStoreThread();
+
+	defaultActions = new Action[] {
+	    new ActionWrapper(new OpenAction(), storeThread),
+	    new ActionWrapper(new DeleteAction(), storeThread),
+	    new ActionWrapper(new MoveAction(), storeThread)
+		};
 
 	commands = new Hashtable();
 	
@@ -115,12 +127,6 @@ public class MultiMessageProxy extends MessageProxy{
     public Action[] getActions() {
 	return defaultActions;
     }
-
-    public Action[] defaultActions = {
-	new OpenAction(),
-	new DeleteAction(),
-	new MoveAction()
-    };
 
     public class OpenAction extends AbstractAction {
 	OpenAction() {

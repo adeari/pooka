@@ -11,6 +11,7 @@ import javax.swing.text.TextAction;
 import java.util.*;
 import net.suberic.util.gui.*;
 import net.suberic.util.event.*;
+import net.suberic.util.thread.*;
 
 /**
  * This basically is just the GUI representation of the Messages in
@@ -78,6 +79,10 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	getFolderInfo().setFolderWindow(this);
 
+	defaultActions = new Action[] {
+	    new CloseAction(),
+	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getParentStore().getStoreThread())
+		};
 
 	initWindow();
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
@@ -322,10 +327,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
     // The actions supported by the window itself.
 
-    private Action[] defaultActions = {
-	new CloseAction(),
-	new ExpungeAction()
-    };
+    private Action[] defaultActions;
 
     class CloseAction extends AbstractAction {
 

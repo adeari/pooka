@@ -90,6 +90,7 @@ public class StoreInfo implements ValueChangeListener {
 	    });
 
 	storeThread = new ActionThread(this.getStoreID() + " - ActionThread");
+	storeThread.start();
 
 	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
 

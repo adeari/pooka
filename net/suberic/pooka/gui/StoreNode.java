@@ -6,6 +6,7 @@ import javax.mail.*;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.StoreInfo;
+import net.suberic.util.thread.ActionWrapper;
 import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.mail.event.*;
@@ -23,6 +24,11 @@ public class StoreNode extends MailTreeNode {
 	displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
 	setCommands();
 	loadChildren();
+	defaultActions = new Action[] {
+	    new ActionWrapper(new OpenAction(), getStoreInfo().getStoreThread()),
+	    new ActionWrapper(new SubscribeAction(), getStoreInfo().getStoreThread())
+		};
+	
     }
     
     /**
@@ -127,10 +133,7 @@ public class StoreNode extends MailTreeNode {
 	    return false;
     }
 
-    public Action[] defaultActions = new Action[] {
-	new OpenAction(),
-	new SubscribeAction()
-	};
+    public Action[] defaultActions;
 
     public Action[] getDefaultActions() {
 	return defaultActions;

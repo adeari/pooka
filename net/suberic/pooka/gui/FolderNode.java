@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import javax.swing.JComponent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.mail.Store;
@@ -9,6 +10,7 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 import java.util.*;
 import net.suberic.pooka.*;
+import net.suberic.util.thread.*;
 import javax.mail.FolderNotFoundException;
 import javax.swing.JOptionPane;
 import net.suberic.pooka.FolderInfo;
@@ -33,6 +35,10 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 
 	commands = new Hashtable();
 	
+	defaultActions = new Action[] {
+	    new ActionWrapper(new OpenAction(), folderInfo.getParentStore().getStoreThread())
+		};
+
 	Action[] actions = defaultActions;
 
 	if (actions != null) {
@@ -226,9 +232,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	return defaultActions;
     }
 
-    public Action[] defaultActions = {
-	new OpenAction()
-    };
+    public Action[] defaultActions;
 
     class OpenAction extends AbstractAction {
 
@@ -241,6 +245,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	}
 
 	public void actionPerformed(ActionEvent e) {
+	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    try {
 		if (!getFolderInfo().isOpen())
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
@@ -255,7 +260,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		}
 	    } catch (MessagingException me) {
 	    }
+	((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
+
     }
 }
 

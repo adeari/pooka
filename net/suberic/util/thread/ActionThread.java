@@ -27,16 +27,24 @@ public class ActionThread extends Thread {
 
     // the action queue.
     private Vector actionQueue = new Vector();
-
-    // a flag to catch any time when the thread might be ending its run()
-    // method, but not dead yet.
-    private boolean dying;
+    
+    private boolean sleeping;
 
     public void run() {
-	ActionEventPair pair = popQueue();
-	while (pair != null) {
-	    pair.action.actionPerformed(pair.event);
-	    pair = popQueue();
+	while(true) {
+	    sleeping = false;
+	    ActionEventPair pair = popQueue();
+	    while (pair != null) {
+		pair.action.actionPerformed(pair.event);
+		pair = popQueue();
+	    }
+	    try {
+		sleeping = true;
+		while (true)
+		    Thread.sleep(100000000);
+	    } catch (InterruptedException ie) {
+		sleeping = false;
+	    }
 	}
     }
 
@@ -49,7 +57,6 @@ public class ActionThread extends Thread {
 	    return (ActionEventPair)actionQueue.remove(0);
 	}
 	else {
-	    dying=true;
 	    return null;
 	}
     }
@@ -60,26 +67,8 @@ public class ActionThread extends Thread {
      */
     public synchronized void addToQueue(Action action, ActionEvent event) {
 	actionQueue.addElement(new ActionEventPair(action, event));
-	if (!this.isAlive()) {
-	    this.start();
-	    dying = false;
-	} else if (dying) {
-	    boolean restarted = false;
-	    while (!restarted) {
-		try {
-		    Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
-		try {
-		    this.start();
-		    restarted=true;
-		} catch (IllegalThreadStateException itse) {
-
-		}
-	    }
-	}
-	
-	
-    }
+	if (sleeping)
+	    this.interrupt();
+    } 	
 	
 }

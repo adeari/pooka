@@ -10,6 +10,7 @@ import java.awt.event.*;
 import javax.activation.*;
 import javax.swing.table.AbstractTableModel;
 
+import net.suberic.util.thread.*;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.ExternalLauncher;
 import java.awt.*;
@@ -414,12 +415,14 @@ public class AttachmentPane extends JPanel {
 	    return new Action[] {
 		new RemoveAction()
 		    };
-	else
+	else {
+	    ActionThread storeThread = message.getFolderInfo().getParentStore().getStoreThread();
 	    return new Action[] {
-		new OpenAction(),
-		new OpenWithAction(),
-		new SaveAsAction()
+		new ActionWrapper(new OpenAction(), storeThread),
+		new ActionWrapper(new OpenWithAction(), storeThread),
+		new ActionWrapper(new SaveAsAction(), storeThread)
 		    };
+	}
     }
     
     public Action[] getActions() {
