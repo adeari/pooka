@@ -497,7 +497,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	int messageCount = -1;
 	
 	final int folderType = getFolderInfo().getType();
-	
+
 	if (getFolderInfo().isSortaOpen() && (folderType & Folder.HOLDS_MESSAGES) != 0 && getFolderInfo().getFolderDisplayUI() == null) {
 	  firstUnread = getFolderInfo().getFirstUnreadMessage();
 	  messageCount = getFolderInfo().getMessageCount();
@@ -509,9 +509,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {
 	      if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
-		if (getFolderInfo().getFolderDisplayUI() != null)
+		if (getFolderInfo().getFolderDisplayUI() != null) {
 		  getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-		else {
+		} else {
 		  getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
 		  if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {
 		    if (finalFirstUnread >= 0)

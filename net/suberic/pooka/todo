@@ -1,3 +1,5 @@
+*) outbox and preview pane doesn't work properly.  esp check edit as new.
+
 *) make it faster to start up; make a way to open and load all of your open
 folders before opening the other folders.
 

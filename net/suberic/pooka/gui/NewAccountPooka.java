@@ -228,6 +228,7 @@ public class NewAccountPooka {
       props.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
       props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
       props.setProperty("Store." + accountName + ".leaveMessagesOnServer", manager.getProperty("NewAccountPooka.leaveOnServer", "true"));
+      props.setProperty("Store." + accountName + ".useMaildir", "true");
       if (manager.getProperty("NewAccountPooka.leaveOnServer", "true").equalsIgnoreCase("true")) {
 	props.setProperty("Store." + accountName + ".deleteOnServerOnLocalDelete", "true");
       }
@@ -270,7 +271,7 @@ public class NewAccountPooka {
       }
       testConnection(mailServerName, port);
     } else {
-      // setup mbox connection
+      // setup maildir connection
     }
   }
 
@@ -294,7 +295,6 @@ public class NewAccountPooka {
     String storeName = props.getProperty("Store");
     String protocol = props.getProperty("Store." + storeName + ".protocol");
     String localStoreName = storeName;
-    String sentFolderName = "local/sent";
 
     if (protocol.equalsIgnoreCase("imap")) {
       // if we have an imap connection, then we actually have to do some
@@ -303,7 +303,7 @@ public class NewAccountPooka {
       props.setProperty("Store", storeName + ":local");
       props.setProperty("Store.local.useInbox", "false");
       props.setProperty("Store.local.folderList", "sent:outbox");
-      props.setProperty("Store.local.protocol", "mbox");
+      props.setProperty("Store.local.protocol", "maildir");
     } else {
       // we're fine if not.
       props.setProperty("Store." + localStoreName + ".folderList", "INBOX:sent:outbox");
@@ -320,15 +320,25 @@ public class NewAccountPooka {
     if (! subFolderDir.exists())
       subFolderDir.mkdirs();
     
-    /*
-      File sentFile = new File(subFolderDirName + File.separator + "sent");
-      if (! sentFile.exists())
-      sentFile.createNewFile();
+    File sentFile = new File(subFolderDirName + File.separator + ".sent");
+    if (! sentFile.exists()) {
+      sentFile.mkdir();
       
-      File outboxFile = new File(subFolderDirName + File.separator + "outbox");
-      if (! outboxFile.exists())
-      outboxFile.createNewFile();
-    */
+      // i should probably have the maildir store do this.
+      new File(sentFile, "cur").mkdir();
+      new File(sentFile, "new").mkdir();
+      new File(sentFile, "tmp").mkdir();
+    }
+
+    File outboxFile = new File(subFolderDirName + File.separator + ".outbox");
+    if (! outboxFile.exists()) {
+      outboxFile.mkdir();
+
+      new File(outboxFile, "cur").mkdir();
+      new File(outboxFile, "new").mkdir();
+      new File(outboxFile, "tmp").mkdir();
+    }
+
     props.setProperty("Store.local.mailDir", mailDirName);
     
     

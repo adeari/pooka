@@ -103,10 +103,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
     
     
-    url = new URLName(protocol, server, port, "", user, password);
+    Properties p = loadProperties();
+
+    if (protocol.equalsIgnoreCase("maildir")) {
+      url = new URLName(protocol, server, port, p.getProperty("mail.store.maildir.baseDir"), user, password);
+    } else {
+      url = new URLName(protocol, server, port, "", user, password);
+    }
     
     try {
-      Properties p = loadProperties();
       Session s = Session.getInstance(p, Pooka.defaultAuthenticator);
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	s.setDebug(true);
@@ -197,59 +202,107 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   public Properties loadProperties() {
     Properties p = new Properties(System.getProperties());
     
+    String realProtocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
+    if (realProtocol.equalsIgnoreCase("imap")) {
+      loadImapProperties(p);
+    } else if (realProtocol.equalsIgnoreCase("pop3")) {
+      loadPop3Properties(p);
+      if ( Pooka.getProperty(getStoreProperty() + ".useMaildir", "false").equalsIgnoreCase("false")) {
+	loadMboxProperties(p);
+      } else {
+	loadMaildirProperties(p);
+      }
+    } else if (realProtocol.equalsIgnoreCase("maildir")) {
+      loadMaildirProperties(p);
+    } else if (realProtocol.equalsIgnoreCase("mbox")) {
+      loadMboxProperties(p);
+    }
+    return p;
+  }
+
+  /**
+   * Load all IMAP properties.
+   */
+  void loadImapProperties(Properties p) {
     p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
     p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
-
+    
     // set up ssl
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-      //p.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
       p.setProperty("mail.imap.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
       p.setProperty("mail.imap.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
       p.setProperty("mail.imap.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "993"));
+    }
+  }
 
-
+  /**
+   * Load all POP3 properties.
+   */
+  void loadPop3Properties(Properties p) {
+    if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
       p.setProperty("mail.pop3.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
       p.setProperty("mail.pop3.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
       p.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "995"));
     }
+  }
     
+  /**
+   * Load all Maildir properties.
+   */
+  void loadMaildirProperties(Properties p) {
+    
+    String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
+    if (mailHome.equals("")) {
+      mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+      if (mailHome.equals(""))
+	mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+      
+      mailHome = mailHome + java.io.File.separator + storeID;
+    }
+
+    String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
+
+    //p.setProperty("mail.store.maildir.imapEmulation", "true");
+    p.setProperty("mail.store.maildir.baseDir", userHomeName);
+    p.setProperty("mail.store.maildir.autocreatedir", "true");
+  }
+  
+  /**
+   * Load all Mbox properties.
+   */
+  void loadMboxProperties(Properties p) {
     /*
      * set the properties for mbox folders, and for the mbox backend of 
      * a pop3 mailbox.  properties set are:
      *
-     * mail.mbox.inbox:  the location of the INBOX for this mail store.  for
+     * mail.mbox.inbox:  the location of the INBOX for this mail store. for
      *   pop3 stores, this is the location of the local copy of the inbox.
      *   for mbox stores, this should be the local inbox file.
      * mail.mbox.userhome:  the location of all subfolders.
      */ 
-
-    if (! Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("imap")) {
-      String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
-      if (mailHome.equals("")) {
-	mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
-	if (mailHome.equals(""))
-	  mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+    String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
+    if (mailHome.equals("")) {
+      mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+      if (mailHome.equals(""))
+	mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
 	
-	mailHome = mailHome + java.io.File.separator + storeID;
-      }
-      String inboxFileName;
-      if (Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("pop3")) {
+      mailHome = mailHome + java.io.File.separator + storeID;
+    }
+
+    String inboxFileName;
+    if (Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("pop3")) {
       inboxFileName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");
-      } else {
-	inboxFileName = Pooka.getProperty(getStoreProperty() + ".inboxLocation", "/var/spool/mail/" + System.getProperty("user.name"));
-      }
-      String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
-      
-      if (Pooka.isDebug())
-	System.out.println("for store " + getStoreID() + ", inboxFileName = " + inboxFileName + "; userhome = " + userHomeName);
-      p.setProperty("mail.mbox.inbox", inboxFileName);
-      p.setProperty("mail.mbox.userhome", userHomeName);
-      p.setProperty("mail.store.maildir.imapEmulation", "true");
-      p.setProperty("mail.store.maildir.baseDir", userHomeName);
-      p.setProperty("mail.store.maildir.baseDir", userHomeName);
-      p.setProperty("mail.store.maildir.autocreatedir", "true");
-    } 
-    return p;
+    } else {
+      inboxFileName = Pooka.getProperty(getStoreProperty() + ".inboxLocation", "/var/spool/mail/" + System.getProperty("user.name"));
+    }
+
+    String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
+    
+    if (Pooka.isDebug())
+      System.out.println("for store " + getStoreID() + ", inboxFileName = " + inboxFileName + "; userhome = " + userHomeName);
+
+    p.setProperty("mail.mbox.inbox", inboxFileName);
+    p.setProperty("mail.mbox.userhome", userHomeName);
   }
     
   /**

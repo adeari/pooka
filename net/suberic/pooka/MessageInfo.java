@@ -405,8 +405,9 @@ public class MessageInfo {
 	Message m = getRealMessage();
 	if (m != null) {
 	  m.setFlag(Flags.Flag.DELETED, true);
-	  if ( autoExpunge )
+	  if ( autoExpunge ) {
 	    folderInfo.expunge();
+	  }
 	}
     }
     
