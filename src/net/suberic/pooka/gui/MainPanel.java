@@ -452,91 +452,85 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new HelpKeyBindingsAction(),
 	new SelectMessagePanelAction(),
 	new SelectFolderPanelAction(),
-	new NewMessageAction()
-	    //new SelectMenuAction("select-menu-F"),
-	    //new SelectMenuAction("select-menu-E"),
-	    //new SelectMenuAction("select-menu-M"),
-	    //new SelectMenuAction("select-menu-W"),
-	    //new SelectMenuAction("select-menu-H")
+	new NewMessageAction(),
+	new ExportConfigAction()
     };
 
 
-    /*
-     * TODO:  This really needs to check and ask if you want to save any
-     * modified documents.  Of course, we don't check to see if the docs
-     * are modified yet, so this will do for now.
-     */
-    class ExitAction extends AbstractAction {
-
-	ExitAction() {
-	    super("file-exit");
-	}
-
-        public void actionPerformed(ActionEvent e) {
-	    exitPooka(0);
-	}
-    }
-
-    class ActivateWindowAction extends AbstractAction {
-
-	ActivateWindowAction() {
-	    super("activate-window");
-	}
-
-        public void actionPerformed(ActionEvent e) {
-	    try { 
-		((JInternalFrame)(((MessagePanel)contentPanel).getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
-	    } catch (java.beans.PropertyVetoException pve) {
-	    } catch (NumberFormatException nfe) {
-	    }
-	}
+  /*
+   * TODO:  This really needs to check and ask if you want to save any
+   * modified documents.  Of course, we don't check to see if the docs
+   * are modified yet, so this will do for now.
+   */
+  class ExitAction extends AbstractAction {
+    
+    ExitAction() {
+      super("file-exit");
     }
     
-    class EditUserConfigAction extends AbstractAction {
-
-	EditUserConfigAction() {
-	    super("cfg-users");
-	}
-
-        public void actionPerformed(ActionEvent e) {
-	    Vector valuesToEdit = new Vector();
-	    valuesToEdit.add("UserProfile");
-	    valuesToEdit.add("UserProfile.default");
-
-	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), valuesToEdit);
-	}
+    public void actionPerformed(ActionEvent e) {
+      exitPooka(0);
     }
-
-
-    class EditStoreConfigAction extends AbstractAction {
-
-	EditStoreConfigAction() {
-	    super("cfg-stores");
-	}
-
-        public void actionPerformed(ActionEvent e) {
-	    Vector valuesToEdit = new Vector();
-	    valuesToEdit.add("Store");
-
-	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
-	}
+  }
+  
+  class ActivateWindowAction extends AbstractAction {
+    
+    ActivateWindowAction() {
+      super("activate-window");
     }
-
-    class EditPreferencesAction extends AbstractAction {
-
-	EditPreferencesAction() {
-	    super("cfg-prefs");
-	}
-
-        public void actionPerformed(ActionEvent e) {
-	    //Vector valuesToEdit = Pooka.getResources().getPropertyAsVector("Preferences", "");
-
-	    Vector valuesToEdit = new Vector();
-	    valuesToEdit.add("Preferences");
-	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      try { 
+	((JInternalFrame)(((MessagePanel)contentPanel).getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
+      } catch (java.beans.PropertyVetoException pve) {
+      } catch (NumberFormatException nfe) {
+      }
     }
+  }
+  
+  class EditUserConfigAction extends AbstractAction {
+    
+    EditUserConfigAction() {
+      super("cfg-users");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("UserProfile");
+      valuesToEdit.add("UserProfile.default");
+      
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), valuesToEdit);
+    }
+  }
+  
 
+  class EditStoreConfigAction extends AbstractAction {
+    
+    EditStoreConfigAction() {
+      super("cfg-stores");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("Store");
+      
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
+    }
+  }
+  
+  class EditPreferencesAction extends AbstractAction {
+    
+    EditPreferencesAction() {
+      super("cfg-prefs");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("Preferences");
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
+    }
+  }
+  
   class EditAddressBookAction extends AbstractAction {
     
     EditAddressBookAction() {
@@ -552,7 +546,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.addressBook", "Address Book Editor"), valuesToEdit);
     }
   }
-
+  
   class EditOutgoingServerAction extends AbstractAction {
     
     EditOutgoingServerAction() {
@@ -609,33 +603,33 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
   }
 
-    class HelpAboutAction extends AbstractAction {
-	
-	HelpAboutAction() {
-	    super("help-about");
-	}
-	
-	public void actionPerformed(ActionEvent e) {
-	    String fileName="About.html";
-	    String dir="/net/suberic/pooka/doc";
-	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.About.Label", "About Pooka"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
-	    
-	}
+  class HelpAboutAction extends AbstractAction {
+    
+    HelpAboutAction() {
+      super("help-about");
     }
     
-    class HelpLicenseAction extends AbstractAction {
-	
-	HelpLicenseAction() {
-	    super("help-license");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    String fileName="COPYING";
-	    String dir="/net/suberic/pooka";
-	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
-	}
+    public void actionPerformed(ActionEvent e) {
+      String fileName="About.html";
+      String dir="/net/suberic/pooka/doc";
+      contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.About.Label", "About Pooka"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
+      
     }
-
+  }
+  
+  class HelpLicenseAction extends AbstractAction {
+    
+    HelpLicenseAction() {
+      super("help-license");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      String fileName="COPYING";
+      String dir="/net/suberic/pooka";
+      contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
+    }
+  }
+  
   class HelpAction extends AbstractAction {
     
     HelpAction() {
@@ -646,42 +640,42 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       new CSH.DisplayHelpFromSource(Pooka.getHelpBroker()).actionPerformed(e);
     }
   }
-
-    class HelpKeyBindingsAction extends AbstractAction {
-	
-	HelpKeyBindingsAction() {
-	    super("help-keybindings");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    String fileName="KeyBindings.html";
-	    String dir="/net/suberic/pooka/doc";
-	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.KeyBindings.Label", "Pooka KeyBindings"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
-	}
+  
+  class HelpKeyBindingsAction extends AbstractAction {
+    
+    HelpKeyBindingsAction() {
+      super("help-keybindings");
     }
-
-    class SelectMessagePanelAction extends AbstractAction {
-      
-      SelectMessagePanelAction() {
-	super("select-message-panel");
-      }
-      
-      public void actionPerformed(ActionEvent e) {
+    
+    public void actionPerformed(ActionEvent e) {
+      String fileName="KeyBindings.html";
+      String dir="/net/suberic/pooka/doc";
+      contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.KeyBindings.Label", "Pooka KeyBindings"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
+    }
+  }
+  
+  class SelectMessagePanelAction extends AbstractAction {
+    
+    SelectMessagePanelAction() {
+      super("select-message-panel");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
 	contentPanel.getUIComponent().requestFocus();
-      }
     }
-
-    class SelectFolderPanelAction extends AbstractAction {
-	
-	SelectFolderPanelAction() {
-	    super("select-folder-panel");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    folderPanel.requestFocus();
-	}
+  }
+  
+  class SelectFolderPanelAction extends AbstractAction {
+    
+    SelectFolderPanelAction() {
+      super("select-folder-panel");
     }
-
+    
+    public void actionPerformed(ActionEvent e) {
+      folderPanel.requestFocus();
+    }
+  }
+  
   public class NewMessageAction extends AbstractAction {
     NewMessageAction() {
       super("message-new");
@@ -695,6 +689,40 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
       }
       
+    }
+    
+  }
+
+  public class ExportConfigAction extends AbstractAction {
+    ExportConfigAction() {
+      super("cfg-export");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      JFileChooser jfc;
+      String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+      if (currentDirectoryPath == "")
+	jfc = new JFileChooser();
+      else
+	jfc = new JFileChooser(currentDirectoryPath);
+      
+      jfc.setDialogTitle("Choose Export File");
+      jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+      jfc.setMultiSelectionEnabled(false);
+      int a = jfc.showDialog(MainPanel.this, "Save");
+      
+      Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", jfc.getCurrentDirectory().getPath(), true);
+
+      if (a == JFileChooser.APPROVE_OPTION) {
+	File f = jfc.getSelectedFile();
+	try {
+	  net.suberic.pooka.resource.DisklessResourceManager.exportResources(f, false);
+	  Pooka.getUIFactory().showMessage("Resources exported successfully", "Export complete");
+	} catch (Exception exc) {
+	  Pooka.getUIFactory().showError("Error exporting resources", exc);
+	}
+	
+      }
     }
     
   }

@@ -921,13 +921,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     return getStoreID();
   }
   
-    /**
-     * This sets the storeID.
-     */
-    private void setStoreID(String newValue) {
-	storeID=newValue;
-    }
-
+  /**
+   * This sets the storeID.
+   */
+  private void setStoreID(String newValue) {
+    storeID=newValue;
+  }
+  
   /**
    * This returns the property which defines this StoreInfo, such as
    * "Store.myStore".
@@ -943,71 +943,78 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   public String getItemProperty() {
     return getStoreProperty();
   }
+  
+  /**
+   * Returns the protocol we're using.
+   */
+  public String getProtocol() {
+    return protocol;
+  }
 
-    public Vector getChildren() {
-	return children;
-    }
-
-    public StoreNode getStoreNode() {
-	return storeNode;
-    }
-
-    public void setStoreNode(StoreNode newValue) {
-	storeNode = newValue;
-    }
-
-    public boolean isConnected() {
-	return connected;
-    }
-
-    public boolean isAvailable() {
-	return available;
-    }
-
-    public boolean isAuthorized() {
-	return authorized;
-    }
-
-    public UserProfile getDefaultProfile() {
-	return defaultProfile;
-    }
-
+  public Vector getChildren() {
+    return children;
+  }
+  
+  public StoreNode getStoreNode() {
+    return storeNode;
+  }
+  
+  public void setStoreNode(StoreNode newValue) {
+    storeNode = newValue;
+  }
+  
+  public boolean isConnected() {
+    return connected;
+  }
+  
+  public boolean isAvailable() {
+    return available;
+  }
+  
+  public boolean isAuthorized() {
+    return authorized;
+  }
+  
+  public UserProfile getDefaultProfile() {
+    return defaultProfile;
+  }
+  
   public NetworkConnection getConnection() {
     return connection;
   }
-
-    public ActionThread getStoreThread() {
-	return storeThread;
-    }
-
-    public void setStoreThread(ActionThread newValue) {
-	storeThread=newValue;
-    }
-
-    public FolderInfo getTrashFolder() {
-	return trashFolder;
-    }
-
-    /**
-     * This returns whether or not this Store is set up to use the 
-     * TrashFolder.  If StoreProperty.useTrashFolder is set, return that as
-     * a boolean.  Otherwise, return Pooka.useTrashFolder as a boolean.
-     */
-    public boolean useTrashFolder() {
-	if (getTrashFolder() == null)
-	    return false;
-
-	String prop = Pooka.getProperty(getStoreProperty() + ".useTrashFolder", "");
-	if (!prop.equals(""))
-	    return (! prop.equalsIgnoreCase("false"));
-	else
-	    return (! Pooka.getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
-	
-    }
-
-
-    public void setTrashFolder(FolderInfo newValue) {
-	trashFolder = newValue;
-    }
-
+  
+  public ActionThread getStoreThread() {
+    return storeThread;
+  }
+  
+  public void setStoreThread(ActionThread newValue) {
+    storeThread=newValue;
+  }
+  
+  public FolderInfo getTrashFolder() {
+    return trashFolder;
+  }
+  
+  /**
+   * This returns whether or not this Store is set up to use the 
+   * TrashFolder.  If StoreProperty.useTrashFolder is set, return that as
+   * a boolean.  Otherwise, return Pooka.useTrashFolder as a boolean.
+   */
+  public boolean useTrashFolder() {
+    if (getTrashFolder() == null)
+      return false;
+    
+    String prop = Pooka.getProperty(getStoreProperty() + ".useTrashFolder", "");
+    if (!prop.equals(""))
+      return (! prop.equalsIgnoreCase("false"));
+    else
+      return (! Pooka.getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
+    
+  }
+  
+  
+  public void setTrashFolder(FolderInfo newValue) {
+    trashFolder = newValue;
+  }
+  
 }
