@@ -11,20 +11,31 @@ import javax.mail.*;
  * that I want.
  */
 class AttachmentBundle {
-  Attachment textPart = null;
-  Vector allAttachments = new Vector();
+  private Attachment textPart = null;
+  private Vector allAttachments = new Vector();
   Vector attachmentsAndTextPart = null;
   InternetHeaders headers = null;
   Vector headerLines = null;
   
+  /**
+   * Creates an AttachmentBundle.
+   */
   AttachmentBundle() {
   }
   
+  /**
+   * Creates an AttachmentBundle from the given MimePart.
+   */
   AttachmentBundle(MimePart m) throws MessagingException {
     setHeaderSource(m);
   }
   
-  void addAll(AttachmentBundle subBundle) {
+  /**
+   * Adds all of the entries in the <code>subBundle</code> to this
+   * AttachmentBundle.  Also will update the <code>textPart</code>,
+   * if this Bundle doesn't have one yet.
+   */
+  synchronized void addAll(AttachmentBundle subBundle) {
     if (subBundle.textPart != null)
       subBundle.textPart.setHeaderSource(subBundle);
     
@@ -35,7 +46,46 @@ class AttachmentBundle {
     
     allAttachments.addAll(subBundle.allAttachments);
   }
-  
+
+  /**
+   * Adds an Attachment to the AttachmentBundle.  Automagically checks the
+   * type of the Attachment and sets it as the text part, if appropriate.
+   */
+  synchronized void addAttachment(Attachment newAttach) {
+    addAttachment(newAttach, newAttach.getMimeType());
+  }
+
+  /**
+   * Removes the given Attachment.
+   */
+  synchronized void removeAttachment(Attachment delAttach) {
+    if (textPart == delAttach) {
+      textPart = null;
+      Iterator it = allAttachments.iterator();
+      while (textPart == null && it.hasNext()) {
+	Attachment at = (Attachment) it.next();
+	if (at instanceof AlternativeAttachment || at.getMimeType().match("text/")) {
+	  textPart = at;
+	}
+      }
+    } else {
+      allAttachments.remove(delAttach);
+    }
+  }
+
+  /**
+   * Adds an Attachment using the given ContentType.
+   */
+  synchronized void addAttachment(Attachment newAttach, ContentType ct) {
+    System.err.println("ct = " + ct + "; ct.match(\"text/*\") = " + ct.match("text/*"));
+    if (textPart == null && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
+      System.err.println("setting text part");
+      textPart = newAttach;
+    } else {
+      System.err.println("ct = " + ct + "; not adding text part.");
+      allAttachments.add(newAttach);
+    }
+  }
   
   /**
    * This gets the Text part of a message.  This is useful if you want
@@ -83,7 +133,7 @@ class AttachmentBundle {
    * except for the main body of the message).
    */
   public Vector getAttachments() {
-    return allAttachments;
+    return new Vector(allAttachments);
   }
   
   /**
@@ -100,10 +150,10 @@ class AttachmentBundle {
 	attachmentsAndTextPart = new Vector();
 	attachmentsAndTextPart.add(textPart);
 	attachmentsAndTextPart.addAll(allAttachments);
-	return attachmentsAndTextPart;
+	return new Vector(attachmentsAndTextPart);
       }
     } else
-      return allAttachments;
+      return new Vector(allAttachments);
   }
 
   /**
@@ -111,12 +161,12 @@ class AttachmentBundle {
    */
   public Vector getAttachmentsAndTextPart() {
     if (attachmentsAndTextPart != null)
-      return attachmentsAndTextPart;
+      return new Vector(attachmentsAndTextPart);
     else {
       attachmentsAndTextPart = new Vector();
       attachmentsAndTextPart.add(textPart);
       attachmentsAndTextPart.addAll(allAttachments);
-      return attachmentsAndTextPart;
+      return new Vector(attachmentsAndTextPart);
     }
   }
   
@@ -174,8 +224,12 @@ class AttachmentBundle {
     
     returnValue.append("</body></html>");
     return returnValue.toString();
-  }	
-  
+  }
+
+  /**
+   * Sets the header source for this AttachmentBundle.  This is used when
+   * we print out headers for the Message.
+   */
   public void setHeaderSource(MimePart headerSource) throws MessagingException {
     headers = parseHeaders(headerSource.getAllHeaders());
     headerLines = parseHeaderLines(headerSource.getAllHeaderLines());

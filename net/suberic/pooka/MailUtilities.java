@@ -2,6 +2,9 @@ package net.suberic.pooka;
 
 import java.util.Vector;
 import java.util.StringTokenizer;
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.List;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.IOException;
@@ -76,11 +79,11 @@ public class MailUtilities {
       if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
 	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
 	
-	bundle.getAttachments().add(newAttach);
+	bundle.addAttachment(newAttach);
       } else if (encryptionStatus == EncryptionUtils.SIGNED) {
 	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment((MimeMessage)m);
 	
-	bundle.getAttachments().add(newAttach);
+	bundle.addAttachment(newAttach);
       }
 
     } else {
@@ -90,47 +93,16 @@ public class MailUtilities {
 	ContentType ct = new ContentType(contentType);
 	
 	if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	  Multipart mp = (Multipart) m.getContent();
-	  MimeBodyPart textPart = null;
-	  MimeBodyPart htmlPart = null;
-	  
-	  for (int i = 0; i < mp.getCount(); i++) {
-	    MimeBodyPart current = (MimeBodyPart)mp.getBodyPart(i);
-	    ContentType ct2 = new ContentType(current.getContentType());
-	    if (ct2.match("text/plain"))
-	      textPart = current;
-	    else if (ct2.match("text/html"))
-	      htmlPart = current;
-	  }
-	  
-	  if (htmlPart != null && textPart != null) {
-	    Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
-	    bundle.textPart = attachment;
-	  } else {
-	    // hurm
-	    if (textPart != null) {
-	      Attachment attachment = new Attachment(textPart);
-	      bundle.textPart = attachment;
-	    } else if (htmlPart != null) {
-	      Attachment attachment = new Attachment(htmlPart);
-	      bundle.textPart = attachment;
-	    } else {
-	      bundle.addAll(parseAttachments(mp));
-	    }
-	  }
+	  parseAlternativeAttachment(bundle, (MimeMessage) m);
 	} else if (m.getContent() instanceof Multipart) {
 	  bundle.addAll(parseAttachments((Multipart)m.getContent()));
 	} else {
 	  Attachment attachment = new Attachment((MimeMessage)m);
-	  bundle.getAttachments().add(attachment);
+	  bundle.addAttachment(attachment);
 	}
-      } else if (contentType.startsWith("text")) {
-	Attachment attachment = new Attachment((MimeMessage)m);
-	
-	bundle.textPart = attachment;
       } else {
 	Attachment attachment = new Attachment((MimeMessage)m);
-	bundle.getAttachments().add(attachment);
+	bundle.addAttachment(attachment, new ContentType(contentType));
       }
     }
     
@@ -160,60 +132,26 @@ public class MailUtilities {
 	if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
 	  Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
 	
-	  bundle.getAttachments().add(newAttach);
+	  bundle.addAttachment(newAttach);
 	} else if (encryptionStatus == EncryptionUtils.SIGNED) {
 	  Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
 	
-	  bundle.getAttachments().add(newAttach);
+	  bundle.addAttachment(newAttach);
 	}
       
       } else {
 	ContentType ct = new ContentType(mbp.getContentType());
-	if (ct.getPrimaryType().equalsIgnoreCase("text")) {
-	  Attachment current = new Attachment(mbp);
-	  if (bundle.textPart == null) {
-	    bundle.textPart = current;
-	  } else {
-	    bundle.getAttachments().add(current);
-	  }
-	} else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
+	if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 	  if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	    Multipart amp = (Multipart) mbp.getContent();
-	    MimeBodyPart textPart = null;
-	    MimeBodyPart htmlPart = null;
-	    
-	    for (int j = 0; j < amp.getCount(); j++) {
-	      MimeBodyPart current = (MimeBodyPart)amp.getBodyPart(j);
-	      ContentType ct2 = new ContentType(current.getContentType());
-	      if (ct2.match("text/plain"))
-		textPart = current;
-	      else if (ct2.match("text/html"))
-		htmlPart = current;
-	  }
-	    
-	    if (htmlPart != null && textPart != null) {
-	      Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
-	      bundle.textPart = attachment;
-	    } else {
-	      // hurm
-	      if (textPart != null) {
-		Attachment attachment = new Attachment(textPart);
-		bundle.textPart = attachment;
-	      } else if (htmlPart != null) {
-		Attachment attachment = new Attachment(htmlPart);
-		bundle.textPart = attachment;
-	      } else {
-		bundle.addAll(parseAttachments(amp));
-	      }
-	    }
+	    parseAlternativeAttachment(bundle, mbp);
 	  } else if (mbp.getContent() instanceof Multipart) {
 	    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
 	  } else {
 	    Attachment attachment = new Attachment(mbp);
-	    bundle.getAttachments().add(attachment);
+	    bundle.addAttachment(attachment);
 	  }
 	} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-	  bundle.getAttachments().add(new Attachment(mbp));
+	  bundle.addAttachment(new Attachment(mbp));
 	  Object msgContent;
 	  msgContent = mbp.getContent();
 	  
@@ -225,13 +163,47 @@ public class MailUtilities {
 	    System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
 	  
 	} else {
-	  bundle.getAttachments().add(new Attachment(mbp));
+	  bundle.addAttachment(new Attachment(mbp), ct);
 	}
       }
     }
     return bundle;
   }
 
+  /**
+   * Creates an AlternativeAttachment and adds it properly to the
+   * given AttachmentBundle.
+   */
+  public static void parseAlternativeAttachment(AttachmentBundle bundle, MimePart mbp) throws MessagingException, java.io.IOException {
+    Multipart amp = (Multipart) mbp.getContent();
+    
+    MimeBodyPart altTextPart = null;
+    MimeBodyPart altHtmlPart = null;
+    List extraList = new LinkedList();
+    
+    for (int j = 0; j < amp.getCount(); j++) {
+      MimeBodyPart current = (MimeBodyPart)amp.getBodyPart(j);
+      ContentType ct2 = new ContentType(current.getContentType());
+      if (ct2.match("text/plain") && altTextPart == null)
+	altTextPart = current;
+      else if (ct2.match("text/html") && altHtmlPart == null)
+	altHtmlPart = current;
+      else
+	extraList.add(new Attachment(current));
+    }
+    
+    if (altHtmlPart != null && altTextPart != null) {
+      Attachment attachment = new AlternativeAttachment(altTextPart, altHtmlPart);
+      bundle.addAttachment(attachment);
+      Iterator it = extraList.iterator();
+      while (it.hasNext()) {
+	bundle.addAttachment((Attachment) it.next());
+      }
+    } else {
+      // hurm
+      bundle.addAll(parseAttachments(amp));
+    }
+  }
   
   /**
    * This method takes a given character array and returns the offset
@@ -240,7 +212,6 @@ public class MailUtilities {
    * If no break is necessary, the <code>finish</code> value is returned.
    * 
    */
-  
   public static int getBreakOffset(String buffer, int breakLength, int tabSize) {
     // what we'll do is to modify the break length to make it fit tabs.
     

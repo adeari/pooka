@@ -180,17 +180,9 @@ public class MessageCryptoInfo {
 	    if (bp.getContent() instanceof Multipart) {
 	      AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
 	      bundle.addAll(newBundle);
-	    } else if (ca.getMimeType().getPrimaryType().equalsIgnoreCase("text")) {
-	      // if it's a text part, then we might need to set it as 
-	      // such in the attachment bundle.
-	      if (bundle.textPart == null) {
-		bundle.textPart = ca;
-		bundle.allAttachments.remove(ca);
-	      }
 	    } else {
-	      System.err.println("ca.getMimeType() = " + ca.getMimeType());
-	      System.err.println("bp.getMimeType() = " + ((MimeBodyPart) bp).getContentType());
-	      System.err.println("bp.getContent() = " + bp.getContent());
+	      bundle.removeAttachment(ca);
+	      bundle.addAttachment(ca);
 	    }
 	  }
 	}

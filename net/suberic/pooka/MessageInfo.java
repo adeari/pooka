@@ -79,7 +79,7 @@ public class MessageInfo {
 	javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
 	mbp.setText(content);
 	Attachment textPart = new Attachment(mbp);
-	bundle.textPart = textPart;
+	bundle.addAttachment(textPart);
 	
 	attachments = bundle;
       } catch (Exception e) {
