@@ -195,6 +195,9 @@ public class AttachmentPane extends JPanel {
       });
 
     createKeyBindings();
+
+    table.setTransferHandler(new net.suberic.pooka.gui.dnd.AttachmentTransferHandler());
+    table.setDragEnabled(true);
   }
   
   /**

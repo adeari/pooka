@@ -31,6 +31,8 @@ public class NewMessageTransferHandler extends TransferHandler {
 	  mbp.setDataHandler(proxy.getMessageInfo().getRealMessage().getDataHandler());
 	  nmdp.getNewMessageProxy().getNewMessageInfo().addAttachment(new MBPAttachment(mbp));
 
+	  nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	  System.err.println("returning true.");
 	  return true;
 	}
       } catch (Exception e) {
