@@ -2,7 +2,7 @@ package net.suberic.pooka.gui.search;
 import net.suberic.pooka.*;
 import net.suberic.util.VariableBundle;
 import javax.swing.*;
-import java.util.Vector;
+import java.util.*;
 import java.awt.event.*;
 import java.awt.FlowLayout;
 import javax.mail.search.SearchTerm;
@@ -220,26 +220,39 @@ public class SearchEntryPanel extends JPanel {
      */
     public java.util.Properties generateSearchTermProperties(String rootProperty) {
 	java.util.Properties returnValue = new java.util.Properties();
-	
-	if (searchTerms.size() > 0) {
-	    if (Pooka.isDebug())
-		System.out.println("SearchEntryPanel:  searchTerms.size() > 0.");
-	    SearchEntryPair pair = (SearchEntryPair) searchTerms.elementAt(0);
-	    java.util.Properties termProps = pair.form.generateSearchTermProperties(rootProperty));
-	    if (Pooka.isDebug())
-		System.out.println("SearchEntryPanel:  setting term to " + term);
-	    for (int i = 1; i < searchTerms.size(); i++) {
-		SearchEntryPair newPair = (SearchEntryPair) searchTerms.elementAt(i);
-		SearchTerm newTerm = newPair.form.generateSearchTerm();
-		if (newPair.connector.getType() == AND) {
-		    term = new javax.mail.search.AndTerm(term, newTerm);
-		} else if (newPair.connector.getType() == OR) {
-		    term = new javax.mail.search.OrTerm(term, newTerm);
-		}
-	    }
 
+	Vector v = new Vector (searchTerms);
+	addToProperties(v, rootProperty, returnValue);
 	return returnValue;
     }
 
+    /**
+     * Adds the given properties to the list.
+     */
 
+    private void addToProperties(SearchEntryPair pair, String rootProperty, java.util.Properties props) {
+	Properties tmpProperties = pair.form.generateSearchTermProperties(rootProperty);
+	Enumeration keys = tmpProperties.keys();
+	while (keys.hasMoreElements()) {
+	    String current = (String) keys.nextElement();
+	    props.setProperty(current, tmpProperties.getProperty(current));
+	}
+    }
+	
+    private void addToProperties(Vector pairList, String rootProperty, Properties props) {
+	if (pairList.size() == 1) {
+	    addToProperties((SearchEntryPair) pairList.remove(0), rootProperty, props);
+	} else {
+	    addToProperties((SearchEntryPair) pairList.remove(0), rootProperty + ".term1", props);
+	    int type = ((SearchEntryPair) pairList.elementAt(0)).connector.getType();
+	    addToProperties(pairList, rootProperty + ".term2", props);
+	    props.setProperty(rootProperty + ".type", "compound");
+	    props.setProperty(rootProperty + ".subTerms", "term1:term2");
+	    if (type == AND) {
+		props.setProperty(rootProperty + ".operation", "and");
+	    } else {
+		props.setProperty(rootProperty + ".operation", "or");
+	    }
+	}
+    }
 }

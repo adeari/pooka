@@ -272,7 +272,11 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	boolean goodValue = false;
 	boolean matchFound = false;
 
-	String newName = factory.showInputDialog(this, sourceBundle.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
+	String newName = null;
+	if (this.getParentFrame() == null)
+	    newName = factory.showInputDialog(valueComponent, sourceBundle.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
+	else
+	    newName = factory.showInputDialog(this, sourceBundle.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
 
 	while (goodValue == false) {
 	    matchFound = false;
