@@ -33,23 +33,21 @@ public class ItemManager implements ValueChangeListener {
    * This returns a Vector with all the currently registered Item
    * objects.
    */
-  public java.util.Vector getItems() {
+  public synchronized java.util.Vector getItems() {
     return new Vector(itemList);
   }
   
   /**
    * This adds the item with the given name to the item list.
    */
-  public void addItem(String itemName) {
-    if (getItem(itemName) == null) {
-      appendToItemString(itemName);
-    }
+  public synchronized void addItem(String itemName) {
+    addItem(new String[] { itemName });
   }
   
   /**
    * This adds the items with the given itemNames to the items list.
    */
-  public void addItem(String[] itemName) {
+  public synchronized void addItem(String[] itemName) {
     if (itemName != null && itemName.length > 0) {
       StringBuffer itemString = new StringBuffer();
       for (int i = 0 ; i < itemName.length; i++) {
@@ -64,21 +62,21 @@ public class ItemManager implements ValueChangeListener {
   /**
    * This adds the given item to the items list.
    */
-  public void addItem(Item newItem) {
-
+  public synchronized void addItem(Item newItem) {
+    addItem(new Item[] { newItem });
   }
 
   /**
    * This adds the given items to the items list.
    */
-  public void addItem(Item[] newItem) {
+  public synchronized void addItem(Item[] newItem) {
 
   }
   
   /**
    * This removes the item with the given itemName.
    */
-  public void removeItem(String itemName) {
+  public synchronized void removeItem(String itemName) {
     if (getItem(itemName) != null)
       removeFromItemString(new String[] { itemName });
   }
@@ -86,7 +84,7 @@ public class ItemManager implements ValueChangeListener {
   /**
    * This removes the items with the given itemNames.
    */
-  public void removeItem(String[] itemNames) {
+  public synchronized void removeItem(String[] itemNames) {
     // this is probably not necessary at all, but what the hell?
     
     if (itemNames == null || itemNames.length < 1)
@@ -113,7 +111,7 @@ public class ItemManager implements ValueChangeListener {
   /**
    * This removes the given Item.
    */
-  public void removeItem(Item item) {
+  public synchronized void removeItem(Item item) {
     if (item != null)
       removeItem(item.getItemID());
   }
@@ -121,7 +119,7 @@ public class ItemManager implements ValueChangeListener {
   /**
    * This removes the given Items.
    */
-  public void removeItem(Item[] item) {
+  public synchronized void removeItem(Item[] item) {
     if (item != null && item.length > 0) {
       String[] itemNames = new String[item.length];
       for (int i = 0; i < item.length; i++) {
@@ -137,7 +135,7 @@ public class ItemManager implements ValueChangeListener {
    * This compares the itemList object with the Item property, and
    * updates the itemList appropriately.
    */
-  public void refreshItems() {
+  public synchronized void refreshItems() {
     Vector newItemList = new Vector();
     
     StringTokenizer tokens =  new StringTokenizer(sourceBundle.getProperty(resourceString, ""), ":");
@@ -162,7 +160,7 @@ public class ItemManager implements ValueChangeListener {
    * This returns the Item with the given itemName if it exists
    * in the allItems Vector; otherwise, returns null.
    */
-  public Item getItem(String itemID) {
+  public synchronized Item getItem(String itemID) {
     Vector allItems = getItems();
     for (int i = 0; i < allItems.size(); i++) {
       Item si = (Item)(allItems.elementAt(i));
