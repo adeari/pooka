@@ -11,22 +11,31 @@ import net.suberic.pooka.*;
 import net.suberic.pooka.gui.*;
 
 /**
- * A TransferHandler for a FolderTable.
+ * A TransferHandler for a Folder.
  */
-public class FolderTableTransferHandler extends TransferHandler {
-  private DataFlavor messageFlavor;
+public class FolderTransferHandler extends TransferHandler {
   private boolean shouldRemove;
-  
+
+  static DataFlavor[] acceptableFlavors = new DataFlavor[] {
+    MessageProxyTransferable.sMessageProxyDataFlavor
+  };
+
   public boolean importData(JComponent c, Transferable t) {
+    System.err.println("importing.");
     if (!canImport(c, t.getTransferDataFlavors())) {
+      System.err.println("can't import.");
       return false;
     } else {
+      System.err.println("class is " + c);
       FolderInfo fi = DndUtils.getFolderInfo(c);
       if (fi != null) {
+	System.err.println("got folder info.");
 	try {
 	  MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	  if (mp != null) {
-	    mp.moveMessage(fi);
+	    System.err.println("copying.");
+	    mp.copyMessage(fi);
+	    shouldRemove = true;
 	    return true;
 	  }
 	} catch (Exception e) {
@@ -42,6 +51,7 @@ public class FolderTableTransferHandler extends TransferHandler {
   }
   
   protected Transferable createTransferable(JComponent c) {
+    System.err.println("creating transferable.");
     if (c instanceof net.suberic.pooka.gui.FolderDisplayPanel) {
       return new MessageProxyTransferable(((FolderDisplayPanel) c).getSelectedMessage());
     } else if (c instanceof JTable) {
@@ -67,44 +77,25 @@ public class FolderTableTransferHandler extends TransferHandler {
   }
 
   protected void exportDone(JComponent c, Transferable data, int action) {
-    /*
-    if (shouldRemove && (action == MOVE)) {
-      if ((p0 != null) && (p1 != null) &&
-	  (p0.getOffset() != p1.getOffset())) {
-	try {
-	  JTextComponent tc = (JTextComponent)c;
-	  tc.getDocument().remove(p0.getOffset(), p1.getOffset() - p0.getOffset());
-	} catch (BadLocationException e) {
-	  System.out.println("Can't remove text from source.");
+    System.err.println("export Done.");
+    if (action == MOVE && shouldRemove) {
+      try {
+	MessageProxy mp = (MessageProxy) data.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
+	if (mp != null) {
+	  System.err.println("deleting message.");
+	  mp.deleteMessage(true);
 	}
+      } catch (Exception e) {
+	e.printStackTrace();
       }
     }
-    source = null;
-    */
   }
 
   public boolean canImport(JComponent c, DataFlavor[] flavors) {
-    if (containsMessageProxy(flavors)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Returns true if the set of dataflavors contains the M
-   * essageProxyTransferable flavor.
-   */
-  boolean containsMessageProxy(DataFlavor[] flavors) {
-    if (flavors == null)
-      return false;
     
-    for (int i = 0 ; i < flavors.length; i++) {
-      if (flavors[i] == MessageProxyTransferable.sMessageProxyDataFlavor)
-	return true;
-    }
-
-    return false;
+    boolean returnValue = (DndUtils.matchDataFlavor(acceptableFlavors, flavors) != null);
+    System.err.println("canImport = " + returnValue);
+    return returnValue;
   }
 
 }

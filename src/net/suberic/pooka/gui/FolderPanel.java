@@ -111,7 +111,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
     
     mDropTarget = new FolderTreeDropTarget();
-    mTransferHandler = new net.suberic.pooka.gui.dnd.FolderNodeTransferHandler();
+    mTransferHandler = new net.suberic.pooka.gui.dnd.FolderTransferHandler();
     folderTree.setDropTarget(mDropTarget);
 
     folderTree.setTransferHandler(mTransferHandler);
@@ -384,6 +384,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     }
 
     public void drop(DropTargetDropEvent dtde) {
+      System.err.println("dropping.");
       boolean accept = false;
       // first see if we accept this drag.
       if (mTransferHandler.canImport(folderTree, dtde.getCurrentDataFlavors())) {
@@ -402,13 +403,17 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 	    
 	    // and now drop here.
 	    accept = true;
+	    System.err.println("accepting drop.");
+	    
 	    dtde.acceptDrop(dtde.getDropAction());
 	  }
 	}
       }
 
-      if (! accept)
+      if (! accept) {
+	System.err.println("rejecting drop.");
 	dtde.rejectDrop();
+      }
     }
   }
 

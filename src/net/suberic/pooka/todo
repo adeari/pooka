@@ -1,3 +1,9 @@
+*) add drag and drop
+	*) include message
+	*) move message
+	*) attach file
+	*) save attachment?
+
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.
 
@@ -5,12 +11,6 @@
 header.
 
 *) check too many open files error on opening large cached folder?
-
-*) add drag and drop
-	*) include message
-	*) move message
-	*) attach file
-	*) save attachment?
 
 *) add support for running without any local files.
 	-- support for http: access?
