@@ -1,3 +1,6 @@
+changed the display algorithm so that several messages are loaded
+before the folder window itself is shown.
+
 made it so exiting pooka before all the messages are loaded doesn't result
 in a bunch of exceptions.
 

@@ -220,6 +220,15 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     return getFolderDisplay().selectMessage(messageNumber);
   }
   
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
+     * This makes the given row visible.
+     */
+    public void makeSelectionVisible(int messageNumber) {
+      getFolderDisplay().makeSelectionVisible(messageNumber);
+    }
+
   public int selectNextMessage() {
     return getFolderDisplay().selectNextMessage();
   }

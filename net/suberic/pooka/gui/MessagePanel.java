@@ -126,7 +126,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       PreviewFolderPanel pfp = (PreviewFolderPanel) cardTable.get(folderID);
       FolderInternalFrame fif = new FolderInternalFrame(pfp, this);
       pfp.getFolderInfo().setFolderDisplayUI(fif);
-      openFolderWindow(pfp.getFolderInfo());
+      openFolderWindow(fif);
     }
     
     PreviewFolderPanel current = pcp.getCurrentPanel();
@@ -147,7 +147,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * This opens a new FolderWindow for the given FolderInfo, and sets
    * it as the selected window.
    */
-  public void openFolderWindow(FolderInfo f) {
+  public void openFolderWindow(FolderInternalFrame f) {
     openFolderWindow(f, true);
   }
   
@@ -157,23 +157,11 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * selected; if set to false, the folderID.windowLocation.selected 
    * property is used, if set.
    */
-  public void openFolderWindow(FolderInfo f, boolean selectWindow) {
-    
-    // first, get the newFolderWindow and make sure it's a JInternalFrame.
-    JInternalFrame newFolderWindow;
-    newFolderWindow = (JInternalFrame) f.getFolderDisplayUI();
-    if (newFolderWindow == null) {
-      FolderDisplayUI fui = Pooka.getUIFactory().createFolderDisplayUI(f);
-      newFolderWindow = (JInternalFrame) fui;
-      f.setFolderDisplayUI(fui);
-      
-      newFolderWindow.pack();
-      newFolderWindow.setVisible(false);
-    }
-    
+  public void openFolderWindow(FolderInternalFrame newFolderWindow, boolean selectWindow) {
+
     if (newFolderWindow.getDesktopPane() != this) {
       this.add(newFolderWindow);
-      String folderProperty = f.getFolderProperty();
+      String folderProperty = newFolderWindow.getFolderInfo().getFolderProperty();
       try {
 	int x = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.x"));
 	int y = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.y"));

@@ -18,6 +18,8 @@ public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, Act
 
     public int selectMessage(int messageNumber);
 
+    public void makeSelectionVisible(int messageNumber);
+
     public int selectNextMessage();
 
     public int selectPreviousMessage();

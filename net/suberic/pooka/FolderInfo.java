@@ -693,13 +693,90 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       
       setFolderTableModel(ftm);
       
+      Vector loadImmediately = null;
+
+      if (messageProxies.size() > 25) {
+	loadImmediately = new Vector();
+	for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
+	  loadImmediately.add(messageProxies.get(i));
+	}
+      } else {
+	loadImmediately = new Vector(messageProxies);
+      }
+
+      loadMessageTableInfos(loadImmediately);
+
       loaderThread.loadMessages(messageProxies);
       
       if (!loaderThread.isAlive())
 	loaderThread.start();
     }
   }
-  
+
+  /**
+   * Loads the FolderTableInfo objects for the given messages.
+   */
+  public void loadMessageTableInfos(Vector messages) {
+    int numMessages = messages.size();
+    MessageProxy mp;
+    
+    int updateCounter = 0;
+    
+    if (numMessages > 0) {
+
+      int fetchBatchSize = 25;
+      int loadBatchSize = 25;
+      try {
+	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+      } catch (NumberFormatException nfe) {
+      }
+      
+      FetchProfile fetchProfile = getFetchProfile();
+
+      int i = numMessages - 1;
+      while ( i >= 0 ) {
+	for (int batchCount = 0; i >=0 && batchCount < loadBatchSize; batchCount++) {
+	  mp=(MessageProxy)messages.elementAt(i);
+	  
+	  if (! mp.getMessageInfo().hasBeenFetched()) {
+	    try {
+	      int fetchCount = 0;
+	      Vector fetchVector = new Vector();
+	      for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+		if (! fetchInfo.hasBeenFetched()) {
+		  fetchVector.add(fetchInfo);
+		  fetchInfo.setFetched(true);
+		}
+	      }
+	      
+	      MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
+	      toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
+	      this.fetch(toFetch, fetchProfile);
+	    } catch(MessagingException me) {
+	      System.out.println("caught error while fetching for folder " + getFolderID() + ":  " + me);
+	      me.printStackTrace();
+	    }
+	      
+	  }
+	  try {
+	    if (! mp.isLoaded())
+	      mp.loadTableInfo();
+	    if (mp.needsRefresh())
+	      mp.refreshMessage();
+	    else if (! mp.matchedFilters()) {
+	      mp.matchFilters();
+	    }
+	  } catch (Exception e) {
+	    e.printStackTrace();
+	  }
+	  i--;
+	}
+	
+      }
+    }
+  }
+
   /**
    * Fetches the information for the given messages using the given
    * FetchProfile.
@@ -1525,68 +1602,68 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Pooka.getUIFactory().showSearchForm(new FolderInfo[] { this });
     }
 
-    /**
-     * This is a static calls which searches the given FolderInfo objects,
-     * collects the results into a VirtualFolderInfo, and then displays
-     * the results of the search in the UI.
-     */
-    public static void searchFolders(Vector folderList, javax.mail.search.SearchTerm term) {
-	final javax.mail.search.SearchTerm searchTerm = term;
-	final Vector selectedFolders = folderList;
-
-	Pooka.getSearchThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-		public void actionPerformed(ActionEvent e) {
-		    Vector matchingValues = new Vector();
-		    if (Pooka.isDebug()) 
-			System.out.println("init:  matchingValues.size() = " + matchingValues.size());
-		    for (int i = 0; i < selectedFolders.size(); i++) {
-			if (Pooka.isDebug())
-			    System.out.println("trying selected folder number " + i);
-			    try {
-				net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
-				if (Pooka.isDebug())
-				    System.out.println("matches.length = " + matches.length);
-				for (int j = 0; j < matches.length; j++) {
-				    matchingValues.add(matches[j]);
-				    if (Pooka.isDebug())
-					System.out.println("adding " + matches[j] + " to matchingValues.");
-				}
-				
-			    } catch (MessagingException me) {
-				System.out.println("caught exception " + me);
-			    }
-		    }
-		    
-		    if (Pooka.isDebug())
-			System.out.println("got " + matchingValues.size() + " matches.");
-		    
-		    FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
-		    for (int i = 0; i < selectedFolders.size(); i++) {
-			parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
-		    }
-		    
-		    MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
-		    for (int i = 0; i < matchingValues.size(); i++) {
-			if (Pooka.isDebug())
-			    System.out.println("matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
-			matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
-		    }
-			
-		    final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
-		    
-		    Runnable runMe = new Runnable() {
-			    public void run() {
-				FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
-				fdui.openFolderDisplay();
-			    }
-			};
-		    
-		    javax.swing.SwingUtilities.invokeLater(runMe);
-		    
-		}
-	    }, Pooka.getSearchThread()), new java.awt.event.ActionEvent(FolderInfo.class, 1, "search"));
-	
-    }
+  /**
+   * This is a static calls which searches the given FolderInfo objects,
+   * collects the results into a VirtualFolderInfo, and then displays
+   * the results of the search in the UI.
+   */
+  public static void searchFolders(Vector folderList, javax.mail.search.SearchTerm term) {
+    final javax.mail.search.SearchTerm searchTerm = term;
+    final Vector selectedFolders = folderList;
+    
+    Pooka.getSearchThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  Vector matchingValues = new Vector();
+	  if (Pooka.isDebug()) 
+	    System.out.println("init:  matchingValues.size() = " + matchingValues.size());
+	  for (int i = 0; i < selectedFolders.size(); i++) {
+	    if (Pooka.isDebug())
+	      System.out.println("trying selected folder number " + i);
+	    try {
+	      net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
+	      if (Pooka.isDebug())
+		System.out.println("matches.length = " + matches.length);
+	      for (int j = 0; j < matches.length; j++) {
+		matchingValues.add(matches[j]);
+		if (Pooka.isDebug())
+		  System.out.println("adding " + matches[j] + " to matchingValues.");
+	      }
+	      
+	    } catch (MessagingException me) {
+	      System.out.println("caught exception " + me);
+	    }
+	  }
+	  
+	  if (Pooka.isDebug())
+	    System.out.println("got " + matchingValues.size() + " matches.");
+	  
+	  FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
+	  for (int i = 0; i < selectedFolders.size(); i++) {
+	    parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
+	  }
+	  
+	  MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
+	  for (int i = 0; i < matchingValues.size(); i++) {
+	    if (Pooka.isDebug())
+	      System.out.println("matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
+	    matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
+	  }
+	  
+	  final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
+	  
+	  Runnable runMe = new Runnable() {
+	      public void run() {
+		FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
+		fdui.openFolderDisplay();
+	      }
+	    };
+	  
+	  javax.swing.SwingUtilities.invokeLater(runMe);
+	  
+	}
+      }, Pooka.getSearchThread()), new java.awt.event.ActionEvent(FolderInfo.class, 1, "search"));
+    
+  }
 
     /**
      * Searches for messages in this folder which match the given

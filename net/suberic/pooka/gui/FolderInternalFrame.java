@@ -32,142 +32,141 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     ConfigurableKeyBinding keyBindings;
     boolean enabled = true;
 
-    /**
-     * Creates a Folder window from the given Folder.
-     */
-
-    public FolderInternalFrame(FolderInfo newFolderInfo, MessagePanel newMessagePanel) {
-	super(newFolderInfo.getFolderDisplayName(), true, true, true, true);
-
-	this.getContentPane().setLayout(new BorderLayout());
-	
-	messagePanel = newMessagePanel;
-	
-	setFolderInfo(newFolderInfo);
-	
-	getFolderInfo().setFolderDisplayUI(this);
-
-	defaultActions = new Action[] {
-	    new CloseAction(),
-	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
-	    new NextMessageAction(),
-	    new PreviousMessageAction(),
-	    new GotoMessageAction(),
-	    new SearchAction(),
-	    new SelectAllAction()
-		};
-
-	// note:  you have to set the Status Bar before you create the
-	// FolderDisplayPanel, or else you'll get a null pointer exception
-	// from the LoadMessageThread.
-
-	setFolderStatusBar(new FolderStatusBar(this.getFolderInfo()));
-	
-	folderDisplay = new FolderDisplayPanel(getFolderInfo());
-
-	if (getFolderInfo() != null && getFolderInfo().isOutboxFolder())
-	  toolbar = new ConfigurableToolbar("OutboxWindowToolbar", Pooka.getResources());
-	else
-	  toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", folderDisplay);
-	this.getContentPane().add("South", getFolderStatusBar());
-	
-	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-	this.setSize(this.getPreferredSize());
-
-	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
-	
-	keyBindings.setActive(getActions());
-	toolbar.setActive(getActions());
-	
-	// if the FolderInternalFrame itself gets the focus, pass it on to
-	// the folderDisplay
-	
-	this.addFocusListener(new FocusAdapter() {
-		public void focusGained(FocusEvent e) {
-		    folderDisplay.requestFocus();
-		}
-	    });
-	
-	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-
-	getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
-
-	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-	this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
-		public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-		    getFolderInfo().setFolderDisplayUI(null);
-		}
-	    });
-	
-    }
-
-
-    public FolderInternalFrame(PreviewFolderPanel pfp, MessagePanel newMessagePanel) {
-	super(pfp.getFolderInfo().getFolderDisplayName(), true, true, true, true);
-
-	FolderInfo newFolderInfo = pfp.getFolderInfo();
-
-	this.getContentPane().setLayout(new BorderLayout());
-	
-	messagePanel = newMessagePanel;
-	
-	setFolderInfo(newFolderInfo);
-
-	defaultActions = new Action[] {
-	    new CloseAction(),
-	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
-	    new NextMessageAction(),
-	    new PreviousMessageAction(),
-	    new GotoMessageAction(),
-	    new SearchAction()
-		};
-
-	// note:  you have to set the Status Bar before you create the
-	// FolderDisplayPanel, or else you'll get a null pointer exception
-	// from the LoadMessageThread.
-
-	setFolderStatusBar(new FolderStatusBar(this.getFolderInfo()));
-	
-	folderDisplay = pfp.getFolderDisplay();
-	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", folderDisplay);
-	this.getContentPane().add("South", getFolderStatusBar());
-	
-	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-	this.setSize(this.getPreferredSize());
-
-	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
-	
-	keyBindings.setActive(getActions());
-	toolbar.setActive(getActions());
-	
-	// if the FolderInternalFrame itself gets the focus, pass it on to
-	// the folderDisplay
-	
-	this.addFocusListener(new FocusAdapter() {
-		public void focusGained(FocusEvent e) {
-		    folderDisplay.requestFocus();
-		}
-	    });
-	
-	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-
-	getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
-
-	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
-	this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
-		public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-		    getFolderInfo().setFolderDisplayUI(null);
-		}
-	    });
-	
-    }
-
+  /**
+   * Creates a Folder window from the given Folder.
+   */
+  public FolderInternalFrame(FolderInfo newFolderInfo, MessagePanel newMessagePanel) {
+    super(newFolderInfo.getFolderDisplayName(), true, true, true, true);
+    
+    this.getContentPane().setLayout(new BorderLayout());
+    
+    messagePanel = newMessagePanel;
+    
+    setFolderInfo(newFolderInfo);
+    
+    getFolderInfo().setFolderDisplayUI(this);
+    
+    defaultActions = new Action[] {
+      new CloseAction(),
+      new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
+      new NextMessageAction(),
+      new PreviousMessageAction(),
+      new GotoMessageAction(),
+      new SearchAction(),
+      new SelectAllAction()
+	};
+    
+    // note:  you have to set the Status Bar before you create the
+    // FolderDisplayPanel, or else you'll get a null pointer exception
+    // from the LoadMessageThread.
+    
+    setFolderStatusBar(new FolderStatusBar(this.getFolderInfo()));
+    
+    folderDisplay = new FolderDisplayPanel(getFolderInfo());
+    
+    if (getFolderInfo() != null && getFolderInfo().isOutboxFolder())
+      toolbar = new ConfigurableToolbar("OutboxWindowToolbar", Pooka.getResources());
+    else
+      toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", folderDisplay);
+    this.getContentPane().add("South", getFolderStatusBar());
+    
+    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+    this.setSize(this.getPreferredSize());
+    
+    keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
+    
+    keyBindings.setActive(getActions());
+    toolbar.setActive(getActions());
+    
+    // if the FolderInternalFrame itself gets the focus, pass it on to
+    // the folderDisplay
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  folderDisplay.requestFocus();
+	}
+      });
+    
+    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+    
+    getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
+    
+    this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    
+    this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
+	  getFolderInfo().setFolderDisplayUI(null);
+	}
+      });
+    
+  }
+  
+  
+  public FolderInternalFrame(PreviewFolderPanel pfp, MessagePanel newMessagePanel) {
+    super(pfp.getFolderInfo().getFolderDisplayName(), true, true, true, true);
+    
+    FolderInfo newFolderInfo = pfp.getFolderInfo();
+    
+    this.getContentPane().setLayout(new BorderLayout());
+    
+    messagePanel = newMessagePanel;
+    
+    setFolderInfo(newFolderInfo);
+    
+    defaultActions = new Action[] {
+      new CloseAction(),
+      new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
+      new NextMessageAction(),
+      new PreviousMessageAction(),
+      new GotoMessageAction(),
+      new SearchAction()
+	};
+    
+    // note:  you have to set the Status Bar before you create the
+    // FolderDisplayPanel, or else you'll get a null pointer exception
+    // from the LoadMessageThread.
+    
+    setFolderStatusBar(new FolderStatusBar(this.getFolderInfo()));
+    
+    folderDisplay = pfp.getFolderDisplay();
+    toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", folderDisplay);
+    this.getContentPane().add("South", getFolderStatusBar());
+    
+    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+    this.setSize(this.getPreferredSize());
+    
+    keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
+    
+    keyBindings.setActive(getActions());
+    toolbar.setActive(getActions());
+    
+    // if the FolderInternalFrame itself gets the focus, pass it on to
+    // the folderDisplay
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  folderDisplay.requestFocus();
+	}
+      });
+    
+    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+    
+    getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
+    
+    this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    
+    this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
+	  getFolderInfo().setFolderDisplayUI(null);
+	}
+      });
+    
+  }
+  
     /**
      * Searches the underlying FolderInfo's messages for messages matching
      * the search term.
@@ -199,7 +198,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     public void openFolderDisplay() {
       Runnable runMe = new Runnable() {
 	  public void run() {
-	    getMessagePanel().openFolderWindow(getFolderInfo());
+	    getMessagePanel().openFolderWindow(FolderInternalFrame.this);
 	  } 
 	};
       if (SwingUtilities.isEventDispatchThread())
@@ -294,6 +293,15 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      */
     public int selectMessage(int messageNumber) {
 	return getFolderDisplay().selectMessage(messageNumber);
+    }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
+     * This makes the given row visible.
+     */
+    public void makeSelectionVisible(int messageNumber) {
+      getFolderDisplay().makeSelectionVisible(messageNumber);
     }
 
     public int selectNextMessage() {

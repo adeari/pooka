@@ -353,54 +353,77 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-			((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		    }
-		});
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	      }
+	    });
+	  
+	  try {
+	    
+	    getFolderInfo().loadAllMessages();
+	    
+	    if (! getFolderInfo().isSortaOpen())
+	      getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE);
+	    
+	    int firstUnread = -1;
+	    int messageCount = -1;
 
-	    try {
+	    final int folderType = getFolderInfo().getType();
 
-		getFolderInfo().loadAllMessages();
-		
-		if (! getFolderInfo().isSortaOpen())
-		  getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE);
-
-		final int folderType = getFolderInfo().getType();
-
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-			    if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
-				if (getFolderInfo().getFolderDisplayUI() != null)
-				    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-				else {
-				    getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
-				    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-				}
-				
-			    }
-			    if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
-				javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-				folderTree.expandPath(folderTree.getSelectionPath());
-			    }
-			}
-		    });
-	    }  catch (MessagingException me) {
-		final MessagingException newMe = me;
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-			    Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + "\n", newMe);
-			}
-		    });
+	    if (getFolderInfo().isSortaOpen() && (folderType & Folder.HOLDS_MESSAGES) != 0 && getFolderInfo().getFolderDisplayUI() == null) {
+	      firstUnread = getFolderInfo().getFirstUnreadMessage();
+	      messageCount = getFolderInfo().getMessageCount();
 	    }
 	    
+	    final int finalFirstUnread = firstUnread;
+	    final int finalMessageCount = messageCount;
+
 	    SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		public void run() {
+		  if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
+		    if (getFolderInfo().getFolderDisplayUI() != null)
+		      getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+		    else {
+		      getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
+		      if (Pooka.getProperty("Pooka.selectFirstUnread", "true").equalsIgnoreCase("true")) {
+			if (finalFirstUnread >= 0)
+			  getFolderInfo().getFolderDisplayUI().selectMessage(finalFirstUnread);
+			else
+			  getFolderInfo().getFolderDisplayUI().selectMessage(finalMessageCount);
+		      } else {
+			if (finalFirstUnread >= 0)
+			  getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalFirstUnread);
+			else
+			  getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalMessageCount);
+			
+		      }
+		      getFolderInfo().getFolderDisplayUI().openFolderDisplay();
 		    }
-		});
+		    
+		  }
+		  if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
+		    javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+		    folderTree.expandPath(folderTree.getSelectionPath());
+		  }
+		}
+	      });
+	  }  catch (MessagingException me) {
+	    final MessagingException newMe = me;
+	    SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		  Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + "\n", newMe);
+		}
+	      });
+	  }
+	    
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	      }
+	    });
 	}
-	
+      
     }
     
     class UnsubscribeAction extends AbstractAction {

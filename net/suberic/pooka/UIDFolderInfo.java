@@ -103,6 +103,20 @@ public class UIDFolderInfo extends FolderInfo {
 	    
 	    setFolderTableModel(ftm);
 	    
+	    Vector loadImmediately = null;
+	    
+	    if (messageProxies.size() > 25) {
+	      loadImmediately = new Vector();
+	      for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
+		loadImmediately.add(messageProxies.get(i));
+	      }
+	    } else {
+	      loadImmediately = new Vector(messageProxies);
+	    }
+	    
+	    loadMessageTableInfos(loadImmediately);
+	    
+	    
 	    loaderThread.loadMessages(messageProxies);
 	    
 	    if (!loaderThread.isAlive())

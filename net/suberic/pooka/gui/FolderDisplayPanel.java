@@ -43,43 +43,57 @@ public class FolderDisplayPanel extends JPanel {
 	enabled=false;
     }
 
-    /**
-     * Creates a FolderDisplayPanel for the given FolderInfo.
-     */
-
-    public FolderDisplayPanel(FolderInfo newFolderInfo) {
-	initWindow();
-	setFolderInfo(newFolderInfo);
-	addMessageTable();
+  /**
+   * Creates a FolderDisplayPanel for the given FolderInfo.
+   */
+  public FolderDisplayPanel(FolderInfo newFolderInfo) {
+    initWindow();
+    setFolderInfo(newFolderInfo);
+    addMessageTable();
+  }
+  /*
+    if (messageTable != null) {
+      if (Pooka.getProperty("Pooka.selectFirstUnread", "true").equalsIgnoreCase("true")) {
+	if (selectedValue >= 0) {
+	  selectMessage(selectedValue);
+	} else {
+	  selectFirstUnread();
+	}
+      } else {
+	if (selectedValue >= 0) {
+	  makeSelectionVisible(selectedValue);
+	}
+      }
     }
+  */
 
-    /**
-     * Initializes the window. 
-     */
-
-    public void initWindow() {
-	scrollPane = new JScrollPane();
-	this.setLayout(new BorderLayout());
-	this.add("Center", scrollPane);
-
-	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-	
-	// if the FolderDisplayPanel itself gets the focus, pass it on to
-	// the messageTable
-	this.addFocusListener(new FocusAdapter() {
-		public void focusGained(FocusEvent e) {
-		    if (messageTable != null)
-			messageTable.requestFocus();
-		    if (getFolderInfo() != null && getFolderInfo().hasNewMessages()) {
-			getFolderInfo().setNewMessages(false);
-			FolderNode fn = getFolderInfo().getFolderNode();
-			if (fn != null)
-			    fn.getParentContainer().repaint();
-		    }
-		}
-	    });
-    }
-
+  /**
+   * Initializes the window. 
+   */
+  
+  public void initWindow() {
+    scrollPane = new JScrollPane();
+    this.setLayout(new BorderLayout());
+    this.add("Center", scrollPane);
+    
+    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+    
+    // if the FolderDisplayPanel itself gets the focus, pass it on to
+    // the messageTable
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (messageTable != null)
+	    messageTable.requestFocus();
+	  if (getFolderInfo() != null && getFolderInfo().hasNewMessages()) {
+	    getFolderInfo().setNewMessages(false);
+	    FolderNode fn = getFolderInfo().getFolderNode();
+	    if (fn != null)
+	      fn.getParentContainer().repaint();
+	  }
+	}
+      });
+  }
+  
   /**
    * Creates the JTable for the FolderInfo and adds it to the component.
    */
@@ -87,7 +101,6 @@ public class FolderDisplayPanel extends JPanel {
     if (folderInfo != null) {
       createMessageTable();
       scrollPane.getViewport().add(messageTable);
-      selectFirstUnread();
     }
     
   }
@@ -96,40 +109,40 @@ public class FolderDisplayPanel extends JPanel {
      * This creates the messageTable.
      */
     public void createMessageTable() {
-	messageTable=new JTable(getFolderInfo().getFolderTableModel());
-
-	if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
-	    messageTable.setShowVerticalLines(false);
-	    messageTable.setShowHorizontalLines(false);
-	}
-	
-	for (int i = 0; i < messageTable.getColumnCount(); i++) {
-	    messageTable.getColumnModel().getColumn(i).setPreferredWidth(getFolderInfo().getFolderTableModel().getColumnSize(i));
-	}
-	
-	messageTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-	
-	messageTable.setDefaultRenderer(Object.class, new FilterFolderCellRenderer());
-	messageTable.setDefaultRenderer(Number.class, new FilterFolderCellRenderer());
-
-	messageTable.setCellSelectionEnabled(false);
-	messageTable.setColumnSelectionAllowed(false);
-	messageTable.setRowSelectionAllowed(true);
-	addListeners();
+      messageTable=new JTable(getFolderInfo().getFolderTableModel());
+      
+      if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
+	messageTable.setShowVerticalLines(false);
+	messageTable.setShowHorizontalLines(false);
+      }
+      
+      for (int i = 0; i < messageTable.getColumnCount(); i++) {
+	messageTable.getColumnModel().getColumn(i).setPreferredWidth(getFolderInfo().getFolderTableModel().getColumnSize(i));
+      }
+      
+      messageTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+      
+      messageTable.setDefaultRenderer(Object.class, new FilterFolderCellRenderer());
+      messageTable.setDefaultRenderer(Number.class, new FilterFolderCellRenderer());
+      
+      messageTable.setCellSelectionEnabled(false);
+      messageTable.setColumnSelectionAllowed(false);
+      messageTable.setRowSelectionAllowed(true);
+      addListeners();
     }
-    
-    /**
-     * This removes the current message table.
-     */
-    public void removeMessageTable() {
-	if (messageTable != null) {
-	    scrollPane.getViewport().remove(messageTable);
-	    if (getFolderInfo() != null)
-		getFolderInfo().getFolderTableModel().removeTableModelListener(messageTable);
-	    messageTable = null;
-	}
+  
+  /**
+   * This removes the current message table.
+   */
+  public void removeMessageTable() {
+    if (messageTable != null) {
+      scrollPane.getViewport().remove(messageTable);
+      if (getFolderInfo() != null)
+	getFolderInfo().getFolderTableModel().removeTableModelListener(messageTable);
+      messageTable = null;
     }
-
+  }
+  
   /**
    * This removes rows from the FolderTableModel.  This is the preferred
    * way to remove rows from the FolderTableModel.

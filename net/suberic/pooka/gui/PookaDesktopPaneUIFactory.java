@@ -81,197 +81,196 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
     // a FolderInfo can only have one FolderDisplayUI.
     
-    
     if (fi.getFolderDisplayUI() != null)
       return fi.getFolderDisplayUI();
     
     FolderDisplayUI fw = new FolderInternalFrame(fi, getMessagePanel());
     return fw;
   }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the values in the properties Vector.  The given properties
-     * will be shown according to the values in the templates Vector.
-     * Note that there should be an entry in the templates Vector for
-     * each entry in the properties Vector.
-     */
-    public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
-	JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, properties, templates);
-	getMessagePanel().add(jif);
-	jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
-
-	jif.setVisible(true);
-	try {
-	    jif.setSelected(true);
-	} catch (java.beans.PropertyVetoException pve) {
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the values in the properties Vector.  The given properties
+   * will be shown according to the values in the templates Vector.
+   * Note that there should be an entry in the templates Vector for
+   * each entry in the properties Vector.
+   */
+  public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
+    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, properties, templates);
+    getMessagePanel().add(jif);
+    jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
+    
+    jif.setVisible(true);
+    try {
+      jif.setSelected(true);
+    } catch (java.beans.PropertyVetoException pve) {
+    }
+    
+  }
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the values in the properties Vector.
+   */
+  public void showEditorWindow(String title, java.util.Vector properties) {
+    showEditorWindow(title, properties, properties);
+  }
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the given property.
+   */
+  public void showEditorWindow(String title, String property) {
+    java.util.Vector v = new java.util.Vector();
+    v.add(property);
+    showEditorWindow(title, v, v);
+  }
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the given property, which is in turn defined by the 
+   * given template.
+   */
+  public void showEditorWindow(String title, String property, String template) {
+    java.util.Vector prop = new java.util.Vector();
+    prop.add(property);
+    java.util.Vector templ = new java.util.Vector();
+    templ.add(template);
+    showEditorWindow(title, prop, templ);
+  }
+  
+  
+  /**
+   * Creates a JPanel which will be used to show messages and folders.
+   *
+   * This implementation creates an instance of MessagePanel.
+   */
+  public ContentPanel createContentPanel() {
+    messagePanel = new MessagePanel(Pooka.getMainPanel());
+    messagePanel.setSize(1000,1000);
+    JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
+    messagePanel.setUIComponent(messageScrollPane);
+    
+    ((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+    return messagePanel;
+  }
+  
+  /**
+   * Creates a JPanel which will be used to show messages and folders.
+   *
+   * This implementation creates an instance of MessagePanel.
+   */
+  public ContentPanel createContentPanel(PreviewContentPanel pcp) {
+    messagePanel = new MessagePanel(Pooka.getMainPanel(), pcp);
+    messagePanel.setSize(1000,1000);
+    JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
+    messagePanel.setUIComponent(messageScrollPane);
+    
+    ((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+    return messagePanel;
+  }
+  
+  /**
+   * Returns the MessagePanel associated with this Factory.
+   */
+  public MessagePanel getMessagePanel() {
+    return messagePanel;
+  }
+  
+  /**
+   * Returns the PropertyEditorFactory used by this component.
+   */
+  public PropertyEditorFactory getEditorFactory() {
+    return editorFactory;
+  }
+  
+  /**
+   * Shows a Confirm dialog.
+   */
+  public int showConfirmDialog(String message, String title, int type) {
+    return JOptionPane.showInternalConfirmDialog(messagePanel, message, title, type);
+  }
+  
+  /**
+   * Shows a Confirm dialog with the given Object[] as the Message.
+   */
+  public int showConfirmDialog(Object[] messageComponents, String title, int type) {
+    return JOptionPane.showInternalConfirmDialog(messagePanel, messageComponents, title, type);
+  }
+  
+  /**
+   * This shows an Error Message window.
+   */
+  public void showError(String errorMessage, String title) {
+    if (showing)
+      JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+    else
+      System.out.println(errorMessage);
+    
+  }
+  
+  /**
+   * This shows an Error Message window.  
+   */
+  public void showError(String errorMessage) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+  }
+  
+  /**
+   * This shows an Error Message window.  
+   */
+  public void showError(String errorMessage, Exception e) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+  }
+  
+  /**
+   * This shows an Error Message window.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    showError(errorMessage + e.getMessage(), title);
+    e.printStackTrace();
+  }
+  
+  /**
+   * This shows an Input window.
+   */
+  public String showInputDialog(String inputMessage, String title) {
+    return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(Object[] inputPanes, String title) {
+    return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * Shows a message.
+   */
+  public void showMessage(String newMessage, String title) {
+    JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
+    }
+  
+  /**
+   * Shows a status message.
+   */
+  public void showStatusMessage(String newMessage) {
+    final String msg = newMessage;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  Pooka.getMainPanel().getInfoPanel().setMessage(msg);
 	}
-	    
-    }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the values in the properties Vector.
-     */
-    public void showEditorWindow(String title, java.util.Vector properties) {
-	showEditorWindow(title, properties, properties);
-    }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the given property.
-     */
-    public void showEditorWindow(String title, String property) {
-	java.util.Vector v = new java.util.Vector();
-	v.add(property);
-	showEditorWindow(title, v, v);
-    }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the given property, which is in turn defined by the 
-     * given template.
-     */
-    public void showEditorWindow(String title, String property, String template) {
-	java.util.Vector prop = new java.util.Vector();
-	prop.add(property);
-	java.util.Vector templ = new java.util.Vector();
-	templ.add(template);
-	showEditorWindow(title, prop, templ);
-    }
-
-
-    /**
-     * Creates a JPanel which will be used to show messages and folders.
-     *
-     * This implementation creates an instance of MessagePanel.
-     */
-    public ContentPanel createContentPanel() {
-	messagePanel = new MessagePanel(Pooka.getMainPanel());
-	messagePanel.setSize(1000,1000);
-	JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
-	messagePanel.setUIComponent(messageScrollPane);
-
-	((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
-	return messagePanel;
-    }
-
-    /**
-     * Creates a JPanel which will be used to show messages and folders.
-     *
-     * This implementation creates an instance of MessagePanel.
-     */
-    public ContentPanel createContentPanel(PreviewContentPanel pcp) {
-	messagePanel = new MessagePanel(Pooka.getMainPanel(), pcp);
-	messagePanel.setSize(1000,1000);
-	JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
-	messagePanel.setUIComponent(messageScrollPane);
-	
-	((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
-	return messagePanel;
-    }
-
-    /**
-     * Returns the MessagePanel associated with this Factory.
-     */
-    public MessagePanel getMessagePanel() {
-	return messagePanel;
-    }
-
-    /**
-     * Returns the PropertyEditorFactory used by this component.
-     */
-    public PropertyEditorFactory getEditorFactory() {
-	return editorFactory;
-    }
-
-    /**
-     * Shows a Confirm dialog.
-     */
-    public int showConfirmDialog(String message, String title, int type) {
-	return JOptionPane.showInternalConfirmDialog(messagePanel, message, title, type);
-    }
-
-    /**
-     * Shows a Confirm dialog with the given Object[] as the Message.
-     */
-    public int showConfirmDialog(Object[] messageComponents, String title, int type) {
-	return JOptionPane.showInternalConfirmDialog(messagePanel, messageComponents, title, type);
-    }
-
-    /**
-     * This shows an Error Message window.
-     */
-    public void showError(String errorMessage, String title) {
-	if (showing)
-	    JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
-	else
-	    System.out.println(errorMessage);
-	
-    }
-
-    /**
-     * This shows an Error Message window.  
-     */
-    public void showError(String errorMessage) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"));
-    }
-
-    /**
-     * This shows an Error Message window.  
-     */
-    public void showError(String errorMessage, Exception e) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
-
-    /**
-     * This shows an Error Message window.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-	e.printStackTrace();
-    }
-
-    /**
-     * This shows an Input window.
-     */
-    public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(Object[] inputPanes, String title) {
-	return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * Shows a message.
-     */
-    public void showMessage(String newMessage, String title) {
-      JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
-    }
-
-    /**
-     * Shows a status message.
-     */
-    public void showStatusMessage(String newMessage) {
-      final String msg = newMessage;
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
-	  }
-	};
-      if (SwingUtilities.isEventDispatchThread())
-	runMe.run();
-      else
-	SwingUtilities.invokeLater(runMe);
-    }
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
+  }
 
     /**
      * Clears the main status message panel.
