@@ -5,6 +5,8 @@ import java.net.*;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import java.security.KeyStore;
+import java.io.File;
+import java.io.FileInputStream;
 
 import com.sun.net.ssl.*;
 
@@ -50,7 +52,11 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
 	new PookaTrustManager(trustManagers, fileName)
       };
 
-      sslc.init(keyManagers, pookaTrustManagers, new java.security.SecureRandom());
+      java.security.SecureRandom secureRandomGenerator = new java.security.SecureRandom();
+      if (Pooka.getProperty("Pooka.SSL.useSecureRandom", "true").equalsIgnoreCase("false")) {
+	seed(secureRandomGenerator);
+      }
+      sslc.init(keyManagers, pookaTrustManagers, secureRandomGenerator);
       wrappedFactory = (SSLSocketFactory) sslc.getSocketFactory();
 
     } catch(Exception e) {
@@ -122,6 +128,35 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    */
   public String[] getSupportedCipherSuites() {
     return wrappedFactory.getSupportedCipherSuites();
+  }
+
+  /**
+   * Generates a random seed.  Useful because the default SecureRandom
+   * seed generation system is very very slow.
+   */
+  public void seed(java.security.SecureRandom random) {
+    // check for /dev/urandom if we're on unix.
+    if (File.separatorChar == '/') {
+      File f = new File("/dev/urandom");
+      if (f.exists()) {
+	try {
+	  FileInputStream fis = new FileInputStream(f);
+	  byte[] seed = new byte[8];
+	  fis.read(seed);
+	  random.setSeed(seed);
+	  return;
+	} catch (java.io.IOException ioe) {
+	  long newSeed = new java.util.Random(System.currentTimeMillis()).nextLong();
+	  random.setSeed(newSeed);
+
+	}
+      }
+      
+    } 
+
+    // if not...
+    long newSeed = new java.util.Random(System.currentTimeMillis()).nextLong();
+    random.setSeed(newSeed);
   }
 }
 

@@ -760,6 +760,8 @@ Preferences.Files=Pooka.defaultMailSubDir:Pooka.sslCertFile
 Pooka.defaultMailSubDir.propertyType=Directory
 Pooka.sslCertFile.propertyType=File
 
+Pooka.SSL.useSecureRandom=false
+
 Pooka.messagePanel.theme.propertyType=List
 Pooka.messagePanel.theme.allowedValues=Pooka.theme
 Pooka.folderPanel.theme.propertyType=List
