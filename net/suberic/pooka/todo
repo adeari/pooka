@@ -1,3 +1,9 @@
+*) add java console for debugging during webstart/console-less operation.
+
+*) add status information during mail sending.
+
+*) support multiple attachment selection, including wildcards.
+
 *) fix NPE in KeySelectorPane editing with a new user.
 
 *) fix jmaildir on windows xp
