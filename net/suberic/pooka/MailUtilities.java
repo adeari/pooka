@@ -10,8 +10,30 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 public class MailUtilities {
-    public MailUtilities() {
+  public MailUtilities() {
+  }
+  
+  /**
+   * This returns the value of an array of Address objects as a String.
+   */
+  public static String getAddressString(Address[] addresses) {
+    if (addresses == null)
+      return null;
+
+    StringBuffer returnValue = new StringBuffer();
+    for (int i = 0; i < addresses.length; i++) {
+      if (addresses[i] != null) {
+	if (i > 0)
+	  returnValue.append(", ");
+	if (addresses[i] instanceof javax.mail.internet.InternetAddress)
+	  returnValue.append(((javax.mail.internet.InternetAddress)addresses[i]).toUnicodeString());
+	else
+	  returnValue.append(addresses[i].toString());
+      }
     }
+
+    return returnValue.toString();
+  }
 
     /**
      * This parses the message given into an AttachmentBundle.

@@ -26,4 +26,15 @@ public interface AddressBook {
    * Gets the ID for this address book.
    */
   public String getAddressBookID();
+
+  /**
+   * Loads the AddressBook.
+   */
+  public void loadAddressBook() throws java.io.IOException, java.text.ParseException;
+  
+  /**
+   * Saves the AddressBook.
+   */
+  public void saveAddressBook() throws java.io.IOException;
+
 }

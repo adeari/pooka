@@ -56,4 +56,9 @@ public interface AddressBookEntry {
    */
   public void setLastName(String newName);
 
+  /**
+   * Gets a Properties representation of the values in the AddressBookEntry.
+   */
+  public java.util.Properties getProperties();
+
 }

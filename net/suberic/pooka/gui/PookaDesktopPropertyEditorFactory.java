@@ -106,14 +106,14 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
      * This returns a new AddressBookEditorPane.
      */
     public DefaultPropertyEditor createAddressEditor(String property, String typeTemplate) {
-	return new net.suberic.pooka.gui.AddressBookEditorPane(property, typeTemplate, getBundle());
+	return new net.suberic.pooka.gui.AddressBookEditorPane(this, property, typeTemplate, getBundle());
     }
 
     /**
      * This returns a new AddressBookEditorPane.
      */
     public DefaultPropertyEditor createAddressEditor(String property) {
-	return new net.suberic.pooka.gui.AddressBookEditorPane(property, property, getBundle());
+	return new net.suberic.pooka.gui.AddressBookEditorPane(this, property, property, getBundle());
     }
 
 }

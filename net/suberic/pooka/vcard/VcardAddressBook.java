@@ -51,7 +51,7 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   /**
    * Loads the AddressBook from the saved filename.
    */
-  protected void loadAddressBook() throws java.text.ParseException, java.io.IOException {
+  public void loadAddressBook() throws java.text.ParseException, java.io.IOException {
     File f = new File(fileName);
     if (f.exists()) {
       BufferedReader reader = new BufferedReader(new FileReader(f));

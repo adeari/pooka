@@ -44,6 +44,21 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   }
   
   /**
+   * Gets a Properties representation of the values in the AddressBookEntry.
+   */
+  public java.util.Properties getProperties() {
+    Properties returnValue = new Properties();
+    // we need four settings:  "personalName", "firstName", "lastName", and 
+    // "address".
+
+    returnValue.setProperty("currentAddress.personalName", getPersonalName());
+    returnValue.setProperty("currentAddress.firstName", getFirstName());
+    returnValue.setProperty("currentAddress.lastName", getLastName());
+    returnValue.setProperty("currentAddress.address", getAddress().getAddress());
+    return returnValue;
+  }
+
+  /**
    * Gets the InternetAddress associated with this Vcard.
    */
   public InternetAddress getAddress() {
@@ -64,7 +79,8 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     if (newAddress != null) {
       address = newAddress;
       properties.setProperty("email;internet", newAddress.getAddress());
-      properties.setProperty("fn", newAddress.getPersonal());
+      if (newAddress.getPersonal() != null)
+	properties.setProperty("fn", newAddress.getPersonal());
     }
   }
 
@@ -78,7 +94,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       }
       return address.getPersonal();
     } catch (java.io.UnsupportedEncodingException uee) {
-      return null;
+      return "";
     }
   }
 
@@ -109,7 +125,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
 	return name.substring(index + 1);
     }
 
-    return null;
+    return "";
   }
 
   /**
@@ -137,7 +153,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
 	return name.substring(0, index);
     }
 
-    return null;
+    return "";
   }
 
   /**

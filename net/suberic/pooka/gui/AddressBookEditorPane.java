@@ -18,17 +18,19 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   JTable addressTable;
 
   VariableBundle sourceBundle = null;
+  PropertyEditorFactory factory = null;
 
-  public AddressBookEditorPane(String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
-    configureEditor(newProperty, newTemplateType, bundle, isEnabled);
+  public AddressBookEditorPane(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
+    configureEditor(newFactory, newProperty, newTemplateType, bundle, isEnabled);
   }
 
-  public AddressBookEditorPane(String newProperty, String newTemplateType, VariableBundle bundle) {
-    configureEditor(newProperty, newTemplateType, bundle, true);
+  public AddressBookEditorPane(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle) {
+    configureEditor(newFactory, newProperty, newTemplateType, bundle, true);
   }
   
-  public void configureEditor(PropertyEditorFactory factory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
+  public void configureEditor(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
     sourceBundle = bundle;
+    factory = newFactory;
 
     property=newProperty;
     // we're going to have "AddressBook." at the beginning, and 
@@ -131,7 +133,8 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    * Brings up an editor for the current entry.
    */
   public void editEntry(AddressBookEntry entry) {
-    
+    AddressEntryEditor editor = new AddressEntryEditor(factory, entry, sourceBundle);
+    factory.showNewEditorWindow(sourceBundle.getProperty("AddressEntryEditor.title", "Address Entry"), editor);
   }
 
   /**
@@ -150,6 +153,12 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
 
   public void setValue() {
+    try {
+      book.saveAddressBook();
+    } catch (Exception e) {
+      Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
+      e.printStackTrace();
+    }
   }
   
   public java.util.Properties getValue() {
@@ -157,6 +166,13 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
   
   public void resetDefaultValue() {
+    try {
+      book.loadAddressBook();
+    } catch (Exception e) {
+      Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.loadAddressBook", "Error reloading Address Book:  ") + e.getMessage());
+      e.printStackTrace();
+    }
+    performSearch();
   }
   
   public boolean isChanged() {

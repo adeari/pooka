@@ -112,20 +112,17 @@ public class MessageInfo {
 	Message msg = getMessage();
 	if (prop.equals("From")) {
 	    Address[] fromAddr = msg.getFrom();
-	    if (fromAddr != null && fromAddr[0] != null) 
-		return ((javax.mail.internet.InternetAddress)fromAddr[0]).toString();
-	    else 
-		return null;
+	    return MailUtilities.getAddressString(fromAddr);
 	} else if (prop.equalsIgnoreCase("receivedDate")) {
 	    return msg.getReceivedDate();
 	} else if (prop.equalsIgnoreCase("recipients")) {
 	    return msg.getAllRecipients();
 	} else if (prop.equalsIgnoreCase("to")) {
-	    return msg.getRecipients(Message.RecipientType.TO).toString();
+	    return MailUtilities.getAddressString(msg.getRecipients(Message.RecipientType.TO));
 	} else if (prop.equalsIgnoreCase("cc")) {
-	    return msg.getRecipients(Message.RecipientType.CC).toString();
+	    return MailUtilities.getAddressString(msg.getRecipients(Message.RecipientType.CC));
 	} else if (prop.equalsIgnoreCase("bcc")) {
-	    return msg.getRecipients(Message.RecipientType.BCC).toString();
+	    return MailUtilities.getAddressString(msg.getRecipients(Message.RecipientType.BCC));
 	} else if (prop.equalsIgnoreCase("Date")) {
 	    return msg.getSentDate();
 	} else if (prop.equalsIgnoreCase("Subject")) {
@@ -412,11 +409,11 @@ public class MessageInfo {
 		    char nextChar = introTemplate.charAt(index + 1);
 		    if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
 
-			Address[] fromAddresses = m.getFrom();
-			if (fromAddresses.length > 0 && fromAddresses[0] != null)
-			    intro.replace(index, index +2, fromAddresses[0].toString());
+		      Address[] fromAddresses = m.getFrom();
+		      if (fromAddresses.length > 0 && fromAddresses[0] != null)
+			intro.replace(index, index +2, MailUtilities.getAddressString(fromAddresses));
 		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
-			intro.replace(index, index + 2, Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate()));
+		      intro.replace(index, index + 2, Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate()));
 		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
 			intro.replace(index, index + 2, m.getSubject());
 		    } else if (nextChar == '%') {
