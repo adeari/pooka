@@ -129,7 +129,9 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
    * This creates a new NetworkConnection.
    */
   public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID) {
-    return new NetworkConnection(itemID);
+    NetworkConnection returnValue = new NetworkConnection(itemID);
+    returnValue.configure();
+    return returnValue;
   }
 
   //---------------------------

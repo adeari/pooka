@@ -41,8 +41,6 @@ public class OutgoingMailServer implements net.suberic.util.Item {
 
     connectionID = bundle.getProperty(getItemProperty() + ".connection", "");
     outboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
-    System.err.println("outboxID for " + id + " is " + outboxID);
-    System.err.println("connectionID for " + getItemProperty() + ".connectionID is " + connectionID);
 
     sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + "/");
     
@@ -97,7 +95,6 @@ public class OutgoingMailServer implements net.suberic.util.Item {
     FolderInfo outbox = getOutbox();
     NetworkConnection connection = getConnection();
 
-    System.err.println("outbox is " + outbox);
     if (outbox != null) {
       outbox.appendMessages(new MessageInfo[] { nmi });
       if (connection.getStatus() == NetworkConnection.CONNECTED)
@@ -107,7 +104,7 @@ public class OutgoingMailServer implements net.suberic.util.Item {
 	  connection.connect();
 	  sendAll();
 	} catch (MessagingException me) {
-	  System.err.println("me is a " + me);
+	  System.out.println("me is a " + me);
 	  me.printStackTrace();
 	}
       }
@@ -159,4 +156,5 @@ public class OutgoingMailServer implements net.suberic.util.Item {
   public String getItemProperty() {
     return propertyName;
   }
+
 }

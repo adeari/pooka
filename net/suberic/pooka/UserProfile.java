@@ -401,12 +401,9 @@ public class UserProfile extends Object implements ValueChangeListener {
    * property.
    */
   public void loadMailServer() {
-    System.err.println("mailServerName is " + mailServerName);
     mailServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(mailServerName);
-    System.err.println("mailServer is " + mailServer);
     if (mailServer == null) {
       mailServer = Pooka.getOutgoingMailManager().getDefaultOutgoingMailServer();
-      System.err.println("mailServer was null.  using default, which is " + mailServer);
     }
   }
 

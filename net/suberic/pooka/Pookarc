@@ -74,6 +74,8 @@ Pooka.defaultSigGenerator=net.suberic.pooka.FileSignatureGenerator
 Pooka.autoExpunge=true
 Pooka.autoExpunge.propertyType=Boolean
 
+Pooka.fetchBatchSize=50
+
 MenuBar=File:Edit:Mail:Config:Window:Help
 
 MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
@@ -431,10 +433,11 @@ OutgoingServer._default.propertyType=List
 OutgoingServer._default.allowedValues=OutgoingServer
 
 Connection.propertyType=Multi
-Connection.editableFields=connectCommand:disconnectCommand:connectOnStartup
+Connection.editableFields=connectCommand:disconnectCommand:valueOnStartup
 Connection.editableFields.scoped=true
-Connection.editableFields.connectOnStartup.propertyType=Boolean
-Connection.editableFields.connectOnStartup=true
+Connection.editableFields.valueOnStartup.propertyType=List
+Connection.editableFields.valueOnStartup.allowedValues=Connected:Disconnected:Unavailable
+Connection.editableFields.valueOnStartup=Connected
 
 Connection._default.propertyType=List
 Connection._default.allowedValues=Connection

@@ -36,6 +36,7 @@ public class NetworkConnection implements net.suberic.util.Item {
   public NetworkConnection (String newId) {
     id = newId;
     propertyName = "Connection." + newId;
+
   }
 
   /**
@@ -58,8 +59,11 @@ public class NetworkConnection implements net.suberic.util.Item {
     connectCommand = bundle.getProperty(getItemProperty() + ".connectCommand", "");
     disconnectCommand = bundle.getProperty(getItemProperty() + ".disconnectCommand", "");
 
-    if ( bundle.getProperty(getItemProperty() + ".connectOnStartup", "false").equalsIgnoreCase("true") ) {
+    String onStartup = bundle.getProperty(getItemProperty() + ".valueOnStartup", "Unavailable");
+    if (onStartup.equalsIgnoreCase("Connected")) {
       this.connect();
+    } else if (onStartup.equalsIgnoreCase("Unavailable")) {
+      status = UNAVAILABLE;
     }
   }
   

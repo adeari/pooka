@@ -59,11 +59,9 @@ public class NewMessageInfo extends MessageInfo {
       }
       
       boolean sent = false;
-      System.err.println("checking to see if we're using the outbox or not.");
       if (Pooka.getProperty("Pooka.useOutbox", "false").equalsIgnoreCase("true")) {
 	if (profile != null) {
 	  OutgoingMailServer mailServer = profile.getMailServer();
-	  System.err.println("mailServer is " + mailServer);
 	  if (mailServer != null) {
 	    mailServer.sendMessage(this);
 	    sent = true;

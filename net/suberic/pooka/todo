@@ -1,6 +1,20 @@
 next release:
 
 *) add queuing of outgoing mails (?)
+	todo on this:
+	*)  make it so you can manually send the messages in the mail queue.
+	*)  make it so the mail queue automatically flushes when you 
+		connect.
+	*)  make the mail stores pay attention to the Connection objects.
+	*)  make it fault tolerant so that if you still have the old
+		sendMailURL, things still work.
+	*)  fix the local mail store so that it doesn't necessarily put
+		in an INBOX for everything.
+	*)  fix the UIDFolderInfo so that you can add new messages directly
+		to it.
+	*)  make sure everything works properly if there is no outbox
+		configured.  throw an exception if there's no outbox and
+		the connection is down.
 
 *) make search give a popup window saying it's running.
 
@@ -9,6 +23,8 @@ next release:
 *) add support for authenticated smtp.
 
 *) add support for external editors, such as emacs.
+
+*) add support for random SSL certificates.
 
 beta 1
 ---------------
@@ -27,6 +43,7 @@ beta 1
 
 *) make disconnected imap use LoadMessageTracker.
 	make disconnected imap not show messages that aren't there!
+	for that matter, make normal imap folders use the lmt again, too.
 
 error:  filterfoldercellrenderer has problems with search forms.
 

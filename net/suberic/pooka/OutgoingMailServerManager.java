@@ -2,6 +2,9 @@ package net.suberic.pooka;
 
 import java.util.*;
 
+import javax.mail.*;
+import javax.mail.internet.*;
+
 import net.suberic.util.*;
 
 /**
@@ -14,6 +17,8 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
   
   private ItemManager manager;
   private LinkedList listenerList = new LinkedList();
+
+  private DefaultOutgoingMailServer defaultServer = null;
 
   /**
    * <p>Creates a new OutgoingMailServerManager.</p>
@@ -90,16 +95,23 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    * exists; otherwise, returns null.
    */
   public OutgoingMailServer getOutgoingMailServer(String OutgoingMailServerID) {
-    System.err.println("getting OutgoingMailServer for id " + OutgoingMailServerID);
     return (OutgoingMailServer) manager.getItem(OutgoingMailServerID);
   }
 
   /**
-   * This returns the NetwordOutgoingMailServer with the given OutgoingMailServerName if it 
+   * This returns the NetworkOutgoingMailServer with the given 
+   * OutgoingMailServerName if it 
    * exists; otherwise, returns null.
    */
   public OutgoingMailServer getDefaultOutgoingMailServer() {
-    return (OutgoingMailServer) manager.getItem("_default");
+    if (defaultServer == null) {
+      String defaultId = Pooka.getProperty("OutgoingServer._default", "");
+      if (defaultId != "") {
+	defaultServer = new DefaultOutgoingMailServer(defaultId);
+      }
+    }
+
+    return defaultServer;
   }
 
   /**
@@ -130,7 +142,6 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    * This creates a new OutgoingMailServer.
    */
   public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID) {
-    System.err.println("creating OutgoingMailServer from itemId " + itemID);
     return new OutgoingMailServer(itemID);
   }
 
@@ -144,8 +155,113 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
   private void createOutgoingMailServerList() {
     manager = new ItemManager("OutgoingServer", Pooka.getResources(), this);
     Vector v = getOutgoingMailServerList();
-    System.err.println("create mailserverlist.  serverlist has length of " + v.size());
 
     manager.addItemListChangeListener(this);
   }
+
+  /**
+   * A special OutgoingMailServer that represents the 'default' value.
+   */
+  class DefaultOutgoingMailServer extends OutgoingMailServer {
+    String defaultServerId = null;
+    OutgoingMailServer underlyingServer = null;
+    String outboxID = null;
+
+    /**
+     * <p>Creates a new DefaultOutgoingMailServer using the given 
+     * String as the default server id.
+     */
+    public DefaultOutgoingMailServer (String newDefaultServerId) {
+      super(newDefaultServerId);
+    }
+    
+    /**
+     * <p>Configures this mail server.</p>
+     */
+    protected void configure() {
+      defaultServerId = id;
+      id = Pooka.getProperty("OutgoingServer._default.label", "*default*");
+      propertyName = "OutgoingServer._default";
+
+      underlyingServer = getOutgoingMailServer(defaultServerId);
+      outboxID = Pooka.getProperty("OutgoingServer._default.outbox");
+    }
+    
+    /**
+     * Sends all available messages.
+     *
+     * What this will do actually is send all of the default server's
+     * messages, and then send the underlying server's messages, if any.
+     */
+    public void sendAll() throws javax.mail.MessagingException {
+      
+      NetworkConnection connection = getConnection();
+      
+      if (connection.getStatus() == NetworkConnection.DISCONNECTED) {
+	connection.connect();
+      }
+      
+      if (connection.getStatus() != NetworkConnection.CONNECTED) {
+	throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Mail Server:  ") + getItemID());
+      }
+      
+      Transport sendTransport = Pooka.getDefaultSession().getTransport(underlyingServer.sendMailURL); 
+      try {
+	sendTransport.connect();
+	
+	FolderInfo outbox = getOutbox();
+	
+	Message[] msgs = outbox.getFolder().getMessages();    
+	
+	try {
+	  for (int i = 0; i < msgs.length; i++) {
+	    Message m = msgs[i];
+	    if (! m.isSet(Flags.Flag.DRAFT)) {
+	      sendTransport.sendMessage(m, m.getAllRecipients());
+	      m.setFlag(Flags.Flag.DELETED, true);
+	    }
+	  }
+	} finally {
+	  outbox.getFolder().expunge();
+	}
+
+	FolderInfo underlyingOutbox = underlyingServer.getOutbox();
+	
+	if (underlyingOutbox != outbox) {
+	  msgs = underlyingOutbox.getFolder().getMessages();    
+	  
+	  try {
+	    for (int i = 0; i < msgs.length; i++) {
+	      Message m = msgs[i];
+	      if (! m.isSet(Flags.Flag.DRAFT)) {
+		sendTransport.sendMessage(m, m.getAllRecipients());
+		m.setFlag(Flags.Flag.DELETED, true);
+	      }
+	    }
+	  } finally {
+	    underlyingOutbox.getFolder().expunge();
+	  }
+	}
+      } finally {
+	sendTransport.close();
+      }
+    }
+    
+    /**
+     * <p>The NetworkConnection that this OutgoingMailServer depends on.
+     */
+    public NetworkConnection getConnection() {
+      return underlyingServer.getConnection();
+    }
+    
+    /**
+     * <p>The FolderInfo where messages for this MailServer are
+     * stored until they're ready to be sent.
+     */
+    public FolderInfo getOutbox() {
+      return Pooka.getStoreManager().getFolder(outboxID);
+    }
+    
+  }
+
 }
