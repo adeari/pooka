@@ -12,9 +12,9 @@ import javax.mail.internet.*;
 public class NewMessageInfo extends MessageInfo {
 
   // ok, i could have just used sets of booleans, but...
-  static int CRYPTO_YES = 0;
-  static int CRYPTO_DEFAULT = 5;
-  static int CRYPTO_NO = 10;
+  public static int CRYPTO_YES = 0;
+  public static int CRYPTO_DEFAULT = 5;
+  public static int CRYPTO_NO = 10;
 
   // whether or not we want to encrypt this message.
   int mEncryptMessage = CRYPTO_DEFAULT;
@@ -260,5 +260,31 @@ public class NewMessageInfo extends MessageInfo {
 
     outboxFolder.appendMessages(new MessageInfo[] { this });
 
+  }
+
+  /**
+   * Returns whether we're planning on encrypting this message or not.
+   */
+  public int getEncryptMessage() {
+    return mEncryptMessage;
+  }
+  /**
+   * Sets whether or not we want to encrypt this message.
+   */
+  public void setEncryptMessage(int pEncryptMessage) {
+    mEncryptMessage = pEncryptMessage;
+  }
+
+  /**
+   * Returns whether we're planning on encrypting this message or not.
+   */
+  public int getSignMessage() {
+    return mSignMessage;
+  }
+  /**
+   * Sets whether or not we want to encrypt this message.
+   */
+  public void setSignMessage(int pSignMessage) {
+    mSignMessage = pSignMessage;
   }
 }

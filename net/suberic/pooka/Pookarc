@@ -98,7 +98,7 @@ EncryptionManager.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
 Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
 Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png
 
-MenuBar=File:Edit:Mail:Config:Window:Help
+MenuBar=File:Edit:Mail:Encryption:Config:Window:Help
 
 MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
 
@@ -167,6 +167,14 @@ MenuBar.Mail.Filter.Action=message-filter
 MenuBar.Mail.AddSignature.Action=message-add-signature
 MenuBar.Mail.SearchFolder.Action=folder-search
 MenuBar.Mail.Subscribe.Action=folder-subscribe
+
+MenuBar.Encryption=Encrypt:Decrypt:Sign:CheckSignature:SelectPublic:SelectPrivate
+MenuBar.Encryption.Encrypt.Action=message-encrypt
+MenuBar.Encryption.Decrypt.Action=message-decrypt
+MenuBar.Encryption.Sign.Action=message-sign
+MenuBar.Encryption.CheckSignature.Action=message-check-signature
+MenuBar.Encryption.SelectPublic.Action=message-select-crypt-key
+MenuBar.Encryption.SelectPrivate.Action=message-select-sig-key
 
 MenuBar.Config=Preferences:StoreConfig:UserConfig:OutgoingConfig:ConnectionConfig:AddressBook:Theme
 MenuBar.Config.Preferences.Action=cfg-prefs

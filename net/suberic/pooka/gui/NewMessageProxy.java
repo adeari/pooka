@@ -302,7 +302,11 @@ public class NewMessageProxy extends MessageProxy {
   public Action[] defaultActions = {
     new SendAction(),
     new AttachAction(),
-    new SaveDraftAction()
+    new SaveDraftAction(),
+    new EncryptAction(),
+    new SelectEncryptionKeyAction(),
+    new SignAction(),
+    new SelectSignatureKeyAction()
       };
   
   public Action getAction(String name) {
@@ -336,14 +340,55 @@ public class NewMessageProxy extends MessageProxy {
       attach();
     }
   }
-
+  
   class SaveDraftAction extends AbstractAction {
     SaveDraftAction() {
       super("message-save-draft");
     }
-    
+
     public void actionPerformed(ActionEvent e) {
       saveDraft();
+    }
+  }
+  
+
+  class EncryptAction extends AbstractAction {
+    EncryptAction() {
+      super("message-encrypt");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      getNewMessageInfo().setEncryptMessage(NewMessageInfo.CRYPTO_YES);
+    }
+  }
+
+  class SignAction extends AbstractAction {
+    SignAction() {
+      super("message-sign");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_YES);
+    }
+  }
+
+  class SelectSignatureKeyAction extends AbstractAction {
+    SelectSignatureKeyAction() {
+      super("message-select-sig-key");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      selectPublicKey();
+    }
+  }
+
+  class SelectEncryptionKeyAction extends AbstractAction {
+    SelectEncryptionKeyAction() {
+      super("message-select-crypt-key");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      selectPrivateKey();
     }
   }
   

@@ -547,10 +547,75 @@ public class MessageProxy {
   }
 
   /**
+   * Attempts to check the signature on the given message.
+   */
+  public void checkSignature() {
+    MessageInfo info = getMessageInfo();
+    if (info != null) {
+      if (info.hasEncryption()) {
+
+	net.suberic.pooka.crypto.EncryptionKey key = getDefaultProfile().getEncryptionKey();
+
+	MessageCryptoInfo cInfo = info.getCryptoInfo();
+	int sigStatus = 0;
+	int encryptStatus = 0;
+
+	CryptoStatusDisplay csd = getCryptoStatusDisplay();
+	if (csd != null) {
+	  // sigStatus -= csd.getSignatureStatus();
+	  // encryptStatus = csd.getEncryptionStatus();
+	}
+
+	try {
+	  boolean hasSignature = cInfo.isSigned();
+	  if (hasSignature) {
+	    if (cInfo.isSignatureValid()) {
+	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
+	    } else {
+	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
+	      
+	    }
+	  } else {
+	    sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.NOT_SIGNED;
+	  }
+	} catch (Exception e) {
+	  sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION;
+	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
+	}
+	  
+	if (csd != null)
+	  csd.cryptoUpdated(sigStatus, encryptStatus);
+	
+	if (getMessageUI() != null) {
+	  try {
+	    getMessageUI().refreshDisplay();
+	  } catch (MessagingException me) {
+	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed"), me);
+	  }
+	}
+      }
+    }
+  }
+
+  /**
    * Returns the CryptoStatusDisplay for this MessageProxy, if any.
    */
   public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
     return mCryptoStatusDisplay;
+  }
+
+  /**
+   * Opens up a dialog to select a public key.
+   */
+  public void selectPublicKey() {
+    
+  }
+
+  /**
+   * Opens up a dialog to select a private key.
+   */
+  public void selectPrivateKey() {
+    
   }
 
   /**
@@ -1157,7 +1222,8 @@ public class MessageProxy {
 	new ActionWrapper(new SaveAddressAction(), folderThread),
 	new ActionWrapper(new OpenAsNewAction(), folderThread),
 	new ActionWrapper(new FilterAction(), folderThread),
-	new ActionWrapper(new DecryptAction(), folderThread)
+	new ActionWrapper(new DecryptAction(), folderThread),
+	new ActionWrapper(new CheckSignatureAction(), folderThread)
       };
 
       commands = new Hashtable();
@@ -1603,6 +1669,27 @@ public class MessageProxy {
 	fw.setBusy(true);;
 	
       decryptMessage();
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class CheckSignatureAction extends AbstractAction {
+    CheckSignatureAction() {
+      super("message-check-signature");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      checkSignature();
       
       if (fw != null)
 	fw.setBusy(false);
