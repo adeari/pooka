@@ -2,7 +2,9 @@ beta 1
 ---------------
 
 *) bug:  need to clear the preview panel if you unselect a message, or 
-delete the last message, and so forth.
+delete the last message, and so forth.  -- i think this is more or less
+fixed, but we still need to manage to send an event when the last 
+selection goes away.
 
 *) bug:  there's a problem either with line wrapping or with the size of the
 ReadMessageWindow.  They should be the same size, such that if you read a

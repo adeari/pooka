@@ -62,7 +62,10 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	this.add("South", folderStatusBar);
 
 	defaultActions = new Action[] {
-	    new ActionWrapper(new ExpungeAction(), folder.getFolderThread())
+	    new ActionWrapper(new ExpungeAction(), folder.getFolderThread()),
+	    new NextMessageAction(),
+	    new PreviousMessageAction(),
+	    new GotoMessageAction()
 		};
     }
 
@@ -285,9 +288,22 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
 	getFolderStatusBar().messageChanged(e);
-
+	try {
+	    if (e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && e.getMessage().getFlags().contains(Flags.Flag.DELETED)) {
+		MessageProxy selectedProxy = getFolderDisplay().getSelectedMessage();
+		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage() == e.getMessage()) {
+		    SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+				selectNextMessage();
+			    }
+			});
+		}
+	    }
+	} catch (MessagingException me) {
+	    
+	}
     }
-
+    
     /**
      * Gets the folderStatusBar.
      */
@@ -331,6 +347,39 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	
         public void actionPerformed(ActionEvent e) {
 	    expungeMessages();
+	}
+    }
+
+    public class NextMessageAction extends AbstractAction {
+
+	NextMessageAction() {
+	    super("message-next");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    selectNextMessage();
+	}
+    }
+
+    public class PreviousMessageAction extends AbstractAction {
+
+	PreviousMessageAction() {
+	    super("message-previous");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    selectPreviousMessage();
+	}
+    }
+
+    public class GotoMessageAction extends AbstractAction {
+
+	GotoMessageAction() {
+	    super("message-goto");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    getFolderStatusBar().activateGotoDialog();
 	}
     }
 }

@@ -253,11 +253,22 @@ public class FolderDisplayPanel extends JPanel {
      */
     public int selectNextMessage() {
 	int selectedRow = messageTable.getSelectedRow();
-	if (selectedRow < 0) {
-	    return selectMessage(0);
-	} else {
-	    return selectMessage(selectedRow + 1);
+	int newRow = selectedRow + 1;
+	boolean done = false;
+	while (! done && newRow < messageTable.getRowCount() ) {
+	    MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
+	    try {
+		if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+		    newRow ++;
+		} else {
+		    done = true;
+		}
+	    } catch (MessagingException me) {
+		newRow ++;
+	    }
 	}
+	
+	return selectMessage(newRow);
     }
 
     /**
@@ -266,11 +277,24 @@ public class FolderDisplayPanel extends JPanel {
      */
     public int selectPreviousMessage() {
 	int[] rowsSelected = messageTable.getSelectedRows();
-	if (rowsSelected.length > 0) {
-	    return selectMessage(rowsSelected[0] - 1);
-	} else {
-	    return selectMessage(messageTable.getRowCount() -1 );
+	int selectedRow = rowsSelected[0];
+	int newRow = selectedRow - 1;
+	boolean done = false;
+	while (! done && newRow >= 0 ) {
+	    MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
+	    try {
+		if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+		    newRow--;
+		} else {
+		    done = true;
+		}
+	    } catch (MessagingException me) {
+		newRow--;
+	    }
 	}
+	
+	return selectMessage(newRow);
+
     }
     
     /**

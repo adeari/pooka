@@ -448,6 +448,21 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
 	getFolderStatusBar().messageChanged(e);
+	try {
+	    if (e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && e.getMessage().getFlags().contains(Flags.Flag.DELETED)) {
+		MessageProxy selectedProxy = getSelectedMessage();
+		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage() == e.getMessage()) {
+		    SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+				selectNextMessage();
+			    }
+			});
+		}
+	    }
+	} catch (MessagingException me) {
+	    
+	}
+		
     }
 
     /**
