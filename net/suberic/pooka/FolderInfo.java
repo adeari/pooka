@@ -501,44 +501,46 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public void loadAllMessages() {
-	Vector messageProxies = new Vector();
-
-	FetchProfile fp = createColumnInformation();
-	if (loaderThread == null) 
-	    loaderThread = createLoaderThread();
-	
-	try {
-	    if (!(getFolder().isOpen())) {
-		openFolder(Folder.READ_WRITE);
-	    }
+    public synchronized void loadAllMessages() {
+	if (folderTableModel == null) {
+	    Vector messageProxies = new Vector();
 	    
+	    FetchProfile fp = createColumnInformation();
+	    if (loaderThread == null) 
+		loaderThread = createLoaderThread();
 	    
-	    Message[] msgs = folder.getMessages();
-	    folder.fetch(msgs, fp);
-	    MessageInfo mi;
-	    
-	    for (int i = 0; i < msgs.length; i++) {
-		mi = new MessageInfo(msgs[i], this);
+	    try {
+		if (!(getFolder().isOpen())) {
+		    openFolder(Folder.READ_WRITE);
+		}
 		
-		messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		messageToInfoTable.put(msgs[i], mi);
+		
+		Message[] msgs = folder.getMessages();
+		folder.fetch(msgs, fp);
+		MessageInfo mi;
+		
+		for (int i = 0; i < msgs.length; i++) {
+		    mi = new MessageInfo(msgs[i], this);
+		    
+		    messageProxies.add(new MessageProxy(getColumnValues() , mi));
+		    messageToInfoTable.put(msgs[i], mi);
+		}
+	    } catch (MessagingException me) {
+		System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	    }
-	} catch (MessagingException me) {
-	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
+	    
+	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+	    
+	    setFolderTableModel(ftm);
+	    
+	    
+	    loaderThread.loadMessages(messageProxies);
+	    
+	    if (!loaderThread.isAlive())
+		loaderThread.start();
+	    
+	    folderTableModel = ftm;
 	}
-
-	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
-
-	setFolderTableModel(ftm);
-
-
-	loaderThread.loadMessages(messageProxies);
-	
-	if (!loaderThread.isAlive())
-	    loaderThread.start();
-
-	folderTableModel = ftm;
     }
     
     /**
