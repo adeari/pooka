@@ -152,7 +152,7 @@ public class CachingMimeMessage extends MimeMessage {
      * @see 		javax.mail.Flags
      */
     public synchronized Flags getFlags() throws MessagingException {
-	return getCache().getFlags(uid).clone();
+	return (Flags) getCache().getFlags(uid).clone();
     }
 
     /**

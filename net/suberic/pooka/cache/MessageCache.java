@@ -2,6 +2,7 @@ package net.suberic.pooka.cache;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.activation.DataHandler;
+import net.suberic.pooka.MessageInfo;
 
 public interface MessageCache {
 
@@ -53,35 +54,31 @@ public interface MessageCache {
      * This does not affect the server, nor does it affect message
      * count on the client.
      */
-    public boolean cacheMessage(MimeMessage m, long uid, int status);
+    public boolean cacheMessage(MimeMessage m, long uid, int status) throws MessagingException;
 
     /**
      * Removes a message from the cache only.  This has no effect on the
      * server.
      */
-    public boolean invalidateCache(long uid);
+    public boolean invalidateCache(long uid, int status);
 
     /**
      *  Invalidates all of the messages in the uids array in the cache.
      */
-    public boolean invalidateCache(long[] uids);
+    public boolean invalidateCache(long[] uids, int status);
 
     /**
      * Adds the messages to the given folder.  Returns the uids for the 
      * message.  Uses the status to determine how much of the message
      * is cached.
      *
-     * Note that if any message fails to be appended, then the ones that
-     * have succeeded should be returned in the long[].  
-     *
      * This method changes both the client cache as well as the server, if
      * the server is available.
      */
-    public long[] appendMessages(MimeMessage[] msgs, int status);
+    public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException;
 
     /**
      * Removes all messages marked as 'DELETED'  from the given folder.  
-     * Returns the uids of all the removed messages.
      *
      * Note that if any message fails to be removed, then the ones
      * that have succeeded should be returned in the long[].
@@ -89,7 +86,7 @@ public interface MessageCache {
      * This method changes both the client cache as well as the server, if
      * the server is available.
      */
-    public long[] expungeMessages();
+    public void expungeMessages() throws MessagingException;
 
     /**
      * This returns the uid's of the message which exist in updatedUids, but

@@ -676,6 +676,18 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	getFolder().copyMessages(m, targetFolder.getFolder());
     }
+
+    /**
+     * This appends the given message to the given FolderInfo.
+     */
+    public void appendMessages(MessageInfo[] msgs) throws MessagingException {
+	Message[] m = new Message[msgs.length];
+	for (int i = 0; i < msgs.length; i++) {
+	    m[i] = msgs[i].getMessage();
+	}
+
+	getFolder().appendMessages(m);
+    }
     
     /**
      * This expunges the deleted messages from the Folder.
@@ -1303,6 +1315,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    addMessageCountListener(display);
 	    getFolder().addConnectionListener(display);
 	}
+    }
+
+    public javax.mail.internet.MimeMessage getMessageById(long uid) throws MessagingException {
+	if (folder != null && folder instanceof UIDFolder) {
+	    javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage) ((UIDFolder) folder).getMessageByUID(uid);
+	    return m;
+	}
+	return null;
     }
 
     /**
