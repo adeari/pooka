@@ -15,6 +15,10 @@ public class PasswordEditorPane extends DefaultPropertyEditor {
 	configureEditor(newProperty, bundle, isEnabled);
     }
 
+    public PasswordEditorPane(String newProperty, String typeTemplate, VariableBundle bundle) {
+	configureEditor(newProperty, typeTemplate, bundle, true);
+    }
+
     public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
 	property=newProperty;
 	sourceBundle=bundle;

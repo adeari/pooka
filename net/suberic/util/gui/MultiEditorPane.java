@@ -35,6 +35,14 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	this.configureEditor(newFactory, newProperty, newProperty, newFactory.getBundle(), isEnabled);
     }
 
+    public MultiEditorPane(String newProperty, String typeTemplate, PropertyEditorFactory newFactory, boolean isEnabled) {
+	this.configureEditor(newFactory, newProperty, typeTemplate, newFactory.getBundle(), isEnabled);
+    }
+
+    public MultiEditorPane(String newProperty, String typeTemplate, PropertyEditorFactory newFactory) {
+	this.configureEditor(newFactory, newProperty, typeTemplate, newFactory.getBundle(), true);
+    }
+
     public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String newTemplate, VariableBundle bundle, boolean isEnabled) { 
 	JLabel label;
 	property=propertyName;

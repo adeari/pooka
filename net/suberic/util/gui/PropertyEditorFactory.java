@@ -110,15 +110,15 @@ public class PropertyEditorFactory {
     public DefaultPropertyEditor createEditor(String property, String typeTemplate) {
 	String test = sourceBundle.getProperty(typeTemplate + ".propertyType", "");
 	if (test.equals("String"))
-	    return createStringEditor(property);
+	    return createStringEditor(property, typeTemplate);
 	if (test.equals("Password"))
-	    return createPasswordEditor(property);
+	    return createPasswordEditor(property, typeTemplate);
 	else if (test.equals("List"))
 	    return createListEditor(property, typeTemplate);
 	else if (test.equals("Boolean"))
-	    return createBooleanEditor(property);
+	    return createBooleanEditor(property, typeTemplate);
 	else if (test.equals("Multi"))
-	    return createMultiEditor(property);
+	    return createMultiEditor(property, typeTemplate);
 	else if (test.equals("Tabbed"))
 	    return createTabbedEditor(property, typeTemplate);
 	else if (test.equals("Composite"))
@@ -126,19 +126,31 @@ public class PropertyEditorFactory {
 	else if (test.equalsIgnoreCase("Variable"))
 	    return createVariableEditor(property, typeTemplate);
 	else
-	    return createBasicEditor(property);
+	    return createBasicEditor(property, typeTemplate);
     }
 
     private DefaultPropertyEditor createBasicEditor(String property) {
 	return createStringEditor(property);
     }
 
+    private DefaultPropertyEditor createBasicEditor(String property, String typeTemplate) {
+	return createStringEditor(property, typeTemplate);
+    }
+
     private DefaultPropertyEditor createStringEditor(String property) {
 	return new StringEditorPane(property, sourceBundle);
     }
 
+    private DefaultPropertyEditor createStringEditor(String property, String typeTemplate) {
+	return new StringEditorPane(property, typeTemplate, sourceBundle);
+    }
+
     private DefaultPropertyEditor createPasswordEditor(String property) {
 	return new PasswordEditorPane(property, sourceBundle);
+    }
+
+    private DefaultPropertyEditor createPasswordEditor(String property, String typeTemplate) {
+	return new PasswordEditorPane(property, typeTemplate, sourceBundle);
     }
 
     private DefaultPropertyEditor createListEditor(String property) {
@@ -153,8 +165,16 @@ public class PropertyEditorFactory {
 	return new BooleanEditorPane(property, sourceBundle);
     }
 
+    private DefaultPropertyEditor createBooleanEditor(String property, String typeTemplate) {
+	return new BooleanEditorPane(property, typeTemplate, sourceBundle);
+    }
+
     private DefaultPropertyEditor createMultiEditor(String property) {
 	return new MultiEditorPane(property,this);
+    }
+
+    private DefaultPropertyEditor createMultiEditor(String property, String typeTemplate) {
+	return new MultiEditorPane(property, typeTemplate, this);
     }
 
     private DefaultPropertyEditor createTabbedEditor(String property, String typeTemplate) {

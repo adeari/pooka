@@ -14,7 +14,15 @@ public class StringEditorPane extends DefaultPropertyEditor {
 	configureEditor(null, newProperty, newProperty, bundle, isEnabled);
     }
 
-    public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+    public StringEditorPane(String newProperty, String typeTemplate, VariableBundle bundle, boolean isEnabled) {
+	configureEditor(null, newProperty, typeTemplate, bundle, isEnabled);
+    }
+
+    public StringEditorPane(String newProperty, String typeTemplate, VariableBundle bundle) {
+	configureEditor(null, newProperty, typeTemplate, bundle, true);
+    }
+
+    public void configureEditor(PropertyEditorFactory factory, String newProperty, String typeTemplate, VariableBundle bundle, boolean isEnabled) {
 	property=newProperty;
 	sourceBundle=bundle;
 	originalValue = sourceBundle.getProperty(newProperty, "");
@@ -26,7 +34,8 @@ public class StringEditorPane extends DefaultPropertyEditor {
 	else
 	    defaultLabel = property.substring(dotIndex+1);
 
-	label = new JLabel(sourceBundle.getProperty(property + ".label", defaultLabel));
+	//System.out.println("property is " + property + "; typeTemplate is " + typeTemplate);
+	label = new JLabel(sourceBundle.getProperty(typeTemplate + ".label", defaultLabel));
 	inputField = new JTextField(originalValue);
 	inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
 	this.add(label);

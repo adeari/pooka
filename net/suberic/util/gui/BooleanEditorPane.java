@@ -19,12 +19,17 @@ public class BooleanEditorPane extends DefaultPropertyEditor {
     public BooleanEditorPane(String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
 	configureEditor(newProperty, templateType, bundle, isEnabled);
     }
+
     public BooleanEditorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {
 	configureEditor(newProperty, bundle, isEnabled);
     }
     
     public BooleanEditorPane(String newProperty, VariableBundle bundle) {
 	this(newProperty, bundle, true);
+    }
+
+    public BooleanEditorPane(String newProperty, String typeTemplate, VariableBundle bundle) {
+	this(newProperty, typeTemplate, bundle, true);
     }
 
     public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
