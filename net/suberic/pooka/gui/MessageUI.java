@@ -1,7 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 
-public interface MessageUI extends UserProfileContainer, ErrorHandler {
+public interface MessageUI extends UserProfileContainer, ErrorHandler, ActionContainer {
 
     public void openMessageUI();
 

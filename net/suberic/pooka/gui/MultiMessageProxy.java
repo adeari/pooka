@@ -16,7 +16,7 @@ import net.suberic.util.thread.*;
 public class MultiMessageProxy extends MessageProxy {
 
     int[] rowNumbers;
-    FolderWindow folderWindow;
+    FolderInfo folderInfo;
 
     /**
      * This creates a new MultiMessageProxy from the MessageProxys in 
@@ -24,10 +24,9 @@ public class MultiMessageProxy extends MessageProxy {
      * which correspond with rows newRowNumbers on FolderWindow
      * newFolderWindow.
      */
-    public MultiMessageProxy(int[] newRowNumbers, MessageProxy[] newMessageProxy, FolderWindow newFolderWindow) {
+    public MultiMessageProxy(int[] newRowNumbers, MessageProxy[] newMessageProxy, FolderInfo newFolderInfo) {
 	rowNumbers=newRowNumbers;
-	folderWindow=newFolderWindow;
-	FolderInfo folderInfo = folderWindow.getFolderInfo();
+	folderInfo = newFolderInfo;
 
 	MessageInfo[] newMessageInfo = new MessageInfo[newMessageProxy.length];
 	for (int i = 0; i < newMessageProxy.length; i++)
@@ -36,7 +35,7 @@ public class MultiMessageProxy extends MessageProxy {
 	messageInfo=new MultiMessageInfo(newMessageInfo, folderInfo);
 	
 	if (folderInfo != null) {
-	    ActionThread storeThread = folderWindow.getFolderInfo().getParentStore().getStoreThread();
+	    ActionThread storeThread = folderInfo.getParentStore().getStoreThread();
 	    
 	    defaultActions = new Action[] {
 		new ActionWrapper(new OpenAction(), storeThread),

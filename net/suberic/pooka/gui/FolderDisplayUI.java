@@ -1,7 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 
-public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler {
+public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, ActionContainer {
     
     public void openFolderDisplay();
     

@@ -118,11 +118,12 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      */
     public void openFolderWindow(FolderInfo f, boolean selectWindow) {
 
-	FolderWindow newFolderWindow;
-	newFolderWindow = (FolderWindow) f.getFolderDisplayUI();
+	JInternalFrame newFolderWindow;
+	newFolderWindow = (JInternalFrame) f.getFolderDisplayUI();
 	if (newFolderWindow == null) {
-	    newFolderWindow = new FolderWindow(f, this);
-	    f.setFolderDisplayUI(newFolderWindow);
+	    FolderDisplayUI fui = Pooka.getUIFactory().createFolderDisplayUI(f);
+	    newFolderWindow = (JInternalFrame) fui;
+	    f.setFolderDisplayUI(fui);
 	    newFolderWindow.pack();
 	    newFolderWindow.setVisible(false);
 	    this.add(newFolderWindow);
@@ -295,8 +296,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	JInternalFrame[] allFrames = getAllFrames();
 	
 	for(int i = 0; i < allFrames.length; i++) {
-	    if (allFrames[i] instanceof FolderWindow)
-		saveWindowLocation((FolderWindow)allFrames[i]);
+	    if (allFrames[i] instanceof FolderDisplayUI)
+		saveWindowLocation((FolderDisplayUI)allFrames[i]);
 	}
 	
     }
@@ -306,8 +307,10 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * time we start up, we can put it in the same place.
      */
 
-    public void saveWindowLocation(FolderWindow current) {
-	String folderProperty = current.getFolderInfo().getFolderProperty();
+    public void saveWindowLocation(FolderDisplayUI currentUI) {
+	String folderProperty = currentUI.getFolderInfo().getFolderProperty();
+
+	JInternalFrame current = (JInternalFrame) currentUI;
 
 	// we have to do these as absolute values.
 	int x = current.getX() + getMainPanel().getMessageScrollPane().getHorizontalScrollBar().getValue();
@@ -338,8 +341,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
 	StringBuffer savedFolderValues = new StringBuffer();
 	for(int i = 0; i < allFrames.length; i++) {
-	    if (allFrames[i] instanceof FolderWindow) {
-		String folderID = ((FolderWindow)allFrames[i]).getFolderInfo().getFolderID();
+	    if (allFrames[i] instanceof FolderDisplayUI) {
+		String folderID = ((FolderDisplayUI)allFrames[i]).getFolderInfo().getFolderID();
 		if (! isFirst)
 		    savedFolderValues.append(":");
 
@@ -528,11 +531,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	JInternalFrame cw = getCurrentWindow();
 	if (cw != null) {
 	    Action[] windowActions = null;
-	    if (cw instanceof FolderWindow) {
-		windowActions = ((FolderWindow)cw).getActions();
-	    } else if (cw instanceof MessageWindow) {
-		windowActions = ((MessageWindow)cw).getActions();
-	    }
+	    if (cw instanceof ActionContainer)
+		windowActions = ((ActionContainer)cw).getActions();
 	    
 	    if (windowActions != null)
 		return TextAction.augmentList(windowActions, getDefaultActions());

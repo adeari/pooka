@@ -42,7 +42,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 	if (fi.getFolderDisplayUI() != null)
 	    return fi.getFolderDisplayUI();
 
-	FolderDisplayUI fw = new FolderWindow(fi, getMessagePanel());
+	FolderDisplayUI fw = new FolderInternalFrame(fi, getMessagePanel());
 	return fw;
     }
 
