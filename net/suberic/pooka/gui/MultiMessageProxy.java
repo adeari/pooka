@@ -35,13 +35,14 @@ public class MultiMessageProxy extends MessageProxy {
 	messageInfo=new MultiMessageInfo(newMessageInfo, folderInfo);
 	
 	if (folderInfo != null) {
-	    ActionThread storeThread = folderInfo.getParentStore().getStoreThread();
+	    ActionThread storeThread = folderInfo.getFolderThread();
 	    
 	    defaultActions = new Action[] {
 		new ActionWrapper(new OpenAction(), storeThread),
 		new ActionWrapper(new DeleteAction(), storeThread),
 		new ActionWrapper(new MoveAction(), storeThread),
-		new ActionWrapper(new PrintAction(), storeThread)
+		new ActionWrapper(new PrintAction(), storeThread),
+		new ActionWrapper(new CacheMessageAction(), storeThread)
 		    };
 	} else {
 	    defaultActions = new Action[] {
@@ -80,7 +81,12 @@ public class MultiMessageProxy extends MessageProxy {
      */
     public void showPopupMenu(JComponent component, MouseEvent e) {
 	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
-	popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
+	if (folderInfo instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+	    popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());
+	} else {
+	    popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());
+
+	}
 	popupMenu.setActive(getActions());
 	popupMenu.show(component, e.getX(), e.getY());
 	    
@@ -117,7 +123,6 @@ public class MultiMessageProxy extends MessageProxy {
 	    
 	}
     }
-    
 
     /**
      * Returns the messageInfo attribute as a MultiMessageInfo.

@@ -37,9 +37,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	commands = new Hashtable();
 	
 	defaultActions = new Action[] {
-	    new ActionWrapper(new OpenAction(), folderInfo.getParentStore().getStoreThread()),
-	    new CloseAction(),
-	    new UnsubscribeAction()
+	    new ActionWrapper(new OpenAction(), folderInfo.getFolderThread()),
+	    new ActionWrapper(new CloseAction(), folderInfo.getFolderThread()),
+	    new ActionWrapper(new UnsubscribeAction(), folderInfo.getFolderThread())
 		};
 
 	Action[] actions = defaultActions;

@@ -116,6 +116,19 @@ public class MultiMessageInfo extends MessageInfo {
     }
 
     /**
+     *  Caches the current messages.
+     */
+    public void cacheMessage() throws MessagingException {
+	for (int i = 0; i < messages.length; i++) {
+	    FolderInfo fi = messages[i].getFolderInfo();
+	    if (fi != null && fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+		((net.suberic.pooka.cache.CachingFolderInfo) fi).cacheMessage(messages[i], net.suberic.pooka.cache.MessageCache.MESSAGE);
+	    
+	    }
+	}
+    }
+
+    /**
      * This returns the MessageInfo at the given index.
      */
     public MessageInfo getMessageInfo(int index) {

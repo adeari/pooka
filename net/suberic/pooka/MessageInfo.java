@@ -581,6 +581,17 @@ public class MessageInfo {
     }
 
     /**
+     *  Caches the current messages.
+     */
+    public void cacheMessage() throws MessagingException {
+	FolderInfo fi = getFolderInfo();
+	if (fi != null && fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+	    ((net.suberic.pooka.cache.CachingFolderInfo) fi).cacheMessage(this, net.suberic.pooka.cache.MessageCache.MESSAGE);
+	    
+	}
+    }
+
+    /**
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *
      * If the MessageProxy's folderInfo is set, this returns the 

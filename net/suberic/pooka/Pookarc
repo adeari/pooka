@@ -282,11 +282,28 @@ MessageProxy.popupMenu.ReplyAll.Action=message-reply-all
 MessageProxy.popupMenu.Forward.Action=message-forward
 MessageProxy.popupMenu.Delete.Action=message-delete
 
+MessageProxy.cachingPopupMenu=Open:Move:Reply:ReplyAll:Forward:Delete:Cache
+MessageProxy.cachingPopupMenu.Open.Action=file-open
+MessageProxy.cachingPopupMenu.Move.Action=message-move
+MessageProxy.cachingPopupMenu.Move.class=net.suberic.pooka.gui.FolderMenu
+MessageProxy.cachingPopupMenu.Reply.Action=message-reply
+MessageProxy.cachingPopupMenu.ReplyAll.Action=message-reply-all
+MessageProxy.cachingPopupMenu.Forward.Action=message-forward
+MessageProxy.cachingPopupMenu.Delete.Action=message-delete
+MessageProxy.cachingPopupMenu.Cache.Action=message-cache
+
 MultiMessageProxy.popupMenu=Open:Move:Delete
 MultiMessageProxy.popupMenu.Open.Action=file-open
 MultiMessageProxy.popupMenu.Move.Action=message-move
 MultiMessageProxy.popupMenu.Move.class=net.suberic.pooka.gui.FolderMenu
 MultiMessageProxy.popupMenu.Delete.Action=message-delete
+
+MultiMessageProxy.cachingPopupMenu=Open:Move:Delete:Cache
+MultiMessageProxy.cachingPopupMenu.Open.Action=file-open
+MultiMessageProxy.cachingPopupMenu.Move.Action=message-move
+MultiMessageProxy.cachingPopupMenu.Move.class=net.suberic.pooka.gui.FolderMenu
+MultiMessageProxy.cachingPopupMenu.Delete.Action=message-delete
+MultiMessageProxy.cachingPopupMenu.Cache.Action=message-cache
 
 NewMessageWindow.popupMenu=Cut:Copy:Paste:Send:Attach
 NewMessageWindow.popupMenu.Cut.Action=cut-to-clipboard

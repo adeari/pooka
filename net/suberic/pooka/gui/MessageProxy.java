@@ -204,7 +204,8 @@ public class MessageProxy {
 	    new ActionWrapper(new ForwardQuotedAction(), folderThread),
 	    new ActionWrapper(new DeleteAction(), folderThread),
 	    new ActionWrapper(new PrintAction(), folderThread),
-	    new ActionWrapper(new SaveMessageAction(), folderThread)
+	    new ActionWrapper(new SaveMessageAction(), folderThread),
+	    new ActionWrapper(new CacheMessageAction(), folderThread)
 		};
 	
         Action[] actions = getActions();
@@ -515,7 +516,11 @@ public class MessageProxy {
      */
     public void showPopupMenu(JComponent component, MouseEvent e) {
 	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
-	popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
+	if (getMessageInfo().getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+	    popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());	
+	} else {
+	    popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
+	}
 	popupMenu.setActive(getActions());
 	popupMenu.show(component, e.getX(), e.getY());
 	    
@@ -813,6 +818,31 @@ public class MessageProxy {
 	    if (fw != null)
 		fw.setBusy(true);;
 	    saveMessageToFile();
+
+	    if (fw != null)
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(false);
+	}
+    }
+
+    public class CacheMessageAction extends AbstractAction {
+	CacheMessageAction() {
+	    super("message-cache");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
+	    if (fw != null)
+		fw.setBusy(true);;
+
+	    try {
+		getMessageInfo().cacheMessage();
+	    } catch (MessagingException me) {
+		showError(me.getMessage(), me);
+	    }
 
 	    if (fw != null)
 		fw.setBusy(false);
