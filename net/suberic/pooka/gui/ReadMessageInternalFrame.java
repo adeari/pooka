@@ -30,6 +30,13 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	    }
 	  });
 
+	this.addInternalFrameListener(new InternalFrameAdapter() {
+	    public void internalFrameClosed(InternalFrameEvent e) {
+	      if (getMessageProxy().getMessageUI() == ReadMessageInternalFrame.this)
+		getMessageProxy().setMessageUI(null);
+	    }
+	  });
+
     }
 
     public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
@@ -59,6 +66,13 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	    public void focusGained(FocusEvent e) {
 	      if (getMessageDisplay() != null)
 		getMessageDisplay().requestFocus();
+	    }
+	  });
+
+	this.addInternalFrameListener(new InternalFrameAdapter() {
+	    public void internalFrameClosed(InternalFrameEvent e) {
+	      if (getMessageProxy().getMessageUI() == ReadMessageInternalFrame.this)
+		getMessageProxy().setMessageUI(null);
 	    }
 	  });
 

@@ -1,3 +1,8 @@
+made file->exit check for unsent messages and offer you a chance to send
+them.  (BUG:  doesn't work properly under jdk1.2)
+
+added saving messages as drafts (BUG:  doesn't work properly under jdk1.2)
+
 Outbox no longer throws a NPE if the Outbox is not yet open.
 
 added support for specifying SMTP port number (dan)

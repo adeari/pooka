@@ -28,6 +28,14 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	super(newMsgProxy);
 
 	configureMessageFrame();
+
+	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	this.addWindowListener(new WindowAdapter() {
+	    public void windowClosing(WindowEvent we) {
+	      handleClose();
+	    }
+	  });
+	
     }
 
     public NewMessageFrame(NewMessageInternalFrame source) {
@@ -46,6 +54,14 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	configureInterfaceStyle();
 
 	this.setLocation(source.getLocationOnScreen());
+
+	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	this.addWindowListener(new WindowAdapter() {
+	    public void windowClosing(WindowEvent we) {
+	      handleClose();
+	    }
+	  });
+	
     }
 
     /**
@@ -78,6 +94,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	}
 	
 	configureInterfaceStyle();
+
     }
     
   /**
@@ -96,21 +113,50 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
      * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
      */
     public void closeMessageUI() {
-	
-	if (isModified()) {
-	    int saveDraft = showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
-	    switch (saveDraft) {
-	    case JOptionPane.YES_OPTION:
-		//this.saveDraft();
-	    case JOptionPane.NO_OPTION:
-		this.dispose();
-	    default:
-		return;
-	    }
-	} else {
-	    this.dispose();
-	}
+      this.dispose();
     }
+
+  private void handleClose() {
+    // first, make sure this is still a valid NewMessageUI.
+    NewMessageProxy nmp = (NewMessageProxy)getMessageProxy();
+    if (nmp == null)
+      dispose();
+    
+    if (nmp.getNewMessageUI() == this) {
+      if (isModified()) {
+	int saveDraft = promptSaveDraft();
+	switch (saveDraft) {
+	case JOptionPane.YES_OPTION:
+	  ((NewMessageProxy)getMessageProxy()).saveDraft();
+	  break;
+	case JOptionPane.NO_OPTION:
+	  NewMessageProxy.getUnsentProxies().remove(getMessageProxy());
+	  dispose();
+	  break;
+	default:
+	  return;
+	}
+      } else {
+	NewMessageProxy.getUnsentProxies().remove(getMessageProxy());
+	dispose();
+      }
+    } else {
+      dispose();
+    }
+  }
+  
+ /**
+   * Prompts the user to see if she wants to save this message as a draft.
+   *
+   * If the message is not modified, returns JOptionPane.NO_OPTION.
+   */
+  public int promptSaveDraft() {
+   if (isModified()) {
+      return  showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
+    } else {
+      return JOptionPane.NO_OPTION;
+    }
+  }
 
     /**
      * Reattaches the window to the MessagePanel, if there is one.

@@ -228,6 +228,13 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * Shows a message.
+     */
+    public void showMessage(String newMessage, String title) {
+      JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    /**
      * Shows a status message.
      */
     public void showStatusMessage(String newMessage) {

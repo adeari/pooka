@@ -28,6 +28,13 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	super(newParentContainer, newMsgProxy);
 
 	configureMessageInternalFrame();
+
+	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	this.addInternalFrameListener(new InternalFrameAdapter() {
+	    public void internalFrameClosing(InternalFrameEvent ife) {
+	      handleClose();
+	    }
+	  });
     }
 
     public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageFrame source) {
@@ -49,6 +56,13 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 
 	configureInterfaceStyle();
 
+	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+	this.addInternalFrameListener(new InternalFrameAdapter() {
+	    public void internalFrameClosing(InternalFrameEvent ife) {
+	      handleClose();
+	    }
+	  });
+				      
     }
 
     /**
@@ -81,6 +95,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	}
 
 	configureInterfaceStyle();
+
     }
     
   /**
@@ -90,53 +105,83 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
     HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowStyle(this);
     messageDisplay.configureInterfaceStyle(uiStyle);
   }
-
-    /**
-     * Closes the message window.  This checks to see if the underlying
-     * message is modified, and if so, pops up a dialog to make sure that
-     * you really want to close the window.
-     *
-     * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
+  
+  /**
+   * Closes the message window.  This checks to see if the underlying
+   * message is modified, and if so, pops up a dialog to make sure that
+   * you really want to close the window.
+   *
+   * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
      */
-    public void closeMessageUI() {
-	if (isModified()) {
-	    int saveDraft = showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
-	    switch (saveDraft) {
-	    case JOptionPane.YES_OPTION:
-		//this.saveDraft();
-	    case JOptionPane.NO_OPTION:
-		try {
-		    this.setClosed(true);
-		} catch (java.beans.PropertyVetoException e) {
-		}
-	    default:
-		return;
-	    }
-	} else {
-	    try {
-		this.setClosed(true);
-	    } catch (java.beans.PropertyVetoException e) {
-	    }
-	}
+  public void closeMessageUI() {
+    try {
+      this.setClosed(true);
+    } catch (java.beans.PropertyVetoException e) {
     }
+    
+  }
 
-    public void detachWindow() {
-	NewMessageFrame nmf = new NewMessageFrame(this);
-
-	nmf.show();
-	try {
-	    this.setClosed(true);
-	} catch (java.beans.PropertyVetoException pve) {
+  /**
+   * Handles what happens when someone tries to close this window.
+   */
+  private void handleClose() {
+    // first, make sure this is still a valid NewMessageUI.
+    NewMessageProxy nmp = (NewMessageProxy)getMessageProxy();
+    if (nmp == null || nmp.getNewMessageUI() != this) {
+      setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+    } else {
+      setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
+      if (isModified()) {
+	int saveDraft = promptSaveDraft();
+	switch (saveDraft) {
+	case JOptionPane.YES_OPTION:
+	  ((NewMessageProxy)getMessageProxy()).saveDraft();
+	  break;
+	case JOptionPane.NO_OPTION:
+	  NewMessageProxy.getUnsentProxies().remove(getMessageProxy());
+	  setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+	default:
+	  return;
 	}
+      } else {
+	NewMessageProxy.getUnsentProxies().remove(getMessageProxy());
+	setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+      }
+      
     }
+  }
 
+  /**
+   * Prompts the user to see if she wants to save this message as a draft.
+   *
+   * If the message is not modified, returns JOptionPane.NO_OPTION.
+   */
+  public int promptSaveDraft() {
+    if (isModified()) {
+      return  showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
+    } else {
+      return JOptionPane.NO_OPTION;
+    }
+    
+  }
+  
+  public void detachWindow() {
+    NewMessageFrame nmf = new NewMessageFrame(this);
+    
+    nmf.show();
+    try {
+      this.setClosed(true);
+    } catch (java.beans.PropertyVetoException pve) {
+    }
+  }
+  
     /**
      * This returns the values in the MesssageWindow as a set of 
      * InternetHeaders.
      */
-    public InternetHeaders getMessageHeaders() throws MessagingException {
-	return getNewMessageDisplay().getMessageHeaders();
-    }
+  public InternetHeaders getMessageHeaders() throws MessagingException {
+    return getNewMessageDisplay().getMessageHeaders();
+  }
 
     /**
      * This registers the Keyboard action not only for the FolderWindow

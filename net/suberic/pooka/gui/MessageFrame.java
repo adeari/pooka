@@ -37,23 +37,11 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
 
 	msg.setMessageUI(this);
 	
-	this.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e) {
-		    if (getMessageProxy().getMessageUI() == MessageFrame.this)
-			getMessageProxy().setMessageUI(null);
-		}
-	    });
     }
 
     protected MessageFrame() {
 	this.getContentPane().setLayout(new BorderLayout());
 
-	this.addWindowListener(new WindowAdapter() {
-		public void windowClosing(WindowEvent e) {
-		    if (getMessageProxy().getMessageUI() == MessageFrame.this)
-			getMessageProxy().setMessageUI(null);
-		}
-	    });
     }
 
     /**
@@ -154,6 +142,15 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
     public String showInputDialog(Object[] inputPanes, String title) {
 	return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
     }
+
+    /**
+     * This shows a Message window.  We include this so that the 
+     * MessageProxy can call the method without caring about the actual
+     * implementation of the dialog.
+     */
+  public void showMessageDialog(String message, String title) {
+    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+  }
 
     /**
      * A convenience method to set the PreferredSize and Size of the

@@ -42,13 +42,6 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 
 	msg.setMessageUI(this);
 	
-	this.addInternalFrameListener(new InternalFrameAdapter() {
-		public void internalFrameClosed(InternalFrameEvent e) {
-		    if (getMessageProxy().getMessageUI() == MessageInternalFrame.this)
-			getMessageProxy().setMessageUI(null);
-		}
-	    });
-	
     }
 
     /**
@@ -58,13 +51,6 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     protected MessageInternalFrame() {
 	super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"), true, true, true, true);
 	this.getContentPane().setLayout(new BorderLayout());
-	
-	this.addInternalFrameListener(new InternalFrameAdapter() {
-		public void internalFrameClosed(InternalFrameEvent e) {
-		    if (getMessageProxy().getMessageUI() == MessageInternalFrame.this)
-			getMessageProxy().setMessageUI(null);
-		}
-	    });
 	
     }
     
@@ -115,8 +101,8 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * the MessageProxy can call the method without caring abou the
      * actual implementation of the Dialog.
      */    
-    public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-	return Pooka.getUIFactory().showConfirmDialog(messageText, title, optionType);
+  public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
+    return JOptionPane.showInternalConfirmDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), messageText, title, optionType);
     }
 
     /**
@@ -155,6 +141,15 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	showError(errorMessage + e.getMessage(), title);
 	e.printStackTrace();
     }
+
+    /**
+     * This shows a Message window.  We include this so that
+     * the MessageProxy can call the method without caring about the
+     * actual implementation of the Dialog.
+     */
+  public void showMessageDialog(String message, String title) {
+    JOptionPane.showInternalMessageDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), message, title, JOptionPane.PLAIN_MESSAGE);
+  }
 
     /**
      * This shows an Input window.  We include this so that the 

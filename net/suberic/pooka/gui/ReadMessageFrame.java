@@ -93,6 +93,14 @@ public class ReadMessageFrame extends MessageFrame {
 	}
 
 	configureInterfaceStyle();
+
+	this.addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent e) {
+		    if (getMessageProxy().getMessageUI() == ReadMessageFrame.this)
+			getMessageProxy().setMessageUI(null);
+		}
+	    });
+
     }
 
   /**

@@ -11,10 +11,10 @@ import javax.mail.internet.*;
  */
 public class NewMessageInfo extends MessageInfo {
 
-    public NewMessageInfo(Message newMessage) {
-	message = newMessage;
-	attachments = new AttachmentBundle();
-    }
+  public NewMessageInfo(Message newMessage) {
+    message = newMessage;
+    attachments = new AttachmentBundle();
+  }
 
   /**
    * Sends the new message, using the given Profile, the given 
@@ -165,4 +165,15 @@ public class NewMessageInfo extends MessageInfo {
 	    return null;
 	}
     }
+
+  /**
+   * Marks the message as a draft message and then saves it to the outbox
+   * folder given.
+   */
+  public void saveDraft(FolderInfo outboxFolder) throws MessagingException {
+    getMessage().setFlag(Flags.Flag.DRAFT, true);
+
+    outboxFolder.appendMessages(new MessageInfo[] { this });
+
+  }
 }

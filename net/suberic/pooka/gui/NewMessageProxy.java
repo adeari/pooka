@@ -14,6 +14,8 @@ import java.io.*;
  */
 public class NewMessageProxy extends MessageProxy {
   Hashtable commands;
+
+  private static Vector allUnsentProxies = new Vector();
   
   public NewMessageProxy(NewMessageInfo newMessage) {
     messageInfo = newMessage;
@@ -28,6 +30,8 @@ public class NewMessageProxy extends MessageProxy {
 	commands.put(a.getValue(Action.NAME), a);
       }
     }
+
+    allUnsentProxies.add(this);
     
   }
   
@@ -94,6 +98,7 @@ public class NewMessageProxy extends MessageProxy {
 	};
       SwingUtilities.invokeLater(runMe);
     }
+
   }
 
   /**
@@ -189,7 +194,75 @@ public class NewMessageProxy extends MessageProxy {
     if (index != -1)
       getNewMessageUI().attachmentRemoved(index);
   }
+
+  /**
+   * Saves this message as a draft version, if there is an Outbox
+   * configured.
+   */
+  public void saveDraft() {
+    UserProfile profile = getNewMessageUI().getSelectedProfile();
+    
+    OutgoingMailServer mailServer = profile.getMailServer();
+
+    final FolderInfo fi = mailServer.getOutbox();
+    
+    
+    if (fi != null) {
+      net.suberic.util.thread.ActionThread folderThread = fi.getFolderThread();
+      Action runMe = new AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent e) {
+	    try {
+	      getNewMessageInfo().saveDraft(fi);
+	      saveDraftSucceeded(fi);
+	    } catch (MessagingException me) {
+	      saveDraftFailed(me);
+	    }
+	  }
+	};
+      folderThread.addToQueue(runMe, new java.awt.event.ActionEvent(this, 0, "saveDraft"));
+    } else {
+      saveDraftFailed(new MessagingException ("No outbox specified for default mailserver " + mailServer.getItemID()));
+    }
+  }
+
+  /**
+   * Called when the save draft succeeds.
+   */
+  public void saveDraftSucceeded(FolderInfo outboxFolder) {
+    final FolderInfo outbox = outboxFolder;
+    final NewMessageUI nmui = getNewMessageUI();
+    if (nmui != null) {
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    nmui.setBusy(false);
+	    nmui.setModified(false);
+	    getMessageUI().showMessageDialog("Message saved to " +outbox.getFolderID(), "Draft Saved");
+	    getMessageUI().closeMessageUI();
+	  }
+	};
+      SwingUtilities.invokeLater(runMe);
+    }
+
+  }
+
+  /**
+   * Called when the send fails.
+   */
+  public void saveDraftFailed(Exception e) {
+    final Exception me = e;
+    final NewMessageUI nmui = getNewMessageUI();
+    if (nmui != null) {
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    getMessageUI().showError(Pooka.getProperty("error.MessageUI.saveDraftFailed", "Failed to save message.") + "\n" + me.getMessage());
+	    nmui.setBusy(false);
+	  }
+	};
+      SwingUtilities.invokeLater(runMe);
+    }
+  }
   
+
   /**
    * a convenience method which returns the current MessageUI as
    * a NewMessageUI.
@@ -211,7 +284,8 @@ public class NewMessageProxy extends MessageProxy {
   
   public Action[] defaultActions = {
     new SendAction(),
-    new AttachAction()
+    new AttachAction(),
+    new SaveDraftAction()
       };
   
   public Action getAction(String name) {
@@ -221,7 +295,11 @@ public class NewMessageProxy extends MessageProxy {
   public Action[] getActions() {
     return defaultActions;
   }
-  
+
+  public static Vector getUnsentProxies() {
+    return allUnsentProxies;
+  }
+
   class SendAction extends AbstractAction {
     SendAction() {
       super("message-send");
@@ -239,6 +317,16 @@ public class NewMessageProxy extends MessageProxy {
     
     public void actionPerformed(ActionEvent e) {
       attach();
+    }
+  }
+
+  class SaveDraftAction extends AbstractAction {
+    SaveDraftAction() {
+      super("message-save-draft");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      saveDraft();
     }
   }
   

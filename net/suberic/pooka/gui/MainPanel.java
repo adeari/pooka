@@ -201,39 +201,76 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      */
     
     public void exitPooka(int exitValue) {
-	if (contentPanel instanceof MessagePanel && 
-	    ((MessagePanel)contentPanel).isSavingWindowLocations()) {
-	    ((MessagePanel)contentPanel).saveWindowLocations();
+      if (! processUnsentMessages())
+	return;
+      
+      if (contentPanel instanceof MessagePanel && 
+	  ((MessagePanel)contentPanel).isSavingWindowLocations()) {
+	((MessagePanel)contentPanel).saveWindowLocations();
+      }
+      
+      Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
+      Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
+      Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
+      Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
+      Pooka.setProperty("Pooka.messagePanel.hsize", Integer.toString(contentPanel.getUIComponent().getWidth()));
+      Pooka.setProperty("Pooka.messagePanel.vsize", Integer.toString(contentPanel.getUIComponent().getHeight()));
+      
+      if (contentPanel.isSavingOpenFolders()) {
+	contentPanel.saveOpenFolders();
+      }
+      
+      Vector v = Pooka.getStoreManager().getStoreList();
+      for (int i = 0; i < v.size(); i++) {
+	// FIXME:  we should check to see if there are any messages
+	// to be deleted, and ask the user if they want to expunge the
+	// deleted messages.
+	try {
+	  ((StoreInfo)v.elementAt(i)).closeAllFolders(false);
+	} catch (Exception e) {
+	  // we really don't care.
 	}
-	
-	Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
-	Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
-	Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
-	Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
-	Pooka.setProperty("Pooka.messagePanel.hsize", Integer.toString(contentPanel.getUIComponent().getWidth()));
-	Pooka.setProperty("Pooka.messagePanel.vsize", Integer.toString(contentPanel.getUIComponent().getHeight()));
-	
-	if (contentPanel.isSavingOpenFolders()) {
-	    contentPanel.saveOpenFolders();
-	}
-	
-	Vector v = Pooka.getStoreManager().getStoreList();
-	for (int i = 0; i < v.size(); i++) {
-	    // FIXME:  we should check to see if there are any messages
-	    // to be deleted, and ask the user if they want to expunge the
-	    // deleted messages.
-	    try {
-		((StoreInfo)v.elementAt(i)).closeAllFolders(false);
-	    } catch (Exception e) {
-		// we really don't care.
-	    }
-	}
-
-	Pooka.resources.saveProperties(new File(Pooka.localrc));
-	System.exit(exitValue);
-	
+      }
+      
+      Pooka.resources.saveProperties(new File(Pooka.localrc));
+      System.exit(exitValue);
+      
     }
 
+  /**
+   * Checks to see if there are any unsent messages.  If there are,
+   * then find out if we want to save them as drafts, send them, or 
+   * forget them.
+   *
+   * Returns true if all of the messages are processed, false if the
+   * user cancels out.
+   */
+  public boolean processUnsentMessages() {
+    Vector unsentMessages = NewMessageProxy.getUnsentProxies();
+    boolean cancel = false;
+    for (int i = 0; !cancel && i < unsentMessages.size(); i++) {
+      NewMessageProxy current = (NewMessageProxy)unsentMessages.get(i);
+      NewMessageUI nmui = current.getNewMessageUI();
+      // FIXME
+      if (nmui != null) {
+	nmui.openMessageUI();
+	int saveDraft = nmui.promptSaveDraft();
+	switch (saveDraft) {
+	case JOptionPane.YES_OPTION:
+	  current.saveDraft();
+	  break;
+	case JOptionPane.NO_OPTION:
+	  nmui.setModified(false);
+	  nmui.closeMessageUI();
+	  break;
+	case JOptionPane.CANCEL_OPTION:
+	  cancel = true;
+	}
+      }
+    }
+
+    return ! cancel;
+  }
 
     // Accessor methods.
     // These shouldn't all be public.

@@ -218,6 +218,13 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * Shows a message.
+     */
+    public void showMessage(String newMessage, String title) {
+      JOptionPane.showMessageDialog(contentPanel.getUIComponent(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
+    }
+
+    /**
      * Shows a status message.
      */
     public void showStatusMessage(String newMessage) {

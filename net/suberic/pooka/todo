@@ -4,9 +4,6 @@ top todo:
 
 *) add more font support
 
-*)  check on file->exit to make sure that there are no unsent messages,
-and give an option on what you want to do with each one if there are any.
-
 *)  make it so file->exit gives you the option for expunging deleted messages
     from your mailboxes.
 
@@ -24,6 +21,10 @@ possible folders, nor just the ones that are open.
 
 *) fix the header information display when we read html messages.  i think
 that there are cases where it doesn't display properly.
+
+*) fix both the multieditorpane and the tabbededitorpane (?) so that they 
+create the panels lazily.  otherwise, an editor pane that has a lot of sub
+panels takes forever to create.
 
 	-- search --
 
@@ -43,6 +44,9 @@ that there are cases where it doesn't display properly.
 *) make disconnected imap use LoadMessageTracker.
 	make disconnected imap not show messages that aren't there!
 
+*) in general, make reconnecting/resynching (with disconnected imap or
+	with the uid system) use the LoadMessageThread.  also make the
+	LoadMessageThread use the main FolderThread synchronization.
 
 ------------
 
@@ -128,6 +132,9 @@ use it--or at least so it doesn't matter if it does.  -- only on unix.
 
 *) fix the startup bugs:  
 	1)  windows take too long to show up
+
+*) a nested message which is of type text/html doesn't get shown on the
+	display.
 
 *) enable voice control
 

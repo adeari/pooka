@@ -211,11 +211,13 @@ OutboxWindowToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
 OutboxWindowToolbar.Send.Action=folder-send
 OutboxWindowToolbar.Send.Image=/net/suberic/pooka/gui/images/Envelope.gif
 
-NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste:Undo:Redo:SelectAll:|:Print:|:Detach
+NewMessageWindowToolbar=Send:AttachFile:SaveDraft:|:Cut:Copy:Paste:Undo:Redo:SelectAll:|:Print:|:Detach
 NewMessageWindowToolbar.Send.Action=message-send
 NewMessageWindowToolbar.Send.Image=/net/suberic/pooka/gui/images/Envelope.gif
 NewMessageWindowToolbar.AttachFile.Action=message-attach-file
 NewMessageWindowToolbar.AttachFile.Image=/net/suberic/pooka/gui/images/Pin.gif
+NewMessageWindowToolbar.SaveDraft.Action=message-save-draft
+NewMessageWindowToolbar.SaveDraft.Image=/net/suberic/pooka/gui/images/Save.gif
 NewMessageWindowToolbar.Cut.Action=cut-to-clipboard
 NewMessageWindowToolbar.Cut.Image=/net/suberic/pooka/gui/images/Cut.gif
 NewMessageWindowToolbar.Copy.Action=copy-to-clipboard

@@ -74,6 +74,12 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	}
       });
     
+    editorPane.addKeyListener(new KeyAdapter() {
+	public void keyTyped(KeyEvent e) {
+	  setModified(true);
+	}
+      });
+
     splitPane.resetToPreferredSizes();
 
   }
@@ -187,6 +193,13 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    inputField.setLineWrap(true);
 	    inputField.setWrapStyleWord(true);
 	    inputField.setBorder(BorderFactory.createEtchedBorder());
+	    inputField.addKeyListener(new KeyAdapter() {
+		public void keyTyped(KeyEvent e) {
+		  setModified(true);
+		}
+	      });
+
+
 	    inputRow.add(inputField);
 	    
 	    inputPanel.add(inputRow);

@@ -81,6 +81,11 @@ public interface PookaUIFactory extends ErrorHandler {
      */
     public void showStatusMessage(String newMessage);
 
+  /**
+   * Shows a message.
+   */
+  public void showMessage(String newMessage, String title);
+
     /**
      * Clears the main status message panel.
      */

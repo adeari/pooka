@@ -15,6 +15,8 @@ public interface MessageUI extends UserProfileContainer, ErrorHandler, ActionCon
     
     public int showConfirmDialog(String message, String title, int optionType, int messageType);
 
+  public void showMessageDialog(String message, String title);
+
     public void setBusy(boolean newValue);
 
     public void setEnabled(boolean newValue);
