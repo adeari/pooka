@@ -1,15 +1,16 @@
-
-*) make it so the connection objects actually have a clue as to whether
-or not they're actually connected, instead of relying on the user.
-
 *) _really_ fix the window resizing problem.
 
 *) fix the new account creation / new mailbox creation so that the
 	folder display actually gets updated.  (jdk 1.3.1?)
 
-*) make it so you can stop html displays from showing non-local images.
+*) make it so the connection objects actually have a clue as to whether
+or not they're actually connected, instead of relying on the user.
+
 
 ----------
+
+*) make it so you can stop html displays from showing non-local images.
+ 	-- support RFC-2557??
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
@@ -77,6 +78,9 @@ or not they're actually connected, instead of relying on the user.
 say, like reacting to a mailto: link.
 
 *) add a search and replace for the message editors.
+
+*) disconnected from folder (like if the server goes down) doesn't result in 
+icons changing?  test.
 
 	-- disconnected imap --
 
