@@ -1,5 +1,5 @@
-
 package net.suberic.pooka;
+
 import javax.mail.search.*;
 import javax.mail.*;
 import java.util.HashMap;
@@ -10,6 +10,9 @@ import java.text.DateFormat;
  * This class generates SearchTerms from properties in the Pooka 
  * VariableBundle.  It also will give out a list of property labels and 
  * then will translate those labels and/or properties into SearchTerms.
+ *
+ * This class also handles the Filter properties and editors.  This might
+ * get moved out of this class eventually.
  */
 public class SearchTermManager {
 
@@ -31,6 +34,12 @@ public class SearchTermManager {
     public static String BOOLEAN_MATCH = "Boolean";
     public static String DATE_MATCH = "Date";
 
+    // filter properties
+
+    Vector filterLabels;
+    HashMap filterLabelToPropertyMap;
+    HashMap filterClassToPropertyMap;
+
     /**
      * Default constructor.  Initializes the labelToPropertyMap and the
      * termLabels Vector from the Pooka property.
@@ -45,6 +54,8 @@ public class SearchTermManager {
 	createTermMaps(propertyName + ".searchTerms");
 	createOperationMaps(propertyName + ".operations");
 	createOperationTypeMaps(propertyName);
+
+	createFilterMaps();
 
 	dateFormat = new java.text.SimpleDateFormat(Pooka.getProperty(propertyName + ".dateFormat", "MM/dd/yyyy"));
     }
@@ -85,6 +96,9 @@ public class SearchTermManager {
 	} 
     }
 
+    /**
+     * Creates the typeToLabelMap for the given property.
+     */
     private void createOperationTypeMaps(String propName) {
 	typeToLabelMap = new HashMap();
 	Vector types = Pooka.getResources().getPropertyAsVector(propName + ".operationTypes", "");
@@ -98,6 +112,25 @@ public class SearchTermManager {
 	    }
 
 	    typeToLabelMap.put(currentType, labelList);
+	}
+    }
+
+    /**
+     * Creates the filter properties.
+     */
+    public void createFilterMaps() {
+	filterLabels=new Vector();
+	filterLabelToPropertyMap = new HashMap();
+	filterClassToPropertyMap = new HashMap();
+
+	Vector filterProperties = Pooka.getResources().getPropertyAsVector("FolderFilters", "");
+	for (int i = 0; i < filterProperties.size(); i++) {
+	    String currentProperty = "FolderFilters." + (String) filterProperties.elementAt(i);
+	    String label = Pooka.getProperty(currentProperty + ".label", (String) filterProperties.elementAt(i));
+	    String className = Pooka.getProperty(currentProperty + ".class", "");
+	    filterLabels.add(label);
+	    filterLabelToPropertyMap.put(label, currentProperty);
+	    filterClassToPropertyMap.put(className, currentProperty);
 	}
     }
 
@@ -271,6 +304,41 @@ public class SearchTermManager {
 	    return new Flags(Flags.Flag.SEEN);
 
 	return new Flags(flagName);
+    }
+
+    /**
+     * Returns the filter labels.
+     */
+    public Vector getFilterLabels() {
+	return filterLabels;
+    }
+
+    /**
+     * creates an editor for a given filter label.
+     */
+    public net.suberic.pooka.gui.filter.FilterEditor getEditorForFilterLabel(String label) {
+	String property = (String) filterLabelToPropertyMap.get(label);
+	String className = Pooka.getProperty(property + ".editorClass", "");
+	if (className.equals(""))
+	    return null;
+	else {
+	    try {
+		Class editorClass = Class.forName(className);
+		net.suberic.pooka.gui.filter.FilterEditor editor = (net.suberic.pooka.gui.filter.FilterEditor) editorClass.newInstance();
+		return editor;
+	    } catch (Exception e) {
+		return null;
+	    }
+	}
+    }
+
+    /**
+     * Returns the appropriate label for the given filter class.
+     */
+    public String getLabelForFilterClass(String className) {
+	String property = (String) filterClassToPropertyMap.get(className);
+	String label = Pooka.getProperty(property + ".label", "");
+	return label;
     }
 
     /**

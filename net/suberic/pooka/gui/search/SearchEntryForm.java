@@ -130,6 +130,10 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	return manager.generateSearchTerm(searchProperty, operationProperty, pattern);
     }
 
+    /**
+     * This handles the switch of the selectionPanel when the searchFieldCombo
+     * value changes.
+     */
     public void itemStateChanged(java.awt.event.ItemEvent e) {
 	String selectedString = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
 	
