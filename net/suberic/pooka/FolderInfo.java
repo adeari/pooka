@@ -70,6 +70,7 @@ public class FolderInfo implements MessageCountListener {
 	    });
     }
 
+
     /**
      * Loads all Messages into a new FolderTableModel, sets this 
      * FolderTableModel as the current FolderTableModel, and then returns
@@ -99,8 +100,9 @@ public class FolderInfo implements MessageCountListener {
 	    loaderThread = createLoaderThread();
 
 	try {
-	    if (!(getFolder().isOpen()))
+	    if (!(getFolder().isOpen())) {
 		openFolder(Folder.READ_WRITE);
+	    }
 	    Message[] msgs = folder.getMessages();
 	    MessageProxy mp;
 
@@ -312,14 +314,23 @@ public class FolderInfo implements MessageCountListener {
      * calling getFolder().open(), because if you use this method, then
      * the FolderInfo will try to keep the Folder open, and will try to
      * reopen the Folder if it gets closed before closeFolder is called.
+     *
+     * This method can also be used to reset the mode of an already 
+     * opened folder.
      */
     public void openFolder(int mode) throws MessagingException {
-	if (folder.isOpen())
-	    return;
-	else {
+	if (folder.isOpen()) {
+	    if (folder.getMode() == mode)
+		return;
+	    else { 
+		closeFolder(false);
+		openFolder(mode);
+	    }
+	} else {
 	    folder.open(mode);
 	    open=true;
 	}
+	    
     }
 
     /**
@@ -332,8 +343,8 @@ public class FolderInfo implements MessageCountListener {
 	if (!(folder.isOpen()))
 	    return;
 	else {
-	    folder.close(expunge);
 	    open=false;
+	    folder.close(expunge);
 	}
     }
     
