@@ -7,6 +7,29 @@ all the information we need off the Message.  3)  effectively have a 'real'
 message which is what you make changes on.  4)  searches won't work in 
 disconnected mode.
 	-- started.  todo:
+1)  folder opens:
+norm:  messages loaded.  window starts.
+uid:  messages loaded.  window starts.
+caching:  info loaded from cache.  window starts.  msg: "connecting and
+	synchronizing"  synchronize.  clearMsg.
+
+2)  folder closes on purpose:
+norm:  DisplayUI.close().  status=CLOSED.  messages unloaded.
+uid:  STATUS=CLOSED.  DisplayUI.close()
+caching:  STATUS=CLOSED.  moves into disconnected mode.  msg:  "folder disconnected.  only cached messages will be available."
+
+3)  folder loses connection:
+norm:  msg:  "lost connection.  please reopen folder."  note:  openDisplayUI() when DisplayUI is already set but disabled should close old window, open new one.status=CLOSED.  messages unloaded.
+uid:  status=LOST_CONNECTION.  
+caching:  status=LOST_CONNECTION.  
+
+4)  folder reopens after lost connection:
+norm:  doesn't matter.  just as folder opens.  messages loaded.  window starts.
+uid:  msg:  "reconnecting to folder..."  gets new uidValidity.  i
+	if validity not correct, msg:  "error:  validity not correct.  reloading from scratch."  unloadMessages().  loadAllMessages().  getFolderDisplayUI().resetFolderTableModel(new ftm).  msg.clear().
+	if validity correct:  get all messages.  get the uid list.  fetch headers and flags.  compare uid list.  remove removed messages.  add added messages.  send a MessageChangedEvent for each message, just in case flags have changed.  message.clear().
+
+caching:  pretty much the same as uid, no?  only difference is that we also have to add new messages/flag changes.  
 	   *)  need to remove the 'Recent' flag from the cache once we've
 	       received a message.
 	   *)  loading the initial cache takes too long--we should have a 
