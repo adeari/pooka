@@ -1,9 +1,15 @@
-*) outbox and preview pane doesn't work properly.  esp check edit as new.
-
 *) make it faster to start up; make a way to open and load all of your open
 folders before opening the other folders.
 
 *) change over from mbox to maildir or something like it.
+
+*) add plugin for spam checker?
+
+*) check moving internal windows code in 1.4
+
+*) add mrpostman support(?)
+
+--
 
 *) add "view pookarc"
 
@@ -11,6 +17,11 @@ folders before opening the other folders.
 raw input stream.
 
 *) check why the bcc field sometimes doesn't show the address book icon.
+
+*) check unsubscribe w/subdir.
+
+*) memory leak???
+   -- theme listener!!!
 
 ------
 
@@ -92,6 +103,7 @@ raw input stream.
 	the readmessagedisplaypanel--or possibly on the status pane.
 	-- maybe change the toolbars so there's only 1?
 	-- ?? make it so you can compose messages in the main window ??
+  -- switching from preview to desktop gives outbox a "normal" toolbar.
 
 *) NPE -- is that from switching from preview to desktop?
 	-- check window menu from switching preview to desktop.

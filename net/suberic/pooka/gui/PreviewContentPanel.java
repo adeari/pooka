@@ -26,7 +26,6 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   
   private PreviewFolderPanel current = null;
   
-  private ConfigurableToolbar toolbar;
   HashMap cardTable = new HashMap();
   
   private ListSelectionListener selectionListener;
@@ -54,11 +53,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
     
     
-    toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
-    
     this.setLayout(new BorderLayout());
     
-    this.add("North", toolbar);
     this.add("Center", splitPanel);
     
     splitPanel.setDividerLocation(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200")));
@@ -421,7 +417,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Refreshes the currently available actions.
    */
   public void refreshActiveMenus() {
-    toolbar.setActive(getActions());
+    if (current != null)
+      current.getToolbar().setActive(getActions());
     //Pooka.getMainPanel().refreshActiveMenus();
   }
   

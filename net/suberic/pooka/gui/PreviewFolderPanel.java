@@ -28,6 +28,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
   private FolderInfo displayedFolder = null;
   
   private FolderStatusBar folderStatusBar = null;
+  private ConfigurableToolbar toolbar;
   
   ConfigurableKeyBinding keyBindings;
   
@@ -83,6 +84,14 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     
     this.setLayout(new java.awt.BorderLayout());
     
+    if (displayedFolder != null) {
+      if (displayedFolder.isOutboxFolder()) {
+	toolbar = new ConfigurableToolbar("OutboxWindowToolbar", Pooka.getResources());
+      } else {
+	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
+      }
+    }
+    this.add("North", toolbar);
     this.add("Center", folderDisplay);
     this.add("South", folderStatusBar);
     
@@ -471,18 +480,25 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     getFolderDisplay().removeRows(removedProxies);
   }
 
-    /**
-     * Gets the folderStatusBar.
-     */
-    public FolderStatusBar getFolderStatusBar() {
-	return folderStatusBar;
-    }
+  /**
+   * Returns the Toolbar for this FolderPanel.
+   */
+  public ConfigurableToolbar getToolbar() {
+    return toolbar;
+  }
 
-    /**
-     * Gets the currently available Actions for this component.
-     *
-     * As defined in interface net.suberic.pooka.gui.ActionContainer.
-     */
+  /**
+   * Gets the folderStatusBar.
+   */
+  public FolderStatusBar getFolderStatusBar() {
+    return folderStatusBar;
+  }
+  
+  /**
+   * Gets the currently available Actions for this component.
+   *
+   * As defined in interface net.suberic.pooka.gui.ActionContainer.
+   */
   public Action[] getActions() {
     if (enabled) {
       Action[] returnValue = defaultActions;

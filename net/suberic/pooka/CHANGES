@@ -1,3 +1,5 @@
+the outbox folder now gets the correct toolbar in preview pane mode.
+
 switching pop local store from mbox to maildir.
 
 for internal frames, focus now goes to the correct component instead of to
