@@ -1,3 +1,6 @@
+added a way to specify caching scheme per folder, so we can avoid autocaching
+of messages in spam and/or sent folders.
+
 added a splashscreen on startup.
 
 optimized the loading of new messages a bit so that we only do one fetch.

@@ -757,7 +757,7 @@ Folder.editableFields.propertyType=Tabbed
 Folder.editableFields.propertyScoped=true
 Folder.editableFields.templateScoped=true
 Folder.editableFields=config:display:backend:uiConfig
-Folder.editableFields.config=defaultProfile:useTrashFolder:notifyNewMessagesMain:notifyNewMessagesNode
+Folder.editableFields.config=defaultProfile:useTrashFolder:notifyNewMessagesMain:notifyNewMessagesNode:autoCache
 Folder.editableFields.config.scoped=true
 Folder.editableFields.config.scopeRoot=Folder.editableFields
 
@@ -800,6 +800,8 @@ Folder.editableFields.notifyNewMessagesMain.propertyType=Boolean
 Folder.editableFields.notifyNewMessagesMain=True
 Folder.editableFields.notifyNewMessagesNode.propertyType=Boolean
 Folder.editableFields.notifyNewMessagesNode=True
+Folder.editableFields.autoCache.propertyType=DefaultBoolean
+Folder.editableFields.autoCache.value=
 
 Store.propertyType=Multi
 Store.editableFields.scoped=true
@@ -1203,10 +1205,11 @@ FolderInfo.defaultDisplayFilters.DeleteInProgress.action.rgb=-6710887
 Pooka.background=0
 
 # PropertyEditors
-PropertyEditor=String:Boolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key:LookAndFeel
+PropertyEditor=String:Boolean:DefaultBoolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key:LookAndFeel
 
 PropertyEditor.String.class=net.suberic.util.gui.propedit.StringEditorPane
 PropertyEditor.Boolean.class=net.suberic.util.gui.propedit.BooleanEditorPane
+PropertyEditor.DefaultBoolean.class=net.suberic.util.gui.propedit.DefaultBooleanEditorPane
 PropertyEditor.List.class=net.suberic.util.gui.propedit.ListEditorPane
 PropertyEditor.Variable.class=net.suberic.util.gui.propedit.VariableEditorPane
 PropertyEditor.Composite.class=net.suberic.util.gui.propedit.CompositeEditorPane

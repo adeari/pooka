@@ -30,14 +30,17 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   public CachingFolderInfo(StoreInfo parent, String fname) {
     super(parent, fname);
 
-    autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+    autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false")))).equalsIgnoreCase("true");
+
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".autoCache");
   }
   
   public CachingFolderInfo(FolderInfo parent, String fname) {
     super(parent, fname);
     
-    autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+    autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false")))).equalsIgnoreCase("true");
 
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".autoCache");
   }
   
   /**
@@ -1311,6 +1314,20 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       pUI.showStatusMessage(message);
     else
       Pooka.getUIFactory().showStatusMessage(message);
+  }
+
+  /**
+   * This handles the changes if the source property is modified.
+   *
+   * As defined in net.suberic.util.ValueChangeListener.
+   */
+  
+  public void valueChanged(String changedValue) {
+    if (changedValue.equals(getFolderProperty() + ".autoCache")) {
+      autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false")))).equalsIgnoreCase("true");
+    } else {
+      super.valueChanged(changedValue);
+    }
   }
 }
 
