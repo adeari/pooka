@@ -25,7 +25,7 @@ public class PookaStartup {
     
     ImagePanel imagePanel = null;
     try {
-      java.net.URL sourceUrl = this.getClass().getResource(Pooka.getProperty("Pooka.startupImage", "./images/PookaSplashscreen.jpg"));
+      java.net.URL sourceUrl = this.getClass().getResource(Pooka.getProperty("Pooka.startupImage", "images/PookaSplashscreen.jpg"));
       Image image = Toolkit.getDefaultToolkit().getImage(sourceUrl);
 
       imagePanel = new ImagePanel(image);

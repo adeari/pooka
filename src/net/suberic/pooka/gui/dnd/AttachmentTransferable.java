@@ -41,7 +41,6 @@ public class AttachmentTransferable implements Transferable {
 
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
     if (isDataFlavorSupported(flavor)) {
-      System.err.println("creating TransferData with tmp file.");
       
       java.util.LinkedList list = new java.util.LinkedList();
 
@@ -61,7 +60,6 @@ public class AttachmentTransferable implements Transferable {
    * Writes the File object for this attachment.
    */
   public void writeFile() {
-    System.err.println("writing file " + mTmpFile);
     AttachmentHandler handler = new AttachmentHandler(mMessageProxy);
     try {
       handler.saveFileAs(mAttachment, mTmpFile);

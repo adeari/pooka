@@ -61,7 +61,6 @@ public class NewMessageTransferHandler extends TransferHandler {
 	  Iterator it = fileList.iterator();
 	  while (it.hasNext()) {
 	    File f = (File) it.next();
-	    System.err.println("f = " + f);
 	    if (f != null) {
 	      // attach each file.
 	      nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f, "message/rfc822");
@@ -74,7 +73,6 @@ public class NewMessageTransferHandler extends TransferHandler {
 	  // cutDisallowed on the Proxy.
 	  try {
 	    MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
-	    System.err.println("don't allow for a removal.");
 	    mp.setCutDisallowed(true);
 	    mp.setImportDone(true);
 	    if (mp.removeMessageOnCompletion() || mp.getActionType() == MOVE) {
@@ -108,7 +106,6 @@ public class NewMessageTransferHandler extends TransferHandler {
 	  Iterator it = fileList.iterator();
 	  while (it.hasNext()) {
 	    File f = (File) it.next();
-	    System.err.println("f = " + f);
 	    if (f != null) {
 	      nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f);
 	    

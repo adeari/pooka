@@ -82,7 +82,6 @@ public class FolderTransferHandler extends TransferHandler {
   }
 
   protected void exportDone(JComponent c, Transferable data, int action) {
-    System.err.println("exportDone.");
     if (action == MOVE) {
       try {
 	MessageProxy mp = (MessageProxy) data.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);

@@ -82,7 +82,6 @@ public class DndUtils {
    * or null if no match is found.
    */
   public static DataFlavor matchDataFlavor(DataFlavor[] acceptableFlavors, DataFlavor[] availableFlavors) {
-    System.err.println("matching data flavor...");
     if (acceptableFlavors != null && availableFlavors != null) {
       for (int i = 0; i < availableFlavors.length; i++) {
 	for (int j = 0; j < acceptableFlavors.length; j++) {
@@ -102,12 +101,10 @@ public class DndUtils {
     File returnValue = null;
     File tmpDir = null;
     String tmpDirString = System.getProperty("java.io.tmpdir");
-    System.err.println("tmpDirString = " + tmpDirString);
     if (tmpDirString != null && tmpDirString.length() > 0) {
       File firstType = new File(tmpDirString);
       if (firstType != null && firstType.exists() && firstType.isDirectory() && firstType.canWrite()) {
 	tmpDir = firstType;
-	System.err.println("tmpDir is " + tmpDir);
       }
     } 
 
