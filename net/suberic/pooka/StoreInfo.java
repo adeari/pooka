@@ -16,7 +16,6 @@ import net.suberic.util.VariableBundle;
  */
 
 public class StoreInfo implements ValueChangeListener {
-    //public static Vector allStores = null;
 
     private Store store;
 
@@ -244,92 +243,6 @@ public class StoreInfo implements ValueChangeListener {
 	}
     }
 
-    /**
-     * This loads and creates all the Stores from the Store property of
-     * the VariableBundle.
-     */
-    /*
-    public static Vector loadAllStores(VariableBundle resources) {
-	allStores = new Vector();
-	String storeID = null;
-	StringTokenizer tokens =  new StringTokenizer(resources.getProperty("Store", ""), ":");
-	
-	while (tokens.hasMoreTokens()) {
-	    storeID=(String)tokens.nextElement();
-	    
-	    addStore(storeID);	    
-	}
-
-	return allStores;
-    }
-    */
-
-    /**
-     * This adds the store with the given storeName to the allStores list.
-     */
-    /*
-    public static void addStore(String storeName) {
-	if (getStoreInfo(storeName) == null) {
-	    StoreInfo store = new StoreInfo(storeName);
-	    allStores.add(store);
-	}
-    }
-    */
-
-    /**
-     * This adds the StoreInfo to the allStores list.
-     */
-    /*
-    public static void addStore(StoreInfo storeInfo) {
-	if (!allStores.contains(storeInfo))
-	    allStores.add(storeInfo);
-    }
-    */
-
-    /**
-     * This removes the StoreInfo with the given storeName from the allStores
-     * list.
-     */
-    /*
-    public static void removeStore (String storeName) {
-	boolean removed = false;
-
-	for (int i = 0; (removed == false) && i < allStores.size(); i++) {
-	    StoreInfo si = (StoreInfo)(allStores.elementAt(i));
-
-	    if (si.getStoreID().equals(storeName)) {
-		allStores.remove(si);
-		removed = true;
-	    }
-	}	
-    }
-    */
-    
-    /**
-     * This removes the StoreInfo from the allStores list.
-     */
-    /*
-    public static void removeStore (StoreInfo storeInfo) {
-	allStores.remove(storeInfo);
-    }
-    */
-
-    /**
-     * This returns the StoreInfo with the given storeName if it exists
-     * in the allStores Vector; otherwise, returns null.
-     */
-    static public StoreInfo getStoreInfo(String storeName) {
-	Vector allStores = getAllStores();
-	for (int i = 0; i < allStores.size(); i++) {
-	    StoreInfo si = (StoreInfo)(getAllStores().elementAt(i));
-
-	    if (si.getStoreID().equals(storeName)) {
-		return si;
-	    }
-	}	
-	return null;
-    }
-
     // Accessor methods.
 
     public Store getStore() {
@@ -406,7 +319,4 @@ public class StoreInfo implements ValueChangeListener {
 	trashFolder = newValue;
     }
 
-    public static Vector getAllStores() {
-	return Pooka.getAllStoreInfos();
-    }
 }

@@ -36,7 +36,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	commands = new Hashtable();
 	
 	defaultActions = new Action[] {
-	    new ActionWrapper(new OpenAction(), folderInfo.getParentStore().getStoreThread())
+	    new ActionWrapper(new OpenAction(), folderInfo.getParentStore().getStoreThread()),
+	    new UnsubscribeAction()
 		};
 
 	Action[] actions = defaultActions;
@@ -211,6 +212,24 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	getParentContainer().repaint();
     }
 
+    /**
+     * This opens up a dialog asking if the user wants to unsubsribe to 
+     * the current Folder.  If the user chooses 'yes', then
+     * getFolderInfo().unsubscribe() is called.
+     */
+    public void unsubscribeFolder() {
+	String message;
+	if (isLeaf())
+	    message = Pooka.getProperty("Folder.unsubscribeConfirm", "Do you really want to unsubscribe from the following folder?");
+	else
+	    message = Pooka.getProperty("Folder.unsubscribeConfirm.notLeaf", "Do you really want to unsubscribe from \nthis folder and all its children?");
+	
+	int response = JOptionPane.showInternalConfirmDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), message + "\n" + getFolderInfo().getFolderName(), Pooka.getProperty("Folder.unsubscribeConfirm.title", "Unsubscribe from Folder"), JOptionPane.YES_NO_OPTION);
+	
+	if (response == JOptionPane.YES_OPTION)
+	    getFolderInfo().unsubscribe();
+    }
+
     public String getFolderID() {
 	return getFolderInfo().getFolderID();
     }
@@ -273,6 +292,18 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    } catch (MessagingException me) {
 	    }
 	((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+
+    }
+
+    class UnsubscribeAction extends AbstractAction {
+
+	UnsubscribeAction() {
+	    super("folder-unsubscribe");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    unsubscribeFolder();
 	}
 
     }

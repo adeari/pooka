@@ -188,12 +188,13 @@ FolderTable.Subject.value=Subject
 FolderTable.Subject.size=260
 
 # -- Popup menus.
-FolderNode.popupMenu=Open:Update:Close:New:Edit
+FolderNode.popupMenu=Open:Update:Close:New:Edit:Unsubscribe
 FolderNode.popupMenu.Open.Action=file-open
 FolderNode.popupMenu.Update.Action=folder-update
 FolderNode.popupMenu.Close.Action=folder-close
 FolderNode.popupMenu.New.Action=file-new
 FolderNode.popupMenu.Edit.Action=file-edit
+FolderNode.popupMenu.Unsubscribe.Action=folder-unsubscribe
 
 StoreNode.popupMenu=Open:Subscribe:Close:Edit
 StoreNode.popupMenu.Open.Action=file-open

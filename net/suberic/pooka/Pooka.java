@@ -2,6 +2,7 @@ package net.suberic.pooka;
 import net.suberic.pooka.gui.*;
 import java.awt.*;
 import javax.swing.*;
+import java.util.Vector;
 
 public class Pooka {
     static public net.suberic.util.VariableBundle resources;
@@ -13,6 +14,8 @@ public class Pooka {
 
     static public javax.mail.Session defaultSession;
     static public net.suberic.pooka.thread.FolderTracker folderTracker;
+
+    static public StoreManager storeManager;
 
     static public void main(String argv[]) {
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
@@ -40,6 +43,10 @@ public class Pooka {
 	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
 	defaultSession = javax.mail.Session.getDefaultInstance(System.getProperties(), auth);
 
+	storeManager = new StoreManager();
+
+	storeManager.loadAllSentFolders();
+
 	frame.setBackground(Color.lightGray);
 	frame.getContentPane().setLayout(new BorderLayout());
 	panel = new MainPanel(frame);
@@ -59,7 +66,6 @@ public class Pooka {
 		panel.getMessagePanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
 	}
 
-	//UserProfile.loadAllSentFolders();
 	panel.refreshActiveMenus();
     }
 
@@ -110,67 +116,9 @@ public class Pooka {
 	return panel;
     }
 
-    /**
-     * This returns a Vector with all the currently registered StoreInfo
-     * objects.
-     */
-    static java.util.Vector getAllStoreInfos() {
-	// i really should store all the StoreInfos as a static variable
-	// on the StoreInfo class, or something like that.  instead, i'm
-	// getting it from the FolderPanel.  *sigh*
-
-	return getMainPanel().getFolderPanel().getAllStoreInfos();
+    static public StoreManager getStoreManager() {
+	return storeManager;
     }
-
-    /**
-     * This returns the StoreInfo which corresponds with the storeName.
-     */
-    static public StoreInfo getStore(String storeName) {
-	return StoreInfo.getStoreInfo(storeName);
-    }
-
-    /**
-     * This returns the FolderInfo which corresponds to the given folderName.
-     * The folderName should be in the form "/storename/folder/subfolder".
-     */
-    static public FolderInfo getFolder(String folderName) {
-	if (folderName.length() < 1) {
-	    int divider = folderName.indexOf('/', 1);
-	    if (divider > 0) {
-		String storeName = folderName.substring(1, divider);
-		StoreInfo store = getStore(storeName);
-		if (store != null) {
-		    return store.getChild(folderName.substring(divider +1));
-		} 
-	    }
-	}
-
-	return null;
-    }
-
-    /**
-     * This returns the FolderInfo which corresponds to the given folderID.
-     * The folderName should be in the form "storename.folderID.folderID".
-     */
-    static public FolderInfo getFolderById(String folderID) {
-	// hurm.  the problem here is that '.' is a legal value in a name...
-
-	java.util.Vector allStores = getAllStoreInfos();
-
-	for (int i = 0; i < allStores.size(); i++) {
-	    StoreInfo currentStore = (StoreInfo) allStores.elementAt(i);
-	    if (folderID.startsWith(currentStore.getStoreID())) {
-		FolderInfo possibleMatch = currentStore.getFolderById(folderID);
-		if (possibleMatch != null) {
-		    return possibleMatch;
-		}
-	    }
-	}
-
-	return null;
-    }
-
-    
 }
 
 

@@ -10,9 +10,11 @@ import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
 import net.suberic.pooka.gui.*;
-import java.util.StringTokenizer;
 import java.util.Vector;
 
+/**
+ * This class displays the Stores and Folders for Pooka.
+ */
 public class FolderPanel extends JScrollPane implements ValueChangeListener, UserProfileContainer {
     MainPanel mainPanel=null;
     JTree folderTree;
@@ -20,6 +22,9 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
     Session session;
     ConfigurableKeyBinding keyBindings;
     
+    /**
+     * This creates and configures a new FolderPanel.
+     */
     public FolderPanel(MainPanel newMainPanel) {
 	mainPanel=newMainPanel;
 
@@ -89,6 +94,9 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 
     }
 
+    /**
+     * This returns the currently highlighted node on the FolderTree.
+     */
     public MailTreeNode getSelectedNode() {
 	TreePath tp = folderTree.getSelectionPath();
 
@@ -99,20 +107,23 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 	}
     }
 
+    /**
+     * This creates the tree root from the StoreList of the StoreManager.
+     */
     private MailTreeNode createTreeRoot() {
 	MailTreeNode root = new MailTreeNode("Pooka", this);
 
 	// Get the stores we have listed.
 	String storeID = null;
 
-	StringTokenizer tokens =  new StringTokenizer(Pooka.getProperty("Store", ""), ":");
-
-	while (tokens.hasMoreTokens()) {
-	    storeID=(String)tokens.nextElement();
-
-	    addStore(storeID, root);	    
+	Vector allStoreInfos = Pooka.getStoreManager().getStoreList();
+	for (int i = 0; i < allStoreInfos.size(); i++) {
+	    StoreNode storenode = new StoreNode((StoreInfo)allStoreInfos.elementAt(i), this);
+	    root.add(storenode);
 	}
 	
+	Pooka.getStoreManager().addValueChangeListener(this);
+
 	return root;
     }
 
@@ -128,60 +139,44 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
      *
      * This function is usually called in response to a ValueChanged
      * action on the "Store" property.
-     *
      */
-
     public void refreshStores() {
-	String storeID = null;
+	Vector newStoreList = Pooka.getStoreManager().getStoreList();
 	MailTreeNode root = (MailTreeNode)getFolderTree().getModel().getRoot();
-
-	StringTokenizer tokens =  new StringTokenizer(Pooka.getProperty("Store", ""), ":");
-
-	Vector allStores = new Vector();
+	
 	java.util.Enumeration storeEnum = root.children();
-	while (storeEnum.hasMoreElements()) {
-	    allStores.add(storeEnum.nextElement());
-	}
 
-	while (tokens.hasMoreTokens()) {
+	StoreNode currentStoreNode;
+	StoreInfo currentStoreInfo;
+	while (storeEnum.hasMoreElements()) {
 	    boolean found = false;
-	    storeID=(String)tokens.nextElement();
-	    for (int i=0; !(found) && i < allStores.size(); i++) {
-		StoreNode currentStore = (StoreNode)allStores.elementAt(i);
-		if (currentStore.getStoreID().equals(storeID)) {
+	    currentStoreNode = ((StoreNode)storeEnum.nextElement());
+	    currentStoreInfo = currentStoreNode.getStoreInfo();
+	    for (int i=0; !(found) && i < newStoreList.size(); i++) {
+		if (currentStoreInfo == newStoreList.elementAt(i)) {
 		    found = true;
-		    allStores.removeElement(currentStore);
+		    newStoreList.removeElement(currentStoreInfo);
 		}
 	    }
 	    if (!(found) )
-		this.addStore(storeID, root);
+		root.remove(currentStoreNode);
 	}
 
-	for (int i = 0; i < allStores.size() ; i++) {
-	    this.removeStore(((StoreNode)allStores.elementAt(i)).getStoreID(), root);
+	for (int i = 0; i < newStoreList.size() ; i++) {
+	    this.addStore((StoreInfo)newStoreList.elementAt(i) , root);
 	}
 
 	getFolderTree().updateUI();
     }
 
-    public void addStore(String storeID, MailTreeNode root) {
-	StoreInfo store = new StoreInfo(storeID);
+
+    /**
+     * This creates a new StoreNode from the StoreInfo, and adds that
+     * StoreNode to the root of the FolderTree.
+     */
+    public void addStore(StoreInfo store, MailTreeNode root) {
 	StoreNode storenode = new StoreNode(store, this);
 	root.add(storenode);
-    }
-
-    public void removeStore(String storeID, MailTreeNode root) {
-	java.util.Enumeration children = root.children();
-	boolean removed=false;
-
-	while (children.hasMoreElements() && (removed == false)) {
-	    StoreNode sn = (StoreNode)(children.nextElement());
-
-	    if (sn.getStoreID().equals(storeID)) {
-		root.remove(sn);
-		removed = true;
-	    }
-	}
     }
 
     public MainPanel getMainPanel() {
@@ -196,42 +191,9 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
      * Specified by interface net.suberic.util.ValueChangeListener
      *
      */
-    
     public void valueChanged(String changedValue) {
 	if (changedValue.equals("Store"))
 	    refreshStores();
-    }
-
-    /**
-     * This returns all the StoreInfos associated with this FolderPanel.
-     */
-    public Vector getAllStoreInfos() {
-	Vector returnValue = new Vector();
-	MailTreeNode root = (MailTreeNode) getFolderTree().getModel().getRoot();
-	java.util.Enumeration storeNodes = root.children();
-	while (storeNodes.hasMoreElements()) {
-	    StoreInfo inf = ((StoreNode)storeNodes.nextElement()).getStoreInfo();
-	    returnValue.add(inf);
-	}
-
-	return returnValue;
-	
-    }
-
-    /**
-     * This returns the Store identified by the given id.
-     */
-    public StoreInfo getStore(String storeName) {
-	MailTreeNode root = (MailTreeNode) getFolderTree().getModel().getRoot();
-	java.util.Enumeration storeNodes = root.children();
-	while (storeNodes.hasMoreElements()) {
-	    
-	    StoreInfo inf = ((StoreNode)storeNodes.nextElement()).getStoreInfo();
-	    if (inf.getStoreID().equals(storeName))
-		return inf;
-	}
-
-	return null;
     }
 
     /**

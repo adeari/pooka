@@ -186,7 +186,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public void openSavedFolders(Vector folderList) {
 	if (folderList != null) 
 	    for (int i = 0; i < folderList.size(); i++) {
-		FolderInfo fInfo = Pooka.getFolderById((String)folderList.elementAt(i));
+		FolderInfo fInfo = Pooka.getStoreManager().getFolderById((String)folderList.elementAt(i));
 		if (fInfo != null && fInfo.getFolderNode() != null) {
 		    FolderNode fNode = fInfo.getFolderNode();
 		    Action a = fNode.getAction("file-open");

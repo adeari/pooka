@@ -493,6 +493,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
+    /**
+     * This unsubscribes this FolderInfo and all of its children, if 
+     * applicable.
+     *
+     * This implementation just removes the defining properties from
+     * the Pooka resources.
+     */
+    public void unsubscribe() {
+	
+	if (children != null && children.size() > 0) {
+	    for (int i = 0; i < children.size(); i++) 
+		((FolderInfo)children.elementAt(i)).unsubscribe();
+	}
+	
+    }
+
     // semi-accessor methods.
 
     public MessageProxy getMessageProxy(int rowNumber) {

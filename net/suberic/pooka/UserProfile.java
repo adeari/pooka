@@ -239,14 +239,21 @@ public class UserProfile extends Object {
     }
 
     public FolderInfo getSentFolder() {
-	if (!sentFolderName.equals(""))
-	    return Pooka.getFolder(sentFolderName);
-	else
-	    return null;
+	if (sentFolderName == null)
+	    loadSentFolder();
+
+	return sentFolder;
     }
 
     public void setSentFolderName(String newValue) {
 	sentFolderName = newValue;
+
+	loadSentFolder();
+    }
+
+    public void loadSentFolder() {
+	sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
+
     }
 
     public String getSignature() {
