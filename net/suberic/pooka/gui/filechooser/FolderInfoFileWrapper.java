@@ -233,7 +233,7 @@ public class FolderInfoFileWrapper extends File {
     if (parent != null)
       return parent.getAbsolutePath();
     else
-      return null;
+      return this.getAbsolutePath();
   }
   
   /**

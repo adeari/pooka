@@ -269,6 +269,16 @@ public class PookaFileSystemView
   }
   
   
+  /**
+   * Returns true if the directory is traversable.
+   */
+  public Boolean isTraversable(File f) {
+    if (f != null && f instanceof FolderInfoFileWrapper) {
+      return new Boolean(true);
+    } else
+      return new Boolean(false);
+  }
+  
   /*
    * Used by UI classes to decide whether to display a special icon
    * for drives or partitions, e.g. a "hard disk" icon.
