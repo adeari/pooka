@@ -7,6 +7,7 @@ import javax.activation.DataHandler;
 import java.util.Enumeration;
 import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
 /**
  * A wrapper around a MimeMessage which can either work in real or 
@@ -47,7 +48,36 @@ public class UIDMimeMessage extends MimeMessage {
   }
   
   protected InputStream getContentStream() throws MessagingException {
-    throw new MessagingException("No getting the content stream!  Bad code!");
+    // sigh.  this is pretty much taken from the javamail source.
+
+    try {
+      InputStream handlerStream = getInputStream();
+      InternetHeaders tmpHeaders = new InternetHeaders(handlerStream);
+      
+      byte[] buf;
+      
+      int len;
+      int size = 1024;
+      
+      if (handlerStream instanceof ByteArrayInputStream) {
+	size = handlerStream.available();
+	buf = new byte[size];
+	len = handlerStream.read(buf, 0, size);
+      }
+      else {
+	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	buf = new byte[size];
+	while ((len = handlerStream.read(buf, 0, size)) != -1)
+	  bos.write(buf, 0, len);
+	buf = bos.toByteArray();
+      }
+      
+      return new ByteArrayInputStream(buf);
+    } catch (java.io.IOException ioe) {
+      throw new MessagingException("Error getting Content Stream", ioe);
+    }
+
+    //throw new MessagingException("No getting the content stream!  Bad code!");
   }
   
   public synchronized DataHandler getDataHandler() 
