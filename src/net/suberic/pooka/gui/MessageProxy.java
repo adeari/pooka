@@ -1137,6 +1137,20 @@ public class MessageProxy {
   }
   
   /**
+   * This creates and shows a PopupMenu for this component.  
+   */
+  public void showAttachmentPopupMenu(JComponent component, MouseEvent e) {
+    AttachmentPopupMenu atMenu = new AttachmentPopupMenu(this);
+    try {
+      atMenu.loadAttachments(new java.awt.event.ActionEvent(e, 0, "show-attachments"));
+      atMenu.show(component, e.getX(), e.getY());
+    } catch (MessagingException me) {
+      showError(me.getMessage(), me);
+    }
+
+  }
+  
+  /**
    * As specified by interface net.suberic.pooka.UserProfileContainer.
    *
    * If the MessageProxy's getMessageInfo().getFolderInfo() is set, this returns the 

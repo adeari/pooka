@@ -316,13 +316,18 @@ public class FolderDisplayPanel extends JPanel {
 	  if (e.isPopupTrigger()) {
 	    // see if anything is selected
 	    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+	    int columnIndex = getMessageTable().columnAtPoint(e.getPoint());
 	    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
 	      getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
 	    }
 	    
 	    MessageProxy selectedMessage = getSelectedMessage();
-	    if (selectedMessage != null && isEnabled())
-	      selectedMessage.showPopupMenu(getMessageTable(), e);
+	    if (selectedMessage != null && isEnabled()) {
+	      if (columnIndex == 2) 
+		selectedMessage.showAttachmentPopupMenu(getMessageTable(), e);
+	      else
+		selectedMessage.showPopupMenu(getMessageTable(), e);
+	    }
 	  }
 	}
 	
@@ -330,13 +335,17 @@ public class FolderDisplayPanel extends JPanel {
 	  if (e.isPopupTrigger()) {
 	    // see if anything is selected
 	    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+	    int columnIndex = getMessageTable().columnAtPoint(e.getPoint());
 	    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
 	      getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
 	    }
 	    
 	    MessageProxy selectedMessage = getSelectedMessage();
 	    if (selectedMessage != null && isEnabled())
-	      selectedMessage.showPopupMenu(getMessageTable(), e);
+	      if (columnIndex == 2) 
+		selectedMessage.showAttachmentPopupMenu(getMessageTable(), e);
+	      else
+		selectedMessage.showPopupMenu(getMessageTable(), e);
 	  }
 	}
       });
