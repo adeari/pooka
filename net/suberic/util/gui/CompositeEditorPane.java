@@ -54,10 +54,11 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	Vector templates = new Vector();
 
 	if (scoped) {
+	    String scopeRoot = bundle.getProperty(template + ".scopeRoot", template);
 	    Vector templateNames = bundle.getPropertyAsVector(template, "");
 	    for (int i = 0; i < templateNames.size() ; i++) {
 		properties.add(property + "." + (String) templateNames.elementAt(i));
-		templates.add(template + "." + (String) templateNames.elementAt(i));
+		templates.add(scopeRoot + "." + (String) templateNames.elementAt(i));
 	    }
 	} else {
 	    properties = bundle.getPropertyAsVector(property, "");

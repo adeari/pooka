@@ -62,20 +62,22 @@ public class PropertyEditorFactory {
     public DefaultPropertyEditor createEditor(String property) {
 	String test = sourceBundle.getProperty(property + ".propertyType", "");
 
-	if (test.equals("String"))
+	if (test.equalsIgnoreCase("String"))
 	    return createStringEditor(property);
-	if (test.equals("Password"))
+	if (test.equalsIgnoreCase("Password"))
 	    return createPasswordEditor(property);
-	else if (test.equals("List"))
+	else if (test.equalsIgnoreCase("List"))
 	    return createListEditor(property);
-	else if (test.equals("Boolean"))
+	else if (test.equalsIgnoreCase("Boolean"))
 	    return createBooleanEditor(property);
-	else if (test.equals("Multi"))
+	else if (test.equalsIgnoreCase("Multi"))
 	    return createMultiEditor(property);
-	else if (test.equals("Tabbed"))
+	else if (test.equalsIgnoreCase("Tabbed"))
 	    return createTabbedEditor(property, property);
-	else if (test.equals("Composite"))
+	else if (test.equalsIgnoreCase("Composite"))
 	    return createCompositeEditor(property, property);
+	else if (test.equalsIgnoreCase("Variable"))
+	    return createVariableEditor(property, property);
 	else
 	    return createBasicEditor(property);
     }
@@ -104,6 +106,8 @@ public class PropertyEditorFactory {
 	    return createTabbedEditor(property, typeTemplate);
 	else if (test.equals("Composite"))
 	    return createCompositeEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("Variable"))
+	    return createVariableEditor(property, typeTemplate);
 	else
 	    return createBasicEditor(property);
     }
@@ -142,6 +146,10 @@ public class PropertyEditorFactory {
 
     private DefaultPropertyEditor createCompositeEditor(String property, String typeTemplate) {
 	return new CompositeEditorPane(this, property, typeTemplate);
+    }
+
+    protected DefaultPropertyEditor createVariableEditor(String property, String typeTemplate) {
+	return new VariableEditorPane(property, typeTemplate, this);
     }
 
     public VariableBundle getBundle() {
