@@ -78,7 +78,12 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     try {
       File outFile = writeStreamToFile(rawStream);
 
-      Process p = Runtime.getRuntime().exec("gpg -a -r '" + alias + "' --passphrase-fd 0 -e " + outFile);
+      String[] cmdArray = new String[] {
+	"gpg","-a","-r",alias,"--passphrase-fd","0","-e",outFile.toString() 
+      };
+
+      //Process p = Runtime.getRuntime().exec("gpg -a -r " + alias + " --passphrase-fd 0 -e " + outFile.toString());
+      Process p = Runtime.getRuntime().exec(cmdArray);
 
       // we probably need to write the passphrase.
 
@@ -135,15 +140,28 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     try {
       File outFile = writeStreamToFile(rawStream);
 
-      System.err.println("running 'gpg -a -r " + alias + " --passphrase-fd 0 -b " + outFile + "'");
-      Process p = Runtime.getRuntime().exec("gpg -a -r '" + alias + "' --passphrase-fd 0 -b " + outFile);
+      String[] cmdArray = new String[] {
+	"gpg","-a","--passphrase-fd","0","-b",outFile.toString() 
+      };
 
+      //Process p = Runtime.getRuntime().exec("gpg -a -r '" + alias + "' --passphrase-fd 0 -b " + outFile);
+      Process p = Runtime.getRuntime().exec(cmdArray);
+
+      /*
+      InputStream errorStream = p.getErrorStream();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(errorStream));
+      String errorString = reader.readLine();
+      while (errorString != null) {
+	System.err.println(errorString);
+	errorString = reader.readLine();
+      }
+      */
       // we probably need to write the passphrase.
 
       OutputStream os = p.getOutputStream();
 
       BufferedWriter processWriter = new BufferedWriter(new OutputStreamWriter(os));
-
+      
       processWriter.write(passphrase);
       processWriter.newLine();
       processWriter.flush();
