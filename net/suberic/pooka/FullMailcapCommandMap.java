@@ -55,6 +55,7 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
    */
   public DataContentHandler createDataContentHandler(java.lang.String mimeType) {
     CommandInfo[] allCmds = getAllCommands(mimeType);
+    DataContentHandler returnValue = null;
     if (allCmds != null) {
       for (int i = 0; i < allCmds.length; i++) {
 	CommandInfo current = allCmds[i];
@@ -63,7 +64,8 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	  if (name != null && name.equalsIgnoreCase("content-handler")) {
 	    try {
 	      String className = current.getCommandClass();
-	      return (DataContentHandler) Class.forName(className).newInstance();
+	      if (returnValue == null)
+	      returnValue = (DataContentHandler) Class.forName(className).newInstance();
 	    } catch (Exception e) {
 	    }
 	  }
@@ -71,7 +73,10 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
       }
     }
 
-    return null;
+    if (returnValue == null)
+      return super.createDataContentHandler(mimeType);
+    else 
+      return returnValue;
   }
 
   /**
@@ -421,7 +426,6 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	    }
 
 	    i = sb.length();
-	    //System.err.println("i = " + i + ", sb = '" + sb + "'");
 	    if (i > 0 && (sb.charAt(i-1) == ' ' || sb.charAt(i-1) == '\t')) {
 		while (i > 0 && sb.charAt(i-1) == ' ' || sb.charAt(i-1) == '\t')
 		    i--;
