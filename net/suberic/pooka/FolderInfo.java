@@ -997,87 +997,95 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
   
-    /**
-     * This goes through the list of children of this folder and
-     * returns the FolderInfo for the given childName, if one exists.
-     * If none exists, or if the children Vector has not been loaded
-     * yet, or if this is a leaf node, then this method returns null.
-     */
+  /**
+   * This goes through the list of children of this folder and
+   * returns the FolderInfo for the given childName, if one exists.
+   * If none exists, or if the children Vector has not been loaded
+   * yet, or if this is a leaf node, then this method returns null.
+   */
+  public FolderInfo getChild(String childName) {
+    if (Pooka.isDebug())
+      System.out.println("folder " + getFolderID() + " getting child " + childName);
 
-    public FolderInfo getChild(String childName) {
-      FolderInfo childFolder = null;
-      String folderName  = null, subFolderName = null;
+    FolderInfo childFolder = null;
+    String folderName  = null, subFolderName = null;
+    
+    if (children != null) {
+      int divider = childName.indexOf('/');
+      if (divider > 0) {
+	folderName = childName.substring(0, divider);
+	if (divider < childName.length() - 1)
+	  subFolderName = childName.substring(divider + 1);
+      } else 
+	folderName = childName;
       
-      if (children != null) {
-	int divider = childName.indexOf('/');
-	if (divider > 0) {
-	  folderName = childName.substring(0, divider);
-	  if (divider < childName.length() - 1)
-	    subFolderName = childName.substring(divider + 1);
-	} else 
-	  folderName = childName;
-	
+      if (Pooka.isDebug())
+	System.out.println("getting direct child " + folderName);
+      
 	for (int i = 0; i < children.size(); i++)
 	  if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
 	    childFolder = (FolderInfo)children.elementAt(i);
-      }
-      
-      if (childFolder != null && subFolderName != null)
-	return childFolder.getChild(subFolderName);
+    } else {
+      if (Pooka.isDebug())
+	System.out.println("children of " + getFolderID() + " is null.");
+    }
+    
+    if (childFolder != null && subFolderName != null)
+      return childFolder.getChild(subFolderName);
       else
 	return childFolder;
-    }
-
-    /**
-     * This goes through the list of children of this store and
-     * returns the FolderInfo that matches this folderID.
-     * If none exists, or if the children Vector has not been loaded
-     * yet, or if this is a leaf node, then this method returns null.
-     */
-    public FolderInfo getFolderById(String folderID) {
-	FolderInfo childFolder = null;
-
-	if (getFolderID().equals(folderID))
-	    return this;
-
-	if (children != null) {
-	    for (int i = 0; i < children.size(); i++) {
-		FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
-		if (possibleMatch != null) {
-		    return possibleMatch;
-		}
-	    }
+  }
+  
+  /**
+   * This goes through the list of children of this store and
+   * returns the FolderInfo that matches this folderID.
+   * If none exists, or if the children Vector has not been loaded
+   * yet, or if this is a leaf node, then this method returns null.
+   */
+  public FolderInfo getFolderById(String folderID) {
+    FolderInfo childFolder = null;
+    
+    if (getFolderID().equals(folderID))
+      return this;
+    
+    if (children != null) {
+      for (int i = 0; i < children.size(); i++) {
+	FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
+	if (possibleMatch != null) {
+	  return possibleMatch;
 	}
-
-	return null;
+      }
     }
-
-    /**
-     * creates the loader thread.
-     */
-    public LoadMessageThread createLoaderThread() {
-	LoadMessageThread lmt = new LoadMessageThread(this);
-	return lmt;
+    
+    return null;
+  }
+  
+  /**
+   * creates the loader thread.
+   */
+  public LoadMessageThread createLoaderThread() {
+    LoadMessageThread lmt = new LoadMessageThread(this);
+    return lmt;
+  }
+  
+  /**
+   * gets the 'real' message for the given MessageInfo.
+   */
+  public Message getRealMessage(MessageInfo mi) throws MessagingException {
+    return mi.getMessage();
+  }
+  
+  /**
+   * This sets the given Flag for all the MessageInfos given.
+   */
+  public void setFlags(MessageInfo[] msgs, Flags flag, boolean value) throws MessagingException {
+    Message[] m = new Message[msgs.length];
+    for (int i = 0; i < msgs.length; i++) {
+      m[i] = msgs[i].getRealMessage();
     }
-
-    /**
-     * gets the 'real' message for the given MessageInfo.
-     */
-    public Message getRealMessage(MessageInfo mi) throws MessagingException {
-	return mi.getMessage();
-    }
-
-    /**
-     * This sets the given Flag for all the MessageInfos given.
-     */
-    public void setFlags(MessageInfo[] msgs, Flags flag, boolean value) throws MessagingException {
-	Message[] m = new Message[msgs.length];
-	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = msgs[i].getRealMessage();
-	}
-
-	getFolder().setFlags(m, flag, value);
-    }
+    
+    getFolder().setFlags(m, flag, value);
+  }
 
   /**
    * This copies the given messages to the given FolderInfo.
@@ -1202,18 +1210,28 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   public void valueChanged(String changedValue) {
     if (changedValue.equals(getFolderProperty() + ".folderList")) {
-      getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent e) {
-	    updateChildren();
-	    if (folderNode != null) {
-	      javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		  public void run() {
-		    ((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
-		  }
-		});
-	    }
+      final Runnable runMe = new  Runnable() {
+	  public void run() {
+	    ((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
 	  }
-	} , new java.awt.event.ActionEvent(this, 0, "open-all"));
+	};
+      // if we don't do the update synchronously on the folder thread,
+      // then subscribing to subfolders breaks.
+      if (Thread.currentThread() != getFolderThread()) {
+	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	      updateChildren();
+	      if (folderNode != null) {
+		javax.swing.SwingUtilities.invokeLater(runMe);
+	      }
+	    }
+	  } , new java.awt.event.ActionEvent(this, 0, "open-all"));
+      } else {
+	updateChildren();
+	if (folderNode != null) {
+	  javax.swing.SwingUtilities.invokeLater(runMe);
+	}
+      }
     } else if (changedValue.equals(getFolderProperty() + ".defaultProfile")) {
       if (Pooka.getProperty(changedValue, "").equals(""))
 	defaultProfile = null;
@@ -1234,6 +1252,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * FolderInfo, if it doesn't already exist.
    */
   public void subscribeFolder(String folderName) {
+    if (Pooka.isDebug())
+      System.out.println("Folder " + getFolderID() + " subscribing subfolder " + folderName);
+
     String subFolderName = null;
     String childFolderName = null;
     int firstSlash = folderName.indexOf('/');
@@ -1249,13 +1270,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     } else
       childFolderName = folderName;
     
+    if (Pooka.isDebug()) {
+      System.out.println("Folder " + getFolderID() + " subscribing folder " + childFolderName + ", plus subfolder " + subFolderName);
+    }
+    
     this.addToFolderList(childFolderName);
     
     FolderInfo childFolder = getChild(childFolderName);
-    
-    if (childFolder != null && subFolderName != null)
+
+    if (Pooka.isDebug()) {
+      System.out.println("got child folder " + childFolder + " from childFolderName " + childFolderName);
+    }
+
+    if (childFolder != null && subFolderName != null) {
       childFolder.subscribeFolder(subFolderName);	
-    
+    }
+
     try {
       if (childFolder != null && childFolder.isLoaded() == false)
 	childFolder.loadFolder();

@@ -1,3 +1,5 @@
+fixed an error with subscribing to deeply nested subfolders.
+
 made it so the address entry windows actually show up in desktop mode.
 
 bringing up folders in disconnected mode shows the correct number of

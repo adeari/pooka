@@ -464,39 +464,42 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	Pooka.setProperty(getStoreProperty() + ".folderList", newValue.toString());
     }
     
-    /**
-     * This adds the given folderString to the folderList property.
-     */
-    void addToFolderList(String addFolderName) {
-	String folderName;
-	Vector folderNames = Pooka.getResources().getPropertyAsVector(getStoreProperty() + ".folderList", "");
-	
-	boolean found = false;
-
-	for (int i = 0; i < folderNames.size(); i++) {
-	    folderName = (String) folderNames.elementAt(i);
-
-	    if (folderName.equals(addFolderName)) {
-		found=true;
-	    }
-	    
-	}
-	
-	if (!found) {
-	    String currentValue = Pooka.getProperty(getStoreProperty() + ".folderList");
-	    if (currentValue.equals(""))
-		Pooka.setProperty(getStoreProperty() + ".folderList", addFolderName);
-	    else
-		Pooka.setProperty(getStoreProperty() + ".folderList", currentValue + ":" + addFolderName);
-	}
-			      
+  /**
+   * This adds the given folderString to the folderList property.
+   */
+  void addToFolderList(String addFolderName) {
+    String folderName;
+    Vector folderNames = Pooka.getResources().getPropertyAsVector(getStoreProperty() + ".folderList", "");
+    
+    boolean found = false;
+    
+    for (int i = 0; i < folderNames.size(); i++) {
+      folderName = (String) folderNames.elementAt(i);
+      
+      if (folderName.equals(addFolderName)) {
+	found=true;
+      }
+      
     }
     
+    if (!found) {
+      String currentValue = Pooka.getProperty(getStoreProperty() + ".folderList");
+      if (currentValue.equals(""))
+	Pooka.setProperty(getStoreProperty() + ".folderList", addFolderName);
+      else
+	Pooka.setProperty(getStoreProperty() + ".folderList", currentValue + ":" + addFolderName);
+    }
+    
+  }
+  
   /**
    * This subscribes the Folder described by the given String to this
    * StoreInfo.
    */
   public void subscribeFolder(String folderName) {
+    if (Pooka.isDebug())
+      System.out.println("subscribing folder " + folderName);
+
     String subFolderName = null;
     String childFolderName = null;
     int firstSlash = folderName.indexOf('/');
@@ -508,11 +511,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (firstSlash > 0) {
       childFolderName = folderName.substring(0, firstSlash);
       if (firstSlash < folderName.length() -1)
-	subFolderName = folderName.substring(firstSlash +1);
-      
+	subFolderName = folderName.substring(firstSlash +1);      
     } else
       childFolderName = folderName;
     
+    if (Pooka.isDebug())
+      System.out.println("store " + getStoreID() + " subscribing folder " + childFolderName + "; sending " + subFolderName + " to child for subscription.");
+ 
     this.addToFolderList(childFolderName);
     
     FolderInfo childFolder = getChild(childFolderName);

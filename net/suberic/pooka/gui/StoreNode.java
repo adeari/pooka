@@ -286,30 +286,38 @@ public class StoreNode extends MailTreeNode {
 		       Pooka.getProperty("FolderEditorPane.Select",
 					 "Select"));
       if (returnValue == JFileChooser.APPROVE_OPTION) {
-	net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
+	final net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
 	  ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
-
-	try {
-	  // if it doesn't exist, try to create it.
-	  if (! wrapper.exists()) {
-	    wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
-	  }
-	  String absFileName = wrapper.getAbsolutePath();
-	  int firstSlash = absFileName.indexOf('/');
-	  String normalizedFileName = absFileName;
-	  if (firstSlash >= 0)
-	    normalizedFileName = absFileName.substring(firstSlash);
-	  
-	  getStoreInfo().subscribeFolder(normalizedFileName);
-	} catch (MessagingException me) {
-	  Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + wrapper.getName());
-	}
+	getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent ae) {
+	      try {
+		// if it doesn't exist, try to create it.
+		if (! wrapper.exists()) {
+		  wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+		}
+		String absFileName = wrapper.getAbsolutePath();
+		int firstSlash = absFileName.indexOf('/');
+		String normalizedFileName = absFileName;
+		if (firstSlash >= 0)
+		  normalizedFileName = absFileName.substring(firstSlash);
+		
+		if (Pooka.isDebug()) 
+		  System.out.println("adding folder " + normalizedFileName);
+		
+		getStoreInfo().subscribeFolder(normalizedFileName);
+	      } catch (MessagingException me) {
+		final String folderName = wrapper.getName();
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		      Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
+		    }
+		  });
+	      }
+	    }
+	  },  new java.awt.event.ActionEvent(this, 0, "message-refresh"));
+	
       }
-      /*
-	String newFolder = JOptionPane.showInternalInputDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), "Subscribe to what folder?");
-	getStoreInfo().subscribeFolder(newFolder);
-      */
-	}
+    }
   }
     
   class TestAction extends AbstractAction {
