@@ -16,10 +16,11 @@ public class FontFilterEditor extends FilterEditor {
      * property.
      */
     public void configureEditor(net.suberic.util.VariableBundle bundle, String propertyName) {
+	System.out.println("creating ffe.");
 	property = propertyName;
 	sourceBundle = bundle;
 	
-	origFontString = sourceBundle.getProperty(propertyName + ".type");
+	origFontString = sourceBundle.getProperty(propertyName + ".style");
 
 	fontCombo = createFontCombo();
 
@@ -68,7 +69,7 @@ public class FontFilterEditor extends FilterEditor {
      */
     public java.util.Properties getValue() {
 	java.util.Properties props = new java.util.Properties();
-	props.setProperty(property + ".type", getSelectedFontType());
+	props.setProperty(property + ".style", getSelectedFontType());
 	props.setProperty(property + ".class", FILTER_CLASS);
 	return props;
     }
@@ -79,7 +80,7 @@ public class FontFilterEditor extends FilterEditor {
     public void setValue() {
 	String newValue = getSelectedFontType();
 	if (newValue != origFontString)
-	    sourceBundle.setProperty(property + ".type", newValue);
+	    sourceBundle.setProperty(property + ".style", newValue);
 
 	String oldClassName = sourceBundle.getProperty(property + ".class", "");
 	if (!oldClassName.equals(FILTER_CLASS))
