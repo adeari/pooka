@@ -72,7 +72,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	
 	splitPane.setTopComponent(otherScrollPane);
 	splitPane.setBottomComponent(attachmentScrollPane);
-	
+
 	this.add(WITH_ATTACHMENTS, splitPane);
 	this.add(WITHOUT_ATTACHMENTS, editorScrollPane);
 	
@@ -127,6 +127,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    attachmentPanel = new AttachmentPane(msg);
 	    attachmentScrollPane.setViewportView(attachmentPanel);
 	    ((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
+	    if (splitPane != null && attachmentPanel != null) {
+		splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+	    } else {
+		splitPane.setDividerLocation(400);
+	    }
 	} else {
 	    ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
 	}
@@ -200,13 +205,16 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    if (vsb != null)
 		prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
 	    editorScrollPane.setPreferredSize(prefSize);
+	    if (otherScrollPane != null) {
+		otherScrollPane.setPreferredSize(prefSize);
+	    }
 	    this.setPreferredSize(prefSize);
 	    if (splitPane != null && attachmentPanel != null) {
 		splitPane.setPreferredSize(prefSize);
 		splitPane.setDividerLocation((int)(splitPane.getPreferredSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
 	    }
 	} else {
-	    this.setSize(prefSize);
+	this.setSize(prefSize);
 	}
     }
 
