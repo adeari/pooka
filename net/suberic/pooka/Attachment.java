@@ -128,6 +128,10 @@ public class Attachment {
 	return mimeType.match("text/plain") ;
     }
 
+    public boolean isHtml() {
+	return mimeType.match("text/html");
+    }
+
     /**
      * Returns the text of the Attachment, up to maxLength bytes.  If 
      * the content is truncated, then append the truncationMessage at the
@@ -204,6 +208,27 @@ public class Attachment {
 	    return content + "\n" + truncationMessage + "\n";
 	}
 
+    }
+
+    /**
+     * Returns the html of the Attachment, up to maxLength bytes.  If 
+     * the content is truncated, then append the truncationMessage at the
+     * end of the content displayed.
+     *
+     * If withHeaders is set, then show the Headers to go with this message.
+     * If showFullHeaders is also set, then show all the headers.  
+     */
+    public String getHtml(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws java.io.IOException {
+	if (isHtml()) {
+	    StringBuffer retVal = new StringBuffer();
+	    if (withHeaders)
+		retVal.append(getHeaderInformation(showFullHeaders));
+	    
+	    retVal.append(getText(maxLength, truncationMessage));
+
+	    return retVal.toString();
+	} else
+	    return null;
     }
 
     /**

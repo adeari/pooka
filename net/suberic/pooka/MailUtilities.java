@@ -27,15 +27,31 @@ public class MailUtilities {
 		
 		if (ct.getSubType().equalsIgnoreCase("alternative")) {
 		    Multipart mp = (Multipart) m.getContent();
+		    MimeBodyPart textPart = null;
+		    MimeBodyPart htmlPart = null;
+
 		    for (int i = 0; i < mp.getCount(); i++) {
-			Attachment attachment = new Attachment((MimeBodyPart)mp.getBodyPart(i));
-			ContentType ct2 = attachment.getMimeType();
-			if (ct2.getPrimaryType().equalsIgnoreCase("text") && ct2.getSubType().equalsIgnoreCase("plain")) {
-			    attachment.setHeaderSource((MimeMessage)m);
+			MimeBodyPart current = (MimeBodyPart)mp.getBodyPart(i);
+			ContentType ct2 = new ContentType(current.getContentType());
+			if (ct2.match("text/plain"))
+			    textPart = current;
+			else if (ct2.match("text/html"))
+			    htmlPart = current;
+		    }
+
+		    if (htmlPart != null && textPart != null) {
+			Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
+			bundle.textPart = attachment;
+		    } else {
+			// hurm
+			if (textPart != null) {
+			    Attachment attachment = new Attachment(textPart);
 			    bundle.textPart = attachment;
-			} else {
-			    bundle.getAttachments().add(attachment);
-			}
+			} else if (htmlPart != null) {
+			    Attachment attachment = new Attachment(htmlPart);
+			    bundle.textPart = attachment;
+			} else 
+			    bundle.addAll(parseAttachments(mp));
 		    }
 		} else {
 		    bundle.addAll(parseAttachments((Multipart)m.getContent()));
@@ -62,7 +78,7 @@ public class MailUtilities {
 	for (int i = 0; i < mp.getCount(); i++) {
 	    MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
 	    ContentType ct = new ContentType(mbp.getContentType());
-	    if (ct.getPrimaryType().equalsIgnoreCase("text") && ct.getSubType().equalsIgnoreCase("plain")) {
+	    if (ct.getPrimaryType().equalsIgnoreCase("text")) {
 		Attachment current = new Attachment(mbp);
 		if (bundle.textPart == null) {
 		    bundle.textPart = current;

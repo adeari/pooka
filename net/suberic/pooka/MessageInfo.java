@@ -533,6 +533,83 @@ public class MessageInfo {
 	return Pooka.getProperty("Pooka.messageTruncation", "------ Message truncated ------");
     }
 
+    /**
+     * Returns whether or not this message has an HTML version available.
+     */
+    public boolean containsHtml() throws MessagingException {
+	if (!hasLoadedAttachments())
+	    loadAttachmentInfo();
+
+	return attachments.containsHtml();
+    }
+
+    /**
+     * Returns true if the main content of this message exists only as
+     * HTML.
+     */
+    public boolean isHtml() throws MessagingException {
+	if (!hasLoadedAttachments())
+	    loadAttachmentInfo();
+
+	return attachments.isHtml();
+    }
+
+    /**
+     * Gets the Html part of the Content of this Message.
+     */
+    public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+	try {
+	    if (!hasLoadedAttachments()) 
+		loadAttachmentInfo();
+	    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	} catch (FolderClosedException fce) {
+	    try {
+		getFolderInfo().openFolder(Folder.READ_WRITE);
+		loadAttachmentInfo();
+		return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	    } catch (java.io.IOException ioe) {
+		throw new MessagingException(ioe.getMessage()); 
+	    }
+	} catch (java.io.IOException ioe) {
+	    throw new MessagingException(ioe.getMessage()); 
+	}
+    }
+
+    /**
+     * Gets the Html part of the Content of this Message.
+     */
+    public String getHtmlPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+	return getHtmlPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+    }
+
+    /**
+     * Gets the Content and inline text content for the Message.
+     */
+    public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+	try {
+	    if (!hasLoadedAttachments()) 
+		loadAttachmentInfo();
+	    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+	} catch (FolderClosedException fce) {
+	    try {
+		getFolderInfo().openFolder(Folder.READ_WRITE);
+		loadAttachmentInfo();
+		return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+	    } catch (java.io.IOException ioe) {
+		throw new MessagingException(ioe.getMessage()); 
+	    }
+	} catch (java.io.IOException ioe) {
+	    throw new MessagingException(ioe.getMessage()); 
+	}
+    }
+
+    /**
+     * Gets the Content and inline text content for the Message.
+     */
+    public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+	return getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+    }
+
 }
 
 

@@ -110,12 +110,31 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
 	    } catch (NumberFormatException nfe) {
 	    }
-	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-		content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
+
+
+	    if ((Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().isHtml()) || (Pooka.getProperty("Pooka.displayHtmlAsDefault", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().containsHtml())) {
+
+		if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+		    content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
+		} else {
+		    content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
+		}
+
+		editorPane.setContentType("text/html");
+		otherEditorPane.setContentType("text/html");
+
 	    } else {
-		content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
+
+		if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+		    content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
+		} else {
+		    content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
+		}
+		editorPane.setContentType("text/plain");
+		otherEditorPane.setContentType("text/plain");
+		
 	    }
-	    
+	
 	    if (content != null) {
 		messageText.append(content);
 		editorPane.setEditable(false);

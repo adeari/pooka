@@ -19,6 +19,11 @@ ones that come in while you're already connected are labelled like that.
 
 *) support receiving html mail.
 
+*) fix the startup bugs:  
+	1)  windows take too long to show up
+	2)  sometimes the mailboxes are marked as broken when they shouldn't
+		be.
+
 --
 
 *) add copying messages.

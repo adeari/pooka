@@ -54,6 +54,22 @@ class AttachmentBundle {
     }
 
     /**
+     * This gets the Html part of a message.  This is useful if you want
+     * to display just the 'body' of the message without the attachments.
+     */
+    public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
+	StringBuffer retVal = new StringBuffer();
+
+	if (withHeaders)
+	    retVal.append(getHeaderInformation(showFullHeaders));
+
+	if (textPart != null)
+	    retVal.append(textPart.getHtml(withHeaders, showFullHeaders, maxLength, truncationMessage));
+
+	return retVal.toString();
+    }
+
+    /**
      * This returns the Attachments (basically, all the Parts in a Multipart
      * except for the main body of the message).
      */
@@ -93,6 +109,33 @@ class AttachmentBundle {
 
 	if (textPart != null)
 	    returnValue.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
+	
+	if (allAttachments != null && allAttachments.size() > 0) {
+	    for (int i = 0; i < allAttachments.size() ; i++) {
+		Attachment attach = (Attachment) allAttachments.elementAt(i);
+		if (attach.isPlainText()) {
+		    returnValue.append(separator);
+		    returnValue.append(attach.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
+		}
+	    }
+	}
+
+	return returnValue.toString();
+    }	
+    
+
+    /**
+     * This method returns the Message HTML plus the text inline attachments.
+     * The attachments are separated by the separator flag.
+     */
+    public String getHtmlAndTextInlines(String separator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
+	StringBuffer returnValue = new StringBuffer();
+
+	if (withHeaders)
+	    returnValue.append(getHeaderInformation(showFullHeaders));
+
+	if (textPart != null)
+	    returnValue.append(textPart.getHtml(withHeaders, showFullHeaders, maxLength, truncationMessage));
 	
 	if (allAttachments != null && allAttachments.size() > 0) {
 	    for (int i = 0; i < allAttachments.size() ; i++) {
@@ -175,4 +218,31 @@ class AttachmentBundle {
 	return retVal;
     }
 
+    /**
+     * Returns whether or not this attachment has an HTML version available.
+     */
+    public boolean containsHtml() {
+	if (textPart != null) {
+	    if (textPart instanceof AlternativeAttachment) {
+		return true;
+	    } else {
+		return textPart.getMimeType().match("text/html");
+	    }
+	} else 
+	    return false;
+    }
+
+    /**
+     * Returns true if the main content of this message exists only as
+     * HTML.
+     */
+    public boolean isHtml() {
+	if (textPart != null) {
+	    if (textPart instanceof AlternativeAttachment)
+		return false;
+	    else
+		return (textPart.getMimeType().match("text/html"));
+	} else
+	    return false;
+    }
 }
