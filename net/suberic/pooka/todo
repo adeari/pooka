@@ -1,3 +1,4 @@
+*) fix NPE in KeySelectorPane editing with a new user.
 
 *) fix jmaildir on windows xp
 	done.  test.
