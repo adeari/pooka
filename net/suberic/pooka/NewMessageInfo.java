@@ -62,6 +62,10 @@ public class NewMessageInfo extends MessageInfo {
     
     getMessage().setSentDate(new java.util.Date(System.currentTimeMillis()));
 
+    message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+
+    message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile);
+
     boolean sent = false;
     if (profile != null) {
       OutgoingMailServer mailServer = profile.getMailServer();

@@ -3,25 +3,151 @@ package net.suberic.pooka.crypto;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
 
+import java.security.*;
+import java.io.*;
+import java.util.Enumeration;
+
 /**
- * This manages a set of Encryption keys.
+ * This manages a set of Encryption keys for use with PGP or S/MIME.
  */
-public class EncryptionKeyManager extends ItemManager implements ItemCreator {
+public interface EncryptionKeyManager {
 
-  /**
-   * Create an EncryptionKeyManager which loads information from the given
-   * VariableBundle using the given newResourceString, and creates new
-   * Items using the given ItemCreator.
+  /*
+   * Loads this KeyStore from the given input stream.
+   *
+   * <p>If a password is given, it is used to check the integrity of the
+   * keystore data. Otherwise, the integrity of the keystore is not checked.
+   *
+   * <p>In order to create an empty keystore, or if the keystore cannot
+   * be initialized from a stream (e.g., because it is stored on a hardware
+   * token device), you pass <code>null</code>
+   * as the <code>stream</code> argument.
+   *
+   * <p> Note that if this KeyStore has already been loaded, it is
+   * reinitialized and loaded again from the given input stream.
+   *
+   * @param stream the input stream from which the keystore is loaded, or
+   * null if an empty keystore is to be created.
+   * @param password the (optional) password used to check the integrity of
+   * the keystore.
+   *
+   * @exception IOException if there is an I/O or format problem with the
+   * keystore data
+   * @exception NoSuchAlgorithmException if the algorithm used to check
+   * the integrity of the keystore cannot be found
    */
-  public EncryptionKeyManager(String newResourceString, VariableBundle newSourceBundle, ItemCreator newItemCreator) {
-    super(newResourceString, newSourceBundle, newItemCreator);
-  }
-
+  public void load(InputStream stream, char[] password)
+    throws IOException, NoSuchAlgorithmException;
+  
   /**
-   * Creates an item from the given sourceBundle, resourceString, and itemID.
+   * Stores this keystore to the given output stream, and protects its
+   * integrity with the given password.
+   *
+   * @param stream the output stream to which this keystore is written.
+   * @param password the password to generate the keystore integrity check
+   *
+   * @exception KeyStoreException if the keystore has not been initialized
+   * (loaded).
+   * @exception IOException if there was an I/O problem with data
+   * @exception NoSuchAlgorithmException if the appropriate data integrity
+   * algorithm could not be found
    */
-  public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID) {
-    return null;
-  }
+  public void store(OutputStream stream, char[] password)
+    throws KeyStoreException, IOException, NoSuchAlgorithmException;
+  
+  /**
+   * Retrieves the number of entries in this keystore.
+   *
+   * @return the number of entries in this keystore
+   *
+   * @exception KeyStoreException if the keystore has not been initialized
+   * (loaded).
+   */
+  public int size()
+    throws KeyStoreException;
+  
+  /**
+   * Returns the key associated with the given alias, using the given
+   * password to recover it.
+   *
+   * @param alias the alias name
+   * @param password the password for recovering the key
+   *
+   * @return the requested key, or null if the given alias does not exist
+   * or does not identify a <i>key entry</i>.
+   *
+   * @exception KeyStoreException if the keystore has not been initialized
+   * (loaded).
+   * @exception NoSuchAlgorithmException if the algorithm for recovering the
+   * key cannot be found
+   * @exception UnrecoverableKeyException if the key cannot be recovered
+   * (e.g., the given password is wrong).
+   */
+  public Key getKey(String alias, char[] password)
+    throws KeyStoreException, NoSuchAlgorithmException,
+	   UnrecoverableKeyException;
+  
+  
+  /**
+   * Assigns the given key to the given alias, protecting it with the given
+   * password.
+   *
+   * <p>If the given key is of type <code>java.security.PrivateKey</code>,
+   * it must be accompanied by a certificate chain certifying the
+   * corresponding public key.
+   *
+   * <p>If the given alias already exists, the keystore information
+   * associated with it is overridden by the given key (and possibly
+   * certificate chain).
+   *
+   * @param alias the alias name
+   * @param key the key to be associated with the alias
+   * @param password the password to protect the key
+   * @param chain the certificate chain for the corresponding public
+   * key (only required if the given key is of type
+   * <code>java.security.PrivateKey</code>).
+   *
+   * @exception KeyStoreException if the keystore has not been initialized
+   * (loaded), the given key cannot be protected, or this operation fails
+   * for some other reason
+   */
+  public void setKeyEntry(String alias, Key key, char[] password)
+    throws KeyStoreException;
+  
+  /**
+   * Deletes the entry identified by the given alias from this keystore.
+   *
+   * @param alias the alias name
+   *
+   * @exception KeyStoreException if the keystore has not been initialized,
+   * or if the entry cannot be removed.
+   */
+  public void deleteEntry(String alias)
+    throws KeyStoreException;
+  
+  /**
+   * Lists all the alias names of this keystore.
+   *
+   * @return enumeration of the alias names
+   *
+   * @exception KeyStoreException if the keystore has not been initialized
+   * (loaded).
+   */
+  public Enumeration aliases()
+    throws KeyStoreException;
+  
+  
+  /**
+   * Checks if the given alias exists in this keystore.
+   *
+   * @param alias the alias name
+   *
+   * @return true if the alias exists, false otherwise
+   *
+   * @exception KeyStoreException if the keystore has not been initialized
+   * (loaded).
+   */
+  public boolean containsAlias(String alias)
+    throws KeyStoreException;
   
 }

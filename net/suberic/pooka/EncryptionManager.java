@@ -1,6 +1,7 @@
 package net.suberic.pooka;
 
 import net.suberic.pooka.crypto.*;
+import javax.mail.internet.MimeMessage;
 
 /**
  * The EncryptionManager manages Pooka's encryption facilities.
@@ -8,6 +9,10 @@ import net.suberic.pooka.crypto.*;
 public class EncryptionManager {
 
   EncryptionUtils defaultUtils = null;
+
+  EncryptionUtils pgpUtils = null;
+  
+  EncryptionUtils smimeUtils = null;
 
   /**
    * Returns the default EncryptionUtilities.
@@ -35,4 +40,19 @@ public class EncryptionManager {
   public EncryptionKey getEncryptionKey(String keyId) {
     return null;
   }
+
+  /**
+   * Encrypts the given message if we think we should.
+   */
+  public MimeMessage encryptMessage(MimeMessage mMsg) {
+    return mMsg;
+  }
+
+  /**
+   * Signs the given message if we think we should.
+   */
+  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile) {
+    return mMsg;
+  }
+
 }
