@@ -353,11 +353,27 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 	showSearchForm(selectedFolders, null);
     } 
 
-    /**
-     * This tells the factory whether or not its ui components are showing
-     * yet or not.
-     */
-    public void setShowing(boolean newValue) {
-	showing=newValue;
+  /**
+   * Shows an Address Selection form for the given AddressEntryTextArea.
+   */
+  public void showAddressWindow(AddressEntryTextArea aeta) {
+    JInternalFrame jif = new JInternalFrame();
+    getMessagePanel().add(jif);
+    jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
+    
+    jif.setVisible(true);
+    try {
+      jif.setSelected(true);
+    } catch (java.beans.PropertyVetoException pve) {
     }
+    
+  }
+
+  /**
+   * This tells the factory whether or not its ui components are showing
+   * yet or not.
+   */
+  public void setShowing(boolean newValue) {
+    showing=newValue;
+  }
 }

@@ -297,56 +297,64 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
       
     }
 
-        /**
-     * Shows a SearchForm with the given FolderInfos selected from the list
-     * of the given allowedValues.
-     */
-    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
-	SearchForm sf = null;
-	if (allowedValues != null)
-	    sf = new SearchForm(selectedFolders, allowedValues);
-	else
-	    sf = new SearchForm(selectedFolders);
-	
-	boolean ok = false;
-	int returnValue = -1;
-	java.util.Vector tmpSelectedFolders = null;
-	javax.mail.search.SearchTerm tmpSearchTerm = null;
-
-	while (! ok ) {
-	    returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
-	    if (returnValue == JOptionPane.OK_OPTION) {
-	        tmpSelectedFolders = sf.getSelectedFolders();
-		try {
-		    tmpSearchTerm = sf.getSearchTerm();
-		    ok = true;
-		} catch (java.text.ParseException pe) {
-		    showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
-		    ok = false;
-		}
-	    } else {
-		ok = true;
-	    }
+  /**
+   * Shows a SearchForm with the given FolderInfos selected from the list
+   * of the given allowedValues.
+   */
+  public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
+    SearchForm sf = null;
+    if (allowedValues != null)
+      sf = new SearchForm(selectedFolders, allowedValues);
+    else
+      sf = new SearchForm(selectedFolders);
+    
+    boolean ok = false;
+    int returnValue = -1;
+    java.util.Vector tmpSelectedFolders = null;
+    javax.mail.search.SearchTerm tmpSearchTerm = null;
+    
+    while (! ok ) {
+      returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
+      if (returnValue == JOptionPane.OK_OPTION) {
+	tmpSelectedFolders = sf.getSelectedFolders();
+	try {
+	  tmpSearchTerm = sf.getSearchTerm();
+	  ok = true;
+	} catch (java.text.ParseException pe) {
+	  showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
+	  ok = false;
 	}
-	
-	if (returnValue == JOptionPane.OK_OPTION) {
-	    FolderInfo.searchFolders(tmpSelectedFolders, tmpSearchTerm);
-	}
+      } else {
+	ok = true;
+      }
     }
+    
+    if (returnValue == JOptionPane.OK_OPTION) {
+      FolderInfo.searchFolders(tmpSelectedFolders, tmpSearchTerm);
+    }
+  }
+  
+  /**
+   * Shows a SearchForm with the given FolderInfos selected.  The allowed
+   * values will be the list of all available Folders.
+   */
+  public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
+    showSearchForm(selectedFolders, null);
+  }
+ 
+  /**
+   * Shows an Address Selection form for the given AddressEntryTextArea.
+   */
+  public void showAddressWindow(AddressEntryTextArea aeta) {
+    JFrame jf = new JFrame();
+    jf.show();
+  }
 
-    /**
-     * Shows a SearchForm with the given FolderInfos selected.  The allowed
-     * values will be the list of all available Folders.
-     */
-    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
-	showSearchForm(selectedFolders, null);
-    }
-
-    /**
-     * This tells the factory whether or not its ui components are showing
-     * yet or not.
-     */
-    public void setShowing(boolean newValue) {
-	showing=newValue;
-    }
+  /**
+   * This tells the factory whether or not its ui components are showing
+   * yet or not.
+   */
+  public void setShowing(boolean newValue) {
+    showing=newValue;
+  }
 }

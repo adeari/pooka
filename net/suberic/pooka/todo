@@ -3,6 +3,9 @@
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
 	address field.
+	-- make it a two pane search/display and 'selected' display(?)
+	-- check to make sure that we get the correct ui factory for
+	each message window.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
@@ -19,6 +22,8 @@
 
 *) fix the display of the FolderTree -- right now, unopened stores are
 	squashed.
+
+*) fix connection failed message for ssl stores
 
 -------
 
@@ -222,6 +227,7 @@ error:  filterfoldercellrenderer has problems with search forms.
 
 *) expand an unopened store in the folder tree that has folders and
 	subfolders.  connect to the store.  the subfolders close back up.
+	-- i think that happens when you have 'sync with subscribed folders'		  set.
 
 *) loadMessageTracker?  it doesn't seem to show up anymore.
 
@@ -273,12 +279,18 @@ window at -5, -5.
 
 *) add 'edit message as new' for normal messages.
 
+*) add support for flowed text
+
+*) add color support for replies (i.e. > in one color, >> in another, etc.)
+
 *) add ability to edit received messages, so you can do things like remove
 attachments that you don't want to keep (?)
 
 *) name all of your threads.
 
 *) customize settings on folder window--headers, window size.
+
+*) add customization editor for toolbars and menus. 
 
 *) make required fields for the gui properties.
 

@@ -450,6 +450,24 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     }
   }
 
+  /**
+   * Creates a button that pulls up an editor dialog for addresses.
+   */
+  public JButton createAddressButton() {
+    return new JButton(new AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	  Pooka.getUIFactory().showAddressWindow(AddressEntryTextArea.this);
+	}
+      });
+  }
+
+  /**
+   * Returns the parent MessageUI.
+   */
+  public MessageUI getMessageUI() {
+    return messageUI;
+  }
+
   private class Selection {
     int beginOffset;
     int endOffset;

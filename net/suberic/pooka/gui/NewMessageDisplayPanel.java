@@ -264,7 +264,9 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       
       
       inputRow.add(inputField);
-      
+      if (inputField instanceof AddressEntryTextArea) {
+	inputRow.add(((AddressEntryTextArea)inputField).createAddressButton());
+      }
       inputPanel.add(inputRow);
       
       proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
