@@ -17,6 +17,7 @@ public class SimpleFileCache implements MessageCache {
 
   // FIXME:  why isn't anything synchronized?
   
+  public static int NOT_CACHED = -1;
   public static int CONTENT = 0;
   public static int HEADERS = 1;
   public static int FLAGS = 2;
@@ -620,52 +621,52 @@ public class SimpleFileCache implements MessageCache {
     }
   }
   
-    /**
-     * Gets the Flags from the cache.  Returns null if no flagss are
-     * available in the cache.
-     */
-    Flags getFlagsFromCache(long uid) {
-      Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
-      if (returnValue != null) {
-	return new Flags(returnValue);
-      } else {	    
-	File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
-	if (f.exists()) {
-	  try {
-	    Flags newFlags = new Flags();
-	    BufferedReader in = new BufferedReader(new FileReader(f));
-	    for (String currentLine = in.readLine(); currentLine != null; currentLine = in.readLine()) {
-	      
-	      if (currentLine.equalsIgnoreCase("Deleted"))
-		newFlags.add(Flags.Flag.DELETED);
-	      else if (currentLine.equalsIgnoreCase("Answered"))
-		newFlags.add(Flags.Flag.ANSWERED);
-	      else if (currentLine.equalsIgnoreCase("Draft"))
-		newFlags.add(Flags.Flag.DRAFT);
-	      else if (currentLine.equalsIgnoreCase("Flagged"))
-		newFlags.add(Flags.Flag.FLAGGED);
-	      else if (currentLine.equalsIgnoreCase("Recent"))
-		newFlags.add(Flags.Flag.RECENT);
-	      else if (currentLine.equalsIgnoreCase("SEEN"))
-		newFlags.add(Flags.Flag.SEEN);
-	      else 
-		newFlags.add(new Flags(currentLine));
-	    }
+  /**
+   * Gets the Flags from the cache.  Returns null if no flagss are
+   * available in the cache.
+   */
+  Flags getFlagsFromCache(long uid) {
+    Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
+    if (returnValue != null) {
+      return new Flags(returnValue);
+    } else {	    
+      File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
+      if (f.exists()) {
+	try {
+	  Flags newFlags = new Flags();
+	  BufferedReader in = new BufferedReader(new FileReader(f));
+	  for (String currentLine = in.readLine(); currentLine != null; currentLine = in.readLine()) {
 	    
-	    cachedFlags.put(new Long(uid), newFlags);
-	    return newFlags;
-	  } catch (FileNotFoundException fnfe) {
-	    System.out.println("caught filenotfoundexception.");
-	    return null;
-	  } catch (IOException ioe) {
-	    System.out.println("caught ioexception.");
-	    return null;
+	    if (currentLine.equalsIgnoreCase("Deleted"))
+	      newFlags.add(Flags.Flag.DELETED);
+	    else if (currentLine.equalsIgnoreCase("Answered"))
+	      newFlags.add(Flags.Flag.ANSWERED);
+	    else if (currentLine.equalsIgnoreCase("Draft"))
+	      newFlags.add(Flags.Flag.DRAFT);
+	    else if (currentLine.equalsIgnoreCase("Flagged"))
+	      newFlags.add(Flags.Flag.FLAGGED);
+	    else if (currentLine.equalsIgnoreCase("Recent"))
+	      newFlags.add(Flags.Flag.RECENT);
+	    else if (currentLine.equalsIgnoreCase("SEEN"))
+	      newFlags.add(Flags.Flag.SEEN);
+	    else 
+	      newFlags.add(new Flags(currentLine));
 	  }
+	  
+	  cachedFlags.put(new Long(uid), newFlags);
+	  return newFlags;
+	} catch (FileNotFoundException fnfe) {
+	  System.out.println("caught filenotfoundexception.");
+	  return null;
+	} catch (IOException ioe) {
+	  System.out.println("caught ioexception.");
+	  return null;
 	}
-	
-	return null;
       }
+      
+      return null;
     }
+  }
   
   /**
    * Saves the given flags to the cache.
@@ -882,18 +883,39 @@ public class SimpleFileCache implements MessageCache {
     return unreadCount;
   }
 
-    /**
-     * Returns whether a given uid exists fully in the cache or not.
+  /**
+   * Returns whether a given uid exists fully in the cache or not.
      */
-    public boolean isFullyCached(long uid) {
-	DataHandler dh = getHandlerFromCache(uid);
-	return (dh != null);
+  public boolean isFullyCached(long uid) {
+    DataHandler dh = getHandlerFromCache(uid);
+    return (dh != null);
+  }
+  
+  /**
+   * Returns the status of the given uid.
+   */
+  public int getCacheStatus(long uid) throws MessagingException {
+    if (isFullyCached(uid))
+      return CONTENT;
+    else {
+      InternetHeaders ih = getHeadersFromCache(uid);
+      Flags f = getFlagsFromCache(uid);
+      if (ih != null && f != null)
+	return FLAGS_AND_HEADERS;
+      else if (ih != null)
+	return HEADERS;
+      else if (f != null)
+	return FLAGS;
+      else
+	return NOT_CACHED;
     }
-
-    public long getUIDValidity() {
-	return uidValidity;
-    }
-
+    
+  }
+  
+  public long getUIDValidity() {
+    return uidValidity;
+  }
+  
   public void setUIDValidity(long newValidity) {
     try {
       File f = new File(cacheDir, "validity");

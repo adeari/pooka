@@ -397,6 +397,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * Fetches the information for the given messages using the given
    * FetchProfile.
    */
+  /* original version
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException {
     // if we're connected, go ahead and fetch these.
 
@@ -456,7 +457,82 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
 
   }
-  
+  */
+  // new version
+  public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException {
+    // if we're connected, go ahead and fetch these.
+
+    if (Pooka.isDebug()) {
+      if (messages == null)
+	System.out.println("cachingFolderInfo:  fetching with null messages.");
+      else
+	System.out.println("cachingFolderInfo:  fetching " + messages.length + " messages.");
+    }
+
+    int cacheStatus = -1;
+    boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);
+    boolean doHeaders = (profile.contains(FetchProfile.Item.ENVELOPE) || profile.contains(FetchProfile.Item.CONTENT_INFO));
+    
+    if (doFlags && doHeaders) {
+      cacheStatus = SimpleFileCache.FLAGS_AND_HEADERS;
+    } else if (doFlags) {
+      cacheStatus = SimpleFileCache.FLAGS;
+    } else if (doHeaders) {
+      cacheStatus = SimpleFileCache.HEADERS;
+    }
+    
+    if (isConnected()) {
+      
+      // assume that headers don't change.
+      FetchProfile fp = new FetchProfile();
+      if (doFlags) {
+	fp.add(FetchProfile.Item.FLAGS);
+      }
+
+      if (Pooka.isDebug()) {
+	System.out.println("CachingFolderInfo:  running fetch against folder.");
+      }
+      
+      java.util.LinkedList flagsOnly = new java.util.LinkedList();
+      java.util.LinkedList headersAndFlags = new java.util.LinkedList();
+
+      for (int i = 0 ; i < messages.length; i++) {
+	
+      }
+      
+      super.fetch(messages, profile);
+      
+      if (cacheStatus != -1) {
+	for (int i = 0; i < messages.length; i++) {
+	  Message m = messages[i].getRealMessage();
+	  if (m != null) {
+	    long uid = getUID(m);
+	    getCache().cacheMessage((MimeMessage)m, uid, cache.getUIDValidity(), cacheStatus);	
+	  }
+	}
+      }
+    } else {
+      // if we're not connected, then go ahead and preload the cache for
+      // these.
+      for (int i = 0; i < messages.length; i++) {
+	Message current = messages[i].getMessage();
+	if (current != null && current instanceof UIDMimeMessage) {
+	  long uid = ((UIDMimeMessage) current).getUID();
+	  if (cacheStatus == SimpleFileCache.FLAGS_AND_HEADERS || cacheStatus == SimpleFileCache.FLAGS) {
+	    getCache().getFlags(uid, cache.getUIDValidity());
+	  }
+	  
+	  if (cacheStatus == SimpleFileCache.FLAGS_AND_HEADERS || cacheStatus == SimpleFileCache.HEADERS) {
+	    getCache().getHeaders(uid, cache.getUIDValidity());
+	  }
+	}
+
+	messages[i].setFetched(true);
+      }
+    }
+
+  }
+  // end new version
   /**
    * Refreshes the headers for the given MessageInfo.
    */

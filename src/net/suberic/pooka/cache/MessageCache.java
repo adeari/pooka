@@ -119,54 +119,59 @@ public interface MessageCache {
      */ 
     public long[] getAddedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
 
-    /**
-     * This returns the uid's of the message which exist in the current
-     * list of messages, but no longer exist in the updatedUids.
-     */
-    public long[] getRemovedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
+  /**
+   * This returns the uid's of the message which exist in the current
+   * list of messages, but no longer exist in the updatedUids.
+   */
+  public long[] getRemovedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
+  
+  /**
+   * This returns the message id's of all the currently cached messages.
+   * Note that only the headers and flags of the message need to be
+   * cached for a message to be considered in the cache.
+   */
+  public long[] getMessageUids();
+  
+  /**
+   * This returns the number of messages in the cache.
+   */
+  public int getMessageCount() throws MessagingException;
+  
+  /**
+   * This returns the number of unread messages in the cache.
+   */
+  public int getUnreadMessageCount() throws MessagingException;
+  
+  /**
+   * Returns the current UIDValidity of the cache.
+   */
+  public long getUIDValidity();
+  
+  /**
+   * Updates the UIDValidity of the cache to a new value.  Should only
+   * be used after a call to invalidateCache().
+   */
+  public void setUIDValidity(long newValidity);
+  
+  /**
+   * Writes any offline changes made back to the server.
+   */
+  public void writeChangesToServer(Folder f) throws MessagingException;
 
-    /**
-     * This returns the message id's of all the currently cached messages.
-     * Note that only the headers and flags of the message need to be
-     * cached for a message to be considered in the cache.
-     */
-    public long[] getMessageUids();
+  /**
+   * Gets the size for the given message, if available.
+   */
+  public int getSize(long uid);
 
-    /**
-     * This returns the number of messages in the cache.
-     */
-    public int getMessageCount() throws MessagingException;
+  /**
+   * Returns whether a given uid exists fully in the cache or not.
+   */
+  public boolean isFullyCached(long uid);
 
-    /**
-     * This returns the number of unread messages in the cache.
-     */
-    public int getUnreadMessageCount() throws MessagingException;
-
-    /**
-     * Returns the current UIDValidity of the cache.
-     */
-    public long getUIDValidity();
-
-    /**
-     * Updates the UIDValidity of the cache to a new value.  Should only
-     * be used after a call to invalidateCache().
-     */
-    public void setUIDValidity(long newValidity);
-
-    /**
-     * Writes any offline changes made back to the server.
-     */
-    public void writeChangesToServer(Folder f) throws MessagingException;
-
-    /**
-     * Gets the size for the given message, if available.
-     */
-    public int getSize(long uid);
-
-    /**
-     * Returns whether a given uid exists fully in the cache or not.
-     */
-    public boolean isFullyCached(long uid);
+  /**
+   * Returns the status of the given uid.
+   */
+  public int getCacheStatus(long uid) throws MessagingException;
 
   /**
    * Searches all of the cached messages and returns those which match
