@@ -21,154 +21,154 @@ import net.suberic.util.thread.ActionThread;
 
 public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer, MessageChangedListener, ConnectionListener {
 
-    // folder is currently open and available.
-    public static int CONNECTED = 0;
+  // folder is currently open and available.
+  public static int CONNECTED = 0;
+  
+  // folder is disconnected, but should be open; try to reopen at first
+  // opportunity
+  public static int LOST_CONNECTION = 5;
+  
+  // folder is available, but only should be accessed during the checkFolder
+  // phase.
+  
+  public static int PASSIVE = 10;
+  
+  // folder is running in disconnected mode; only act on the cached 
+  // messages.
+  public static int DISCONNECTED = 15;
+  
+  // Folder doesn't seem to exist on server, but exists in cache.
+  public static int CACHE_ONLY = 18;
+  
+  // folder is just simply closed.
+  public static int CLOSED = 20;
+  
+  // folder is not yet loaded.
+  public static int NOT_LOADED = 25;
+  
+  // folder does not exist on server or in cache.
+  public static int INVALID = 30;
+  
+  // shows the current status of the FolderInfo.
+  protected int status = NOT_LOADED;
+  
+  // shows the type of this folder.
+  protected int type = 0;
+  
+  // shows the preferred state of the FolderInfo.  should be CONNECTED,
+  // PASSIVE, DISCONNECTED, or CLOSED.
+  protected int preferredStatus = CONNECTED;
+  
+  // the resource for the folder disconnected message
+  protected static String disconnectedMessage = "error.Folder.disconnected";
+  
+  // the Folder wrapped by this FolderInfo.
+  private Folder folder;
+  
+  // The is the folder ID: storeName.parentFolderName.folderName
+  private String folderID;
+  
+  // This is just the simple folderName, such as "INBOX"
+  private String mFolderName;
+  
+  private EventListenerList eventListeners = new EventListenerList();
+  
+  // Information for the FolderNode
+  protected FolderNode folderNode;
+  protected Vector children;
+  
+  // Information for the FolderTable.
+  protected FolderTableModel folderTableModel;
+  protected Hashtable messageToInfoTable = new Hashtable();
+  private Vector columnValues;
+  private Vector columnNames;
+  private Vector columnSizes;
+  
+  // GUI information.
+  private FolderDisplayUI folderDisplayUI;
+  private Action[] defaultActions;
+  
+  //filters
+  private BackendMessageFilter[] backendFilters = null;
+  private MessageFilter[] displayFilters = null;
 
-    // folder is disconnected, but should be open; try to reopen at first
-    // opportunity
-    public static int LOST_CONNECTION = 5;
-
-    // folder is available, but only should be accessed during the checkFolder
-    // phase.
-
-    public static int PASSIVE = 10;
-
-    // folder is running in disconnected mode; only act on the cached 
-    // messages.
-    public static int DISCONNECTED = 15;
-
-    // Folder doesn't seem to exist on server, but exists in cache.
-    public static int CACHE_ONLY = 18;
+  protected LoadMessageThread loaderThread;
+  private FolderTracker folderTracker = null;
+  
+  protected boolean loading = false;
+  protected int unreadCount = 0;
+  protected int messageCount = 0;
+  private boolean newMessages = false;
+  
+  private FolderInfo parentFolder = null;
+  private StoreInfo parentStore = null;
+  private UserProfile defaultProfile = null;
+  
+  private boolean sentFolder = false;
+  private boolean trashFolder = false;
+  
+  private boolean notifyNewMessagesMain = true;
+  private boolean notifyNewMessagesNode = true;
+  
+  /**
+   * For subclasses.
+   */
+  protected FolderInfo() {
+  }
+  
+  /**
+   * Creates a new FolderInfo from a parent FolderInfo and a Folder 
+   * name.
+   */
+  
+  public FolderInfo(FolderInfo parent, String fname) {
+    parentFolder = parent;
+    setFolderID(parent.getFolderID() + "." + fname);
+    mFolderName = fname;
     
-    // folder is just simply closed.
-    public static int CLOSED = 20;
-
-    // folder is not yet loaded.
-    public static int NOT_LOADED = 25;
-
-    // folder does not exist on server or in cache.
-    public static int INVALID = 30;
-
-    // shows the current status of the FolderInfo.
-    protected int status = NOT_LOADED;
-
-    // shows the type of this folder.
-    protected int type = 0;
-
-    // shows the preferred state of the FolderInfo.  should be CONNECTED,
-    // PASSIVE, DISCONNECTED, or CLOSED.
-    protected int preferredStatus = CONNECTED;
-
-    // the resource for the folder disconnected message
-    protected static String disconnectedMessage = "error.Folder.disconnected";
-
-    // the Folder wrapped by this FolderInfo.
-    private Folder folder;
-
-    // The is the folder ID: storeName.parentFolderName.folderName
-    private String folderID;
-
-    // This is just the simple folderName, such as "INBOX"
-    private String mFolderName;
-
-    private EventListenerList eventListeners = new EventListenerList();
-
-    // Information for the FolderNode
-    protected FolderNode folderNode;
-    protected Vector children;
-
-    // Information for the FolderTable.
-    protected FolderTableModel folderTableModel;
-    protected Hashtable messageToInfoTable = new Hashtable();
-    private Vector columnValues;
-    private Vector columnNames;
-    private Vector columnSizes;
-
-    // GUI information.
-    private FolderDisplayUI folderDisplayUI;
-    private Action[] defaultActions;
-
-    //filters
-    private BackendMessageFilter[] backendFilters = null;
-    private MessageFilter[] displayFilters = null;
-
-    protected LoadMessageThread loaderThread;
-    private FolderTracker folderTracker = null;
-
-    protected boolean loading = false;
-    protected int unreadCount = 0;
-    protected int messageCount = 0;
-    private boolean newMessages = false;
-
-    private FolderInfo parentFolder = null;
-    private StoreInfo parentStore = null;
-    private UserProfile defaultProfile = null;
-
-    private boolean sentFolder = false;
-    private boolean trashFolder = false;
-
-    private boolean notifyNewMessagesMain = true;
-    private boolean notifyNewMessagesNode = true;
-
-    /**
-     * For subclasses.
-     */
-    protected FolderInfo() {
-    }
-
-    /**
-     * Creates a new FolderInfo from a parent FolderInfo and a Folder 
-     * name.
-     */
+    if (parent.isLoaded())
+      loadFolder();
     
-    public FolderInfo(FolderInfo parent, String fname) {
-	parentFolder = parent;
-	setFolderID(parent.getFolderID() + "." + fname);
-	mFolderName = fname;
-
-	if (parent.isLoaded())
-	    loadFolder();
-
-	updateChildren();
-
-	createFilters();
-
-	resetDefaultActions();
-	
-	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
-	    setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
-
-	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
-	    setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
-    }
-
-
-    /**
-     * Creates a new FolderInfo from a parent StoreInfo and a Folder 
-     * name.
-     */
+    updateChildren();
     
-    public FolderInfo(StoreInfo parent, String fname) {
-	parentStore = parent;
-	setFolderID(parent.getStoreID() + "." + fname);
-	mFolderName = fname;
-
-	if (parent.isConnected())
-	    loadFolder();
-
-	updateChildren();
-
-	createFilters();
-
-	resetDefaultActions();
-
-	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
-	    setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
-
-	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
-	    setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
-    }
+    createFilters();
     
+    resetDefaultActions();
+    
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
+      setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
+    
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
+      setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
+  }
+  
+  
+  /**
+   * Creates a new FolderInfo from a parent StoreInfo and a Folder 
+   * name.
+   */
+  
+  public FolderInfo(StoreInfo parent, String fname) {
+    parentStore = parent;
+    setFolderID(parent.getStoreID() + "." + fname);
+    mFolderName = fname;
+    
+    if (parent.isConnected())
+      loadFolder();
+    
+    updateChildren();
+    
+    createFilters();
+    
+    resetDefaultActions();
+    
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
+      setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
+    
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
+      setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
+  }
+  
   /**
    * This actually loads up the Folder object itself.  This is used so 
    * that we can have a FolderInfo even if we're not connected to the
@@ -608,50 +608,49 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return fp;
     }
 
-    /**
-     * Loads all Messages into a new FolderTableModel, sets this 
-     * FolderTableModel as the current FolderTableModel, and then returns
-     * said FolderTableModel.  This is the basic way to populate a new
-     * FolderTableModel.
-     */
-    public synchronized void loadAllMessages() throws MessagingException {
-	if (folderTableModel == null) {
-	    Vector messageProxies = new Vector();
-	    
-	    FetchProfile fp = createColumnInformation();
-	    if (loaderThread == null) 
-		loaderThread = createLoaderThread();
-	    
-	    if (! isLoaded())
-		loadFolder();
-
-	    if (! isConnected() ) {
-		openFolder(Folder.READ_WRITE);
-	    }
-	    
-	    
-	    Message[] msgs = folder.getMessages();
-	    folder.fetch(msgs, fp);
-	    MessageInfo mi;
-	    
-	    for (int i = 0; i < msgs.length; i++) {
-		mi = new MessageInfo(msgs[i], this);
-		
-		messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		messageToInfoTable.put(msgs[i], mi);
-	    }
-
-	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
-	    
-	    setFolderTableModel(ftm);
-	    
-	    loaderThread.loadMessages(messageProxies);
-	    
-	    if (!loaderThread.isAlive())
-		loaderThread.start();
-	}
+  /**
+   * Loads all Messages into a new FolderTableModel, sets this 
+   * FolderTableModel as the current FolderTableModel, and then returns
+   * said FolderTableModel.  This is the basic way to populate a new
+   * FolderTableModel.
+   */
+  public synchronized void loadAllMessages() throws MessagingException {
+    if (folderTableModel == null) {
+      Vector messageProxies = new Vector();
+      
+      FetchProfile fp = createColumnInformation();
+      if (loaderThread == null) 
+	loaderThread = createLoaderThread();
+      
+      if (! isLoaded())
+	loadFolder();
+      
+      if (! isConnected() ) {
+	openFolder(Folder.READ_WRITE);
+      }
+      
+      Message[] msgs = folder.getMessages();
+      folder.fetch(msgs, fp);
+      MessageInfo mi;
+      
+      for (int i = 0; i < msgs.length; i++) {
+	mi = new MessageInfo(msgs[i], this);
+	
+	messageProxies.add(new MessageProxy(getColumnValues() , mi));
+	messageToInfoTable.put(msgs[i], mi);
+      }
+      
+      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+      
+      setFolderTableModel(ftm);
+      
+      loaderThread.loadMessages(messageProxies);
+      
+      if (!loaderThread.isAlive())
+	loaderThread.start();
     }
-    
+  }
+  
     /**
      * Unloads all messages.  This should be run if ever the current message
      * information becomes out of date, as can happen when the connection
