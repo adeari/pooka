@@ -25,7 +25,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     StatusBar statusBar = null;
     MessagePanel messagePanel = null;
     ConfigurableToolbar toolbar;
-    ConfigurableKeyBinding keybinding;
+    ConfigurableKeyBinding keyBindings;
 
     public class StatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
 	JLabel folderLabel;
@@ -83,9 +83,9 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 	this.getContentPane().add("North", toolbar);
 
-	keybinding = new ConfigurableKeyBinding(this, "FolderWindowToolbar.keyBindings", Pooka.getResources());
+	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
 
-	keybinding.setActive(getActions());
+	keyBindings.setActive(getActions());
 	toolbar.setActive(getActions());
     }
 
@@ -232,8 +232,8 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
 	    if (toolbar != null)
 		toolbar.setActive(getActions());
-	    if (keybindings != null)
-		keybindings.setActive(getActions());
+	    if (keyBindings != null)
+		keyBindings.setActive(getActions());
 	}
     }
 

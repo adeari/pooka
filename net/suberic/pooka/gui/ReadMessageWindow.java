@@ -1,6 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
-import net.suberic.util.gui.ConfigurableToolbar;
+import net.suberic.util.gui.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -62,6 +62,8 @@ public class ReadMessageWindow extends MessageWindow {
 	    this.getContentPane().add("Center", editorScrollPane);
 	}
 
+	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+	keyBindings.setActive(getActions());
     }
 
     /**

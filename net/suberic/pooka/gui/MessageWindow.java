@@ -1,6 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
-import net.suberic.util.gui.ConfigurableToolbar;
+import net.suberic.util.gui.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -22,6 +22,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
     protected JTextPane editorPane = null;
     protected JScrollPane editorScrollPane = null;
     protected ConfigurableToolbar toolbar;
+    protected ConfigurableKeyBinding keyBindings;
     protected boolean hasAttachment = false;
 
     //<sigh>

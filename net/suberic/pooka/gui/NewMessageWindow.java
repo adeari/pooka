@@ -1,6 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
-import net.suberic.util.gui.ConfigurableToolbar;
+import net.suberic.util.gui.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -69,6 +69,9 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	
 	toolbar.setActive(this.getActions());
 	this.getContentPane().add("North", toolbar);
+
+	keyBindings = new ConfigurableKeyBinding(this, "NewMessageWindow.keyBindings", Pooka.getResources());
+	keyBindings.setActive(getActions());
 
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 		public void internalFrameClosed(InternalFrameEvent e) {

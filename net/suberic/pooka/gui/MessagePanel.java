@@ -30,6 +30,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	public void activateFrame(JInternalFrame f) {
 	    super.activateFrame(f);
 	    
+	    f.requestFocus();
 	    mainPanel.refreshActiveMenus(mainPanel.getMainMenu());
 	    mainPanel.refreshCurrentUser();
 	}

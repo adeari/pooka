@@ -28,6 +28,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     private MailQueue mailQueue;
     private UserProfile currentUser = null;
     private PropertyEditorFactory editorFactory = new PropertyEditorFactory(Pooka.getResources());
+    private ConfigurableKeyBinding keyBindings;
 
     public MainPanel(JFrame frame) {
 	super(JSplitPane.HORIZONTAL_SPLIT);
@@ -50,10 +51,14 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
 	mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
 
+	keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
+	keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+
 	// set the default active menus.
 	mainMenu.setActive(getActions());
 	mainToolbar.setActive(getActions());
-
+	keyBindings.setActive(getActions());
+	
 	// set the initial currentUser
 	refreshCurrentUser();
     }
@@ -113,6 +118,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     protected void refreshActiveMenus(JMenuBar menuBar) {
 	mainMenu.setActive(getActions());
 	mainToolbar.setActive(getActions());
+	keyBindings.setActive(getActions());
     }
 
     /**
@@ -177,6 +183,14 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
     public ConfigurableToolbar getMainToolbar() {
 	return mainToolbar;
+    }
+
+    public ConfigurableKeyBinding getKeyBindings() {
+	return keyBindings;
+    }
+    
+    public void setKeyBindings(ConfigurableKeyBinding newKeyBindings) {
+	keyBindings = newKeyBindings;
     }
 
     public void setMainToolbar(ConfigurableToolbar newMainToolbar) {
