@@ -18,18 +18,14 @@ public class FolderTableTransferHandler extends TransferHandler {
   private boolean shouldRemove;
   
   public boolean importData(JComponent c, Transferable t) {
-    System.err.println("importData:  importing " + t);
     if (!canImport(c, t.getTransferDataFlavors())) {
       return false;
     } else {
-      System.err.println("trying to import...");
       FolderInfo fi = DndUtils.getFolderInfo(c);
       if (fi != null) {
-	System.err.println("got folder " + fi);
 	try {
 	  MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	  if (mp != null) {
-	    System.err.println("got mp " + mp);
 	    mp.moveMessage(fi);
 	    return true;
 	  }
@@ -46,18 +42,14 @@ public class FolderTableTransferHandler extends TransferHandler {
   }
   
   protected Transferable createTransferable(JComponent c) {
-    System.err.println("creating transferable");
-    
     if (c instanceof net.suberic.pooka.gui.FolderDisplayPanel) {
       return new MessageProxyTransferable(((FolderDisplayPanel) c).getSelectedMessage());
     } else if (c instanceof JTable) {
       try {
 	Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
-	System.err.println("o is " + o);
 	if (o != null ) {
 	  
 	  Transferable returnValue = new MessageProxyTransferable(((FolderDisplayPanel) o).getSelectedMessage());
-	  System.err.println("returning " + returnValue);
 	  return returnValue;
 	} else {
 	  return null;
@@ -75,7 +67,6 @@ public class FolderTableTransferHandler extends TransferHandler {
   }
 
   protected void exportDone(JComponent c, Transferable data, int action) {
-    System.err.println("exportDone; exported " + data + ", action " + action);
     /*
     if (shouldRemove && (action == MOVE)) {
       if ((p0 != null) && (p1 != null) &&
@@ -93,12 +84,9 @@ public class FolderTableTransferHandler extends TransferHandler {
   }
 
   public boolean canImport(JComponent c, DataFlavor[] flavors) {
-    System.err.println("checking canImport, flavors " + flavors);
     if (containsMessageProxy(flavors)) {
-      System.err.println("can import.");
       return true;
     } else {
-      System.err.println("can't import.");
       return false;
     }
   }

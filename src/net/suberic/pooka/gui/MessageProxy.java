@@ -768,8 +768,15 @@ public class MessageProxy {
    * Moves the Message into the target Folder.
    */
   public void moveMessage(FolderInfo targetFolder) {
+    moveMessage(targetFolder, Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
+  }
+
+  /**
+   * Moves the Message into the target Folder.
+   */
+  public void moveMessage(FolderInfo targetFolder, boolean expunge) {
     try {
-      messageInfo.moveMessage(targetFolder);
+      messageInfo.moveMessage(targetFolder, expunge);
     } catch (MessagingException me) {
       showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
       if (Pooka.isDebug())
@@ -903,8 +910,18 @@ public class MessageProxy {
    * showing any errors, if they happen.
    */
   public void bounceMessage(Address[] addresses, boolean deleteOnSuccess) {
+    bounceMessage(addresses, deleteOnSuccess, true);
+  }
+
+  /**
+   * Bounces the message.  Passes on the actual work of bouncing the
+   * message to the underlying MessageInfo, but handles the job of
+   * showing any errors, if they happen.
+   */
+  public void bounceMessage(Address[] addresses, boolean deleteOnSuccess, boolean expunge) {
     final Address[] final_addresses = addresses;
     final boolean final_delete = deleteOnSuccess;
+    final boolean final_expunge = expunge;
 
     ActionThread folderThread = getMessageInfo().getFolderInfo().getFolderThread();
     folderThread.addToQueue(new javax.swing.AbstractAction() {
@@ -912,7 +929,7 @@ public class MessageProxy {
 	  try {
 	    getMessageInfo().bounceMessage(final_addresses);
 	    if (final_delete)
-	      deleteMessage(false);
+	      deleteMessage(final_expunge);
 
 	  } catch (javax.mail.MessagingException me) {
 	    final MessagingException final_me = me;

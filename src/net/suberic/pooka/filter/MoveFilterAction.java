@@ -30,7 +30,7 @@ public class MoveFilterAction implements FilterAction {
     List moved = new ArrayList();
     for (int i = 0; i < filteredMessages.size(); i++) {
       MessageProxy current = (MessageProxy) filteredMessages.get(i);
-      current.moveMessage(getTargetFolder());
+      current.moveMessage(getTargetFolder(), false);
       moved.add(current);
     }
     return moved;

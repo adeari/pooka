@@ -10,10 +10,11 @@ import java.io.File;
 public class AttachmentTransferable implements Transferable {
   
   Attachment mAttachment = null;
-  MessageProxy mProxy = null;
+  MessageProxy mMessageProxy = null;
   
-  public AttachmentTransferable(Attachment pAttachment, MessageProxy mp) {
+  public AttachmentTransferable(Attachment pAttachment, MessageProxy pMessageProxy) {
     setAttachment(pAttachment);
+    setMessageProxy(pMessageProxy);
   }
   
   public DataFlavor[] getTransferDataFlavors() {
@@ -34,7 +35,7 @@ public class AttachmentTransferable implements Transferable {
       java.util.LinkedList list = new java.util.LinkedList();
 
       File f = File.createTempFile("pooka", "attachment");
-      AttachmentHandler handler = new AttachmentHandler(mProxy);
+      AttachmentHandler handler = new AttachmentHandler(mMessageProxy);
       handler.saveFileAs(mAttachment, f);
 
       list.add(f);
@@ -57,4 +58,20 @@ public class AttachmentTransferable implements Transferable {
   public void setAttachment(Attachment pAttachment) {
     mAttachment = pAttachment;
   }
+
+  /**
+   * Returns the MessageProxy.
+   */
+  public MessageProxy getMessageProxy() {
+    return mMessageProxy;
+  }
+  
+  /**
+   * Sets the MessageProxy.
+   */
+  public void setMessageProxy(MessageProxy pMessageProxy) {
+    mMessageProxy = pMessageProxy;
+  }
+  
+  
 }

@@ -20,7 +20,6 @@ public class DndUtils {
    */
   public static boolean hasFileFlavor(DataFlavor[] flavors) {
     // first see if we're on linux.
-    System.err.println("isLinux = " + isLinux);
     if (flavors != null) {
       for (int i = 0; i < flavors.length; i++) {
 	if (flavors[i]!= null && flavors[i].isFlavorJavaFileListType())
@@ -44,7 +43,6 @@ public class DndUtils {
     } else if (isLinux) {
       match = matchDataFlavor(new DataFlavor[] { DataFlavor.stringFlavor }, availableFlavors);
       if (match != null) {
-	System.err.println("importing Linux flavors.");
 	ArrayList returnValue = new ArrayList();
 	Reader urlReader = match.getReaderForText(t);
 	BufferedReader br = new BufferedReader(urlReader);
@@ -72,11 +70,6 @@ public class DndUtils {
   public static DataFlavor matchDataFlavor(DataFlavor[] acceptableFlavors, DataFlavor[] availableFlavors) {
     if (acceptableFlavors != null && availableFlavors != null) {
       for (int i = 0; i < availableFlavors.length; i++) {
-	if (availableFlavors[i] != null) {
-	  System.err.println("availableFlavors[" + i + "] = " + availableFlavors[i] + "; name is " + availableFlavors[i].getHumanPresentableName() + "; class is " + availableFlavors[i].getRepresentationClass());
-	} else {
-	  System.err.println("availableFlavors[" + i + "] = " + availableFlavors[i]);
-	}
 	for (int j = 0; j < acceptableFlavors.length; j++) {
 	  if (availableFlavors[i] != null && availableFlavors[i].match(acceptableFlavors[j]))
 	    return availableFlavors[i];
@@ -98,10 +91,8 @@ public class DndUtils {
 	} 
 
       o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
-      if (o != null) {
-	System.err.println("got FolderPanel...");
-      } else {
-      }
+      // FIXME
+
       return null;
     } catch (Exception e) {
       return null;

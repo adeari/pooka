@@ -469,152 +469,152 @@ public class MessageInfo {
 	deleteMessage(Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
     }
 
-    /**
-     * This actually marks the message as deleted, and, if autoexpunge is
-     * set to true, expunges the folder.
-     *
-     * This should not be called directly; rather, deleteMessage() should
-     * be used in order to ensure that the delete is done properly (using
-     * trash folders, for instance).  If, however, the deleteMessage() 
-     * throws an Exception, it may be necessary to follow up with a call
-     * to remove().
-     */
-    public void remove(boolean autoExpunge) throws MessagingException {
-	Message m = getMessage();
-	if (m != null) {
-	  m.setFlag(Flags.Flag.DELETED, true);
-	  if ( autoExpunge ) {
-	    folderInfo.expunge();
-	  }
-	}
+  /**
+   * This actually marks the message as deleted, and, if autoexpunge is
+   * set to true, expunges the folder.
+   *
+   * This should not be called directly; rather, deleteMessage() should
+   * be used in order to ensure that the delete is done properly (using
+   * trash folders, for instance).  If, however, the deleteMessage() 
+   * throws an Exception, it may be necessary to follow up with a call
+   * to remove().
+   */
+  public void remove(boolean autoExpunge) throws MessagingException {
+    Message m = getMessage();
+    if (m != null) {
+      m.setFlag(Flags.Flag.DELETED, true);
+      if ( autoExpunge ) {
+	folderInfo.expunge();
+      }
     }
+  }
+  
+  /**
+   * This puts the reply prefix 'prefix' in front of each line in the
+   * body of the Message.
+   */
+  public String prefixMessage(String originalMessage, String prefix, String intro) {
+    StringBuffer newValue = new StringBuffer(originalMessage);
     
-    /**
-     * This puts the reply prefix 'prefix' in front of each line in the
-     * body of the Message.
-     */
-    public String prefixMessage(String originalMessage, String prefix, String intro) {
-	StringBuffer newValue = new StringBuffer(originalMessage);
-	
-	int currentCR = originalMessage.lastIndexOf('\n', originalMessage.length());
-	while (currentCR != -1) {
-	    newValue.insert(currentCR+1, prefix);
-	    currentCR=originalMessage.lastIndexOf('\n', currentCR-1);
-	}
-	newValue.insert(0, prefix);
-	newValue.insert(0, intro);
-	
-	return newValue.toString();
+    int currentCR = originalMessage.lastIndexOf('\n', originalMessage.length());
+    while (currentCR != -1) {
+      newValue.insert(currentCR+1, prefix);
+      currentCR=originalMessage.lastIndexOf('\n', currentCR-1);
     }
-
-    /**
-     * This parses a message line using the current Message as a model.
-     * The introTemplate will be of the form 'On %d, %n wrote', or 
-     * something similar.  This method uses the Pooka.parsedString
-     * characters to decide which strings to substitute for which
-     * characters.
-     */
-    public String parseMsgString(MimeMessage m, String introTemplate, boolean addLF) {
-	StringBuffer intro = new StringBuffer(introTemplate);
-	int index = introTemplate.lastIndexOf('%', introTemplate.length());
+    newValue.insert(0, prefix);
+    newValue.insert(0, intro);
+    
+    return newValue.toString();
+  }
+  
+  /**
+   * This parses a message line using the current Message as a model.
+   * The introTemplate will be of the form 'On %d, %n wrote', or 
+   * something similar.  This method uses the Pooka.parsedString
+   * characters to decide which strings to substitute for which
+   * characters.
+   */
+  public String parseMsgString(MimeMessage m, String introTemplate, boolean addLF) {
+    StringBuffer intro = new StringBuffer(introTemplate);
+    int index = introTemplate.lastIndexOf('%', introTemplate.length());
+    try {
+      while (index > -1) {
 	try {
-	  while (index > -1) {
-	    try {
-	      char nextChar = introTemplate.charAt(index + 1);
-	      String replaceMe = null;
-	      if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
-		
-		Address[] fromAddresses = m.getFrom();
-		if (fromAddresses.length > 0 && fromAddresses[0] != null) {
-		  replaceMe = MailUtilities.decodeAddressString(fromAddresses);
-		  if (replaceMe == null)
-		    replaceMe = "";
-		  intro.replace(index, index +2, replaceMe);
-		}
-	      } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
-		replaceMe = Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate());
-		if (replaceMe == null)
-		  replaceMe = "";
-		intro.replace(index, index + 2, replaceMe);
-	      } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
-		replaceMe = m.getSubject();
-		if (replaceMe == null)
-		  replaceMe = "";
-		intro.replace(index, index + 2, m.getSubject());
-	      } else if (nextChar == '%') {
-		intro.replace(index, index+1, "%");
-	      }
-	      index = introTemplate.lastIndexOf('%', index -1);
-	    } catch (StringIndexOutOfBoundsException e) {
-	      index = introTemplate.lastIndexOf('%', index -1);
+	  char nextChar = introTemplate.charAt(index + 1);
+	  String replaceMe = null;
+	  if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
+	    
+	    Address[] fromAddresses = m.getFrom();
+	    if (fromAddresses.length > 0 && fromAddresses[0] != null) {
+	      replaceMe = MailUtilities.decodeAddressString(fromAddresses);
+	      if (replaceMe == null)
+		replaceMe = "";
+	      intro.replace(index, index +2, replaceMe);
 	    }
+	  } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
+	    replaceMe = Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate());
+	    if (replaceMe == null)
+	      replaceMe = "";
+	    intro.replace(index, index + 2, replaceMe);
+	  } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
+	    replaceMe = m.getSubject();
+	    if (replaceMe == null)
+	      replaceMe = "";
+	    intro.replace(index, index + 2, m.getSubject());
+	  } else if (nextChar == '%') {
+	    intro.replace(index, index+1, "%");
 	  }
-	} catch (MessagingException me) {
-	    return null;
+	  index = introTemplate.lastIndexOf('%', index -1);
+	} catch (StringIndexOutOfBoundsException e) {
+	  index = introTemplate.lastIndexOf('%', index -1);
 	}
-
-	if (addLF)
-	    if (intro.charAt(intro.length()-1) != '\n')
-		intro.append('\n');
-
-	return intro.toString();
+      }
+    } catch (MessagingException me) {
+      return null;
     }
     
-    /**
-     * This populates a message which is a reply to the current
-     * message.
-     */
-    public NewMessageInfo populateReply(boolean replyAll, boolean withAttachments) 
-	throws MessagingException {
-	MimeMessage newMsg = (MimeMessage) getMessage().reply(replyAll);
-
-	MimeMessage mMsg = (MimeMessage) getMessage();
-
-	String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
-	if (textPart == null) {
-	  textPart = "";
-	}
-
-	UserProfile up = getDefaultProfile();
-
-	String parsedText;
-	String replyPrefix;
-	String parsedIntro;
-
-	if (up != null && up.getMailProperties() != null) {
-	    
-	    replyPrefix = up.getMailProperties().getProperty("replyPrefix", Pooka.getProperty("Pooka.replyPrefix", "> "));
-	    parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")), true);
-	} else { 
-	    replyPrefix = Pooka.getProperty("Pooka.replyPrefix", "> ");
-	    parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"), true);
-	}
-	parsedText = prefixMessage(textPart, replyPrefix, parsedIntro);
-	newMsg.setText(parsedText);
-	
-	if (replyAll && Pooka.getProperty("Pooka.excludeSelfInReply", "true").equalsIgnoreCase("true")) {
-	    getDefaultProfile().removeFromAddress(newMsg); 
-	}
-
-	NewMessageInfo returnValue = new NewMessageInfo(newMsg);
-
-	if (withAttachments) {
-	    returnValue.attachments = new AttachmentBundle();
-	    returnValue.attachments.addAll(attachments);
-	    returnValue.attachmentsLoaded=true;
-	}
-
-	return returnValue;
+    if (addLF)
+      if (intro.charAt(intro.length()-1) != '\n')
+	intro.append('\n');
+    
+    return intro.toString();
+  }
+  
+  /**
+   * This populates a message which is a reply to the current
+   * message.
+   */
+  public NewMessageInfo populateReply(boolean replyAll, boolean withAttachments) 
+    throws MessagingException {
+    MimeMessage newMsg = (MimeMessage) getMessage().reply(replyAll);
+    
+    MimeMessage mMsg = (MimeMessage) getMessage();
+    
+    String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
+    if (textPart == null) {
+      textPart = "";
     }
-
-    /**
-     * This populates a message which is a reply to the current
-     * message.
-     */
-    public NewMessageInfo populateReply(boolean replyAll)
-	throws MessagingException {
-	return populateReply(replyAll, false);
+    
+    UserProfile up = getDefaultProfile();
+    
+    String parsedText;
+    String replyPrefix;
+    String parsedIntro;
+    
+    if (up != null && up.getMailProperties() != null) {
+      
+      replyPrefix = up.getMailProperties().getProperty("replyPrefix", Pooka.getProperty("Pooka.replyPrefix", "> "));
+      parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")), true);
+    } else { 
+      replyPrefix = Pooka.getProperty("Pooka.replyPrefix", "> ");
+      parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"), true);
     }
+    parsedText = prefixMessage(textPart, replyPrefix, parsedIntro);
+    newMsg.setText(parsedText);
+    
+    if (replyAll && Pooka.getProperty("Pooka.excludeSelfInReply", "true").equalsIgnoreCase("true")) {
+      getDefaultProfile().removeFromAddress(newMsg); 
+    }
+    
+    NewMessageInfo returnValue = new NewMessageInfo(newMsg);
+    
+    if (withAttachments) {
+      returnValue.attachments = new AttachmentBundle();
+      returnValue.attachments.addAll(attachments);
+      returnValue.attachmentsLoaded=true;
+    }
+    
+    return returnValue;
+  }
+  
+  /**
+   * This populates a message which is a reply to the current
+   * message.
+   */
+  public NewMessageInfo populateReply(boolean replyAll)
+    throws MessagingException {
+    return populateReply(replyAll, false);
+  }
   
   /**
    * This populates a new message which is a forwarding of the

@@ -136,7 +136,7 @@ public class FolderDisplayPanel extends JPanel {
       messageTable.setRowSelectionAllowed(true);
       addListeners();
 
-      messageTable.setTransferHandler(new net.suberic.pooka.gui.dnd.MessageTransferHandler());
+      messageTable.setTransferHandler(new net.suberic.pooka.gui.dnd.FolderTableTransferHandler());
 
       messageTable.setDragEnabled(true);
 

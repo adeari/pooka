@@ -2117,6 +2117,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
       }
     
+    if (removed.size() > 0) {
+      try {
+	expunge();
+      } catch (MessagingException me) {
+	me.printStackTrace();
+      }
+    }
+
     return removed;
   }
   

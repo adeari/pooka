@@ -1,3 +1,5 @@
+fixed expunging on backend filteres.
+
 changed the Cached search so that you can now make a custom display filter
 
 changed the theme selection menu so that we should see all of (and only) the

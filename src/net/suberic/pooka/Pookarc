@@ -1,9 +1,6 @@
 #This is the resource file for Pooka.  Note that all of the labels and key
 #bindings for the menus, etc., are found in locale/Pooka_<Locale>.properties
 
-Pooka.debug=false
-Pooka.sessionDebug=false
-
 Pooka.useLocalFiles=true
 #Pooka.useLocalFiles=false
 
@@ -895,7 +892,7 @@ Store.editableFields.useMaildir=true
 Store.editableFields.trashFolder.namePrefix=Store.
 Store.editableFields.trashFolder.nameSuffix=.trashFolder
 
-Preferences=UI:Reply:Startup:Signature:HTML:Files:Spam
+Preferences=UI:Reply:Startup:Signature:HTML:Files:Spam:Debug
 Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
@@ -907,6 +904,14 @@ Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatu
 Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.Files=Pooka.defaultMailSubDir:Pooka.sslCertFile
 Preferences.Spam=Pooka.spamAction
+Preferences.Debug=Pooka.debug:Pooka.sessionDebug
+
+Pooka.debug=false
+Pooka.debug.propertyType=Boolean
+Pooka.sessionDebug=false
+Pooka.sessionDebug.propertyType=Boolean
+editors.debug=false
+editors.debug.propertyType=Boolean
 
 Pooka.defaultMailSubDir.propertyType=Directory
 Pooka.sslCertFile.propertyType=File

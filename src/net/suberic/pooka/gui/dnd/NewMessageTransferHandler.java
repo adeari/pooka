@@ -21,23 +21,8 @@ public class NewMessageTransferHandler extends TransferHandler {
   };
 
   public boolean importData(JComponent c, Transferable t) {
-    System.err.println("new message importing");
     DataFlavor matchedFlavor = DndUtils.matchDataFlavor(usableDataFlavors, t.getTransferDataFlavors());
-    if (matchedFlavor == null) {
-      System.err.println("checking to see if it's available as a String...");
-      try {
-	matchedFlavor = DndUtils.matchDataFlavor(new DataFlavor[] { DataFlavor.stringFlavor }, t.getTransferDataFlavors());
-	if (matchedFlavor != null) {
-	  String value = (String) t.getTransferData(DataFlavor.stringFlavor);
-	  System.err.println("yep; String is '" + value + "'");
-	} else {
-	  System.err.println("nope; not a String.");
-	}
-      } catch (Exception e) {
-	System.err.println("nope; caught exception " + e);
-      }
-      return false;
-    } else {
+    if (matchedFlavor != null) {
       if (matchedFlavor == MessageProxyTransferable.sMessageProxyDataFlavor) {
 	return importMessageProxy(c, t);
       } else if (matchedFlavor == DataFlavor.javaFileListFlavor) {
@@ -45,18 +30,19 @@ public class NewMessageTransferHandler extends TransferHandler {
       } else if (matchedFlavor == DataFlavor.stringFlavor) {
 	try {
 	  String value = (String) t.getTransferData(DataFlavor.stringFlavor);
-	  System.err.println("yep; String is '" + value + "'");
 	  return importFileList(c, t);
-
+	  
 	} catch (Exception e) {
-	  System.err.println("caught exception " + e);
+	  e.printStackTrace();
 	}
-
+	
 	return false;
       } else {
 	// weird
 	return false;
       }
+    } else {
+      return false;
     }
   }
 
@@ -74,7 +60,6 @@ public class NewMessageTransferHandler extends TransferHandler {
 	nmdp.getNewMessageProxy().getNewMessageInfo().addAttachment(new MBPAttachment(mbp));
 	
 	nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
-	System.err.println("returning true.");
 	return true;
       }
     } catch (Exception e) {
@@ -102,7 +87,6 @@ public class NewMessageTransferHandler extends TransferHandler {
 	    nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
 	  }
 	
-	  System.err.println("returning true.");
 	  return true;
 	}
       }
@@ -114,12 +98,9 @@ public class NewMessageTransferHandler extends TransferHandler {
   }
 
   public boolean canImport(JComponent c, DataFlavor[] flavors) {
-    System.err.println("checking canImport for NMTH, flavors " + flavors);
     if (DndUtils.matchDataFlavor(usableDataFlavors, flavors) != null) {
-      System.err.println("can import.");
       return true;
     } else {
-      System.err.println("can't import.");
       return false;
     }
   }

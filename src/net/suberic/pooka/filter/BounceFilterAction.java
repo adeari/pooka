@@ -35,7 +35,7 @@ public class BounceFilterAction implements FilterAction {
     List removed = new ArrayList();
     for (int i = 0; i < filteredMessages.size(); i++) {
       MessageProxy current = (MessageProxy) filteredMessages.get(i);
-      current.bounceMessage(getTargetAddresses(), removeBounced);
+      current.bounceMessage(getTargetAddresses(), removeBounced, false);
       if (removeBounced) {
 	removed.add(current);
       }
