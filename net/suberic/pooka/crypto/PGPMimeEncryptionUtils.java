@@ -66,6 +66,20 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   }
 
   /**
+   * Extracts public key information.
+   */
+  public EncryptionKey[] extractKeys(InputStream rawStream) {
+    return pgpImpl.extractKeys(rawStream);
+  }
+
+  /** 
+   * Packages up the public keys in a form to be sent as a public key message.
+   */
+  public byte[] packageKeys(EncryptionKey[] keys) {
+    return pgpImpl.packageKeys(keys);
+  }
+
+  /**
    * Encrypts a Message.
    */
   public MimeMessage encryptMessage(Session s, MimeMessage msg, EncryptionKey key) 
@@ -348,6 +362,50 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
       
   }
 
+  /**
+   * Extracts public key information.
+   */
+  public EncryptionKey[] extractKeys(MimeMessage m) 
+  throws MessagingException, IOException {
+    // we need a MimeBodyPart of type "application/pgp-keys"
+    // make sure that we're of type application/pgp-keys
+
+    ContentType ct = new ContentType(m.getContentType());
+    if (ct.getBaseType().equalsIgnoreCase("application/pgp-keys")) {
+      InputStream is = m.getInputStream();
+      return extractKeys(is);
+    } else {
+      throw new MessagingException("invalid content type; expected application/pgp-keys, got " + ct.getBaseType());
+    }
+  }
+
+  /**
+   * Extracts public key information.
+   */
+  public EncryptionKey[] extractKeys(MimeBodyPart mbp) 
+  throws MessagingException, IOException {
+    // make sure that we're of type application/pgp-keys
+
+    ContentType ct = new ContentType(mbp.getContentType());
+    if (ct.getBaseType().equalsIgnoreCase("application/pgp-keys")) {
+      InputStream is = mbp.getInputStream();
+      return extractKeys(is);
+    } else {
+      throw new MessagingException("invalid content type; expected application/pgp-keys, got " + ct.getBaseType());
+    }
+  }
+
+  /** 
+   * Packages up the public keys in a form to be sent as a public key message.
+   */
+  public MimeBodyPart createPublicKeyPart(EncryptionKey[] keys) 
+  throws MessagingException {
+    MimeBodyPart mbp = new MimeBodyPart();
+    byte[] keyData = packageKeys(keys);
+    mbp.setContent(keyData, "application/pgp-keys");
+    return mbp;
+  }
+  
   /**
    * Returns a KeyStore provider.
    */

@@ -8,7 +8,7 @@ import java.io.*;
  * Something which decrypts PGP streams.
  */
 public interface PGPProviderImpl {
-
+  
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
@@ -24,21 +24,31 @@ public interface PGPProviderImpl {
   /**
    * Signs a section of text.
    */
-  public abstract byte[] sign(InputStream rawStream, EncryptionKey key)
+  public byte[] sign(InputStream rawStream, EncryptionKey key)
     throws EncryptionException;
 
   /**
    * Checks a signature against a section of text.
    */
-  public abstract boolean checkSignature(InputStream rawStream, 
+  public boolean checkSignature(InputStream rawStream, 
 					 byte[] signature, EncryptionKey key)
     throws EncryptionException;
+  
+  /**
+   * Extracts public key information.
+   */
+  public EncryptionKey[] extractKeys(InputStream rawStream);
 
+  /** 
+   * Packages up the public keys in a form to be sent as a public key message.
+   */
+  public byte[] packageKeys(EncryptionKey[] keys);
+  
   /**
    * Returns a KeyStore provider.
    */
   public abstract EncryptionKeyManager createKeyManager() throws EncryptionException;
-
+  
   /**
    * Returns a KeyStore provider.
    */

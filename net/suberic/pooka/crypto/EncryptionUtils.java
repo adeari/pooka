@@ -71,6 +71,26 @@ public abstract class EncryptionUtils {
     throws EncryptionException, MessagingException, IOException;
 
   /**
+   * Creates a public key body part.
+   */
+  public abstract MimeBodyPart createPublicKeyPart(EncryptionKey[] keys)
+    throws MessagingException;
+
+  /**
+   * Extracts keys from a public key body part.
+   *
+   */
+  public abstract EncryptionKey[] extractKeys(MimeBodyPart mbp)
+    throws MessagingException, IOException ;
+
+  /**
+   * Extracts keys from a public key body part.
+   *
+   */
+  public abstract EncryptionKey[] extractKeys(MimeMessage m)
+    throws MessagingException, IOException ;
+
+  /**
    * Creates an empty EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
