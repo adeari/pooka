@@ -312,14 +312,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
 	if (!defProfile.equals(""))
-	    defaultProfile = UserProfile.getProfile(defProfile);
+	  defaultProfile = UserProfile.getProfile(defProfile);
 	
 	// if we got to this point, we should assume that the open worked.
 	
 	if (getFolderTracker() == null) {
-	    FolderTracker tracker = Pooka.getFolderTracker();
-	    tracker.addFolder(this);
-	    this.setFolderTracker(tracker);
+	  FolderTracker tracker = Pooka.getFolderTracker();
+	  tracker.addFolder(this);
+	  this.setFolderTracker(tracker);
 	}
     }
 

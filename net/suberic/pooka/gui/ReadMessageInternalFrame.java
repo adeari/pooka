@@ -104,6 +104,8 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 
 	if (dscb.headerStyle)
 	  ((ReadMessageDisplayPanel)messageDisplay).setHeaderCombo(dscb);
+
+	dscb.styleUpdated(getMessageProxy().getDisplayMode(), getMessageProxy().getHeaderMode());
       }
     }
 

@@ -1,13 +1,5 @@
 *) finish support for switching display style and headers.  
-  ...actually, make a subclass of JButton that's a ConfigurableUI.  have
-	the button action be to popup a window.  do it that way.
-	--also have the MessageProxy have a link to it.  go ahead and
-	  make it so setting the actions in the ConfigurableUI will
-	  transfer the action to the button.   - note.  should be done
-	  through the message ui object, not the message proxy.
   -- make the buttons have reasonable images
-  -- make button the correct size
-  -- make a subclass that dynamically handles updates.
   *) make sure we lose our settings for the message whenever the window
 	closes.
 
@@ -134,13 +126,16 @@ preview:
 
 *) threading of attachment actions.
 
-++++++++++++++++++
++++ version 1.1 +++++++++++++++ 
 
 *) add support for jdk1.4
 	-- tabbing between the address components for New Messages
 	-- the MailFileSystemView doesn't seem to work at all (!)
 	-- up and down arrows while composing new messages.
 	-- ssl doesn't work.
+
+*) add support for other mail formats, like maildir (and maybe hotmail?).
+	shift pop3 backing from mbox to maildir.
 
 *) queuing of outgoing mails
 	todo on this:
@@ -151,10 +146,6 @@ preview:
 	*) make it so there is some way for the NetworkConnection to detect
 		whether or not it's up.
 			-- started.  make sure it's enough.
-
-*) make the local file store backend (currently mbox) more efficient,
-   possibly replacing it with the backend to the disconnected imap
-   store.
 
 *) forward to all.
  

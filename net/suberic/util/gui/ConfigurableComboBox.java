@@ -89,8 +89,8 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
 	}
       });
 
-    this.setSize(minWidth, minHeight);
-    this.setPreferredSize(new java.awt.Dimension(minWidth, minHeight));
+    this.setMaximumSize(this.getPreferredSize());
+
   }
 
 
