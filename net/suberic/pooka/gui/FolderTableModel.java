@@ -2,7 +2,8 @@ package net.suberic.pooka.gui;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.SwingUtilities;
 import net.suberic.util.swing.RunnableAdapter;
-import java.util.Vector;
+import java.util.*;
+
 
 /**
  * This class holds the information about the Messages in a Folder.
@@ -19,11 +20,13 @@ public class FolderTableModel extends AbstractTableModel {
     private Vector data;
     private Vector columnNames;
     private Vector columnSizes;
+    //private Vector displayData;
     
     public FolderTableModel(Vector newData, Vector newColumnNames, Vector newColumnSizes) {
 	data=newData;
 	columnNames = newColumnNames;
 	columnSizes = newColumnSizes;
+	//displayData = new Vector(newData);
     }
 
     public int getColumnCount() {
@@ -145,6 +148,144 @@ public class FolderTableModel extends AbstractTableModel {
 	    return 0;
 	}
     }
+
+
+    // all of this is the sorting code.
+
+    protected class RowComparator implements Comparator {
+
+	public int column;
+
+	public RowComparator(int newColumn) {
+	    column = newColumn;
+	}
+	/**
+	 * This compares two row objects by column.
+	 */
+	public int compare(Object row1, Object row2) {
+	    // Check for nulls.
+	    
+	    // If both values are null, return 0.
+	    if (row1 == null && row2 == null) {
+		return 0; 
+	    } else if (row1 == null) { // Define null less than everything. 
+		return -1; 
+	    } else if (row2 == null) { 
+		return 1; 
+	    }
+	    
+	    Object o1 = ((MessageProxy)row1).getTableInfo().elementAt(column);
+	    Object o2 = ((MessageProxy)row2).getTableInfo().elementAt(column);
+	    Class type = o1.getClass();
+	    
+	    
+	    /*
+	     * We copy all returned values from the getValue call in case
+	     * an optimised model is reusing one object to return many
+	     * values.  The Number subclasses in the JDK are immutable and
+	     * so will not be used in this way but other subclasses of
+	     * Number might want to do this to save space and avoid
+	     * unnecessary heap allocation.
+	     */
+	    
+	    if (type.getSuperclass() == java.lang.Number.class) {
+		Number n1 = (Number)o1;
+		double d1 = n1.doubleValue();
+		Number n2 = (Number)o2;
+		double d2 = n2.doubleValue();
+		
+		if (d1 < d2) {
+		    return -1;
+		} else if (d1 > d2) {
+		    return 1;
+		} else {
+		    return 0;
+		}
+	    } else if (type == java.util.Date.class) {
+		Date d1 = (Date)o1;
+		long n1 = d1.getTime();
+		Date d2 = (Date)o2;
+		long n2 = d2.getTime();
+		
+		if (n1 < n2) {
+		    return -1;
+		} else if (n1 > n2) {
+                return 1;
+		} else {
+		    return 0;
+		}
+	    } else if (type == String.class) {
+		String s1 = (String)o1;
+		String s2    = (String)o2;
+		int result = s1.compareTo(s2);
+		
+		if (result < 0) {
+		    return -1;
+		} else if (result > 0) {
+		    return 1;
+		} else {
+		    return 0;
+		}
+	    } else if (type == Boolean.class) {
+		Boolean bool1 = (Boolean)o1;
+		boolean b1 = bool1.booleanValue();
+		Boolean bool2 = (Boolean)o2;
+		boolean b2 = bool2.booleanValue();
+		
+		if (b1 == b2) {
+		    return 0;
+		} else if (b1) { // Define false < true
+		    return 1;
+		} else {
+		    return -1;
+		}
+	    } else {
+		Object v1 = o1;
+		String s1 = v1.toString();
+		Object v2 = o2;
+		String s2 = v2.toString();
+		int result = s1.compareTo(s2);
+		
+		if (result < 0) {
+		    return -1;
+		} else if (result > 0) {
+		    return 1;
+		} else {
+		    return 0;
+		}
+	    }
+	}
+
+	public boolean equals(Object comparator2) {
+	    return super.equals(comparator2);
+	}
+    }
+
+    public class ReverseRowComparator extends RowComparator {
+	public ReverseRowComparator(int newColumn) {
+	    super(newColumn);
+	}
+
+	public int compare(Object row1, Object row2) {
+	    return (super.compare(row1, row2) * -1);
+	}
+    }
+
+    public void sortByColumn(int column, boolean ascending) {
+	if (ascending)
+	    java.util.Collections.sort(data, new RowComparator(column));
+	else
+	    java.util.Collections.sort(data, new ReverseRowComparator(column));
+
+        this.fireTableChanged(new javax.swing.event.TableModelEvent(this)); 
+
+    }
+
+
+    public void sortByColumn(int column) {
+        sortByColumn(column, true);
+    }
+
 }
 
 

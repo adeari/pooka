@@ -175,6 +175,23 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	messageTable.setDefaultRenderer(Object.class, new DefaultFolderCellRenderer());
 	messageTable.setDefaultRenderer(Number.class, new DefaultFolderCellRenderer());
 
+	// add sorting by header.
+
+	messageTable.getTableHeader().addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent e) {
+		    TableColumnModel columnModel = messageTable.getColumnModel();
+		    int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
+		    int column = messageTable.convertColumnIndexToModel(viewColumn); 
+		    if (e.getClickCount() == 1 && column != -1) {
+			//System.out.println("Sorting ..."); 
+			int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
+			boolean ascending = (shiftPressed == 0); 
+			((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
+		    }
+            }
+	    });
+	
+	
 	scrollPane.getViewport().add(messageTable);
 
 	int firstUnread = getFolderInfo().getFirstUnreadMessage();
