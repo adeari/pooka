@@ -84,7 +84,11 @@ public abstract class MessageDisplayPanel extends JPanel {
 		if (currentFont != null) {
 		    FontMetrics fm = this.getFontMetrics(currentFont);
 		    Insets margin = editorPane.getMargin();
-		    hsize = ((int)(charLength * fm.getStringBounds("Remember when you were young?  You shone like the sun.  Shine on you crazy diamo", editorPane.getGraphics()).getWidth() / 80)) + margin.left + margin.right;
+		    int scrollBarWidth = 0;
+		    if (editorScrollPane != null && editorScrollPane.getVerticalScrollBar() != null) {
+			scrollBarWidth = editorScrollPane.getVerticalScrollBar().getPreferredSize().width;
+		    }
+		    hsize = ((int)(charLength * fm.getStringBounds("Remember when you were young?  You shone like the sun.  Shine on you crazy diamo", editorPane.getGraphics()).getWidth() / 80)) + margin.left + margin.right + scrollBarWidth;
 		}
 	    } else {
 		hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.hsize", "500"));
