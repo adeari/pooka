@@ -1,13 +1,6 @@
 beta 1
 ---------------
 
-*) add disconnected imap support.  thoughts:  1)  cache headers so that we
-can make an InternetHeaders object.  2)  cache full messages so we can get
-all the information we need off the Message.  3)  effectively have a 'real'
-message which is what you make changes on.  4)  searches won't work in 
-disconnected mode.
-	-- started.  todo:
-
 caching:  pretty much the same as uid, no?  only difference is that we also have to add new messages/flag changes.  
 	   *)  add a ui for configuring caching.
 	   *)  bug:  new message count isn't quite correct, is it?
@@ -30,9 +23,6 @@ and subfolders.
 *) bug:  send mail seems to be on the awt event thread.
 
 *) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
-
-*) bug:  make sure all of the showError, etc. methods are on the AWTEventThread
-rather than the calling thread.
 
 *) check:  see how outgoing and incoming mail handle tab characters.
 	-- a little bit of a bug, but not too much.  should probably
@@ -71,6 +61,11 @@ so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
 
 *) add undo/redo support
+
+*) add ability to switch between preview and desktop mode without restarting.
+
+*) fix key binding on tables so that enter/space (or both) will open the
+message.
 
 protocol support
 ----------------
@@ -112,8 +107,6 @@ after beta 1
 
 *) fix the startup bugs:  
 	1)  windows take too long to show up
-	2)  sometimes the mailboxes are marked as broken when they shouldn't
-		be. * note:  i put in a possible workaround for this.
 
 *) enable voice control
 
@@ -139,7 +132,11 @@ and give an option on what you want to do with each one if there are any.
 properly--both that the email work is being done on the proper thread,
 and that all the gui updates are happening on the EventDispatcher thread.
 
-*)  all MessagingExceptions should be handled correctly, not ignored.
+*) bug:  make sure all of the showError, etc. methods are on the AWTEventThread
+rather than the calling thread.
+
+*)  all MessagingExceptions should be handled correctly, not ignored.  there
+should only be a few of these left.
 
 *) make the scrolling work properly for all border cases, such as a single new
 window at -5, -5.
