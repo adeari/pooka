@@ -21,9 +21,6 @@ next release:
 
 *) add support for external editors, such as emacs.
 
-*) add support for random SSL certificates.
-	done.  make it so we actually have a local keystore so that 
-	we don't have to ask each time.
 
 beta 1
 ---------------
