@@ -302,11 +302,18 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
       
       FetchProfile fp = new FetchProfile();
-      fp.add(FetchProfile.Item.ENVELOPE);
-      fp.add(FetchProfile.Item.FLAGS);
+      //fp.add(FetchProfile.Item.ENVELOPE);
+      //fp.add(FetchProfile.Item.FLAGS);
       fp.add(UIDFolder.FetchProfileItem.UID);
+      if (Pooka.isDebug())
+	System.out.println("getting messages.");
+
       Message[] messages = getFolder().getMessages();
+      if (Pooka.isDebug())
+	System.out.println("fetching messages.");
       getFolder().fetch(messages, fp);
+      if (Pooka.isDebug())
+	System.out.println("done fetching messages.  getting uid's");
       
       long[] uids = new long[messages.length];
       
@@ -369,14 +376,15 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   protected void runMessagesAdded(MessageCountEvent mce) {
     if (folderTableModel != null) {
       Message[] addedMessages = mce.getMessages();
-      MessageInfo mp;
+
+      MessageInfo mi;
       Vector addedProxies = new Vector();
       for (int i = 0; i < addedMessages.length; i++) {
 	if (addedMessages[i] instanceof CachingMimeMessage) {
-	  mp = new MessageInfo(addedMessages[i], CachingFolderInfo.this);
-	  addedProxies.add(new MessageProxy(getColumnValues(), mp));
-	  messageToInfoTable.put(addedMessages[i], mp);
-	  uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
+	  mi = new MessageInfo(addedMessages[i], CachingFolderInfo.this);
+	  addedProxies.add(new MessageProxy(getColumnValues(), mi));
+	  messageToInfoTable.put(addedMessages[i], mi);
+	  uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mi);
 	  try {
 	    if (autoCache) {
 	      getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.CONTENT);
@@ -386,9 +394,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  } catch (MessagingException me) {
 	    System.out.println("caught exception:  " + me);
 	    me.printStackTrace();
-	    
 	  }
-	  
 	} else {
 	  // it's a 'real' message from the server.
 	  
@@ -399,10 +405,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  }
 	  
 	  CachingMimeMessage newMsg = new CachingMimeMessage(CachingFolderInfo.this, uid);
-	  mp = new MessageInfo(newMsg, CachingFolderInfo.this);
-	  addedProxies.add(new MessageProxy(getColumnValues(), mp));
-	  messageToInfoTable.put(newMsg, mp);
-	  uidToInfoTable.put(new Long(uid), mp);
+	  mi = new MessageInfo(newMsg, CachingFolderInfo.this);
+	  addedProxies.add(new MessageProxy(getColumnValues(), mi));
+	  messageToInfoTable.put(newMsg, mi);
+	  uidToInfoTable.put(new Long(uid), mi);
 	  try {
 	    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
 	  } catch (MessagingException me) {
@@ -417,7 +423,19 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  getFolderTableModel().addRows(addedProxies);
 	setNewMessages(true);
 	resetMessageCounts();
-	fireMessageCountEvent(mce);
+
+	// notify the message loaded thread.
+	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
+	loaderThread.loadMessages(addedArray);
+
+	// change the Message objects in the MessageCountEvent to 
+	// our UIDMimeMessages.
+	Message[] newMsgs = new Message[addedProxies.size()];
+	for (int i = 0; i < addedProxies.size(); i++) {
+	  newMsgs[i] = ((MessageProxy)addedProxies.elementAt(i)).getMessageInfo().getMessage();
+	}
+	MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), newMsgs);
+	fireMessageCountEvent(newMce);
       }
       
     }

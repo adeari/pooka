@@ -434,7 +434,8 @@ public class ChangeCache {
      */
     public Message getMessageByPopUID(String uid, com.sun.mail.pop3.POP3Folder f, Message[] msgs) throws MessagingException {
 	// this is a really dumb algorithm.  we can do much better, especially
-	// if you consider that pop uids are sequential.
+	// if you consider that pop uids are sequential.  well, except for
+      // the fact that they're not.  :)
 	for (int i = msgs.length - 1; i >=0; i--) {
 	    String currentUid = f.getUID(msgs[i]);
 	    if (f.getUID(msgs[i]).equals(uid))
