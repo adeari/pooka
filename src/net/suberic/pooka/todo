@@ -25,6 +25,9 @@ say, like reacting to a mailto: link.
 *) bug:  can't switch back to original theme in theme configuration (starts
 	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
 
+*) fix problem with starting up work account and having it select first
+	message (???)
+
 *) support jdk 1.5
    *) add support for ocean theme 
 
