@@ -412,6 +412,10 @@ AttachmentPane.NewMsgActions.Remove.Action=file-remove
 
 AttachmentPane.2xClickAction=file-open
 
+FolderSelectorPane.popupMenu=Select
+FolderSelectorPane.popupMenu.Select.Action=select-folder
+FolderSelectorPane.popupMenu.Select.class=net.suberic.pooka.gui.FolderMenu
+
 # -- end popup menus.
 
 CachedMessages.notCached.foregroundColor=-65536
@@ -740,12 +744,18 @@ Preferences.SSL=Pooka.sslCertFile
 
 Pooka.sslCertFile.propertyType=File
 
-Pooka.uiConfig=messagePanel:folderPanel:messageWindow:newMessageWindow-editor:newMessageWindow-labels:folderTable:Button:ToggleButton:RadioButton:CheckBox:ColorChooser:ComboBox:Label:List:MenuBar:MenuItem:RadioButtonMenuItem:CheckBoxMeuItem:Menu:PopupMenu:OptionPane:Panel:ProgressBar:ScrollPane:Viewport:TabbedPane:Table:TableHeader:TextField:PasswordField:TextArea:TextPane:EditorPane:TitledBorder:ToolBar:ToolTip:Tree
-
+Pooka.uiConfig=default:black
 Pooka.uiConfig.propertyType=Multi
-Pooka.uiConfig._fixed=true
+Pooka.uiConfig.editableFields=uiConfig
 Pooka.uiConfig.editableFields.scoped=true
-Pooka.uiConfig.editableFields=font:background:foreground:disabledText:select:focus
+Pooka.uiConfig.editableFields.addSubProperty=false
+
+Pooka.uiConfig.editableFields.uiConfig.propertyType=Multi
+Pooka.uiConfig.editableFields.uiConfig._useTemplateForValue=true
+Pooka.uiConfig.editableFields.uiConfig=Button:ToggleButton:RadioButton:CheckBox:ColorChooser:ComboBox:Label:List:MenuBar:MenuItem:RadioButtonMenuItem:CheckBoxMeuItem:Menu:PopupMenu:OptionPane:Panel:ProgressBar:ScrollPane:Viewport:TabbedPane:Table:TableHeader:TextField:PasswordField:TextArea:TextPane:EditorPane:TitledBorder:ToolBar:ToolTip:Tree
+Pooka.uiConfig.editableFields.uiConfig._fixed=true
+Pooka.uiConfig.editableFields.uiConfig.editableFields=border:font:caretForeground:selectionBackground:selectionForeground:background:foreground:disabledText:select:focus:icon:text:disabledSelectedText:disabledBackground:disabledSelectedBackground:focusInsets:horizontalThumbIcon:verticalThumbIcon:foregroundHighligh:backgroundHighlight:listBackground:listForeground:titleColor:disabledForeground:shadow:darkShadow:thumb:thumbShadow:thumbHighlight:tabAreaBackground:lightHighlight:selectedHighlight:focusCellBackground:gridColor:acceleratorFont:acceleratorForeground:acceleratorSelectionForeground:textForeground:textBackground:selectionBorderColor:dockingBackground:floatingBackground:dockingForeground:floatingForeground
+Pooka.uiConfig.editableFields.uiConfig.editableFields.scoped=true
 
 Pooka.uiConfig.editableFields.font.propertyType=Font
 Pooka.uiConfig.editableFields.font._enabledBox=true

@@ -29,19 +29,9 @@ import javax.swing.*;
  * Foo.editableFields.baz for templates.
  *
  */
+
 public class MultiEditorPane extends DefaultPropertyEditor implements ListSelectionListener {
-  /*
- * Foo.editableFields.bar.addSubProperty=false -- shows whether or not to
- *                 add this property's name to the main edited property.
- *
- * If, for instance, Foo.editableFields.baz is a compisite editor (a 
- * CompositeEditorPane or a TabbedEditorPane, for instance), then, by default,
- * all properties under that editor will be scoped by baz.  So if the baz
- * editor has a "zork" property, then the actual edited property will be
- * Foo.fooOne.baz.zork.  If you'd rather have this Composite/Tabbed pane
- * edit top-level properties, then use the ".addSubProperty=false" extension
- * on that property.
- */
+
   String property;
   VariableBundle sourceBundle;
   PropertyEditorFactory factory;
@@ -96,7 +86,12 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     property=propertyName;
     factory = newFactory;
     sourceBundle=bundle;
-    originalValue = sourceBundle.getProperty(property, "");
+
+    if (sourceBundle.getProperty(newTemplate + "._useTemplateForValue", "false").equalsIgnoreCase("true")) {
+      originalValue = sourceBundle.getProperty(newTemplate, "");
+    } else {
+      originalValue = sourceBundle.getProperty(property, "");
+    }
     
     // set the default label.
     

@@ -89,9 +89,9 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    */
   public void configureInterfaceStyle(HashMap editorStyle, HashMap labelStyle) {
 
+    /*
     LinkedList editorList = new LinkedList();
     LinkedList labelList = new LinkedList();
-    /*
     editorList.add(editorPane);
 
     Enumeration  keys = inputTable.keys();
@@ -118,19 +118,20 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       }
     }
     
-    */
 
     sortComponents(this, editorList, labelList);
     applyStyle(editorList, editorStyle);
-    applyStyle(labelList, labelStyle);
-    splitPane.updateUI();
-    tabbedPane.updateUI();
+    //applyStyle(labelList, labelStyle);
+    //splitPane.updateUI();
+    //tabbedPane.updateUI();
+    */
   }
 
   /**
    * Apply the given style to the components in the given List
    */
   private void applyStyle(LinkedList componentList, HashMap uiStyle) {
+    /*
     Color backgroundColor = (Color) uiStyle.get("background");
     Color foregroundColor = (Color) uiStyle.get("foreground");
     Font f = (Font) uiStyle.get("font");
@@ -144,7 +145,26 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       if (f != null && currentComponent.getFont() != f) 
 	currentComponent.setFont(f);
     }
+    */
 
+    /*
+    System.err.println("doing updates and such.");
+    Hashtable oldDefaults = new Hashtable();
+    oldDefaults.put("TabbedPane.tabAreaBackground", UIManager.get("TabbedPane.tabAreaBackground"));
+    UIManager.put("TabbedPane.tabAreaBackground", Color.red);
+
+    oldDefaults.put("TabbedPane.background", UIManager.get("TabbedPane.background"));
+    UIManager.put("TabbedPane.background", Color.blue);
+
+    oldDefaults.put("TabbedPane.selected",UIManager.get("TabbedPane.selected"));
+    UIManager.put("TabbedPane.selected", Color.yellow);
+
+    SwingUtilities.updateComponentTreeUI(this);
+
+    UIManager.put("TabbedPane.tabAreaBackground", oldDefaults.get("TabbedPane.tabAreaBackground"));
+    UIManager.put("TabbedPane.background", oldDefaults.get("TabbedPane.background"));
+    UIManager.put("TabbedPane.selected", oldDefaults.get("TabbedPane.selected"));
+    */
   }
 
   private void sortComponents(Container parentContainer, LinkedList editorList, LinkedList labelList) {
