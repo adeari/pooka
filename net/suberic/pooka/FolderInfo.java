@@ -361,8 +361,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    }
 			}
 		    }
-		    */
-		    /*
+
 		    try {
 			closeFolder(false);
 		    } catch (MessagingException me) {
@@ -1098,7 +1097,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
     }
 
-
+    /**
+     * Actually runs the meat of the messagesChanged method.  Removed so 
+     * that it's easier for classes to override this method.
+     */
     protected void runMessageChanged(MessageChangedEvent mce) {
 	
 	// if the message is getting deleted, then we don't
@@ -1171,12 +1173,47 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
+    /**
+     * This updates the folder information if the folder has just been
+     * opened or closed.  Again, this is mainly to make it easier for
+     * subclasses to override functionality.
+     */
     protected void updateFolderOpenStatus(boolean isNowOpen) {
 	if (isNowOpen) {
 	    setStatus(CONNECTED);
 	} else {
 	    setStatus(CLOSED);
 	}
+    }
+
+    /**
+     * Opens the folder into its preferred state.
+     */
+    public void openToPreferredState() throws MessagingException {
+	if (! isLoaded())
+	    loadFolder();
+	
+	loadPreferredState();
+	
+	if (preferred_state < CLOSED)
+	    openFolder(Folder.READ_WRITE);
+    }
+
+    /**
+     * Sets the preferred state of the folder.
+     */
+    public void loadPreferredState() {
+	String state = Pooka.getProperty(getFolderProperty() + ".preferredState", "connected");
+	if (state.equalsIgnoreCase("connected"))
+	    preferred_state = CONNECTED;
+	else if (state.equalsIgnoreCase("passive"))
+	    preferred_state = PASSIVE;
+	else if (state.equalsIgnoreCase("disconnected"))
+	    preferred_state = DISCONNECTED;
+	else if (state.equalsIgnoreCase("CLOSED"))
+	    preferred_state = CLOSED;
+	else
+	    preferred_state = CONNECTED;
     }
 
     /**
@@ -1197,7 +1234,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (children != null)
 	    for (int i = 0; i < children.size(); i++) 
 		try {
-		    ((FolderInfo)children.elementAt(i)).openFolder(mode);
+		    ((FolderInfo)children.elementAt(i)).openToPreferredState();
 		} catch (MessagingException me) {
 		}
 	
