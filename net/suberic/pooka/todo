@@ -15,8 +15,6 @@ immediate todo:
 
 	bug:  openwith doesn't work under preview.
 
-	
-
 ui engine
 ---------
 *)  make the windows detachable.
@@ -95,6 +93,11 @@ message that you wrote, the lines will wrap at the correct place.
 *) bug:  send mail seems to be on the awt event thread.
 
 *) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
+
+*) bug:  if you subscribe to a subfolder underneath another, already subscribed
+subfolder (i.e. you're subscribed to IMAP/foo, and then subscribe to 
+IMAP/zeta), then the parent folder gets renamed to the above subfolder (so
+you end up with foo/foo and foo/zeta).
 
 *) loadMessageTracker?
 
