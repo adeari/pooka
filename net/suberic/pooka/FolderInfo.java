@@ -529,11 +529,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       Folder[] subscribedFolders = folder.list();
       
       StringBuffer newSubscribed = new StringBuffer();
-      
 
       for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
 	// sometimes listSubscribed() doesn't work.
-	if (subscribedFolders[i].isSubscribed()) {
+	if (subscribedFolders[i].isSubscribed() || subscribedFolders[i].getName().equalsIgnoreCase("INBOX")) {
 	  String folderName = subscribedFolders[i].getName();
 	  newSubscribed.append(folderName).append(':');
 	}

@@ -297,10 +297,15 @@ public class UIDFolderInfo extends FolderInfo {
 		for (int i = 0; i < addedMessages.length; i++) {
 		    UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
 		    long uid = newMsg.getUID();
-		    mp = new MessageInfo(newMsg, this);
-		    addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		    messageToInfoTable.put(newMsg, mp);
-		    uidToInfoTable.put(new Long(uid), mp);
+		    if (getMessageInfoByUid(uid) != null) {
+		      if (Pooka.isDebug())
+			System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
+		    } else {
+		      mp = new MessageInfo(newMsg, this);
+		      addedProxies.add(new MessageProxy(getColumnValues(), mp));
+		      messageToInfoTable.put(newMsg, mp);
+		      uidToInfoTable.put(new Long(uid), mp);
+		    }
 		}
 		addedProxies.removeAll(applyFilters(addedProxies));
 		if (addedProxies.size() > 0) {

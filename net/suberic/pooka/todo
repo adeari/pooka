@@ -25,9 +25,6 @@ next release:
 	done.  make it so we actually have a local keystore so that 
 	we don't have to ask each time.
 
-*) fix the multiple copies of new messages that sometimes happens when
-we lose and regain our imap connections.
-
 *) fix the display of html messages so that if there are errors in the
 html, we either fall back on the text version (if any) or display
 the straight html.
