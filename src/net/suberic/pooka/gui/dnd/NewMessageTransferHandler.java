@@ -16,19 +16,41 @@ import net.suberic.pooka.gui.*;
 public class NewMessageTransferHandler extends TransferHandler {
   private DataFlavor[] usableDataFlavors = new DataFlavor[] {
     MessageProxyTransferable.sMessageProxyDataFlavor,
-    DataFlavor.javaFileListFlavor
+    DataFlavor.javaFileListFlavor,
+    DataFlavor.stringFlavor
   };
 
   public boolean importData(JComponent c, Transferable t) {
     System.err.println("new message importing");
     DataFlavor matchedFlavor = DndUtils.matchDataFlavor(usableDataFlavors, t.getTransferDataFlavors());
     if (matchedFlavor == null) {
+      System.err.println("checking to see if it's available as a String...");
+      try {
+	matchedFlavor = DndUtils.matchDataFlavor(new DataFlavor[] { DataFlavor.stringFlavor }, t.getTransferDataFlavors());
+	if (matchedFlavor != null) {
+	  String value = (String) t.getTransferData(DataFlavor.stringFlavor);
+	  System.err.println("yep; String is '" + value + "'");
+	} else {
+	  System.err.println("nope; not a String.");
+	}
+      } catch (Exception e) {
+	System.err.println("nope; caught exception " + e);
+      }
       return false;
     } else {
       if (matchedFlavor == MessageProxyTransferable.sMessageProxyDataFlavor) {
 	return importMessageProxy(c, t);
       } else if (matchedFlavor == DataFlavor.javaFileListFlavor) {
 	return importFileList(c, t);
+      } else if (matchedFlavor == DataFlavor.stringFlavor) {
+	try {
+	  String value = (String) t.getTransferData(DataFlavor.stringFlavor);
+	  System.err.println("yep; String is '" + value + "'");
+	} catch (Exception e) {
+	  System.err.println("caught exception " + e);
+	}
+
+	return false;
       } else {
 	// weird
 	return false;
