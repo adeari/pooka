@@ -1,5 +1,7 @@
 *) threading of attachment actions.
 
+*) switch attached progress dialog to use a ProgressDialog.
+
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
 	address field.
@@ -15,6 +17,9 @@
 *) make search window look different than normal window.
 
 *) search doesn't work properly for sent folders.
+
+*) fix the display of the FolderTree -- right now, unopened stores are
+	squashed.
 
 -------
 

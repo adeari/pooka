@@ -99,7 +99,7 @@ public class UIDFolderInfo extends FolderInfo {
 	Pooka.getUIFactory().showError(Pooka.getProperty("Pooka.error.errorLoadingMessages", "Error loading message for folder ") + getFolderID(), me);
       }
       
-      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
       
       setFolderTableModel(ftm);
       

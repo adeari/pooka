@@ -297,7 +297,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	      uidToInfoTable.put(new Long(uids[i]), mi);
 	    }
 	    
-	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
 	    
 	    setFolderTableModel(ftm);
 	    
@@ -329,7 +329,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    uidToInfoTable.put(new Long(uids[i]), mi);
 	  }
 	  
-	  FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+	  FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
 	  
 	  setFolderTableModel(ftm);
 	  

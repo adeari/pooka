@@ -90,7 +90,7 @@ public class VirtualFolderInfo extends FolderInfo {
 	  System.out.println("column name " + i + " = " + getColumnNames().elementAt(i));
 	}
       }
-      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
       setFolderTableModel(ftm);
       
       resetMessageCounts();

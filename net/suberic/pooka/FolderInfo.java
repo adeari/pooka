@@ -627,7 +627,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       Vector colvals = new Vector();
       Vector colnames = new Vector();
       Vector colsizes = new Vector();
-      
+
       String tmp;
       
       while (tokens.hasMoreElements()) {
@@ -731,7 +731,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	messageToInfoTable.put(msgs[i], mi);
       }
       
-      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
       
       setFolderTableModel(ftm);
       

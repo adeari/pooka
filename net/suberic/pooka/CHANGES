@@ -1,3 +1,6 @@
+changed the message display code so that searches work a bit better with
+items in a sent folder.
+
 fixed a possible deadlock in manipulating messages that are the results
 of a search.
 

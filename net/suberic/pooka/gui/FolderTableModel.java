@@ -23,11 +23,13 @@ public class FolderTableModel extends AbstractTableModel {
   private int currentSortColumn = -1;
   private boolean currentAscending = true;
   //private Vector displayData;
+  private Vector columnKeys;
   
-  public FolderTableModel(Vector newData, Vector newColumnNames, Vector newColumnSizes) {
+  public FolderTableModel(Vector newData, Vector newColumnNames, Vector newColumnSizes, Vector newColumnKeys) {
     data=newData;
     columnNames = newColumnNames;
     columnSizes = newColumnSizes;
+    columnKeys = newColumnKeys;
     //displayData = new Vector(newData);
   }
   
@@ -60,7 +62,8 @@ public class FolderTableModel extends AbstractTableModel {
 	if (! mp.isLoaded()) {
 	  return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
 	} else {
-	  return ((MessageProxy)data.elementAt(row)).getTableInfo().elementAt(col);
+	  Object key = columnKeys.get(col);
+	  return ((MessageProxy)data.elementAt(row)).getTableInfo().get(key);
 	}
       }
     } catch (ArrayIndexOutOfBoundsException ae) {
@@ -185,9 +188,11 @@ public class FolderTableModel extends AbstractTableModel {
   protected class RowComparator implements Comparator {
     
     public int column;
-    
+    public Object columnKey;
+
     public RowComparator(int newColumn) {
       column = newColumn;
+      columnKey = columnKeys.get(column);
     }
     
     /**
@@ -205,8 +210,9 @@ public class FolderTableModel extends AbstractTableModel {
 	return 1; 
       }
       
-      Object o1 = ((MessageProxy)row1).getTableInfo().elementAt(column);
-      Object o2 = ((MessageProxy)row2).getTableInfo().elementAt(column);
+      
+      Object o1 = ((MessageProxy)row1).getTableInfo().get(columnKey);
+      Object o2 = ((MessageProxy)row2).getTableInfo().get(columnKey);
       
       // again, check for nulls.
       if (o1 == null && o2 == null) {

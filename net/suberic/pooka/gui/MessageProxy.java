@@ -8,6 +8,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
 import javax.swing.*;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
 import java.awt.event.*;
 import java.awt.print.*;
@@ -105,7 +106,7 @@ public class MessageProxy {
   MessageInfo messageInfo;
   
   // the information for the FolderTable
-  Vector tableInfo;
+  HashMap tableInfo;
   
   // matching Filters.
   DisplayFilter[] matchingFilters;
@@ -343,13 +344,16 @@ public class MessageProxy {
 	
 	// third, compare.
 	
-	Vector newTableInfo = createTableInfo();
+	HashMap newTableInfo = createTableInfo();
 	
 	// check to see if anything has actually changed
 	boolean hasChanged = (tableInfo == null);
-	for (int i = 0; hasChanged != true && i < newTableInfo.size(); i++) {
-	  Object newValue = newTableInfo.get(i);
-	  Object oldValue = tableInfo.get(i);
+	// assume that we're not actually changing the values...
+	java.util.Iterator it = newTableInfo.keySet().iterator();
+	while ((! hasChanged) && it.hasNext()) {
+	  Object key = it.next();
+	  Object newValue = newTableInfo.get(key);
+	  Object oldValue = tableInfo.get(key);
 	  if (! newValue.equals(oldValue)) {
 	    hasChanged = true;
 	  }
@@ -397,10 +401,10 @@ public class MessageProxy {
   /**
    * Creates a TableInfo Vector.
    */
-  protected Vector createTableInfo() throws MessagingException {
+  protected HashMap createTableInfo() throws MessagingException {
     int columnCount = columnHeaders.size();
     
-    Vector returnValue = new Vector();
+    HashMap returnValue = new HashMap();
     
     for(int j=0; j < columnCount; j++) {
       Object newProperty = columnHeaders.elementAt(j);
@@ -408,20 +412,20 @@ public class MessageProxy {
 	String propertyName = (String)newProperty;
 	
 	if (propertyName.startsWith("FLAG")) 
-	  returnValue.addElement(getMessageFlag(propertyName));
+	  returnValue.put(newProperty, getMessageFlag(propertyName));
 	else if (propertyName.equals("attachments"))
-	  returnValue.addElement(new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
+	  returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
 	else if (propertyName.equalsIgnoreCase("subject")) 
-	  returnValue.addElement(new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
+	  returnValue.put(newProperty, new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
 	else if (propertyName.equalsIgnoreCase("from")) 
-	  returnValue.addElement(new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
+	  returnValue.put(newProperty, new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
 	else
-	  returnValue.addElement(getMessageInfo().getMessageProperty(propertyName));
+	  returnValue.put(newProperty, getMessageInfo().getMessageProperty(propertyName));
       } else if (newProperty instanceof SearchTermIconManager) {
 	SearchTermIconManager stm = (SearchTermIconManager) newProperty;
-	returnValue.addElement(new SearchTermIcon(stm, this));
+	returnValue.put(newProperty, new SearchTermIcon(stm, this));
       } else if (newProperty instanceof RowCounter) {
-	returnValue.addElement(newProperty);
+	returnValue.put(newProperty, newProperty);
       }
     }
 
@@ -845,7 +849,7 @@ public class MessageProxy {
   /**
    * This returns the tableInfo for this MessageProxy.
    */
-  public Vector getTableInfo() {
+  public HashMap getTableInfo() {
     if (isLoaded()) {
       return tableInfo;
     } else {
@@ -858,7 +862,7 @@ public class MessageProxy {
     return getMessageInfo().getFolderInfo();
   }
   
-  public void setTableInfo(Vector newValue) {
+  public void setTableInfo(HashMap newValue) {
     tableInfo=newValue;
   }
   
