@@ -89,7 +89,7 @@ public class AttachmentPane extends JPanel {
 	 */
 	public Attachment getAttachmentAtRow(int row) {
 	    try {
-		if (row < msg.getAttachments().size())
+		if ((row < msg.getAttachments().size()) && (row >= 0))
 		    return (Attachment)msg.getAttachments().elementAt(row);
 	    } catch (MessagingException me) {
 	    }
