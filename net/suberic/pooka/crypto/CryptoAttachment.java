@@ -31,6 +31,15 @@ public class CryptoAttachment extends Attachment {
       encrypted = true;
     else if (ct.getSubType().equalsIgnoreCase("signed"))
       signed = true;
+
+    if (signed) {
+      try {
+	System.err.println("checkSignature = " + checkSignature());
+      } catch (Exception ee) {
+	System.err.println("caught exception checking signature:  " + ee.getMessage());
+	ee.printStackTrace();
+      }
+    }
   }
   
   /**
@@ -59,6 +68,11 @@ public class CryptoAttachment extends Attachment {
 
   // accessor methods.
   
+  /**
+   * Returns the decrypted version of the wrapped attachment, or null 
+   * if the attachment is either not actually encrypted, or cannot be 
+   * decrypted.
+   */
   protected BodyPart getDecryptedBodyPart() 
     throws EncryptionException, MessagingException, java.io.IOException {
     if (decryptedBodyPart != null)
@@ -70,7 +84,6 @@ public class CryptoAttachment extends Attachment {
 	PGPMimeEncryptionUtils utils = new PGPMimeEncryptionUtils();
 	utils.setPGPProviderImpl(new net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl());
 	decryptedBodyPart = utils.decryptMultipart((Multipart)o, new net.suberic.pooka.crypto.gpg.GPGEncryptionKey("allen", "biteme"));
-
 
 	return decryptedBodyPart;
       } else {
