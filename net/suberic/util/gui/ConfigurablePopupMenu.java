@@ -54,9 +54,10 @@ public class ConfigurablePopupMenu extends JPopupMenu implements ConfigurableUI 
 	System.err.println(vars.getProperty("error.NoSuchResource") + " " + mre.getKey());
       } catch (MissingResourceException mretwo) {
 	System.err.println("Unable to load resource " + mre.getKey());
-      } finally {
-	return;
       }
+
+      return;
+      
     }
     String currentToken;
     
