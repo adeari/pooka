@@ -213,6 +213,8 @@ FolderTree.unreadStyle=BOLD
 FolderTree.connectedIcon=images/Plus.gif
 FolderTree.disconnectedIcon=images/Minus.gif
 FolderTree.unavailableIcon=images/Delete.gif
+FolderTree.connectedStoreIcon=images/mailbox.gif
+FolderTree.disconnectedStoreIcon=images/mailbox.gif
 
 NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
 NewAccountPooka.password.propertyType=Password
