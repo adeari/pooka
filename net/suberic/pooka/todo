@@ -1,5 +1,4 @@
 *) document keybindings
-	-- keybinding for undo/redo
 	-- keybindings for external message frame(s)
 	-- keybindings for address book
 	-- keybindings for saving attachments.
@@ -8,11 +7,6 @@
 *) focus issues
 	--  when you select a new message window (using, say, alt+up), 
 		nothing gets the keyboard focus.
-
-*) startup:  make it so if you're actually showing a folder, that you
-	a) load the first, say, 25 message, and b) (if necessary) select
-	the first unread.  these should be done in the background before
-	any displaying is done.
 
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
