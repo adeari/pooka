@@ -1,3 +1,6 @@
+fixed a bug where unsubscribing to the current folder in preview pane mode
+would cause a NPE the next time a folder was selected.
+
 Added a way to delete a folder.
 
 Pooka now remembers its location on screen when restarting.

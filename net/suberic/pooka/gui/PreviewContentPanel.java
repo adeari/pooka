@@ -303,6 +303,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void removePreviewPanel(String folderId) {
     PreviewFolderPanel panel = (PreviewFolderPanel)cardTable.get(folderId);
     if (panel != null) {
+      if (panel == current)
+	current = null;
       folderDisplay.remove(panel);
       cardTable.remove(folderId);
     }

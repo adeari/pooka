@@ -813,20 +813,21 @@ public class SimpleFileCache implements MessageCache {
 	return cachedMessages.size();
     }
     
-    /**
-     * This returns the number of unread messages in the cache.
-     */
-    public int getUnreadMessageCount() throws MessagingException {
-	// sigh.
-	int unreadCount = 0;
-	for (int i = 0; i < cachedMessages.size(); i++) {
-	    Flags f = getFlags(((Long) cachedMessages.elementAt(i)).longValue(), uidValidity, false);
-	    if (! f.contains(Flags.Flag.SEEN))
-		unreadCount++;
-	}
-
-	return unreadCount;
+  /**
+   * This returns the number of unread messages in the cache.
+   */
+  public int getUnreadMessageCount() throws MessagingException {
+    // sigh.
+    int unreadCount = 0;
+    for (int i = 0; i < cachedMessages.size(); i++) {
+      Flags f = getFlags(((Long) cachedMessages.elementAt(i)).longValue(), uidValidity, false);
+      if (! f.contains(Flags.Flag.SEEN)) {
+	unreadCount++;
+      }
     }
+    
+    return unreadCount;
+  }
 
     /**
      * Returns whether a given uid exists fully in the cache or not.

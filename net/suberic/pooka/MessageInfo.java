@@ -759,7 +759,8 @@ public class MessageInfo {
     else {
       boolean seen = isSeen();
       if (newValue != seen) {
-	Message m = getRealMessage();
+	//Message m = getRealMessage();
+	Message m = getMessage();
 	m.setFlag(Flags.Flag.SEEN, newValue);
 	getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
       }
