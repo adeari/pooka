@@ -438,9 +438,9 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    openWindow();
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
 
@@ -450,9 +450,13 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    moveMessage((FolderInfo)getValue("target"));
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
 
     }
@@ -464,7 +468,9 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    try {
 		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)message.reply(false);
 		populateReply(m);
@@ -473,7 +479,9 @@ public class MessageProxy {
 	    } catch (MessagingException me) {
 		JOptionPane.showInternalMessageDialog(getMessagePanel(), Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
 	    }
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
 
@@ -484,7 +492,9 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    try {
 		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)message.reply(true);
 
@@ -494,7 +504,9 @@ public class MessageProxy {
 	    } catch (MessagingException me) {
 		JOptionPane.showInternalMessageDialog(getMessagePanel(), Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
 	    }
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
 
@@ -505,7 +517,9 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    try {
 		javax.mail.internet.MimeMessage m = new MimeMessage(getMessagePanel().getMainPanel().getSession());
 
@@ -515,7 +529,9 @@ public class MessageProxy {
 	    } catch (MessagingException me) {
 		JOptionPane.showInternalMessageDialog(getMessagePanel(), Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
 	    }
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
 
@@ -525,9 +541,11 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    deleteMessage();
-	    folderInfo.getFolderWindow().getMessagePanel().getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
 
