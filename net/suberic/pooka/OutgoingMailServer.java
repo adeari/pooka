@@ -221,23 +221,32 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       boolean connected = false;
       Transport sendTransport = null;
       try {
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.connecting", "Connecting to SMTP server..."));
+
 	sendTransport = prepareTransport(connect);
 	sendTransport.connect();
 	connected = true;
       } catch (MessagingException me) {
 	// if the connection/mail transport isn't available.
 	me.printStackTrace();
+
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.connecting", "SMTP server not available; getting outbox."));
+
 	FolderInfo outbox = getOutbox();
 	
 	if (outbox != null) {
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.waitForLock", "SMTP server not available; waiting for outbox lock."));
+
 	  // we need the lock
 	  Object runLock = outbox.getFolderThread().getRunLock();
 	  synchronized(runLock) {
 	    try {
 	      if ( ! outbox.isConnected()) {
+		Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.opening", "SMTP server not available; opening outbox."));
 		outbox.openFolder(Folder.READ_WRITE);
 	      }
 	      
+	      Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.appending", "SMTP server not available; appending to outbox."));
 	      outbox.appendMessages(new MessageInfo[] { nmi });
 	    
 	      javax.swing.SwingUtilities.invokeLater(new Runnable() {
@@ -265,7 +274,9 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	      /*
 		Message m = nmi.getMessage();
 		sendTransport.sendMessage(m, m.getAllRecipients());
-	      */	
+	      */
+	    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.sending", "Sending message over SMTP."));
+
 	    List sendMessageList = nmi.getSendMessageList();
 	    for (int i = 0; i < sendMessageList.size(); i++) {
 	      Message m = (Message) sendMessageList.get(i);

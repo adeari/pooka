@@ -91,7 +91,6 @@ public class NewMessageProxy extends MessageProxy {
 	
 	if (getCryptoInfo().updateRecipientInfos(profile, headers)) {
 	  getNewMessageInfo().sendMessage(profile, headers, getCryptoInfo(), messageText, messageContentType);
-	  getNewMessageInfo().saveToSentFolder(profile);
 	}
       }
     } catch (MessagingException me) {
@@ -105,6 +104,7 @@ public class NewMessageProxy extends MessageProxy {
    * Called when the send succeeds.
    */
   public void sendSucceeded() {
+    Pooka.getUIFactory().clearStatus();
     final NewMessageUI nmui = getNewMessageUI();
     if (nmui != null) {
       Runnable runMe = new Runnable() {
@@ -123,6 +123,7 @@ public class NewMessageProxy extends MessageProxy {
    * Called when the send fails.
    */
   public void sendFailed(Exception e) {
+    Pooka.getUIFactory().clearStatus();
     final Exception me = e;
     final NewMessageUI nmui = getNewMessageUI();
     if (nmui != null) {

@@ -287,15 +287,16 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * Shows a status message.
    */
   public void showStatusMessage(String newMessage) {
+
     final String msg = newMessage;
     Runnable runMe = new Runnable() {
 	public void run() {
 	  Pooka.getMainPanel().getInfoPanel().setMessage(msg);
 	}
       };
-    if (SwingUtilities.isEventDispatchThread())
+    if (SwingUtilities.isEventDispatchThread()) {
       runMe.run();
-    else
+    } else
       SwingUtilities.invokeLater(runMe);
   }
   

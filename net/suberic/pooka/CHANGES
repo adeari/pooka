@@ -1,3 +1,9 @@
+added status messages while sending new messages.  this is to make sure that
+users always know what the status of their outgoing messages is.
+
+moved much of the send message code from the AWTEventThread to the 
+OutgoingMailServer thread.
+
 up and down arrows on ReadMessageWindows now scroll the ScrollPane.  
 
 fixed the handling of incorrectly-formed multipart/alternative messages so 

@@ -1,7 +1,3 @@
-*) add java console for debugging during webstart/console-less operation.
-
-*) add status information during mail sending.
-
 *) support multiple attachment selection, including wildcards.
 
 *) fix NPE in KeySelectorPane editing with a new user.
@@ -12,10 +8,16 @@
 *) ?? ^D message, hit return for next message, get an error?
 	tough.  could fix by having a temporary 'deleted' flag on the message
 	itself, maybe?
+	- thought was to make stuff happen almost immediately on the awt
+	event thread, then switch over to the folder thread for the real
+	work.
 
 *) ??? still a chance to send a message twice????? !!!! ????
 
 *) encryption support:
+   *) add encryption button to new message window.
+   *) fix 'encrypted message' text display.
+	make sure to test with attachments.
    *) fix startup errors if no encryption configured.
 	if no keystore named, don't try loading?
    *) add documentation
@@ -31,6 +33,8 @@
 	see about prepackaging cryptix and bouncycastle.
 
 ----
+
+*) fix error display with exception so that you can see the stack trace.
 
 *) ?? change reply-all binding?
 

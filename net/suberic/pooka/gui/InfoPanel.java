@@ -22,12 +22,18 @@ public class InfoPanel extends JPanel {
 
     public void setMessage(String newMessage) {
 	final String msg = newMessage;
-	SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    currentLabel.setText(msg);
-		    currentLabel.repaint();
-		}
-	    });
+	Runnable runMe = new Runnable() {
+	    public void run() {
+	      currentLabel.setText(msg);
+	      currentLabel.repaint();
+	    }
+	  };
+
+	if (SwingUtilities.isEventDispatchThread()) {
+	  runMe.run();
+	} else {
+	  SwingUtilities.invokeLater(runMe);
+	}
     }
 
     public void clear() {
