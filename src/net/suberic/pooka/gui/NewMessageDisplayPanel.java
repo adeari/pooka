@@ -473,7 +473,61 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Creates a new CustomHeaderPane.
    */
   public Container createCustomHeaderPane() {
-    return new JPanel();
+    Box customInputPanel = new Box(BoxLayout.Y_AXIS);
+    
+    Box inputRow = null;
+    
+    // Create Address panel
+    
+    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
+    String currentHeader = null;
+    JLabel hdrLabel = null;
+    EntryTextArea inputField = null;
+    
+    while (tokens.hasMoreTokens()) {
+      inputRow = new Box(BoxLayout.X_AXIS);
+      currentHeader=tokens.nextToken();
+      hdrLabel = new JLabel(Pooka.getProperty("MessageWindow.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
+      hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
+      inputRow.add(hdrLabel);
+      
+      if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") ) {
+	try {
+	  inputField = new AddressEntryTextArea(getNewMessageUI(), getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+	} catch (MessagingException me) {
+	  inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
+	}
+      } else {
+	try {
+	  inputField = new net.suberic.util.swing.EntryTextArea(getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+	} catch (MessagingException me) {
+	  inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
+	}
+      }
+      
+      inputField.setLineWrap(true);
+      inputField.setWrapStyleWord(true);
+      inputField.setBorder(BorderFactory.createEtchedBorder());
+      inputField.addKeyListener(new KeyAdapter() {
+	  public void keyTyped(KeyEvent e) {
+	    setModified(true);
+	  }
+	});
+      
+      
+      inputRow.add(inputField);
+      if (inputField instanceof AddressEntryTextArea) {
+	//int height = inputField.getPreferredSize().height;
+	JButton addressButton = ((AddressEntryTextArea)inputField).createAddressButton(10, 10);
+	inputRow.add(Box.createHorizontalGlue());
+	inputRow.add(addressButton);
+      }
+      customInputPanel.add(inputRow);
+      
+      //proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
+    }
+    
+    return customInputPanel;
   }
 
   /**
@@ -483,6 +537,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     if (customHeaderPane == null) {
       customHeaderPane = createCustomHeaderPane();
       customHeaderScrollPane = new JScrollPane(customHeaderPane);
+      tabbedPane.add(Pooka.getProperty("MessageWindow.CustomHeaderTab", "Custom"), customHeaderScrollPane);
     }
     tabbedPane.setSelectedComponent(customHeaderScrollPane);
   }
@@ -491,7 +546,13 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Removes the custom header pane, if any.
    */
   public void removeCustomHeaderPane() {
+    if (customHeaderPane != null) {
+      tabbedPane.setSelectedComponent(headerScrollPane);
 
+      tabbedPane.remove(customHeaderScrollPane);
+    }
+    customHeaderPane = null;
+    customHeaderScrollPane = null;
   }
 
   /**
