@@ -134,7 +134,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	final MessageWindow newMessageWindow = messageWindow;
 	final boolean isNew = newMessage;
 
-	SwingUtilities.invokeLater(new RunnableAdapter() {
+	Runnable openWindowCommand = new RunnableAdapter() {
 		public void run() {
 		    if (isNew) {
 			MessagePanel.this.add(newMessageWindow);
@@ -152,7 +152,15 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 		    } catch (java.beans.PropertyVetoException e) {
 		    }
 		}
-	    });
+	    };
+	if (SwingUtilities.isEventDispatchThread())
+	    openWindowCommand.run();
+	else 
+	    try {
+		SwingUtilities.invokeAndWait(openWindowCommand);
+	    } catch (Exception e) {
+		// shouldn't happen.
+	    }
 	
     }
 
