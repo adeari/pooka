@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
+import net.suberic.util.swing.*;
 import net.suberic.util.gui.ConfigurableKeyBinding;
 import java.awt.*;
 import java.awt.event.*;
@@ -109,7 +110,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
    * Gets the UIConfig object from the UpdatableUIManager which is appropriate
    * for this UI.
    */
-  public UpdatableUIManager.UIConfig getUIConfig(UpdatableUIManager uuim) {
+  public UIConfig getUIConfig(UpdatableUIManager uuim) {
     String id = Pooka.getProperty("Pooka.folderPanel.uiConfig", "");
     if (id != null && ! id.equals("")) {
       return uuim.getUIConfig(id);
