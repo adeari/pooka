@@ -11,6 +11,7 @@ import java.io.*;
 
 public class NewMessageProxy extends MessageProxy {
     Hashtable commands;
+    NewMessageWindow msgWindow;
 
     public NewMessageProxy(Message newMessage) {
 	message=newMessage;
@@ -75,7 +76,7 @@ public class NewMessageProxy extends MessageProxy {
 	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
 		}
-		getMessageWindow().setModified(false);
+		((NewMessageWindow)getMessageWindow()).setModified(false);
 		getMessageWindow().closeMessageWindow();
 	    } catch (MessagingException me) {
 		if (me instanceof SendFailedException) {
@@ -109,7 +110,7 @@ public class NewMessageProxy extends MessageProxy {
      * method returns null.
      */
     public File[] getFileToAttach() {
-	return getMessageWindow().getFiles(Pooka.getProperty("MessageWindow.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageWindow.attachFileDialog.buttonText", "Attach"));
+	return ((NewMessageWindow)getMessageWindow()).getFiles(Pooka.getProperty("MessageWindow.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageWindow.attachFileDialog.buttonText", "Attach"));
     }
 
     /**
@@ -146,7 +147,7 @@ public class NewMessageProxy extends MessageProxy {
 	    
 	    attachments.add(mbp);
 	    
-	    getMessageWindow().attachmentAdded(attachments.size() -1);
+	    ((NewMessageWindow)getMessageWindow()).attachmentAdded(attachments.size() -1);
 	} catch (Exception e) {
 	    getMessageWindow().showError(Pooka.getProperty("error.MessageWindow.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageWindow.unableToAttachFile.title", "Unable to Attach File."), e);
 	}
@@ -163,7 +164,7 @@ public class NewMessageProxy extends MessageProxy {
 	if (attachments != null) {
 	    int index = attachments.indexOf(mbp);
 	    attachments.remove(mbp);
-	    getMessageWindow().attachmentRemoved(index);
+	    ((NewMessageWindow)getMessageWindow()).attachmentRemoved(index);
 	}
     }
 

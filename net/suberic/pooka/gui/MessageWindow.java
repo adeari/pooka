@@ -21,74 +21,68 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 
     MessageProxy msg;
     JSplitPane splitPane = null;
-    JTabbedPane tabbedPane = null;
-    Container headerPanel = null;
     AttachmentPane attachmentPanel = null;
     JComponent bodyPanel = null;
     int headerStyle = MessageWindow.HEADERS_DEFAULT;
     boolean editable = false;
     boolean showFullHeaders = false;
-    boolean modified = false;
-    Hashtable inputTable = null;
     JEditorPane editorPane = null;
     ConfigurableToolbar toolbar;
     boolean hasAttachment = false;
 
     //<sigh>
-    JScrollPane attachmentScrollPane, headerScrollPane;
+    JScrollPane attachmentScrollPane;
 
     /**
      * Creates a MessageWindow from the given Message.
      */
 
-    public MessageWindow(MessagePanel newParentContainer, MessageProxy newMsgProxy, boolean isEditable) {
+    public MessageWindow(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
 	super(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"), true, true, true, true);
 
 	parentContainer = newParentContainer;
-	editable = isEditable;
-	if (isEditable()) 
-	    inputTable = new Hashtable();
+	msg=newMsgProxy;
+
+	configureMessageWindow();
+    }
+    
+    protected void configureMessageWindow() {
+
 	this.getContentPane().setLayout(new BorderLayout());
 
-	msg=newMsgProxy;
-	if (editable) {
-	    this.setModified(true);
-	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
-	    toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
-	} else {
-	    try {
-		this.setTitle(msg.getMessage().getSubject());
-	    } catch (MessagingException me) {
-		this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.noSubject", "<no subject>"));
-	    }
-	    toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
+	try {
+	    this.setTitle(msg.getMessage().getSubject());
+	} catch (MessagingException me) {
+	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.noSubject", "<no subject>"));
 	}
+
+	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
 	
 	toolbar.setActive(this.getActions());
 	this.getContentPane().add("North", toolbar);
 
-	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	tabbedPane = new JTabbedPane();
-	
-	headerPanel = createHeaderPanel(msg);
-	bodyPanel = createBodyPanel(msg);
-
-	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
+	editorPane = createMessagePanel(msg);
 
 	if (!getMessageProxy().hasLoadedAttachments())
 	    getMessageProxy().loadAttachmentInfo();
 
-	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
-	    addAttachmentPane();
-	
-	splitPane.setTopComponent(tabbedPane);
-	splitPane.setBottomComponent(bodyPanel);
-	this.getContentPane().add("Center", splitPane);
+	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
+	    attachmentPanel = new AttachmentPane(msg);
+	    attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+	    splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	    
+	    splitPane.setTopComponent(new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	    splitPane.setBottomComponent(attachmentScrollPane);
+	    splitPane.resetToPreferredSizes();
+	    this.getContentPane().add("Center", splitPane);
+	} else {
+	    this.getContentPane().add("Center", new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	}
 	
 	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500")));
 	
-	newMsgProxy.setMessageWindow(this);
+	msg.setMessageWindow(this);
 
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 		public void internalFrameClosed(InternalFrameEvent e) {
@@ -96,133 +90,13 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 			getMessageProxy().setMessageWindow(null);
 		}
 	    });
-	
     }
 
     public void closeMessageWindow() {
-	
-	if (isModified()) {
-	    int saveDraft = showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
-	    switch (saveDraft) {
-	    case JOptionPane.YES_OPTION:
-		//this.saveDraft();
-	    case JOptionPane.NO_OPTION:
-		try {
-		    this.setClosed(true);
-		} catch (java.beans.PropertyVetoException e) {
-		}
-	    default:
-		return;
-	    }
-	} else {
-	    try {
-		this.setClosed(true);
-	    } catch (java.beans.PropertyVetoException e) {
-	    }
+	try {
+	    this.setClosed(true);
+	} catch (java.beans.PropertyVetoException e) {
 	}
-    }
-
-    public Container createHeaderPanel(MessageProxy aMsg) {
-	if (isEditable()) {
-	    return createHeaderInputPanel(aMsg, inputTable);
-	} else {
-	    return createHeaderTextField(aMsg);
-	}
-    }
-	
-
-    public JTextArea createHeaderTextField(MessageProxy aMsg) {
-	MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
-	
-	JTextArea headerArea = new JTextArea();
-	
-	if (showFullHeaders()) {
-	}
-	else {
-	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
-	    String hdrLabel,currentHeader = null;
-	    String[] hdrValue = null;
-	    
-	    while (tokens.hasMoreTokens()) {
-		currentHeader=tokens.nextToken();
-		hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		try {
-		    hdrValue = mMsg.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
-		} catch (MessagingException me) {
-		    hdrValue = null;
-		}
-
-		if (hdrValue != null && hdrValue.length > 0) {
-		    headerArea.append(hdrLabel + ":  ");
-		    for (int i = 0; i < hdrValue.length; i++) {
-			headerArea.append(hdrValue[i]);
-			if (i != hdrValue.length -1) 
-			    headerArea.append(", ");
-		    }
-		    headerArea.append("\n");
-		}
-	    }
-	}
-	return headerArea;
-    }
-		    
-
-    public Container createHeaderInputPanel(MessageProxy aMsg, Hashtable proptDict) {
-	
-	Box inputPanel = new Box(BoxLayout.Y_AXIS);
-
-	Box inputRow = new Box(BoxLayout.X_AXIS);
-
-	// Create UserProfile DropDown
-	JLabel userProfileLabel = new JLabel(Pooka.getProperty("UserProfile.label","User:"), SwingConstants.RIGHT);
-	userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
-	JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
-	inputRow.add(userProfileLabel);
-	inputRow.add(profileCombo);
-	
-	UserProfile selectedProfile = getParentContainer().getMainPanel().getCurrentUser();
-
-	if (selectedProfile != null)
-	    profileCombo.setSelectedItem(selectedProfile);
-
-	profileCombo.addItemListener(this);
-	
-	proptDict.put("UserProfile", profileCombo);
-
-	inputPanel.add(inputRow);
-	
-	// Create Address panel
-
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
-	String currentHeader = null;
-	JLabel hdrLabel = null;
-	JTextField inputField = null;
-
-	while (tokens.hasMoreTokens()) {
-	    inputRow = new Box(BoxLayout.X_AXIS);
-	    currentHeader=tokens.nextToken();
-	    hdrLabel = new JLabel(Pooka.getProperty("MessageWindow.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
-	    hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
-	    inputRow.add(hdrLabel);
-
-	    if (aMsg.getMessage() instanceof MimeMessage) {
-		MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
-		try {
-		    inputField = new JTextField(mMsg.getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","));
-		} catch (MessagingException me) {
-		    inputField = new JTextField();
-		}
-	    } else {
-		inputField = new JTextField();
-	    }
-		inputRow.add(inputField);
-	    
-	    inputPanel.add(inputRow);
-
-	    proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
-	}
-
-	return inputPanel;
     }
 
     /**
@@ -235,148 +109,71 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	getParentContainer().getMainPanel().refreshCurrentUser();
     }
 
-    public JComponent createBodyPanel(MessageProxy aMsg) {
+
+    /**
+     * This method creates the component that will display the message
+     * itself.
+     *
+     * It returns a JEditorPane with the headers and the message body
+     * together.
+     */
+
+    public JEditorPane createMessagePanel(MessageProxy aMsg) {
 	editorPane = new JEditorPane();
+	StringBuffer messageText = new StringBuffer();
 	
-	if (isEditable()) {
-	    
-	    // see if this message already has a text part, and if so,
-	    // include it.
-	    
-	    String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage());
-	    if (origText != null && origText.length() > 0) 
-		editorPane.setText(origText);
-	    
-	    //	    bodyInputPane.setContentType("text");
-	    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	} else {
-	    if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
-		javax.mail.internet.MimeMessage mMsg = (javax.mail.internet.MimeMessage) aMsg.getMessage();
-		String content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
-		if (content != null) {
-		    editorPane.setEditable(false);
-		    editorPane.setText(content);
-		    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		} else { 
-		    
-		    /* nothing found.  return a blank TextArea. */
-		    
-		    return new JScrollPane(new JTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		}
-	    } else 
-		return null;
-	}
-    }
+	if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
+	    javax.mail.internet.MimeMessage mMsg = (javax.mail.internet.MimeMessage) aMsg.getMessage();
 
-    /**
-     * This will populate a Message with the values entered in the 
-     * MessageWindow.
-     */
+	    // first do the headers.
 
-    public URLName populateMessageHeaders(Message m) throws MessagingException {
-	if (m instanceof MimeMessage) {
-	    MimeMessage mMsg = (MimeMessage)m;
-	    String key;
-	    URLName urlName = null;
-	    
-	    Enumeration keys = inputTable.keys();
-	    while (keys.hasMoreElements()) {
-		key = (String)(keys.nextElement());
-
-		if (key.equals("UserProfile")) {
-		    UserProfile up = (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
-		    up.populateMessage(mMsg);
-		    urlName = new URLName(up.getMailProperties().getProperty("sendMailURL", "smtp://localhost/"));
-		} else {
-		    String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
-		    String value = ((JTextField)(inputTable.get(key))).getText();
-		    mMsg.setHeader(header, value);
-		}
+	    if (showFullHeaders()) {
 	    }
-	    return urlName;
-	}
-	return null;
+	    else {
+		StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
+		String hdrLabel,currentHeader = null;
+		String[] hdrValue = null;
+		
+		while (tokens.hasMoreTokens()) {
+		    currentHeader=tokens.nextToken();
+		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
+		    try {
+			hdrValue = mMsg.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
+		    } catch (MessagingException me) {
+			hdrValue = null;
+		    }
+		    
+		    if (hdrValue != null && hdrValue.length > 0) {
+			messageText.append(hdrLabel + ":  ");
+			for (int i = 0; i < hdrValue.length; i++) {
+			    messageText.append(hdrValue[i]);
+			    if (i != hdrValue.length -1) 
+				messageText.append(", ");
+			}
+			messageText.append("\n");
+		    }
+		}
+		String separator = Pooka.getProperty("MessageWindow.separator", "");
+		if (separator.equals(""))
+		    messageText.append("\n\n");
+		else
+		    messageText.append(separator);
+	    }
+
+	    // then do the content
+	    String content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
+	    if (content != null) {
+		messageText.append(content);
+		editorPane.setEditable(false);
+		editorPane.setText(messageText.toString());
+	    } 
+	 
+	    return editorPane;
+
+	} else
+	    return new JEditorPane();
     }
-
-    /**
-     * Pops up a JFileChooser and returns the results.
-     *
-     * Note:  i'd like to have this working so that you can attach multiple
-     * files at once, but it seems that the JFileChooser really doesn't 
-     * want to return an array with anything in it for getSelectedFiles().  
-     * So for now, I'll leave the Pooka API as is, but only ever return a 
-     * single entry in the File array.
-     */
-    public File[] getFiles(String title, String buttonText) {
-	JFileChooser jfc = new JFileChooser();
-	jfc.setDialogTitle(title);
-	jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	jfc.setMultiSelectionEnabled(false);
-	int a = jfc.showDialog(this, buttonText);
-
-	if (a == JFileChooser.APPROVE_OPTION)
-	    return new File[] {jfc.getSelectedFile()};
-	else
-	    return null;
-    }
-    /**
-     * This notifies the MessageWindow that an attachment has been added
-     * at the provided index.  This does not actually add an attachment,
-     * but rather should be called by the MessageProxy when an attachment
-     * has been added.
-     *
-     * If an AttachmentPane does not currently exist for this MessageWindow,
-     * this method will call addAttachmentPane() to create one.
-     */
-    public void attachmentAdded(int index) {
-	if (getAttachmentPanel() == null)
-	    addAttachmentPane();
-	else
-	    getAttachmentPanel().getTableModel().fireTableRowsInserted(index, index);
-    }
-
-    /**
-     * This notifies the MessageWindow that the attachment at the 
-     * provided index has been removed.  This does not actually remove
-     * the attachment, but rather should be called by the MessageProxy
-     * when an attachment has been removed.
-     *
-     * If this removes the last attachment, the entire AttachmentPane
-     * is removed from the MessageWindow.
-     */
-    public void attachmentRemoved(int index) {
-	Vector attach = getMessageProxy().getAttachments();
-	if (attach == null || attach.size() == 0) {
-	    removeAttachmentPane();
-	} else {
-	    getAttachmentPanel().getTableModel().fireTableRowsDeleted(index, index);
-	}
-    }
-
-    /**
-     * This creates the JComponent which shows the attachments, and then
-     * adds it to the JTabbedPane.
-     *
-     */
-    public void addAttachmentPane() {
-	attachmentPanel = new AttachmentPane(getMessageProxy());
-	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentScrollPane);
-    }
-
-    /**
-     * This removes the AttachmentPane from the JTabbedPane.
-     */
-
-    public void removeAttachmentPane() {
-	if (attachmentPanel != null) {
-	    tabbedPane.setSelectedComponent(headerScrollPane);
-	    tabbedPane.remove(attachmentScrollPane);
-	}
-	attachmentPanel = null;
-	attachmentScrollPane=null;
-    }
-
+		    
     /**
      * This shows an Confirm Dialog window.  We include this so that
      * the MessageProxy can call the method without caring abou the
@@ -414,20 +211,7 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
      */
 
     public UserProfile getDefaultProfile() {
-	if (isEditable())
-	    return getSelectedProfile();
-	else
-	    return getMessageProxy().getDefaultProfile();
-    }
-
-
-    /**
-     * This method returns the UserProfile currently selected in the 
-     * drop-down menu.
-     */
-
-    public UserProfile getSelectedProfile() {
-	return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
+	return getMessageProxy().getDefaultProfile();
     }
 
     public String getMessageText() {
@@ -436,19 +220,6 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 
     public String getMessageContentType() {
 	return getEditorPane().getContentType();
-    }
-
-    public boolean isEditable() {
-	return editable;
-    }
-
-    public boolean isModified() {
-	return modified;
-    }
-
-    public void setModified(boolean mod) {
-	if (isEditable())
-	    modified=mod;
     }
 
     public boolean showFullHeaders() {
@@ -548,9 +319,7 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 
     public Action[] defaultActions = {
 	new CloseAction(),
-	new CutAction(),
-	new CopyAction(),
-	new PasteAction()
+	new CopyAction()
     };
 
     class CloseAction extends AbstractAction {
@@ -561,17 +330,6 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	
         public void actionPerformed(ActionEvent e) {
 	    closeMessageWindow();
-	}
-    }
-
-    class CutAction extends AbstractAction {
-	
-	CutAction() {
-	    super("cut-to-clipboard");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    performTextAction((String)getValue(Action.NAME), e);
 	}
     }
 
@@ -586,16 +344,6 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	}
     }
 
-    class PasteAction extends AbstractAction {
-	
-	PasteAction() {
-	    super("paste-from-clipboard");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    performTextAction((String)getValue(Action.NAME), e);
-	}
-    }
 }
 
 
