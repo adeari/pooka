@@ -152,10 +152,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	      }
 	    }
 
-
 	    inputField.setLineWrap(true);
 	    inputField.setWrapStyleWord(true);
-	    //inputField.setBorder(new javax.swing.plaf.basic.BasicBorders.FieldBorder(Color.black, Color.black, Color.black, Color.black));
 	    inputField.setBorder(BorderFactory.createEtchedBorder());
 	    inputRow.add(inputField);
 	    
@@ -218,24 +216,31 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      * This returns the values in the MesssageWindow as a set of 
      * InternetHeaders.
      */
-
     public InternetHeaders getMessageHeaders() throws MessagingException {
-	InternetHeaders returnValue = new InternetHeaders();
-	String key;
+      InternetHeaders returnValue = new InternetHeaders();
+      String key;
+      
+      Enumeration keys = inputTable.keys();
+      while (keys.hasMoreElements()) {
+	key = (String)(keys.nextElement());
 	
-	Enumeration keys = inputTable.keys();
-	while (keys.hasMoreElements()) {
-	    key = (String)(keys.nextElement());
-	    
-	    if (! key.equals("UserProfile")) {
-		String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
-		String value = ((EntryTextArea)(inputTable.get(key))).getText();
-		returnValue.setHeader(header, value);
-	    }
-	}
-	return returnValue;
-    }
+	if (! key.equals("UserProfile")) {
+	  String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
+	
+	  EntryTextArea inputField = (EntryTextArea) inputTable.get(key);
+	  String value = null;
+	  if (inputField instanceof AddressEntryTextArea) {
+	    value = ((AddressEntryTextArea) inputField).getParsedAddresses();
+	  } else {
+	    value = ((EntryTextArea)(inputTable.get(key))).getText();
+	  }
 
+	  returnValue.setHeader(header, value);
+	}
+      }
+      return returnValue;
+    }
+  
     /**
      * This notifies the MessageDisplayPanel that an attachment has been added
      * at the provided index.  This does not actually add an attachment,

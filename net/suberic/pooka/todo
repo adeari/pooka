@@ -4,6 +4,8 @@ next release:
 
 *) make vcard address book at least come close to working for simple cases.
 	should work for groups.
+	editor should work for new address books.
+	make editor take 'external' editors.
 
 *) fix "got an empty/null added or deleted event" message after a search has
 	been done.

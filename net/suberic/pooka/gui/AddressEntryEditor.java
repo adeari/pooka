@@ -42,8 +42,9 @@ public class AddressEntryEditor extends CompositeEditorPane {
 
     VariableBundle wrappedBundle = factory.getBundle();
     try {
-      entry.setAddress(new javax.mail.internet.InternetAddress(wrappedBundle.getProperty("currentAddress.address", "")));
+      entry.setAddresses(javax.mail.internet.InternetAddress.parse(wrappedBundle.getProperty("currentAddress.address", "")));
     } catch (javax.mail.internet.AddressException ae) {
+      ae.printStackTrace();
 
     }
     entry.setPersonalName(wrappedBundle.getProperty("currentAddress.personalName", ""));

@@ -173,9 +173,9 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   public void performAdd() {
     AddressBookEntry newEntry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
     try {
-      newEntry.setAddress(new javax.mail.internet.InternetAddress("example@example.com"));
+      newEntry.setAddresses(new javax.mail.internet.InternetAddress[] { new javax.mail.internet.InternetAddress("example@example.com") });
     } catch (Exception e) { }
-    if (newEntry.getAddress() != null) {
+    if (newEntry.getAddresses() != null) {
       book.addAddress(newEntry);
       ((AddressBookTableModel)addressTable.getModel()).addEntry(newEntry);
     }
@@ -317,7 +317,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
       AddressBookEntry currentEntry = entries[row];
 
       if (column == 0) {
-	return currentEntry.getPersonalName();
+	return currentEntry.getID();
       }
       if (column == 1) {
 	return currentEntry.getFirstName();
@@ -326,7 +326,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 	return currentEntry.getLastName();
       }
       if (column == 3) {
-	return currentEntry.getAddress();
+	return currentEntry.getAddressString();
       }
 
       return null;

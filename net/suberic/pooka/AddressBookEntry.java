@@ -17,9 +17,15 @@ public interface AddressBookEntry {
   public void setProperty(String propertyName, String value);
 
   /**
-   * Gets the InternetAddress associated with this AddressBookEntry.
+   * Gets the InternetAddresses associated with this AddressBookEntry.
    */
-  public javax.mail.internet.InternetAddress getAddress();
+  public javax.mail.internet.InternetAddress[] getAddresses();
+
+  /**
+   * Gets the String that's a proper representation of the address(es)
+   * in this AddressBookEntry.
+   */
+  public String getAddressString();
 
   /**
    * Gets the PersonalName property associated with this AddressBookEntry.
@@ -42,6 +48,11 @@ public interface AddressBookEntry {
   public void setAddress(javax.mail.internet.InternetAddress newAddress);
 
   /**
+   * sets the InternetAddresses associated with this AddressBookEntry.
+   */
+  public void setAddresses(javax.mail.internet.InternetAddress[] newAddress);
+
+  /**
    * Gets the PersonalName property associated with this AddressBookEntry.
    */
   public void setPersonalName(String newName);
@@ -61,4 +72,16 @@ public interface AddressBookEntry {
    */
   public java.util.Properties getProperties();
 
+  /**
+   * <p>Gets the ID of this AddressBookEntry.  This is the ID that will
+   * be searched by default, that can be entered into the To: field, etc.</p>
+   */
+  public String getID();
+
+  /**
+   * <p>Sets the ID of this AddressBookEntry.  This is the ID that will
+   * be searched by default, that can be entered into the To: field, etc.</p>
+   */
+  public void setID(String newID);
+  
 }

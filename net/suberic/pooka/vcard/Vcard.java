@@ -15,13 +15,15 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   public static final int SORT_BY_FIRST_NAME = 2;
   
   public static final int SORT_BY_PERSONAL_NAME = 3;
+
+  public static final int SORT_BY_ID = 4;
   
   Properties properties;
   
-  private int sortingMethod = 0;
+  private int sortingMethod = SORT_BY_ID;
   
-  private InternetAddress address;
-  
+  private InternetAddress[] addresses;
+
   /**
    * Creates a new Vcard from the given properties.
    */
@@ -41,6 +43,10 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
    */
   public void setProperty(String propertyName, String newValue) {
     properties.setProperty(propertyName, newValue);
+    
+    // if pretty much anything changes on here, then we should probably
+    // null out the address objects.
+    addresses = null;
   }
   
   /**
@@ -48,39 +54,58 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
    */
   public java.util.Properties getProperties() {
     Properties returnValue = new Properties();
-    // we need four settings:  "personalName", "firstName", "lastName", and 
-    // "address".
+    // we need five settings:  "personalName", "firstName", "lastName", 
+    // "address", and "id".
 
     returnValue.setProperty("currentAddress.personalName", getPersonalName());
     returnValue.setProperty("currentAddress.firstName", getFirstName());
     returnValue.setProperty("currentAddress.lastName", getLastName());
-    returnValue.setProperty("currentAddress.address", getAddress().getAddress() != null ? getAddress().getAddress() : "" );
+    returnValue.setProperty("currentAddress.address", getAddressString());
+    returnValue.setProperty("currentAddress.id", getID());
     return returnValue;
   }
 
   /**
    * Gets the InternetAddress associated with this Vcard.
    */
-  public InternetAddress getAddress() {
+  public InternetAddress[] getAddresses() {
     try {
-      if (address == null) {
-	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
+      if (addresses == null) {
+	addresses = InternetAddress.parse(properties.getProperty("email;internet"), false);
       }
-      return address;
-    } catch (java.io.UnsupportedEncodingException uee) {
+      return addresses;
+    } catch (javax.mail.internet.AddressException ae) {
+      ae.printStackTrace();
       return null;
     }
   }
 
   /**
+   * Gets the String that's a proper representation of the address(es)
+   * in this AddressBookEntry.
+   */
+  public String getAddressString() {
+    String returnValue = properties.getProperty("email;internet");
+    if (returnValue != null)
+      return returnValue;
+    else
+      return "";
+  }
+  
+  /**
    * Sets the InternetAddress associated with this Vcard.
    */
   public void setAddress(InternetAddress newAddress) {
-    if (newAddress != null) {
-      address = newAddress;
-      properties.setProperty("email;internet", newAddress.getAddress());
-      if (newAddress.getPersonal() != null)
-	properties.setProperty("fn", newAddress.getPersonal());
+    setAddresses(new InternetAddress[] { newAddress });
+  }
+
+  /**
+   * Sets the InternetAddress associated with this Vcard.
+   */
+  public void setAddresses(InternetAddress newAddresses[]) {
+    if (newAddresses != null) {
+      addresses = newAddresses;
+      properties.setProperty("email;internet", InternetAddress.toString(newAddresses));
     }
   }
 
@@ -88,33 +113,18 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
    * Gets the PersonalName property associated with this Vcard.
    */
   public String getPersonalName() {
-    try {
-      if (address == null) {
-	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
-      }
-      if (address.getPersonal() != null)
-	return address.getPersonal();
-      else 
-	return "";
-    } catch (java.io.UnsupportedEncodingException uee) {
+    String returnValue = properties.getProperty("fn");
+    if (returnValue != null)
+      return returnValue;
+    else
       return "";
-    }
   }
 
   /**
    * Gets the PersonalName property associated with this Vcard.
    */
   public void setPersonalName(String newName) {
-    try {
-      if (address == null) {
-	properties.setProperty("fn", newName);
-	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
-      } else {
-	properties.setProperty("fn", newName);
-	address.setPersonal(newName);
-      }
-    } catch (java.io.UnsupportedEncodingException uee) {
-    }
+    properties.setProperty("fn", newName);
   }
 
   /**
@@ -196,7 +206,23 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
    * Gets the email address (as a string) associated with this Vcard.
    */
   public String getEmailAddress() {
-    return address.getAddress();
+    return getAddressString();
+  }
+
+  /**
+   * <p>Gets the ID of this AddressBookEntry.  This is the ID that will
+   * be searched by default, that can be entered into the To: field, etc.</p>
+   */
+  public String getID() {
+    return getPersonalName();
+  }
+
+  /**
+   * <p>Sets the ID of this AddressBookEntry.  This is the ID that will
+   * be searched by default, that can be entered into the To: field, etc.</p>
+   */
+  public void setID(String newID) {
+    setPersonalName(newID);
   }
 
   //----  Comparable  ----//
@@ -220,7 +246,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       
       switch (sortingMethod) {
       case (SORT_BY_ADDRESS): 
-	int returnValue = getAddress().toString().compareTo(target.getAddress().toString());
+	int returnValue = getAddressString().compareTo(target.getAddressString());
 	return returnValue;
       case (SORT_BY_LAST_NAME):
 	return getLastFirst().compareTo(target.getLastFirst());
@@ -228,16 +254,16 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
 	return getFirstLast().compareTo(target.getFirstLast());
       case (SORT_BY_PERSONAL_NAME):
 	return getPersonalName().compareTo(target.getPersonalName());
+      default:
+	return getID().compareTo(target.getID());
       }
-      
-      return -1;
     } else if (o instanceof String) {
       String compareString = null;
       String matchString = (String) o;
       
       switch (sortingMethod) {
       case (SORT_BY_ADDRESS):
-	compareString = getAddress().toString();
+	compareString = getAddressString();
 	break;
       case (SORT_BY_LAST_NAME):
 	compareString = getLastFirst();
@@ -245,6 +271,8 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       case (SORT_BY_FIRST_NAME):
 	compareString = getFirstLast();
 	break;
+      default:
+	compareString = getID();
       }
       
       // see if the string to be matched is shorter; if so, match
@@ -325,7 +353,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       while (! isDone) {
 	reader.mark(256);
 	String nextLine = reader.readLine();
-	if (nextLine != null) {
+	if (nextLine != null && nextLine.length() > 0) {
 	  if (! Character.isWhitespace(nextLine.charAt(0))) {
 	    isDone = true;
 	    reader.reset();

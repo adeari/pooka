@@ -157,6 +157,20 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns all of the InternetAddresses which match the given String.
    */
   public AddressBookEntry[] match(String matchString) {
+    return match(matchString, false);
+  }
+
+  /**
+   * Returns all of the InternetAddresses which match the given String.
+   */
+  public AddressBookEntry[] matchExactly(String matchString) {
+    return match(matchString, true);
+  }
+
+  /**
+   * Returns all of the InternetAddresses which match the given String.
+   */
+  public AddressBookEntry[] match(String matchString, boolean exactly) {
     if (orderedList.length < 1)
       return new AddressBookEntry[0];
 

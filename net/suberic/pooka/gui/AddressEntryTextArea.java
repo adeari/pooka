@@ -1,8 +1,13 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.Pooka;
+import net.suberic.pooka.AddressBookEntry;
+import net.suberic.pooka.AddressMatcher;
 import java.awt.event.KeyEvent;
-import java.util.LinkedList;
+import java.awt.Color;
+import java.awt.Font;
+import java.util.*;
 import javax.swing.*;
+import javax.swing.text.*;
 import javax.mail.internet.InternetAddress;
 
 /**
@@ -18,12 +23,26 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   // the list of all AddressEntryTextAreas
   static java.util.WeakHashMap areaList = new java.util.WeakHashMap();
 
+  static int ADDRESS_MATCH = 0;
+  static int VALID = 1;
+  static int INVALID = 2;
+
   //---------- instance variables -----------//
   // the list of Addresses
   LinkedList addressList = new LinkedList();
 
+  // a map of looked-up values and their associated statuses
+  HashMap addressStatusMap = new HashMap();
+
+  // the last text value updated.
+  String lastUpdatedValue = "";
+
+
   // if we're doing this by delay or by keystroke
   boolean automaticallyDisplay = false;
+
+  // flag for if we've pressed the complete key.
+  boolean completeNow = false;
 
   // if by keystroke, the key that is used to request address completion
   javax.swing.KeyStroke completionKey = javax.swing.KeyStroke.getKeyStroke(net.suberic.pooka.Pooka.getProperty("Pooka.addressComplete", "control D"));
@@ -40,6 +59,12 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   // the delay in milliseconds between the last key hit and the next update.
   int delayInMilliSeconds = 1000;
 
+  // if we're updating the display if we match, or if an address is 
+  // incomplete, then these are the colors that we'll use to notify.
+  Color incompleteColor = Color.red;
+  Color matchedColor = Color.green;
+  Color validColor = Color.blue;
+  
   /**
    * Creates a new AddressEntryTextArea using the given NewMessageUI.
    */
@@ -86,20 +111,16 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 	// ignore
 	break;
       default:
-	if (automaticallyDisplay) {
-	  lastKeyTime = new java.util.Date().getTime();
-	  if (updateThread != null)
-	    updateThread.interrupt();
-	  else
-	    createUpdateThread();
-	} else {
-	  if (keyCode == completionKey.getKeyCode() && e.getModifiers() == completionKey.getModifiers()) {
-	    lastKeyTime = new java.util.Date().getTime();
-	    if (updateThread != null)
-	      updateThread.interrupt();
-	    else
-	      createUpdateThread();
-	  }
+	// we're just going to have to look at updating the text area
+	// all the freakin' time.  :)
+	lastKeyTime = System.currentTimeMillis();
+	if (updateThread != null)
+	  updateThread.interrupt();
+	else
+	  createUpdateThread();
+
+	if (keyCode == completionKey.getKeyCode() && e.getModifiers() == completionKey.getModifiers()) {
+	  completeNow = true;
 	}
       }
     }
@@ -111,39 +132,167 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   protected void updateTextValue() {
     final long lastModifiedTime = lastKeyTime;
-    //long currentTime = currentTime
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
 
     final String entryString = getAddressText();
 
     if (needToMatch(entryString)) {
-      net.suberic.pooka.AddressBookEntry[] matchedEntries = matcher.match(entryString);
-      InternetAddress[] tmpMatched = new InternetAddress[matchedEntries.length];
-      for (int i = 0; i < matchedEntries.length; i++) {
-	tmpMatched[i] = matchedEntries[i].getAddress();
-      }
-      final InternetAddress[] matchedAddresses = tmpMatched;
+      final net.suberic.pooka.AddressBookEntry[] matchedEntries = matcher.match(entryString);
 
       try {
 	SwingUtilities.invokeAndWait(new Runnable() {
 	    public void run() {
 	      // make sure no keys have been pressed since we did the match.
 	      if (lastModifiedTime == lastKeyTime) {
-		if (matchedAddresses.length > 0) {
-		  String newAddress = matchedAddresses[0].toString(); 
+		if (matchedEntries.length > 0) {
+		  String newAddress = matchedEntries[0].getID(); 
 		  if (!newAddress.equalsIgnoreCase(entryString))
 		    updateAddressText(newAddress);
 		} else {
 		  updateAddressText(entryString + Pooka.getProperty("error.noMatchingAddresses", "<no matching addresses>"));
 		}
 		
-		lastMatchedTime = new java.util.Date().getTime();
+		lastMatchedTime = System.currentTimeMillis();
 	      }
 	    }
 	  });
       } catch (Exception e) {
       }
     }
+  }
+
+  /**
+   * This updates the list of matched addresses in this entry field.
+   */
+  protected synchronized void updateAddressList() {
+    final String currentText = getText();
+    if (!currentText.equals(lastUpdatedValue)) {
+      LinkedList newAddressList = new LinkedList();
+      int beginOffset = 0;
+      boolean done = false;
+      while (! done) {
+	int endOffset = currentText.indexOf(',', beginOffset);
+	if (endOffset == -1) {
+	  endOffset = currentText.length();
+	  done = true;
+	}
+	Selection currentSelection = new Selection(beginOffset, endOffset, currentText.substring(beginOffset, endOffset));
+	currentSelection.status = parseStatus(currentSelection);
+	newAddressList.add(currentSelection);
+	beginOffset = endOffset + 1;
+	if (beginOffset >= currentText.length())
+	  done = true;
+      }
+
+      final LinkedList toUpdateList = newAddressList;
+
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    updateParsedSelections(toUpdateList, currentText);
+	  }
+	});
+    }
+  }
+
+  /**
+   * <p>Checks a selection to see if it's a correctly parsed address, an
+   * address book entry, or neither.</p>
+   *
+   * <p>This method also updates the addressStatusMap with any parsed
+   * values.</p>
+   */
+  public SelectionStatus parseStatus(Selection current) {
+    String addressText = current.text.trim();
+    Object value = addressStatusMap.get(addressText);
+    if (value != null) {
+      return (SelectionStatus) value;
+    } else {
+      SelectionStatus status = null;
+
+      // first see if we're an address book entry.
+      net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+      AddressBookEntry[] matchedEntries = matcher.matchExactly(addressText);
+      if (matchedEntries != null && matchedEntries.length > 0) {
+	status = new SelectionStatus(matchedEntries[0].getAddressString(), ADDRESS_MATCH);
+      } else {
+	// check to see if it's a valid address
+	try {
+	  InternetAddress newAddress = new InternetAddress(addressText);
+	  status = new SelectionStatus(addressText, VALID);
+	} catch (javax.mail.internet.AddressException ae) {
+	  status = new SelectionStatus(addressText, INVALID);
+	}
+      }
+      addressStatusMap.put(addressText, status);
+      return status;
+    }
+  }
+
+  /**
+   * <p>This redraws the text with the fonts and colors to represent the 
+   * separate fields' statuses.</p>
+   *
+   * <p>The method will first check to make sure that the text hasn't
+   * changed since the last update.  If it hasn't, then it will update the
+   * text, and then write in the new addressList and lastUpdatedValue
+   * fields.</p>
+   *
+   * <p>This method should only be called from the SwingEvent thread.</p>
+   */
+  public void updateParsedSelections(LinkedList newAddressList, String parsedText) {
+    if (parsedText.equals(getText())) {
+      Iterator iter = newAddressList.iterator();
+      while (iter.hasNext()) {
+	Selection current = (Selection) iter.next();
+	changeSelectionFont(current.beginOffset, current.endOffset, current.status.status);
+      }
+
+      lastUpdatedValue = parsedText;
+      addressList = newAddressList;
+    }
+  }
+
+  /**
+   * This validates that the current addressList matches the actual
+   * text in the field.
+   */
+  public boolean validateAddressList() {
+    String currentText = getText();
+    int caretPos = getCaretPosition();
+    java.util.Iterator iter = addressList.iterator();
+    boolean matches = true;
+    
+    while (matches && iter.hasNext()) {
+      Selection current = (Selection) iter.next();
+      if (! currentText.substring(current.beginOffset, current.endOffset).equals(current.text)) {
+	matches = false;
+      }
+    }
+    
+    return matches;
+  }
+
+  /**
+   * <p>Changes the text in the area between the <code>beginOffset<code> and 
+   * <code>endOffset</code>
+   * to the font appropriate for status <code>status</code>.
+   */
+  void changeSelectionFont(int beginOffset, int endOffset, int status) {
+    // implement me later, when you can get wrapping to work.
+    /*
+    javax.swing.text.StyledDocument doc = (javax.swing.text.StyledDocument)getDocument();
+    StyledEditorKit kit = (StyledEditorKit) getEditorKit();
+    MutableAttributeSet attr = kit.getInputAttributes();
+    SimpleAttributeSet sas = new SimpleAttributeSet();
+    if (status == ADDRESS_MATCH) {
+      StyleConstants.setForeground(sas, matchedColor);
+    } else if (status == VALID) {
+      StyleConstants.setForeground(sas, validColor);
+    } else {
+      StyleConstants.setForeground(sas, incompleteColor);
+    }
+    doc.setCharacterAttributes(beginOffset, (endOffset - beginOffset + 1), sas, false);
+    */
   }
 
   /**
@@ -164,6 +313,24 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     return currentSelection.text;
   }
 
+  /**
+   * This gets the parsed address text for this feel.
+   */
+  public String getParsedAddresses() {
+    updateAddressList();
+    StringBuffer returnBuffer = new StringBuffer();
+
+    Iterator iter = addressList.iterator();
+    while (iter.hasNext()) {
+      Selection current = (Selection) iter.next();
+      returnBuffer.append(current.status.addressText);
+      if (iter.hasNext())
+	returnBuffer.append(", ");
+    }
+    
+    return returnBuffer.toString();
+  }
+  
   /**
    * Gets the current Selection.
    */
@@ -194,6 +361,16 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     int length = current.text.length();
     // the text should always match the newAddress.  really.  :)
     this.insert(newAddress.substring(length), current.beginOffset + length);
+
+    // for use when we get the JTextPane to wrap.
+    /*
+    try {
+      getDocument().insertString(current.beginOffset + length, newAddress.substring(length), null);
+    } catch (BadLocationException ble) {
+      ble.printStackTrace();
+    }
+    */
+
     this.setSelectionStart(current.beginOffset + length);
     this.setSelectionEnd(current.beginOffset + newAddress.length());
   }
@@ -204,7 +381,13 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   public void replaceAddressText(Selection current, String newAddress) {
     int length = current.text.length();
     // the text should always match the newAddress.  really.  :)
-    this.replaceRange(newAddress, current.beginOffset, current.endOffset);
+    //this.replaceRange(newAddress, current.beginOffset, current.endOffset);
+    try {
+      getDocument().remove(current.beginOffset, current.endOffset - current.beginOffset + 1);
+      getDocument().insertString(current.beginOffset, newAddress, null);
+    } catch (BadLocationException ble) {
+      ble.printStackTrace();
+    }
     this.setSelectionStart(current.beginOffset);
     this.setSelectionEnd(current.beginOffset + newAddress.length());
   }
@@ -215,9 +398,9 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   public void selectNextEntry() {
     Selection currentSelection = getCurrentSelection();
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
-    InternetAddress newValue = matcher.getNextMatch(currentSelection.text).getAddress();
+    AddressBookEntry newValue = matcher.getNextMatch(currentSelection.text);
     if (newValue != null) {
-      replaceAddressText(currentSelection, newValue.toString());
+      replaceAddressText(currentSelection, newValue.getID());
     }
 
   }
@@ -228,17 +411,17 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   public void selectPreviousEntry() {
     Selection currentSelection = getCurrentSelection();
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
-    InternetAddress newValue = matcher.getPreviousMatch(currentSelection.text).getAddress();
+    AddressBookEntry newValue = matcher.getPreviousMatch(currentSelection.text);
     if (newValue != null) {
-      replaceAddressText(currentSelection, newValue.toString());
+      replaceAddressText(currentSelection, newValue.getID());
     }
-
   }
 
   private class Selection {
     int beginOffset;
     int endOffset;
     String text;
+    SelectionStatus status = null;
 
     Selection(int newBegin, int newEnd, String newText) {
       beginOffset = newBegin;
@@ -247,6 +430,15 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     }
   }
 
+  private class SelectionStatus {
+    String addressText = null;
+    int status;
+    
+    SelectionStatus(String newAddressText, int newStatus) {
+      addressText = newAddressText;
+      status = newStatus;
+    }
+  }
   //----------- focus listener ----------------
   /**
    * a no-op -- don't do anything on focusGained.
@@ -259,7 +451,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    *
    */
   public void focusLost(java.awt.event.FocusEvent e) {
-    lastMatchedTime = new java.util.Date().getTime();
+    lastMatchedTime = System.currentTimeMillis();
   }
 
   //----------- updater thread ----------------
@@ -285,11 +477,17 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 	sleepTime = 60000;
 	java.util.Iterator entryIter = entrySet.iterator();
 	while (entryIter.hasNext()) {
-	  long currentTime = new java.util.Date().getTime();
+	  long currentTime = System.currentTimeMillis();
 	  AddressEntryTextArea area = (AddressEntryTextArea) ((java.util.Map.Entry)entryIter.next()).getKey();
-	  if (area.lastKeyTime > area.lastMatchedTime || ! area.automaticallyDisplay) {
+	  if (area.lastKeyTime > area.lastMatchedTime) {
 	    if (area.lastKeyTime + area.delayInMilliSeconds < currentTime) {
-	      area.updateTextValue();
+	      if (area.completeNow || area.automaticallyDisplay) {
+		area.completeNow = false;
+		area.updateTextValue();
+	      }
+
+	      area.updateAddressList();
+
 	    } else {
 	      sleepTime = Math.min(sleepTime, (area.delayInMilliSeconds + area.lastKeyTime) - currentTime);
 	    }
@@ -301,22 +499,6 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 	} catch (InterruptedException e) {
 	}
       }
-    }
-  }
-
-  /**
-   * <p>An address entry.  Consists of a text representation, an underlying
-   * address representation, and a status.</p>
-   */
-  public class AddressField {
-    public String addressText;
-    public String actualAddress;
-    public int status;
-
-    public AddressField(String newText, String newActual, int newStatus) {
-      addressText = newText;
-      actualAddress = newActual;
-      status = newStatus;
     }
   }
 

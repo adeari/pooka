@@ -8,9 +8,14 @@ import javax.mail.internet.InternetAddress;
 public interface AddressMatcher {
 
   /**
-   * Returns all of the AddressBookEntryes which match the given String.
+   * Returns all of the AddressBookEntries which match the given String.
    */
   public AddressBookEntry[] match(String matchString);
+
+  /**
+   * <p>Returns the AddressBookEntries that match the given String exactly.
+   */
+  public AddressBookEntry[] matchExactly(String matchString);
 
   /**
    * Returns all of the AddressBookEntries whose FirstName matches the given 
