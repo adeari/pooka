@@ -20,6 +20,8 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
 
   SSLSocketFactory wrappedFactory = null;
 
+  public static Object sLock = new Object();
+
   /**
    * Creates a PookaSSLSocketFactory.
    */
@@ -50,7 +52,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
       
       PookaTrustManager ptm = Pooka.getTrustManager();
       if (ptm == null) {
-	synchronized (this) {
+	synchronized (sLock) {
 	  ptm = Pooka.getTrustManager();
 	  if (ptm == null) {
 	    TrustManager[] trustManagers = tmFactory.getTrustManagers();
