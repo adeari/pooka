@@ -45,11 +45,13 @@ MenuBar.File.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif
 
-MenuBar.Edit=UserConfig:StoreConfig:Undo:Select All:Cut:Copy:Paste
+MenuBar.Edit=UserConfig:StoreConfig:Folders:Undo:Select All:Cut:Copy:Paste
 MenuBar.Edit.UserConfig.Action=cfg-users
 MenuBar.Edit.UserConfig.Label=User Configuration
 MenuBar.Edit.StoreConfig.Action=cfg-stores
 MenuBar.Edit.StoreConfig.Label=Mailbox Configuration
+MenuBar.Edit.Folders.Action=folder-subscribe
+MenuBar.Edit.Folders.Label=Folders
 MenuBar.Edit.Undo.Action=undo-action
 MenuBar.Edit.Undo.Image=/net/suberic/pooka/gui/images/Undo.gif
 MenuBar.Edit.Select All.Action=select-all
