@@ -151,7 +151,7 @@ public class MessageProxy {
      * Moves the Message into the target Folder.
      */
     public void moveMessage(FolderInfo targetFolder) {
-	int success=false;
+        boolean success=false;
 	try {
 	    /*
 	      this shouldn't be necessary according to the api.
