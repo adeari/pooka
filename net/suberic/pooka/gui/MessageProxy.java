@@ -55,10 +55,10 @@ public class MessageProxy {
 	jd.dispose();
 	
       } catch (IOException ioe) {
-	Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
+	getPookaUIFactory().showError("Error saving file:  " + ioe.getMessage());
 	cancelSave();
       } catch (MessagingException me) {
-	Pooka.getUIFactory().showError("Error saving file:  " + me.getMessage());
+	getPookaUIFactory().showError("Error saving file:  " + me.getMessage());
 	cancelSave();
       } finally {
 	if (outStream != null) {
@@ -129,9 +129,6 @@ public class MessageProxy {
   
   // The Window associated with this MessageProxy.
   MessageUI msgWindow;
-  
-  // The GUI factory used by this MessageProxy.
-  PookaUIFactory uiFactory;
   
   public Action[] defaultActions;
   
@@ -523,7 +520,7 @@ public class MessageProxy {
   public void openWindow() {
     try {
       if (getMessageUI() == null) {
-	MessageUI newUI = getPookaUIFactory().createMessageUI(this);
+	MessageUI newUI = Pooka.getUIFactory().createMessageUI(this);
 	setMessageUI(newUI);
       }
       SwingUtilities.invokeLater(new Runnable() {
@@ -549,7 +546,7 @@ public class MessageProxy {
       NewMessageInfo nmi = new NewMessageInfo(newMessage);
       NewMessageProxy nmp = new NewMessageProxy(nmi);
       
-      final MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
+      final MessageUI nmu = getPookaUIFactory().createMessageUI(nmp, getMessageUI());
 
       nmp.matchUserProfile();
 
@@ -952,19 +949,12 @@ public class MessageProxy {
    * Returns the UI Factory currently being used by this MessageProxy.
    */
   public PookaUIFactory getPookaUIFactory() {
-    if (uiFactory != null)
-      return uiFactory;
+    if (getMessageUI() != null)
+      return getMessageUI().getPookaUIFactory();
     else
       return Pooka.getUIFactory();
   }
 
-  /**
-   * Sets the UI Factory currently being used by this MessageProxy.
-   */
-  public void setPookaUIFactory(PookaUIFactory puif) {
-    uiFactory = puif;
-  }
-  
   /**
    * Returns the matching filters for this MessageProxy.
    */

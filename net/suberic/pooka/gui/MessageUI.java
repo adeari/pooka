@@ -21,4 +21,9 @@ public interface MessageUI extends UserProfileContainer, ErrorHandler, ActionCon
   
   public void setEnabled(boolean newValue);
   
+  /**
+   * Returns the PookaUIFactory that should be used by this MessageUI.
+   */
+  public PookaUIFactory getPookaUIFactory();
+
 }

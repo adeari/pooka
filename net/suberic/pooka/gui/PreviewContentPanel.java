@@ -16,21 +16,21 @@ import javax.swing.event.ListSelectionListener;
  */
 public class PreviewContentPanel extends JPanel implements ContentPanel, MessageUI {
 
-    private JPanel folderDisplay = null;
-    private ReadMessageDisplayPanel messageDisplay;
-    private JPanel messageCardPanel;
-
-    private JSplitPane splitPanel;
-
-    private PreviewFolderPanel current = null;
-
-    private ConfigurableToolbar toolbar;
-    HashMap cardTable = new HashMap();
-
-    private ListSelectionListener selectionListener;
-
-    private boolean savingOpenFolders;
-
+  private JPanel folderDisplay = null;
+  private ReadMessageDisplayPanel messageDisplay;
+  private JPanel messageCardPanel;
+  
+  private JSplitPane splitPanel;
+  
+  private PreviewFolderPanel current = null;
+  
+  private ConfigurableToolbar toolbar;
+  HashMap cardTable = new HashMap();
+  
+  private ListSelectionListener selectionListener;
+  
+  private boolean savingOpenFolders;
+  
   /**
    * Creates a new PreviewContentPanel.
    */
@@ -366,93 +366,100 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void setEnabled(boolean newValue) {
     // no-op here.
   }
-
+  
   public boolean getAutoPreview() {
     return (Pooka.getProperty("Pooka.autoPreview", "true").equalsIgnoreCase("true"));
   }
-
+  
   /**
    * This shows an Confirm Dialog window.  We include this so that
    * the MessageProxy can call the method without caring abou the
    * actual implementation of the Dialog.
    */    
   public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showConfirmDialog(this, messageText, title, type);
-    }
-
-    /**
-     * This shows an Confirm Dialog window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */    
-    public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-	return JOptionPane.showConfirmDialog(this, messageText, title, optionType, iconType);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title) {
-	JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"));
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, Exception e) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring about the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-	e.printStackTrace();
-    }
-
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(Object[] inputPanes, String title) {
-	return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * This shows a Message window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
+    return JOptionPane.showConfirmDialog(this, messageText, title, type);
+  }
+  
+  /**
+   * This shows an Confirm Dialog window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */    
+  public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
+    return JOptionPane.showConfirmDialog(this, messageText, title, optionType, iconType);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title) {
+    JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, Exception e) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    showError(errorMessage + e.getMessage(), title);
+    e.printStackTrace();
+  }
+  
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(String inputMessage, String title) {
+    return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(Object[] inputPanes, String title) {
+    return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * This shows a Message window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
   public void showMessageDialog(String message, String title) {
     JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
   }
   
+  /**
+   * Gets the PookaUIFactory that should be used by this MessageUI.
+   */
+  public PookaUIFactory getPookaUIFactory() {
+      return Pooka.getUIFactory();
+  }
+
   public Action[] defaultActions = {
     new NextWindowAction(),
     new PreviousWindowAction()

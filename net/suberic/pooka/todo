@@ -5,9 +5,9 @@
 	address field.
 	-- check to make sure that we get the correct ui factory for
 	each message window.
+	-- make the button actually be the right size.
 	-- make it so you can add to the address book from the selection
 		panel.
-	-- make the button actually be the right size.
 
 *) make address book editable as soon as you create it.
 
@@ -28,10 +28,10 @@
 
 	-- search --
 
-*) make search window look different than normal window.
-
 *) search doesn't work properly for sent folders.
 	-- started, at least.
+
+*) make search window look different than normal window.
 
 *) fix the display of the FolderTree -- right now, unopened stores are
 	squashed.
@@ -42,6 +42,9 @@
 	at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:357)
 	at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
 	at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
+	-- check received folder for that.
+
+*) fix protocol grep timeout for imap/ssl?
 
 -------
 

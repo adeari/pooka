@@ -19,20 +19,22 @@ import javax.swing.plaf.metal.MetalTheme;
  * A top-level window for displaying a message.
  */
 public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSupporter, ThemeListener {
-
-    protected MessageProxy msg;
-    protected MessageDisplayPanel messageDisplay;
-
-    protected ConfigurableToolbar toolbar;
-    protected ConfigurableKeyBinding keyBindings;
-    protected ConfigurableMenuBar menuBar;
-
+  
+  protected MessageProxy msg;
+  protected MessageDisplayPanel messageDisplay;
+  
+  protected ConfigurableToolbar toolbar;
+  protected ConfigurableKeyBinding keyBindings;
+  protected ConfigurableMenuBar menuBar;
+  
+  protected PookaUIFactory uiFactory;
+  
   protected javax.swing.plaf.metal.MetalTheme currentTheme = null;
-
-    /**
-     * Creates a MessageFrame from the given Message.
-     */
-
+  
+  /**
+   * Creates a MessageFrame from the given Message.
+   */
+  
   public MessageFrame(MessageProxy newMsgProxy) {
     super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"));
     
@@ -54,8 +56,8 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
       });
     
     
-    }
-
+  }
+  
   protected MessageFrame() {
     this.getContentPane().setLayout(new BorderLayout());
     
@@ -74,13 +76,13 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
       
     }
 
-    /**
-     * this method is expected to do all the implementation-specific
-     * duties.
-     */
-
-    protected abstract void configureMessageFrame();
-
+  /**
+   * this method is expected to do all the implementation-specific
+   * duties.
+   */
+  
+  protected abstract void configureMessageFrame();
+  
   /**
    * Configures the InterfaceStyle for this component.
    */
@@ -88,7 +90,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
      Runnable runMe = new Runnable() {
 	public void run() {
 	  try {
-	    Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
+	    getPookaUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
 	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
 	    getMessageDisplay().sizeToDefault();
 	    MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
@@ -135,7 +137,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    try {
-	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
+	      getPookaUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
 	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
 	      getMessageDisplay().sizeToDefault();
               MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
@@ -147,215 +149,231 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     }
   }
 
-
-    /**
-     * This opens the MessageFrame.
-     */
-    public void openMessageUI() {
-	this.show();
-    }
-
-    /**
-     * This closes the MessageFrame.
-     */
-    public void closeMessageUI() {
-	this.dispose();
-    }
-
-    /**
-     * Attaches the window to a MessagePanel.
-     */
-    public abstract void attachWindow();
-
-    /**
-     * This shows an Confirm Dialog window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-    */    
-    public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showConfirmDialog(this, messageText, title, type);
-    }
-
-    /**
-     * This shows an Confirm Dialog window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */    
-    public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-	return JOptionPane.showConfirmDialog(this, messageText, title, optionType, iconType);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title) {
-	JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"));
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, Exception e) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring about the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-	e.printStackTrace();
-    }
-
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(Object[] inputPanes, String title) {
-	return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * This shows a Message window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
+  /**
+   * This opens the MessageFrame.
+   */
+  public void openMessageUI() {
+    this.show();
+  }
+  
+  /**
+   * This closes the MessageFrame.
+   */
+  public void closeMessageUI() {
+    this.dispose();
+  }
+  
+  /**
+   * Attaches the window to a MessagePanel.
+   */
+  public abstract void attachWindow();
+  
+  /**
+   * This shows an Confirm Dialog window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */    
+  public int showConfirmDialog(String messageText, String title, int type) {
+    return JOptionPane.showConfirmDialog(this, messageText, title, type);
+  }
+  
+  /**
+   * This shows an Confirm Dialog window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */    
+  public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
+    return JOptionPane.showConfirmDialog(this, messageText, title, optionType, iconType);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title) {
+    JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, Exception e) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    showError(errorMessage + e.getMessage(), title);
+    e.printStackTrace();
+  }
+  
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(String inputMessage, String title) {
+    return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(Object[] inputPanes, String title) {
+    return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * This shows a Message window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
   public void showMessageDialog(String message, String title) {
     JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
   }
 
-    /**
-     * A convenience method to set the PreferredSize and Size of the
-     * component to that of the current preferred width.
-     */
-    public void resizeByWidth() {
-	//int width = (int)messageDisplay.getPreferredSize().getWidth();
-	//this.setPreferredSize(new Dimension(width, width));
-	this.setSize(this.getPreferredSize());
+  /**
+   * A convenience method to set the PreferredSize and Size of the
+   * component to that of the current preferred width.
+   */
+  public void resizeByWidth() {
+    //int width = (int)messageDisplay.getPreferredSize().getWidth();
+    //this.setPreferredSize(new Dimension(width, width));
+    this.setSize(this.getPreferredSize());
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.gui.MessageUI.
+   * 
+   * This implementation sets the cursor to either Cursor.WAIT_CURSOR
+   * if busy, or Cursor.DEFAULT_CURSOR if not busy.
+   */
+  public void setBusy(boolean newValue) {
+    if (newValue)
+      this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    else
+      this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.UserProfileContainer.
+   *
+   * This implementation returns the DefaultProfile of the associated
+   * MessageProxy if the MessageFrame is not editable.  If the 
+   * MessageFrame is editable, it returns the currently selected 
+   * UserProfile object.
+   */
+  
+  public UserProfile getDefaultProfile() {
+    return getMessageProxy().getDefaultProfile();
+  }
+  
+  public MessageDisplayPanel getMessageDisplay() {
+    return messageDisplay;
+  }
+  
+  public MessageProxy getMessageProxy() {
+    return msg;
+  }
+  
+  public void setMessageProxy(MessageProxy newValue) {
+    msg = newValue;
+  }
+  
+  public String getMessageText() {
+    return getMessageDisplay().getMessageText();
+  }
+  
+  public String getMessageContentType() {
+    return getMessageDisplay().getMessageContentType();
+  }
+  
+  public AttachmentPane getAttachmentPanel() {
+    return getMessageDisplay().getAttachmentPanel();
+  }
+  
+  public ConfigurableToolbar getToolbar() {
+    return toolbar;
+  }
+  
+  public ConfigurableKeyBinding getKeyBindings() {
+    return keyBindings;
+  }
+
+  /**
+   * Sets the PookaUIFactory for this MessageFrame. 
+   */
+  public void setPookaUIFactory(PookaUIFactory puif) {
+    uiFactory = puif;
+  }
+
+  /**
+   * Gets the PookaUIFactory that should be used by this MessageFrame.
+   */
+  public PookaUIFactory getPookaUIFactory() {
+    if (uiFactory != null)
+      return uiFactory;
+    else
+      return Pooka.getUIFactory();
+  }
+
+  //------- Actions ----------//
+  
+  public Action[] getActions() {
+    return defaultActions;
+  }
+  
+  public Action[] getDefaultActions() {
+    return defaultActions;
+  }
+  
+  //-----------actions----------------
+  
+  // The actions supported by the window itself.
+  
+  public Action[] defaultActions = {
+    new CloseAction(),
+    new AttachAction()
+      };
+  
+  class CloseAction extends AbstractAction {
+    
+    CloseAction() {
+      super("file-close");
     }
-
-    /**
-     * As specified by interface net.suberic.pooka.gui.MessageUI.
-     * 
-     * This implementation sets the cursor to either Cursor.WAIT_CURSOR
-     * if busy, or Cursor.DEFAULT_CURSOR if not busy.
-     */
-    public void setBusy(boolean newValue) {
-	if (newValue)
-	    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	else
-	    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    
+    public void actionPerformed(ActionEvent e) {
+      closeMessageUI();
     }
-
-    /**
-     * As specified by interface net.suberic.pooka.UserProfileContainer.
-     *
-     * This implementation returns the DefaultProfile of the associated
-     * MessageProxy if the MessageFrame is not editable.  If the 
-     * MessageFrame is editable, it returns the currently selected 
-     * UserProfile object.
-     */
-
-    public UserProfile getDefaultProfile() {
-	return getMessageProxy().getDefaultProfile();
+  }
+  
+  public class AttachAction extends AbstractAction {
+    AttachAction() {
+      super("window-detach");
     }
-
-    public MessageDisplayPanel getMessageDisplay() {
-	return messageDisplay;
+    
+    public void actionPerformed(ActionEvent e) {
+      attachWindow();
     }
-
-    public MessageProxy getMessageProxy() {
-	return msg;
-    }
-
-    public void setMessageProxy(MessageProxy newValue) {
-	msg = newValue;
-    }
-
-    public String getMessageText() {
-	return getMessageDisplay().getMessageText();
-    }
-
-    public String getMessageContentType() {
-	return getMessageDisplay().getMessageContentType();
-    }
-
-    public AttachmentPane getAttachmentPanel() {
-	return getMessageDisplay().getAttachmentPanel();
-    }
-
-    public ConfigurableToolbar getToolbar() {
-	return toolbar;
-    }
-
-    public ConfigurableKeyBinding getKeyBindings() {
-	return keyBindings;
-    }
-
-    //------- Actions ----------//
-
-    public Action[] getActions() {
-	return defaultActions;
-    }
-
-    public Action[] getDefaultActions() {
-	return defaultActions;
-    }
-
-    //-----------actions----------------
-
-    // The actions supported by the window itself.
-
-    public Action[] defaultActions = {
-	new CloseAction(),
-	new AttachAction()
-    };
-
-    class CloseAction extends AbstractAction {
-
-	CloseAction() {
-	    super("file-close");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    closeMessageUI();
-	}
-    }
-
-    public class AttachAction extends AbstractAction {
-	AttachAction() {
-	    super("window-detach");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    attachWindow();
-	}
-    }
+  }
 }
 
 
