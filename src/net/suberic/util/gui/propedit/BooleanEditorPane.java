@@ -21,13 +21,23 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default. 
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
-    
+    debug = newManager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
+
     property=propertyName;
     editorTemplate=template;
     manager=newManager;
 
+    if (debug) {
+      System.out.println("configuring Boolean editor with property " + propertyName + ", editorTemplate " + editorTemplate);
+    }
+
     originalValue = manager.getProperty(property, manager.getProperty(template, "false"));
     originalBoolean = originalValue.equalsIgnoreCase("true");
+
+    if (debug) {
+      System.out.println("configuring with value getProperty(" + property + ", manager.getProperty(" + template + ", \"false\")) = " + originalBoolean);
+    }
+
 
     label = createLabel();
 

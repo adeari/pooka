@@ -9,7 +9,7 @@
 
 -----
 
-*) fix error display with exception so that you can see the stack trace.
+*) add a way to put in custom headers into a new message.
 
 *) printing
 	timing--jtextpane creation should happen after dialog
@@ -17,30 +17,16 @@
 		printing page 1 of...  etc.  should be able to cancel
 		during that.  maybe even a progress bar?
 
+*) fix notification settings.  my spam folder shouldn't show a star when
+	new messages come in.
+	-- test
+
+*) fix error display with exception so that you can see the stack trace.
 
 *) bug:  check to see if moving a message marks it as read.
 
-*) bug:  parse exception
-caught exception while checking encryption:  null
-javax.mail.internet.ParseException
-        at javax.mail.internet.ContentType.<init>(ContentType.java:71)
-        at net.suberic.crypto.EncryptionManager.checkEncryptionType(Unknown Source)
-        at net.suberic.pooka.MessageCryptoInfo.checkEncryptionType(MessageCryptoInfo.java:68)
-        at net.suberic.pooka.MessageCryptoInfo.getEncryptionUtils(MessageCryptoInfo.java:49)
-        at net.suberic.pooka.MessageCryptoInfo.isEncrypted(MessageCryptoInfo.java:122)
-        at net.suberic.pooka.MessageInfo.hasEncryption(MessageInfo.java:935)
-        at net.suberic.pooka.gui.MessageProxy.createTableInfo(MessageProxy.java:414)
-        at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:338)
-        at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
-        at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
-
 *) fix getFirstUnreadMessage on CachingFolderInfo to make sure that we've
 	fetched all of the messages first.
-
-*) fix notification settings.  my spam folder shouldn't show a star when
-	new messages come in.
-
-*) add a way to put in custom headers into a new message.
 
 *) make it so selecting or scrolling in a messagepanel will remove the
 	new message icon.
@@ -58,6 +44,8 @@ javax.mail.internet.ParseException
 	event thread, then switch over to the folder thread for the real
 	work.
 
+*) add proper icon for spam button. make spam button available, and give
+	it a keybinding.
 ----
 
 *) fix NPE if try to send a new message without configuring client.

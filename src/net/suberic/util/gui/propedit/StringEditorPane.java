@@ -30,7 +30,7 @@ public class StringEditorPane extends SwingPropertyEditor {
     currentValue = originalValue;
 
     if (debug) {
-      System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
+      System.out.println("configuring StringEditorPane.  property is " + property + "; editorTemplate is " + editorTemplate);
     }
 
     label = createLabel();
