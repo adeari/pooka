@@ -268,14 +268,52 @@ public class UIDFolderInfo extends FolderInfo {
     if (folderTableModel != null) {
       try {
 	Message[] addedMessages = mce.getMessages();
+	/*
 	FetchProfile fp = new FetchProfile();
 	fp.add(FetchProfile.Item.ENVELOPE);
 	fp.add(FetchProfile.Item.FLAGS);
 	fp.add(UIDFolder.FetchProfileItem.UID);
+	*/
 
-      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.fetchingMessages", "Fetching") + " " + addedMessages.length + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.fetchingMessages", "Fetching") + " " + addedMessages.length + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
+	if (Pooka.isDebug()) {
+	  System.out.println("UIDFolderInfo:  runMessagesAdded().  getting " + addedMessages.length + " messages.");
+	}
 
-	getFolder().fetch(addedMessages, fp);
+	if (fetchProfile != null) {
+	  FetchProfile fp = null;
+	  if (! fetchProfile.contains(UIDFolder.FetchProfileItem.UID)) {
+	    // clone it.  we could cache this, but i doubt it's a problem.
+	    fp = new FetchProfile();
+	    FetchProfile.Item[] items = fetchProfile.getItems();
+	    String[] headers = fetchProfile.getHeaderNames();
+	    if (items != null) {
+	      for (int i = 0; i < items.length; i++) {
+		fp.add(items[i]);
+	      }
+	    }
+	    
+	    if (headers != null) {
+	      for (int i = 0; i < headers.length; i++) {
+		fp.add(headers[i]);
+	      }
+	    }
+
+	    fp.add(UIDFolder.FetchProfileItem.UID);
+	    
+	  } else {
+	    fp = fetchProfile;
+	  }
+	  getFolder().fetch(addedMessages, fp);
+	} else {
+	  FetchProfile fp = new FetchProfile();
+	  fp.add(FetchProfile.Item.ENVELOPE);
+	  fp.add(FetchProfile.Item.FLAGS);
+	  fp.add(UIDFolder.FetchProfileItem.UID);
+
+	  getFolder().fetch(addedMessages, fp);
+	}
+
 	MessageInfo mi;
 	Vector addedProxies = new Vector();
 	for (int i = 0; i < addedMessages.length; i++) {
@@ -295,8 +333,14 @@ public class UIDFolderInfo extends FolderInfo {
 	  }
 	}
 	
+	if (Pooka.isDebug()) {
+	  System.out.println("filtering proxies.");
+	}
 	addedProxies.removeAll(applyFilters(addedProxies));
 
+	if (Pooka.isDebug()) {
+	  System.out.println("filters run; adding " + addedProxies.size() + " messages.");
+	}
 	if (addedProxies.size() > 0) {
 	  getFolderTableModel().addRows(addedProxies);
 	  setNewMessages(true);

@@ -7,12 +7,6 @@
      *) fix file export for attachments
      *) test with desktop/external apps.
 
-*) check efficiency on copying a lot of messages.  looks like we're copying
-	and/or loading each message individually.
-
-*) test l&f selection and make sure it saves all of them (esp kunst and gtk)
-	correctly.
-
 *) make status icon for store itself.
 
 *) test w/gnu javamail -- ???

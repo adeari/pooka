@@ -705,14 +705,27 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  if (toFetch != null) {
 	    for (int z = 0; z < toFetch.size(); z++) {
 	      String profileDef = (String) toFetch.elementAt(z);
-	      if (profileDef.equalsIgnoreCase("Flags"))
+	      if (profileDef.equalsIgnoreCase("Flags")) {
+		if (Pooka.isDebug()) {
+		  System.out.println("adding FLAGS to FetchProfile.");
+		}
 		fp.add(FetchProfile.Item.FLAGS);
-	      else if (profileDef.equalsIgnoreCase("Envelope"))
+	      } else if (profileDef.equalsIgnoreCase("Envelope")) {
+		if (Pooka.isDebug()) {
+		  System.out.println("adding ENVELOPE to FetchProfile.");
+		}
 		fp.add(FetchProfile.Item.ENVELOPE);
-	      else if (profileDef.equalsIgnoreCase("Content_Info"))
+	      } else if (profileDef.equalsIgnoreCase("Content_Info")) {
+		if (Pooka.isDebug()) {
+		  System.out.println("adding CONTENT_INFO to FetchProfile.");
+		}
 		fp.add(FetchProfile.Item.CONTENT_INFO);
-	      else
+	      } else {
+		if (Pooka.isDebug()) {
+		  System.out.println("adding " + profileDef + " to FetchProfile.");
+		}
 		fp.add(profileDef);
+	      }
 	    }
 	  }
 	} else if (type.equalsIgnoreCase("RowCounter")) {
@@ -739,6 +752,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       }
     }
 
+    if (Pooka.isDebug()) {
+      System.out.println("created fetch profile.");
+      String[] headers = fp.getHeaderNames();
+      if (headers != null) {
+	for (int i = 0; i < headers.length; i++) {
+	  System.out.println("headers["+i+"]=" + headers[i]);
+	}
+      }
+      System.out.println("headers done.");
+    }
+    
     return fp;
   }
   
@@ -1733,18 +1757,30 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   protected void runMessagesAdded(MessageCountEvent mce) {
+    if (Pooka.isDebug()) {
+      System.out.println("running messagesAdded on FolderInfo.");
+    }
     if (folderTableModel != null) {
       Message[] addedMessages = mce.getMessages();
       
       MessageInfo mp;
       Vector addedProxies = new Vector();
+      if (Pooka.isDebug()) {
+	System.out.println("running messagesAdded: creating " + addedMessages.length + " proxies/MessageInfos.");
+      }
       for (int i = 0; i < addedMessages.length; i++) {
 	mp = new MessageInfo(addedMessages[i], FolderInfo.this);
 	addedProxies.add(new MessageProxy(getColumnValues(), mp));
 	messageToInfoTable.put(addedMessages[i], mp);
       }
+      if (Pooka.isDebug()) {
+	System.out.println("filtering proxies.");
+      }
       addedProxies.removeAll(applyFilters(addedProxies));
       if (addedProxies.size() > 0) {
+	if (Pooka.isDebug()) {
+	  System.out.println("filters run; adding " + addedProxies.size() + " messages.");
+	}
 	getFolderTableModel().addRows(addedProxies);
 	setNewMessages(true);
 	resetMessageCounts();
