@@ -7,6 +7,10 @@
 
 -----
 
+*) fix smtp auth password
+
+*) ?? forward with attachments not working?
+
 *) queuing of outgoing mails
 	todo on this:
 	*)  add some sort of an administrative api to the NetworkConnection
@@ -27,8 +31,6 @@
 *) printing in windows can leave control characters at the end of lines
 	-- test.  shouldn't happen anymore.
 
-*) filtering multiple message should show a status.
-
 ---
 
 *) add support for running without any local files.
@@ -48,6 +50,8 @@
 	*) save attachment?
 
 *) add support for saved searches.
+
+*) add mark as unread 
 
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.

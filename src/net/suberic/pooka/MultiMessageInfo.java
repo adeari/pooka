@@ -134,17 +134,26 @@ public class MultiMessageInfo extends MessageInfo {
    * Runs folder filters on this MessageInfo.
    */
   public void runBackendFilters() {
-    net.suberic.util.swing.ProgressDialog pd = Pooka.getUIFactory().createProgressDialog(0, messages.length, 0, Pooka.getProperty("message.filteringMessages", "Filtering Messages..."), Pooka.getProperty("message.filteringMessages", "Filtering Messages..."));
-    pd.show();
-
+    net.suberic.util.swing.ProgressDialog pd = null;
+    
     try {
+      
       if (folderInfo != null) {
+	
+	int filterCount = folderInfo.getBackendFilters() == null ? 1 : folderInfo.getBackendFilters().length;
+	
+	pd = Pooka.getUIFactory().createProgressDialog(0, messages.length * filterCount, 0, Pooka.getProperty("message.filteringMessages", "Filtering Messages..."), Pooka.getProperty("message.filteringMessages", "Filtering Messages..."));
+	pd.show();
+	
 	java.util.List list = new LinkedList();
 	for (int i = 0; i < messages.length; i++) {
 	  list.add(messages[i].getMessageProxy());
 	}
 	folderInfo.applyFilters(list, pd);
       } else {
+	pd = Pooka.getUIFactory().createProgressDialog(0, messages.length, 0, Pooka.getProperty("message.filteringMessages", "Filtering Messages..."), Pooka.getProperty("message.filteringMessages", "Filtering Messages..."));
+	pd.show();
+
 	for (int i = 0; i < messages.length; i++) {
 	  java.util.LinkedList list = new java.util.LinkedList();
 	  list.add(messages[i]);

@@ -2113,6 +2113,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   // Accessor methods.
   
+  /**
+   * Returns the backend filters for this folder.
+   */
+  public BackendMessageFilter[] getBackendFilters() {
+    return backendFilters;
+  }
+
   public Action[] getActions() {
     return defaultActions;
   }

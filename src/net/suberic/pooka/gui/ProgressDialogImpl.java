@@ -107,20 +107,29 @@ public class ProgressDialogImpl implements ProgressDialog {
    */
   public void setValue(int current) {
     mCurrentValue = current;
-    if (SwingUtilities.isEventDispatchThread())
-      progressBar.setValue(mCurrentValue);
-    else
+    if (SwingUtilities.isEventDispatchThread()) {
+      if (mCurrentValue != getBarValue())
+	progressBar.setValue(mCurrentValue);
+    } else
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
-	    progressBar.setValue(mCurrentValue);
+	    if (mCurrentValue != getBarValue())
+	      progressBar.setValue(mCurrentValue);
 	  }
 	});   
   }
 
   /**
-   * Gets the current value for the progress dialog.
+   * Gets the configured current value for the progress dialog.
    */
   public int getValue() {
+    return mCurrentValue;
+  }
+
+  /**
+   * Gets the actual value for the progress dialog.
+   */
+  public int getBarValue() {
     return progressBar.getValue();
   }
 

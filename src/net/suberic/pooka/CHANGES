@@ -1,3 +1,5 @@
+applying folder filters to a set of messages now shows a status dialog.
+
 unsuccessful open attachment commands now show an error.
 
 right-clicking on the Attachment icon now brings up a menu to open, save
