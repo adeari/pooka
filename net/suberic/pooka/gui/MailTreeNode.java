@@ -11,6 +11,9 @@ public class MailTreeNode extends DefaultMutableTreeNode {
 
     public JComponent parentContainer;
 
+    // this is only used for the FolderChooser
+    private boolean subscribed = false;
+
     MailTreeNode(Object userObj, JComponent parent) {
 	super(userObj);
 
@@ -46,6 +49,14 @@ public class MailTreeNode extends DefaultMutableTreeNode {
 
     public JComponent getParentContainer() {
 	return parentContainer;
+    }
+
+    public boolean isSubscribed() {
+	return subscribed;
+    }
+   
+    public void setSubscribed(boolean newValue) {
+	subscribed=newValue;
     }
 }
 

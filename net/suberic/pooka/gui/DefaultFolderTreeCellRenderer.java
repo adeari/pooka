@@ -7,8 +7,11 @@ import javax.swing.JTree;
 
 /**
  * This class overrides the default TreeCellRenderer in order to 
- * provide notification of unread messages.  Subclasses could probably
- * add additional enhancements.
+ * provide notification of some such, like for unread messages.  
+ * Subclasses could probably add additional enhancements.
+ *
+ * As of now I'm using this both for the main FolderTree and for the
+ * FolderChooser, mainly because I'm lazy.
  */
 
 public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
@@ -17,12 +20,22 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
        font information each time.  or at least, that's what i'm doing. :)
     */
 
+	
+    public static int UNREAD_MESSAGES = 0;
+    public static int SUBSCRIBED_FOLDER = 1;
+
     private boolean hasFocus;
 
-    static Font unreadFont = null;
+    Font specialFont = null;
 
-    static Font noUnreadFont = null;
+    Font defaultFont = null;
 
+    int selectionCriteria = UNREAD_MESSAGES;
+
+    public DefaultFolderTreeCellRenderer(int criteria) {
+	super();
+	selectionCriteria = criteria;
+    }
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
 	// from super().
 
@@ -65,30 +78,29 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	if (tp != null && tp.getLastPathComponent() instanceof FolderNode) {
 	    FolderNode node = (FolderNode)tp.getLastPathComponent();
-
+	    
 	    try {
-
-		if (node != null && node.getFolderInfo().getFolder().getUnreadMessageCount() > 0) {
-		    setFontToUnread();
-		} else {
-		    setFontToNoUnread();
+		if (isSpecial(node))
+		    setFontToSpecial();
+		else {
+		    setFontToDefault();
 		}
 	    } catch (MessagingException me) {
 		// if we can't connect, do something silly like turn the
 		// node red.
 		
-		this.setFontToNoUnread();
+		this.setFontToDefault();
 		this.setForeground(Color.getColor(Pooka.getProperty("MailTreeNode.color.error", "red")));
 		return this;
 	    } catch (NullPointerException npe) {
 		// the IMAP implementation seems to have some bugs in it when
 		// it comes to closed connections...
-		this.setFontToNoUnread();
+		this.setFontToDefault();
 		this.setForeground(Color.getColor(Pooka.getProperty("MailTreeNode.color.error", "red")));
 		return this;
 	    }
         } else {
-	    setFontToNoUnread();
+	    setFontToDefault();
 	}
 
 	this.setForeground(Color.getColor(Pooka.getProperty("MailTreeNode.color", "black")));
@@ -96,12 +108,19 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
         return this;
     }
 
-    public void setFontToNoUnread() {
-	if (getNoUnreadFont() != null) {
-	    setFont(getNoUnreadFont());
+    public void setFontToDefault() {
+	if (getDefaultFont() != null) {
+	    setFont(getDefaultFont());
 	} else {
 	    // create the new font.
-	    String fontStyle = Pooka.getProperty("FolderTree.readStyle", "");
+	    String fontStyle;
+	    if (selectionCriteria == UNREAD_MESSAGES)
+		fontStyle = Pooka.getProperty("FolderTree.readStyle", "");
+	    else if (selectionCriteria == SUBSCRIBED_FOLDER)
+		fontStyle = Pooka.getProperty("FolderTree.readStyle", "");
+	    else
+		fontStyle = "";
+	    
 	    Font f = null;
 	    
 	    if (this.getFont() == null)
@@ -117,17 +136,24 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	    if (f == null)
 		f = this.getFont();
 	    
-	    setNoUnreadFont(f);
+	    setDefaultFont(f);
 	    this.setFont(f);
 	}
     }
 
-    public void setFontToUnread() {
-	if (getUnreadFont() != null) {
-	    setFont(getUnreadFont());
+    public void setFontToSpecial() {
+	if (getSpecialFont() != null) {
+	    setFont(getSpecialFont());
 	} else {
 	    // create the new font.
-	    String fontStyle = Pooka.getProperty("FolderTree.UnreadStyle", "BOLD");
+	    String fontStyle;
+	    if (selectionCriteria == UNREAD_MESSAGES)
+		fontStyle = Pooka.getProperty("FolderTree.UnreadStyle", "BOLD");
+	    else if (selectionCriteria == SUBSCRIBED_FOLDER)
+		fontStyle = Pooka.getProperty("FolderChooser.subscribedStyle", "BOLD");
+	    else
+		fontStyle = "BOLD";
+
 	    Font f = null;
 	    
 	    if (fontStyle.equalsIgnoreCase("BOLD"))
@@ -138,25 +164,38 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	    if (f == null)
 		f = this.getFont();
 	    
-	    setUnreadFont(f);
+	    setSpecialFont(f);
 	    this.setFont(f);
 	}
     }
 
-    public static Font getUnreadFont() {
-        return unreadFont;
-    }
-    
-    public static void setUnreadFont(Font newValue) {
-        unreadFont = newValue;
+    /**
+     * Returns whether or not we should render the default style or a 
+     * special style.
+     */
+    public boolean isSpecial (FolderNode node) throws MessagingException {
+	if (selectionCriteria == UNREAD_MESSAGES)
+	    return (node != null && node.getFolderInfo().getFolder().getUnreadMessageCount() > 0);
+	else if (selectionCriteria == SUBSCRIBED_FOLDER)
+	    return (node != null && node.isSubscribed());
+	else 
+	    return false;
     }
 
-    public static Font getNoUnreadFont() {
-	return noUnreadFont;
+    public Font getSpecialFont() {
+        return specialFont;
     }
     
-    public static void setNoUnreadFont(Font newValue) {
-	noUnreadFont = newValue;
+    public void setSpecialFont(Font newValue) {
+        specialFont = newValue;
+    }
+
+    public Font getDefaultFont() {
+	return defaultFont;
+    }
+    
+    public void setDefaultFont(Font newValue) {
+	defaultFont = newValue;
     }
 
 
@@ -173,7 +212,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	Dimension        retDimension = super.getPreferredSize();
 
 	if(retDimension != null)
-	    retDimension = new Dimension((int)((retDimension.width + 3) * 1.1),
+	    retDimension = new Dimension((int)((retDimension.width + 3) * 1.2),
 					 retDimension.height);
 	return retDimension;
     }

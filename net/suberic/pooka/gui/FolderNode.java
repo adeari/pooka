@@ -96,7 +96,20 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	}
 	return super.getChildCount();
     }
+
+    /**
+     * returns the children of this folder node.  The first
+     * time this method is called we load up all of the folders
+     * under the store's defaultFolder
+     */
     
+    public java.util.Enumeration children() {
+	if (!hasLoaded) {
+	    loadChildren();
+	}
+	return super.children();
+    }
+
     protected void loadChildren() {
 	// if it is a leaf, just say we have loaded them
 	if (isLeaf()) {
@@ -119,10 +132,12 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 		try {
 		    newFolderName = (String)tokens.nextToken();
 		    subscribed = folder.list(newFolderName);
-		    FolderNode node = new FolderNode(new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName), getParentContainer(), true);
-		    // we used insert here, since add() would mak
-		    // another recursive call to getChildCount();
-		    insert(node, i);
+		    if (subscribed.length > 0) {
+			FolderNode node = new FolderNode(new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName), getParentContainer(), true);
+			// we used insert here, since add() would mak
+			// another recursive call to getChildCount();
+			insert(node, i);
+		    }
 		} catch (MessagingException me) {
 		    if (me instanceof FolderNotFoundException) {
 			JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
@@ -137,7 +152,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 		Folder[] folderList = folder.list();
 		
 		for (int i = 0 ; i < folderList.length ; i++) {
-		    FolderNode node = new FolderNode(new FolderInfo(folderList[i], getFolderID() + "." + folderList[0].getName()), getParentContainer(), false);
+		    
+		    FolderNode node = new FolderNode(new FolderInfo(folderList[i], getFolderID() + "." + folderList[i].getName()), getParentContainer(), false);
 		    // we used insert here, since add() would mak
 		    // another recursive call to getChildCount();
 		    insert(node, i);

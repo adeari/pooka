@@ -46,7 +46,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
 	    }
 	});
 	folderTree.addTreeSelectionListener(getMainPanel());
-	folderTree.setCellRenderer(new DefaultFolderTreeCellRenderer());
+	folderTree.setCellRenderer(new DefaultFolderTreeCellRenderer(DefaultFolderTreeCellRenderer.UNREAD_MESSAGES));
     }
 
     public MailTreeNode getSelectedNode() {

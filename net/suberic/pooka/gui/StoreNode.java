@@ -73,6 +73,18 @@ public class StoreNode extends MailTreeNode {
 	return super.getChildCount();
     }
     
+    /**
+     * returns the children of this folder node.  The first
+     * time this method is called we load up all of the folders
+     * under the store's defaultFolder
+     */
+    
+    public java.util.Enumeration children() {
+	if (folder == null) {
+	    loadChildren();
+	}
+	return super.children();
+    }
 
     protected void connectStore() throws MessagingException {
 	if (isConnected())
@@ -249,7 +261,7 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    FolderChooser fc = new FolderChooser(store);
+	    FolderChooser fc = new FolderChooser(store, getStoreID());
 	    ((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel().add((JInternalFrame)fc.getFrame());
 	    fc.show();
 	    try {
