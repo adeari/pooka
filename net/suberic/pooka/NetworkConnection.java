@@ -28,6 +28,8 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   public static int DOWN = 10;
 
+  private java.util.LinkedList listenerList = new java.util.LinkedList();
+
   /**
    * <p>Creates a new NetworkConnection from the given property.</p>
    */
@@ -87,8 +89,10 @@ public class NetworkConnection implements net.suberic.util.Item {
 	}
       }
 
-      status = CONNECTED;
-
+      if (status != CONNECTED) {
+	status = CONNECTED;
+	fireConnectionEvent();
+      }
     } catch (Exception ex) {
       System.out.println("Could not run connect command:");
       ex.printStackTrace();
@@ -123,8 +127,11 @@ public class NetworkConnection implements net.suberic.util.Item {
 	}
       }
 
-      status = DOWN;
-
+      if (status != DOWN) {
+	status = DOWN;
+	fireConnectionEvent();
+      } else {
+      }
     } catch (Exception ex) {
       System.out.println("Could not run disconnect command:");
       ex.printStackTrace();
@@ -147,6 +154,32 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public int getStatus() {
     return status;
+  }
+
+  /**
+   * Notifies all listeners that the Network connection status has
+   * changed.
+   */
+  public void fireConnectionEvent() {
+    for (int i = 0; i < listenerList.size(); i++) {
+      ((NetworkConnectionListener) listenerList.get(i)).connectionStatusChanged(this, getStatus());
+    }
+  }
+
+  /**
+   * Adds a NetworkConnectionListener to the listener list.
+   */
+  public void addConnectionListener(NetworkConnectionListener newListener) {
+    if (!listenerList.contains(newListener))
+      listenerList.add(newListener);
+  }
+
+  /**
+   * Removes a NetworkConnectionListener from the listener list.
+   */
+  public void removeConnectionListener(NetworkConnectionListener oldListener) {
+    if (listenerList.contains(oldListener))
+      listenerList.remove(oldListener);
   }
 
   /**
