@@ -118,7 +118,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 		originalPanels.put(itemList.elementAt(i), pep);
 	    }
 
-	    pep.setEnabled(false);
+	    //	    pep.setEnabled(false);
 
 	    currentPanels.put(itemList.elementAt(i), pep);
 
