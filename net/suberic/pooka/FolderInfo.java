@@ -27,7 +27,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private String folderID;
 
     // This is just the simple folderName, such as "INBOX"
-    private String folderName;
+    private String mFolderName;
 
     private EventListenerList messageCountListeners = new EventListenerList();
     private EventListenerList messageChangedListeners = new EventListenerList();
@@ -78,7 +78,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public FolderInfo(FolderInfo parent, String fname) {
 	parentFolder = parent;
 	setFolderID(parent.getFolderID() + "." + fname);
-	folderName = fname;
+	mFolderName = fname;
 
 	if (parent.isAvailable() && parent.isLoaded())
 	    loadFolder();
@@ -100,7 +100,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public FolderInfo(StoreInfo parent, String fname) {
 	parentStore = parent;
 	setFolderID(parent.getStoreID() + "." + fname);
-	folderName = fname;
+	mFolderName = fname;
 
 	if (parent.isConnected())
 	    loadFolder();
@@ -186,7 +186,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			parentStore.connectStore();
 		    Store store = parentStore.getStore();
 		    tmpParentFolder = store.getDefaultFolder();
-		    tmpFolder = tmpParentFolder.list(folderName);
+		    tmpFolder = tmpParentFolder.list(mFolderName);
 		} catch (MessagingException me) {
 		    tmpFolder =null;
 		}
@@ -198,7 +198,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		} else {
 		    tmpParentFolder = parentFolder.getFolder();
 		    if (tmpParentFolder != null)
-			tmpFolder = tmpParentFolder.list(folderName);
+			tmpFolder = tmpParentFolder.list(mFolderName);
 		    else
 			tmpFolder = null;
 		}
@@ -703,7 +703,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	boolean found = false;
 
 	for (int i = 0; i < folderNames.size(); i++) {
-	    folderName = (String) folderNames.elementAt(i);
+	    String folderName = (String) folderNames.elementAt(i);
 
 	    if (folderName.equals(addFolderName)) {
 		found=true;
@@ -1141,7 +1141,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * This returns the simple folderName, such as "INBOX".
      */
     public String getFolderName() {
-	return folderName;
+	return mFolderName;
     }
 
     /**

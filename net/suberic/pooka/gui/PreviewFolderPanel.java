@@ -302,6 +302,13 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	} catch (MessagingException me) {
 	    
 	}
+
+	SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    getFolderDisplay().repaint();
+		}
+	    });
+
     }
     
     /**

@@ -462,7 +462,12 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	} catch (MessagingException me) {
 	    
 	}
-		
+	
+	SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    getFolderDisplay().repaint();
+		}
+	    });
     }
 
     /**

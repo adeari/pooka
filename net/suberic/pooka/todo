@@ -1,19 +1,9 @@
 beta 1
 ---------------
 
-*) bug:  need to clear the preview panel if you unselect a message, or 
-delete the last message, and so forth.  -- i think this is more or less
-fixed, but we still need to manage to send an event when the last 
-selection goes away.
-
 *) bug:  there's a problem either with line wrapping or with the size of the
 ReadMessageWindow.  They should be the same size, such that if you read a
 message that you wrote, the lines will wrap at the correct place.
-
-*) bug:  if you subscribe to a subfolder underneath another, already subscribed
-subfolder (i.e. you're subscribed to IMAP/foo, and then subscribe to 
-IMAP/zeta), then the parent folder gets renamed to the above subfolder (so
-you end up with foo/foo and foo/zeta).
 
 *) add ability to reply/forward with attachments, or as inline, and so forth
 
@@ -129,9 +119,6 @@ and that all the gui updates are happening on the EventDispatcher thread.
 
 *) make the scrolling work properly for all border cases, such as a single new
 window at -5, -5.
-
-*) fix the display of the messages in the FolderWindow--right now, you get
-too much date info, not enough Subject.
 
 *) make printing nicer--it's pretty basic now.
 
