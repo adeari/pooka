@@ -226,5 +226,5 @@ FolderTree.disconnectedStoreIcon=images/mailbox.gif
 NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
 NewAccountPooka.password.propertyType=Password
 NewAccountPooka.type.propertyType=List
-NewAccountPooka.type.allowedValues=IMAP
-NewAccountPooka.type=IMAP
+NewAccountPooka.type.allowedValues=imap
+NewAccountPooka.type=imap
