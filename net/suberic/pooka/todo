@@ -1,7 +1,11 @@
 *)  Fix the display of the MultiPropertyEditor.--especially the 'don't show
 the password on the screen' part.
 
-*)  Add the ability to subscribe to/add new folders in the GUI.
+*)  make the subscribe/unsubscribe folders actually update the live folders,
+instead of just setting the properties.  should just be able to set the
+FolderNodes as PropertyChangeListeners for their respective properties to 
+make that work.  also need to make the FolderChooser less clunky and more
+efficient.
 
 *)  make the default profile for each folder work properly.  right now it
 just gives you the default profile for the system, rather than making it 
