@@ -102,7 +102,54 @@ public class LoadMessageThread extends Thread {
 
       int i = numMessages - 1;
       while ( ! stopped &&  i >= 0 ) {
-	synchronized(folderInfo.getFolderThread().getRunLock()) {
+	if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
+	  synchronized(folderInfo.getFolderThread().getRunLock()) {
+	    for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
+	      mp=(MessageProxy)messages.elementAt(i);
+	      
+	      if (! mp.getMessageInfo().hasBeenFetched()) {
+		try {
+		  int fetchCount = 0;
+		  Vector fetchVector = new Vector();
+		  for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+		    MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+		    if (! fetchInfo.hasBeenFetched()) {
+		    fetchVector.add(fetchInfo);
+		    fetchInfo.setFetched(true);
+		    }
+		  }
+		  
+		  MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
+		  toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
+		  getFolderInfo().fetch(toFetch, fetchProfile);
+		} catch(MessagingException me) {
+		  System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+		  me.printStackTrace();
+		}
+		
+	      }
+	      
+	      try {
+		if (! mp.isLoaded())
+		  mp.loadTableInfo();
+		if (mp.needsRefresh())
+		  mp.refreshMessage();
+		else if (! mp.matchedFilters()) {
+		  mp.matchFilters();
+		}
+	      } catch (Exception e) {
+		e.printStackTrace();
+	      }
+	      
+	      if (++updateCounter >= getUpdateMessagesCount()) {
+		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
+		updateCounter = 0;		   
+	      }
+	      loadedMessageCount++;
+	      i--;
+	    }
+	  } // end synchronized
+	} else {
 	  for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
 	    mp=(MessageProxy)messages.elementAt(i);
 	    
@@ -114,28 +161,32 @@ public class LoadMessageThread extends Thread {
 		  MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
 		  if (! fetchInfo.hasBeenFetched()) {
 		    fetchVector.add(fetchInfo);
-		    fetchInfo.setFetched(true);
+		    //fetchInfo.setFetched(true);
 		  }
 		}
 		
 		MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
 		toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
-		getFolderInfo().fetch(toFetch, fetchProfile);
+		synchronized(folderInfo.getFolderThread().getRunLock()) {
+		  getFolderInfo().fetch(toFetch, fetchProfile);
+		} // end synchronized
 	      } catch(MessagingException me) {
 		System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
 		me.printStackTrace();
 	      }
 	      
 	    }
-	    
+	      
 	    try {
-	      if (! mp.isLoaded())
-		mp.loadTableInfo();
-	      if (mp.needsRefresh())
-		mp.refreshMessage();
-	      else if (! mp.matchedFilters()) {
-		mp.matchFilters();
-	      }
+	      synchronized(folderInfo.getFolderThread().getRunLock()) {
+		if (! mp.isLoaded())
+		  mp.loadTableInfo();
+		if (mp.needsRefresh())
+		  mp.refreshMessage();
+		else if (! mp.matchedFilters()) {
+		  mp.matchFilters();
+		}
+	      } // end synchronized
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }

@@ -402,6 +402,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    getCache().getHeaders(uid, cache.getUIDValidity());
 	  }
 	}
+
+	messages[i].setFetched(true);
       }
     }
 

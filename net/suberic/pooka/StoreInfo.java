@@ -592,15 +592,20 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   }
 
   private void doOpenFolders(FolderInfo fi) {
-    final FolderInfo current = fi;
-    getStoreThread().addToQueue(new javax.swing.AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  current.openAllFolders(Folder.READ_WRITE);
-	}
-      }, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
-  }
+    if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
 
-    
+      final FolderInfo current = fi;
+      getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent e) {
+	    current.openAllFolders(Folder.READ_WRITE);
+	  }
+	}, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
+    }
+    else {
+      fi.openAllFolders(Folder.READ_WRITE);
+    }
+  }
+  
   /**
    * This method disconnects the Store.  If you connect to the Store using 
    * connectStore() (which you should), then you should use this method

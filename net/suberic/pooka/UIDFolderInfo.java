@@ -508,6 +508,10 @@ public class UIDFolderInfo extends FolderInfo {
 	realMsgs[i] = currentMsg;
     }
     getFolder().fetch(realMsgs, profile);
+
+    for (int i = 0 ; i < messages.length; i++) {
+      messages[i].setFetched(true);
+    }
   }
 
     /**

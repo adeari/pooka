@@ -434,13 +434,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   
   private void doOpenFolders(FolderInfo fi, int mode) {
-    final FolderInfo current = fi;
-    final int finalMode = mode;
-    getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  current.openAllFolders(finalMode);
-	}
-      }, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
+    if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
+      final FolderInfo current = fi;
+      final int finalMode = mode;
+      getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent e) {
+	    current.openAllFolders(finalMode);
+	  }
+	}, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
+    } else {
+      fi.openAllFolders(mode);
+    }
+
+
   }
   
   /**
@@ -571,70 +577,70 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
 
-    /**
-     * Loads the column names and sizes.
-     */
-    protected FetchProfile createColumnInformation() {
-	String tableType;
-
-	if (isSentFolder())
-	  tableType="SentFolderTable";
-	//else if (this instanceof VirtualFolderInfo)
-	//    tableType="SearchResultsTable";
-	else if (isOutboxFolder()) 
-	  tableType="SentFolderTable";
-	else
-	  tableType="FolderTable";
-
-	FetchProfile fp = new FetchProfile();
-	fp.add(FetchProfile.Item.FLAGS);
-	if (columnValues == null) {
-	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
-	    Vector colvals = new Vector();
-	    Vector colnames = new Vector();
-	    Vector colsizes = new Vector();
-	    
-	    String tmp;
-	
-	    while (tokens.hasMoreElements()) {
-		tmp = (String)tokens.nextElement();
-		String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
-		if (type.equalsIgnoreCase("Multi")) {
-		    SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
-		    colvals.addElement(stm);
-		    Vector toFetch = Pooka.getResources().getPropertyAsVector(tableType + "." + tmp + ".profileItems", "");
-		    if (toFetch != null) {
-			for (int z = 0; z < toFetch.size(); z++) {
-			    String profileDef = (String) toFetch.elementAt(z);
-			    if (profileDef.equalsIgnoreCase("Flags"))
-				fp.add(FetchProfile.Item.FLAGS);
-			    else if (profileDef.equalsIgnoreCase("Envelope"))
-				fp.add(FetchProfile.Item.ENVELOPE);
-			    else if (profileDef.equalsIgnoreCase("Content_Info"))
-				fp.add(FetchProfile.Item.CONTENT_INFO);
-			    else
-				fp.add(profileDef);
-			}
-		    }
-		} else if (type.equalsIgnoreCase("RowCounter")) {
-		    colvals.addElement(RowCounter.getInstance());
-		} else {
-		    String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
-		    colvals.addElement(value);
-		    fp.add(value);
-		}
-
-		colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
-		colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
-	    }	    
-	    setColumnNames(colnames);
-	    setColumnValues(colvals);
-	    setColumnSizes(colsizes);
+  /**
+   * Loads the column names and sizes.
+   */
+  protected FetchProfile createColumnInformation() {
+    String tableType;
+    
+    if (isSentFolder())
+      tableType="SentFolderTable";
+    //else if (this instanceof VirtualFolderInfo)
+    //    tableType="SearchResultsTable";
+    else if (isOutboxFolder()) 
+      tableType="SentFolderTable";
+    else
+      tableType="FolderTable";
+    
+    FetchProfile fp = new FetchProfile();
+    fp.add(FetchProfile.Item.FLAGS);
+    if (columnValues == null) {
+      Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
+      Vector colvals = new Vector();
+      Vector colnames = new Vector();
+      Vector colsizes = new Vector();
+      
+      String tmp;
+      
+      while (tokens.hasMoreElements()) {
+	tmp = (String)tokens.nextElement();
+	String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
+	if (type.equalsIgnoreCase("Multi")) {
+	  SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
+	  colvals.addElement(stm);
+	  Vector toFetch = Pooka.getResources().getPropertyAsVector(tableType + "." + tmp + ".profileItems", "");
+	  if (toFetch != null) {
+	    for (int z = 0; z < toFetch.size(); z++) {
+	      String profileDef = (String) toFetch.elementAt(z);
+	      if (profileDef.equalsIgnoreCase("Flags"))
+		fp.add(FetchProfile.Item.FLAGS);
+	      else if (profileDef.equalsIgnoreCase("Envelope"))
+		fp.add(FetchProfile.Item.ENVELOPE);
+	      else if (profileDef.equalsIgnoreCase("Content_Info"))
+		fp.add(FetchProfile.Item.CONTENT_INFO);
+	      else
+		fp.add(profileDef);
+	    }
+	  }
+	} else if (type.equalsIgnoreCase("RowCounter")) {
+	  colvals.addElement(RowCounter.getInstance());
+	} else {
+	  String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
+	  colvals.addElement(value);
+	  fp.add(value);
 	}
-	    
-	return fp;
+	
+	colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
+	colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
+      }	    
+      setColumnNames(colnames);
+      setColumnValues(colvals);
+      setColumnSizes(colsizes);
     }
-
+    
+    return fp;
+  }
+  
   /**
    * Loads all Messages into a new FolderTableModel, sets this 
    * FolderTableModel as the current FolderTableModel, and then returns
@@ -787,6 +793,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       realMsgs[i] = messages[i].getMessage();
     }
     getFolder().fetch(realMsgs, profile);
+
+    for (int i = 0 ; i < messages.length; i++) {
+      messages[i].setFetched(true);
+    }
   }
 
     /**
