@@ -26,11 +26,7 @@ public class MessageFilter {
      *
      */
     public MessageFilter(String sourceProperty) {
-	String searchTermProperty = Pooka.getProperty(sourceProperty + ".searchTerm", "");
-	String operation = Pooka.getProperty(sourceProperty + ".operation", "");
-	String pattern = Pooka.getProperty(sourceProperty + ".pattern", "");
-
-	searchTerm = Pooka.getSearchManager().generateSearchTerm(searchTermProperty, operation, pattern);
+	searchTerm = Pooka.getSearchManager().generateSearchTermFromProperty(sourceProperty);
 	
 	action = generateFilterAction(sourceProperty + ".action");
     }
@@ -63,7 +59,7 @@ public class MessageFilter {
     public Vector filterMessages(Vector messages) {
 	Vector matches = new Vector();
 	for (int i = 0; i < messages.size(); i++) {
-	    if (searchTerm.match(((MessageInfo)messages.elementAt(i)).getMessage()))
+	    if (searchTerm.match(((net.suberic.pooka.gui.MessageProxy)messages.elementAt(i)).getMessageInfo().getMessage()))
 		matches.add(messages.elementAt(i));
 	}
 

@@ -30,6 +30,7 @@ public class SearchTermIconManager {
     public SearchTermIconManager(String definitionProperty) {
 	SearchTermManager manager = Pooka.getSearchManager();
 	createTermsAndIcons(definitionProperty, manager);
+        ((JLabel)blankImage).setOpaque(true);
     }
 
     /**
@@ -92,7 +93,7 @@ public class SearchTermIconManager {
      * Creates an appropriate SearchTerm from the given property.
      */
     public SearchTerm createSearchTerm(String propertyName, SearchTermManager manager) {
-	return manager.generateSearchTerm(Pooka.getProperty(propertyName + ".searchTerm", ""), Pooka.getProperty(propertyName + ".operation", ""), Pooka.getProperty(propertyName + ".value", ""));
+	return manager.generateSearchTermFromProperty(propertyName);
     }
 
     /**

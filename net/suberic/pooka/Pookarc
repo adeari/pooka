@@ -95,9 +95,7 @@ MenuBar.Edit.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MenuBar.Edit.Paste.Action=paste-from-clipboard
 MenuBar.Edit.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-#MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge:AddSignature:SearchFolder
-
-MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:AddSignature:SearchFolder
+MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge:AddSignature:SearchFolder
 
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Reply.Action=message-reply
@@ -188,15 +186,20 @@ MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 FolderPanel.2xClickAction=file-open
 
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject
-FolderTable=New:SentDate:From:Subject
-#FolderTable=Status:SentDate:From:Subject
+#FolderTable=New:SentDate:From:Subject
+FolderTable=Status:SentDate:From:Subject
 FolderTable.Status.type=Multi
 FolderTable.Status.size=15
 FolderTable.Status.value=Deleted:New:Answered
 FolderTable.Status.Deleted.searchTerm=Search.searchTerms.Deleted
 FolderTable.Status.Deleted.icon=/net/suberic/pooka/gui/images/SmallRedCircle.gif
-FolderTable.Status.New.searchTerm=Search.searchTerms.Seen
+FolderTable.Status.New.type=compound
+FolderTable.Status.New.subTerms=FolderTable.Status.New.notSeenTerm:FolderTable.Status.New.recentTerm
+FolderTable.Status.New.operation=and
 FolderTable.Status.New.icon=/net/suberic/pooka/gui/images/SmallGreenCircle.gif
+FolderTable.Status.New.notSeenTerm.searchTerm=Search.searchTerms.Seen
+FolderTable.Status.New.notSeenTerm.operationProperty=Search.operations.Not
+FolderTable.Status.New.recentTerm.searchTerm=Search.searchTerms.Recent
 FolderTable.Status.Answered.searchTerm=Search.searchTerms.Answered
 FolderTable.Status.Answered.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
 FolderTable.Status.profileItems=Flags

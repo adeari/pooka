@@ -70,6 +70,57 @@ public class SearchTermManager {
     }
 
     /**
+     * Generates a compound SearchTerm.
+     */
+    public SearchTerm generateCompoundSearchTerm(String[] properties, String operation) {
+	SearchTerm[] terms = new SearchTerm[properties.length];
+	for (int i = 0; i < properties.length; i++)
+	    terms[i] = generateSearchTermFromProperty(properties[i]);
+
+	if (operation.equalsIgnoreCase("and"))
+	    return new AndTerm(terms);
+	else if (operation.equalsIgnoreCase("or"))
+	    return new OrTerm(terms);
+	else
+	    return null;
+    }
+
+    /**
+     * Generates a SearchTerm from a single property root.  This method 
+     * expects the following sub-properties to be set on the given
+     * property:
+     *
+     * property.type should be set either to 'compound' or 'single'
+     * 
+     * for 'single' types:
+     * property.searchTerm
+     * property.operationProperty (optional)
+     * property.pattern (optional)
+     *
+     * for 'compound' types:
+     * property.subTerms
+     * property.operation (should be 'or' or 'and')
+     */
+    public SearchTerm generateSearchTermFromProperty(String property) {
+	String type = Pooka.getProperty(property + ".type", "single");
+	if (type.equalsIgnoreCase("single")) {
+	    String searchProperty = Pooka.getProperty(property + ".searchTerm", "");
+	    String operationProperty = Pooka.getProperty(property + ".operationProperty", "");
+	    String pattern = Pooka.getProperty(property + ".pattern", "");
+	    return generateSearchTerm(searchProperty, operationProperty, pattern);
+	} else if (type.equalsIgnoreCase("compound")) {
+	    Vector subTermList = Pooka.getResources().getPropertyAsVector(property + ".subTerms", "");
+	    String[] subTerms = new String[subTermList.size()];
+	    for (int i = 0; i < subTerms.length; i++) 
+		subTerms[i] = (String) subTermList.elementAt(i);
+	    String operation = Pooka.getProperty(property + ".operation", "");
+	    
+	    return generateCompoundSearchTerm(subTerms, operation);
+	} else
+	    return null;
+    }
+
+    /**
      * Generates a SearchTerm from the given property and pattern.
      *
      * This method used the .class subproperty of the given searchProperty

@@ -46,6 +46,8 @@ a big ui overhaul.
 
 *) make it so you can skip directly to any message in the folder.
 
+*) add the ability for reply-all to exclude your own email address.
+
 protocol support
 ----------------
 *) add pop3/local mail spool support.
