@@ -101,6 +101,7 @@ public class UIDFolderInfo extends FolderInfo {
                 if (current != null && current.isOpen()) {
                     current.getNewMessageCount();
                     current.getUnreadMessageCount();
+		    resetMessageCounts();
                 }
 	    } else if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
 		s = getParentStore();
@@ -109,6 +110,8 @@ public class UIDFolderInfo extends FolderInfo {
 		
 		openFolder(Folder.READ_WRITE);
 
+		resetMessageCounts();
+
 		if (isAvailable() && preferredStatus == PASSIVE)
 		    closeFolder(false);
 	    } 
@@ -116,8 +119,6 @@ public class UIDFolderInfo extends FolderInfo {
 
 	} catch ( MessagingException me ) {
 	}
-	
-	resetMessageCounts();
     }
 
     protected void updateFolderOpenStatus(boolean isNowOpen) {
