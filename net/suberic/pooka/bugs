@@ -1,3 +1,9 @@
+the big, big bug that i'm still hitting is that the Folders are closing
+after a while, and Pooka 1) can't keep them open, and 2) doesn't recover
+gracefully at all when they do.
+
+
+
 getting an IllegalStateException when opening a folder.  that folder also 
 seems not to be getting updates (notifications of new messages) at the
 time:
