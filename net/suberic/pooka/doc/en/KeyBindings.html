@@ -5,7 +5,7 @@
 
 <h2>Message Commands</h2>
 <table border=1>
-<tr><td>Command</td><td>Key</td></tr>
+<tr><th>Command</th><th>Key</th></tr>
 <tr><td>Send Message</td><td>Control-S</td></tr>
 <tr><td>Reply</td><td>Control-R</td></tr>
 <tr><td>Reply to All</td><td>Control-A</td></tr>
@@ -13,6 +13,7 @@
 <tr><td>Forward Message</td><td>Control-F</td></tr>
 <tr><td>New Message</td><td>Control-N</td></tr>
 <tr><td>Open Message</td><td>Control-O</td></tr>
+<tr><td>Open Message<br>(in Folder)</td><td>SPACE<br>ENTER</td></tr>
 <tr><td>Close Message Window</td><td>Control-F4</td></tr>
 <tr><td>Add Signature</td><td>Alt-I</td></tr>
 <tr><td>Attach File</td><td>Control-T</td></tr>
@@ -21,7 +22,7 @@
 
 <h2>Editor Commands</h2>
 <table border=1>
-<tr><td>Command</td><td>Key</td></tr>
+<tr><th>Command</th><th>Key</th></tr>
 <tr><td>Cut</td><td>Control-X</td></tr>
 <tr><td>Copy</td><td>Control-C</td></tr>
 <tr><td>Paste</td><td>Control-V</td></tr>
@@ -29,71 +30,34 @@
 
 <h2>Folder Commands</h2>
 <table border=1>
-<tr><td>Command</td><td>Key</td></tr>
+<tr><th>Command</th><th>Key</th></tr>
 <tr><td>Subscribe to Folder(s)</td><td>Control-B</td></tr>
-<tr><td></td><td></td></tr>
+<tr><td>Goto message</td><td>Control+G</td></tr>
 </table>
 
 <h2>Navigation</h2>
 <table border=1>
-<tr><td>Command</td><td>Key</td></tr>
+<tr><th>Command</th><th>Key</th></tr>
 <tr><td>Select Navigation Panel</td><td>Alt-LEFT</td></tr>
 <tr><td>Select Content Panel</td><td>Alt-RIGHT</td></tr>
 <tr><td>Select Next Window<br>(Desktop Mode)</td><td>Alt+UP</td></tr>
 <tr><td>Select Previous Window<br>(Desktop Mode)</td><td>Alt+DOWN</td></tr>
 <tr><td>Select Message List<br>(Preview Mode)</td><td>Alt+UP</td></tr>
 <tr><td>Select Preview Panel<br>(Preview Mode)</td><td>Alt+DOWN</td></tr>
-<tr><td></td><td></td></tr>
+<tr><td>Move window left<br>(Desktop Mode)</td><td>Control+Alt+LEFT</td></tr>
+<tr><td>Move window left<br>(Desktop Mode)</td><td>Shift+Control+Alt+LEFT</td></tr>
+<tr><td>Move window right<br>(Desktop Mode)</td><td>Control+Alt+RIGHT</td></tr>
+<tr><td>Move window right<br>(Desktop Mode)</td><td>Control+Alt+RIGHT</td></tr>
+<tr><td>Move window up<br>(Desktop Mode)</td><td>Control+Alt+UP</td></tr>
+<tr><td>Move window up<br>(Desktop Mode)</td><td>Shift+Control+Alt+UP</td></tr>
+<tr><td>Move window down<br>(Desktop Mode)</td><td>Control+Alt+DOWN</td></tr>
+<tr><td>Move window down<br>(Desktop Mode)</td><td>Shift+Control+Alt+DOWN</td></tr>
 </table>
 
-<h2>Navigation</h2>
-<table border=1>
-<tr><td>Command</td><td>Key</td></tr>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
-<tr><td></td><td></td></tr>
-</table>
 </body>
 </html>
 <!--
 MainPanel.keyBindings.C+E.Action=edit-properties
 MainPanel.keyBindings.C+E.Key=control E
-MainPanel.keyBindings.C+G.Action=message-goto
-MainPanel.keyBindings.C+G.Key=control G
 
-MainPanel.keyBindings.Alt+F.Key=alt F
-MainPanel.keyBindings.Alt+F.Action=select-menu-F
-MainPanel.keyBindings.Alt+E.Key=alt E
-MainPanel.keyBindings.Alt+E.Action=select-menu-E
-MainPanel.keyBindings.Alt+M.Key=alt M
-MainPanel.keyBindings.Alt+M.Action=select-menu-M
-MainPanel.keyBindings.Alt+W.Key=alt W
-MainPanel.keyBindings.Alt+W.Action=select-menu-W
-MainPanel.keyBindings.Alt+H.Key=alt H
-MainPanel.keyBindings.Alt+H.Action=select-menu-H
-
-FolderPanel.keyBindings=Enter:Space
-FolderPanel.keyBindings.Space.Action=message-open
-FolderPanel.keyBindings.Space.Key=SPACE
-FolderPanel.keyBindings.Enter.Action=message-open
-FolderPanel.keyBindings.Enter.Key=ENTER
-
-MessagePanel.keyBindings=C+A+Left:C+A+Right:C+A+Up:C+A+Down:S+C+A+Left:S+C+A+Right:S+C+A+Up:S+C+A+Down
-MessagePanel.keyBindings.C+A+Left.Key=control alt LEFT
-MessagePanel.keyBindings.C+A+Left.Action=move-window-left
-MessagePanel.keyBindings.S+C+A+Left.Key=control alt shift LEFT
-MessagePanel.keyBindings.S+C+A+Left.Action=move-window-left
-MessagePanel.keyBindings.C+A+Right.Key=control alt RIGHT
-MessagePanel.keyBindings.C+A+Right.Action=move-window-right
-MessagePanel.keyBindings.S+C+A+Right.Key=control alt shift RIGHT
-MessagePanel.keyBindings.S+C+A+Right.Action=move-window-right
-MessagePanel.keyBindings.C+A+Up.Key=control alt UP
-MessagePanel.keyBindings.C+A+Up.Action=move-window-up
-MessagePanel.keyBindings.S+C+A+Up.Key=control alt shift UP
-MessagePanel.keyBindings.S+C+A+Up.Action=move-window-up
-MessagePanel.keyBindings.C+A+Down.Key=control alt DOWN
-MessagePanel.keyBindings.C+A+Down.Action=move-window-down
-MessagePanel.keyBindings.S+C+A+Down.Key=control alt shift DOWN
-MessagePanel.keyBindings.S+C+A+Down.Action=move-window-down
 -->

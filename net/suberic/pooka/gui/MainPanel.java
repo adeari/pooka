@@ -415,6 +415,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new EditInterfaceAction(),
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
+	new HelpKeyBindingsAction(),
 	new SelectMessagePanelAction(),
 	new SelectFolderPanelAction(),
 	new NewMessageAction()
@@ -585,6 +586,19 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    String fileName="COPYING";
 	    String dir="/net/suberic/pooka";
 	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
+	}
+    }
+
+    class HelpKeyBindingsAction extends AbstractAction {
+	
+	HelpKeyBindingsAction() {
+	    super("help-keybindings");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    String fileName="KeyBindings.html";
+	    String dir="/net/suberic/pooka/doc";
+	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.KeyBindings.Label", "Pooka KeyBindings"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
 	}
     }
 
