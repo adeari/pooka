@@ -12,6 +12,7 @@ public class AttachmentTransferable implements Transferable {
   Attachment mAttachment = null;
   MessageProxy mMessageProxy = null;
   File mTmpFile = null;
+  boolean mFileWritten = false;
 
   public AttachmentTransferable(Attachment pAttachment, MessageProxy pMessageProxy) throws java.io.IOException {
     setAttachment(pAttachment);
@@ -40,9 +41,16 @@ public class AttachmentTransferable implements Transferable {
 
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
     if (isDataFlavorSupported(flavor)) {
+      System.err.println("creating TransferData with tmp file.");
+      
       java.util.LinkedList list = new java.util.LinkedList();
 
       list.add(mTmpFile);
+
+      if (! mFileWritten) {
+	writeFile();
+	mFileWritten = true;
+      }
       return list;
     } else {
       throw new UnsupportedFlavorException(flavor);

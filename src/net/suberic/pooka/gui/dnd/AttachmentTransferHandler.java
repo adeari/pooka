@@ -57,9 +57,11 @@ public class AttachmentTransferHandler extends TransferHandler {
   }
 
   protected void exportDone(JComponent source, Transferable data, int action) {
+    /*
     if (data instanceof AttachmentTransferable) {
-      ((AttachmentTransferable) data).writeFile();
+      ((AttachmentTransferable) data).completeWrite();
     }
+    */
   }
   
 }
