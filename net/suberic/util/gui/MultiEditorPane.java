@@ -25,6 +25,8 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     Vector subProperties;
     Vector templateTypes;
 
+    String template;
+
     String originalValue;
     Hashtable originalPanels = new Hashtable();
     Hashtable currentPanels = new Hashtable();
@@ -33,7 +35,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	this.configureEditor(newFactory, newProperty, newProperty, newFactory.getBundle(), isEnabled);
     }
 
-    public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String templateType, VariableBundle bundle, boolean isEnabled) { 
+    public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String newTemplate, VariableBundle bundle, boolean isEnabled) { 
 	JLabel label;
 	property=propertyName;
 	factory = newFactory;
@@ -67,6 +69,10 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	this.add(createOptionBox(label, optionList));
 
 	// first create the subproperties and templateTypes lists
+
+	template = property + ".editableFields";
+
+	/*
 	subProperties = new Vector();
 	templateTypes = new Vector();
 	StringTokenizer subPropertiesTok  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
@@ -76,6 +82,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	    subProperties.add(current);
 	    templateTypes.add(property + "." + current);
 	}
+	*/
 	
 	// create entryPanels (the panels which show the subproperties
 	// of each item in the optionList) for each option.
@@ -120,7 +127,8 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
     private JPanel createEntryPanel (Vector itemList, boolean original) {
 	JPanel entryPanel = new JPanel(new CardLayout());
-	PropertyEditorPane pep;
+
+	CompositeEditorPane pep;
 
 	String rootProp;
 	Vector propList;
@@ -128,9 +136,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	
 	for (int i = 0; i < itemList.size(); i++) {
 	    rootProp = new String(property + "." + (String)(itemList.elementAt(i)));
-	    propList = createPropertiesList(rootProp, subProperties);
+	    //propList = createPropertiesList(rootProp, subProperties);
 	    
-	    pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
+	    pep = new CompositeEditorPane(factory, rootProp, template);;
 	    
 	    if (original == true) {
 		originalPanels.put(itemList.elementAt(i), pep);
@@ -151,9 +159,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	rootProp = new String(property + ".default");
 	    
-	propList = createPropertiesList(rootProp, subProperties);
+	//propList = createPropertiesList(rootProp, subProperties);
 
-	pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
+	pep = new CompositeEditorPane(factory, rootProp, template);;
 	    
 	if (original == true) {
 	    originalPanels.put("default", pep);
@@ -231,9 +239,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	    return;
 	
 	String rootProp =new String(property.concat("." + newValueName));
-	Vector propList = createPropertiesList(rootProp, subProperties);
+	//Vector propList = createPropertiesList(rootProp, subProperties);
 	
-	PropertyEditorPane pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
+	CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
 	optionListModel.addElement(newValueName);
 
 	entryPanel.add(newValueName, pep);
@@ -293,12 +301,12 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     public void renameProperty(String oldName, String newName) {
 	newName = getNewValueName();
 	if (newName != null) {
-	    PropertyEditorPane oldPane = (PropertyEditorPane)currentPanels.get(oldName);
+	    CompositeEditorPane oldPane = (CompositeEditorPane)currentPanels.get(oldName);
 	    if (oldPane != null) {
 		String rootProp =new String(property.concat("." + newName));
-		Vector propList = createPropertiesList(rootProp, subProperties);
+		//Vector propList = createPropertiesList(rootProp, subProperties);
 		
-		PropertyEditorPane pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
+		CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
 		java.util.Properties oldProps = oldPane.getValue();
 	    }
 	}
@@ -328,7 +336,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	    
 	    java.awt.Component[] components = entryPanel.getComponents();
 	    for (int i = 0; i < components.length; i++) {
-		((PropertyEditorPane)components[i]).setValue();
+		((CompositeEditorPane)components[i]).setValue();
 	    }
 	    
 	    if (isChanged())
@@ -354,8 +362,19 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	java.awt.Component[] components = entryPanel.getComponents();
 	for (int i = 0; i < components.length; i++) {
-	    ((PropertyEditorPane)components[i]).resetDefaultValue();
+	    ((CompositeEditorPane)components[i]).resetDefaultValue();
 	}
+    }
+
+    public java.util.Properties getValue() {
+	java.util.Properties currentRetValue = new java.util.Properties();
+	java.util.Collection panels = currentPanels.values();
+	java.util.Iterator iter = panels.iterator();
+	while (iter.hasNext()) {
+	    currentRetValue.putAll(((DefaultPropertyEditor)iter.next()).getValue());
+	}
+	
+	return currentRetValue;
     }
 
     public boolean isChanged() {

@@ -27,7 +27,7 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
     VariableBundle sourceBundle;
 
     public TabbedEditorPane(String newProperty, String newTemplate, PropertyEditorFactory newFactory) {
-	configureEditor(newFactory, newProperty, newTemplate, factory.getBundle(), true);
+	configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), true);
     }
 
     /**
@@ -46,23 +46,26 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
 
 	Vector propsToEdit = factory.getBundle().getPropertyAsVector(template, "");
 
-	JComponent currentEditor;
+	DefaultPropertyEditor currentEditor;
 	
 	editors = new Vector();
 
 	for (int i = 0; i < propsToEdit.size(); i++) {
 	    String currentProperty = template + "." + (String)propsToEdit.elementAt(i);
-	    currentEditor = createEditorPane(propertyName, currentProperty);
+	    currentEditor = createEditorPane(currentProperty, currentProperty);
 	    editors.add(currentEditor);
 	    tabbedPane.add(factory.getBundle().getProperty(currentProperty + ".label", currentProperty), currentEditor);
 	}
+
+	this.add(tabbedPane);
     }
 
     /**
      * Creates an editor pane for a group of values.
      */
-    private JComponent createEditorPane(String subProperty, String subTemplate) {
-	return new PropertyEditorPanel();
+    private DefaultPropertyEditor createEditorPane(String subProperty, String subTemplate) {
+	System.out.println("creating compositeEditorPane for " + subProperty + ", template " + subTemplate);
+	return new CompositeEditorPane(factory, subProperty, subTemplate);
     }
 
 
@@ -80,6 +83,16 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
 		((PropertyEditorUI) editors.elementAt(i)).resetDefaultValue();
 	    }
 	}
+    }
+
+    public java.util.Properties getValue() {
+	java.util.Properties currentRetValue = new java.util.Properties();
+	java.util.Iterator iter = editors.iterator();
+	while (iter.hasNext()) {
+	    currentRetValue.putAll(((DefaultPropertyEditor)iter.next()).getValue());
+	}
+	
+	return currentRetValue;
     }
 
     public void setEnabled(boolean newValue) {
