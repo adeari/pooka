@@ -15,82 +15,82 @@ import java.io.ByteArrayInputStream;
 
 public class UIDMimeMessage extends MimeMessage {
 
-    long uid;
-    UIDFolderInfo parent;
-    
-    public UIDMimeMessage(UIDFolderInfo parentFolderInfo, long newUid) {
-	super(Pooka.getDefaultSession());
-	uid = newUid;
-	parent = parentFolderInfo;
-	saved=true;
-	modified=false;
-    }
-
-    public int getSize() throws MessagingException {
+  long uid;
+  UIDFolderInfo parent;
+  
+  public UIDMimeMessage(UIDFolderInfo parentFolderInfo, long newUid) {
+    super(Pooka.getDefaultSession());
+    uid = newUid;
+    parent = parentFolderInfo;
+    saved=true;
+    modified=false;
+  }
+  
+  public int getSize() throws MessagingException {
+    try {
+      return getMessage().getSize();
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    return getMessage().getSize();
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		return getMessage().getSize();
-		
-	    } else {
-		throw fce;
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
 	}
+	
+	return getMessage().getSize();
+	
+      } else {
+	throw fce;
+      }
     }
-
-    protected InputStream getContentStream() throws MessagingException {
-	throw new MessagingException("No getting the content stream!  Bad code!");
-    }
-
-    public synchronized DataHandler getDataHandler() 
-		throws MessagingException {
+  }
+  
+  protected InputStream getContentStream() throws MessagingException {
+    throw new MessagingException("No getting the content stream!  Bad code!");
+  }
+  
+  public synchronized DataHandler getDataHandler() 
+    throws MessagingException {
+    try {
+      return getMessage().getDataHandler();
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    return getMessage().getDataHandler();
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		return getMessage().getDataHandler();
-	    } else {
-		throw fce;
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
 	}
+	
+	return getMessage().getDataHandler();
+      } else {
+	throw fce;
+      }
     }
-
-    public String[] getHeader(String name)
-			throws MessagingException {
+  }
+  
+  public String[] getHeader(String name)
+    throws MessagingException {
+    try {
+      return getMessage().getHeader(name);
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    return getMessage().getHeader(name);
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		return getMessage().getHeader(name);
-		
-	    } else {
-		throw fce;
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
 	}
+	
+	return getMessage().getHeader(name);
+	
+      } else {
+	throw fce;
+      }
     }
-
+  }
+  
   public String getHeader(String name, String delimiter)
     throws MessagingException {
     try {
