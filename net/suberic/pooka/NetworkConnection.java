@@ -1,5 +1,6 @@
 package net.suberic.pooka;
 
+import java.net.*;
 import net.suberic.util.*;
 
 /**
@@ -19,6 +20,10 @@ public class NetworkConnection implements net.suberic.util.Item {
   String connectCommand = null;
 
   String disconnectCommand = null;
+
+  InetAddress testAddress = null;
+
+  int testPort = -1;
 
   boolean disconnectRequested = false;
 
@@ -65,12 +70,26 @@ public class NetworkConnection implements net.suberic.util.Item {
     connectCommand = bundle.getProperty(getItemProperty() + ".connectCommand", "");
     disconnectCommand = bundle.getProperty(getItemProperty() + ".disconnectCommand", "");
 
+    String testAddressString = bundle.getProperty(getItemProperty() + ".testAddress", "");
+    String testPortString = bundle.getProperty(getItemProperty() + ".testPort", "");
+    if (testAddressString != "" && testPortString != "") {
+      try {
+	testAddress = InetAddress.getByName(testAddressString);
+	testPort = Integer.parseInt(testPortString);
+      } catch (Exception e) {
+	testAddress = null;
+	testPort = -1;
+      }
+    } 
+
     String onStartup = bundle.getProperty(getItemProperty() + ".valueOnStartup", "Unavailable");
+
     if (onStartup.equalsIgnoreCase("Connected")) {
       this.connect();
     } else if (onStartup.equalsIgnoreCase("Unavailable")) {
       status = UNAVAILABLE;
     }
+
   }
   
   /**
@@ -103,8 +122,10 @@ public class NetworkConnection implements net.suberic.util.Item {
       }
 
       if (status != CONNECTED) {
-	status = CONNECTED;
-	fireConnectionEvent();
+	if (checkConnection()) {
+	  status = CONNECTED;
+	  fireConnectionEvent();
+	}
       }
     } catch (Exception ex) {
       System.out.println("Could not run connect command:");
@@ -175,6 +196,29 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public int disconnect() {
     return disconnect(true);
+  }
+
+  /**
+   * <p>Checks this connection to see if it's actually up.  This 
+   * implementation uses the testAddress and testPort settings to open
+   * a TCP connection.  This returns whether or not the connection
+   * succeeds.
+   */
+  public boolean checkConnection() {
+    if (testAddress != null && testPort > -1) {
+      try {
+	System.err.println("testing address " + testAddress + ", port " + testPort);
+	Socket testSocket = new Socket(testAddress, testPort);
+	testSocket.close();
+	return true;
+      } catch (Exception e) {
+	System.err.println("caught exception " + e);
+	return false;
+      }
+    }
+
+    // if there's no test case, assume that we're ok.
+    return true;
   }
 
   /**
