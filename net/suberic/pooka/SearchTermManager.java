@@ -302,6 +302,10 @@ public class SearchTermManager {
 	return term;
     }
     
+    /**
+     * This creates a javax.mail.Flags object containing the flag indicated
+     * by flagName.
+     */
     public Flags getFlags(String flagName) {
 	if (flagName.equalsIgnoreCase("answered"))
 	    return new Flags(Flags.Flag.ANSWERED);
@@ -317,6 +321,21 @@ public class SearchTermManager {
 	    return new Flags(Flags.Flag.SEEN);
 
 	return new Flags(flagName);
+    }
+
+    /**
+     * Returns the available flag labels.
+     */
+    public Vector getFlagLabels() {
+	// FIXME this isn't customizable or internationalized at all.
+	Vector v = new Vector();
+	v.add("flagged");
+	v.add("seen");
+	v.add("answered");
+	v.add("deleted");
+	v.add("draft");
+	v.add("recent");
+	return v;
     }
 
     /**
