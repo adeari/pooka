@@ -3,15 +3,16 @@ alpha 2
 
 *) enable voice control
 
-*)  fix the response window size when there are lots of people in the 
-address fields--right now it makes the entire window huge.
-
 *)  add a way to edit the mailcap file.  this should be doable both from
 a menu option and from the 'open with' dialog.
 
 *)  make the windows detachable.
 
 *) create a Trash folder.
+
+*) add the ability to sort the FolderTable.
+
+*) add new/unread/urgent/etc flags to the FolderTable.
 
 after alpha 2
 ----------------
@@ -55,11 +56,9 @@ too much date info, not enough Subject.
 
 *) add something to search through all messages in the folder.
 
-*) add the ability to print
+*) make printing nicer--it's pretty basic now.
 
 *) add the ability to save messages to files.
-
-*) make the folderWindow sortable
 
 *) add ability to reply/forward with attachments, or as inline, and so forth
 
