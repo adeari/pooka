@@ -137,4 +137,19 @@ public class ActionThread extends Thread {
   public Object getRunLock() {
     return runLock;
   }
+
+  /**
+   * Returns the current Queue size.
+   */
+  public int getQueueSize() {
+    return actionQueue.size();
+  }
+
+  /**
+   * Returns the name of the current action.
+   */
+  public String getCurrentActionName() {
+    return "";
+  }
+
 }

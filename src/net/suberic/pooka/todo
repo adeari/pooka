@@ -41,6 +41,8 @@ say, like reacting to a mailto: link.
 *) fix AttachmentPane.openAction from showing dialog on store thread instead
 	of AWTEventThread.
 
+*) fix TLS/SSL support for SMTP with new javamil 1.3.2.
+
 -----
 
 *) test w/gnu javamail -- ???

@@ -26,6 +26,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
   String outboxID = null;
 
+  String mProtocol = "smtp://";
+
   NetworkConnection.ConnectionLock connectionLock = null;
 
   boolean sending = false;
@@ -53,7 +55,14 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     if (currentConnection != null)
       currentConnection.addConnectionListener(this);
 
-    sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
+
+    if (Pooka.getProperty(getItemProperty() + ".authenticated", "false").equalsIgnoreCase("true")) {
+      String mProtocol = "smtps://";
+    } else {
+      String mProtocol = "smtp://";
+    }
+
+    sendMailURL = new URLName(mProtocol + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
 
     outboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
 
@@ -84,7 +93,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	  currentConnection.addConnectionListener(this);
 	
       } else if (changedValue.equals(getItemProperty() + ".server")) {
-	sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
+	sendMailURL = new URLName(mProtocol + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
       } else if (changedValue.equals(getItemProperty() + ".outbox")) {
 	String newOutboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
 	if (newOutboxID != outboxID) {
@@ -325,6 +334,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
 
     boolean useAuth = Pooka.getProperty(getItemProperty() + ".authenticated", "false").equalsIgnoreCase("true");
+
     if (useAuth) {
       java.util.Properties sysProps = new java.util.Properties(System.getProperties());
       sysProps.setProperty("mail.mbox.mailspool", Pooka.getProperty("Pooka.spoolDir", "/var/spool/mail"));
@@ -338,6 +348,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
 	sysProps.setProperty("mail.smtp.password", password);
       }
+
+      sysProps.setProperty("mail.smtp.starttls.enable", "true");
 
       session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password, (net.suberic.pooka.gui.SimpleAuthenticator) Pooka.defaultAuthenticator));
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
