@@ -30,8 +30,13 @@ public class VariableBundle extends Object {
 	    try {
 		resources = ResourceBundle.getBundle(resourceFile, Locale.getDefault());
 	    } catch (MissingResourceException mre) {
-		System.err.println(mre.getClassName() + mre.getKey());
-		System.exit(1);
+		System.err.println("Error loading resource " + mre.getClassName() + mre.getKey() + ":  trying default locale.");
+		try {
+		    resources = ResourceBundle.getBundle(resourceFile, Locale.US);
+		} catch (MissingResourceException mreTwo){ 
+		    System.err.println("Unable to load default (US) resource bundle; exiting.");
+		    System.exit(1);
+		}
 	    }
 	else
 	    resources=null;
