@@ -449,6 +449,7 @@ UserProfile.editableFields.editor.config=signatureFile:sentFolder:mailServer
 UserProfile.editableFields.editor.config.scoped=true
 UserProfile.editableFields.editor.config.scopeRoot=UserProfile.editableFields
 UserProfile.editableFields.editor.config.propertyType=Composite
+UserProfile.editableFields.editor.config.signatureFile.propertyType=File
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
@@ -531,6 +532,7 @@ AddressBook.editableFields.type=file
 AddressBook.editableFields.edit.file.propertyType=Composite
 AddressBook.editableFields.edit.file.scoped=true
 AddressBook.editableFields.edit.file=filename
+AddressBook.editableFields.edit.file.filename.propertyType=File
 
 AddressBook.editableFields.edit.ldap.propertyType=Composite
 AddressBook.editableFields.edit.ldap=server
@@ -676,7 +678,7 @@ Store.editableFields.mailDirectory=Pooka.cacheDirectory
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
-Preferences=UI:Reply:Startup:Signature:HTML:SSL
+Preferences=UI:Reply:Startup:Signature:HTML:SSL:Color
 Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
@@ -687,6 +689,11 @@ Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:P
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
 Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.SSL=Pooka.sslCertFile
+Preferences.Color=Pooka.background
+
+Pooka.sslCertFile.propertyType=File
+
+Pooka.background.propertyType=Color
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v
@@ -792,3 +799,5 @@ FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTer
 FolderInfo.defaultDisplayFilters.Uncached.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderInfo.defaultDisplayFilters.Uncached.action.rgb=28101
 
+# colors
+Pooka.background=0

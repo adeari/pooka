@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 
 /**
  * This displays the currently selected folder (if any), along with a 
- * button which will bring up a 
+ * button which will bring up a dialog to select another folder.
  */
 
 public class FolderSelectorPane extends DefaultPropertyEditor {
@@ -95,7 +95,7 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
     }
 
     /**
-     * Creates a button that will bring up a way to select the
+     * Creates a button that will bring up a way to select a folder.
      */
     public JButton createInputButton() {
 	if (Pooka.isDebug())

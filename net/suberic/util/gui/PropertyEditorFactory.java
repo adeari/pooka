@@ -106,6 +106,10 @@ public class PropertyEditorFactory {
 	    return createCompositeEditor(property, property);
 	else if (test.equalsIgnoreCase("Variable"))
 	    return createVariableEditor(property, property);
+	else if (test.equalsIgnoreCase("File"))
+	    return createFileEditor(property, property);
+	else if (test.equalsIgnoreCase("Color"))
+	    return createColorEditor(property, property);
 	else
 	    return createBasicEditor(property);
     }
@@ -136,6 +140,10 @@ public class PropertyEditorFactory {
 	    return createCompositeEditor(property, typeTemplate);
 	else if (test.equalsIgnoreCase("Variable"))
 	    return createVariableEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("File"))
+	    return createFileEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("Color"))
+	    return createColorEditor(property, typeTemplate);
 	else
 	    return createBasicEditor(property, typeTemplate);
     }
@@ -198,6 +206,14 @@ public class PropertyEditorFactory {
 
     protected DefaultPropertyEditor createVariableEditor(String property, String typeTemplate) {
 	return new VariableEditorPane(property, typeTemplate, this);
+    }
+
+    protected DefaultPropertyEditor createFileEditor(String property, String typeTemplate) {
+	return new FileSelectorPane(property, typeTemplate, sourceBundle);
+    }
+
+    protected DefaultPropertyEditor createColorEditor(String property, String typeTemplate) {
+	return new ColorSelectorPane(property, typeTemplate, sourceBundle);
     }
 
     public VariableBundle getBundle() {

@@ -1,3 +1,9 @@
+added a File Selector for Configuration properties that take files.
+
+
+011226 release
+--------------
+
 fixed a bug where two copies of a message could get added to the folder
 list.
 
