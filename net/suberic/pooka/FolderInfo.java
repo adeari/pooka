@@ -59,6 +59,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // PASSIVE, DISCONNECTED, or CLOSED.
     protected int preferredStatus = CONNECTED;
 
+    // the resource for the folder disconnected message
+    protected static String disconnectedMessage = "error.Folder.disconnected";
+
     // the Folder wrapped by this FolderInfo.
     private Folder folder;
 
@@ -283,51 +286,48 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
-    /**
-     * Invoked when a Store/Folder/Transport is closed.
-     * 
-     * As specified in javax.mail.event.ConnectionListener.
-     */
     public void closed(ConnectionEvent e) {
-	if (Pooka.isDebug()) {
-	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
-	}
+	synchronized(this) {
+	    if (Pooka.isDebug()) {
+		System.out.println("Folder " + getFolderID() + " closed:  " + e);
+	    }
+	    
 	
-	if (getFolderDisplayUI() != null) {
-	    if (status != CLOSED)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please close and re-open."));
+	    if (getFolderDisplayUI() != null) {
+		if (status != CLOSED)
+		    getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
+	    }
+	    
+	    
+	    if (status == CONNECTED) {
+		setStatus(LOST_CONNECTION);
+	    }
+	    
 	}
-
-	if (status == CONNECTED) {
-	    setStatus(LOST_CONNECTION);
-	}
-	
 	fireConnectionEvent(e);
     }
     
-    /**
-     * Invoked when a Store/Folder/Transport is disconnected.
-     * 
-     * As specified in javax.mail.event.ConnectionListener.
-     */
     public void disconnected(ConnectionEvent e) {
-	if (Pooka.isDebug()) {
-	    System.out.println("Folder " + getFolderID() + " disconnected.");
-	    Thread.dumpStack();
-	}
-	
-	if (getFolderDisplayUI() != null) {
-	    if (status != CLOSED)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please close and re-open."));
-	}
-	
-	if (status == CONNECTED) {
-	    setStatus(LOST_CONNECTION);
+	synchronized(this) {
+	    if (Pooka.isDebug()) {
+		System.out.println("Folder " + getFolderID() + " disconnected.");
+		Thread.dumpStack();
+	    }
+	    
+	    if (getFolderDisplayUI() != null) {
+		if (status != CLOSED)
+		    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
+	    }
+	    
+	    if (status == CONNECTED) {
+		setStatus(LOST_CONNECTION);
+	    }
 	}
 	fireConnectionEvent(e);
     }
-    
-    /**
+
+
+   /**
      * Invoked when a Store/Folder/Transport is opened.
      * 
      * As specified in javax.mail.event.ConnectionListener.
@@ -365,7 +365,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (Pooka.isDebug())
 	    System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
 
-	if (status == CLOSED) {
+	if (status == CLOSED || status == LOST_CONNECTION) {
 	    if (Pooka.isDebug())
 		System.out.println(this + ":  isLoaded() and isAvailable().");
 	    if (folder.isOpen()) {
@@ -1842,14 +1842,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * sets the status.
      */
     public void setStatus(int newStatus) {
-	status = newStatus;
+	synchronized(this) {
+	    System.out.println("setting status for " + this + " to " + newStatus);
+	    status = newStatus;
+	}
     }
 
     /**
      * gets the status.
      */
     public int getStatus() {
-	return status;
+	synchronized(this) {
+	    return status;
+	}
     }
 
     public ActionThread getFolderThread() {

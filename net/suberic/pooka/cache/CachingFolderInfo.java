@@ -19,6 +19,9 @@ import net.suberic.pooka.gui.FolderTableModel;
 public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     protected MessageCache cache = null;
 
+    // the resource for the folder disconnected message
+    protected static String disconnectedMessage = "error.CachingFolder.disconnected";
+
     boolean autoCache = false;
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
@@ -631,40 +634,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
      */
     public void closeFolder(boolean expunge) throws MessagingException {
 	closeFolder(expunge, false);
-    }
-
-    public void closed(ConnectionEvent e) {
-	if (Pooka.isDebug()) {
-	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
-	}
-	
-	if (getFolderDisplayUI() != null) {
-	    if (getStatus() == CLOSED)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.CachingFolder.disconnected", "Folder disconnected.  Only cached messages will be available."));
-	}
-	
-	if (status == CONNECTED) {
-	    setStatus(LOST_CONNECTION);
-	}
-	
-	fireConnectionEvent(e);
-    }
-    
-    public void disconnected(ConnectionEvent e) {
-	if (Pooka.isDebug()) {
-	    System.out.println("Folder " + getFolderID() + " disconnected.");
-	    Thread.dumpStack();
-	}
-	
-	if (getFolderDisplayUI() != null) {
-	    if (getStatus() == CLOSED)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.CachingFolder.disconnected", "Folder disconnected.  Only cached messages will be available."));
-	}
-	
-	if (status == CONNECTED) {
-	    setStatus(LOST_CONNECTION);
-	}
-	fireConnectionEvent(e);
     }
 
     /**

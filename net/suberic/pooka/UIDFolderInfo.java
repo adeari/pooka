@@ -21,6 +21,9 @@ public class UIDFolderInfo extends FolderInfo {
     protected HashMap uidToInfoTable = new HashMap();
     protected long uidValidity;
 
+    // the resource for the folder disconnected message
+    protected static String disconnectedMessage = "error.UIDFolder.disconnected";
+
     public UIDFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
 	
@@ -461,40 +464,6 @@ public class UIDFolderInfo extends FolderInfo {
 
     }
 
-    public void closed(ConnectionEvent e) {
-	if (Pooka.isDebug()) {
-	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
-	}
-	
-	if (getFolderDisplayUI() != null) {
-	    if (status != CLOSED)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
-	}
-
-	if (status == CONNECTED) {
-	    setStatus(LOST_CONNECTION);
-	}
-	
-	fireConnectionEvent(e);
-    }
-    
-    public void disconnected(ConnectionEvent e) {
-	if (Pooka.isDebug()) {
-	    System.out.println("Folder " + getFolderID() + " disconnected.");
-	    Thread.dumpStack();
-	}
-	
-	if (getFolderDisplayUI() != null) {
-	    if (status != CLOSED)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
-	}
-	
-	if (status == CONNECTED) {
-	    setStatus(LOST_CONNECTION);
-	}
-	fireConnectionEvent(e);
-    }
-
     public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
 	if (m instanceof UIDMimeMessage)
 	    return (UIDMimeMessage) m;
@@ -551,10 +520,10 @@ public class UIDFolderInfo extends FolderInfo {
 		m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
 		return m;
 	    } catch (IllegalStateException ise) {
-		return null;
+		throw new MessagingException(ise.getMessage());
 	    }
 	} else {
-	    return null;
+	    throw new MessagingException("Error:  Folder unavailable or is not a UIDFolder");
 	}
     }
 
