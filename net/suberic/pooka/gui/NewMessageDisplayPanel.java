@@ -12,6 +12,8 @@ import java.util.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
+import javax.swing.plaf.metal.*;
+import javax.swing.plaf.*;
 
 /**
  * A window for entering new messages.
@@ -199,10 +201,25 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      * as defined in java.awt.event.ItemListener
      *
      * This implementation calls a refreshCurrentUser() on the MainPanel.
+     *
+     * It also updates the panel's interface style.
      */
 
     public void itemStateChanged(ItemEvent ie) {
-	Pooka.getMainPanel().refreshCurrentUser();
+      Pooka.getMainPanel().refreshCurrentUser();
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+	      try {
+		Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
+	      } catch (Exception e) {
+		System.err.println("error setting theme:  " + e);
+	      }
+	    }
+	  }
+	});
+	
     }
 
     public Container createHeaderInputPanel(MessageProxy aMsg, Hashtable proptDict) {

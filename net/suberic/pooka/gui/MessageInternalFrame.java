@@ -11,13 +11,14 @@ import java.util.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
+import javax.swing.plaf.metal.MetalTheme;
 
 /**
  * An InternalFrame which can display messages.
  * 
  * This class should be used in conjunction with a MessagePanel.
  */
-public abstract class MessageInternalFrame extends JInternalFrame implements MessageUI, net.suberic.util.swing.UpdatableUI {
+public abstract class MessageInternalFrame extends JInternalFrame implements MessageUI, net.suberic.util.swing.ThemeSupporter {
 
     protected MessagePanel parentContainer;
 
@@ -28,6 +29,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     protected ConfigurableKeyBinding keyBindings;
     protected boolean addedToDesktop = false;
 
+  protected javax.swing.plaf.metal.MetalTheme currentTheme = null;
     /**
      * Creates a MessageInternalFrame from the given Message.
      */
@@ -65,7 +67,24 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * Configures the InterfaceStyle for this component.
    */
   public void configureInterfaceStyle() {
-    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
+    try {
+      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+    } catch (Exception e) {
+    }
+  }
+
+  /**
+   * Gets the currently configured Theme.
+   */
+  public MetalTheme getCurrentTheme() {
+    return currentTheme;
+  }
+
+  /**
+   * Sets the Theme that this component is currently using.
+   */
+  public void setCurrentTheme(MetalTheme newTheme) {
+    currentTheme = newTheme;
   }
 
     /**

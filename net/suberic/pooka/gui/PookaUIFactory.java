@@ -3,9 +3,9 @@ package net.suberic.pooka.gui;
 public interface PookaUIFactory extends ErrorHandler {
 
   /**
-   * Returns the PookaUIManager for fonts and colors.
+   * Returns the PookaThemeManager for fonts and colors.
    */
-  public net.suberic.util.swing.UpdatableUIManager getPookaUIManager();
+  public net.suberic.util.swing.ThemeManager getPookaThemeManager();
 
     /**
      * Creates an appropriate MessageUI object for the given MessageProxy.

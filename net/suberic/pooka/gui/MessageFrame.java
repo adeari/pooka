@@ -11,11 +11,13 @@ import java.util.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
+import javax.swing.plaf.metal.MetalTheme;
+
 
 /**
  * A top-level window for displaying a message.
  */
-public abstract class MessageFrame extends JFrame implements MessageUI, net.suberic.util.swing.UpdatableUI {
+public abstract class MessageFrame extends JFrame implements MessageUI, net.suberic.util.swing.ThemeSupporter {
 
     protected MessageProxy msg;
     protected MessageDisplayPanel messageDisplay;
@@ -23,6 +25,8 @@ public abstract class MessageFrame extends JFrame implements MessageUI, net.sube
     protected ConfigurableToolbar toolbar;
     protected ConfigurableKeyBinding keyBindings;
     protected ConfigurableMenuBar menuBar;
+
+  protected javax.swing.plaf.metal.MetalTheme currentTheme = null;
 
     /**
      * Creates a MessageFrame from the given Message.
@@ -55,8 +59,26 @@ public abstract class MessageFrame extends JFrame implements MessageUI, net.sube
    * Configures the InterfaceStyle for this component.
    */
   public void configureInterfaceStyle() {
-    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
+    try {
+      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+    } catch (Exception e) {
+    }
   }
+  
+  /**
+   * Gets the currently configured Theme.
+   */
+  public MetalTheme getCurrentTheme() {
+    return currentTheme;
+  }
+  
+  /**
+   * Sets the Theme that this component is currently using.
+   */
+  public void setCurrentTheme(MetalTheme newTheme) {
+    currentTheme = newTheme;
+  }
+
 
     /**
      * This opens the MessageFrame.

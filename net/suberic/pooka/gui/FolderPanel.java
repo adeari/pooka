@@ -10,19 +10,22 @@ import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 import javax.swing.tree.*;
+import javax.swing.plaf.metal.MetalTheme;
 import net.suberic.pooka.gui.*;
 import java.util.Vector;
+
 
 /**
  * This class displays the Stores and Folders for Pooka.
  */
-public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer, net.suberic.util.swing.UpdatableUI {
-    MainPanel mainPanel=null;
-    JTree folderTree;
-    DefaultTreeModel folderModel;
-    Session session;
-    ConfigurableKeyBinding keyBindings;
-    
+public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer, net.suberic.util.swing.ThemeSupporter {
+  MainPanel mainPanel=null;
+  JTree folderTree;
+  DefaultTreeModel folderModel;
+  Session session;
+  ConfigurableKeyBinding keyBindings;
+  MetalTheme currentTheme = null;
+
     /**
      * This creates and configures a new FolderPanel.
      */
@@ -100,23 +103,39 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
    * Configures the interfaceStyle for this Pane.
    */
   public void configureInterfaceStyle() {
-        
-    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
-    
+    try {
+      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+    } catch (Exception e) {
+      
+    }
 
   }
 
  /**
-   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
-  public UIConfig getUIConfig(UpdatableUIManager uuim) {
-    String id = Pooka.getProperty("Pooka.folderPanel.uiConfig", "");
+  public MetalTheme getTheme(ThemeManager tm) {
+    String id = Pooka.getProperty("Pooka.folderPanel.theme", "");
     if (id != null && ! id.equals("")) {
-      return uuim.getUIConfig(id);
+      return tm.getTheme(id);
     } 
     
     return null;
+  }
+
+  /**
+   * Gets the currently configured Theme.
+   */
+  public MetalTheme getCurrentTheme() {
+    return currentTheme;
+  }
+
+  /**
+   * Sets the Theme that this component is currently using.
+   */
+  public void setCurrentTheme(MetalTheme newTheme) {
+    currentTheme = newTheme;
   }
 
 
@@ -182,8 +201,8 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     for (int i = 0; added != null && i < added.length ; i++) {
       this.addStore((StoreInfo)added[i] , root);
     }
-    
-    getFolderTree().updateUI();
+
+    // note:  see if we need to do an explicit update here.
   }
 
 

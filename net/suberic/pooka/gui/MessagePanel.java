@@ -1,7 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
-import net.suberic.util.swing.RunnableAdapter;
+import net.suberic.util.swing.*;
 import net.suberic.util.gui.ConfigurableKeyBinding;
 import java.util.*;
 import java.awt.*;
@@ -13,13 +13,14 @@ import javax.mail.MessagingException;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
+import javax.swing.plaf.metal.MetalTheme;
 
 /**
  * The message panel.
  *
  */
 
-public class MessagePanel extends JDesktopPane implements ContentPanel, net.suberic.util.swing.UpdatableUI {
+public class MessagePanel extends JDesktopPane implements ContentPanel, net.suberic.util.swing.ThemeSupporter {
   /**
    * ExtendedDesktopManager is just a Desktop Manager which also
    * calls refreshActiveMenus() and refreshCurrentUser()  when the 
@@ -76,7 +77,8 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, net.sube
   ConfigurableKeyBinding keyBindings;
   boolean savingWindowLocations = false;
   boolean savingOpenFolders = false;
-  
+  MetalTheme currentTheme = null;
+
   /**
    * Creates a new MessagePanel to go in the given MainPanel.
    */
@@ -251,7 +253,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, net.sube
       final JInternalFrame newMessageWindow = messageWindow;
       final boolean isNew = newMessage;
       
-      Runnable openWindowCommand = new RunnableAdapter() {
+      Runnable openWindowCommand = new Runnable() {
 	  public void run() {
 	    if (isNew) {
 	      MessagePanel.this.add(newMessageWindow);
@@ -505,21 +507,39 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, net.sube
    */
   public void configureInterfaceStyle() {
         
-    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
+    try {
+      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+    } catch (Exception e) {
+
+    }
 
   }
 
  /**
-   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
-  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
-    String id = Pooka.getProperty("Pooka.messagePanel.uiConfig", "");
+  public MetalTheme getTheme(ThemeManager tm) {
+    String id = Pooka.getProperty("Pooka.messagePanel.theme", "");
     if (id != null && ! id.equals("")) {
-      return uuim.getUIConfig(id);
+      return tm.getTheme(id);
     } 
     
     return null;
+  }
+
+  /**
+   * Gets the currently configured Theme.
+   */
+  public MetalTheme getCurrentTheme() {
+    return currentTheme;
+  }
+
+  /**
+   * Sets the Theme that this component is currently using.
+   */
+  public void setCurrentTheme(MetalTheme newTheme) {
+    currentTheme = newTheme;
   }
 
   /**

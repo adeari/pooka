@@ -2,6 +2,8 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
 import net.suberic.util.swing.EntryTextArea;
+import net.suberic.util.swing.*;
+import javax.swing.plaf.metal.MetalTheme;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -99,20 +101,20 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
     }
   
  /**
-   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
-  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
+  public MetalTheme getTheme(ThemeManager tm) {
     UserProfile up = getSelectedProfile();
     if (up != null) {
-      String id = Pooka.getProperty(up.getUserProperty() + ".uiConfig", "");
+      String id = Pooka.getProperty(up.getUserProperty() + ".theme", "");
       if (id != null && ! id.equals("")) {
-	return uuim.getUIConfig(id);
+	return tm.getTheme(id);
       } 
     }
      
     return null;
-  }
+  }   
 
   /**
    * Closes the message window.  This checks to see if the underlying

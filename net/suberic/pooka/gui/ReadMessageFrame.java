@@ -1,6 +1,8 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
+import net.suberic.util.swing.*;
+import javax.swing.plaf.metal.MetalTheme;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -11,6 +13,7 @@ import java.util.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
+
 
 public class ReadMessageFrame extends MessageFrame {
 
@@ -104,10 +107,10 @@ public class ReadMessageFrame extends MessageFrame {
     }
 
  /**
-   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
-  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
+  public MetalTheme getTheme(ThemeManager tm) {
     MessageProxy mp = getMessageProxy();
     if (mp == null)
       return null;
@@ -118,14 +121,13 @@ public class ReadMessageFrame extends MessageFrame {
 
     FolderInfo fi = mi.getFolderInfo();
     if (fi != null) {
-      String id = Pooka.getProperty(fi.getFolderProperty() + ".uiConfig", "");
+      String id = Pooka.getProperty(fi.getFolderProperty() + ".theme", "");
       if (id != null && ! id.equals("")) {
-	return uuim.getUIConfig(id);
+	return tm.getTheme(id);
       } 
     } 
 
     return null;
-
   }
 
     /**
