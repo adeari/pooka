@@ -92,44 +92,49 @@ public class ConfigurableMenuBar extends JMenuBar implements ConfigurableUI {
     }
     return menu;
     }
-        /**
+    /**
      * And this actually creates the menu items themselves.
      */
     protected JMenuItem createMenuItem(String menuID, String menuItemID, VariableBundle vars) {
-    // TODO:  should also make these undo-able.
+	// TODO:  should also make these undo-able.
 	
-	/*	if (vars.getProperty(menuID + "." + menuItemID, "") == "") { */
-	    JMenuItem mi;
-	    try {
-		mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
-	    } catch (MissingResourceException mre) {
-		mi = new JMenuItem(menuItemID);
-	    }
-	    
-	    java.net.URL url = null;
-	    
-	    try {
-		url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
-	    } catch (MissingResourceException mre) {
-	    } /*catch (java.net.MalformedURLException mue) {
-		System.out.println("malformedURL for " + menuID + "." + menuItemID + ".Image");
-		}*/
-	    if (url != null) {
-		mi.setHorizontalTextPosition(JButton.RIGHT);
-		mi.setIcon(new ImageIcon(url));
-	    }
-	    
-	    String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
-	    
-	    mi.setActionCommand(cmd);	
-	    return mi;
-	    /*	}
-	    if (vars.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
+	/*	
+		when we become able to do custom menus again.
+		if (vars.getProperty(menuID + "." + menuItemID, "") == "") { 
+	*/
+
+	JMenuItem mi;
+	try {
+	    mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
+	} catch (MissingResourceException mre) {
+	    mi = new JMenuItem(menuItemID);
+	}
+	
+	java.net.URL url = null;
+	
+	try {
+	    url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
+	} catch (MissingResourceException mre) {
+	}
+
+	if (url != null) {
+	    mi.setHorizontalTextPosition(JButton.RIGHT);
+	    mi.setIcon(new ImageIcon(url));
+	}
+	
+	String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
+	
+	mi.setActionCommand(cmd);	
+	
+	return mi;
+	/*	
+		}
+		if (vars.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
 		return new FolderMenu(menuID + "." + menuItemID, getFolderPanel());
 		}
-	    else
+		else
 		return createMenu(menuID + "." + menuItemID );
-	    */
+	*/
     }
 
     /**
@@ -149,8 +154,10 @@ public class ConfigurableMenuBar extends JMenuBar implements ConfigurableUI {
     /**
      * As defined in net.suberic.util.gui.ConfigurableUI
      */
-    public void setActive(Hashtable commands) {
+    public void setActive(Hashtable newCommands) {
 	clearListeners();
+	commands = newCommands;
+	setActiveMenus(this);
     }
 
     private void setActiveMenuItems(JMenu men) {
