@@ -7,9 +7,7 @@
 
 -----
 
-*) give spam buttom a keybinding.  
-
-*) theme bug in folder table display between preview and desktop.
+*) give spam button a keybinding.  
 
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
 	message.  read it.  disconnect there.  get a few new messages.
@@ -19,6 +17,9 @@
 	
 *) bug:  html text is always black, no matter the theme or the 
 specifications in the html itself.
+
+*) bug:  NPE when adding a new (user?  smtp server) and accepting the default
+	with a new pooka config.
 
 --?
 
@@ -156,6 +157,8 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 *) add "view pookarc"
 
 *) add console?
+
+*) theme bug in folder table display between preview and desktop.
 
 ------
 

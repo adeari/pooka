@@ -28,10 +28,12 @@ public abstract class MessageDisplayPanel extends JPanel {
   protected boolean hasAttachment = false;
   protected ConfigurableKeyBinding keyBindings;
   
+  protected boolean mFontSet = false;
+
   protected Matcher currentMatcher = null;
 
   JPanel attachmentDisplayPanel;
-  
+
   /**
    * Creates an empty MessageDisplayPanel.
    */
@@ -215,18 +217,17 @@ public abstract class MessageDisplayPanel extends JPanel {
       // if we get an exception, just ignore it and use the default.
     }
     
-    /* ignore for now.
-    if (f == null) {
+    if (f == null && ! mFontSet) {
       String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
       int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
       
       f = new Font(fontName, Font.PLAIN, fontSize);
     }
-    */
     
-    if (f != null)
+    if (f != null) {
       jep.setFont(f);
-    
+      mFontSet = true;
+    }
   }
 
   /**
