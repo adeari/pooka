@@ -68,8 +68,9 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 
 	if (table.getModel() instanceof FolderTableModel) {
 	    ftm = (FolderTableModel) table.getModel();
+	    MessageProxy msg = ftm.getMessageProxy(row);
 
-	    if (!(ftm.getMessageProxy(row).isSeen())) {
+	    if ( msg != null && ! (msg.isSeen())) {
 		if (getUnreadFont() != null) {
 		    returnValue.setFont(getUnreadFont());
 		    return returnValue;

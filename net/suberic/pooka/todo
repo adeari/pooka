@@ -15,11 +15,6 @@ different icon and different folder information (to: instead of from:).
 
 *) fix the signature
 
-*) fix the NullPointerException in the DefaultFolderCellRenderer.
-
-*) say...  i think the subjects in responses and forwards are ending with
-trailing \n's too often.  fix that.
-
 ?????? alpha 2 or not ??????
 ----------------------------
 

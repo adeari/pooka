@@ -355,7 +355,7 @@ public class MessageProxy {
      * characters to decide which strings to substitute for which
      * characters.
      */
-    public String parseMsgString(String introTemplate) {
+    public String parseMsgString(String introTemplate, boolean addLF) {
 	MimeMessage m = (MimeMessage)message;
 	StringBuffer intro = new StringBuffer(introTemplate);
 	int index = introTemplate.lastIndexOf('%', introTemplate.length());
@@ -384,8 +384,9 @@ public class MessageProxy {
 	    return null;
 	}
 
-	if (intro.charAt(intro.length()-1) != '\n')
-	    intro.append('\n');
+	if (addLF)
+	    if (intro.charAt(intro.length()-1) != '\n')
+		intro.append('\n');
 
 	return intro.toString();
     }
@@ -406,10 +407,10 @@ public class MessageProxy {
 	if (up != null && up.getMailProperties() != null) {
 	    
 	    replyPrefix = up.getMailProperties().getProperty("replyPrefix", Pooka.getProperty("Pooka.replyPrefix", "> "));
-	    parsedIntro = parseMsgString(up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")));
+	    parsedIntro = parseMsgString(up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")), true);
 	} else { 
 	    replyPrefix = Pooka.getProperty("Pooka.replyPrefix", "> ");
-	    parsedIntro = parseMsgString(Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"));
+	    parsedIntro = parseMsgString(Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"), true);
 	}
 	parsedText = prefixMessage(textPart, replyPrefix, parsedIntro);
 	mMsg.setText(parsedText);
@@ -433,16 +434,16 @@ public class MessageProxy {
 	if (up != null && up.getMailProperties() != null) {
 	    if (forwardStyle.equals("prefixed")) {
 		forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
-		parsedIntro = parseMsgString(up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")));
+		parsedIntro = parseMsgString(up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")), true);
 	    } else { 
 		forwardPrefix = Pooka.getProperty("Pooka.forwardPrefix", "> ");
-		parsedIntro = parseMsgString(Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"));
+		parsedIntro = parseMsgString(Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"), true);
 	    }
 	    parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
 	}
 
 	    mMsg.setText(parsedText);
-	    mMsg.setSubject(parseMsgString(Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s")));
+	    mMsg.setSubject(parseMsgString(Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
     }
 
     /**
