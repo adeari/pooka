@@ -245,6 +245,32 @@ public class FolderDisplayPanel extends JPanel {
     }
 
     /**
+     * This selects the next message.  If no message is selected, then
+     * the first message is selected.
+     */
+    public int selectNextMessage() {
+	int selectedRow = messageTable.getSelectedRow();
+	if (selectedRow <= 0) {
+	    return selectMessage(0);
+	} else {
+	    return selectMessage(selectedRow + 1);
+	}
+    }
+
+    /**
+     * This selects the previous message.  If no message is selected, then
+     * the last message is selected.
+     */
+    public int selectPreviousMessage() {
+	int[] rowsSelected = messageTable.getSelectedRows();
+	if (rowsSelected.length > 0) {
+	    return selectMessage(rowsSelected[0] - 1);
+	} else {
+	    return selectMessage(messageTable.getRowCount() -1 );
+	}
+    }
+    
+    /**
      * This selects the message at the given row, and also scrolls the
      * MessageTable to make the given row visible.
      *
@@ -252,8 +278,10 @@ public class FolderDisplayPanel extends JPanel {
      * the first message is selected.  If the number entered is above that
      * range, then the last message is selected.  If the MessageTable 
      * contains no messages, nothing happens.
+     *
+     * @return  the index of the newly selected row.
      */
-    public void selectMessage(int messageNumber) {
+    public int selectMessage(int messageNumber) {
 	int rowCount = messageTable.getRowCount();
 
 	if (rowCount > 0) {
@@ -266,6 +294,9 @@ public class FolderDisplayPanel extends JPanel {
 	    }
 	    messageTable.setRowSelectionInterval(numberToSet, numberToSet);
 	    makeSelectionVisible(numberToSet);
+	    return numberToSet;
+	} else {
+	    return -1;
 	}
     }
     /**

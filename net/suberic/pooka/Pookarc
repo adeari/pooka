@@ -141,9 +141,9 @@ MainToolbar.Print.Action=file-print
 MainToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 
 FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Print
-FolderWindowToolbar.Down.Action=folder-down
+FolderWindowToolbar.Down.Action=message-next
 FolderWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
-FolderWindowToolbar.Up.Action=folder-up
+FolderWindowToolbar.Up.Action=message-previous
 FolderWindowToolbar.Up.Image=/net/suberic/pooka/gui/images/Up.gif
 FolderWindowToolbar.Open.Action=file-open
 FolderWindowToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif

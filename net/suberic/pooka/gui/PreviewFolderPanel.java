@@ -135,8 +135,16 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      * 
      * This skips to the given message.
      */
-    public void selectMessage(int messageNumber) {
-	getFolderDisplay().selectMessage(messageNumber);
+    public int selectMessage(int messageNumber) {
+	return getFolderDisplay().selectMessage(messageNumber);
+    }
+
+    public int selectNextMessage() {
+	return getFolderDisplay().selectNextMessage();
+    }
+
+    public int selectPreviousMessage() {
+	return getFolderDisplay().selectPreviousMessage();
     }
 
     /**

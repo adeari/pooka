@@ -16,6 +16,9 @@ public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, Act
 
     public String showInputDialog(String inputMessage, String title);
 
-    public void selectMessage(int messageNumber);
+    public int selectMessage(int messageNumber);
 
+    public int selectNextMessage();
+
+    public int selectPreviousMessage();
 }

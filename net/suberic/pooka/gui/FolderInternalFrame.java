@@ -48,6 +48,9 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	defaultActions = new Action[] {
 	    new CloseAction(),
 	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
+	    new NextMessageAction(),
+	    new PreviousMessageAction(),
+	    new GotoMessageAction(),
 	    new SearchAction()
 		};
 
@@ -194,8 +197,16 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * 
      * This skips to the given message.
      */
-    public void selectMessage(int messageNumber) {
-	getFolderDisplay().selectMessage(messageNumber);
+    public int selectMessage(int messageNumber) {
+	return getFolderDisplay().selectMessage(messageNumber);
+    }
+
+    public int selectNextMessage() {
+	return getFolderDisplay().selectNextMessage();
+    }
+
+    public int selectPreviousMessage() {
+	return getFolderDisplay().selectPreviousMessage();
     }
 
     /**
@@ -490,6 +501,40 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	
         public void actionPerformed(ActionEvent e) {
 	    expungeMessages();
+	}
+    }
+
+
+    public class NextMessageAction extends AbstractAction {
+
+	NextMessageAction() {
+	    super("message-next");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    selectNextMessage();
+	}
+    }
+
+    public class PreviousMessageAction extends AbstractAction {
+
+	PreviousMessageAction() {
+	    super("message-previous");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    selectPreviousMessage();
+	}
+    }
+
+    public class GotoMessageAction extends AbstractAction {
+
+	GotoMessageAction() {
+	    super("message-goto");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    getFolderStatusBar().activateGotoDialog();
 	}
     }
 
