@@ -18,7 +18,7 @@ public interface MessageCache {
     /**
      * Returns the datahandler for the given message uid.
      */
-    public DataHandler getDataHandler(long uid) throws MessagingException;
+    public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException;
 
     /**
      * Adds the given Flags to the message with the given uid.
@@ -26,7 +26,7 @@ public interface MessageCache {
      * This affects both the client cache as well as the message on the
      * server, if the server is available.
      */
-    public void addFlag(long uid, Flags flag) throws MessagingException;
+    public void addFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
 
     /**
      * Removes the given Flags from the message with the given uid.
@@ -34,17 +34,17 @@ public interface MessageCache {
      * This affects both the client cache as well as the message on the
      * server, if the server is available.
      */
-    public void removeFlag(long uid, Flags flag) throws MessagingException;
+    public void removeFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
 
     /**
      * Returns the InternetHeaders object for the given uid.
      */
-    public InternetHeaders getHeaders(long uid) throws MessagingException;
+    public InternetHeaders getHeaders(long uid, long uidValidity) throws MessagingException;
 
     /**
      * Returns the Flags object for the given uid.
      */
-    public Flags getFlags(long uid) throws MessagingException;
+    public Flags getFlags(long uid, long uidValidity) throws MessagingException;
 
     /**
      * Adds a message to the cache.  Note that status is only used to
@@ -54,7 +54,7 @@ public interface MessageCache {
      * This does not affect the server, nor does it affect message
      * count on the client.
      */
-    public boolean cacheMessage(MimeMessage m, long uid, int status) throws MessagingException;
+    public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status) throws MessagingException;
 
     /**
      * Removes a message from the cache only.  This has no effect on the
@@ -92,13 +92,13 @@ public interface MessageCache {
      * This returns the uid's of the message which exist in updatedUids, but
      * not in the current list of messsages.
      */ 
-    public long[] getAddedMessages(long[] updatedUids);
+    public long[] getAddedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
 
     /**
      * This returns the uid's of the message which exist in the current
      * list of messages, but no longer exist in the updatedUids.
      */
-    public long[] getRemovedMessages(long[] updatedUids);
+    public long[] getRemovedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
 
     /**
      * This returns the message id's of all the currently cached messages.

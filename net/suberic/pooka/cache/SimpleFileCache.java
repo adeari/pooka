@@ -27,6 +27,8 @@ public class SimpleFileCache implements MessageCache {
     public static String HEADER_EXT = "hdr";
     public static String FLAG_EXT = "flag";
     
+    protected long uidValidity;
+
     // the source FolderInfo.
     private CachingFolderInfo folderInfo;
 
@@ -34,7 +36,7 @@ public class SimpleFileCache implements MessageCache {
     private File cacheDir;
 
     // the UIDValidity
-    private long uidValidity;
+    private long newUidValidity;
 
     // the HashMaps which store the cached results.
     private HashMap headerCache = new HashMap();
@@ -60,7 +62,11 @@ public class SimpleFileCache implements MessageCache {
 	loadCache();
     }
 
-    public DataHandler getDataHandler(long uid, boolean saveToCache) throws MessagingException {
+    public DataHandler getDataHandler(long uid, long newUidValidity, boolean saveToCache) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
+
 	DataHandler h = getHandlerFromCache(uid);
 	if (h != null) {
 	    return h;
@@ -70,7 +76,7 @@ public class SimpleFileCache implements MessageCache {
 		if (m != null) {
 		    h = m.getDataHandler();
 		    if (saveToCache)
-			cacheMessage(m, uid, CONTENT);
+			cacheMessage(m, uid, newUidValidity, CONTENT);
 		    return h;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -83,8 +89,8 @@ public class SimpleFileCache implements MessageCache {
     /**
      * Returns the datahandler for the given message uid.
      */
-    public DataHandler getDataHandler(long uid) throws MessagingException {
-	return getDataHandler(uid, true);
+    public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException {
+	return getDataHandler(uid, uidValidity, true);
     }
     
     /**
@@ -93,8 +99,11 @@ public class SimpleFileCache implements MessageCache {
      * This affects both the client cache as well as the message on the
      * server, if the server is available.
      */
-    public void addFlag(long uid, Flags flag) throws MessagingException {
-	Flags f = getFlags(uid);
+    public void addFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
+	Flags f = getFlags(uid, newUidValidity);
 	if (f != null) {
 	    f.add(flag);
 	} else {
@@ -108,7 +117,7 @@ public class SimpleFileCache implements MessageCache {
 	    writeToChangeLog(uid, flag, ADDED);
 	}
 	    
-	saveFlags(uid, f);
+	saveFlags(uid, uidValidity, f);
     }
 
     /**
@@ -117,8 +126,11 @@ public class SimpleFileCache implements MessageCache {
      * This affects both the client cache as well as the message on the
      * server, if the server is available.
      */
-    public void removeFlag(long uid, Flags flag) throws MessagingException {
-	Flags f = getFlags(uid);
+    public void removeFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
+	Flags f = getFlags(uid, newUidValidity);
 	if (f != null) {
 	    f.remove(flag);
 
@@ -130,14 +142,17 @@ public class SimpleFileCache implements MessageCache {
 		writeToChangeLog(uid, flag, REMOVED);
 	    }
 	    
-	    saveFlags(uid, f);
+	    saveFlags(uid, uidValidity, f);
 	}
     }
 
     /**
      * Returns the InternetHeaders object for the given uid.
      */    
-    public InternetHeaders getHeaders(long uid, boolean saveToCache) throws MessagingException {
+    public InternetHeaders getHeaders(long uid, long newUidValidity, boolean saveToCache) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
 	InternetHeaders h = getHeadersFromCache(uid);
 	if (h != null) {
 	    return h;
@@ -151,7 +166,7 @@ public class SimpleFileCache implements MessageCache {
 			h.addHeaderLine((String) enum.nextElement());
 		    }
 		    if (saveToCache)
-			cacheMessage(m, uid, HEADERS);
+			cacheMessage(m, uid, newUidValidity, HEADERS);
 		    return h;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -161,14 +176,17 @@ public class SimpleFileCache implements MessageCache {
 	}
     }
 
-    public InternetHeaders getHeaders(long uid) throws MessagingException {
-	return getHeaders(uid, true);
+    public InternetHeaders getHeaders(long uid, long uidValidity) throws MessagingException {
+	return getHeaders(uid, uidValidity, true);
     }
 
     /**
      * Returns the Flags object for the given uid.
      */
-    public Flags getFlags(long uid, boolean saveToCache) throws MessagingException {
+    public Flags getFlags(long uid, long newUidValidity, boolean saveToCache) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
 	Flags f = getFlagsFromCache(uid);
 	if (f != null) {
 	    return f;
@@ -178,7 +196,7 @@ public class SimpleFileCache implements MessageCache {
 		if (f != null) {
 		    f = m.getFlags();
 		    if (saveToCache)
-			cacheMessage(m, uid, HEADERS);
+			cacheMessage(m, uid, newUidValidity, HEADERS);
 		    return f;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -192,8 +210,8 @@ public class SimpleFileCache implements MessageCache {
     /**
      * Returns the Flags object for the given uid.
      */
-    public Flags getFlags(long uid) throws MessagingException {
-	return getFlags(uid, true);
+    public Flags getFlags(long uid, long uidValidity) throws MessagingException {
+	return getFlags(uid, uidValidity, true);
     }
 
     /**
@@ -204,7 +222,10 @@ public class SimpleFileCache implements MessageCache {
      * This does not affect the server, nor does it affect message
      * count on the client.
      */  
-    public boolean cacheMessage(MimeMessage m, long uid, int status) throws MessagingException {
+    public boolean cacheMessage(MimeMessage m, long uid, long newUidValidity, int status) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
 	try {
 	    if (status == CONTENT) {
 		File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
@@ -219,7 +240,7 @@ public class SimpleFileCache implements MessageCache {
 	    }
 	    
 	    Flags flags = m.getFlags();
-	    saveFlags(uid, flags);
+	    saveFlags(uid, uidValidity, flags);
 	    
 	    File outFile = new File(cacheDir, uid + DELIMETER + HEADER_EXT);
 	    if (outFile.exists())
@@ -271,6 +292,18 @@ public class SimpleFileCache implements MessageCache {
 	return true;
     }
 
+    /**
+     * Invalidates the entire cache.  Usually called when the uidValidity
+     * is changed.
+     */
+    public void invalidateCache() {
+	File[] matchingFiles = cacheDir.listFiles();
+	for (int j = 0; j < matchingFiles.length; j++) {
+	    if (matchingFiles[j].isFile())
+		matchingFiles[j].delete();
+	}
+    }
+
 
     /**
      * Adds the messages to the given folder.  Returns the uids for the 
@@ -283,6 +316,9 @@ public class SimpleFileCache implements MessageCache {
     
     /*
     public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
 	if (getFolderInfo().isAvailable()) {
 	    getFolderInfo().appendMessages(msgs);
 	} else {
@@ -313,7 +349,10 @@ public class SimpleFileCache implements MessageCache {
      * This returns the uid's of the message which exist in updatedUids, but
      * not in the current list of messsages.
      */ 
-    public long[] getAddedMessages(long[] uids) {
+    public long[] getAddedMessages(long[] uids, long newUidValidity) throws StaleCacheException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
 	long[] added = new long[uids.length];
 	int addedCount = 0;
 	
@@ -334,7 +373,10 @@ public class SimpleFileCache implements MessageCache {
      * This returns the uid's of the message which exist in the current
      * list of messages, but no longer exist in the updatedUids.
      */
-    public long[] getRemovedMessages(long[] uids) {
+    public long[] getRemovedMessages(long[] uids, long newUidValidity) throws StaleCacheException {
+	if (newUidValidity != uidValidity) {
+	    throw new StaleCacheException(uidValidity, newUidValidity);
+	}
 	Vector remainders = new Vector(cachedMessages);
 	
 	for (int i = 0; i < uids.length; i++) {
@@ -432,7 +474,7 @@ public class SimpleFileCache implements MessageCache {
     /**
      * Saves the given flags to the cache.
      */
-    protected void saveFlags(long uid, Flags f) throws MessagingException {
+    protected void saveFlags(long uid, long newUidValidity, Flags f) throws MessagingException {
 	try {
 	    File outFile = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
 	    if (outFile.exists())
@@ -502,6 +544,15 @@ public class SimpleFileCache implements MessageCache {
 	    Long uid = new Long(cacheFilenames[i].substring(0, cacheFilenames[i].indexOf(DELIMETER + HEADER_EXT)));
 	    cachedMessages.add(uid);
 	}
+
+	File validityFile = new File(cacheDir, "validity");
+	if (validityFile.exists()) {
+	    try {
+		BufferedReader in = new BufferedReader(new FileReader(validityFile));
+		uidValidity = Long.parseLong(in.readLine());
+	    } catch (Exception e) {
+	    }
+	}
     }	    
 
     public CachingFolderInfo getFolderInfo() {
@@ -559,7 +610,7 @@ public class SimpleFileCache implements MessageCache {
 	// sigh.
 	int unreadCount = 0;
 	for (int i = 0; i < cachedMessages.size(); i++) {
-	    Flags f = getFlags(((Long) cachedMessages.elementAt(i)).longValue(), false);
+	    Flags f = getFlags(((Long) cachedMessages.elementAt(i)).longValue(), uidValidity, false);
 	    if (f.contains(Flags.Flag.SEEN))
 		unreadCount++;
 	}

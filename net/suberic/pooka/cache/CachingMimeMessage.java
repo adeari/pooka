@@ -43,7 +43,7 @@ public class CachingMimeMessage extends MimeMessage {
 
     public synchronized DataHandler getDataHandler() 
 		throws MessagingException {
-	return getCache().getDataHandler(uid);
+	return getCache().getDataHandler(uid, getUIDValidity());
     }
 
     public String[] getHeader(String name)
@@ -154,7 +154,7 @@ public class CachingMimeMessage extends MimeMessage {
      * @see 		javax.mail.Flags
      */
     public synchronized Flags getFlags() throws MessagingException {
-	return (Flags) getCache().getFlags(uid).clone();
+	return (Flags) getCache().getFlags(uid, getUIDValidity()).clone();
     }
 
     /**
@@ -194,9 +194,9 @@ public class CachingMimeMessage extends MimeMessage {
     public synchronized void setFlags(Flags flag, boolean set)
 			throws MessagingException {
 	if (set)
-	    getCache().addFlag(uid, flag);
+	    getCache().addFlag(uid, getUIDValidity(), flag);
 	else
-	    getCache().removeFlag(uid, flag);
+	    getCache().removeFlag(uid, getUIDValidity(), flag);
     }
 
     public MessageCache getCache() {
@@ -204,11 +204,15 @@ public class CachingMimeMessage extends MimeMessage {
     }
 
     public InternetHeaders getHeaders() throws MessagingException {
-	return getCache().getHeaders(uid);
+	return getCache().getHeaders(uid, getUIDValidity());
     }
 
     public long getUID() {
 	return uid;
+    }
+
+    public long getUIDValidity() {
+	return parent.getUIDValidity();
     }
 }
 

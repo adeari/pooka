@@ -80,7 +80,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean loaded = false;
     private boolean loading = false;
     private boolean available = true;
-    private boolean open = false;
+    protected boolean open = false;
     private int unreadCount = 0;
     private int messageCount = 0;
     private boolean newMessages = false;
@@ -1156,7 +1156,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		}
 	    } else {
 		folder.open(mode);
-		open=true;
+		updateFolderOpenStatus(true);
 		resetMessageCounts();
 		if (getFolderNode() != null)
 		    getFolderNode().getParentContainer().repaint();
@@ -1170,6 +1170,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    tracker.addFolder(this);
 	    this.setFolderTracker(tracker);
 	}
+    }
+
+    protected void updateFolderOpenStatus(boolean isNowOpen) {
+	if (isNowOpen)
+	    open = true;
+	else
+	    open = false;
     }
 
     /**

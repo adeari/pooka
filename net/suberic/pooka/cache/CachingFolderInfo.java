@@ -17,7 +17,8 @@ import net.suberic.pooka.gui.FolderTableModel;
 public class CachingFolderInfo extends FolderInfo {
     protected MessageCache cache = null;
     protected HashMap uidToInfoTable = new HashMap();
-    
+    protected long uidValidity;
+
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
 	
@@ -129,6 +130,16 @@ public class CachingFolderInfo extends FolderInfo {
 	resetMessageCounts();
     }
 
+    protected void updateFolderOpenStatus(boolean isNowOpen) {
+	if (isNowOpen) {
+	    try {
+		uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
+	    } catch (Exception e) { }
+	    open = true;
+	} else
+	    open = false;
+    }
+
     /**
      * Gets the row number of the first unread message.  Returns -1 if
      * there are no unread messages, or if the FolderTableModel is not
@@ -187,7 +198,7 @@ public class CachingFolderInfo extends FolderInfo {
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing--uids.length = " + uids.length);
 
-	long[] addedUids = cache.getAddedMessages(uids);
+	long[] addedUids = cache.getAddedMessages(uids, uidValidity);
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing--addedUids.length = " + addedUids.length);
 
@@ -200,7 +211,7 @@ public class CachingFolderInfo extends FolderInfo {
 	    messagesAdded(mce);
 	}    
 
-	long[] removedUids = cache.getRemovedMessages(uids);
+	long[] removedUids = cache.getRemovedMessages(uids, uidValidity);
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing--removedUids.length = " + removedUids.length);
 
@@ -336,9 +347,9 @@ public class CachingFolderInfo extends FolderInfo {
 		if (mp != null) {
 		    if (msg != null && msg instanceof CachingMimeMessage) {
 			if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
-			    getCache().cacheMessage((MimeMessage)msg, uid, SimpleFileCache.FLAGS);
+			    getCache().cacheMessage((MimeMessage)msg, uid, uidValidity, SimpleFileCache.FLAGS);
 			else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
-			    getCache().cacheMessage((MimeMessage)msg, uid, SimpleFileCache.HEADERS);
+			    getCache().cacheMessage((MimeMessage)msg, uid, uidValidity, SimpleFileCache.HEADERS);
 		    }
 		    mp.unloadTableInfo();
 		    mp.loadTableInfo();
@@ -444,6 +455,10 @@ public class CachingFolderInfo extends FolderInfo {
 	    return m;
 	}
 	return null;
+    }
+
+    public long getUIDValidity() {
+	return uidValidity;
     }
 }
 
