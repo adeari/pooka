@@ -141,7 +141,7 @@ public class MessageProxy {
 	    else if (flagName.equals("FLAG.FLAGGED"))
 		return new BooleanIcon(msg.isSet(Flags.Flag.FLAGGED), Pooka.getProperty("FolderTable.Flagged.icon", ""));
 	    else if (flagName.equals("FLAG.RECENT"))
-		return new BooleanIcon(msg.isSet(Flags.Flag.RECENT), Pooka.getProperty("FolderTable.Recent.icon", ""));
+		return new BooleanIcon(msg.isSet(Flags.Flag.RECENT), Pooka.getProperty("FolderTable.New.icon", ""));
 	    else if (flagName.equals("FLAG.SEEN"))
 		return new BooleanIcon(msg.isSet(Flags.Flag.SEEN), Pooka.getProperty("FolderTable.Seen.icon", ""));
 	    else
