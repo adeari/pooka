@@ -10,8 +10,7 @@ disconnected mode.
 
 caching:  pretty much the same as uid, no?  only difference is that we also have to add new messages/flag changes.  
 	   *)  add a ui for configuring caching.
-	   *)  bug:  messages aren't being removed properly from the messages
-	       list when they are removed from the server.
+	   *)  bug:  new message count isn't quite correct, is it?
 
 *) add pop3/local mail spool support.
 	in progress.  todo:

@@ -338,7 +338,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		    removedProxies.add(mi.getMessageProxy());
 		    messageToInfoTable.remove(mi);
 		    uidToInfoTable.remove(new Long(((CachingMimeMessage) removedMessages[i]).getUID()));
-		    getCache().invalidateCache(((CachingMimeMessage) removedMessages[i]).getUID(), SimpleFileCache.CONTENT);
+		    getCache().invalidateCache(((CachingMimeMessage) removedMessages[i]).getUID(), SimpleFileCache.MESSAGE);
 		    
 		}
 	    } else {
@@ -363,7 +363,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		    removedProxies.add(mi.getMessageProxy());
 		    messageToInfoTable.remove(localMsg);
 		    uidToInfoTable.remove(new Long(uid));
-		    getCache().invalidateCache(uid, SimpleFileCache.CONTENT);
+		    getCache().invalidateCache(uid, SimpleFileCache.MESSAGE);
 		}
 	    }
 	    if (getFolderTableModel() != null)
