@@ -485,6 +485,7 @@ UserProfile.editableFields=editor
 UserProfile.editableFields.editor=user:config:uiConfig
 UserProfile.editableFields.editor.propertyType=Tabbed
 UserProfile.editableFields.editor.propertyScoped=true
+UserProfile.editableFields.editor.templateScoped=true
 UserProfile.editableFields.editor.addSubProperty=false
 
 UserProfile.editableFields.editor.user=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization
@@ -499,7 +500,6 @@ UserProfile.editableFields.editor.config.propertyType=Composite
 UserProfile.editableFields.editor.config.signatureFile.propertyType=File
 
 UserProfile.editableFields.editor.uiConfig.scoped=true
-UserProfile.editableFields.editor.uiConfig.addSubProperty=false
 UserProfile.editableFields.editor.uiConfig.scopeRoot=UserProfile.editableFields.uiConfig
 UserProfile.editableFields.editor.uiConfig=theme
 UserProfile.editableFields.uiConfig.theme.propertyType=List
@@ -524,6 +524,7 @@ OutgoingServer.editableFields.scoped=true
 OutgoingServer.editableFields.editor=smtp:connection
 OutgoingServer.editableFields.editor.propertyType=Tabbed
 OutgoingServer.editableFields.editor.propertyScoped=true
+OutgoingServer.editableFields.editor.templateScoped=true
 OutgoingServer.editableFields.editor.addSubProperty=false
 
 OutgoingServer.editableFields.editor.smtp=server:port:authenticated:user:password
@@ -571,7 +572,7 @@ AddressBook.editableFields.editor=config:addressList
 AddressBook.editableFields.editor.scoped=true
 AddressBook.editableFields.editor.propertyType=Tabbed
 AddressBook.editableFields.editor.propertyScoped=true
-AddressBook.editableFields.editor.addSubProperty=false
+AddressBook.editableFields.editor.templateScoped=true
 
 AddressBook.editableFields.editor.config=type:edit
 AddressBook.editableFields.editor.config.scoped=true
@@ -580,7 +581,6 @@ AddressBook.editableFields.editor.config.propertyType=Composite
 
 AddressBook.editableFields.edit.propertyType=Variable
 AddressBook.editableFields.edit.allowedValues=file:ldap
-AddressBook.editableFields.edit.addSubProperty=false
 AddressBook.editableFields.edit.scoped=true
 AddressBook.editableFields.edit.keyProperty=type
 AddressBook.editableFields.edit.allowedValues=file:ldap
@@ -638,7 +638,6 @@ Folder.editableFields.backendFilters.editableFields.action.propertyType=Filter
 Folder.editableFields.backendFilters.editableFields.action.filterType=backend
 
 Folder.editableFields.uiConfig.scoped=true
-Folder.editableFields.uiConfig.addSubProperty=false
 Folder.editableFields.uiConfig.scopeRoot=Folder.editableFields.uiConfig
 Folder.editableFields.uiConfig=theme
 Folder.editableFields.uiConfig.theme.propertyType=List
@@ -660,7 +659,7 @@ Store.editableFields.editor=config:connection
 Store.editableFields.editor.scoped=true
 Store.editableFields.editor.propertyType=Tabbed
 Store.editableFields.editor.propertyScoped=true
-#Store.editableFields.editor.templateScoped=true
+Store.editableFields.editor.templateScoped=true
 Store.editableFields.editor.addSubProperty=false
 
 Store.editableFields.editor.config=protocol:storeConfig:trashFolder:defaultProfile
@@ -676,10 +675,6 @@ Store.editableFields.editor.connection.propertyType=Composite
 Store.editableFields.protocol.propertyType=List
 Store.editableFields.protocol.allowedValues=imap:pop3:mbox
 Store.editableFields.protocol=imap
-Store.editableFields.storeConfig.propertyType=Variable
-Store.editableFields.storeConfig.scoped=true
-Store.editableFields.storeConfig.keyProperty=protocol
-Store.editableFields.storeConfig.allowedValues=imap:pop3:mbox
 Store.editableFields.trashFolder.propertyType=Folder
 Store.editableFields.trashFolder.selectionRoot=currentStore
 Store.editableFields.trashFolder.onlySubscribed=true
@@ -691,6 +686,10 @@ Store.editableFields.connection.propertyType=List
 Store.editableFields.connection.allowedValues=Connection
 Store.editableFields.connection._includeAddButton=true
 
+Store.editableFields.storeConfig.propertyType=Variable
+Store.editableFields.storeConfig.scoped=true
+Store.editableFields.storeConfig.keyProperty=protocol
+Store.editableFields.storeConfig.allowedValues=imap:pop3:mbox
 Store.editableFields.storeConfig.removeString=.storeConfig
 Store.editableFields.storeConfig.allowedValues.imap=Store.editableFields.storeConfig.imap
 
@@ -746,7 +745,7 @@ Store.editableFields.leaveMessagesOnServer.propertyType=Boolean
 Store.editableFields.leaveMessagesOnServer=false
 Store.editableFields.deleteOnServerOnLocalDelete.propertyType=Boolean
 Store.editableFields.deleteOnServerOnLocalDelete=false
-Store.editableFields.inboxLocation=/var/spool/mail/username
+Store.editableFields.inboxLocation=/var/spool/mail/${user.name}
 Store.editableFields.inboxLocation.propertyType=File
 Store.editableFields.mailDirectory.propertyType=Directory
 Store.editableFields.mailDirectory=Pooka.cacheDirectory
@@ -782,6 +781,7 @@ Pooka.theme=default
 Pooka.theme.propertyType=Multi
 Pooka.theme.editableFields=primary1:primary2:primary3:secondary1:secondary2:secondary3:black:white:controlFont:systemFont:userFont:smallFont:monospacedFont
 Pooka.theme.editableFields.scoped=true
+Pooka.theme.editableFields.addSubProperty=false
 
 Pooka.theme.editableFields.primary1.propertyType=Color
 Pooka.theme.editableFields.primary1._enabledBox=true
@@ -843,11 +843,85 @@ NewAccountPooka.firstPanel.propertyScoped=true
 NewAccountPooka.firstPanel.templateScoped=true
 NewAccountPooka.firstPanel.scoped=true
 NewAccountPooka.firstPanel.scopeRoot=NewAccountPooka
+
 NewAccountPooka.password.propertyType=Password
 NewAccountPooka.password.size=20
 NewAccountPooka.protocol.propertyType=List
-NewAccountPooka.protocol.allowedValues=imap:pop3
-NewAccountPooka.type=imap
+NewAccountPooka.protocol.allowedValues=imap:pop3:mbox
+NewAccountPooka.protocol=imap
+NewAccountPooka.useSSL.propertyType=Boolean
+NewAccountPooka.useSSL=false
+NewAccountPooka.useSent.propertyType=Boolean
+NewAccountPooka.useSent=true
+NewAccountPooka.enableDisconnected.propertyType=Boolean
+NewAccountPooka.enableDisconnected=false
+NewAccountPooka.pookaDirectory.propertyType=Directory
+NewAccountPooka.pookaDirectory=${user.home}/.pooka
+NewAccountPooka.inboxLocation.propertyType=File
+NewAccountPooka.inboxLocation=/var/spool/mail/${user.name}
+
+NewAccountPooka=protocol:options:fullName:smtpServer
+NewAccountPooka.propertyType=Composite
+NewAccountPooka.propertyScoped=true
+NewAccountPooka.scoped=true
+NewAccountPooka.templateScoped=true
+
+NewAccountPooka.options=connectPanel:optionPanel
+NewAccountPooka.options.propertyType=Tabbed
+NewAccountPooka.options.propertyScoped=false
+NewAccountPooka.options.templateScoped=true
+
+NewAccountPooka.options.connectPanel=NewAccountPooka.connectPanel
+NewAccountPooka.options.optionPanel=NewAccountPooka.optionPanel
+
+NewAccountPooka.connectPanel.propertyType=Variable
+NewAccountPooka.connectPanel.scoped=true
+NewAccountPooka.connectPanel.keyProperty=protocol
+NewAccountPooka.connectPanel.allowedValues=imap:pop3:mbox
+NewAccountPooka.connectPanel.removeString=.connectPanel
+NewAccountPooka.connectPanel.allowedValues.imap=NewAccountPooka.connectPanel.imap
+NewAccountPooka.connectPanel.allowedValues.pop3=NewAccountPooka.connectPanel.pop3
+NewAccountPooka.connectPanel.allowedValues.mbox=NewAccountPooka.connectPanel.mbox
+
+NewAccountPooka.connectPanel.imap=userName:password:serverName
+NewAccountPooka.connectPanel.imap.propertyType=Composite
+NewAccountPooka.connectPanel.imap.scoped=true
+NewAccountPooka.connectPanel.imap.scopeRoot=NewAccountPooka
+
+NewAccountPooka.connectPanel.pop3=userName:password:serverName
+NewAccountPooka.connectPanel.pop3.propertyType=Composite
+NewAccountPooka.connectPanel.pop3.scoped=true
+NewAccountPooka.connectPanel.pop3.scopeRoot=NewAccountPooka
+
+NewAccountPooka.connectPanel.mbox=inboxLocation
+NewAccountPooka.connectPanel.mbox.propertyType=Composite
+NewAccountPooka.connectPanel.mbox.scoped=true
+NewAccountPooka.connectPanel.mbox.scopeRoot=NewAccountPooka
+
+NewAccountPooka.optionPanel.propertyType=Variable
+NewAccountPooka.optionPanel.scoped=true
+NewAccountPooka.optionPanel.keyProperty=protocol
+NewAccountPooka.optionPanel.allowedValues=imap:pop3:mbox
+NewAccountPooka.optionPanel.removeString=.optionPanel
+NewAccountPooka.optionPanel.allowedValues.imap=NewAccountPooka.optionPanel.imap
+NewAccountPooka.optionPanel.allowedValues.pop3=NewAccountPooka.optionPanel.pop3
+NewAccountPooka.optionPanel.allowedValues.mbox=NewAccountPooka.optionPanel.mbox
+
+NewAccountPooka.optionPanel.imap.propertyType=Composite
+NewAccountPooka.optionPanel.imap=pookaDirectory:useSent:useSSL:enableDisconnected
+NewAccountPooka.optionPanel.imap.scoped=true
+NewAccountPooka.optionPanel.imap.scopeRoot=NewAccountPooka
+
+NewAccountPooka.optionPanel.pop3.propertyType=Composite
+NewAccountPooka.optionPanel.pop3=pookaDirectory:useSent:useSSL
+NewAccountPooka.optionPanel.pop3.scoped=true
+NewAccountPooka.optionPanel.pop3.scopeRoot=NewAccountPooka
+
+NewAccountPooka.optionPanel.mbox.propertyType=Composite
+NewAccountPooka.optionPanel.mbox=pookaDirectory:useSent
+NewAccountPooka.optionPanel.mbox.scoped=true
+NewAccountPooka.optionPanel.mbox.scopeRoot=NewAccountPooka
+
 
 FolderSelectorPane.inputButton.image=/net/suberic/pooka/gui/images/More.gif
 

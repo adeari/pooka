@@ -2,6 +2,14 @@
 *) make the NewAccountPooka make a more fully-featured account; i.e. allow
 	for laptop configurations, sent folder configuration, etc.
 	include the .pooka directory configuration.
+	started:  todo:
+	*) make it so it actually opens your inbox.
+	*) configure sent folder
+	*) configure outbox.
+	*) premake ssl file.
+	*) make us test the connection to the configured servers first.
+	*) pop:  keep message on folder, etc.
+	*) gen:  actually make .pooka dir config do something.
 
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.
@@ -123,11 +131,24 @@ preview:
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.MessageInfo.remove(Unknown Source)
 	at net.suberic.pooka.MessageInfo.deleteMessage(Unknown Source)
+java.lang.NullPointerException
+	at net.suberic.pooka.MessageInfo.remove(MessageInfo.java:389)
+	at net.suberic.pooka.MessageInfo.deleteMessage(MessageInfo.java:358)
+	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:673)
+	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:755)
+	at net.suberic.pooka.gui.MessageProxy$DeleteAction.actionPerformed(MessageProxy.java:1173)
+	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
+
 
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.FolderInfo.getTrashFolder(Unknown Source)
 	at net.suberic.pooka.MultiMessageInfo.deleteMessage(Unknown Source)
 	(from search folder)
+
+*) fix:java.lang.NullPointerException
+	at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:353)
+	at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:185)
+	at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
 
 *) make it so you can stop html displays from showing non-local images.
  	-- support RFC-2557??

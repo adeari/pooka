@@ -17,6 +17,7 @@ import javax.swing.*;
  *
  * Foo.editableFields=bar:baz -- shows which subfields are to be edited
  *
+ * 
  * So if your Foo property equals "fooOne:fooTwo", then you'll end up with
  * a MultiPropertyEditor that has an entry for fooOne and fooTwo, along with
  * ways to add and delete these properties.
@@ -259,8 +260,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       if (newSelected == null) {
 	String rootProp = new String(property + "." + selectedId);
 	SwingPropertyEditor sep = createEditorPane(rootProp, editorTemplate + ".editableFields");
-	//CompositeEditorPane pep = new CompositeEditorPane();
-	//pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
 
 	// save reference to new pane in hash table
 	currentPanels.put(selectedId, sep);
@@ -518,9 +517,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    */
   public SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
     return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
-    //CompositeEditorPane pep = new CompositeEditorPane();
-    //pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
-    
   }
   
   /**

@@ -9,7 +9,6 @@ import java.util.*;
 
 import javax.mail.MessagingException;
 
-
 /**
  * This is effectively a wizard to run at startup if there's no UserProfile or
  * Store configured.
@@ -23,7 +22,6 @@ public class NewAccountPooka {
   private PropertyEditorManager manager = null;
   private PropertyEditorFactory factory = null;
   private String accountName = null;
-  private Vector propertyList = new Vector();
   
   public NewAccountPooka() {
   };
@@ -53,6 +51,9 @@ public class NewAccountPooka {
     }
   }
   
+  /**
+   * Shows the user information entry area.
+   */
   public void showFirstEntryWindow() {
     /**
      * This takes the username, fullname, password, servername, and type 
@@ -61,9 +62,10 @@ public class NewAccountPooka {
     
     java.util.Vector propertyVector = new java.util.Vector();
     
-    propertyVector.add("NewAccountPooka.firstPanel");
-    
-    JInternalFrame firstEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.entryWindowMessage.title", "Enter Email Account Information"), false, false, false, false);
+    //propertyVector.add("NewAccountPooka.firstPanel");
+    propertyVector.add("NewAccountPooka");
+
+    JInternalFrame firstEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.entryWindowMessage.title", "Enter Email Account Information"), true, false, false, false);
     JComponent contentPane = (JComponent) firstEntryWindow.getContentPane();
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     
@@ -105,190 +107,270 @@ public class NewAccountPooka {
     
   }
   
+  /**
+   * handles the entries.
+   */
   public void handleFirstEntry() {
+    Properties props = new java.util.Properties();
+    
+    try {
+      String smtpName = configureSMTP(manager, props);
+      String accountName = configureUserStore(manager, props, smtpName);
+
+      testConnections(props);
+
+      setupFolders(props);
+
+      saveProperties(props);
+      openInbox();
+
+    } catch (Exception e) {
+      handleInvalidEntry(e.getMessage());
+    }
+
+  }
+
+  /**
+   * Configures the outgoing mail server for the new user.
+   */
+  public String configureSMTP(PropertyEditorManager mgr, Properties props) throws Exception {
+
+    String smtpServerName = mgr.getProperty("NewAccountPooka.smtpServer", "");
+
+    if (smtpServerName.equals("")) {
+      throw new Exception("Must have an Outgoing mail server set.");
+    }
+
+    // set up the smtp server
+    
+    props.setProperty("OutgoingServer", smtpServerName);
+    props.setProperty("OutgoingServer." + smtpServerName + ".server", smtpServerName);
+    props.setProperty("OutgoingServer." + smtpServerName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
+    
+    props.setProperty("OutgoingServer._default", smtpServerName);
+
+    return smtpServerName;
+  }
+
+  /**
+   * Configures the store and user.
+   */
+  public String configureUserStore(PropertyEditorManager mgr, Properties props, String smtpServerName) throws Exception {
+    String localUser = System.getProperty("user.name");
+
     /*
      * this converts the initial entires into an appropriate UserProfile
      * and Store entry.
      */
-    String userName = manager.getProperty("NewAccountPooka.firstPanel.userName", "");
-    String fullName = manager.getProperty("NewAccountPooka.firstPanel.fullName", "");
-    String password = manager.getProperty("NewAccountPooka.firstPanel.password", "");
-    String serverName = manager.getProperty("NewAccountPooka.firstPanel.serverName", "");
-    String protocol = manager.getProperty("NewAccountPooka.firstPanel.protocol", "");
-    String smtpServerName = manager.getProperty("NewAccountPooka.firstPanel.smtpServer", "");
+    String protocol = manager.getProperty("NewAccountPooka.protocol", "");
+
+    String userName = manager.getProperty("NewAccountPooka.userName", "");
+    String fullName = manager.getProperty("NewAccountPooka.fullName", "");
+    String password = manager.getProperty("NewAccountPooka.password", "");
+    String serverName = manager.getProperty("NewAccountPooka.serverName", "");
+
+    if (protocol.equalsIgnoreCase("mbox"))
+      userName = localUser;
+
+    if (userName.equals("") || serverName.equals("") || protocol.equals("")) {
+      throw new Exception();
+    }
+
+    String accountName;
+    if (protocol.equalsIgnoreCase("mbox")) {
+      accountName = userName + "_local";
+    } else {
+      accountName = userName + "@" + serverName;
+    }
+
+    // set up the user.
     
-    if (userName.equals("") || serverName.equals("") || protocol.equals("") || smtpServerName.equals(""))
-      invalidFirstEntry();
-    else {
-      String accountName = userName + "@" + serverName;
-
-      // set up the smtp server
-
-      manager.setProperty("OutgoingServer", smtpServerName);
-      manager.setProperty("OutgoingServer." + smtpServerName + ".server", smtpServerName);
-      propertyList.add("OutgoingServer." + smtpServerName + ".server");
-      manager.setProperty("OutgoingServer." + smtpServerName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
-      propertyList.add("OutgoingServer." + smtpServerName + ".connection");
-
-      manager.setProperty("OutgoingServer._default", smtpServerName);
-      propertyList.add("OutgoingServer._default");
-
-      // set up the user.
-
-      manager.setProperty("UserProfile", accountName);
-      propertyList.add("UserProfile." + accountName + ".mailHeaders.From");
-      manager.setProperty("UserProfile." + accountName + ".mailHeaders.From", accountName);
-      manager.setProperty("UserProfile." + accountName + ".mailHeaders.FromPersonal", fullName);
-      propertyList.add("UserProfile." + accountName + ".mailHeaders.FromPersonal");
-      manager.setProperty("UserProfile." + accountName + ".mailServer", smtpServerName);
-      propertyList.add("UserProfile." + accountName + ".mailServer");
-
-      manager.setProperty("UserProfile.default", accountName);
-      propertyList.add("UserProfile.default");
-
-
-      // set up mail server information
-
-      manager.setProperty("Store", accountName);
-      manager.setProperty("Store." + accountName + ".server", serverName);
-      propertyList.add("Store." + accountName + ".server");
-      manager.setProperty("Store." + accountName + ".protocol", protocol);
-      propertyList.add("Store." + accountName + ".protocol");
-      manager.setProperty("Store." + accountName + ".user", userName);
-      propertyList.add("Store." + accountName + ".user");
-      manager.setProperty("Store." + accountName + ".password", password);
-      propertyList.add("Store." + accountName + ".password");
-      manager.setProperty("Store." + accountName + ".defaultProfile", accountName);
-      propertyList.add("Store." + accountName + ".defaultProfile");
-      manager.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
-      propertyList.add("Store." + accountName + ".connection");
+    props.setProperty("UserProfile", accountName);
+    props.setProperty("UserProfile." + accountName + ".mailHeaders.From", accountName);
+    props.setProperty("UserProfile." + accountName + ".mailHeaders.FromPersonal", fullName);
+    props.setProperty("UserProfile." + accountName + ".mailServer", smtpServerName);
+    
+    props.setProperty("UserProfile.default", accountName);
+    
+    // set up mail server information
+    
+    props.setProperty("Store", accountName);
+    props.setProperty("Store." + accountName + ".server", serverName);
+    props.setProperty("Store." + accountName + ".protocol", protocol);
+    props.setProperty("Store." + accountName + ".user", userName);
+    props.setProperty("Store." + accountName + ".password", password);
+    props.setProperty("Store." + accountName + ".defaultProfile", accountName);
+    props.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
       
-      if (protocol.equalsIgnoreCase("POP3")) {
-	manager.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
-	propertyList.add("OutgoingServer." + smtpServerName + ".sendOnConnect");
-      } else {
-	manager.setProperty("Store." + accountName + ".useSubscribed", "true");
-	propertyList.add("Store." + accountName + ".useSubscribed");
-      }
+    if (protocol.equalsIgnoreCase("imap")) {
+      props.setProperty("Store." + accountName + ".useSubscribed", "true");
+      props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
+      props.setProperty("Store." + accountName + ".cachingEnabled", manager.getProperty("NewAccountPooka.enableDisconnected", "false"));
+    } else if (protocol.equalsIgnoreCase("pop3")) {
+      props.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
+      props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
+    } else if (protocol.equalsIgnoreCase("mbox")) {
+      props.setProperty("Store." + accountName + ".inboxLocation", manager.getProperty("NewAccountPooka.inboxLocation", "/var/spool/mail/" + System.getProperty("user.name")));
+    }
+    
+    return accountName;
+  }
 
-      Pooka.getUIFactory().showStatusMessage("Creating mail store " + smtpServerName + "...");
+  /**
+   * Tests the connections to the servers.
+   */
+  public void testConnections(Properties props) throws Exception {
+    String smtpServer = props.getProperty("OutgoingServer");
+    
+    Pooka.getUIFactory().showStatusMessage("Creating mail store " + smtpServer + "...");
+    
+    Pooka.getUIFactory().showStatusMessage("Connecting to mailserver " + smtpServer + "...");
+    
+    testConnection(smtpServer, 25);
 
-      saveProperties();
+    String mailServerId = props.getProperty("Store");
+    String protocol = props.getProperty("Store." + mailServerId + ".protocol");
+    if (! protocol.equalsIgnoreCase("mbox")) {
+      String mailServerName = props.getProperty("Store." + mailServerId + ".server");
+      String useSSL = props.getProperty("Store." + mailServerId + ".SSL");
+      int port = 0;
+      if (protocol.equalsIgnoreCase("pop3")) {
+	if (useSSL.equalsIgnoreCase("true")) 
+	  port = 995;
+	else
+	  port = 110;
 	
-      Pooka.getUIFactory().showStatusMessage("Connecting to mailserver " + smtpServerName + "...");
-
-      java.util.Vector allStores = Pooka.getStoreManager().getStoreList();
-      net.suberic.pooka.StoreInfo si = null;
-      if (allStores.size() > 0) {
-	si = (net.suberic.pooka.StoreInfo) allStores.get(0);
+      } else if (protocol.equalsIgnoreCase("imap")) {
+	if (useSSL.equalsIgnoreCase("true")) 
+	  port = 993;
+	else
+	  port = 143;
       }
+      testConnection(mailServerName, port);
+    }
+  }
+
+  /**
+   * Tests the connection to the given server and port.
+   */
+  public void testConnection(String serverName, int port) throws Exception {
+
+  }
+
+  /**
+   * Sets up your sent folder and outbox.
+   */
+  public void setupFolders(Properties props) {
+    String storeName = props.getProperty("Store");
+    String protocol = props.getProperty("Store." + storeName + ".protocol");
+    String localStoreName = storeName;
+    String sentFolderName = "local/sent";
+
+    if (protocol.equalsIgnoreCase("imap")) {
+      // if we have an imap connection, then we actually have to do some
+      // work.
+      localStoreName = "local";
+      props.setProperty("Store", storeName + ":local");
+      props.setProperty("Store.local.useInbox", "false");
+      props.setProperty("Store.local.folderList", "sent:outbox");
+      props.setProperty("Store.local.protocol", "mbox");
+    } else {
+      // we're fine if not.
+      props.setProperty("Store." + localStoreName + ".folderList", "INBOX:sent:outbox");
+    }
+
+    // actually configure said folders.
+    
+    String outgoingServer = props.getProperty("OutgoingServer");
+    props.setProperty("OutgoingServer." + outgoingServer + ".outbox", localStoreName + "/outbox");
+
+    String userName = props.getProperty("UserProfile");
+    props.setProperty("UserProfile." + userName + ".sentFolder", localStoreName + "/sent");
+  }
+
+  /**
+   * Opens up your inbox.
+   */
+  public void openInbox() throws Exception {
+    java.util.Vector allStores = Pooka.getStoreManager().getStoreList();
+    net.suberic.pooka.StoreInfo si = null;
+    if (allStores.size() > 0) {
+      si = (net.suberic.pooka.StoreInfo) allStores.get(0);
+    }
+    
+    if (si != null) {
+      ActionThread thread = si.getStoreThread();
+      final net.suberic.pooka.StoreInfo storeInfo = si;
       
-      if (si != null) {
-	ActionThread thread = si.getStoreThread();
-	final net.suberic.pooka.StoreInfo storeInfo = si;
-
-	javax.swing.Action connectionAction = new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent ae) {
-	      try {
-		storeInfo.connectStore();
-		javax.swing.SwingUtilities.invokeLater( new Runnable() {
-
-		    public void run() {
-		      MailTreeNode mtn = null;
-		      net.suberic.pooka.FolderInfo fi = storeInfo.getChild("INBOX");
-		      if (fi != null) {
-			mtn = fi.getFolderNode();
-		      } else {
-			mtn = storeInfo.getStoreNode();
-		      }
-		      if (mtn != null) {
-			javax.swing.JTree folderTree = ((FolderPanel)mtn.getParentContainer()).getFolderTree();
-			folderTree.scrollPathToVisible(new javax.swing.tree.TreePath(mtn.getPath()));
-		      }
-		      
-		      Pooka.getUIFactory().clearStatus();
-		      
-		      showConfirmation();
+      javax.swing.Action connectionAction = new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent ae) {
+	    try {
+	      storeInfo.connectStore();
+	      javax.swing.SwingUtilities.invokeLater( new Runnable() {
+		  
+		  public void run() {
+		    MailTreeNode mtn = null;
+		    net.suberic.pooka.FolderInfo fi = storeInfo.getChild("INBOX");
+		    if (fi != null) {
+		      mtn = fi.getFolderNode();
+		    } else {
+		      mtn = storeInfo.getStoreNode();
 		    }
-		  });
-	      } catch (MessagingException me) {
-		final MessagingException error = me;
-		javax.swing.SwingUtilities.invokeLater( new Runnable() {
+		    if (mtn != null) {
+		      javax.swing.JTree folderTree = ((FolderPanel)mtn.getParentContainer()).getFolderTree();
+		      folderTree.scrollPathToVisible(new javax.swing.tree.TreePath(mtn.getPath()));
+		    }
 		    
-		    public void run() {
-		      Pooka.getUIFactory().clearStatus();
-		      StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.connectingToStore", "Failed to connect to store.  \nReceived the following error:\n"));
-		      errorMessage.append(error.getMessage());
-		      errorMessage.append("\n\n");
-		      errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
-
-		      JTextArea jta = new JTextArea(errorMessage.toString());
+		    Pooka.getUIFactory().clearStatus();
+		    
+		    showConfirmation();
+		  }
+		});
+	    } catch (MessagingException me) {
+	      final MessagingException error = me;
+	      javax.swing.SwingUtilities.invokeLater( new Runnable() {
+		  
+		  public void run() {
+		    Pooka.getUIFactory().clearStatus();
+		    StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.connectingToStore", "Failed to connect to store.  \nReceived the following error:\n"));
+		    errorMessage.append(error.getMessage());
+		    errorMessage.append("\n\n");
+		    errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
+		    
+		    JTextArea jta = new JTextArea(errorMessage.toString());
 		      JLabel jl = new JLabel("test");
 		      jta.setBackground(jl.getBackground());
 		      jta.setFont(jl.getFont());
-
+		      
 		      int continueResponse = Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.OK_CANCEL_OPTION);
 		      if (continueResponse == javax.swing.JOptionPane.OK_OPTION)
 			showFirstEntryWindow();
-		    }
-		  });
-	      }
+		  }
+		});
 	    }
-	  };
+	  }
+	};
+      
+      thread.addToQueue(connectionAction, new java.awt.event.ActionEvent(this, 0, "connectStore"));
+    }
 
-	thread.addToQueue(connectionAction, new java.awt.event.ActionEvent(this, 0, "connectStore"));
-      }
-    }
   }
-  
-  public void showSecondEntryWindow() {
-    // here we just do the SMTP server.
-    
-    PropertyEditorFactory factory = getFactory();
-    
-    // set the properties we're going to show
-    java.util.Vector propertyVector = new java.util.Vector();
-    //propertyVector.add("OutgoingServer." + getDefaultName() + ".server");
-    
-    // this is a hack, but now we add descriptions to each of these.
-    
-    JInternalFrame secondEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.secondWindowMessage.title", "Outgoing Email Server"), false, false, false, false);
-    secondEntryWindow.getContentPane().setLayout(new BoxLayout(secondEntryWindow.getContentPane(), BoxLayout.Y_AXIS));
-    secondEntryWindow.getContentPane().add(new JTextArea(Pooka.getProperty("NewAccountPooka.secondWindowMessage", "Please enter the URL for your outgoing email.")));
-    secondEntryWindow.getContentPane().add(new PropertyEditorPane(manager, propertyVector, secondEntryWindow));
-    secondEntryWindow.pack();
-    secondEntryWindow.show();
-    secondEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
-	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-	  SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		handleSecondEntry();
-	      }
-	    } );
-	}
-      });		
-    
-    getMessagePanel().add(secondEntryWindow);
-    secondEntryWindow.setVisible(true);
-    try {
-      secondEntryWindow.setSelected(true);
-    } catch (java.beans.PropertyVetoException pve) {
-    }
+
+  public void testSmtpConnection() {
+
   }
-  
-  public void handleSecondEntry() {
-    saveProperties();
-    showConfirmation();
-  }
-  
-    
+
   public void showConfirmation() {
     JOptionPane.showInternalMessageDialog(getMessagePanel(), Pooka.getProperty("NewAccountPooka.finishedMessage", "Email account configured!  If you need to make changes,\nor to add new accounts, go to the Configuration menu."), Pooka.getProperty("NewAccountPooka.finishedMessage.title", "Done!"), JOptionPane.INFORMATION_MESSAGE);
     
   }
   
-  public void invalidFirstEntry() {
+  public void handleInvalidEntry(String message) {
     StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
+    if (message != null && message.length() > 0) {
+      errorMessage.append("\n");
+      errorMessage.append(message);
+    }
     errorMessage.append("\n\n");
     errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
     
@@ -307,37 +389,31 @@ public class NewAccountPooka {
    * Saves the tagged properties from our local VariableBundle to the 
    * main Pooka properties list.
    */
-  public void saveProperties() {
-    for (int i = 0; i < propertyList.size(); i++) {
-      String propertyName = (String) propertyList.elementAt(i);
-      transferProperty(propertyName);
+  public void saveProperties(Properties props) {
+    Enumeration names = props.propertyNames();
+    while (names.hasMoreElements()) {
+      String propertyName = (String) names.nextElement();
+      if (propertyName.equals("UserProfile") || propertyName.equals("Store") || propertyName.equals("OutgoingServer")) {
+	// skip
+      } else {
+	transferProperty(props, propertyName);
+      }
     }
-    // have to add these after the others, else we get an
-    // exception.
-    
-    //if (!Pooka.getProperty("UserProfile", "").equals(""))
-    //Pooka.setProperty("UserProfile", Pooka.getProperty("UserProfile", "") + ":" + getProperties().getProperty("UserProfile", ""));
-    //else
-    transferProperty("UserProfile");
-    
-    //if (!Pooka.getProperty("Store", "").equals(""))
-    //Pooka.setProperty("Store", Pooka.getProperty("Store", "") + ":" + getProperties().getProperty("Store", ""));
-    //else
-    transferProperty("Store");
 
-    //if (!Pooka.getProperty("OutgoingServer", "").equals(""))
-    //Pooka.setProperty("OutgoingServer", Pooka.getProperty("OutgoingServer", "") + ":" + manager.getProperty("OutgoingServer", ""));
-    //else
-    transferProperty("OutgoingServer");
+    transferProperty(props, "UserProfile");
+    
+    transferProperty(props, "Store");
+
+    transferProperty(props, "OutgoingServer");
   }
 
   /**
    * Transfers the given property from our local PropertyEditorManager
    * main Pooka properties list.
    */
-  public void transferProperty(String propertyName) {
-    if (!(manager.getProperty(propertyName, "").equals(""))) {
-      Pooka.setProperty(propertyName, manager.getProperty(propertyName, ""));
+  public void transferProperty(Properties props, String propertyName) {
+    if (!(props.getProperty(propertyName, "").equals(""))) {
+      Pooka.setProperty(propertyName, props.getProperty(propertyName, ""));
     }
   }
 

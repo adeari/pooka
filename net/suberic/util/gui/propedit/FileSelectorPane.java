@@ -28,8 +28,8 @@ public class FileSelectorPane extends SwingPropertyEditor {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
-    originalValue = manager.getProperty(property, "");
-
+    originalValue = parseValue(manager.getProperty(property, ""));
+    
     if (debug) {
       System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
     }
@@ -178,5 +178,31 @@ public class FileSelectorPane extends SwingPropertyEditor {
       enabled=newValue;
     }
   }
-  
+
+  /**
+   * Parses any ${} special values out of the string.
+   */
+   public String parseValue(String origString) {
+     StringBuffer newValue = new StringBuffer(origString);
+     int nextVar = origString.indexOf("${");
+     int offset = 0;
+     while (nextVar >= 0) {
+       int end = origString.indexOf("}", nextVar);
+       if (end >= nextVar) {
+	 String variable = origString.substring(nextVar +2, end);
+
+	 String replaceValue = System.getProperty(variable);
+	 if (replaceValue == null)
+	   replaceValue = "";
+	 newValue.replace(nextVar + offset, end + 1 + offset, replaceValue);
+
+	 offset = offset - end + nextVar + replaceValue.length() - 1;
+	 
+	 nextVar = origString.indexOf("${", end);
+       } else {
+	 nextVar = -1;
+       }
+     }
+     return newValue.toString();
+   }
 }

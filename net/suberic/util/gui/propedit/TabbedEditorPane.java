@@ -17,9 +17,14 @@ import java.util.ArrayList;
  * TabbedList.tabThree=prop7:prop8:prop9
  *
  * Options:
+ * TabbedList.templateScoped - add subproperty to the template.  for instance,
+ *   if true, the example will edit using the template 
+ *   TabbedList.tabOne.prop1.  if false, it will use the template prop1.
  * TabbedList.propertyScoped - add the subproperty to the property instead
- *                             of using it as its own property
- * TabbedList.templateScoped - add subproperty to the template
+ *   of using it as its own property.  if true, this example would edit,
+ *   for instance, MyProp.prop1 (since it would actually edit MyProp,
+ *   TabbedList.tabOne, which would in turn probably edit MyProp.prop1,
+ *   TabbedList.tabOne.prop1).
  *
  */
 public class TabbedEditorPane extends CompositeSwingPropertyEditor {
@@ -89,31 +94,24 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     SwingPropertyEditor currentEditor;
     
     for (int i = 0; i < propsToEdit.size(); i++) {
-      String currentProperty = (String)propsToEdit.get(i);
+      String currentTemplate = (String)propsToEdit.get(i);
       if (templateScoped) 
-	currentProperty = editorTemplate + currentProperty;
+	currentTemplate = editorTemplate + "." + currentTemplate;
 
       if (debug) {
-	System.out.println("getting editor for " + currentProperty);
+	System.out.println("getting editor using template " + currentTemplate);
       }
       
       if (propertyScoped) {
-	if (manager.getProperty(currentProperty + ".addSubProperty", "false").equalsIgnoreCase("true")) {
-	  if (debug) {
-	    System.out.println("TEP:  addSubProperty = true; getting editor for " + property + "." + propsToEdit.get(i) + "," + currentProperty);
-	  }
-	  currentEditor = createEditorPane(property + "." + (String) propsToEdit.get(i), currentProperty);
-	} else {
-	  if (debug) {
-	    System.out.println("TWP:  addSubProperty = false.  getting editor for " + property + ", " + currentProperty);
-	  }
-	  currentEditor = createEditorPane(property, currentProperty);
+	if (debug) {
+	  System.out.println("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
 	}
+	currentEditor = createEditorPane(property, currentTemplate);
       } else {
 	if (debug) {
-	  System.out.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
+	  System.out.println("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
 	}
-	currentEditor = createEditorPane(currentProperty, currentProperty);
+	currentEditor = createEditorPane(currentTemplate, currentTemplate);
       }
       
       if (debug) {
@@ -121,7 +119,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 	System.out.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
       }
       editorList.add(currentEditor);
-      tabbedPane.add(manager.getProperty(currentProperty + ".label", currentProperty), currentEditor);
+      tabbedPane.add(manager.getProperty(currentTemplate + ".label", currentTemplate), currentEditor);
     }
     
     return editorList;
