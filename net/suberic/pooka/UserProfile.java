@@ -273,7 +273,8 @@ public class UserProfile extends Object {
      */
     public SignatureGenerator createSignatureGenerator() {
 	try {
-	    String classname = Pooka.getProperty("UserProfile." + name + ".sigClass", Pooka.getProperty("Pooka.defaultSigGenerator", "net.suberic.pooka.StringSignatureGenerator"));
+	    String classname = Pooka.getProperty("UserProfile." + name + ".sigClass", Pooka.getProperty("Pooka.defaultSigGenerator", "net.suberic.pooka.FileSignatureGenerator"));
+	    System.out.println("using " + classname + " for signature.");
 	    Class sigClass = Class.forName(classname);
 	    SignatureGenerator sigGen = (SignatureGenerator) sigClass.newInstance();
 	    sigGen.setProfile(this);
@@ -281,6 +282,7 @@ public class UserProfile extends Object {
 	} catch (Exception e) {
 	    SignatureGenerator sigGen = new StringSignatureGenerator();
 	    sigGen.setProfile(this);
+	    System.out.println("caught exception.  using StringSigGen.");
 	    return sigGen;
 	}
     }

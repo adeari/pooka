@@ -31,7 +31,7 @@ Pooka.saveFolderWindowLocationsOnExit=true
 
 Pooka.newMessage.autoAddSignature=true
 Pooka.newMessage.signatureBeforeCopiedMessage=false
-Pooka.defaultSigGenerator=net.suberic.pooka.StringSignatureGenerator
+Pooka.defaultSigGenerator=net.suberic.pooka.FileSignatureGenerator
 
 MenuBar=File:Edit:Mail:Window:Help
 
@@ -72,8 +72,8 @@ MenuBar.Edit.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MenuBar.Edit.Paste.Action=paste-from-clipboard
 MenuBar.Edit.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-#MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge
-MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete
+#MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge:AddSignature
+MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:AddSignature
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Reply.Action=message-reply
 MenuBar.Mail.ReplyAll.Action=message-reply-all
@@ -83,6 +83,7 @@ MenuBar.Mail.Move.class=net.suberic.pooka.gui.FolderMenu
 MenuBar.Mail.Move.Action=message-move
 MenuBar.Mail.Delete.Action=message-delete
 MenuBar.Mail.Expunge.Action=message-expunge
+MenuBar.Mail.AddSignature.Action=message-add-signature
 
 MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
@@ -289,7 +290,7 @@ UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
 UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
 UserProfile.mailHeaders.fields.Organization.value=Organization
 
-UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:signature:sentFolder
+UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:signatureFile:sentFolder
 UserProfile.propertyType=Multi
 UserProfile.sentFolder.propertyType=Folder
 UserProfile.sentFolder.selectionRoot=allStores

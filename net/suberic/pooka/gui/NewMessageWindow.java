@@ -221,7 +221,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 
 	    }
 
-	    addSignature();
+	    addSignature(retval);
 
 	}
 
@@ -234,11 +234,13 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
      * This adds the current user's signature to the message at the current
      * location of the cursor.
      */
-    public void addSignature() {
+    public void addSignature(JEditorPane editor) {
+	System.out.println("calling addSignature() method itself.");
 	String sig = getSelectedProfile().getSignature();
+	System.out.println("sig is " + sig);
 	if (sig != null) {
 	    try {
-		editorPane.getDocument().insertString(editorPane.getCaretPosition(), sig, null);
+		editor.getDocument().insertString(editor.getCaretPosition(), sig, null);
 	    } catch (javax.swing.text.BadLocationException ble) {
 		;
 	    }
@@ -543,6 +545,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 
 	defaultActions = new Action[] {
 	    new CloseAction(),
+	    new AddSignatureAction(),
 	    new TestAction()
 		};
     }
@@ -558,6 +561,18 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	
         public void actionPerformed(ActionEvent e) {
 	    closeMessageWindow();
+	}
+    }
+
+    class AddSignatureAction extends AbstractAction {
+
+	AddSignatureAction() {
+	    super("message-add-signature");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    System.out.println("adding signature");
+	    addSignature(editorPane);
 	}
     }
 

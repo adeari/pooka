@@ -135,9 +135,9 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 
 		BufferedReader readSourceFile = new BufferedReader(new FileReader(sourceFile));
 		BufferedWriter writeSourceFile = new BufferedWriter(new FileWriter(outputFile));
-		currentLine = readSourceFile.readLine();
+		String currentLine = readSourceFile.readLine();
 		while (currentLine != null) {
-		    equalsLoc = currentLine.indexOf(';');
+		    int equalsLoc = currentLine.indexOf(';');
 		    if (equalsLoc != -1) {
 			String key = currentLine.substring(0, equalsLoc);
 			if (!mimeType.equals(key)) {

@@ -11,8 +11,7 @@ import javax.activation.*;
 import javax.swing.table.AbstractTableModel;
 
 import net.suberic.util.thread.*;
-import net.suberic.pooka.Pooka;
-import net.suberic.pooka.ExternalLauncher;
+import net.suberic.pooka.*;
 import java.awt.*;
 
 /**
@@ -222,37 +221,117 @@ public class AttachmentPane extends JPanel {
 	if (Pooka.isDebug())
 	    System.out.println("calling AttachmentPane.openWith()");
 
-	String inputMessage = Pooka.getProperty("AttchmentPane.openWith.message", "Enter the command with which \nto open the attchment.");
-	String inputTitle = Pooka.getProperty("AttachmentPane.openWith.title", "Open Attachment With");
-
-	String newCmd = message.getMessageWindow().showInputDialog(inputMessage, inputTitle);
-
-	if (newCmd != null) {
-	    if (newCmd.indexOf("%s") == -1)
-		newCmd = newCmd.concat(" %s");
+	
+	MimeBodyPart mbp = getSelectedPart();
+	String mType;
+	try {
+	    mType = mbp.getContentType();
+	    String inputMessage = Pooka.getProperty("AttchmentPane.openWith.message", "Enter the command with which \nto open the attchment.");
+	    String inputTitle = Pooka.getProperty("AttachmentPane.openWith.title", "Open Attachment With");
+	    String makeDefaultLabel = Pooka.getProperty("AttachmentPane.openWith.makeDefaultMessage", "Make default command?");
 	    
-	    MimeBodyPart mbp = getSelectedPart();
-	    if (mbp != null) {
+	    OpenWithWindow oww = new OpenWithWindow(inputMessage, inputTitle, makeDefaultLabel, mbp, mType);
+	    oww.show(message.getMessageWindow().getDesktopPane());
+	    
+	} catch (MessagingException me) {
+	}
+	
+    }
+    
+    public String getCommandString(String newCmd) {
+	if (newCmd.indexOf("%s") == -1)
+	    newCmd = newCmd.concat(" %s");
+	return newCmd;
+    }
+    
+    private void openWith(MimeBodyPart mbp, String cmd) {
+	if (mbp != null && cmd != null && !cmd.equals("")) {
+	    try {
+		
 		DataHandler dh = null;
-		try {
-		    dh = mbp.getDataHandler();
-		} catch (MessagingException me) {
-		}
+		
+		dh = mbp.getDataHandler();
 		if (dh != null) {
 		    dh.setCommandMap(Pooka.getMailcap());
 		    try {
 			ExternalLauncher el = new ExternalLauncher();
-			el.setCommandContext(newCmd, dh);
+			el.setCommandContext(cmd, dh);
 			el.show();
 		    } catch (IOException ioe) {
 				//
 		    }
 		}
+	    } catch (MessagingException me) {
 	    }
 	}
     }
-    
 
+    private class OpenWithWindow {
+
+	public int returnValue = 0;
+	public JInternalFrame jif;
+	public JTextField inputField;
+	public JToggleButton toggleButton;
+	public MimeBodyPart mbp;
+	public String mimeType;
+	
+	public OpenWithWindow(String message, String title, String defaultMsg, MimeBodyPart bodyPart, String partMimeType) {
+	    mbp = bodyPart;
+	    mimeType = partMimeType;
+
+	    jif = new JInternalFrame(title, false, false, false);
+	    JLabel inputLabel = new JLabel(message);
+	    System.out.println("creating label with message " + inputLabel);
+
+	    inputField = new JTextField();
+	
+	    toggleButton = new JToggleButton(defaultMsg);
+
+	    JPanel buttonPanel = new JPanel();
+	    JButton okButton = new JButton(Pooka.getProperty("button.ok", "Ok"));
+	    okButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			try {
+			    jif.setClosed(true);
+			} catch (java.beans.PropertyVetoException pve) {}
+			String cmd = getCommandString(inputField.getText());
+			if (toggleButton.isSelected()) {
+			    String newMailcap = new String(mimeType + ";" + cmd);
+			    ((FullMailcapCommandMap)Pooka.getMailcap()).addMailcap(newMailcap);
+			}
+			openWith(mbp, cmd);
+			
+		    }
+		});
+	    
+	    JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
+	    cancelButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			try {
+			    jif.setClosed(true);
+			} catch (java.beans.PropertyVetoException pve) {}
+		    }
+		});
+
+	    buttonPanel.add(okButton);
+	    buttonPanel.add(cancelButton);
+	    
+	    jif.getContentPane().setLayout(new BoxLayout(jif.getContentPane(), BoxLayout.Y_AXIS));
+	    jif.getContentPane().add(inputLabel);
+	    jif.getContentPane().add(toggleButton);
+	    jif.getContentPane().add(buttonPanel);
+	    jif.pack();
+	}
+
+	public void show(JDesktopPane parent) {
+	    parent.add(jif);
+	    jif.setVisible(true);
+	    try {
+		jif.setSelected(true);
+	    } catch (java.beans.PropertyVetoException e) {}
+	}
+    }
+	    
     /**
      * This opens up a JFileChooser to let the user choose under what
      * name and where the selected Attachment should be saved.  It then
