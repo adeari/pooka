@@ -1,3 +1,7 @@
+added selectAll support for read messages, new messages, and the FolderTable.
+
+added undo/redo support for the new message editor
+
 added a File Selector for Configuration properties that take files.
 
 

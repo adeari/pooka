@@ -18,63 +18,64 @@ import java.io.File;
  */
 public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemListener {
 
-    JTabbedPane tabbedPane = null;
-    Container headerPanel = null;
-    boolean modified = false;
-    Hashtable inputTable;
+  JTabbedPane tabbedPane = null;
+  Container headerPanel = null;
+  boolean modified = false;
+  Hashtable inputTable;
+  
+  JScrollPane headerScrollPane;
+  
+  private Action[] defaultActions;
 
-    JScrollPane headerScrollPane;
-
-    private Action[] defaultActions;
-
-    /**
-     * Creates a NewMessageDisplayPanel from the given Message.
-     */
-
-    public NewMessageDisplayPanel(NewMessageProxy newMsgProxy) {
-	super(newMsgProxy);
-
-    }
-
-    /**
-     * This configures the MessageDisplayPanel.  This means that here is 
-     * where we create the headerPanel and editorPane and add them to the 
-     * splitPane.
-     */
-    public void configureMessageDisplay() throws MessagingException {
-
-	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	tabbedPane = new JTabbedPane();
-
-	inputTable = new Hashtable();
+  
+  /**
+   * Creates a NewMessageDisplayPanel from the given Message.
+   */
+  
+  public NewMessageDisplayPanel(NewMessageProxy newMsgProxy) {
+    super(newMsgProxy);
+    
+  }
+  
+  /**
+   * This configures the MessageDisplayPanel.  This means that here is 
+   * where we create the headerPanel and editorPane and add them to the 
+   * splitPane.
+   */
+  public void configureMessageDisplay() throws MessagingException {
+    
+    splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+    tabbedPane = new JTabbedPane();
+    
+    inputTable = new Hashtable();
+    
+    headerPanel = createHeaderInputPanel(msg, inputTable);
+    editorPane = createMessagePanel(msg);
+    
+    headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
+    
+    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
+      addAttachmentPane();
+    
+    editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    
+    splitPane.setTopComponent(tabbedPane);
+    splitPane.setBottomComponent(editorScrollPane);
+    
+    this.add("Center", splitPane);
+    
+    editorPane.addMouseListener(new MouseAdapter() {
 	
-	headerPanel = createHeaderInputPanel(msg, inputTable);
-	editorPane = createMessagePanel(msg);
-
-	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
-
-	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
-	    addAttachmentPane();
-
-	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	
-	splitPane.setTopComponent(tabbedPane);
-	splitPane.setBottomComponent(editorScrollPane);
-	
-	this.add("Center", splitPane);
-	
-	editorPane.addMouseListener(new MouseAdapter() {
-		
-		public void mousePressed(MouseEvent e) {
-		    if (SwingUtilities.isRightMouseButton(e)) {
-			showPopupMenu(editorPane, e);
-		    }
-		}
-	    });
-	
-	splitPane.resetToPreferredSizes();
-    }
+	public void mousePressed(MouseEvent e) {
+	  if (SwingUtilities.isRightMouseButton(e)) {
+	    showPopupMenu(editorPane, e);
+	  }
+	}
+      });
+    
+    splitPane.resetToPreferredSizes();
+  }
     
     /**
      * Sets the window to its preferred size.
@@ -170,7 +171,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      * message.  It will also include the current text of the message.
      */
     public JTextPane createMessagePanel(MessageProxy aMsg) {
-	JTextPane retval = new JTextPane();
+	JTextPane retval = new net.suberic.util.swing.ExtendedEditorPane();
 	retval.setEditorKit(new MailEditorKit());
 
 	setDefaultFont(retval);

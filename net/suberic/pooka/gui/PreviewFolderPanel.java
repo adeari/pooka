@@ -91,7 +91,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    new NextMessageAction(),
 	    new PreviousMessageAction(),
 	    new GotoMessageAction(),
-	    new SearchAction()
+	    new SearchAction(),
+	    new SelectAllAction()
 		};
     }
 
@@ -476,5 +477,16 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    searchFolder();
 	}
     }
+
+  public class SelectAllAction extends AbstractAction {
+    
+    SelectAllAction() {
+      super("select-all");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      getFolderDisplay().selectAll();
+    }
+  }
 }
 

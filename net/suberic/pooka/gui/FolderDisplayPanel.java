@@ -464,6 +464,13 @@ public class FolderDisplayPanel extends JPanel {
 	return selectMessage(newRow);
 
     }
+
+  /**
+   * Selects all of the messages in the FolderTable.
+   */
+  public void selectAll() {
+    messageTable.selectAll();
+  }
     
     /**
      * This selects the message at the given row, and also scrolls the

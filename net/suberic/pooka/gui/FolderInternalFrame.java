@@ -53,7 +53,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	    new NextMessageAction(),
 	    new PreviousMessageAction(),
 	    new GotoMessageAction(),
-	    new SearchAction()
+	    new SearchAction(),
+	    new SelectAllAction()
 		};
 
 	// note:  you have to set the Status Bar before you create the
@@ -732,6 +733,17 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
     }
 
+  public class SelectAllAction extends AbstractAction {
+    
+    SelectAllAction() {
+      super("select-all");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      getFolderDisplay().selectAll();
+    }
+  }
+  
 }
 
 
