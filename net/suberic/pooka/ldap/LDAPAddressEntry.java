@@ -32,11 +32,20 @@ public class LDAPAddressEntry implements AddressBookEntry {
   }
 
   /**
-   * Gets the InternetAddress associated with this LDAPAddressEntry.
+   * Gets the InternetAddresses associated with this LDAPAddressEntry.
    */
-  public javax.mail.internet.InternetAddress getAddress() {
+  public javax.mail.internet.InternetAddress[] getAddresses() {
     return null;
   }
+
+  /**
+   * Gets the String that's a proper representation of the address(es)
+   * in this AddressBookEntry.
+   */
+  public String getAddressString() {
+    return "";
+  }
+
 
   /**
    * Gets the PersonalName property associated with this LDAPAddressEntry.
@@ -57,6 +66,13 @@ public class LDAPAddressEntry implements AddressBookEntry {
    */
   public String getLastName() {
     return null;
+  }
+
+  /**
+   * sets the InternetAddress associated with this LDAPAddressEntry.
+   */
+  public void setAddresses(javax.mail.internet.InternetAddress[] newAddress) {
+
   }
 
   /**
@@ -93,5 +109,22 @@ public class LDAPAddressEntry implements AddressBookEntry {
   public java.util.Properties getProperties() {
     return null;
   }
+
+  /**
+   * <p>Gets the ID of this AddressBookEntry.  This is the ID that will
+   * be searched by default, that can be entered into the To: field, etc.</p>
+   */
+  public String getID() {
+    return "";
+  }
+
+  /**
+   * <p>Sets the ID of this AddressBookEntry.  This is the ID that will
+   * be searched by default, that can be entered into the To: field, etc.</p>
+   */
+  public void setID(String newID) {
+
+  }
+
 
 }

@@ -77,6 +77,13 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
+   * Returns all of the AddressBookEntryes which match the given String.
+   */
+  public AddressBookEntry[] matchExactly(String matchString) {
+    return match(matchString);
+  }
+
+  /**
    * Returns all of the AddressBookEntryes whose FirstName matches the given 
    * String.
    */
