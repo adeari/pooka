@@ -8,16 +8,10 @@ alpha 2
 *)  fix the occasional NullPointerException in the FolderInfo (?) -- might
     be done already.
 
-*)  fix what happens if you select an unreachable/incorrectly written
-mailbox--right now it hangs.
-
-*)  associated with above, multithread properly--too many actions happen
-on the main i/o thread.
-
-*) need to separate requests out into different threads.  right now, it's way
-too easy for the entire client to hang if your network connection hangs, be
-it checking to see if there are new messages, loading the information on 
-current messages, etc.
+*) finish fixing the threading problems--specifically, see if we can get
+the FolderWindow to refresh properly, the ReadMessageWindow to come up with
+an AttachmentPane, and the new message windows to look a bit better when
+they appear (i.e. actually appear in front).
 
 *)  fix the response window size when there are lots of people in the 
 address fields--right now it makes the entire window huge.
