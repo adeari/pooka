@@ -594,9 +594,11 @@ Search.operations.Equals=equals
 Search.operations.True=equals
 Search.operations.False=notEquals
 
-FolderFilters=ColorFilter
+FolderFilters=ColorFilter:FontFilter
 FolderFilters.ColorFilter.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderFilters.ColorFilter.editorClass=net.suberic.pooka.gui.filter.ColorFilterEditor
+FolderFilters.FontFilter.class=net.suberic.pooka.gui.filter.FontDisplayFilter
+FolderFilters.FontFilter.editorClass=net.suberic.pooka.gui.filter.FontFilterEditor
 
 FolderInfo.defaultDisplayFilters=Unread
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen
