@@ -1,7 +1,8 @@
 package net.suberic.pooka.gui;
 import java.awt.CardLayout;
 import javax.swing.*;
-import net.suberic.pooka.UserProfile;
+import net.suberic.pooka.*;
+import net.suberic.util.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
 import net.suberic.pooka.Pooka;
@@ -9,12 +10,13 @@ import net.suberic.util.gui.*;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.metal.MetalTheme;
 
 /**
  * A Content Panel which shows a JSplitPane, with a PreviewFolderPanel in
  * the top section and a PreviewMessagePanel in the bottom section.
  */
-public class PreviewContentPanel extends JPanel implements ContentPanel, MessageUI {
+public class PreviewContentPanel extends JPanel implements ContentPanel, MessageUI, ThemeSupporter, ThemeListener {
 
   private JPanel folderDisplay = null;
   private ReadMessageDisplayPanel messageDisplay;
@@ -29,6 +31,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   
   private ListSelectionListener selectionListener;
   
+  protected javax.swing.plaf.metal.MetalTheme currentTheme = null;
+
   private boolean savingOpenFolders;
   
   /**
@@ -116,6 +120,96 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     if (selectedID != null)
       showFolder(selectedID);
   }
+
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+     Runnable runMe = new Runnable() {
+	public void run() {
+	  try {
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this);
+	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	    getMessageDisplay().sizeToDefault();
+	  } catch (Exception e) {
+	  }
+	}
+       };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(runMe);
+    } else {
+      runMe.run();
+    } 
+  }
+  
+  /**
+   * Gets the currently configured Theme.
+   */
+  public MetalTheme getCurrentTheme() {
+    return currentTheme;
+  }
+  
+  /**
+   * Sets the Theme that this component is currently using.
+   */
+  public void setCurrentTheme(MetalTheme newTheme) {
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).removeThemeListener(this);
+    }
+    currentTheme = newTheme;
+    
+    if (currentTheme != null && currentTheme instanceof ConfigurableMetalTheme) {
+      ((ConfigurableMetalTheme)currentTheme).addThemeListener(this);
+    }
+  }
+
+  /**
+   * Called when the specifics of a Theme change.
+   */
+  public void themeChanged(ConfigurableMetalTheme theme) {
+    // we should really only be getting messages from our own current themes,
+    // but, hey, it never hurts to check.
+    if (currentTheme != null && currentTheme == theme) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    try {
+	      Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this, true);
+	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	    } catch (Exception e) {
+	    }
+
+	  }
+	});
+    }
+  }
+
+
+  /**
+   * Gets the Theme object from the ThemeManager which is appropriate
+   * for this UI.
+   */
+  public MetalTheme getTheme(ThemeManager tm) {
+    MessageProxy mp = getMessageProxy();
+    if (mp == null)
+      return null;
+    
+    MessageInfo mi = mp.getMessageInfo();
+    if (mi == null)
+      return null;
+
+    FolderInfo fi = mi.getFolderInfo();
+    if (fi != null) {
+      String id = Pooka.getProperty(fi.getFolderProperty() + ".theme", "");
+      if (id != null && ! id.equals("")) {
+	return tm.getTheme(id);
+      }
+    } 
+
+    return tm.getDefaultTheme();
+    
+  }
+
 
   /**
    * Saves the panel size information.  For this, saves the location of 
@@ -379,6 +473,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Refreshes the display.
    */
   public void refreshDisplay() throws javax.mail.MessagingException {
+    configureInterfaceStyle();
     messageDisplay.resetEditorText();
   }
   
@@ -480,6 +575,13 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    */
   public PookaUIFactory getPookaUIFactory() {
       return Pooka.getUIFactory();
+  }
+
+  /**
+   * Gets the MessageDisplay part.
+   */
+  public ReadMessageDisplayPanel getMessageDisplay() {
+    return messageDisplay;
   }
 
   public Action[] defaultActions = {
