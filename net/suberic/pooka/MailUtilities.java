@@ -58,6 +58,9 @@ public class MailUtilities {
      */
     public static Vector getInlineTextAttachments(Message m) {
 	Vector v = getAttachments(m);
+	if (v == null || v.size() < 1)
+	    return null;
+
 	Vector retval = new Vector();
 	try {
 	    for (int i = 0; i < v.size(); i++) {
@@ -95,14 +98,17 @@ public class MailUtilities {
 			    textFound = true;
 			} else {
 			    if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
+				System.out.println("attachment is another multipart.");
 				Vector v = getAttachments((MimeMultipart)mbp.getContent());
 				if (v != null && v.size() > 0)
 				    attachments.addAll(v);
-			    } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+			    } /*else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+				System.out.println("attachment is a message.");				
 				Vector v = getAttachments((Message)mbp.getContent());
 				if (v != null && v.size() > 0)
 				    attachments.addAll(v);
-			    } else {
+				    } */ else {
+				System.out.println("attachment is just a plain attachment.  adding.");
 				attachments.add(mbp);
 			    }  
 			}
@@ -110,15 +116,17 @@ public class MailUtilities {
 		    } else {
 			
 			if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
+			    System.out.println("attachment is another multipart.");
 			    Vector v = getAttachments((MimeMultipart)mbp.getContent());
 			    if (v != null && v.size() > 0)
 				attachments.addAll(v);
-			} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+			} /*else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+				System.out.println("attachment is a message.");				
 				Vector v = getAttachments((Message)mbp.getContent());
 				if (v != null && v.size() > 0)
 				    attachments.addAll(v);
-			    } else {
-			    
+				    } */ else {
+				System.out.println("attachment is just a plain attachment.  adding.");
 				attachments.add(mbp);
 			    }
 		    }
