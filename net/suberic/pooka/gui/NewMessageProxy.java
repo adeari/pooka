@@ -5,8 +5,7 @@ import javax.swing.*;
 import javax.activation.*;
 import java.util.Hashtable;
 import java.util.Vector;
-import net.suberic.pooka.Pooka;
-import net.suberic.pooka.UserProfile;
+import net.suberic.pooka.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 
@@ -16,8 +15,8 @@ import java.io.*;
 public class NewMessageProxy extends MessageProxy {
     Hashtable commands;
 
-    public NewMessageProxy(Message newMessage) {
-	message=newMessage;
+    public NewMessageProxy(NewMessageInfo newMessage) {
+	messageInfo = newMessage;
 
 	commands = new Hashtable();
 	
@@ -59,45 +58,18 @@ public class NewMessageProxy extends MessageProxy {
     public void send() {
 	if (getNewMessageWindow() != null) { 
 	    try {
-		URLName urlName = null;
+		UserProfile profile = getNewMessageWindow().getSelectedProfile();
+		InternetHeaders headers = getNewMessageWindow().getMessageHeaders();
 
-		UserProfile profile = getNewMessageWindow().populateMessageHeaders(getMessage());
-		if (profile != null)
-		    urlName = profile.getSendMailURL();
-
-		String messageText;
-		if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
-		    messageText=net.suberic.pooka.MailUtilities.wrapText(getMessageWindow().getMessageText());
-		else
-		    messageText = getMessageWindow().getMessageText();
+		String messageText = getMessageWindow().getMessageText();
 
 		String messageContentType = getMessageWindow().getMessageContentType();
+		getNewMessageInfo().sendMessage(profile, headers, messageText, messageContentType);
 
-		if (urlName != null) {
-		    Vector attachments = getAttachments();
-		    if (attachments != null && attachments.size() > 0) {
-			MimeBodyPart mbp = new MimeBodyPart();
-			mbp.setContent(messageText, messageContentType);
-			MimeMultipart multipart = new MimeMultipart();
-			multipart.addBodyPart(mbp);
-			for (int i = 0; i < attachments.size(); i++) 
-			    multipart.addBodyPart((BodyPart)attachments.elementAt(i));
-			multipart.setSubType("mixed");
-			getMessage().setContent(multipart);
-			getMessage().saveChanges();
-		    } else {
-			getMessage().setContent(messageText, messageContentType);
-		    }
-	       
-		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
-		    try {
-			if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
-			    getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
-			    profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
-			}
-		    } catch (MessagingException me) {
-			getMessageWindow().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
-		    }
+		try {
+		    getNewMessageInfo().saveToSentFolder(profile);
+		} catch (MessagingException me) {
+		    getMessageWindow().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 		}
 		getNewMessageWindow().setModified(false);
 		getMessageWindow().closeMessageWindow();
@@ -110,7 +82,6 @@ public class NewMessageProxy extends MessageProxy {
 		    me.printStackTrace(System.out);
 		}
 	    }
-	    
 	}
     }
     
@@ -144,36 +115,9 @@ public class NewMessageProxy extends MessageProxy {
      */
     public void attachFile(File f) {
 	try {
+	    getNewMessageInfo().attachFile(f);
 
-	    // borrowing liberally from ICEMail here.
-
-	    MimeBodyPart mbp = new MimeBodyPart();
-	    
-	    FileDataSource fds = new FileDataSource(f);
-
-	    DataHandler dh = new DataHandler(fds);
-	    
-	    mbp.setFileName(f.getName());
-
-	    if (Pooka.getMimeTypesMap().getContentType(f).startsWith("text"))
-		mbp.setDisposition(Part.ATTACHMENT);
-	    else
-		mbp.setDisposition(Part.INLINE);
-	    
-	    mbp.setDescription(f.getName());
-	    
-	    mbp.setDataHandler( dh );
-	    
-	    Vector attachments = getAttachments();
-	    
-	    if (attachments == null) 
-		attachments = new Vector();
-	    
-	    attachments.add(mbp);
-	    
-	    messageInfo.setAttachments(attachments);
-	    
-	    getNewMessageWindow().attachmentAdded(attachments.size() -1);
+	    getNewMessageWindow().attachmentAdded(getNewMessageInfo().getAttachments().size() -1);
 	} catch (Exception e) {
 	    getMessageWindow().showError(Pooka.getProperty("error.MessageWindow.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageWindow.unableToAttachFile.title", "Unable to Attach File."), e);
 	}
@@ -187,15 +131,9 @@ public class NewMessageProxy extends MessageProxy {
      * correct underlying object.
      */
     public void detachFile(MimeBodyPart mbp) {
-	if (attachments != null) {
-	    int index = attachments.indexOf(mbp);
-	    attachments.remove(mbp);
+	int index = getNewMessageInfo().removeAttachment(mbp);
+	if (index != -1)
 	    getNewMessageWindow().attachmentRemoved(index);
-	}
-    }
-
-    public Message getMessage() {
-	return message;
     }
 
     /**
@@ -207,6 +145,14 @@ public class NewMessageProxy extends MessageProxy {
 	    return (NewMessageWindow)getMessageWindow();
 	else
 	    return null;
+    }
+
+    /** 
+     * a convenience method which returns the current MessageInfo as
+     * a NewMessageInfo.
+     */
+    public NewMessageInfo getNewMessageInfo() {
+	return (NewMessageInfo) messageInfo;
     }
 
     public Action[] defaultActions = {

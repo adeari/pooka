@@ -260,7 +260,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * MessagePanel and set it as Active.
      */
     public void createNewMessage(javax.mail.Message m) {
-	final MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(m));
+	final MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(new NewMessageInfo(m)));
 
 
 	Runnable openWindowCommand = new RunnableAdapter() {

@@ -13,6 +13,9 @@ import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
 
+/**
+ * A window for entering new messages.
+ */
 public class NewMessageWindow extends MessageWindow implements ItemListener {
 
     JTabbedPane tabbedPane = null;
@@ -26,7 +29,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
      * Creates a NewMessageWindow from the given Message.
      */
 
-    public NewMessageWindow(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
+    public NewMessageWindow(MessagePanel newParentContainer, NewMessageProxy newMsgProxy) {
 	super(newParentContainer, newMsgProxy);
 
 	configureMessageWindow();
@@ -57,52 +60,64 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
 
-	if (!getMessageProxy().hasLoadedAttachments())
-	    getMessageProxy().loadAttachmentInfo();
-
-	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
-	    addAttachmentPane();
-	
+	try {
+	    if (!getMessageProxy().getMessageInfo().hasLoadedAttachments())
+		getMessageProxy().getMessageInfo().loadAttachmentInfo();
+	    
+	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
+		addAttachmentPane();
+	} catch (MessagingException me) {
+	}   
 	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
+	
 	splitPane.setTopComponent(tabbedPane);
 	splitPane.setBottomComponent(editorScrollPane);
-
+	
 	this.getContentPane().add("Center", splitPane);
 	
 	toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
 	
 	toolbar.setActive(this.getActions());
 	this.getContentPane().add("North", toolbar);
-
+	
 	keyBindings = new ConfigurableKeyBinding(this, "NewMessageWindow.keyBindings", Pooka.getResources());
 	keyBindings.setActive(getActions());
-
+	
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 		public void internalFrameClosed(InternalFrameEvent e) {
 		    if (getMessageProxy().getMessageWindow() == NewMessageWindow.this)
 			getMessageProxy().setMessageWindow(null);
 		}
 	    });
-
+	
 	editorPane.addMouseListener(new MouseAdapter() {
 		
 		public void mousePressed(MouseEvent e) {
 		    if (SwingUtilities.isRightMouseButton(e)) {
 			showPopupMenu(editorPane, e);
-		    }
+			}
 		}
 	    });
-
+	
 	this.sizeWindow();
     }
-
+    
+    /**
+     * Sets the window to its preferred size.
+     */
     private void sizeWindow() {
 	editorScrollPane.setPreferredSize(getDefaultEditorPaneSize());
 	splitPane.resetToPreferredSizes();
 	this.resizeByWidth();
     }
 
+    /**
+     * Closes the message window.  This checks to see if the underlying
+     * message is modified, and if so, pops up a dialog to make sure that
+     * you really want to close the window.
+     *
+     * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
+     */
     public void closeMessageWindow() {
 	
 	if (isModified()) {
@@ -174,16 +189,12 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	    hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
 	    inputRow.add(hdrLabel);
 
-	    if (aMsg.getMessage() instanceof MimeMessage) {
-		MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
-		try {
-		    inputField = new net.suberic.util.swing.EntryTextArea(mMsg.getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
-		} catch (MessagingException me) {
-		    inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
-		}
-	    } else {
+	    try {
+		inputField = new net.suberic.util.swing.EntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+	    } catch (MessagingException me) {
 		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	    }
+
 	    inputField.setLineWrap(true);
 	    inputField.setWrapStyleWord(true);
 	    //inputField.setBorder(new javax.swing.plaf.basic.BasicBorders.FieldBorder(Color.black, Color.black, Color.black, Color.black));
@@ -211,7 +222,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	// see if this message already has a text part, and if so,
 	// include it.
 	
-	String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage(), false);
+	String origText = ((NewMessageInfo)getMessageProxy().getMessageInfo()).getTextPart(false);
 	if (origText != null && origText.length() > 0) 
 	    retval.setText(origText);
 	
@@ -246,32 +257,25 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
     }
 
     /**
-     * This will populate a Message with the values entered in the 
-     * MessageWindow.
+     * This returns the values in the MesssageWindow as a set of 
+     * InternetHeaders.
      */
 
-    public UserProfile populateMessageHeaders(Message m) throws MessagingException {
-	if (m instanceof MimeMessage) {
-	    MimeMessage mMsg = (MimeMessage)m;
-	    String key;
+    public InternetHeaders getMessageHeaders() throws MessagingException {
+	InternetHeaders returnValue = new InternetHeaders();
+	String key;
+	
+	Enumeration keys = inputTable.keys();
+	while (keys.hasMoreElements()) {
+	    key = (String)(keys.nextElement());
 	    
-	    Enumeration keys = inputTable.keys();
-	    UserProfile up = null;
-	    while (keys.hasMoreElements()) {
-		key = (String)(keys.nextElement());
-		
-		if (key.equals("UserProfile")) {
-		    up = (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
-		    up.populateMessage(mMsg);
-		} else {
-		    String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
-		    String value = ((EntryTextArea)(inputTable.get(key))).getText();
-		    mMsg.setHeader(header, value);
-		}
+	    if (! key.equals("UserProfile")) {
+		String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
+		String value = ((EntryTextArea)(inputTable.get(key))).getText();
+		returnValue.setHeader(header, value);
 	    }
-	    return up;
 	}
-	return null;
+	return returnValue;
     }
 
     /**
@@ -321,11 +325,14 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
      * is removed from the MessageWindow.
      */
     public void attachmentRemoved(int index) {
-	Vector attach = getMessageProxy().getAttachments();
-	if (attach == null || attach.size() == 0) {
-	    removeAttachmentPane();
-	} else {
-	    getAttachmentPanel().getTableModel().fireTableRowsDeleted(index, index);
+	try {
+	    Vector attach = ((NewMessageProxy)getMessageProxy()).getAttachments();
+	    if (attach == null || attach.size() == 0) {
+		removeAttachmentPane();
+	    } else {
+		getAttachmentPanel().getTableModel().fireTableRowsDeleted(index, index);
+	    }
+	} catch (MessagingException me) {
 	}
     }
 
