@@ -7,11 +7,6 @@
 
 -----
 
-*) add a way to put in custom headers into a new message.
-	added.  
-	make button look better.
-	make it take the last header.
-	
 *) printing
 	timing--jtextpane creation should happen after dialog
 		should also show status - loading message, paginating,
@@ -22,8 +17,6 @@
 	new messages come in.
 	-- test
 	-- tested.  does happen even when settings are correct. fix.
-
-*) fix error display with exception so that you can see the stack trace.
 
 *) bug:  check to see if moving a message marks it as read.
 
@@ -48,6 +41,9 @@
 
 *) add proper icon for spam button. make spam button available, and give
 	it a keybinding.
+
+*) fix error display with exception so that you can see the stack trace.
+
 ----
 
 *) fix NPE if try to send a new message without configuring client.

@@ -248,6 +248,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
       });
 
+    customHeaderButton.setToolTipText(Pooka.getProperty("NewMessage.customHeaders.button.Tooltip", "Edit Headers"));
+
     inputRow.add(userProfileLabel);
     inputRow.add(profileCombo);
     inputRow.add(customHeaderButton);
@@ -354,6 +356,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	return true;
       }
     }
+
   }
 
   /**
@@ -675,14 +678,13 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    */
   public void populateCustomHeaders(InternetHeaders pHeaders) {
     if (customHeaderTable.isEditing()) {
-      Component editingComponent = customHeaderTable.getEditorComponent();
-      if (editingComponent != null) {
-	javax.swing.event.ChangeEvent event = new javax.swing.event.ChangeEvent(editingComponent);
-	customHeaderTable.editingStopped(event);
-      }
+      javax.swing.table.TableCellEditor tce = customHeaderTable.getCellEditor(customHeaderTable.getEditingRow(), customHeaderTable.getEditingColumn());
+      if (tce != null) {
+	tce.stopCellEditing();
+      }      
     }
+
     int rowCount = customHeaderTable.getRowCount();
-    System.err.println("doing " + rowCount + " headers.");
     for (int i = 0; i < rowCount; i++) {
       String header = null;
       String value = null;
@@ -693,10 +695,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	// ignore the header.
       }
 
-      System.err.println("row " + i + ":  got " + header + ", " + value);
       if (header != null && value != null && header.length() > 0 && value.length() > 0) {
 	pHeaders.setHeader(header, value);
-	System.err.println("row " + i + ":  set " + header + ": " + value);
       }
     }
   }
