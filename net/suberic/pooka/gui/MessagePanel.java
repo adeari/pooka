@@ -151,6 +151,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    }
 	    
 	    newFolderWindow.setVisible(true);
+
 	} else {
 	    if (newFolderWindow.isIcon())
 		try {
@@ -189,6 +190,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 		FolderInfo fInfo = Pooka.getStoreManager().getFolderById((String)folderList.elementAt(i));
 		if (fInfo != null && fInfo.getFolderNode() != null) {
 		    FolderNode fNode = fInfo.getFolderNode();
+		    fNode.makeVisible();
 		    Action a = fNode.getAction("file-open");
 		    a.actionPerformed(new ActionEvent(this, 0, "file-open"));
 		}

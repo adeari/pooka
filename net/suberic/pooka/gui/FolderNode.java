@@ -4,7 +4,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
-import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.*;
 import javax.mail.Store;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
@@ -206,6 +206,16 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
 		this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
 	}
+    }
+
+    /**
+     * This makes the FolderNode visible in its parent JTree.
+     */
+    public void makeVisible() {
+	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+	TreeNode[] nodeList = ((DefaultTreeModel)folderTree.getModel()).getPathToRoot(this);
+	TreePath path = new TreePath(nodeList);
+	folderTree.makeVisible(path);
     }
 
     public void messageChanged(MessageChangedEvent mce) {
