@@ -3,12 +3,24 @@ beta 1
 
 *) check:  see how outgoing and incoming mail handle tab characters.
 
+*) there's a bug with the email address removal.  fix it.
+
 --
 
 *) add address book and alias support
 
 *)  fix the out of memory problems--only load a certain amount of large
-messages.  for that matter, maybe also do an optimizeit audit.
+messages.  
+	thoughts:
+	1)  change it so that the MessageInfo gets a copy of the 
+	AttachmentInfo object, once it has been parsed.  that way, 
+	we don't have to do a separate loadAttachments, and we also
+	don't have to parse the message multiple times.
+	2)  change the AttachmentInfo so that it uses DataHandlers 
+	instead of using getContent() all the time.  that way we should
+	be able to cut down on the memory usage quite a bit.
+	3)  if we do 2), we might need to cache some information along with
+	each DataHandler (size, name, etc.).
 
 *) bug:  messages that are new for the session (i.e. showed up between the
 last time you ran the client and this time) aren't marked as recent--only
