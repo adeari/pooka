@@ -4,8 +4,12 @@ top todo:
 	begun.  todo:
 	*) color chooser needs to disable the color button when the checkbox
 		isn't checked.
-	*) make it so we can actually change all of the appropriate 
-		color settings.
+	*) create a decent secondary interface style.
+	*) test the folderPanel, messagePanel, and Folder settings.
+	*) make the NewMessageWindow change when you change your selected
+		user.
+
+*) fix the UserProfile editor display.
 
 *) have Pooka itself change its icon if you get new messages, in addition to 
 changing the title bar.
@@ -16,6 +20,8 @@ changing the title bar.
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
 possible folders, nor just the ones that are open.
+
+*) test and fix the external editor spawning on windows.
 
 ------------------
 
