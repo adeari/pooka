@@ -131,15 +131,9 @@ public class FolderWindow extends JInternalFrame {
 	if (firstUnread > -1) {
 	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
 
-	    /*
-	    // this is an estimation--hopefully it will work.
-	    System.out.println("default value for scrollbar is " + scrollPane.getVerticalScrollBar().getValue());
-	    System.out.println("firstUnread is " + firstUnread + "; Maximum is " + scrollPane.getVerticalScrollBar().getMaximum() + "; rowCount is " + messageTable.getRowCount());
-	    scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() * messageTable.getRowCount() / firstUnread);
-	    System.out.println("set value of vertical scroll bar to " + scrollPane.getVerticalScrollBar().getValue());
-	    */
-
 	    messageTable.scrollRectToVisible(messageTable.getCellRect(firstUnread, 1, true));
+	} else {
+	    messageTable.scrollRectToVisible(messageTable.getCellRect(messageTable.getRowCount(), 1, true));
 	}
 	
 	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
