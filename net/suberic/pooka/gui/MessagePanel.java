@@ -135,9 +135,11 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
     }
   }
 
+  /**
+   * Saves the panel size.  A no-op for this.
+   */
   public void savePanelSize() {
-    Pooka.setProperty("Pooka.contentPanel.hsize", Integer.toString(getUIComponent().getWidth()));
-    Pooka.setProperty("Pooka.contentPanel.vsize", Integer.toString(getUIComponent().getHeight()));
+    //
   }
   
   

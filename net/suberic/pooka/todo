@@ -65,6 +65,8 @@ or not they're actually connected, instead of relying on the user.
 
 *)  fix up the error messages, and make sure that they look ok.
 
+*)  ?? if network connection goes down, pooka hangs on exit.
+
 +++++++
 
 *) add support for jdk1.4

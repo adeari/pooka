@@ -152,30 +152,45 @@ public class Pooka {
     storeManager.loadAllSentFolders();
     outgoingMailManager.loadOutboxFolders();
     
+    final JFrame finalFrame = frame;
+
+    // do all of this on the awt event thread.
+    Runnable createPookaUI = new Runnable() {
+	public void run() {
+	  finalFrame.setBackground(Color.lightGray);
+	  finalFrame.getContentPane().setLayout(new BorderLayout());
+	  panel = new MainPanel(finalFrame);
+	  finalFrame.getContentPane().add("Center", panel);
+	  panel.configureMainPanel();
+	  finalFrame.getContentPane().add("North", panel.getMainToolbar());
+	  finalFrame.setJMenuBar(panel.getMainMenu());
+	  finalFrame.getContentPane().add("South", panel.getInfoPanel());
+	  finalFrame.pack();
+	  finalFrame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
+	  
+	  finalFrame.show();
+	  
+	  uiFactory.setShowing(true);
+	  
+	  if (getProperty("Store", "").equals("")) {
+	    if (panel.getContentPanel() instanceof MessagePanel) {
+	      NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());
+	      nap.start();
+	    }
+	  } else if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true")) {
+	    panel.getContentPanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
+	  }
+	  panel.refreshActiveMenus();
+	}
+      };
     
-    frame.setBackground(Color.lightGray);
-    frame.getContentPane().setLayout(new BorderLayout());
-    panel = new MainPanel(frame);
-    frame.getContentPane().add("Center", panel);
-    panel.configureMainPanel();
-    frame.getContentPane().add("North", panel.getMainToolbar());
-    frame.setJMenuBar(panel.getMainMenu());
-    frame.getContentPane().add("South", panel.getInfoPanel());
-    frame.pack();
-    frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
-    frame.show();
-    
-    uiFactory.setShowing(true);
-    
-    if (getProperty("Store", "").equals("")) {
-      if (panel.getContentPanel() instanceof MessagePanel) {
-	NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());
-	nap.start();
-      }
-    } else if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true")) {
-      panel.getContentPanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
+    try {
+      javax.swing.SwingUtilities.invokeAndWait(createPookaUI);
+    } catch (Exception e) {
+      System.err.println("caught exception creating ui:  " + e);
+      e.printStackTrace();
     }
-    panel.refreshActiveMenus();
+
   }
   
   /**
