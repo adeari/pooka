@@ -329,6 +329,19 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     MimeBodyPart contentPart = (MimeBodyPart)mMulti.getBodyPart(0);
     MimeBodyPart signaturePart = (MimeBodyPart)mMulti.getBodyPart(1);
 
-    return false;
+    // we need an InputStream for the content, and a byte array for
+    // the signature.
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    contentPart.writeTo(baos);
+
+    ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+
+    String signature = (String) signaturePart.getContent();
+
+    byte[] sigBytes = signature.getBytes();
+    
+    return checkSignature(bais, sigBytes, key);
+      
   }
 }

@@ -84,12 +84,20 @@ public abstract class EncryptionUtils {
   public abstract boolean checkSignature(MimeMessage m, EncryptionKey key)
     throws EncryptionException, MessagingException, IOException;
 
+  /**
+   * Checks the signature on a Multipart.
+   */
+  public abstract boolean checkSignature(MimeMultipart m, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException;
+
   public static boolean isEncrypted(Part pPart) throws MessagingException {
     String contentType = pPart.getContentType().toLowerCase();
     
     if (contentType.startsWith("multipart")) {
       ContentType ct = new ContentType(contentType);
       if (ct.getSubType().equalsIgnoreCase("encrypted")) 
+	return true;
+      else if (ct.getSubType().equalsIgnoreCase("signed")) 
 	return true;
     }
     return false;
