@@ -96,7 +96,7 @@ Pooka.userProfileProperty=X-Pooka-UserProfile
 
 EncryptionManager.propertyType=Composite
 EncryptionManager.scoped=true
-EncryptionManager=pgp:smime:savePasswordsForSession
+EncryptionManager=pgp:smime:savePasswordsForSession:autoDecrypt:autoCheckSig
 EncryptionManager.pgp.propertyType=Composite
 EncryptionManager.pgp.scoped=true
 EncryptionManager.pgp=keyStore.public.filename:keyStore.private.filename:keyStore.private.password
@@ -111,6 +111,10 @@ EncryptionManager.smime.keyStore.private.filename.propertyType=File
 EncryptionManager.smime.keyStore.private.password.propertyType=Password
 EncryptionManager.savePasswordsForSession=false
 EncryptionManager.savePasswordsForSession.propertyType=Boolean
+EncryptionManager.autoDecrypt=true
+EncryptionManager.autoDecrypt.propertyType=Boolean
+EncryptionManager.autoCheckSig=true
+EncryptionManager.autoCheckSig.propertyType=Boolean
 
 Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
 Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png
