@@ -695,6 +695,13 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   }
 
   /**
+   * Refreshes any submenus that need to be refreshed.
+   */
+  public void refreshActiveMenus() {
+
+  }  
+
+  /**
    * Returns the MainPanel for this component.
    */
   public MainPanel getMainPanel() {

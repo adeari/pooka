@@ -76,8 +76,9 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     
     this.addFocusListener(new java.awt.event.FocusAdapter() {
 	public void focusGained(java.awt.event.FocusEvent e) {
-	  if (current != null)
+	  if (current != null) {
 	    current.requestFocus();
+	  }
 	}
       });
   }
@@ -247,7 +248,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     } else {
       clearCurrentMessage();
     }
-    refreshActiveMenus();
+    Pooka.getMainPanel().refreshActiveMenus();
     refreshCurrentUser();
   }
   
@@ -419,7 +420,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    */
   public void refreshActiveMenus() {
     toolbar.setActive(getActions());
-    Pooka.getMainPanel().refreshActiveMenus();
+    //Pooka.getMainPanel().refreshActiveMenus();
   }
   
   /**
@@ -600,9 +601,10 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public Action[] getActions() {
     Action[] returnValue = getDefaultActions();
     
-    if (current != null && current.getActions() != null)
+    if (current != null && current.getActions() != null) {
       returnValue = javax.swing.text.TextAction.augmentList(returnValue, current.getActions());
-    
+    }
+
     if (returnValue == null)
       return messageDisplay.getActions();
     else {

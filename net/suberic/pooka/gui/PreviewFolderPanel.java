@@ -105,8 +105,9 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
-	  if (folderDisplay != null)
+	  if (folderDisplay != null) {
 	    folderDisplay.requestFocus();
+	  }
 	}
       });
     

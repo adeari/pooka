@@ -67,8 +67,10 @@ public class FolderDisplayPanel extends JPanel {
     // the messageTable
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
-	  if (messageTable != null)
+	  if (messageTable != null) {
 	    messageTable.requestFocus();
+	  }
+	  Pooka.getMainPanel().refreshActiveMenus();
 	  if (getFolderInfo() != null && getFolderInfo().hasNewMessages()) {
 	    getFolderInfo().setNewMessages(false);
 	    FolderNode fn = getFolderInfo().getFolderNode();

@@ -17,7 +17,8 @@
 
 *) more doc
 
-*) fix key focus in preview pane.
+*) fix the problem with things like MissingStartBoundary by getting the
+raw input stream.
 
 -----
 
