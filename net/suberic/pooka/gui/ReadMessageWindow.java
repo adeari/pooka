@@ -21,6 +21,8 @@ public class ReadMessageWindow extends MessageWindow {
     boolean showFullHeaders = false;
     ConfigurableToolbar toolbar;
 
+    public boolean firstShow = true;
+
     /**
      * Creates a MessageWindow from the given Message.
      */
@@ -84,14 +86,18 @@ public class ReadMessageWindow extends MessageWindow {
      */
     public void addNotify() {
 	super.addNotify();
-	Dimension prefSize = getDefaultEditorPaneSize();
-	JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
-	if (vsb != null)
-	    prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
-	editorScrollPane.setPreferredSize(prefSize);
-	this.resizeByWidth();
-	if (splitPane != null && attachmentPanel != null)
-	    splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+	
+	if (firstShow) {
+	    Dimension prefSize = getDefaultEditorPaneSize();
+	    JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
+	    if (vsb != null)
+		prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
+	    editorScrollPane.setPreferredSize(prefSize);
+	    this.resizeByWidth();
+	    if (splitPane != null && attachmentPanel != null)
+		splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+	    firstShow = false;
+	}
     }
 
     /**

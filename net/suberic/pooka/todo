@@ -27,10 +27,6 @@ frames and the folderPanel.  oh, and making it so you can get at the menus.
 	...  probably just do another run through for all the options before
 	we finish.
 
-*) fix the addNotify problems--i'm honestly not sure exactly how they need
-to be fixed, but they certainly do.  -- done for the FolderWindow; need to
-	do it for the MessageWindow/NewMessageWindow (sizing).
-
 *) bug:  fix what happens if you try sending out a bad email.  also, while
 	we're at it, make sure that the from: and smtp: information get 
 	updated live.
