@@ -71,30 +71,25 @@ public class FolderTableModel extends AbstractTableModel {
     public synchronized void addOrRemoveRows(Vector changedMsg, int addOrRem) {
 	int firstRow, lastRow;
 
-	if (addOrRem == FolderTableModel.ADD_MESSAGES) {
-	    firstRow = data.size();
-	    lastRow = firstRow + changedMsg.size();
-
-	    data.addAll(changedMsg);
-	    fireTableRowsInserted(firstRow, lastRow);
-	} else if (addOrRem == FolderTableModel.REMOVE_MESSAGES) {
-	    lastRow = ((Integer)changedMsg.elementAt(changedMsg.size() -1)).intValue();
-	    firstRow = lastRow;
-	    data.removeElementAt(lastRow);
-	    
-	    int currentRow;
-	    for (int i = changedMsg.size() -2; i >= 0 ; i--) {
-		currentRow = ((Integer)changedMsg.elementAt(i)).intValue();
-		if (currentRow != firstRow -1) {
-		    fireTableRowsDeleted(firstRow, lastRow);
-		    lastRow = currentRow;
-		    firstRow = currentRow;
-		} else {
-		    firstRow = currentRow;
+	if (changedMsg != null && changedMsg.size() > 0) {
+	    if (addOrRem == FolderTableModel.ADD_MESSAGES) {
+		firstRow = data.size() + 1;
+		lastRow = firstRow + changedMsg.size() -1;
+		
+		data.addAll(changedMsg);
+		fireTableRowsInserted(firstRow, lastRow);
+		System.out.println("inserted rows " + firstRow + " to " + lastRow + ".");
+	    } else if (addOrRem == FolderTableModel.REMOVE_MESSAGES) {
+		for (int i = 0; i < changedMsg.size() ; i++) {
+		    int rowNumber = data.indexOf(changedMsg.elementAt(i));
+		    if (rowNumber > -1) {
+			fireTableRowsDeleted(rowNumber, rowNumber);
+			data.removeElement(changedMsg.elementAt(i));
+		    }
 		}
-		data.removeElementAt(currentRow);
 	    }
-	    fireTableRowsDeleted(firstRow, lastRow);
+	} else {
+	    System.out.println("got an empty/null added or deleted event.");
 	}
     }
     
