@@ -1,3 +1,6 @@
+made it so you get a warning message if you try to start with an unsupported
+JDK.
+
 add a find in page feature for the Read Messages.
 
 fixed a problem with the focus not always returning to the correct component.

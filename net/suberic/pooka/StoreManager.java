@@ -220,5 +220,14 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     manager.addItemListChangeListener(this);
   }
 
+  /**
+   * Sets up SSL connections.
+   */
+  public static void setupSSL() {
+    // set up the SSL socket factory.
+    java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+    java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
+    
+  }
 }
 
