@@ -1,11 +1,12 @@
 read message window
-  export;  attachment 
+  export;  attachment(s) (as filelist)
+	   default swing editor stuff (text)
   import:  nothing
 
 new message window
-  export:  none
-  import:  other message (attachment)
-	   file (attachment)
+  export:  default swing editor stuff
+  import:  other message (file/attachment)
+	   file (file/attachment)
  	   key (encrypt/sign)
 
 folder window
@@ -17,4 +18,5 @@ folder node
   import:  message(s)
 
 attachment panel
+	see read message window.
 

@@ -1,7 +1,8 @@
 *) make it so no cc: means no cc: header at all, rather than a blank cc:
 header.
 
-*) fix incorrect display of unread messages (?)
+*) fix incorrect display of unread messages (?) -- could have to do with
+	delete filter???
 
 *) add drag and drop
 	*) include message
