@@ -212,7 +212,63 @@ public class SearchEntryPanel extends JPanel {
      * the rootProperty in the given VariableBundle.
      */
     public void setSearchTerm(String rootProperty, VariableBundle bundle) {
+	searchTerms = new Vector();
+	entryPanel = new JPanel();
+	entryPanel.setLayout(new BoxLayout(entryPanel,BoxLayout.Y_AXIS));
+	addSearchTermProperty(rootProperty, bundle, FIRST);
+	entryScrollPane.setViewportView(entryPanel);
+	entryPanel.revalidate();
+    }
 
+    /**
+     * Adds a SearchTerm property.  This actually goes through and divides
+     * up single vs. compound search terms.  addSignleSearchTerm() actually
+     * adds the editor.
+     */
+    private void addSearchTermProperty(String rootProperty, VariableBundle bundle, int type) {
+	String termType = bundle.getProperty(rootProperty + ".type", "simple");
+	if (termType.equalsIgnoreCase("compound")) {
+	    Vector subProps = bundle.getPropertyAsVector(rootProperty + ".subTerms", "");
+	    int subType = AND;
+	    String operation = bundle.getProperty(rootProperty + ".operation", "and");
+	    if (operation.equalsIgnoreCase("and"))
+		subType = AND;
+	    else
+		subType = OR;
+
+	    for (int i = 0; i < subProps.size(); i++) {
+		String nextTerm = (String) subProps.elementAt(i);
+		if (i == 0)
+		    addSearchTermProperty(rootProperty + "." + nextTerm, bundle, type);
+		else
+		    addSearchTermProperty(rootProperty + "." + nextTerm, bundle, subType);
+	    }
+	} else {
+	    addSingleSearchTerm(rootProperty, bundle, type);
+	}
+    }
+    
+    /**
+     * Adds a single search term.
+     */
+    private void addSingleSearchTerm(String rootProperty, VariableBundle bundle, int type) {
+	if (type == FIRST) {
+	    SearchEntryForm sef = new SearchEntryForm(manager, rootProperty, bundle);
+	    SearchConnector sc = new SearchConnector(AND);
+	    Box fullPanel = new Box(BoxLayout.X_AXIS);
+	    searchTerms.add(new SearchEntryPair(sef, AND));
+	    fullPanel.add(sef.getPanel());
+	    entryPanel.add(fullPanel);
+	} else {
+	    SearchEntryForm sef = new SearchEntryForm(manager, rootProperty, bundle);
+	    SearchEntryPair pair = new SearchEntryPair(sef, type);
+	    searchTerms.add(pair);
+	    
+	    JPanel newSearchPanel = new JPanel();
+	    newSearchPanel.add(pair.connector.getCombo());
+	    newSearchPanel.add(sef.getPanel());
+	    entryPanel.add(newSearchPanel);
+	}
     }
 
     /**
@@ -230,7 +286,6 @@ public class SearchEntryPanel extends JPanel {
     /**
      * Adds the given properties to the list.
      */
-
     private void addToProperties(SearchEntryPair pair, String rootProperty, java.util.Properties props) {
 	Properties tmpProperties = pair.form.generateSearchTermProperties(rootProperty);
 	Enumeration keys = tmpProperties.keys();
@@ -239,7 +294,11 @@ public class SearchEntryPanel extends JPanel {
 	    props.setProperty(current, tmpProperties.getProperty(current));
 	}
     }
-	
+
+    /**
+     * Adds the searchTerms given by the pairList to the properties list, with
+     * rootProperty as the root property.
+     */
     private void addToProperties(Vector pairList, String rootProperty, Properties props) {
 	if (pairList.size() == 1) {
 	    addToProperties((SearchEntryPair) pairList.remove(0), rootProperty, props);

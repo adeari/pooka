@@ -4,6 +4,12 @@ beta 1
 search: 
 add support for incoming message filter
 add support for message display filter
+ok.  search editor:  need to be able to populate the editor from a property.
+	also need to be able to disable it.
+filter editor:  fix the color button size.  
+	add a filter editor for delete, move, and font.
+figure out what to do about display filters vs backend filters.
+
 
 *) check:  see how outgoing and incoming mail handle tab characters.
 	-- a little bit of a bug, but not too much.  should probably

@@ -5,6 +5,7 @@ import javax.mail.search.*;
 import java.util.*;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.SearchTermManager;
+import net.suberic.util.VariableBundle;
 
 /**
  * This is a gui component which lets you configure a 
@@ -57,6 +58,15 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	panel.add(searchFieldCombo);
 	panel.add(selectionPanel);
 
+    }
+
+    /**
+     * Constructs a new SearchEntryForm using the given property and
+     * VariableBundle.
+     */
+    public SearchEntryForm(SearchTermManager newManager, String rootProperty, VariableBundle bundle) { 
+	this(newManager);
+	setTermValue(rootProperty, bundle);
     }
 
     /**
@@ -181,6 +191,51 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	return returnValue;
     }
 
+    /**
+     * Sets the value of this SearchTerm to the one defined by the
+     * given property.
+     */
+    public void setTermValue(String rootProperty, VariableBundle bundle) {
+	if (Pooka.isDebug())
+	    System.out.println("SearchEntryForm:  setting SearchTerm value to that defined by " + rootProperty);
+	
+	String searchProperty = bundle.getProperty(rootProperty, "Search.searchTerms.Subject");
+	String selectedType = Pooka.getProperty(searchProperty + ".type", "");
+	String typeLabel = Pooka.getProperty(searchProperty + ".label", "Subject");
+	String operationProperty = bundle.getProperty(rootProperty + ".operationProperty", "Search.operations.Contains");
+	String operationLabel = Pooka.getProperty(operationProperty + ".label");
+	    
+	String pattern = bundle.getProperty(rootProperty + ".pattern", "");
+	
+	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	    operationCombo.setSelectedItem(operationLabel);
+	    textField.setText(pattern);
+	} else if (selectedType.equalsIgnoreCase(SearchTermManager.BOOLEAN_MATCH)) {
+	    booleanValueCombo.setSelectedItem(operationLabel);
+	} else	if (selectedType.equalsIgnoreCase(SearchTermManager.DATE_MATCH)) {
+	    dateComparisonCombo.setSelectedItem(operationLabel);
+	    dateField.setText("pattern");
+	}
+
+	searchFieldCombo.setSelectedItem(typeLabel);
+
+    }
+
+    /**
+     * This enables or disables the SearchEntryForm.
+     */
+    public void setEnabled(boolean newValue) {
+	searchFieldCombo.setEnabled(newValue);
+
+	stringMatchPanel.setEnabled(newValue);
+	operationCombo.setEnabled(newValue);
+	textField.setEnabled(newValue);
+
+	booleanValueCombo.setEnabled(newValue);
+
+	dateComparisonCombo.setEnabled(newValue);
+	dateField.setEnabled(newValue);
+    }
 
     /**
      * This handles the switch of the selectionPanel when the searchFieldCombo
