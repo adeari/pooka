@@ -131,7 +131,8 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     // check the type; should be multipart/encrypted
 
     String contentType = part.getContentType();
-    if (contentType == null || ! contentType.equals("multipart/encrypted")) {
+    ContentType ct = new ContentType(contentType);
+    if (contentType == null || ! ct.getBaseType().equalsIgnoreCase("multipart/encrypted")) {
       throw new EncryptionException ("error in content type:  expected 'multipart/encrypted', got '" + contentType + "'");
     }
     // FIXME:  check for protocol, too.
@@ -159,7 +160,8 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     // first part should be application/pgp-encrypted
     BodyPart firstPart = mpart.getBodyPart(0);
     String firstPartType = firstPart.getContentType();
-    if (firstPartType == null || ! firstPartType.equals("application/pgp-encrypted")) {
+    ContentType firstCt = new ContentType(firstPartType);
+    if (firstPartType == null || ! firstCt.getBaseType().equalsIgnoreCase("application/pgp-encrypted")) {
       throw new EncryptionException ("error in content:  expected first part of type application/pgp-encrypted, got " + firstPartType);
     }
 
@@ -167,7 +169,8 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
 
     BodyPart secondPart = mpart.getBodyPart(1);
     String secondPartType = secondPart.getContentType();
-    if (secondPartType == null || ! secondPartType.equals("application/octet-stream")) {
+    ContentType secondCt = new ContentType(secondPartType);
+    if (secondPartType == null || ! secondCt.getBaseType().equalsIgnoreCase("application/octet-stream")) {
       throw new EncryptionException ("error in content:  expected second part of type application/octet-stream, got " + secondPartType);
     }
 

@@ -17,9 +17,9 @@ public class GPGSendTest {
       Session s = Session.getDefaultInstance(System.getProperties());
 
       MimeMessage rawMessage = new MimeMessage(s);
-      rawMessage.setText("This is an encrypted message.  Really!");
-      rawMessage.setSubject("Hi");
-      rawMessage.setRecipient(Message.RecipientType.TO, new InternetAddress("avatar@localhost"));
+      rawMessage.setText("This is an encrypted message.  Really!  I am writing this message here.\n\n\nIsn't it fun?\n\n\n-allen\n");
+      rawMessage.setSubject("Hi two");
+      rawMessage.setRecipient(Message.RecipientType.TO, new InternetAddress("mailtest@localhost"));
 
       PGPMimeEncryptionUtils cryptoUtils = new PGPMimeEncryptionUtils();
       

@@ -22,7 +22,8 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
 
     try {
       File outFile = writeStreamToFile(encryptedStream);
-
+      outFile.deleteOnExit();
+      
       Process p = Runtime.getRuntime().exec("gpg --passphrase-fd 0 -d " + outFile);
 
       // we probably need to write the passphrase.
@@ -87,7 +88,9 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
       } catch (InterruptedException ie) {
       }
 
-      InputStream is = new FileInputStream(new File(outFile.getAbsolutePath() + ".asc"));
+      File inFile = new File(outFile.getAbsolutePath() + ".asc");
+      inFile.deleteOnExit();
+      InputStream is = new FileInputStream(inFile);
       
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
@@ -113,7 +116,8 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
    * Writes an input stream to a temporary File.
    */
   File writeStreamToFile(InputStream encryptedStream) throws IOException {
-    File tmpFile = File.createTempFile("gpg", "txt");
+    File tmpFile = File.createTempFile("gpg", ".txt");
+    tmpFile.deleteOnExit();
     FileOutputStream fos = new FileOutputStream(tmpFile);
 
     byte[] bytesRead = new byte[256];

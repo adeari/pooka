@@ -172,19 +172,19 @@ public class Attachment {
     }
 
     public ContentType getMimeType() {
-	return mimeType;
+      return mimeType;
     }
 
     public boolean isText() {
-	return mimeType.match("text/");
+	return getMimeType().match("text/");
     }
 
     public boolean isPlainText() {
-	return mimeType.match("text/plain") ;
+	return getMimeType().match("text/plain") ;
     }
 
     public boolean isHtml() {
-	return mimeType.match("text/html");
+	return getMimeType().match("text/html");
     }
 
     /**

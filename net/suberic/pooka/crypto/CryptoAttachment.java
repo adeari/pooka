@@ -14,11 +14,15 @@ public class CryptoAttachment extends Attachment {
 
   boolean parsed = false;
 
+  BodyPart decryptedBodyPart = null;
+  
+
   /**
    * Creates a CryptoAttachment out of a MimeBodyPart.
    */
   public CryptoAttachment(MimeBodyPart mbp) throws MessagingException {
     super(mbp);
+    System.out.println("new cryptoattachment.");
   }
   
   /**
@@ -29,48 +33,59 @@ public class CryptoAttachment extends Attachment {
    */
   public CryptoAttachment(MimeMessage msg) throws MessagingException {
     super(msg);
+    System.out.println("new cryptoattachment.");
   }
 
   // accessor methods.
   
-  /**
-   * Returns the decoded InputStream of this Attachment.
-   */
-  public InputStream getInputStream() throws java.io.IOException {
-    return getDataHandler().getInputStream();
+  protected BodyPart getDecryptedBodyPart() 
+    throws EncryptionException, MessagingException, java.io.IOException {
+    if (decryptedBodyPart != null)
+      return decryptedBodyPart;
+    else {
+      // we should always be wrapping a Multipart object here.
+      Object o = super.getContent();
+      if (o instanceof Multipart) {
+	PGPMimeEncryptionUtils utils = new PGPMimeEncryptionUtils();
+	utils.setPGPProviderImpl(new net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl());
+	decryptedBodyPart = utils.decryptMultipart((Multipart)o, new net.suberic.pooka.crypto.gpg.GPGEncryptionKey("allen", "biteme"));
+
+	return decryptedBodyPart;
+      } else {
+	return null;
+      }
+    }
   }
-  
+
   /**
    * Returns the DataHandler for this Attachment.
    */
   public DataHandler getDataHandler() {
+    try {
+      BodyPart bp = getDecryptedBodyPart();
+      
+      if (bp != null) {
+	return bp.getDataHandler();
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
     return super.getDataHandler();
   }
-  
+
+
   /**
-   * Returns the content of this attachment as an Object.
+   * Returns the MimeType.
    */
-  public Object getContent() throws java.io.IOException {
+  public ContentType getMimeType() {
     try {
-      return getDataHandler().getContent();
-    } catch (UnsupportedEncodingException uee) {
-      if (isText()) {
-	/**
-	 * Just read the InputStream directly into a byte array and
-	 * hope for the best.  :)
-	 */
-	InputStream is = getDataHandler().getInputStream();
-	ByteArrayOutputStream bos = new ByteArrayOutputStream();
-	int b;
-	while ((b = is.read()) != -1)
-	  bos.write(b);
-	byte[] barray = bos.toByteArray();
-	return new String(barray, Pooka.getProperty("Pooka.defaultCharset", "iso-8859-1"));
-      } else {
-	throw uee;
-      }
+      BodyPart bp = getDecryptedBodyPart();
+      return new ContentType(bp.getContentType());
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+
+    return super.getMimeType();
   }
-  
   
 }
