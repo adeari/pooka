@@ -5,7 +5,8 @@ import javax.mail.event.MessageCountEvent;
 import javax.mail.event.MessageChangedEvent;
 import java.io.*;
 import java.util.Vector;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import net.suberic.pooka.cache.ChangeCache;
 import net.suberic.pooka.gui.MessageProxy;
 
@@ -20,7 +21,7 @@ public class PopInboxFolderInfo extends FolderInfo {
   ChangeCache changeAdapter;
   String mailHome;
   
-  HashMap uidMap = new HashMap();
+  Set uidsRead = new HashSet();
 
   public static String UID_HEADER = "X-Pooka-Pop-UID";
   
@@ -116,7 +117,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	MessageProxy mp = (MessageProxy) v.elementAt(i);
 	try {
 	  String uid = (String) mp.getMessageInfo().getMessageProperty(UID_HEADER);
-	  uidMap.put(uid, null);
+	  uidsRead.add(uid);
 	  if (Pooka.isDebug())
 	    System.out.println("adding " + uid + " to read list.");
 	} catch (MessagingException me) {
@@ -152,7 +153,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	      msgsToAppend[i] = new MimeMessage((MimeMessage) msgs[i]);
 	      String uid = getUID(msgs[i], f);
 	      msgsToAppend[i].addHeader(UID_HEADER, uid);
-	      uidMap.put(uid, null);
+	      uidsRead.add(uid);
 	      if (Pooka.isDebug())
 		System.out.println("adding " + uid + " to read list.");
 	    }
@@ -274,9 +275,11 @@ public class PopInboxFolderInfo extends FolderInfo {
     if (Pooka.isDebug())
       System.out.println("getting new messages.");
     Message[] newMessages = f.getMessages();
+
     if (newMessages.length > 0) {
+      // if none of the messages have been read, then lastRead will be -1.
       int lastRead = newMessages.length - 1;
-      while (! alreadyRead(newMessages[lastRead], f)) {
+      while (lastRead >=0 && ! alreadyRead(newMessages[lastRead], f)) {
 	lastRead--;
       }
       
@@ -371,7 +374,7 @@ public class PopInboxFolderInfo extends FolderInfo {
     if (Pooka.isDebug()) 
       System.out.println("checking to see if message with uid " + newUid + " is new.");
 
-    boolean returnValue = uidMap.containsKey(newUid);
+    boolean returnValue = uidsRead.contains(newUid);
 
     if (Pooka.isDebug()) 
       System.out.println(newUid + " already read = " + returnValue);
