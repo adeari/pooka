@@ -773,9 +773,9 @@ public class MessageProxy {
   
   public void showError(String message, Exception ex) {
     if (getMessageUI() != null) 
-      getMessageUI().showError(message + ex.getMessage(), ex);
+      getMessageUI().showError(message, ex);
     else
-      Pooka.getUIFactory().showError(message + ex.getMessage(), ex);
+      Pooka.getUIFactory().showError(message, ex);
   }
   
   /**
