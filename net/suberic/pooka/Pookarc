@@ -26,6 +26,9 @@ Pooka.previewPanel.folderSize=200
 
 Pooka.attachmentPanel.vsize=100
 
+Pooka.searchFolderDisplay.hsize=500
+Pooka.searchFolderDisplay.vsize=100
+
 Pooka.replyPrefix=>
 Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
