@@ -10,6 +10,6 @@ public interface UpdatableUI {
    * Gets the UIConfig object from the UpdatableUIManager which is appropriate
    * for this UI.
    */
-  public UpdatableUIManager.UIConfig getUIConfig(UpdatableUIManager uuim);
+  public UIConfig getUIConfig(UpdatableUIManager uuim);
 
 }
