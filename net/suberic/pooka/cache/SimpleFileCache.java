@@ -652,7 +652,8 @@ public class SimpleFileCache implements MessageCache {
 	  Long l = new Long(nextLine);
 	  cachedMessages.add(l);
 	  // this has the side effect of loading the cached flags
-	  // to the cachedFlags HashMap.
+	  // to the cachedFlags HashMap. -- i think we do that now when
+	  // we fetch?
 	  //getFlagsFromCache(l.longValue());
 	  //getHeadersFromCache(l.longValue());
 	}
@@ -664,6 +665,15 @@ public class SimpleFileCache implements MessageCache {
       try {
 	BufferedReader in = new BufferedReader(new FileReader(validityFile));
 	uidValidity = Long.parseLong(in.readLine());
+      } catch (Exception e) {
+      }
+    }
+
+    File localMsgFile = new File(cacheDir, "lastLocal");
+    if (localMsgFile.exists()) {
+      try {
+	BufferedReader in = new BufferedReader(new FileReader(localMsgFile));
+	lastLocalUID = Long.parseLong(in.readLine());
       } catch (Exception e) {
       }
     }
@@ -790,21 +800,21 @@ public class SimpleFileCache implements MessageCache {
 	return uidValidity;
     }
 
-    public void setUIDValidity(long newValidity) {
-	try {
-	    File f = new File(cacheDir, "validity");
-	    if (f.exists())
-		f.delete();
-
-	    f.createNewFile();
-	    
-	    BufferedWriter out = new BufferedWriter(new FileWriter(f));
-	    out.write(Long.toString(newValidity));
-	    out.flush();
-	    out.close();
-	} catch (Exception e) {
-	}
-
+  public void setUIDValidity(long newValidity) {
+    try {
+      File f = new File(cacheDir, "validity");
+      if (f.exists())
+	f.delete();
+      
+      f.createNewFile();
+      
+      BufferedWriter out = new BufferedWriter(new FileWriter(f));
+      out.write(Long.toString(newValidity));
+      out.flush();
+      out.close();
+    } catch (Exception e) {
+    }
+    
 	uidValidity = newValidity;
     }
 
@@ -856,7 +866,21 @@ public class SimpleFileCache implements MessageCache {
    * Generates a local UID.
    */
   public synchronized long generateLocalUID() {
-    return lastLocalUID--;
+    lastLocalUID--;
+    try {
+      File f = new File(cacheDir, "lastLocal");
+      if (f.exists())
+	f.delete();
+      
+      f.createNewFile();
+      
+      BufferedWriter out = new BufferedWriter(new FileWriter(f));
+      out.write(Long.toString(lastLocalUID));
+      out.flush();
+      out.close();
+    } catch (Exception e) {
+    } 
+    return lastLocalUID;
   }
 }
 

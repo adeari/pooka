@@ -180,6 +180,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    openFolder(mode);
 	  }
 	} else {
+	  Folder f = getFolder();
 	  getFolder().open(mode);
 	  updateFolderOpenStatus(true);
 	  resetMessageCounts();
@@ -188,9 +189,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
       }
     } catch (MessagingException me) {
-      System.err.println("error:  " + me);
-      me.printStackTrace();
+      //System.err.println("error:  " + me);
+      //me.printStackTrace();
       setStatus(DISCONNECTED);
+      throw me;
     }
   }
   

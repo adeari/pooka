@@ -54,6 +54,14 @@ public class ReadMessageFrame extends MessageFrame {
     this.setLocation(source.getLocationOnScreen());
     
     configureInterfaceStyle();
+
+    this.addWindowListener(new WindowAdapter() {
+	public void windowClosing(WindowEvent e) {
+	  if (getMessageProxy().getMessageUI() == ReadMessageFrame.this) {
+	    getMessageProxy().setMessageUI(null);
+	  }
+	}
+      });
   }
   
   protected void configureMessageFrame() {
@@ -88,8 +96,9 @@ public class ReadMessageFrame extends MessageFrame {
     
     this.addWindowListener(new WindowAdapter() {
 	public void windowClosing(WindowEvent e) {
-	  if (getMessageProxy().getMessageUI() == ReadMessageFrame.this)
+	  if (getMessageProxy().getMessageUI() == ReadMessageFrame.this) {
 	    getMessageProxy().setMessageUI(null);
+	  }
 	}
       });
     
