@@ -121,25 +121,36 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		otherEditorPane.setText(messageText.toString());
 		otherEditorPane.setCaretPosition(0);
 	    } 
-	}
 
-	if (getMessageProxy() != null && getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
-	    attachmentPanel = new AttachmentPane(msg);
-	    attachmentScrollPane.setViewportView(attachmentPanel);
-	    ((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
+	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
+		attachmentPanel = new AttachmentPane(msg);
+		attachmentScrollPane.setViewportView(attachmentPanel);
+		((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
+		
+		if (splitPane != null && attachmentPanel != null) {
+		    double paneHeight = splitPane.getSize().getHeight();
+		    if (paneHeight <= 0)
+			paneHeight = splitPane.getPreferredSize().getHeight();
+		    splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
+		} else {
+		    splitPane.setDividerLocation(400);
+		}
 
-	    if (splitPane != null && attachmentPanel != null) {
-		double paneHeight = splitPane.getSize().getHeight();
-		if (paneHeight <= 0)
-		    paneHeight = splitPane.getPreferredSize().getHeight();
-		splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
 	    } else {
-		splitPane.setDividerLocation(400);
+		((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
 	    }
-
 	} else {
+	    // if getMessageProxy() == null
+	    editorPane.setEditable(false);
+	    editorPane.setText("");
+	    editorPane.setCaretPosition(0);
+	    
+	    otherEditorPane.setEditable(false);
+	    otherEditorPane.setText("");
+	    otherEditorPane.setCaretPosition(0);
 	    ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
 	}
+
 	this.repaint();
     }
 

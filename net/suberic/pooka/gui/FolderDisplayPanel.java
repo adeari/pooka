@@ -115,6 +115,9 @@ public class FolderDisplayPanel extends JPanel {
 	messageTable.setDefaultRenderer(Object.class, new DefaultFolderCellRenderer());
 	messageTable.setDefaultRenderer(Number.class, new DefaultFolderCellRenderer());
 
+	messageTable.setCellSelectionEnabled(false);
+	messageTable.setColumnSelectionAllowed(false);
+	messageTable.setRowSelectionAllowed(true);
 	addListeners();
     }
     
