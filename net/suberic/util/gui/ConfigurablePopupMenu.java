@@ -163,10 +163,10 @@ public class ConfigurablePopupMenu extends JPopupMenu implements ConfigurableUI 
   
   protected void setActiveMenuItems() {
     for (int j = 0; j < getSubElements().length; j++) {
-      if (getComponentAtIndex(j) instanceof ConfigurableMenu) {
-	((ConfigurableMenu)getComponentAtIndex(j)).setActive(commands);
+      if (getComponent(j) instanceof ConfigurableMenu) {
+	((ConfigurableMenu)getComponent(j)).setActive(commands);
       } else {
-	JMenuItem mi = (JMenuItem)getComponentAtIndex(j);
+	JMenuItem mi = (JMenuItem)getComponent(j);
 	Action a = getAction(mi.getActionCommand());
 	if (a != null) {
 	  //mi.removeActionListener(a);
@@ -185,12 +185,12 @@ public class ConfigurablePopupMenu extends JPopupMenu implements ConfigurableUI 
     
   private void clearListeners() {
     for (int j = 0; j < getSubElements().length; j++) {
-      if (getComponentAtIndex(j) instanceof ConfigurableMenu) {
+      if (getComponent(j) instanceof ConfigurableMenu) {
 	// we don't have to clear the listeners here because
 	// it will be done in setActive().
 	;
       } else {
-	JMenuItem mi = (JMenuItem)getComponentAtIndex(j);
+	JMenuItem mi = (JMenuItem)getComponent(j);
 	Action a = getAction(mi.getActionCommand());
 	if (a != null) {
 	  mi.removeActionListener(a);
