@@ -7,6 +7,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.util.Vector;
 import javax.help.*;
+import java.util.logging.*;
 
 public class Pooka {
 
@@ -506,9 +507,14 @@ public class Pooka {
   
   /**
    * Returns whether or not debug is enabled for this Pooka instance.
+   * 
+   * @deprecated Use Logger.getLogger("Pooka.debug") instead.
+   * 
    */
   static public boolean isDebug() {
     if (resources.getProperty("Pooka.debug", "true").equals("true"))
+      return true;
+    else if (Logger.getLogger("Pooka.debug").isLoggable(Level.FINE))
       return true;
     else
       return false;

@@ -757,7 +757,7 @@ Folder.editableFields.templateScoped=true
 Folder.editableFields.propertyType=Tabbed
 Folder.editableFields.propertyScoped=true
 Folder.editableFields.templateScoped=true
-Folder.editableFields=config:display:backend:uiConfig
+Folder.editableFields=config:display:backend:uiConfig:logging
 Folder.editableFields.config=defaultProfile:useTrashFolder:notifyNewMessagesMain:notifyNewMessagesNode:autoCache
 Folder.editableFields.config.scoped=true
 Folder.editableFields.config.scopeRoot=Folder.editableFields
@@ -792,6 +792,11 @@ Folder.editableFields.uiConfig.theme.propertyType=List
 Folder.editableFields.uiConfig.theme.allowedValues=Pooka.theme
 Folder.editableFields.uiConfig.theme._includeAddButton=true
 
+Folder.editableFields.logging=debug.level
+Folder.editableFields.logging.scoped=true
+Folder.editableFields.logging.scopeRoot=Folder.editableFields
+Folder.editableFields.logging.propertyType=Composite
+
 Folder.editableFields.defaultProfile.propertyType=List
 Folder.editableFields.defaultProfile.allowedValues=UserProfile
 Folder.editableFields.defaultProfile._includeAddButton=true
@@ -804,11 +809,16 @@ Folder.editableFields.notifyNewMessagesNode=True
 Folder.editableFields.autoCache.propertyType=DefaultBoolean
 Folder.editableFields.autoCache.value=
 
+Folder.editableFields.debug.level=DEFAULT
+Folder.editableFields.debug.level.propertyType=List
+Folder.editableFields.debug.level.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+
+
 Store.propertyType=Multi
 Store.editableFields.scoped=true
 Store.editableFields=editor
 
-Store.editableFields.editor=config:connection
+Store.editableFields.editor=config:connection:logging
 Store.editableFields.editor.scoped=true
 Store.editableFields.editor.propertyType=Tabbed
 Store.editableFields.editor.propertyScoped=true
@@ -824,6 +834,11 @@ Store.editableFields.editor.connection=connection:precommand:mailCheckTime
 Store.editableFields.editor.connection.scoped=true
 Store.editableFields.editor.connection.scopeRoot=Store.editableFields
 Store.editableFields.editor.connection.propertyType=Composite
+
+Store.editableFields.editor.logging=debug.level
+Store.editableFields.editor.logging.scoped=true
+Store.editableFields.editor.logging.scopeRoot=Store.editableFields
+Store.editableFields.editor.logging.propertyType=Composite
 
 Store.editableFields.protocol.propertyType=List
 Store.editableFields.protocol.allowedValues=imap:pop3:mbox
@@ -908,6 +923,10 @@ Store.editableFields.useMaildir=true
 
 Store.editableFields.trashFolder.namePrefix=Store.
 Store.editableFields.trashFolder.nameSuffix=.trashFolder
+
+Store.editableFields.debug.level=DEFAULT
+Store.editableFields.debug.level.propertyType=List
+Store.editableFields.debug.level.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
 
 Preferences=UI:Reply:Startup:Signature:HTML:Files:Spam:Debug
 Preferences.propertyScoped=false
