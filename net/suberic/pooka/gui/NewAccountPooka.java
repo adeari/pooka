@@ -74,6 +74,7 @@ public class NewAccountPooka {
     // is there a way to make this wrap automatically, without adding
     // explicit newlines?
     JTextArea jta = new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client."));
+    jta.setMargin(new java.awt.Insets(5, 15, 5, 15));
     jta.setEditable(false);
 
     JLabel jl = new JLabel("test");

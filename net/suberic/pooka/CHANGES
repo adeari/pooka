@@ -1,3 +1,8 @@
+added (limited) online help.
+
+fixed a NPE that could happen if you tried to delete a message that was in
+the process of getting deleted.
+
 020918 release
 --------------
 

@@ -22,15 +22,15 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   
   public static int HEADERS_DEFAULT = 0;
   public static int HEADERS_FULL = 1;
-  
+  public static int RFC822_STYLE = 2;
+
   private static String WITH_ATTACHMENTS = "with";
   private static String WITHOUT_ATTACHMENTS = "without";
   
   private String editorStatus = WITHOUT_ATTACHMENTS;
   
-  int headerStyle = ReadMessageDisplayPanel.HEADERS_DEFAULT;
-  boolean showFullHeaders = false;
-  
+  int displayMode = ReadMessageDisplayPanel.HEADERS_DEFAULT;
+
   Action[] defaultActions = new Action[] {
     new AttachmentPanelAction(),
     new EditorPanelAction()
@@ -166,7 +166,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
       if ((Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().isHtml()) || (Pooka.getProperty("Pooka.displayHtmlAsDefault", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().containsHtml())) {
 	
-	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	if (displayMode == RFC822_STYLE) {
+	  content = getMessageProxy().getMessageInfo().getRawText();
+	} else if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
 	  content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
 	} else {
 	  content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
@@ -176,7 +178,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	
       } else {
 	
-	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	if (displayMode == RFC822_STYLE) {
+	  content = getMessageProxy().getMessageInfo().getRawText();
+	} else if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
 	  // Is there only an HTML part?  Regardless, we will still display it as text.
 	  if (getMessageProxy().getMessageInfo().isHtml())
 	    content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
@@ -287,7 +291,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   }
   
   public boolean showFullHeaders() {
-    return showFullHeaders;
+    return (displayMode == HEADERS_FULL);
   }
   
   /**

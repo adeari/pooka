@@ -42,24 +42,17 @@ public class MessageInfo {
   protected MessageInfo() {
   }
 
-    /**
-     * This creates a new MessageInfo from the given FolderInfo and Message.
-     */
-    public MessageInfo(Message newMessage, FolderInfo newFolderInfo) {
-	folderInfo = newFolderInfo;
-	message = newMessage;
-
-	/*
-	try {
-	    seen = flagIsSet("FLAG.SEEN");
-	} catch (MessagingException me) { }
-	*/
-    }
+  /**
+   * This creates a new MessageInfo from the given FolderInfo and Message.
+   */
+  public MessageInfo(Message newMessage, FolderInfo newFolderInfo) {
+    folderInfo = newFolderInfo;
+    message = newMessage;
+  }
 
   /**
    * This loads the Attachment information into the attachments vector.
    */
-  
   public void loadAttachmentInfo() throws MessagingException {
     attachments = MailUtilities.parseAttachments(getMessage());
     
@@ -69,7 +62,6 @@ public class MessageInfo {
   /**
    * This gets a Flag property from the Message.
    */
-  
   public boolean flagIsSet(String flagName) throws MessagingException {
     
     if (flagName.equals("FLAG.ANSWERED") )
@@ -182,40 +174,40 @@ public class MessageInfo {
 	return getTextAndTextInlines(getAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
     }
 
-    /**
-     * Gets the Text part of the Content of this Message.  If no real text
-     * content is found, returns the html content.  If there's none of that,
-     * either, then returns null.
-     */
-    public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+  /**
+   * Gets the Text part of the Content of this Message.  If no real text
+   * content is found, returns the html content.  If there's none of that,
+   * either, then returns null.
+   */
+  public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+    try {
+      if (!hasLoadedAttachments()) 
+	loadAttachmentInfo();
+      String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+      if (returnValue != null)
+	return returnValue;
+      else
+	return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
+    } catch (FolderClosedException fce) {
       try {
-	if (!hasLoadedAttachments()) 
+	if (getFolderInfo().shouldBeConnected()) {
+	  getFolderInfo().openFolder(Folder.READ_WRITE);
 	  loadAttachmentInfo();
-	String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	if (returnValue != null)
-	  return returnValue;
-	else
-	  return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
-      } catch (FolderClosedException fce) {
-	try {
-	  if (getFolderInfo().shouldBeConnected()) {
-	    getFolderInfo().openFolder(Folder.READ_WRITE);
-	    loadAttachmentInfo();
-	    String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	    if (returnValue != null)
-	      return returnValue;
-	    else
-	      return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
-	  } else {
-	    throw fce;
-	  }
-	} catch (java.io.IOException ioe) {
-	  throw new MessagingException(ioe.getMessage()); 
+	  String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	  if (returnValue != null)
+	    return returnValue;
+	  else
+	    return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
+	} else {
+	  throw fce;
 	}
       } catch (java.io.IOException ioe) {
 	throw new MessagingException(ioe.getMessage()); 
       }
+    } catch (java.io.IOException ioe) {
+      throw new MessagingException(ioe.getMessage()); 
     }
+  }
   
   /**
    * Gets the Text part of the Content of this Message.  If no real text
@@ -226,76 +218,92 @@ public class MessageInfo {
     return getTextPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
   }
   
-    /**
-     * Gets the Html part of the Content of this Message.
-     */
-    public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
-	try {
-	    if (!hasLoadedAttachments()) 
-		loadAttachmentInfo();
-	    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} catch (FolderClosedException fce) {
-	    try {
-		if (getFolderInfo().shouldBeConnected()) {
-		    getFolderInfo().openFolder(Folder.READ_WRITE);
-		    loadAttachmentInfo();
-		    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-		} else {
-		    throw fce;
-		}
-	    } catch (java.io.IOException ioe) {
-		throw new MessagingException(ioe.getMessage()); 
-	    }
-	} catch (java.io.IOException ioe) {
-	    throw new MessagingException(ioe.getMessage()); 
+  /**
+   * Gets the Html part of the Content of this Message.
+   */
+  public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+    try {
+      if (!hasLoadedAttachments()) 
+	loadAttachmentInfo();
+      return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+    } catch (FolderClosedException fce) {
+      try {
+	if (getFolderInfo().shouldBeConnected()) {
+	  getFolderInfo().openFolder(Folder.READ_WRITE);
+	  loadAttachmentInfo();
+	  return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	} else {
+	  throw fce;
 	}
+      } catch (java.io.IOException ioe) {
+	throw new MessagingException(ioe.getMessage()); 
+      }
+    } catch (java.io.IOException ioe) {
+      throw new MessagingException(ioe.getMessage()); 
     }
-
-    /**
-     * Gets the Html part of the Content of this Message.
-     */
-    public String getHtmlPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
-	return getHtmlPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
-    }
-
-    /**
-     * Gets the Content and inline text content for the Message.
-     */
-    public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
-	try {
-	    if (!hasLoadedAttachments()) 
-		loadAttachmentInfo();
-	    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} catch (FolderClosedException fce) {
-	    try {
-		if (getFolderInfo().shouldBeConnected()) {
-		    getFolderInfo().openFolder(Folder.READ_WRITE);
-		    loadAttachmentInfo();
-		    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
-		} else {
-		    throw fce;
-		}
-	    } catch (java.io.IOException ioe) {
-		throw new MessagingException(ioe.getMessage()); 
-	    }
-	} catch (java.io.IOException ioe) {
-	    throw new MessagingException(ioe.getMessage()); 
+  }
+  
+  /**
+   * Gets the Html part of the Content of this Message.
+   */
+  public String getHtmlPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+    return getHtmlPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+  }
+  
+  /**
+   * Gets the Content and inline text content for the Message.
+   */
+  public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+    try {
+      if (!hasLoadedAttachments()) 
+	loadAttachmentInfo();
+      return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+    } catch (FolderClosedException fce) {
+      try {
+	if (getFolderInfo().shouldBeConnected()) {
+	  getFolderInfo().openFolder(Folder.READ_WRITE);
+	  loadAttachmentInfo();
+	  return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+	} else {
+	  throw fce;
 	}
+      } catch (java.io.IOException ioe) {
+	throw new MessagingException(ioe.getMessage()); 
+      }
+    } catch (java.io.IOException ioe) {
+      throw new MessagingException(ioe.getMessage()); 
     }
-
-    /**
-     * Gets the Content and inline text content for the Message.
-     */
-    public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
-	return getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
+  }
+  
+  /**
+   * Gets the Content and inline text content for the Message.
+   */
+  public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+    return getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
+  }
+  
+  /**
+   * Gets the Content and inline text content for the Message.
+   */
+  public String getHtmlAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+    return getHtmlAndTextInlines(getHtmlAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
+  }
+  
+  /**
+   * Gets the raw RFC 822 message.
+   */
+  public String getRawText() throws MessagingException {
+    try {
+      InputStream is = getMessage().getInputStream();
+      StringWriter writer = new StringWriter();
+      for (int i = 0; i > -1; i = is.read()) {
+	writer.write(i);
+      }
+      return writer.toString();
+    } catch (IOException ioe) {
+      throw new MessagingException("Error reading Message Stream", ioe);
     }
-
-    /**
-     * Gets the Content and inline text content for the Message.
-     */
-    public String getHtmlAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
-	return getHtmlAndTextInlines(getHtmlAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
-    }
+  }
 
   /**
    * Moves the Message into the target Folder.
@@ -386,9 +394,11 @@ public class MessageInfo {
      */
     public void remove(boolean autoExpunge) throws MessagingException {
 	Message m = getRealMessage();
-	m.setFlag(Flags.Flag.DELETED, true);
-	if ( autoExpunge )
+	if (m != null) {
+	  m.setFlag(Flags.Flag.DELETED, true);
+	  if ( autoExpunge )
 	    folderInfo.expunge();
+	}
     }
     
     /**
@@ -629,8 +639,6 @@ public class MessageInfo {
     try {
       FileOutputStream fos = new FileOutputStream(saveFile);
       ((MimeMessage)getRealMessage()).writeTo(fos);
-      //MimeMessage tmpMM = new MimeMessage((MimeMessage)getRealMessage());
-      //tmpMM.writeTo(fos);
     } catch (IOException ioe) {
       MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
       me.setNextException(ioe);

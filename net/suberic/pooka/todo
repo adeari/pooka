@@ -22,16 +22,13 @@
 
 *) fix up the error messages, and make sure that they look ok.
 
-*) fix:java.lang.NullPointerException
-	at net.suberic.pooka.MessageInfo.remove(MessageInfo.java:389)
-	at net.suberic.pooka.MessageInfo.deleteMessage(MessageInfo.java:358)
-	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:684)
-	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:766)
-	at net.suberic.pooka.gui.MessageProxy$DeleteAction.actionPerformed(MessageProxy.java:1167)
-	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
-
-*) support windows registry attachment associations.
+*) -- windows --
+  *) support windows registry attachment associations.
 	-- check icemail
+  *) printing in windows can leave control characters at the end of lines
+  *) in windows, a file being sent to an application will need to have the
+	correct extension.  otherwise, the app (like word) won't recognize
+	it as the correct filetype.
 
 *) add support for viewing messages as raw (rfc822 format).
 
