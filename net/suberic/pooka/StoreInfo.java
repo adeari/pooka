@@ -6,6 +6,7 @@ import javax.swing.event.EventListenerList;
 import java.util.*;
 import net.suberic.pooka.gui.*;
 import net.suberic.util.ValueChangeListener;
+import net.suberic.util.thread.ActionThread;
 
 /**
  * This class does all of the work for a Store.  It keeps track of the
@@ -36,6 +37,9 @@ public class StoreInfo implements ValueChangeListener {
     private String server;
     private String protocol;
     private URLName url;
+
+    // the Thread for connections to this Store.
+    private ActionThread storeThread;
 
     /**
      * Creates a new StoreInfo from a Store ID.
@@ -84,7 +88,9 @@ public class StoreInfo implements ValueChangeListener {
 		    }
 		}
 	    });
-	
+
+	storeThread = new ActionThread(this.getStoreID() + " - ActionThread");
+
 	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
 
 	updateChildren();
@@ -247,5 +253,13 @@ public class StoreInfo implements ValueChangeListener {
 
     public UserProfile getDefaultProfile() {
 	return defaultProfile;
+    }
+
+    public ActionThread getStoreThread() {
+	return storeThread;
+    }
+
+    public void setStoreThread(ActionThread newValue) {
+	storeThread=newValue;
     }
 }
