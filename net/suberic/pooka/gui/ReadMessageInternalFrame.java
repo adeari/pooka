@@ -64,6 +64,17 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	}
       });
     
+    FocusTraversalPolicy ftp = new LayoutFocusTraversalPolicy() {
+	public Component getInitialComponent(JInternalFrame jif) {
+	  if (jif instanceof MessageInternalFrame) {
+	    return ((MessageInternalFrame) jif).getMessageDisplay();
+	  } 
+
+	  return super.getInitialComponent(jif);
+	}
+      };
+    this.setFocusTraversalPolicy(ftp);
+
     this.addInternalFrameListener(new InternalFrameAdapter() {
 	public void internalFrameClosed(InternalFrameEvent e) {
 	  if (getMessageProxy().getMessageUI() == ReadMessageInternalFrame.this)

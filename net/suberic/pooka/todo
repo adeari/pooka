@@ -1,29 +1,29 @@
+*) make it faster to start up; make a way to open and load all of your open
+folders before opening the other folders.
+
+*) change over from mbox to maildir or something like it.
 
 *) add "view pookarc"
 
 *) fix the problem with things like MissingStartBoundary by getting the
 raw input stream.
 
+*) check why the bcc field sometimes doesn't show the address book icon.
+
+------
+
 *) make it so folder windows save their settings (column width, sort order)
 
 *) printing in windows can leave control characters at the end of lines
 
-*) regexp? (add search/replace to editor)
-  -- started.  todo:
-		--  ??? jdk bug ???
-	*) add feature to NewMessage
-	*) add replace feature
-		-- check the caret location, too.
-	
-*) check why the bcc field sometimes doesn't show the address book icon.
-
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
 
-*) more doc
+*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
+	for that.  slimpgp or cyptix.  s/mime is available from together
+	(@ sourceforge).
 
-*) make there a build option for help only, so i can switch it in 
-	WebStart.
+*) more doc
 
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
@@ -48,10 +48,15 @@ raw input stream.
 
 *) add help for config stuff.
 
-*) fix up the error messages, and make sure that they look ok.
-
 *) status messages:  make them appear and disappear at appropriate times.
 	-- Comparing new messages to current list... never goes away.
+
+-------
+
+*) make there a build option for help only, so i can switch it in 
+	WebStart.
+
+*) fix up the error messages, and make sure that they look ok.
 
 *) document keybindings
 	-- keybindings for address book
@@ -68,6 +73,13 @@ raw input stream.
 
 -----
 
+*) regexp? (add search/replace to editor)
+  -- started.  todo:
+		--  ??? jdk bug ???
+	*) add feature to NewMessage
+	*) add replace feature
+		-- check the caret location, too.
+	
 *) fix connection failed message for ssl stores -- only fixable by sun?
 
 *) check for memory leaks
@@ -121,10 +133,6 @@ preview:
 *) add support for jdk1.4
 	-- new printing system.
 	-- NetworkInterface classes
-
-*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
-	for that.  slimpgp or cyptix.  s/mime is available from together
-	(@ sourceforge).
 
 *) add ldap support
 

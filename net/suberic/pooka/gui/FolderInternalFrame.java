@@ -94,6 +94,17 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
       });
     
+    FocusTraversalPolicy ftp = new LayoutFocusTraversalPolicy() {
+	public Component getInitialComponent(JInternalFrame jif) {
+	  if (jif instanceof FolderInternalFrame) {
+	    return ((FolderInternalFrame) jif).getFolderDisplay();
+	  } 
+
+	  return super.getInitialComponent(jif);
+	}
+      };
+    this.setFocusTraversalPolicy(ftp);
+    
     getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
     
     this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);

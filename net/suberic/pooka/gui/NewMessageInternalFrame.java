@@ -39,6 +39,17 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
       }
       });
     */
+
+    FocusTraversalPolicy ftp = new LayoutFocusTraversalPolicy() {
+	public Component getInitialComponent(JInternalFrame jif) {
+	  if (jif instanceof MessageInternalFrame) {
+	    return ((MessageInternalFrame) jif).getMessageDisplay();
+	  } 
+
+	  return super.getInitialComponent(jif);
+	}
+      };
+    this.setFocusTraversalPolicy(ftp);
     
     this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     this.addInternalFrameListener(new InternalFrameAdapter() {

@@ -52,7 +52,17 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	}
       });
     
-    
+    FocusTraversalPolicy ftp = new LayoutFocusTraversalPolicy() {
+	public Component getInitialComponent(JInternalFrame jif) {
+	  if (jif instanceof MessageInternalFrame) {
+	    return ((MessageInternalFrame) jif).getMessageDisplay();
+	  } 
+
+	  return super.getInitialComponent(jif);
+	}
+      };
+    this.setFocusTraversalPolicy(ftp);
+
   }
   
   /**
