@@ -5,6 +5,8 @@ package net.suberic.pooka;
  */
 public interface AddressBook {
 
+  public void configureAddressBook(String id);
+
   /**
    * Gets and appropriate AddressMatcher.
    */
@@ -20,4 +22,8 @@ public interface AddressBook {
    */
   public void removeAddress(AddressBookEntry removeEntry);
 
+  /**
+   * Gets the ID for this address book.
+   */
+  public String getAddressBookID();
 }

@@ -26,7 +26,7 @@ public class Pooka {
   
   static public net.suberic.util.thread.ActionThread searchThread = null;
 
-  static public AddressBook addressBook = null;
+  static public AddressBookManager addressBookManager = null;
   
   static public void main(String argv[]) {
     parseArgs(argv);
@@ -40,12 +40,17 @@ public class Pooka {
     }
     java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 
+    /*
     try {
-      addressBook = new net.suberic.pooka.vcard.VcardAddressBook("/home/allen/working/vcard.db");
+    addressBook = new net.suberic.pooka.vcard.VcardAddressBook("/home/allen/working/vcard.db");
+
     } catch (Exception e) {
       System.out.println("caught exception :  " + e);
       e.printStackTrace();
     }
+    */
+    
+    addressBookManager = new AddressBookManager();
 
     dateFormatter = new DateFormatter();
 
@@ -200,5 +205,10 @@ public class Pooka {
   static public net.suberic.util.thread.ActionThread getSearchThread() {
     return searchThread;
   }
+
+  static public AddressBookManager getAddressBookManager() {
+    return addressBookManager;
+  }
 }
+
 

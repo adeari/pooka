@@ -9,6 +9,8 @@ import java.io.*;
  */
 public class VcardAddressBook implements AddressBook, AddressMatcher {
 
+  String addressBookID;
+
   String fileName;
   Vcard[] orderedList;
   ArrayList arrayList = new ArrayList();
@@ -16,15 +18,35 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   int sortingMethod;
   
   /**
+   * Creates a new VcardAddressBook.
+   */
+  public VcardAddressBook() {
+
+  }
+
+  /**
    * Creates a new VcardAddressBook from the given Vcard.  It uses the
    * file represented by the given pFileName as the source for the 
    * addresses.
    */
     public VcardAddressBook(String pFileName) throws java.text.ParseException, java.io.IOException {
       fileName = pFileName;
+      
       loadAddressBook();
+
     }
   
+  public void configureAddressBook(String newAddressBookID) {
+    addressBookID = newAddressBookID;
+    fileName = Pooka.getProperty(addressBookID + ".fileName", "");
+    try {
+      loadAddressBook();
+    } catch (Exception e) {
+      System.out.println(e);
+      e.printStackTrace();
+    }
+  }
+
   /**
    * Loads the AddressBook from the saved filename.
    */
@@ -226,5 +248,11 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
       return orderedList[value];
     }
   }
-  
+
+  /**
+   * Returns the AddressBookID.
+   */
+  public String getAddressBookID() {
+    return addressBookID;
+  }
 }

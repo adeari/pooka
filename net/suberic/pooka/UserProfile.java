@@ -15,7 +15,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   public boolean autoAddSignature = true;
   public boolean signatureFirst = true;
   private SignatureGenerator sigGenerator;
-  private AddressBook addressBook = net.suberic.pooka.Pooka.addressBook;
+  private AddressBook addressBook;
   
   private Vector excludeAddresses;
   
@@ -69,6 +69,11 @@ public class UserProfile extends Object implements ValueChangeListener {
       excludeAddresses.addAll(excludeProp);
     }
     
+    String addressBookId = mainProperties.getProperty("UserProfile." + name + ".AddressBook", "");
+    if (!addressBookId.equals(""))
+      addressBook = Pooka.getAddressBookManager().getAddressBook(addressBookId);
+    else
+      addressBook = null;
   }
   
   /**

@@ -3,6 +3,8 @@ import net.suberic.pooka.*;
 import net.suberic.util.*;
 import net.suberic.util.gui.*;
 import javax.swing.*;
+import java.awt.event.*;
+import java.awt.Cursor;
 
 /**
  * A property editor which edits an AddressBook.
@@ -15,21 +17,23 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   JTextField searchEntryField;
   JTable addressTable;
 
+  VariableBundle resources = null;
+
   public AddressBookEditorPane(String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
     configureEditor(newProperty, newTemplateType, bundle, isEnabled);
   }
   
   public void configureEditor(PropertyEditorFactory factory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
     property=newProperty;
-    book = Pooka.getAddressManager().getAddressBook(property);
+    book = Pooka.getAddressBookManager().getAddressBook(property);
 
-    this.setLayout(new BoxLayout(BoxLayout.Y_AXIS));
+    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
     this.setBorder(BorderFactory.createEtchedBorder());
 
     createSearchEntryPanel();
     createAddressTable();
 
-    labelComponet = this;
+    labelComponent = this;
     
     this.add(searchEntryPanel);
     this.add(addressTable);
@@ -63,7 +67,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     addressTable.setColumnSelectionAllowed(false);
     addressTable.setRowSelectionAllowed(true);
 
-    messageTable.addMouseListener(new MouseAdapter() {
+    addressTable.addMouseListener(new MouseAdapter() {
 	public void mouseClicked(MouseEvent e) {
 	  if (e.getClickCount() == 2) {
 	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
@@ -95,43 +99,69 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
   
   /**
-   * Performs a search using the string value in the searchTextField.  Updates
+   * Performs a search using the string value in the searchEntryField.  Updates
    * the addressTable with the results.
    */
   public void performSearch() {
-    AddressBookEntry[] matchingEntries = book.match(searchTextField.getText());
+    AddressBookEntry[] matchingEntries = book.getAddressMatcher().match(searchEntryField.getText());
     updateTableModel(matchingEntries);
+  }
+
+  /**
+   * Gets the currently selected entry.
+   */
+  public AddressBookEntry getSelectedEntry() {
+    int index = addressTable.getSelectedRow();
+    if (index > -1)
+      return ((AddressBookTableModel)addressTable.getModel()).getEntryAt(index);
+    else
+      return null;
+  }
+
+  /**
+   * Brings up an editor for the current entry.
+   */
+  public void editEntry(AddressBookEntry entry) {
+
+  }
+
+  /**
+   * Brings up the current popup menu.
+   */
+  public void showPopupMenu() {
+
   }
 
   /**
    * Updates the TableModel with the new entries.
    */
   public void updateTableModel(AddressBookEntry[] entries) {
-    AddressTableModel newTableModel = new AddressTableModel(entries);
+    AddressBookTableModel newTableModel = new AddressBookTableModel(entries);
     addressTable.setModel(newTableModel);
   }
 
   public void setValue() {
-    if (isEnabled() && isChanged())
-      sourceBundle.setProperty(property, (String)inputField.getSelectedItem());
   }
   
   public java.util.Properties getValue() {
+    return new java.util.Properties();
   }
   
   public void resetDefaultValue() {
-    inputField.setSelectedIndex(originalIndex);
   }
   
   public boolean isChanged() {
-    return (!(originalIndex == inputField.getSelectedIndex()));
+    return false;
   }
 
   public void setEnabled(boolean newValue) {
-    if (inputField != null) {
-      inputField.setEnabled(newValue);
-      enabled=newValue;
-    }
+  }
+
+  public void setBusy(boolean newValue) {
+    if (newValue)
+      this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    else
+      this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   }
 
   public class AddressBookTableModel extends javax.swing.table.AbstractTableModel {
@@ -182,6 +212,15 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
       if (column == 3) {
 	return currentEntry.getAddress();
       }
+
+      return null;
+    }
+
+    /**
+     * Returns the AddressBookEntry at the given index.
+     */
+    public AddressBookEntry getEntryAt(int index) {
+      return entries[index];
     }
   }
 
@@ -191,9 +230,9 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     }
 
     public void actionPerformed(ActionEvent e) {
-      this.setBusy(true);
+      setBusy(true);
       performSearch();
-      this.setBusy(false);
+      setBusy(false);
     }
   }
 
