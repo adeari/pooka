@@ -140,7 +140,7 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 		    int equalsLoc = currentLine.indexOf(';');
 		    if (equalsLoc != -1) {
 			String key = currentLine.substring(0, equalsLoc);
-			System.out.println("comparing:  mimeType = " + mimeType + ", key = " + key);
+
 			if (!mimeType.equalsIgnoreCase(key)) {
 			    System.out.println("mimeType does not equal key.");
 			    writeSourceFile.write(currentLine);
