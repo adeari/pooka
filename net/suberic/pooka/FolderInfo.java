@@ -533,13 +533,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    
 	    setFolderTableModel(ftm);
 	    
-	    
 	    loaderThread.loadMessages(messageProxies);
 	    
 	    if (!loaderThread.isAlive())
 		loaderThread.start();
-	    
-	    folderTableModel = ftm;
 	}
     }
     

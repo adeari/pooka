@@ -7,6 +7,7 @@ import net.suberic.pooka.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.HashMap;
+import java.util.Set;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderTableModel;
 
@@ -49,16 +50,17 @@ public class UIDFolderInfo extends FolderInfo {
 		    openFolder(Folder.READ_WRITE);
 		}
 		
-		Message[] msgs = folder.getMessages();
-		folder.fetch(msgs, fp);
+		Message[] msgs = getFolder().getMessages();
+		getFolder().fetch(msgs, fp);
 		MessageInfo mi;
 		
 		for (int i = 0; i < msgs.length; i++) {
-		    long uid = ((UIDFolder)folder).getUID(msgs[i]);
-		    mi = new UIDMessageInfo(uid, uidValidity, this);
+		    long uid = ((UIDFolder)getFolder()).getUID(msgs[i]);
+		    UIDMimeMessage newMessage = new UIDMimeMessage(this, uid);
+		    mi = new MessageInfo(newMessage, this);
 		    
 		    messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		    messageToInfoTable.put(msgs[i], mi);
+		    messageToInfoTable.put(newMessage, mi);
 		    uidToInfoTable.put(new Long(uid), mi);
 		}
 	    } catch (MessagingException me) {
@@ -74,7 +76,6 @@ public class UIDFolderInfo extends FolderInfo {
 	    if (!loaderThread.isAlive())
 		loaderThread.start();
 	    
-	    folderTableModel = ftm;
 	}
     }
     
@@ -139,7 +140,7 @@ public class UIDFolderInfo extends FolderInfo {
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
-	long newValidity = ((UIDFolder)folder).getUIDValidity();
+	long newValidity = ((UIDFolder)getFolder()).getUIDValidity();
 	if (uidValidity != newValidity) {
 	    unloadAllMessages();
 	    loadAllMessages();
@@ -186,7 +187,7 @@ public class UIDFolderInfo extends FolderInfo {
 		
 	    }
 	    
-	    updateFlags(uids, messages, cacheUidValidity);
+	    updateFlags(uids, messages, uidValidity);
 	    
 	}
     }
@@ -194,14 +195,14 @@ public class UIDFolderInfo extends FolderInfo {
     /**
      * Gets the added UIDs.
      */
-    protected long getAddedMessages(long[] newUids, long uidValidity) {
+    protected long[] getAddedMessages(long[] newUids, long uidValidity) {
 	long[] added = new long[newUids.length];
 	int addedCount = 0;
 	Set currentUids = uidToInfoTable.keySet();
 
-	for (int i = 0; i < uids.length; i++) {
-	    if (! currentUids.contains(new Long(uids[i]))) {
-		added[addedCount++]=uids[i];
+	for (int i = 0; i < newUids.length; i++) {
+	    if (! currentUids.contains(new Long(newUids[i]))) {
+		added[addedCount++]=newUids[i];
 	    }
 	}
 
@@ -216,11 +217,11 @@ public class UIDFolderInfo extends FolderInfo {
     /**
      * Gets the removed UIDs.
      */
-    protected long getRemovedMessages(long[] newUids, long uidValidity {
+    protected long[] getRemovedMessages(long[] newUids, long uidValidity) {
 	Vector remainders = new Vector(uidToInfoTable.keySet());
 	
-	for (int i = 0; i < uids.length; i++) {
-	    remainders.remove(new Long(uids[i]));
+	for (int i = 0; i < newUids.length; i++) {
+	    remainders.remove(new Long(newUids[i]));
 	}
 	
 	long[] returnValue = new long[remainders.size()];
@@ -232,34 +233,42 @@ public class UIDFolderInfo extends FolderInfo {
 
     protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
 	for (int i = 0; i < messages.length; i++) {
-	    getCache().cacheMessage((MimeMessage)messages[i], uids[i], uidValidity, SimpleFileCache.FLAGS);
+	    MessageChangedEvent mce = new MessageChangedEvent(getFolder(), MessageChangedEvent.FLAGS_CHANGED, messages[i]);
+	    fireMessageChangedEvent(mce);
 	}
 	
     }
 
     
-    protected void runMessagesAdded(MessageCountEvent mce) {
+    protected void runMessagesAdded(MessageCountEvent mce)  {
 	if (folderTableModel != null) {
-	    Message[] addedMessages = mce.getMessages();
-	    FetchProfile fp = new FetchProfile();
-	    fp.add(FetchProfile.Item.ENVELOPE);
-	    fp.add(FetchProfile.Item.FLAGS);
-	    fp.add(UIDFolder.FetchProfileItem.UID);
-	    getFolder().fetch(addedMessages, fp);
-	    MessageInfo mp;
-	    Vector addedProxies = new Vector();
-	    for (int i = 0; i < addedMessages.length; i++) {
-		mp = new MessageInfo(addedMessages[i], FolderInfo.this);
-		addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		messageToInfoTable.put(addedMessages[i], mp);
-		uidToInfoTable.put(new Long(((UIDFolder)getFolder()).getUID(addedMessages[i])), mp);
-	    }
-	    addedProxies.removeAll(applyFilters(addedProxies));
-	    if (addedProxies.size() > 0) {
-		getFolderTableModel().addRows(addedProxies);
+	    try {
+		Message[] addedMessages = mce.getMessages();
+		FetchProfile fp = new FetchProfile();
+		fp.add(FetchProfile.Item.ENVELOPE);
+		fp.add(FetchProfile.Item.FLAGS);
+		fp.add(UIDFolder.FetchProfileItem.UID);
+		getFolder().fetch(addedMessages, fp);
+		MessageInfo mp;
+		Vector addedProxies = new Vector();
+		for (int i = 0; i < addedMessages.length; i++) {
+		    UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
+		    long uid = newMsg.getUID();
+		    mp = new MessageInfo(newMsg, this);
+		    addedProxies.add(new MessageProxy(getColumnValues(), mp));
+		    messageToInfoTable.put(newMsg, mp);
+		    uidToInfoTable.put(new Long(uid), mp);
+		}
+		addedProxies.removeAll(applyFilters(addedProxies));
+		if (addedProxies.size() > 0) {
+		    getFolderTableModel().addRows(addedProxies);
 		setNewMessages(true);
 		resetMessageCounts();
 		fireMessageCountEvent(mce);
+		}
+	    } catch (MessagingException me) {
+		if (getFolderDisplayUI() != null)
+		    getFolderDisplayUI().showError(Pooka.getProperty("error.handlingMessages", "Error handling messages."), Pooka.getProperty("error.handlingMessages.title", "Error handling messages."), me);
 	    }
 	}
 		
@@ -275,31 +284,77 @@ public class UIDFolderInfo extends FolderInfo {
 	    for (int i = 0; i < removedMessages.length; i++) {
 		if (Pooka.isDebug())
 		    System.out.println("checking for existence of message.");
-		mi = getMessageInfo(removedMessages[i]);
-		if (mi.getMessageProxy() != null)
-		    mi.getMessageProxy().close();
 		
-		if (mi != null) {
-		    if (Pooka.isDebug())
-			System.out.println("message exists--removing");
-		    removedProxies.add(mi.getMessageProxy());
+		try {
+		    UIDMimeMessage removedMsg = getUIDMimeMessage(removedMessages[i]);
+		    mi = getMessageInfo(removedMsg);
+		    if (mi.getMessageProxy() != null)
+			mi.getMessageProxy().close();
+		    
+		    if (mi != null) {
+			if (Pooka.isDebug())
+			    System.out.println("message exists--removing");
+			removedProxies.add(mi.getMessageProxy());
 		    messageToInfoTable.remove(mi);
-		    uidToInfoTable.remove(new Long(((UIDFolder)getFolder()).getUID(removedMessages[i])));
+		    uidToInfoTable.remove(new Long(removedMsg.getUID()));
+		    }
+		} catch (MessagingException me) {
 		}
 	    }
 	    getFolderTableModel().removeRows(removedProxies);
 	}
 	resetMessageCounts();
-	fireMessageCountEvent(mce)
+	fireMessageCountEvent(mce);
+    }
+
+    protected void runMessageChanged(MessageChangedEvent mce) {
+	// if the message is getting deleted, then we don't
+	// really need to update the table info.  for that 
+	// matter, it's likely that we'll get MessagingExceptions
+	// if we do, anyway.
+	try {
+	    if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+		Message msg = mce.getMessage();
+		UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
+		long uid = changedMsg.getUID();
+		
+		MessageInfo mi = getMessageInfoByUid(uid);
+		if (mi != null) {
+		    MessageProxy mp = mi.getMessageProxy();
+		    if (mp != null) {
+			mp.unloadTableInfo();
+			mp.loadTableInfo();
+		    }
+		}
+	    }
+	} catch (MessagingException me) {
+	    // if we catch a MessagingException, it just means
+	    // that the message has already been expunged.
+	}
+	
+	fireMessageChangedEvent(mce);
+    }
+
+
+    public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
+	if (m instanceof UIDMimeMessage)
+	    return (UIDMimeMessage) m;
+
+	// it's not a UIDMimeMessage, so it must be a 'real' message.
+	long uid = ((UIDFolder)getFolder()).getUID(m);
+	MessageInfo mi = getMessageInfoByUid(uid);
+	if (mi != null)
+	    return (UIDMimeMessage) mi.getMessage();
+	
+	// doesn't already exist.  just create a new one.
+	return new UIDMimeMessage(this, uid);
     }
 
     /**
      * This updates the children of the current folder.  Generally called
      * when the folderList property is changed.
      */
-    
     public void updateChildren() {
-	// FIXME
 	Vector newChildren = new Vector();
 
 	String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
@@ -312,7 +367,7 @@ public class UIDFolderInfo extends FolderInfo {
 		newFolderName = (String)tokens.nextToken();
 		FolderInfo childFolder = getChild(newFolderName);
 		if (childFolder == null) {
-		    childFolder = new FolderInfo(this, newFolderName);
+		    childFolder = new UIDFolderInfo(this, newFolderName);
 		    newChildren.add(childFolder);
 		} else {
 		    newChildren.add(childFolder);
@@ -344,12 +399,10 @@ public class UIDFolderInfo extends FolderInfo {
      * instead of calling getFolder.close().  If you don't, then the
      * FolderInfo will try to reopen the folder.
      */
-    public void closeFolder(boolean expunge) throws MessagingException {
+    public void closeFolder(boolean expunge, boolean closeDisplay) throws MessagingException {
 
-	if (getFolderTracker() != null) {
-	    getFolderTracker().removeFolder(this);
-	    setFolderTracker(null);
-	}
+	if (closeDisplay && getFolderDisplayUI() != null)
+	    getFolderDisplayUI().closeFolderDisplay();
 
 	if (isLoaded() && isAvailable()) {
 	    setStatus(CLOSED);
@@ -360,14 +413,6 @@ public class UIDFolderInfo extends FolderInfo {
 	    }
 	}
 
-    }
-
-    /**
-     * This returns the MessageCache associated with this FolderInfo,
-     * if any.
-     */
-    public MessageCache getCache() {
-	return cache;
     }
 
     /**

@@ -14,7 +14,7 @@ import net.suberic.pooka.gui.FolderTableModel;
  * A FolderInfo which caches its messages in a MessageCache.
  */
 
-public class CachingFolderInfo extends UIDFolderInfo {
+public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     protected MessageCache cache = null;
     protected HashMap uidToInfoTable = new HashMap();
     protected long uidValidity;
@@ -47,43 +47,43 @@ public class CachingFolderInfo extends UIDFolderInfo {
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public net.suberic.pooka.gui.FolderTableModel loadAllMessages() {
-	Vector messageProxies = new Vector();
-
-	FetchProfile fp = createColumnInformation();
-	if (loaderThread == null) 
-	    loaderThread = createLoaderThread();
+    public synchronized void loadAllMessages() {
+	if (folderTableModel == null) {
+	    Vector messageProxies = new Vector();
 	    
-	try {
-	    if (!(getFolder().isOpen())) {
-		openFolder(Folder.READ_WRITE);
-	    }
-
-	    long[] uids = cache.getMessageUids();
-	    MessageInfo mi;
+	    FetchProfile fp = createColumnInformation();
+	    if (loaderThread == null) 
+		loaderThread = createLoaderThread();
 	    
-	    for (int i = 0; i < uids.length; i++) {
-		Message m = new CachingMimeMessage(this, uids[i]);
-		mi = new MessageInfo(m, this);
+	    try {
+		if (!(getFolder().isOpen())) {
+		    openFolder(Folder.READ_WRITE);
+		}
 		
-		messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		messageToInfoTable.put(m, mi);
-		uidToInfoTable.put(new Long(uids[i]), mi);
+		long[] uids = cache.getMessageUids();
+		MessageInfo mi;
+		
+		for (int i = 0; i < uids.length; i++) {
+		    Message m = new CachingMimeMessage(this, uids[i]);
+		    mi = new MessageInfo(m, this);
+		    
+		    messageProxies.add(new MessageProxy(getColumnValues() , mi));
+		    messageToInfoTable.put(m, mi);
+		    uidToInfoTable.put(new Long(uids[i]), mi);
+		}
+	    } catch (MessagingException me) {
+		System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	    }
-	} catch (MessagingException me) {
-	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
+	    
+	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+	    
+	    setFolderTableModel(ftm);
+	    
+	    loaderThread.loadMessages(messageProxies);
+	    
+	    if (!loaderThread.isAlive())
+		loaderThread.start();
 	}
-	
-	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
-	
-	setFolderTableModel(ftm);
-	
-	loaderThread.loadMessages(messageProxies);
-	
-	if (!loaderThread.isAlive())
-	    loaderThread.start();
-
-	return ftm;
     }
     
     /**
@@ -258,54 +258,56 @@ public class CachingFolderInfo extends UIDFolderInfo {
 
     
     protected void runMessagesAdded(MessageCountEvent mce) {
-	Message[] addedMessages = mce.getMessages();
-	MessageInfo mp;
-	Vector addedProxies = new Vector();
-	for (int i = 0; i < addedMessages.length; i++) {
-	    if (addedMessages[i] instanceof CachingMimeMessage) {
-		mp = new MessageInfo(addedMessages[i], CachingFolderInfo.this);
-		addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		messageToInfoTable.put(addedMessages[i], mp);
-		uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
-		try {
-		    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
-		} catch (MessagingException me) {
-		    System.out.println("caught exception:  " + me);
-		    me.printStackTrace();
-
-		}
-
-	    } else {
-		// it's a 'real' message from the server.
-		
-		long uid = -1;
-		try {
-		    uid = ((UIDFolder)getFolder()).getUID(addedMessages[i]);
-		} catch (MessagingException me) {
-		}
-		
-		CachingMimeMessage newMsg = new CachingMimeMessage(CachingFolderInfo.this, uid);
-		mp = new MessageInfo(newMsg, CachingFolderInfo.this);
-		addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		messageToInfoTable.put(newMsg, mp);
-		uidToInfoTable.put(new Long(uid), mp);
-		try {
-		    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
-		} catch (MessagingException me) {
-		    System.out.println("caught exception:  " + me);
-		    me.printStackTrace();
+	if (folderTableModel != null) {
+	    Message[] addedMessages = mce.getMessages();
+	    MessageInfo mp;
+	    Vector addedProxies = new Vector();
+	    for (int i = 0; i < addedMessages.length; i++) {
+		if (addedMessages[i] instanceof CachingMimeMessage) {
+		    mp = new MessageInfo(addedMessages[i], CachingFolderInfo.this);
+		    addedProxies.add(new MessageProxy(getColumnValues(), mp));
+		    messageToInfoTable.put(addedMessages[i], mp);
+		    uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
+		    try {
+			getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+		    } catch (MessagingException me) {
+			System.out.println("caught exception:  " + me);
+			me.printStackTrace();
+			
+		    }
+		    
+		} else {
+		    // it's a 'real' message from the server.
+		    
+		    long uid = -1;
+		    try {
+			uid = ((UIDFolder)getFolder()).getUID(addedMessages[i]);
+		    } catch (MessagingException me) {
+		    }
+		    
+		    CachingMimeMessage newMsg = new CachingMimeMessage(CachingFolderInfo.this, uid);
+		    mp = new MessageInfo(newMsg, CachingFolderInfo.this);
+		    addedProxies.add(new MessageProxy(getColumnValues(), mp));
+		    messageToInfoTable.put(newMsg, mp);
+		    uidToInfoTable.put(new Long(uid), mp);
+		    try {
+			getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+		    } catch (MessagingException me) {
+			System.out.println("caught exception:  " + me);
+			me.printStackTrace();
+		    }
 		}
 	    }
-	}
-	addedProxies.removeAll(applyFilters(addedProxies));
-	if (addedProxies.size() > 0) {
-	    if (getFolderTableModel() != null) 
-		getFolderTableModel().addRows(addedProxies);
-	    setNewMessages(true);
-	    resetMessageCounts();
-	    fireMessageCountEvent(mce);
-	}
+	    addedProxies.removeAll(applyFilters(addedProxies));
+	    if (addedProxies.size() > 0) {
+		if (getFolderTableModel() != null) 
+		    getFolderTableModel().addRows(addedProxies);
+		setNewMessages(true);
+		resetMessageCounts();
+		fireMessageCountEvent(mce);
+	    }
 	
+	}
     }
 
     protected void runMessagesRemoved(MessageCountEvent mce) {
