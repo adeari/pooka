@@ -49,7 +49,8 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
   ImageIcon signatureFailedVerificationIcon;
 
   // the current status
-  int currentStatus = NOT_ENCRYPTED;
+  int currentCryptStatus = NOT_ENCRYPTED;
+  int currentSigStatus = NOT_SIGNED;
 
   Action currentAction = null;
 
@@ -88,7 +89,7 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
     
     setActionCommand(cmd);
     
-    cryptoUpdated(NOT_ENCRYPTED, NOT_ENCRYPTED);
+    cryptoUpdated(NOT_SIGNED, NOT_ENCRYPTED);
   }
 
   /**
@@ -221,23 +222,68 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
    */
   public void cryptoUpdated(net.suberic.pooka.MessageCryptoInfo cryptoInfo) {
 
+    try {
+      int sigStatus = NOT_SIGNED;
+      int cryptStatus = NOT_ENCRYPTED;
+      
+      if (cryptoInfo.isSigned()) {
+	if (cryptoInfo.hasCheckedSignature()) {
+	  if (cryptoInfo.isSignatureValid()) {
+	    sigStatus = SIGNATURE_VERIFIED;
+	  } else {
+	    sigStatus = SIGNATURE_BAD;
+	  }
+	} else {
+	  sigStatus = UNCHECKED_SIGNED;
+	}
+      }
+
+      if (cryptoInfo.isEncrypted()) {
+	if (cryptoInfo.hasTriedDecryption()) {
+	  if (cryptoInfo.isDecryptedSuccessfully()) {
+	    cryptStatus = DECRYPTED_SUCCESSFULLY;
+	  } else {
+	    cryptStatus = DECRYPTED_UNSUCCESSFULLY;
+	  }
+	} else {
+	  cryptStatus = UNCHECKED_ENCRYPTED;
+	}
+      }
+      
+      
+      cryptoUpdated(sigStatus, cryptStatus);
+
+    } catch (javax.mail.MessagingException me) {
+      // ignore here.
+    }
   }
 
   /**
    * Updates the encryption information.
    */
   public void cryptoUpdated(int newSignatureStatus, int newEncryptionStatus) {
-    currentStatus = newEncryptionStatus;
+    currentCryptStatus = newEncryptionStatus;
+    currentSigStatus = newSignatureStatus;
 
-    System.err.println("currentStatus = " + currentStatus);
+    System.err.println("cryptStatus = " + currentCryptStatus + ", sigStaus = " + currentSigStatus);
 
-    if (currentStatus == NOT_ENCRYPTED) {
-      setIcon(notEncryptedIcon);
-    } else if (currentStatus == UNCHECKED_ENCRYPTED) {
-      setIcon(uncheckedEncryptedIcon);
-    } else if (currentStatus == DECRYPTED_SUCCESSFULLY) {
-      setIcon(decryptedSuccessfullyIcon);
-    } else if (currentStatus == DECRYPTED_UNSUCCESSFULLY) {
+    if (currentCryptStatus == NOT_ENCRYPTED) {
+      if (currentSigStatus == NOT_SIGNED) {
+	setIcon(notEncryptedIcon);
+      } else if (currentStatus == UNCHECKED_SIGNED) {
+	setIcon(uncheckedSignedIcon);
+      } else if (currentStatus == SIGNATURE_VERIFIED) {
+	setIcon(signatureVerifiedIcon);
+      } else if (currentStatus == SIGNATURE_BAD) {
+	setIcon(signatureBadIcon);
+      } else if (currentStatus == SIGNATURE_FAILED_VERIFICATION) {
+	setIcon(signatureFailedVerificationIcon);
+      }
+    } else if (currentCryptStatus == UNCHECKED_ENCRYPTED) {
+	setIcon(uncheckedEncryptedIcon);
+      } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
+	setIcon(decryptedSuccessfullyIcon);
+      } else if (currentStatus == DECRYPTED_UNSUCCESSFULLY) {
       setIcon(decryptedUnsuccessfullyIcon);
     } else if (currentStatus == UNCHECKED_SIGNED) {
       setIcon(uncheckedSignedIcon);

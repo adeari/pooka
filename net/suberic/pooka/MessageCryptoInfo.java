@@ -179,4 +179,11 @@ public class MessageCryptoInfo {
 
     return mDecryptSuccessful;
   }
+
+  /**
+   * Returns true if this has been decrypted successfully.
+   */
+  public boolean isDecryptedSuccessfully() {
+    return mDecryptSuccessful;
+  }
 }
