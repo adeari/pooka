@@ -22,6 +22,8 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     boolean changed = false;
     Vector removeValues = new Vector();
     DefaultListModel optionListModel;
+    Vector subProperties;
+    Vector templateTypes;
 
     String originalValue;
     Hashtable originalPanels = new Hashtable();
@@ -60,6 +62,17 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	this.add(createOptionBox(label, optionList));
 
+	// first create the subproperties and templateTypes lists
+	subProperties = new Vector();
+	templateTypes = new Vector();
+	StringTokenizer subPropertiesTok  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
+
+	while (subPropertiesTok.hasMoreElements()) {
+	    String current = subPropertiesTok.nextToken();
+	    subProperties.add(current);
+	    templateTypes.add(property + "." + current);
+	}
+	
 	// create entryPanels (the panels which show the subproperties
 	// of each item in the optionList) for each option.
 
@@ -103,17 +116,16 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     private JPanel createEntryPanel (Vector itemList, boolean original) {
 	JPanel entryPanel = new JPanel(new CardLayout());
 	PropertyEditorPane pep;
-	StringTokenizer subProperties;
 
 	String rootProp;
 	Vector propList;
+	Vector templateList;
 	
 	for (int i = 0; i < itemList.size(); i++) {
-	    subProperties  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
 	    rootProp = new String(property + "." + (String)(itemList.elementAt(i)));
 	    propList = createPropertiesList(rootProp, subProperties);
-
-	    pep = new PropertyEditorPane(factory, propList, null);;
+	    
+	    pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
 	    
 	    if (original == true) {
 		originalPanels.put(itemList.elementAt(i), pep);
@@ -132,12 +144,11 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	int i = itemList.size();
 
-	subProperties  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
 	rootProp = new String(property + ".default");
 	    
 	propList = createPropertiesList(rootProp, subProperties);
 
-	pep = new PropertyEditorPane(factory, propList, null);;
+	pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
 	    
 	if (original == true) {
 	    originalPanels.put("default", pep);
@@ -191,11 +202,11 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     }
 
 
-    private Vector createPropertiesList(String rootProperty, StringTokenizer subProperties) {
+    private Vector createPropertiesList(String rootProperty, Vector subProps) {
 	Vector editedProperties = new Vector();
 
-	while (subProperties.hasMoreTokens())
-	    editedProperties.add(rootProperty + "." + subProperties.nextToken());
+	for (int i = 0; i < subProps.size(); i++) 
+	    editedProperties.add(rootProperty + "." + (String)subProps.elementAt(i));
 
 	return editedProperties;
     }
@@ -214,7 +225,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	if (newValueName == null || newValueName.length() == 0)
 	    return;
 	
-	StringTokenizer subProperties  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
 	String rootProp =new String(property.concat("." + newValueName));
 	Vector propList = createPropertiesList(rootProp, subProperties);
 	
@@ -229,7 +239,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     }
 
     public void removeSelectedValue() {
-	System.out.println("Removing selected value.");
 	String selValue = (String)getOptionList().getSelectedValue();
 	if (selValue == null)
 	    return;
@@ -239,7 +248,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	if (lm instanceof DefaultListModel)
 	    ((DefaultListModel)lm).removeElement(selValue);
 	
-	StringTokenizer subProperties  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
 	String rootProp = new String(property.concat("." + selValue));
 	
 	removeValues.addAll(createPropertiesList(rootProp, subProperties));
@@ -282,7 +290,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	if (newName != null) {
 	    PropertyEditorPane oldPane = (PropertyEditorPane)currentPanels.get(oldName);
 	    if (oldPane != null) {
-		StringTokenizer subProperties  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
 		String rootProp =new String(property.concat("." + newName));
 		Vector propList = createPropertiesList(rootProp, subProperties);
 		
@@ -309,14 +316,12 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
     public void setValue() {
 	if (isEnabled()) {
-	    System.out.println("removing " + removeValues.size() + " values.");
 	    for (int i = 0; i < removeValues.size() ; i++) 
 		sourceBundle.removeProperty((String)removeValues.elementAt(i));
 	    
 	    removeValues = new Vector();
 	    
 	    java.awt.Component[] components = entryPanel.getComponents();
-	    System.out.println("setting values for " + components.length +" components.");
 	    for (int i = 0; i < components.length; i++) {
 		((PropertyEditorPane)components[i]).setValue();
 	    }

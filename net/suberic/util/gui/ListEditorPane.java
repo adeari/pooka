@@ -10,9 +10,11 @@ public class ListEditorPane extends DefaultPropertyEditor {
     JLabel label;
     JComboBox inputField;
     VariableBundle sourceBundle;
+    String templateType;
 
-    public ListEditorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {
+    public ListEditorPane(String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
 	property=newProperty;
+	templateType=newTemplateType;
 	sourceBundle=bundle;
 
 	String defaultLabel;
@@ -30,10 +32,17 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	this.setEnabled(isEnabled);
     }
     
+    public ListEditorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {
+	this(newProperty, newProperty, bundle, isEnabled);
+    }
+
     public ListEditorPane(String newProperty, VariableBundle bundle) {
 	this(newProperty, bundle, true);
     }
 
+    public ListEditorPane(String newProperty, String templateType, VariableBundle bundle) {
+	this(newProperty, templateType, bundle, true);
+    }
 
     private JComboBox createComboBox() {
 	String originalValue = sourceBundle.getProperty(property, "");
@@ -42,10 +51,10 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	Vector items = new Vector();
 	StringTokenizer tokens;
 
-	if (sourceBundle.getProperty(sourceBundle.getProperty(property + ".allowedValues", ""), "") != "")
-	    tokens = new StringTokenizer(sourceBundle.getProperty(sourceBundle.getProperty(property + ".allowedValues", ""), ""), ":");
+	if (sourceBundle.getProperty(sourceBundle.getProperty(templateType + ".allowedValues", ""), "") != "")
+	    tokens = new StringTokenizer(sourceBundle.getProperty(sourceBundle.getProperty(templateType + ".allowedValues", ""), ""), ":");
 	else
-	    tokens = new StringTokenizer(sourceBundle.getProperty(property + ".allowedValues", ""), ":");
+	    tokens = new StringTokenizer(sourceBundle.getProperty(templateType + ".allowedValues", ""), ":");
 
 	for (int i=0; tokens.hasMoreTokens(); i++) {
 	    currentItem = tokens.nextToken();

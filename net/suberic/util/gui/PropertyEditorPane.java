@@ -7,7 +7,11 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
     Vector editors;
     PropertyEditorFactory factory;
     JInternalFrame container;
-    
+
+    /**
+     * This contructor creates a PropertyEditor for the list of 
+     * properties in the properties Vector.
+     */     
     public PropertyEditorPane(PropertyEditorFactory newFactory, 
                               Vector properties, 
                               JInternalFrame newContainer) {
@@ -23,6 +27,35 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
 	for (int i = 0; i < properties.size(); i++) {
 	    currentEditor =
               factory.createEditor((String)properties.elementAt(i));
+	    editors.add(currentEditor);
+	    this.add(currentEditor);
+	}
+	if (container != null)
+	    this.addButtons();
+    }
+
+    /**
+     * This contructor creates a PropertyEditor for the list of 
+     * properties in the properties Vector, using the template
+     * types in the templateTypes Vector.  Note that there should be
+     * one entry in each of the properties Vector and the templateTypes
+     * Vector for each property to be edited.
+     */     
+    public PropertyEditorPane(PropertyEditorFactory newFactory, 
+                              Vector properties, Vector templateTypes,
+                              JInternalFrame newContainer) {
+	super(BoxLayout.Y_AXIS);
+        
+	factory = newFactory;
+	container = newContainer;
+
+	DefaultPropertyEditor currentEditor;
+
+	editors = new Vector();
+
+	for (int i = 0; i < properties.size(); i++) {
+	    currentEditor =
+              factory.createEditor((String)properties.elementAt(i), (String)templateTypes.elementAt(i));
 	    editors.add(currentEditor);
 	    this.add(currentEditor);
 	}
