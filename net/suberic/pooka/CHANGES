@@ -1,3 +1,12 @@
+fixed a bug where two copies of a message could get added to the folder
+list.
+
+changed the system that synchronized with the IMAP subscribed folders so 
+that it always considers INBOX subscribed.
+
+changed the HTML display method so that, if any errors happen, it shows
+the html as text, instead.
+
 modified the New Account creation on startup to use the new Connection /
 OutgoingMailServer system.
 
