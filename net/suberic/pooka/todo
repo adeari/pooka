@@ -6,8 +6,12 @@ a menu option and from the 'open with' dialog.
 
 *)  get JFileChooser to work with the mail stores.  sort of done; still
 	need to deal with disconnection issues and return value issues.
+	 -- disconnection:  check to see if the Store is actually staying
+	    open or not.
 
-*) fix the signature
+*) fix the signature -- started, anyway.  need to add a keybinding for 
+	inserting the sig, support for signature as a file, support for
+	signature as a generator....  lots of stuff, i suppose.
 
 *) the update feature doesn't show up for INBOX (or maybe just doesn't show
 up for top-level folders?).
@@ -16,7 +20,9 @@ up for top-level folders?).
 	it nicer, maybe listing new messages on the title, and use italics
 	or something other than * * in the folderPanel.
 	-- also, check the update times for the selections of windows; i think
-	that the FolderNodes aren't being redrawn on time.
+	that the FolderNodes aren't being redrawn on time.  specifically,
+	i think that when the FolderWindow is selected, the FolderNode is
+	not redrawn.
 
 *) add keyboard control for everything, including switching between internal
 frames and the folderPanel.  oh, and making it so you can get at the menus.
