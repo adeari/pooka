@@ -34,13 +34,15 @@ public class PasswordEditorPane extends DefaultPropertyEditor {
     }
 
     public void setValue() {
-	if (isEnabled() && !(inputField.getText().equals(originalValue)))
-	sourceBundle.setProperty(property, inputField.getText());
+	String value = new String(inputField.getPassword());
+	if (isEnabled() && !(value.equals(originalValue)))
+	sourceBundle.setProperty(property, value);
     }
 
     public java.util.Properties getValue() {
+	String value = new String(inputField.getPassword());
 	java.util.Properties retProps = new java.util.Properties();
-	retProps.setProperty(property, inputField.getText());
+	retProps.setProperty(property, value);
 	return retProps;
     }
 
