@@ -30,6 +30,11 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
     private JTextField dateField;
     private java.awt.CardLayout layout;
 
+    private Box headerMatchPanel;
+    private JComboBox headerOperationCombo;
+    private JTextField headerNameTextField;
+    private JTextField headerValueTextField;
+
     // the source SearchTermManager.
     SearchTermManager manager;
 
@@ -54,7 +59,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	selectionPanel.add(stringMatchPanel, SearchTermManager.STRING_MATCH);
 	selectionPanel.add(booleanPanel, SearchTermManager.BOOLEAN_MATCH);
 	selectionPanel.add(datePanel, SearchTermManager.DATE_MATCH);
-
+	selectionPanel.add(headerMatchPanel, SearchTermManager.HEADER_MATCH);
 	panel.add(searchFieldCombo);
 	panel.add(selectionPanel);
 
@@ -68,46 +73,64 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	this(newManager);
 	setTermValue(rootProperty, bundle);
     }
+  
+  /**
+   * Creates all of the selection panels.
+   */
+  public void createPanels() {
 
-    /**
-     * Creates all of the selection panels.
-     */
-    public void createPanels() {
-	stringMatchPanel = new Box(BoxLayout.X_AXIS);
-	Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
-	operationCombo = new JComboBox(operationFields);
-	operationCombo.setPreferredSize(operationCombo.getMinimumSize());
-	operationCombo.setMaximumSize(operationCombo.getMinimumSize());
-	textField = new JTextField(20);
-	textField.setMaximumSize(new java.awt.Dimension(1000, textField.getPreferredSize().height));
+    Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
 
-	stringMatchPanel.add(operationCombo);
-	stringMatchPanel.add(textField);
-	stringMatchPanel.add(Box.createGlue());
+    headerMatchPanel = new Box(BoxLayout.X_AXIS);
+    headerOperationCombo = new JComboBox(operationFields);
+    headerOperationCombo.setPreferredSize(headerOperationCombo.getMinimumSize());
+    headerOperationCombo.setMaximumSize(headerOperationCombo.getMinimumSize());
 
-	booleanPanel = new Box(BoxLayout.X_AXIS);
-	Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
-	booleanValueCombo = new JComboBox(booleanFields);
-	booleanValueCombo.setPreferredSize(booleanValueCombo.getMinimumSize());
-	booleanValueCombo.setMaximumSize(booleanValueCombo.getMinimumSize());
-	booleanPanel.add(booleanValueCombo);
-	booleanPanel.add(Box.createGlue());
+    headerNameTextField = new JTextField(10);
+    headerNameTextField.setMaximumSize(new java.awt.Dimension(500, headerNameTextField.getPreferredSize().height));
 
-	datePanel = new Box(BoxLayout.X_AXIS);
+    headerValueTextField = new JTextField(15);
+    headerValueTextField.setMaximumSize(new java.awt.Dimension(1000, headerValueTextField.getPreferredSize().height));
 
-	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
-	dateComparisonCombo = new JComboBox(dateFields);
-	dateComparisonCombo.setPreferredSize(dateComparisonCombo.getMinimumSize());
-	dateComparisonCombo.setMaximumSize(dateComparisonCombo.getMinimumSize());
-	dateField = new JTextField(10);
-	dateField.setMaximumSize(new java.awt.Dimension(1000, dateField.getPreferredSize().height));
+    headerMatchPanel.add(headerNameTextField);
+    headerMatchPanel.add(headerOperationCombo);
+    headerMatchPanel.add(headerValueTextField);
+    headerMatchPanel.add(Box.createGlue());
 
-	JLabel dateFormatLabel = new JLabel(Pooka.getProperty("Search.dateFormat", "mm/dd/yyyy"));
-	datePanel.add(dateComparisonCombo);
-	datePanel.add(dateField);
-	datePanel.add(dateFormatLabel);
-	datePanel.add(Box.createGlue());
-    }
+    stringMatchPanel = new Box(BoxLayout.X_AXIS);
+    operationCombo = new JComboBox(operationFields);
+    operationCombo.setPreferredSize(operationCombo.getMinimumSize());
+    operationCombo.setMaximumSize(operationCombo.getMinimumSize());
+    textField = new JTextField(20);
+    textField.setMaximumSize(new java.awt.Dimension(1000, textField.getPreferredSize().height));
+    
+    stringMatchPanel.add(operationCombo);
+    stringMatchPanel.add(textField);
+    stringMatchPanel.add(Box.createGlue());
+    
+    booleanPanel = new Box(BoxLayout.X_AXIS);
+    Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
+    booleanValueCombo = new JComboBox(booleanFields);
+    booleanValueCombo.setPreferredSize(booleanValueCombo.getMinimumSize());
+    booleanValueCombo.setMaximumSize(booleanValueCombo.getMinimumSize());
+    booleanPanel.add(booleanValueCombo);
+    booleanPanel.add(Box.createGlue());
+    
+    datePanel = new Box(BoxLayout.X_AXIS);
+    
+    Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
+    dateComparisonCombo = new JComboBox(dateFields);
+    dateComparisonCombo.setPreferredSize(dateComparisonCombo.getMinimumSize());
+    dateComparisonCombo.setMaximumSize(dateComparisonCombo.getMinimumSize());
+    dateField = new JTextField(10);
+    dateField.setMaximumSize(new java.awt.Dimension(1000, dateField.getPreferredSize().height));
+    
+    JLabel dateFormatLabel = new JLabel(Pooka.getProperty("Search.dateFormat", "mm/dd/yyyy"));
+    datePanel.add(dateComparisonCombo);
+    datePanel.add(dateField);
+    datePanel.add(dateFormatLabel);
+    datePanel.add(Box.createGlue());
+  }
 
     /**
      * Returns the Box which shows the SearchEntryForm.
@@ -128,12 +151,20 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	String selectedType = Pooka.getProperty(searchProperty + ".type", "");
 	String operationProperty = null;
 	String pattern = null;
+	String header = null;
 
-	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	if (selectedType.equalsIgnoreCase(SearchTermManager.HEADER_MATCH)) {
+	  operationProperty = (String)(manager.getLabelToOperationMap().get(headerOperationCombo.getSelectedItem()));
+	  header = headerNameTextField.getText();
+	  pattern = headerValueTextField.getText();
+	  if (Pooka.isDebug())
+	    System.out.println("using " + searchProperty + ", " + operationProperty + ", " + header + ", " + pattern);
+
+	} else if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
 	    operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
-	    if (Pooka.isDebug())
-		System.out.println("using " + searchProperty + ", " + operationProperty);
 	    pattern = textField.getText();
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty + ", " + pattern);
 
 	} else 	if (selectedType.equalsIgnoreCase(SearchTermManager.BOOLEAN_MATCH)) {
 	    operationProperty = (String)(manager.getLabelToOperationMap().get(booleanValueCombo.getSelectedItem()));
@@ -148,25 +179,33 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	    pattern = dateField.getText();
 	}
 	
-	return manager.generateSearchTerm(searchProperty, operationProperty, pattern);
+	return manager.generateSearchTerm(searchProperty, operationProperty, pattern, header);
     }
 
     /**
      * This generates the Properties for the given SearchTerm.
      */
     public java.util.Properties generateSearchTermProperties(String rootProperty) {
+      if (Pooka.isDebug())
+	System.out.println("SearchEntryForm:  generating SearchTerm property from " + searchFieldCombo.getSelectedItem() + " and " + operationCombo.getSelectedItem() + " using rootProperty " + rootProperty);
+      
+      String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
+      String selectedType = Pooka.getProperty(searchProperty + ".type", "");
+      String operationProperty = null;
+      String pattern = null;
+      String header = null;
+      
+      if (selectedType.equalsIgnoreCase(SearchTermManager.HEADER_MATCH)) {
+	operationProperty = (String)(manager.getLabelToOperationMap().get(headerOperationCombo.getSelectedItem()));
 	if (Pooka.isDebug())
-	    System.out.println("SearchEntryForm:  generating SearchTerm property from " + searchFieldCombo.getSelectedItem() + " and " + operationCombo.getSelectedItem() + " using rootProperty " + rootProperty);
+	  System.out.println("using " + searchProperty + ", " + operationProperty);
+	pattern = headerValueTextField.getText();
+	header = headerNameTextField.getText();
 	
-	String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
-	String selectedType = Pooka.getProperty(searchProperty + ".type", "");
-	String operationProperty = null;
-	String pattern = null;
-
-	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
-	    operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
-	    if (Pooka.isDebug())
-		System.out.println("using " + searchProperty + ", " + operationProperty);
+      } else if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
+	if (Pooka.isDebug())
+	  System.out.println("using " + searchProperty + ", " + operationProperty);
 	    pattern = textField.getText();
 
 	} else 	if (selectedType.equalsIgnoreCase(SearchTermManager.BOOLEAN_MATCH)) {
@@ -189,6 +228,9 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	    returnValue.setProperty(rootProperty + ".operation", operationProperty);
 	if (pattern != null)
 	    returnValue.setProperty(rootProperty + ".pattern", pattern);
+
+	if (header != null)
+	    returnValue.setProperty(rootProperty + ".header", header);
 	returnValue.setProperty(rootProperty + ".type", "single");
 
 	return returnValue;
@@ -222,8 +264,19 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	String pattern = bundle.getProperty(rootProperty + ".pattern", "");
 	if (Pooka.isDebug())
 	    System.out.println("got pattern from " + rootProperty + ".pattern; value is " + pattern);
+
+	String header = bundle.getProperty(rootProperty + ".header", "");
+	if (Pooka.isDebug())
+	    System.out.println("got header from " + rootProperty + ".header; value is " + header);
 	
-	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	if (selectedType.equalsIgnoreCase(SearchTermManager.HEADER_MATCH)) {
+	    if (Pooka.isDebug())
+		System.out.println("selectedType is header_match.");
+	    headerOperationCombo.setSelectedItem(operationLabel);
+	    headerValueTextField.setText(pattern);
+	    headerNameTextField.setText(header);
+
+	} else if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
 	    if (Pooka.isDebug())
 		System.out.println("selectedType is string_match.");
 	    operationCombo.setSelectedItem(operationLabel);
@@ -257,6 +310,11 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 
 	dateComparisonCombo.setEnabled(newValue);
 	dateField.setEnabled(newValue);
+
+	headerMatchPanel.setEnabled(true);
+	headerOperationCombo.setEnabled(newValue);
+	headerNameTextField.setEnabled(newValue);
+	headerValueTextField.setEnabled(newValue);
     }
 
     /**

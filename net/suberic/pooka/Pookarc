@@ -980,7 +980,7 @@ NewAccountPooka.optionPanel.mbox.scopeRoot=NewAccountPooka
 
 FolderSelectorPane.inputButton.image=/net/suberic/util/gui/images/More.gif
 
-Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent:Cached
+Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent:Header:Cached
 Search.searchTerms.Answered.class=javax.mail.search.FlagTerm
 Search.searchTerms.Answered.flag=answered
 Search.searchTerms.Answered.type=Boolean
@@ -1018,6 +1018,8 @@ Search.searchTerms.Sent.class=javax.mail.search.SentDateTerm
 Search.searchTerms.Sent.type=Date
 Search.searchTerms.Cached.class=net.suberic.pooka.filter.CachedSearchTerm
 Search.searchTerms.Cached.type=Boolean
+Search.searchTerms.Header.class=javax.mail.search.HeaderTerm
+Search.searchTerms.Header.type=Header
 
 Search.operations=Contains:NotContains:True:False:Equals:NotEquals:Before:After
 Search.operationTypes=String:Boolean:Date

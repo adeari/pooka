@@ -1,3 +1,5 @@
+added a search/filter for arbitrary message headers.
+
 if a folder becomes disconnected, we now pre-emptively check the store to
 see if it's connected.
 

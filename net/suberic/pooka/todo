@@ -1,3 +1,7 @@
+*) bounce messages
+
+*) apply filters to received messages.
+
 *) add support for running without any local files.
 	-- support for http: access?
 	    -- fix variable bundle to make sure that we close the stream
@@ -8,9 +12,24 @@
 	test to see if the store in general has disconnected.
 
 *) start up disconnected.  connect.  have filters.  get error:
-   class javax.mail.MessagingException: Proxy.
+javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5
+;
+  nested exception is:
+        class javax.mail.MessagingException: Proxy.
         at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:357)
         at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:385)
+        at net.suberic.pooka.gui.MessageProxy.moveMessage(MessageProxy.java:584)        at net.suberic.pooka.filter.MoveFilterAction.performFilter(MoveFilterAction.java:30)
+        at net.suberic.pooka.BackendMessageFilter.performFilter(BackendMessageFilter.java:59)
+        at net.suberic.pooka.BackendMessageFilter.filterMessages(BackendMessageFilter.java:47)
+        at net.suberic.pooka.FolderInfo.applyFilters(FolderInfo.java:2035)
+        at net.suberic.pooka.cache.CachingFolderInfo.runMessagesAdded(CachingFolderInfo.java:725)
+        at net.suberic.pooka.FolderInfo.messagesAdded(FolderInfo.java:1649)
+        at net.suberic.pooka.cache.CachingFolderInfo.synchronizeCache(CachingFolderInfo.java:623)
+        at net.suberic.pooka.UIDFolderInfo.updateFolderOpenStatus(UIDFolderInfo.java:128)
+        at net.suberic.pooka.cache.CachingFolderInfo.openFolder(CachingFolderInfo.java:185)
+        at net.suberic.pooka.FolderInfo.openAllFolders(FolderInfo.java:468)
+        at net.suberic.pooka.StoreInfo$2.actionPerformed(StoreInfo.java:717)
+        at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
 
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together
@@ -40,8 +59,6 @@
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
 	message.  read it.  disconnect there.  get a few new messages.
 	reconnect from original pooka.
-
-*) filter for random headers
 
 ------
 
