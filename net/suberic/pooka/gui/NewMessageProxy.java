@@ -122,8 +122,7 @@ public class NewMessageProxy extends MessageProxy {
 	if (f != null) {
 	    for (int i = 0; i < f.length; i++)
 		attachFile(f[i]);
-	} else
-	    System.out.println("attached file was null.");
+	}
     }
 
     /**
