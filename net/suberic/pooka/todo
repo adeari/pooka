@@ -1,16 +1,21 @@
 alpha release
 -------------
 
+*)  make the default profile for each folder work properly.  right now it
+just gives you the default profile for the system, rather than making it 
+depend on what folder you're currently reading.
+
+*)  fix the MessageWindow sizes--they're way too big now.
+
+*)  make the editor for new messages wrap properly at 75 (or user configurable)
+characters.
+
 *)  Fix the display of the MultiPropertyEditor.--especially the 'don't show
 the password on the screen' part.
 
 *)  While we're at it, do a simple encryption of the password fields in the
 .pookarc file so that you can read .pookarc and not have everyone see your
 password.
-
-*)  make the default profile for each folder work properly.  right now it
-just gives you the default profile for the system, rather than making it 
-depend on what folder you're currently reading.
 
 *)  add context-sensitive menus (right-click menus)
 
@@ -21,11 +26,6 @@ you make a new Store without a password, it shows up lots and lots of times
 and basically just fails all over the place.
 
 *)  add the ability to forward messages (oops)
-
-*)  fix the MessageWindow sizes--they're way too big now.
-
-*)  make the editor for new messages wrap properly at 75 (or user configurable)
-characters.
 
 *)  enable keybindings so they work properly.
 
