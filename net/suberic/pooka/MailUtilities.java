@@ -66,9 +66,42 @@ public class MailUtilities {
 
       ContentType ct2 = newAttach.getMimeType();
 
-      if (ct2.match("text/*") && bundle.textPart == null)
+      if (ct2.match("text/*") && bundle.textPart == null) {
 	bundle.textPart = newAttach;
-      else 
+      } else if (ct2.match("multipart/alternative")) {
+
+	Multipart mp = (Multipart) newAttach.getContent();
+	MimeBodyPart textPart = null;
+	MimeBodyPart htmlPart = null;
+	  
+	for (int i = 0; i < mp.getCount(); i++) {
+	  MimeBodyPart current = (MimeBodyPart)mp.getBodyPart(i);
+	  ContentType ct3 = new ContentType(current.getContentType());
+	  if (ct3.match("text/plain"))
+	    textPart = current;
+	  else if (ct3.match("text/html"))
+	    htmlPart = current;
+	}
+	  
+	if (htmlPart != null && textPart != null) {
+	  Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
+	  bundle.textPart = attachment;
+	} else {
+	  // hurm
+	  if (textPart != null) {
+	    Attachment attachment = new Attachment(textPart);
+	    bundle.textPart = attachment;
+	  } else if (htmlPart != null) {
+	    Attachment attachment = new Attachment(htmlPart);
+	    bundle.textPart = attachment;
+	  } else {
+	    bundle.addAll(parseAttachments(mp));
+	  }
+	}
+      } else if (ct2.match("multipart/*")) {
+	Multipart mp = (Multipart) newAttach.getContent();
+	bundle.addAll(parseAttachments(mp));
+      } else 
 	bundle.getAttachments().add(newAttach);
 
     } else {

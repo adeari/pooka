@@ -176,23 +176,12 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
 
     String fileName = secondPart.getFileName();
     java.io.InputStream is = secondPart.getInputStream();
-    /*
-      java.io.InputStreamReader reader = new java.io.InputStreamReader(is);
-    
-      
-      char[] buf = new char[256];
-      for (int i = 0; i > -1; i = reader.read(buf, 0, 256)) {
-      System.out.print(new String(buf));
-      }
-    */
+
     byte[] value = decrypt(is, key);
-    ByteArrayDataSource dataSource = new ByteArrayDataSource(value, fileName, "text/plain");
 
-    javax.activation.DataHandler dh = new javax.activation.DataHandler(dataSource);
-
-    BodyPart returnValue = new MimeBodyPart();
-    returnValue.setFileName(fileName);
-    returnValue.setDataHandler(dh);
+    ByteArrayInputStream bais = new ByteArrayInputStream(value);
+    MimeBodyPart returnValue = new MimeBodyPart(bais);
+    
     return returnValue;
   }
 

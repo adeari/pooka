@@ -79,6 +79,7 @@ public class CryptoAttachment extends Attachment {
   public ContentType getMimeType() {
     try {
       BodyPart bp = getDecryptedBodyPart();
+      System.err.println("decryptedBodyPart.getContentType() = " + bp.getContentType());
       return new ContentType(bp.getContentType());
     } catch (Exception e) {
       e.printStackTrace();
