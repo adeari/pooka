@@ -1,3 +1,6 @@
+changed the way we load the sun ssl class so that pooka will work on 
+ibm's jdk 1.4.
+
 made it so you get a warning message if you try to start with an unsupported
 JDK.
 

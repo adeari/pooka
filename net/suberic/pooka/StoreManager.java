@@ -225,7 +225,22 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
    */
   public static void setupSSL() {
     // set up the SSL socket factory.
-    java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+
+    // we have to configure this or the sun jdks will fail.  however, this
+    // also will make ibm jdks fail since they don't have the com.sun
+    // classes.  so we have to be sneaky.
+    
+    try {
+      Object provider = Class.forName("com.sun.net.ssl.internal.ssl.Provider").newInstance();
+      
+      java.security.Security.addProvider((java.security.Provider) provider);
+      
+      //java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+    } catch (Exception e) {
+      // if we catch an exception for this then we're probably running with
+      // a non-sun jdk, in which case we shouldn't need to add a provider
+      // explicitly
+    }
     java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
     
   }
