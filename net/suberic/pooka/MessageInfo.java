@@ -440,6 +440,10 @@ public class MessageInfo {
     public MessageProxy getMessageProxy() {
 	return messageProxy;
     }
+
+    public void setMessageProxy(MessageProxy newMp) {
+	messageProxy = newMp;
+    }
 }
 
 

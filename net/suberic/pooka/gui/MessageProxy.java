@@ -91,6 +91,7 @@ public class MessageProxy {
      */
     public MessageProxy(Vector newColumnHeaders, MessageInfo newMessage) {
 	messageInfo = newMessage;
+	messageInfo.setMessageProxy(this);
 
 	columnHeaders = newColumnHeaders;
 

@@ -858,7 +858,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    if (Pooka.isDebug())
 			System.out.println("removedMessages was of size " + removedMessages.length);
 		    MessageInfo mi;
-		    Vector removedInfos=new Vector();
+		    Vector removedProxies=new Vector();
 		    for (int i = 0; i < removedMessages.length; i++) {
 			if (Pooka.isDebug())
 			    System.out.println("checking for existence of message.");
@@ -866,11 +866,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			if (mi != null) {
 			    if (Pooka.isDebug())
 				System.out.println("message exists--removing");
-			    removedInfos.add(mi.getMessageProxy());
+			    removedProxies.add(mi.getMessageProxy());
 			    messageToInfoTable.remove(mi);
 			}
 		    }
-		    getFolderTableModel().removeRows(removedInfos);
+		    getFolderTableModel().removeRows(removedProxies);
 		}
 		resetMessageCounts();
 		fireMessageCountEvent(mce);

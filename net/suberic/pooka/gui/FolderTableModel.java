@@ -92,6 +92,7 @@ public class FolderTableModel extends AbstractTableModel {
      * This removes a Vector of MessageProxys from the FolderTableModel.
      */
     public void removeRows(Vector rowsDeleted) {
+
 	addOrRemoveRows(rowsDeleted, FolderTableModel.REMOVE_MESSAGES);
     }
 
