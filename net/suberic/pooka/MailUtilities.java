@@ -31,13 +31,14 @@ public class MailUtilities {
 			Attachment attachment = new Attachment((MimeBodyPart)mp.getBodyPart(i));
 			ContentType ct2 = attachment.getMimeType();
 			if (ct2.getPrimaryType().equalsIgnoreCase("text") && ct2.getSubType().equalsIgnoreCase("plain")) {
+			    attachment.setHeaderSource((MimeMessage)m);
 			    bundle.textPart = attachment;
 			} else {
 			    bundle.getAttachments().add(attachment);
 			}
 		    }
 		} else {
-		    bundle.addAll(parseAttachments((Multipart)m.getContent()));
+		    bundle.addAll(parseAttachments((Multipart)m.getContent(), (MimeMessage)m));
 		}
 	    } else if (contentType.startsWith("text")) {
 		Attachment attachment = new Attachment((MimeMessage)m);
@@ -56,7 +57,7 @@ public class MailUtilities {
     /**
      * This parses a Mulitpart object into an AttachmentBundle.
      */
-    private static AttachmentBundle parseAttachments(Multipart mp) throws MessagingException {
+    private static AttachmentBundle parseAttachments(Multipart mp, MimePart headerSource) throws MessagingException {
 	AttachmentBundle bundle = new AttachmentBundle();
 	for (int i = 0; i < mp.getCount(); i++) {
 	    MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
@@ -64,13 +65,14 @@ public class MailUtilities {
 	    if (ct.getPrimaryType().equalsIgnoreCase("text") && ct.getSubType().equalsIgnoreCase("plain")) {
 		Attachment current = new Attachment(mbp);
 		if (bundle.textPart == null) {
+		    current.setHeaderSource(headerSource);
 		    bundle.textPart = current;
 		} else {
 		    bundle.getAttachments().add(current);
 		}
 	    } else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 		try {
-		    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
+		    bundle.addAll(parseAttachments((Multipart)mbp.getContent(), headerSource));
 		} catch (IOException ioe) {
 		    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
 		}

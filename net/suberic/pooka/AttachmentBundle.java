@@ -18,6 +18,8 @@ class AttachmentBundle {
     void addAll(AttachmentBundle subBundle) {
 	if (textPart == null)
 	    textPart = subBundle.textPart;
+	else if (subBundle.textPart != null)
+	    allAttachments.add(subBundle.textPart);
 
 	allAttachments.addAll(subBundle.allAttachments);
     }
@@ -66,7 +68,7 @@ class AttachmentBundle {
      * This method returns the Message Text plus the text inline attachments.
      * The attachments are separated by the separator flag.
      */
-    public String getTextAndTextInlines(String separator, boolean showFullHeaders, boolean withHeaders, int maxLength, String truncationMessage) throws IOException {
+    public String getTextAndTextInlines(String separator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
 	StringBuffer returnValue = new StringBuffer();
 	if (textPart != null)
 	    returnValue.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
@@ -74,8 +76,10 @@ class AttachmentBundle {
 	if (allAttachments != null && allAttachments.size() > 0) {
 	    for (int i = 0; i < allAttachments.size() ; i++) {
 		Attachment attach = (Attachment) allAttachments.elementAt(i);
-		if (attach.isPlainText())
+		if (attach.isPlainText()) {
+		    returnValue.append(separator);
 		    returnValue.append(attach.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
+		}
 	    }
 	}
 

@@ -1,33 +1,23 @@
 beta 1
 ---------------
 
+*) bug:  make the FolderSelectorPanel work for all stores/folders instead of
+just for the current store/folder.
+
 *) check:  see how outgoing and incoming mail handle tab characters.
+	-- a little bit of a bug, but not too much.  should probably
+	check the actual message source to see how tabs are sent.
 
 *) there's a bug with the email address removal.  fix it.
+	-- test.  there might not actually be one.
 
---
-
-*) add address book and alias support
-
-*)  fix the out of memory problems--only load a certain amount of large
-messages.  
-	thoughts:
-	1)  change it so that the MessageInfo gets a copy of the 
-	AttachmentInfo object, once it has been parsed.  that way, 
-	we don't have to do a separate loadAttachments, and we also
-	don't have to parse the message multiple times.
-	2)  change the AttachmentInfo so that it uses DataHandlers 
-	instead of using getContent() all the time.  that way we should
-	be able to cut down on the memory usage quite a bit.
-	3)  if we do 2), we might need to cache some information along with
-	each DataHandler (size, name, etc.).
+*) test to see what happens when you have a message with no text part.
 
 *) bug:  messages that are new for the session (i.e. showed up between the
 last time you ran the client and this time) aren't marked as recent--only
 ones that come in while you're already connected are labelled like that.
 
-*) bug:  make the FolderSelectorPanel work for all stores/folders instead of
-just for the current store/folder.
+*) add address book and alias support -- jph
 
 --
 
@@ -43,7 +33,7 @@ ui engine
 *)  make the windows detachable. 
 	-- done, at least for read messages and new message.
 	-- to fix:  1)  location isn't quite right for top-level frame to
-	   intenral frame change.
+	   intenral frame change. -- only on linux?
 	-- 2)  make it not get included for preview pane ui windows.
 	-- 3)  make it available for folder windows?
 	-- 4)  the windows are being resized, meaning that if you make the
@@ -74,7 +64,8 @@ message which is what you make changes on.  4)  searches won't work in
 disconnected mode.
 
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
-use it--or at least so it doesn't matter if it does.
+use it--or at least so it doesn't matter if it does.  -- only on unix.  
+	doesn't happen on linux with latest glibc?
 
 *) add pop3/local mail spool support.
 
@@ -99,9 +90,6 @@ other
 
 *) fix bug with showing a new message--right now, if your imap connection is
 hanging and you try to show a new message, the entire app will hang.
-
-*) same bug can happen when getting the attachment count from the Attachment
-Panel.  we need to cache that.
 
 *) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
 
@@ -157,30 +145,22 @@ attachments that you don't want to keep (?)
 
 *) fix sorting of the from field--make it case-insensitive.
 
--------
+*) name all of your threads.
 
-open messages from the FolderWindow
-	can do.  todo on this:
-	customize settings--headers, window size.
-	check the window size if there are lots of 'to' or 'cc' entries.
+*)  add color support
 
-create and send message
-	can do.  todo on this:
-	fix the signature
-	add ability of setting return values by hand (not by UserProfile)
-	make a sent folder
+*) customize settings on folder window--headers, window size.
 
-Editing Profiles/Stores
-	can do.  todo:
-		make required fields.
+*) add ability of setting return values by hand (not by UserProfile) on 
+	new messages.
+
+*) make required fields for the gui properties.
 
 make an update Thread -- sort of done.  need to institute update time.
 
 attachments available from message list.
 
 the Spice is life
-
-add Font stuff.
 
 write profile changes to disk immediately on setting (?)
 

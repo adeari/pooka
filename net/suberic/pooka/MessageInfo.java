@@ -133,16 +133,16 @@ public class MessageInfo {
     /**
      * Gets the Content and inline text content for the Message.
      */
-    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders, int maxLength, String truncationMessage) throws MessagingException {
+    public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
 	try {
 	    if (!hasLoadedAttachments()) 
 		loadAttachmentInfo();
-	    return attachments.getTextAndTextInlines(attachmentSeparator, showFullHeaders, withHeaders, maxLength, truncationMessage);
+	    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
 		getFolderInfo().openFolder(Folder.READ_WRITE);
 		loadAttachmentInfo();
-		return attachments.getTextAndTextInlines(attachmentSeparator, showFullHeaders, withHeaders, maxLength, truncationMessage);
+		return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
 	    } catch (java.io.IOException ioe) {
 		throw new MessagingException(ioe.getMessage()); 
 	    }
@@ -154,8 +154,8 @@ public class MessageInfo {
     /**
      * Gets the Content and inline text content for the Message.
      */
-    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
-	return getTextAndTextInlines(attachmentSeparator, showFullHeaders, withHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+    public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+	return getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
     }
 
     /**

@@ -26,6 +26,20 @@ public class Attachment {
 	headers = parseHeaders(mbp.getAllHeaders());
 	headerLines = parseHeaderLines(mbp.getAllHeaderLines());
     }
+    
+    /**
+     * Creates an Attachment with the given MimeBodyPart, but with
+     * the attached MimePart as the source for the Headers.  
+     */
+    public Attachment(MimeBodyPart mbp, MimePart headerSource) throws MessagingException {
+	handler = mbp.getDataHandler();
+	name = mbp.getFileName();
+	mimeType = new ContentType(mbp.getContentType());
+	size = mbp.getSize();
+	encoding = mbp.getEncoding();
+	headers = parseHeaders(headerSource.getAllHeaders());
+	headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
+    }
 
     /**
      * Creates an Attachment out of a MimeMessage.  This is typically
@@ -41,6 +55,11 @@ public class Attachment {
 	encoding = msg.getEncoding();
 	headers = parseHeaders(msg.getAllHeaders());
 	headerLines = parseHeaderLines(msg.getAllHeaderLines());
+    }
+
+    public void setHeaderSource(MimePart headerSource) throws MessagingException {
+	headers = parseHeaders(headerSource.getAllHeaders());
+	headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
     }
 
     // accessor methods.
@@ -105,7 +124,7 @@ public class Attachment {
     }
 
     public boolean isPlainText() {
-	return mimeType.match("text/plain");
+	return mimeType.match("text/plain") ;
     }
 
     /**
