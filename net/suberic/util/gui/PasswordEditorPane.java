@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 public class PasswordEditorPane extends DefaultPropertyEditor {
     String property;
     String originalValue;
+    String originalScrambledValue;
     JLabel label;
     JPasswordField inputField;
     VariableBundle sourceBundle;
@@ -17,7 +18,11 @@ public class PasswordEditorPane extends DefaultPropertyEditor {
     public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
 	property=newProperty;
 	sourceBundle=bundle;
-	originalValue = sourceBundle.getProperty(newProperty, "");
+	originalScrambledValue = sourceBundle.getProperty(newProperty, "");
+	if (!originalScrambledValue.equals(""))
+	    originalValue = descrambleString(originalScrambledValue);
+	else
+	    originalValue = "";
 
 	String defaultLabel;
 	int dotIndex = property.lastIndexOf(".");
@@ -38,15 +43,18 @@ public class PasswordEditorPane extends DefaultPropertyEditor {
     }
 
     public void setValue() {
-	String value = scrambleString(new String(inputField.getPassword()));
+	String value = new String(inputField.getPassword());
 	if (isEnabled() && !(value.equals(originalValue)))
-	    sourceBundle.setProperty(property, value);
+	    sourceBundle.setProperty(property, scrambleString(value));
     }
 
     public java.util.Properties getValue() {
 	String value = new String(inputField.getPassword());
 	java.util.Properties retProps = new java.util.Properties();
-	retProps.setProperty(property, value);
+	if (value.equals(originalValue))
+	    retProps.setProperty(property, originalScrambledValue);
+	else
+	    retProps.setProperty(property, scrambleString(value));
 	return retProps;
     }
 
