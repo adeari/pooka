@@ -616,7 +616,7 @@ public class FolderFileWrapper extends File {
     
   }
   
-  private FolderFileWrapper getChildFile(String filename) {
+  FolderFileWrapper getChildFile(String filename) {
     if (Pooka.isDebug())
       System.out.println("calling getChildFile on " + getName() + " with filename " + filename);
     

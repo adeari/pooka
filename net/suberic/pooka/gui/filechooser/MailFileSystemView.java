@@ -12,129 +12,129 @@ import java.util.Vector;
  */
 
 public class MailFileSystemView
-    extends javax.swing.filechooser.FileSystemView {
-
-    StoreInfo[] storeList;
-    FolderFileWrapper[] roots = null;
-
-    /**
-     * This creates a new MailFileSystemView at the top of the Store list; 
-     * all available Stores will be listed, with their folders under them.
-     */
-    public MailFileSystemView() {
-	Vector v = Pooka.getStoreManager().getStoreList();
-	for (int i = v.size() - 1; i >= 0; i--) {
-	    StoreInfo current = (StoreInfo) v.elementAt(i);
-	    if (! current.isConnected()) 
-		v.removeElementAt(i);
-	}
-	
-	storeList = new StoreInfo[v.size()];
-	for (int i = 0; i < v.size(); i++) {
-	    storeList[i] = (StoreInfo) v.elementAt(i);
-	}
-	
-	getRoots();
+  extends javax.swing.filechooser.FileSystemView {
+  
+  StoreInfo[] storeList;
+  FolderFileWrapper[] roots = null;
+  
+  /**
+   * This creates a new MailFileSystemView at the top of the Store list; 
+   * all available Stores will be listed, with their folders under them.
+   */
+  public MailFileSystemView() {
+    Vector v = Pooka.getStoreManager().getStoreList();
+    for (int i = v.size() - 1; i >= 0; i--) {
+      StoreInfo current = (StoreInfo) v.elementAt(i);
+      if (! current.isConnected()) 
+	v.removeElementAt(i);
     }
     
-    /**
-     * This creates a MailFileSystemView out of a Store object.
-     */
-    public MailFileSystemView(StoreInfo newStore) {
-	storeList = new StoreInfo[] { newStore };
-	if (Pooka.isDebug())
-	    System.out.println("creating new MailFileSystemView for store " + newStore.getStoreID());
-
-	try {
-	    if (!newStore.isConnected()) {
-		if (Pooka.isDebug())
-		    System.out.println("store is not connected.  connecting.");
-		newStore.connectStore();
-	    }
-	    getRoots();
-	} catch (MessagingException me) {
-	    System.out.println("caught messagingException : "
-			       + me.getMessage());
-	    me.printStackTrace();
-	}
+    storeList = new StoreInfo[v.size()];
+    for (int i = 0; i < v.size(); i++) {
+      storeList[i] = (StoreInfo) v.elementAt(i);
     }
     
-    /**
-     * This creates a new Folder and FolderFileWrapper in the Folder 
-     * corresponding to the directory dir with the name filename.
-     * 
-     * @dir a FolderFileWrapper representing an IMAP folder.
-     * @filename a string representing an IMAP folder name.
-     */
-    public File createFileObject(File dir, String filename) {
-	if (Pooka.isDebug()) {
-	    if (dir != null)
-		System.out.println("calling createFileObject on directory " + dir.getName() + " (" + dir.getPath() + "), filename " + filename);
-	    else
-		System.out.println("calling createFileObject on directory null, filename " + filename);
-	}
-
-	if (dir != null && dir instanceof FolderFileWrapper)
-	    return ((FolderFileWrapper)dir).getFileByName(filename);
-	else
-	    return null;
-    }
-
-    /**
-     * @filename is an IMAP folder name.
-     */
-    public File createFileObject(String filename) {
-
-	// todo jph:  strip off any leading directoy separators.  we
-	// want to call getFileByName with a relative path (in this case
-	// to the root directory) always.
-
+    getRoots();
+  }
+  
+  /**
+   * This creates a MailFileSystemView out of a Store object.
+   */
+  public MailFileSystemView(StoreInfo newStore) {
+    storeList = new StoreInfo[] { newStore };
+    if (Pooka.isDebug())
+      System.out.println("creating new MailFileSystemView for store " + newStore.getStoreID());
+    
+    try {
+      if (!newStore.isConnected()) {
 	if (Pooka.isDebug())
-	    System.out.println("running createFileObject2 on filename '" + filename + "'");
-
-	if (roots == null || roots.length == 0) {
-	    if (Pooka.isDebug())
-		System.out.println("root == null");
-	    return null;
-	}
-	
-	if (Pooka.isDebug())
-	    System.out.println("root != null");
-	
-	if (filename.equals("/") || filename.equals("")) {
-	    return roots[0];
-	}
-	
-	int firstSlash = filename.indexOf('/');
-	String storeName = null;
-	String filePart = "";
-	if (firstSlash > -1) {
-	    storeName = filename.substring(0, firstSlash);
-	    if (Pooka.isDebug())
-		System.out.println("store name is " + storeName);
-	    if (firstSlash < filename.length()) {
-		filePart = filename.substring(firstSlash + 1);
-		if (Pooka.isDebug())
-		    System.out.println("file name is " + filePart);
-	    }
-	} else {
-	    if (Pooka.isDebug())
-		System.out.println("store name is " + filename);
-
-	    storeName = filename;
-	}
-
-	FolderFileWrapper currentRoot = findRoot(storeName);
-	if (currentRoot == null) {
-	    if (Pooka.isDebug())
-		System.out.println("found no matching store root for " + storeName + ".");
-	    return new File(filename);
-	}
-
-	return currentRoot.getFileByName(filePart);
-
+	  System.out.println("store is not connected.  connecting.");
+	newStore.connectStore();
+      }
+      getRoots();
+    } catch (MessagingException me) {
+      System.out.println("caught messagingException : "
+			 + me.getMessage());
+      me.printStackTrace();
     }
-
+  }
+  
+  /**
+   * This creates a new Folder and FolderFileWrapper in the Folder 
+   * corresponding to the directory dir with the name filename.
+   * 
+   * @dir a FolderFileWrapper representing an IMAP folder.
+   * @filename a string representing an IMAP folder name.
+   */
+  public File createFileObject(File dir, String filename) {
+    if (Pooka.isDebug()) {
+      if (dir != null)
+	System.out.println("calling createFileObject on directory " + dir.getName() + " (" + dir.getPath() + "), filename " + filename);
+      else
+	System.out.println("calling createFileObject on directory null, filename " + filename);
+    }
+    
+    if (dir != null && dir instanceof FolderFileWrapper)
+      return ((FolderFileWrapper)dir).getFileByName(filename);
+    else
+      return null;
+  }
+  
+  /**
+   * @filename is an IMAP folder name.
+   */
+  public File createFileObject(String filename) {
+    
+    // todo jph:  strip off any leading directoy separators.  we
+    // want to call getFileByName with a relative path (in this case
+    // to the root directory) always.
+    
+    if (Pooka.isDebug())
+      System.out.println("running createFileObject2 on filename '" + filename + "'");
+    
+    if (roots == null || roots.length == 0) {
+      if (Pooka.isDebug())
+	System.out.println("root == null");
+      return null;
+    }
+    
+    if (Pooka.isDebug())
+      System.out.println("root != null");
+    
+    if (filename.equals("/") || filename.equals("")) {
+      return roots[0];
+    }
+    
+    int firstSlash = filename.indexOf('/');
+    String storeName = null;
+    String filePart = "";
+    if (firstSlash > -1) {
+      storeName = filename.substring(0, firstSlash);
+      if (Pooka.isDebug())
+	System.out.println("store name is " + storeName);
+      if (firstSlash < filename.length()) {
+	filePart = filename.substring(firstSlash + 1);
+	if (Pooka.isDebug())
+	  System.out.println("file name is " + filePart);
+      }
+    } else {
+      if (Pooka.isDebug())
+	System.out.println("store name is " + filename);
+      
+      storeName = filename;
+    }
+    
+    FolderFileWrapper currentRoot = findRoot(storeName);
+    if (currentRoot == null) {
+      if (Pooka.isDebug())
+	System.out.println("found no matching store root for " + storeName + ".");
+      return new File(filename);
+    }
+    
+    return currentRoot.getFileByName(filePart);
+    
+  }
+  
   /**
    * Creates a new Folder under the containingDir.
    */
@@ -168,6 +168,24 @@ public class MailFileSystemView
     }
     
     return null;
+  }
+
+  /**
+   * Gets the child for the file.
+   */
+  public File getChild(File parent, String filename) {
+    if (parent instanceof FolderFileWrapper) {
+      return ((FolderFileWrapper) parent).getChildFile(filename);
+    } else {
+      return new File(parent, filename);
+    }
+  }
+
+  /**
+   * Gets the default starting directory for the file chooser.
+   */
+  public File getDefaultDirectory() {
+    return getDefaultRoot();
   }
 
   /**

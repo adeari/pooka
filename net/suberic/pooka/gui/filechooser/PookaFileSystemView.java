@@ -121,11 +121,39 @@ public class PookaFileSystemView
   }
   
   /**
+   * Creates a new File object for f with correct behavior for a file system 
+   * root directory.
+   */
+  /*
+  protected File createFileSystemRoot(File f) {
+    
+  }
+  */
+
+  /**
    * Creates a new Folder under the containingDir.
    */
   public File createNewFolder(File containingDir) throws java.io.IOException {
     throw new IOException (Pooka.getProperty("error.folderinfofilewrapper.cantcreate", "Cannot create new Folders here.  Use Subscribe instead."));
 
+  }
+
+  /**
+   * Gets the child for the file.
+   */
+  public File getChild(File parent, String filename) {
+    if (parent instanceof FolderInfoFileWrapper) {
+      return ((FolderInfoFileWrapper) parent).getChildFile(filename);
+    } else {
+      return new File(parent, filename);
+    }
+  }
+
+  /**
+   * Gets the default starting directory for the file chooser.
+   */
+  public File getDefaultDirectory() {
+    return getDefaultRoot();
   }
 
   /**
@@ -223,12 +251,12 @@ public class PookaFileSystemView
       return roots;
     }
   
-    /**
-     * always returns false for now.
-     */
-    public boolean isHiddenFile(File f) {
-      return false;
-    }
+  /**
+   * always returns false for now.
+   */
+  public boolean isHiddenFile(File f) {
+    return false;
+  }
   
   /**
    * returns true for all files in the roots array.
