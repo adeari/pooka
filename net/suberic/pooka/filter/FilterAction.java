@@ -20,5 +20,5 @@ public interface FilterAction {
      * Initializes the FilterAction from the sourceProperty given.
      */
     
-    public void intitializeFilter(String sourceProperty);
+    public void initializeFilter(String sourceProperty);
 }

@@ -27,7 +27,29 @@ public class MessageFilter {
      *
      */
     public MessageFilter(String sourceProperty) {
+	String searchTermProperty = Pooka.getProperty(sourceProperty + ".searchTerm", "");
+	String operation = Pooka.getProperty(sourceProperty + ".operation", "");
+	String pattern = Pooka.getProperty(sourceProperty + ".pattern", "");
+
+	searchTerm = Pooka.getSearchManager().generateSearchTerm(searchTermProperty, operation, pattern);
 	
+	action = generateFilterAction(sourceProperty + ".action");
+    }
+
+    /**
+     * Generates a FilterAction from the given property.
+     */
+
+    public FilterAction generateFilterAction(String actionProperty) {
+	String className = Pooka.getProperty(actionProperty + ".class", "");
+	try {
+	    Class filterClass = Class.forName(className);
+	    FilterAction newAction = (FilterAction)filterClass.newInstance();
+	    newAction.initializeFilter(actionProperty);
+	    return newAction;
+	} catch (Exception e) {
+	}
+	return null;
     }
 
     /**

@@ -356,4 +356,5 @@ Search.searchTerms.Body.class=javax.mail.search.BodyTerm
 Search.searchTerms.Subject.class=javax.mail.search.SubjectTerm
 
 Search.operations=Contains:Not
-Search.operaions.Not=not
+Search.operations.Not=not
+

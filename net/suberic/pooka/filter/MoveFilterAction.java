@@ -43,7 +43,7 @@ public class MoveFilterAction {
      * and initializes the targetFolder from it.
      */
     
-    public void intitializeFilter(String sourceProperty) {
+    public void initializeFilter(String sourceProperty) {
 	String folderID = Pooka.getProperty(sourceProperty + ".targetFolder", "");
 	targetFolder = Pooka.getStoreManager().getFolder(folderID);
     }
