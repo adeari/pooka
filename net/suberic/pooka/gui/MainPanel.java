@@ -289,6 +289,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new ExitAction(),
 	new EditUserConfigAction(),
 	new EditStoreConfigAction(),
+	new EditPreferencesAction(),
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
 	new SelectMessagePanelAction(),
@@ -360,6 +361,19 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    valuesToEdit.add("Store");
 
 	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
+	}
+    }
+
+    class EditPreferencesAction extends AbstractAction {
+
+	EditPreferencesAction() {
+	    super("cfg-prefs");
+	}
+
+        public void actionPerformed(ActionEvent e) {
+	    Vector valuesToEdit = Pooka.getResources().getPropertyAsVector("Preferences", "");
+
+	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
 	}
     }
 

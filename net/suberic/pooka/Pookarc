@@ -58,13 +58,12 @@ MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif
 
 #MenuBar.Edit=UserConfig:StoreConfig:Folders:Undo:Select All:Cut:Copy:Paste
-MenuBar.Edit=UserConfig:StoreConfig:Folders:Cut:Copy:Paste
+MenuBar.Edit=UserConfig:StoreConfig:Preferences:Cut:Copy:Paste
 MenuBar.Edit.UserConfig.Action=cfg-users
-MenuBar.Edit.UserConfig.Label=User Configuration
 MenuBar.Edit.StoreConfig.Action=cfg-stores
-MenuBar.Edit.StoreConfig.Label=Mailbox Configuration
 MenuBar.Edit.Folders.Action=folder-subscribe
 MenuBar.Edit.Folders.Label=Folders
+MenuBar.Edit.Preferences.Action=cfg-prefs
 MenuBar.Edit.Undo.Action=undo-action
 MenuBar.Edit.Undo.Image=/net/suberic/pooka/gui/images/Undo.gif
 MenuBar.Edit.Select All.Action=select-all
@@ -318,6 +317,8 @@ Store.trashFolder.propertyType=Folder
 Store.trashFolder.selectionRoot=currentStore
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
+
+Preferences=Pooka.guiType:Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocations:Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v
