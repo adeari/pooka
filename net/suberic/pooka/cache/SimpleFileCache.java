@@ -13,6 +13,8 @@ import javax.activation.DataHandler;
  *
  */
 public class SimpleFileCache implements MessageCache {
+
+    // FIXME:  why isn't anyhting synchronized?
     
     public static int CONTENT = 0;
     public static int HEADERS = 1;
@@ -45,6 +47,9 @@ public class SimpleFileCache implements MessageCache {
     // the currently cached uid's
     private Vector cachedMessages;
 
+    // the place where we store changes to happen later...
+    private ChangeCache changes = null;
+
     /**
      * Creates a new SimpleFileCache for the given FolderInfo, in the
      * directory provided.
@@ -57,7 +62,9 @@ public class SimpleFileCache implements MessageCache {
 	    cacheDir.mkdirs();
 	else if (! cacheDir.isDirectory())
 	    throw new IOException("not a directory.");
-	
+
+	changes = new ChangeCache(cacheDir);
+
 	loadCache();
     }
 
@@ -353,7 +360,11 @@ public class SimpleFileCache implements MessageCache {
 	if (getFolderInfo().isAvailable()) {
 	    getFolderInfo().expunge();
 	} else {
-	    throw new MessagingException("Error:  cannot expunge an unavailable folder.");
+	    try {
+		getChangeAdapter().expunge();
+	    } catch (IOException ioe) {
+		throw new MessagingException(ioe.getMessage(), ioe);
+	    }
 	}
     }
 
@@ -539,8 +550,15 @@ public class SimpleFileCache implements MessageCache {
 	}
     }
 
-    protected void writeToChangeLog(long uid, Flags flags, int status) {
-	
+    protected void writeToChangeLog(long uid, Flags flags, int status) throws MessagingException {
+	try {
+	    if (status == REMOVED)
+		getChangeAdapter().setFlags(uid, flags, false);
+	    else
+		getChangeAdapter().setFlags(uid, flags, true);
+	} catch (IOException ioe) {
+	    throw new MessagingException (ioe.getMessage(), ioe);
+	}
     }
 
     /**
@@ -670,6 +688,10 @@ public class SimpleFileCache implements MessageCache {
 	}
 
 	uidValidity = newValidity;
+    }
+
+    public ChangeCache getChangeAdapter() {
+	return changes;
     }
 }
 
