@@ -102,7 +102,13 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	this.addFocusListener(new FocusAdapter() {
 		public void focusGained(FocusEvent e) {
 		    messageTable.requestFocus();
-		    getFolderInfo().setNewMessages(false);
+		    if (getFolderInfo().hasNewMessages()) {
+			getFolderInfo().setNewMessages(false);
+			FolderNode fn = getFolderInfo().getFolderNode();
+			if (fn != null)
+			    fn.getParentContainer().repaint();
+		    }
+		    
 		}
 	    });
 
