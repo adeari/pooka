@@ -68,6 +68,11 @@ public interface MessageCache {
     public boolean invalidateCache(long[] uids, int status);
 
     /**
+     * Invalidates the entire cache.
+     */
+    public void invalidateCache();
+
+    /**
      * Adds the messages to the given folder.  Returns the uids for the 
      * message.  Uses the status to determine how much of the message
      * is cached.
@@ -117,4 +122,14 @@ public interface MessageCache {
      */
     public int getUnreadMessageCount() throws MessagingException;
 
+    /**
+     * Returns the current UIDValidity of the cache.
+     */
+    public long getUIDValidity();
+
+    /**
+     * Updates the UIDValidity of the cache to a new value.  Should only
+     * be used after a call to invalidateCache().
+     */
+    public void setUIDValidity(long newValidity);
 }

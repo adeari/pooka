@@ -88,7 +88,7 @@ public class PopInboxFolderInfo extends FolderInfo {
      * Checks the pop folder for new messages.
      */
     public void checkFolder() {
-	// if (Pooka.isDebug())
+	if (Pooka.isDebug())
 	    System.out.println("checking folder " + getFolderName());
 	
 	// i'm taking this almost directly from ICEMail; i don't know how
@@ -97,17 +97,19 @@ public class PopInboxFolderInfo extends FolderInfo {
 	Folder f = null;
 	try {
 	    if (isOpen() && popStore != null) {
-		System.out.println("checking folder " + getFolderName() + ":  opening pop store.");
+		if (Pooka.isDebug())
+		    System.out.println("checking folder " + getFolderName() + ":  opening pop store.");
 		popStore.connect();
 		f = popStore.getDefaultFolder().getFolder("INBOX");
 		if (f != null) {
 		    f.open(Folder.READ_WRITE);
 		    Message[] msgs = f.getMessages();
-		    if (f == null)
-			System.out.println("got messages; msgs = null.");
-		    else 
-			System.out.println("got messages; msgs = " + msgs.length);
-
+		    if (Pooka.isDebug()) {
+			if (f == null)
+			    System.out.println("got messages; msgs = null.");
+			else 
+			    System.out.println("got messages; msgs = " + msgs.length);
+		    }
 		    
 		    if (msgs != null && msgs.length > 0) {
 			MimeMessage[] msgsToAppend = new MimeMessage[msgs.length];
@@ -117,17 +119,21 @@ public class PopInboxFolderInfo extends FolderInfo {
 			getFolder().appendMessages(msgsToAppend);
 			for (int i = 0; i < msgs.length; i++) {
 			    msgs[i].setFlag(Flags.Flag.DELETED, true);
-			    System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
+			    if (Pooka.isDebug())
+				System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
 			}
 		    }
 		    f.close(true);
-		    System.out.println("closed folder.");
+		    if (Pooka.isDebug())
+			System.out.println("closed folder.");
 		    f.open(Folder.READ_WRITE);
 		    msgs = f.getMessages();
-		    if (f == null)
-			System.out.println("got messages; msgs = null.");
-		    else 
-			System.out.println("got messages; msgs = " + msgs.length);		    
+		    if (Pooka.isDebug()) {
+			if (f == null)
+			    System.out.println("got messages; msgs = null.");
+			else 
+			    System.out.println("got messages; msgs = " + msgs.length);		    
+		    }
 		    f.close(true);
 		    popStore.close();
 		}

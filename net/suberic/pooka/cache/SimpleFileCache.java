@@ -39,9 +39,9 @@ public class SimpleFileCache implements MessageCache {
     private long newUidValidity;
 
     // the HashMaps which store the cached results.
-    private HashMap headerCache = new HashMap();
-    private HashMap flagCache = new HashMap();
-    private HashMap dataHandlerCache = new HashMap();
+    //private HashMap headerCache = new HashMap();
+    //private HashMap flagCache = new HashMap();
+    //private HashMap dataHandlerCache = new HashMap();
 
     // the currently cached uid's
     private Vector cachedMessages;
@@ -284,11 +284,19 @@ public class SimpleFileCache implements MessageCache {
      */
     public boolean invalidateCache(long[] uids, int status) {
 	for (int i = 0; i < uids.length; i++) {
+	    System.out.println("running invalidate cache for " + uids[i] + ", " + status);
 	    FilenameFilter filter = new CacheFilenameFilter(uids[i], status);
 	    File[] matchingFiles = cacheDir.listFiles(filter);
 	    for (int j = 0; j < matchingFiles.length; j++)
 		matchingFiles[j].delete();
+	    if (status == CONTENT) {
+		System.out.println("removing " + uids[i] + " from cache.");
+		cachedMessages.remove(new Long(uids[i]));
+	    } else {
+		System.out.println(status + " != " + CONTENT + "; not removing from cache.");
+	    }
 	}
+
 	return true;
     }
 
@@ -302,6 +310,8 @@ public class SimpleFileCache implements MessageCache {
 	    if (matchingFiles[j].isFile())
 		matchingFiles[j].delete();
 	}
+
+	cachedMessages = new Vector();
     }
 
 
@@ -618,6 +628,27 @@ public class SimpleFileCache implements MessageCache {
 	return unreadCount;
     }
 
+    public long getUIDValidity() {
+	return uidValidity;
+    }
+
+    public void setUIDValidity(long newValidity) {
+	try {
+	    File f = new File(cacheDir, "validity");
+	    if (f.exists())
+		f.delete();
+
+	    f.createNewFile();
+	    
+	    BufferedWriter out = new BufferedWriter(new FileWriter(f));
+	    out.write(Long.toString(newValidity));
+	    out.flush();
+	    out.close();
+	} catch (Exception e) {
+	}
+
+	uidValidity = newValidity;
+    }
 }
 
 
