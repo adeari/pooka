@@ -103,7 +103,7 @@ public class NewMessageInfo extends MessageInfo {
 		}
 	      }
 	    }
-	  }, sentFolder.getFolderThread()), new java.awt.event.ActionEvent(null, 1, "message-send"));
+	  }, sentFolder.getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-send"));
       } catch (MessagingException me) {
 	Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 
