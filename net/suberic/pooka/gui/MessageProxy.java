@@ -10,8 +10,96 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.awt.event.*;
 import java.awt.print.*;
+import java.io.*;
 
 public class MessageProxy {
+
+    class SaveMessageThread extends Thread {
+	
+	MimeMessage msg;
+	File saveFile;
+	JDialog jd;
+	JProgressBar progressBar;
+	boolean running = true;
+
+	SaveMessageThread(MimeMessage newMsg, File newSaveFile) {
+	    msg = newMsg;
+	    saveFile = newSaveFile;
+	}
+
+	public void run() {
+	    InputStream decodedIS = null;
+	    BufferedOutputStream outStream = null;
+	    
+	    int msgSize = 0;
+	    
+	    try {
+		msgSize = msg.getSize();
+		
+		createDialog(msgSize);
+		jd.show();
+		
+		outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
+		int b=0;
+		byte[] buf = new byte[32768];
+		
+		b = decodedIS.read(buf);
+		while (b != -1 && running) {
+		    outStream.write(buf, 0, b);
+		    progressBar.setValue(progressBar.getValue() + b);
+		    b = decodedIS.read(buf);
+		}
+		
+		jd.dispose();
+		
+	    } catch (IOException ioe) {
+		Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
+		cancelSave();
+	    } catch (MessagingException me) {
+		Pooka.getUIFactory().showError("Error saving file:  " + me.getMessage());
+		cancelSave();
+	    } finally {
+		if (outStream != null) {
+		    try {
+			outStream.flush();
+			outStream.close();
+		    } catch (IOException ioe) {}
+		}
+	    }
+	}
+
+	public void createDialog(int msgSize) {
+	    progressBar = new JProgressBar(0, msgSize);
+	    progressBar.setBorderPainted(true);
+	    progressBar.setStringPainted(true);
+
+	    jd = new JDialog();
+	    jd.getContentPane().setLayout(new BoxLayout(jd.getContentPane(), BoxLayout.Y_AXIS));
+	    JLabel nameLabel = new JLabel(saveFile.getName());
+	    JPanel buttonPanel = new JPanel();
+	    JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
+	    cancelButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			cancelSave();
+		    }
+		});
+	    buttonPanel.add(cancelButton);
+
+	    jd.getContentPane().add(nameLabel);
+	    jd.getContentPane().add(progressBar);
+	    jd.getContentPane().add(buttonPanel);
+
+	    jd.pack();
+	}
+
+	public void cancelSave() {
+	    try {
+		saveFile.delete();
+	    } catch (Exception e) {}
+	    jd.dispose();
+	}
+    }
+
     // the underlying MessageInfo
     MessageInfo messageInfo;
 

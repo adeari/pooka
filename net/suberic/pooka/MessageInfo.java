@@ -498,17 +498,44 @@ public class MessageInfo {
 
 	// handle attachments.
 	if (method == FORWARD_AS_ATTACHMENT) {
+	    /*
+	    javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+	    mbp.setDataHandler(getRealMessage().getDataHandler());
+	    returnValue.addAttachment(new MBPAttachment(mbp));
+	    returnValue.attachmentsLoaded=true;
+	    */
 	    try {
-		returnValue.addAttachment(new MBPAttachment(new javax.mail.internet.MimeBodyPart(getRealMessage().getInputStream())));
+		java.io.PipedOutputStream pos = new java.io.PipedOutputStream();
+		java.io.PipedInputStream pis = new java.io.PipedInputStream(pos);
+		getRealMessage().writeTo(pos);
+		returnValue.addAttachment(new MBPAttachment(new javax.mail.internet.MimeBodyPart(pis)));
+		
 	    } catch (java.io.IOException ioe) {
 		MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
 		me.setNextException(ioe);
 		throw me;
 	    }
+	    returnValue.attachmentsLoaded=true;
 	} else if (withAttachments) {
 	    returnValue.attachments = new AttachmentBundle();
-	    returnValue.attachments.addAll(attachments);
-	    returnValue.attachmentsLoaded=true;
+	    Vector fromAttachments = attachments.getAttachments();
+	    if (fromAttachments != null) {
+		for (int i = 0; i < fromAttachments.size(); i++) {
+		    Attachment current = (Attachment) fromAttachments.elementAt(i);
+		    Attachment newAttachment = null;
+		    //try {
+			javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+			mbp.setDataHandler(current.getDataHandler());
+			newAttachment = new MBPAttachment(mbp);
+			/* } catch (java.io.IOException ioe) {
+			MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
+			me.setNextException(ioe);
+			throw me;
+			}*/
+		    returnValue.addAttachment(newAttachment);
+		}
+		returnValue.attachmentsLoaded=true;
+	    }
 	}
 
 	return returnValue;
@@ -536,6 +563,13 @@ public class MessageInfo {
 	    return getFolderInfo().getDefaultProfile();
 	} else 
 	    return null;
+    }
+
+    /**
+     * Saves the message to the given filename.
+     */
+    public void saveMessageAs(String fileName) {
+	
     }
 
     /**
