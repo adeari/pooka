@@ -39,6 +39,7 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
 	template=templateType;
 	factory = newFactory;
 	sourceBundle = bundle;
+	enabled=isEnabled;
 
 	tabbedPane = new JTabbedPane();
 

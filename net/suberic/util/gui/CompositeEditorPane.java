@@ -46,6 +46,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	factory = newFactory;
 	property = newProperty;
 	template = newTemplate;
+	enabled=isEnabled;
 
 	scoped = bundle.getProperty(template + ".scoped", "false").equalsIgnoreCase("true");
 
@@ -132,6 +133,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     */
 
     public void setValue() {
+
 	if (isEnabled()) {
 	    for (int i = 0; i < editors.size(); i++) {
 		((DefaultPropertyEditor)(editors.elementAt(i))).setValue();
