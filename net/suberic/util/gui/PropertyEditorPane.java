@@ -90,7 +90,7 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
     public java.util.Properties getValue() {
 	java.util.Properties currentRetValue = new java.util.Properties();
 	for (int i = 0; i < editors.size(); i++) {
-	    currentRetValue = new java.util.Properties(((DefaultPropertyEditor)(editors.elementAt(i))).getValue());
+	    currentRetValue.putAll(((DefaultPropertyEditor)(editors.elementAt(i))).getValue());
 	}
 
 	return currentRetValue;
