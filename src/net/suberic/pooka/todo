@@ -5,9 +5,9 @@
      *) test with desktop/external apps.
 
    *) make sure that pasting cut message into new message removes the
-	cut message.
-		*) ???? make that work ????
-		*) should that work???
+	cut message -- should act as copy, not move (!).  including clearing
+	the clipboard???
+	
    *) error:  fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
    *) make sure folderwindow cut/paste is enabled everywhere; add to 

@@ -37,7 +37,11 @@ public class AttachmentTransferHandler extends TransferHandler {
     } 
     
     if (attachment != null && proxy != null) {
-      return new AttachmentTransferable(attachment, proxy);
+      try {
+	return new AttachmentTransferable(attachment, proxy);
+      } catch (java.io.IOException ioe) {
+	return null;
+      }
     } else {
       return null;
     }
