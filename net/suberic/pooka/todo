@@ -109,8 +109,13 @@ preview:
 
 *) add support for jdk1.4
 	-- tabbing between the address components for New Messages
-	-- the MailFileSystemView doesn't seem to work at all (!)
+	-- the MailFileSystemView doesn't seem to work at all (!) -- ok, it
+	does work, but only if you browse to something other than the default.
 	-- up and down arrows while composing new messages.
+	-- check NewAccountPooka display--not all of the main window is drawn.
+	-- property editors like User Email info aren't correctly sized.
+	-- keybindings aren't right; open a message.  ^D it.  try to select
+	another message in the message list.
 
 *) add support for other mail formats, like maildir (and maybe hotmail?).
 	shift pop3 backing from mbox to maildir.
