@@ -3,6 +3,24 @@
 *) make there a build option for help only, so i can switch it in 
 	WebStart.
 
+*) add a check for java version to make sure that you're running the 
+correct version of pooka for the jdk.
+
+	-- regexp?
+	    (add search/replace to editor)
+*) add a search and replace for the message editors.
+
+*) change the keybinding for the address book.  otherwise you get address book
+	entries while you're navigating the to field.
+
+*) check why the bcc field sometimes doesn't show the address book icon.
+
+*) more doc
+
+*) fix sent folders to ignore new message tags.
+
+*) fix key focus in preview pane.
+
 -----
 
 *) add documentation and online help.
@@ -31,11 +49,6 @@
 *) fix up the error messages, and make sure that they look ok.
 
 *) status messages:  make them appear and disappear at appropriate times.
-
-*) change the keybinding for the address book.  otherwise you get address book
-	entries while you're navigating the to field.
-
-*) check why the bcc field sometimes doesn't show the address book icon.
 
 *) document keybindings
 	-- keybindings for address book
@@ -105,9 +118,6 @@ preview:
 *) add support for jdk1.4
 	-- new printing system.
 	-- NetworkInterface classes
-	-- regexp?
-	    (add search/replace to editor)
-*) add a search and replace for the message editors.
 
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together

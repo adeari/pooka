@@ -111,8 +111,8 @@ MenuBar.File.EmptyTrash.Action=folder-empty
 MenuBar.File.Exit.Action=file-exit
 #MenuBar.File.Exit.Image=/org/javalobby/icons/20x20png/Exit.png
 
-#MenuBar.Edit=UserConfig:StoreConfig:OutgoingConfig:ConnectionConfig:Folders:Undo:Select All:Cut:Copy:Paste:SelectAll
-MenuBar.Edit=Cut:Copy:Paste:Undo:Redo:SelectAll
+#MenuBar.Edit=UserConfig:StoreConfig:OutgoingConfig:ConnectionConfig:Folders:Undo:Select All:Cut:Copy:Paste:SelectAll:Find:FindNext
+MenuBar.Edit=Cut:Copy:Paste:Undo:Redo:SelectAll:Find:FindNext
 MenuBar.Edit.Undo.Action=edit-undo
 #MenuBar.Edit.Undo.Image=/org/javalobby/icons/20x20png/Undo.png
 MenuBar.Edit.Redo.Action=edit-redo
@@ -127,6 +127,8 @@ MenuBar.Edit.Paste.Action=paste-from-clipboard
 #MenuBar.Edit.Paste.Image=/org/javalobby/icons/20x20png/Paste.png
 MenuBar.Edit.SelectAll.Action=select-all
 #MenuBar.Edit.SelectAll.Image=/org/javalobby/icons/20x20png/Select.png
+MenuBar.Edit.Find.Action=message-find
+MenuBar.Edit.FindNext.Action=message-find-next
 
 MenuBar.Mail=NewMsg:Open:OpenMulti:Reply:ReplyAll:ReplyMulti:Forward:ForwardMulti:Send:Move:Copy:Delete:Expunge:AddSignature:SearchFolder:Subscribe
 MenuBar.Mail.NewMsg.Action=message-new

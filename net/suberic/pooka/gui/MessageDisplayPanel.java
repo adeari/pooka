@@ -67,6 +67,21 @@ public abstract class MessageDisplayPanel extends JPanel {
       int start = currentMatcher.start();
       int end = currentMatcher.end();
       editorPane.setCaretPosition(start);
+      System.out.println("moving caret position to " + start);
+      editorPane.moveCaretPosition(end);
+      System.out.println("moving carent position to " + end);
+    }
+  }
+
+  /**
+   * This finds the given regular expression in the displayed page.
+   */
+  public void findNext() {
+    boolean matchSucceeded = doFindNext();
+    if (matchSucceeded) {
+      int start = currentMatcher.start();
+      int end = currentMatcher.end();
+      editorPane.setCaretPosition(start);
       editorPane.moveCaretPosition(end);
     }
   }

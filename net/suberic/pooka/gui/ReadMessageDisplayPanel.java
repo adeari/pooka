@@ -30,7 +30,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
   Action[] defaultActions = new Action[] {
     new AttachmentPanelAction(),
-    new TestAction()
+    new FindAction(),
+    new FindNextAction()
   };
 
   /**
@@ -483,16 +484,30 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   }
 
   /**
-   * Selects the Attachment panel.
+   * Finds the given String in the Message body.
    */
-  public class TestAction extends AbstractAction {
-    TestAction() {
-      super("file-test");
+  public class FindAction extends AbstractAction {
+    FindAction() {
+      super("message-find");
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.out.println("finding regexp.");
-      findRegexp("a");
+      String searchString = getMessageUI().showInputDialog(Pooka.getProperty("message.search", "Find what"), Pooka.getProperty("message.search.title", "Find"));
+      if (searchString != null) 
+	findRegexp(searchString);
+    }
+  }
+
+  /**
+   * Finds the given String in the Message body.
+   */
+  public class FindNextAction extends AbstractAction {
+    FindNextAction() {
+      super("message-find-next");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      findNext();
     }
   }
 
