@@ -1,8 +1,16 @@
-2001-09-04
+
+changed the SMTP server support so that we now have a separate SMTP server
+object, instead of having the servers configured in the UserProfile.
+
+2001 november 05 release
+------------------------
+
+fixed new message check algorithm for pop3 folders where old messages are
+left on the server.
+
+support added for pre and post connection commands for mailboxes (pilone)
 
 added the ability to synchronize with the IMAP subscribed folders list.
-
-2001-08-22
 
 added limited address book support using Vcards.
 

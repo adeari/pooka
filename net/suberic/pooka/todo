@@ -8,6 +8,8 @@ next release:
 
 *) add support for authenticated smtp.
 
+*) add support for external editors, such as emacs.
+
 beta 1
 ---------------
 
@@ -23,22 +25,14 @@ beta 1
 	    (i.e. change allen to allen@atg.com)
 
 
-*) add queuing of outgoing emails.
-
 *) make disconnected imap use LoadMessageTracker.
 	make disconnected imap not show messages that aren't there!
-
-*) bug:  search window shows new messages as they come in. (done)
-
-*) enh:  make search window look different from normal message window.
 
 error:  filterfoldercellrenderer has problems with search forms.
 
 *) caching messages marks them as read.
 
 *) no way to cache messages as they come in.
-
-*) no way to connect to all of your subscribed folders.
 
 *) searches don't show a busy icon, or give any other notification that
 they're running.
@@ -51,10 +45,6 @@ old
 *) check:  see how outgoing and incoming mail handle tab characters.
 	-- a little bit of a bug, but not too much.  should probably
 	check the actual message source to see how tabs are sent.
-
-*) bug:  messages that are new for the session (i.e. showed up between the
-last time you ran the client and this time) aren't marked as recent--only
-ones that come in while you're already connected are labelled like that.
 
 *) incorrect number of messages/unread messages when in disconnected mode.
 
@@ -79,10 +69,6 @@ general ui
 other
 -----
 *) loadMessageTracker?
-
-*) add a filter ability to look for duplicate email messages.  so if you're 
-on multiple email lists, then it will filter out all but the first copy of
-the message.
 
 *) have it change its icon if you get new messages, in addition to changing
 the title bar.
