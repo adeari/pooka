@@ -31,7 +31,11 @@ protocol support
 ----------------
 *) add pop3/local mail spool support.
 
-*) add disconnected imap support.
+*) add disconnected imap support.  thoughts:  1)  cache headers so that we
+can make an InternetHeaders object.  2)  cache full messages so we can get
+all the information we need off the Message.  3)  effectively have a 'real'
+message which is what you make changes on.  4)  searches won't work in 
+disconnected mode.
 
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.

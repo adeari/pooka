@@ -9,22 +9,22 @@ import javax.swing.*;
 
 public class MessagePrinter implements Printable {
     
-    private MessageProxy message;
+    private MessageInfo message;
     private PageFormat pf;
     private ArrayList pages;
     private Font font= new Font ("TimesRoman", Font.PLAIN, 12);
     private int offset;
     
     /**
-     * This creates a new MessagePrinter for the given MessageProxy.
+     * This creates a new MessagePrinter for the given MessageInfo.
      */
-    public MessagePrinter(MessageProxy mp, int newOffset) {
-	message = mp;
+    public MessagePrinter(MessageInfo mi, int newOffset) {
+	message = mi;
 	offset = newOffset;
     }
 
-    public MessagePrinter(MessageProxy mp) {
-	this(mp, 0);
+    public MessagePrinter(MessageInfo mi) {
+	this(mi, 0);
     }
 
     /**

@@ -15,7 +15,7 @@ import net.suberic.util.thread.ActionThread;
 
 /**
  * This class does all of the work for a Folder.  If a FolderTableModel,
- * FolderWindow, Message/Row-to-MessageProxy map, or FolderTreeNode exist
+ * FolderWindow, Message/Row-to-MessageInfo map, or FolderTreeNode exist
  * for a Folder, the FolderInfo object has a reference to it.
  */
 
@@ -38,7 +38,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // Information for the FolderTable.
     private FolderTableModel folderTableModel;
-    private Hashtable messageToProxyTable = new Hashtable();
+    private Hashtable messageToInfoTable = new Hashtable();
     private Vector columnValues;
     private Vector columnNames;
     private Vector columnSizes;
@@ -145,9 +145,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     /**
      * This applies each MessageFilter in filters array on the given 
-     * MessageProxy objects.
+     * MessageInfo objects.
      *
-     * @return a Vector containing the removed MessageProxy objects.
+     * @return a Vector containing the removed MessageInfo objects.
      */
     public Vector applyFilters(Vector messages) {
 	Vector notRemovedYet = new Vector(messages);
@@ -246,7 +246,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    if (!(store.isConnected()))
 				store.connect();
 			    openFolder(Folder.READ_WRITE);
-			    refreshAllMessages();
+			    //refreshAllMessages();
 			} catch (MessagingException me) {
 			    System.out.println("Folder " + getFolderID() + " closed and unable to reopen:  " + me.getMessage());
 			    try {
@@ -270,7 +270,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    if (!(store.isConnected()))
 				store.connect();
 			    openFolder(Folder.READ_WRITE);
-			    refreshAllMessages();
+			    //refreshAllMessages();
 			} catch (MessagingException me) {
 			    System.out.println("Folder " + getFolderID() + " disconnected and unable to reconnect:  " + me.getMessage());
 			    try {
@@ -304,7 +304,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	else
 	    tableType="FolderTable";
 
-	Vector messageProxies = new Vector();
+	Vector messageInfos = new Vector();
 
 	if (columnValues == null) {
 	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
@@ -333,25 +333,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		openFolder(Folder.READ_WRITE);
 	    }
 	    Message[] msgs = folder.getMessages();
-	    MessageProxy mp;
+	    MessageInfo mp;
 
 	    for (int i = 0; i < msgs.length; i++) {
-		mp = new MessageProxy(getColumnValues(), msgs[i], this);
+		mp = new MessageInfo(msgs[i], this);
 
-		messageProxies.add(mp);
-		messageToProxyTable.put(msgs[i], mp);
+		messageInfos.add(mp);
+		messageToInfoTable.put(msgs[i], mp);
 	    }
 
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	}
 
-	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
+	FolderTableModel ftm = new FolderTableModel(messageInfos, getColumnNames(), getColumnSizes());
 
 	setFolderTableModel(ftm);
 
 
-	loaderThread.loadMessages(messageProxies);
+	loaderThread.loadMessages(messageInfos);
 	
 	loaderThread.start();
 
@@ -359,21 +359,23 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
     
     /**
-     * Refreshes all the MessageProxy objects by the UID, if any.
+     * Refreshes all the MessageInfo objects by the UID, if any.
      */
+    /*
     public void refreshAllMessages() {
 	if (folder instanceof UIDFolder) {
 	    UIDFolder uidFolder = (UIDFolder) folder;
-	    Hashtable newMessageToProxyTable = new Hashtable();
-	    Enumeration keys = messageToProxyTable.keys(); 
+	    Hashtable newMessageToInfoTable = new Hashtable();
+	    Enumeration keys = messageToInfoTable.keys(); 
 	    while (keys.hasMoreElements()) {
-		MessageProxy proxy = (MessageProxy) messageToProxyTable.get(keys.nextElement());
+		MessageInfo proxy = (MessageInfo) messageToInfoTable.get(keys.nextElement());
 		Message m = proxy.refreshMessage();
 		if (m != null)
-		    newMessageToProxyTable.put(m, proxy);
+		    newMessageToInfoTable.put(m, proxy);
 	    }
 	}	
     }
+    */
 
     /**
      * Gets the row number of the first unread message.  Returns -1 if
@@ -655,6 +657,29 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
+     * This returns whether or not this Folder is set up to use the 
+     * TrashFolder for the Store.  If this is a Trash Folder itself, 
+     * then return false.  If FolderProperty.useTrashFolder is set, 
+     * return that.  else go up the tree, until, in the end, 
+     * Pooka.useTrashFolder is returned.
+     */
+    public boolean useTrashFolder() {
+	if (isTrashFolder())
+	    return false;
+
+	String prop = Pooka.getProperty(getFolderProperty() + ".useTrashFolder", "");
+	if (!prop.equals(""))
+	    return (! prop.equalsIgnoreCase("false"));
+	
+	if (getParentFolder() != null)
+	    return getParentFolder().useTrashFolder();
+	else if (getParentStore() != null)
+	    return getParentStore().useTrashFolder();
+	else
+	    return (! Pooka.getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
+    }
+
+    /**
      * This removes all the messages in the folder, if the folder is a
      * TrashFolder.
      */
@@ -706,12 +731,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // semi-accessor methods.
 
-    public MessageProxy getMessageProxy(int rowNumber) {
-	return getFolderTableModel().getMessageProxy(rowNumber);
+    public MessageInfo getMessageInfo(int rowNumber) {
+	MessageProxy mp = getFolderTableModel().getMessageProxy(rowNumber);
+	if (mp != null)
+	    return mp.getMessageInfo();
+	else
+	    return null;
     }
 
-    public MessageProxy getMessageProxy(Message m) {
-	return (MessageProxy)messageToProxyTable.get(m);
+    public MessageInfo getMessageInfo(Message m) {
+	return (MessageInfo)messageToInfoTable.get(m);
     }
 
     public void addMessageCountListener(MessageCountListener newListener) {
@@ -766,16 +795,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		MessageCountEvent mce = (MessageCountEvent)actionEvent.getSource();
 		if (folderTableModel != null) {
 		    Message[] addedMessages = mce.getMessages();
-		    MessageProxy mp;
-		    Vector addedProxies = new Vector();
+		    MessageInfo mp;
+		    Vector addedInfos = new Vector();
 		    for (int i = 0; i < addedMessages.length; i++) {
-			mp = new MessageProxy(getColumnValues(), addedMessages[i], FolderInfo.this);
-			addedProxies.add(mp);
-			messageToProxyTable.put(addedMessages[i], mp);
+			mp = new MessageInfo(addedMessages[i], FolderInfo.this);
+			addedInfos.add(mp);
+			messageToInfoTable.put(addedMessages[i], mp);
 		    }
-		    addedProxies.removeAll(applyFilters(addedProxies));
-		    if (addedProxies.size() > 0) {
-			getFolderTableModel().addRows(addedProxies);
+		    addedInfos.removeAll(applyFilters(addedInfos));
+		    if (addedInfos.size() > 0) {
+			getFolderTableModel().addRows(addedInfos);
 			setNewMessages(true);
 			resetMessageCounts();
 			fireMessageCountEvent(mce);
@@ -797,20 +826,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    Message[] removedMessages = mce.getMessages();
 		    if (Pooka.isDebug())
 			System.out.println("removedMessages was of size " + removedMessages.length);
-		    MessageProxy mp;
-		    Vector removedProxies=new Vector();
+		    MessageInfo mp;
+		    Vector removedInfos=new Vector();
 		    for (int i = 0; i < removedMessages.length; i++) {
 			if (Pooka.isDebug())
 			    System.out.println("checking for existence of message.");
-			mp = getMessageProxy(removedMessages[i]);
+			mp = getMessageInfo(removedMessages[i]);
 			if (mp != null) {
 			    if (Pooka.isDebug())
 				System.out.println("message exists--removing");
-			    removedProxies.add(mp);
-			    messageToProxyTable.remove(mp);
+			    removedInfos.add(mp);
+			    messageToInfoTable.remove(mp);
 			}
 		    }
-		    getFolderTableModel().removeRows(removedProxies);
+		    getFolderTableModel().removeRows(removedInfos);
 		}
 		resetMessageCounts();
 		fireMessageCountEvent(mce);
@@ -835,9 +864,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    // if we do, anyway.
 		    try {
 			if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
-			    MessageProxy mp = getMessageProxy(mce.getMessage());
-			    mp.unloadTableInfo();
-			    mp.loadTableInfo();
+			    MessageInfo mi = getMessageInfo(mce.getMessage());
+			    MessageProxy mp = mi.getMessageProxy();
+			    if (mp != null) {
+				mp.unloadTableInfo();
+				mp.loadTableInfo();
+			    }
 			}
 		    } catch (MessagingException me) {
 			// if we catch a MessagingException, it just means
@@ -918,9 +950,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * SearchTerm.
      *
      * Basically wraps the call to Folder.search(), and then wraps the
-     * returned Message objects as MessageProxys.
+     * returned Message objects as MessageInfos.
      */
-    public MessageProxy[] search(javax.mail.search.SearchTerm term) 
+    public MessageInfo[] search(javax.mail.search.SearchTerm term) 
     throws MessagingException {
 	Message[] returnValue = folder.search(term);
 	System.out.println("got " + returnValue.length + " results.");
