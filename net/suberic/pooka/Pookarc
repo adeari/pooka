@@ -411,8 +411,7 @@ Store.editableFields.storeConfig.allowedValues.imap=Store.editableFields.storeCo
 Store.editableFields.storeConfig.imap.propertyType=Tabbed
 Store.editableFields.storeConfig.imap.propertyScoped=true
 Store.editableFields.storeConfig.imap.templateScoped=true
-#Store.editableFields.storeConfig.imap.scopeRoot=Store.editableFields
-#Store.editableFields.storeConfig.imap=server:user:password:SSL:cachingEnabled:expungeOnExit
+
 Store.editableFields.storeConfig.imap=IMAP:caching:options
 Store.editableFields.storeConfig.imap.IMAP=server:user:password:SSL
 Store.editableFields.storeConfig.imap.IMAP.scoped=true
@@ -425,14 +424,26 @@ Store.editableFields.storeConfig.imap.options.scoped=true
 Store.editableFields.storeConfig.imap.options.scopeRoot=Store.editableFields
 
 Store.editableFields.storeConfig.allowedValues.pop3=Store.editableFields.storeConfig.pop3
-Store.editableFields.storeConfig.pop3.propertyType=Composite
-Store.editableFields.storeConfig.pop3.scoped=true
-Store.editableFields.storeConfig.pop3.editableFields=server:user:password:leaveMessagesOnServer:deleteOnServerOnLocalDelete
+Store.editableFields.storeConfig.pop3.propertyType=Tabbed
+Store.editableFields.storeConfig.pop3.propertyScoped=true
+Store.editableFields.storeConfig.pop3.templateScoped=true
+Store.editableFields.storeConfig.pop3=POP3:options
+Store.editableFields.storeConfig.pop3.POP3=server:user:password
+Store.editableFields.storeConfig.pop3.POP3.scoped=true
+Store.editableFields.storeConfig.pop3.POP3.scopeRoot=Store.editableFields
+Store.editableFields.storeConfig.pop3.options=leaveMessagesOnServer:deleteOnServerOnLocalDelete
+Store.editableFields.storeConfig.pop3.options.scoped=true
+Store.editableFields.storeConfig.pop3.options.scopeRoot=Store.editableFields
 
 Store.editableFields.storeConfig.allowedValues.mbox=Store.editableFields.storeConfig.mbox
-Store.editableFields.storeConfig.mbox.propertyType=Composite
-Store.editableFields.storeConfig.mbox.scoped=true
-Store.editableFields.storeConfig.mbox.editableFields=inboxLocation:mailDirectory
+Store.editableFields.storeConfig.mbox.propertyType=Tabbed
+Store.editableFields.storeConfig.mbox.propertyScoped=true
+Store.editableFields.storeConfig.mbox.templateScoped=true
+Store.editableFields.storeConfig.mbox=mbox
+
+Store.editableFields.storeConfig.mbox.mbox=inboxLocation:mailDirectory
+Store.editableFields.storeConfig.mbox.mbox.scoped=true
+Store.editableFields.storeConfig.mbox.mbox.scopeRoot=Store.editableFields
 
 Store.editableFields.password.propertyType=Password
 Store.editableFields.SSL.propertyType=Boolean
