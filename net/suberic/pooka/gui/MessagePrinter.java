@@ -6,6 +6,7 @@ import java.awt.Graphics;
 import java.awt.Font;
 import javax.mail.internet.MimeMessage;
 import javax.swing.*;
+import javax.mail.MessagingException;
 
 public class MessagePrinter implements Printable {
     
@@ -31,7 +32,7 @@ public class MessagePrinter implements Printable {
      * This calculates the number of pages using the given PageFormat
      * that it will take to print the message.
      */
-    public int getPageCount(PageFormat format) {
+    public int getPageCount(PageFormat format) throws MessagingException {
 	if (pf != format) {
 	    pf = format;
 	    pages = calculatePages();
@@ -39,7 +40,7 @@ public class MessagePrinter implements Printable {
 	return pages.size();
     }
 
-    private ArrayList calculatePages() {
+    private ArrayList calculatePages() throws MessagingException {
 	// step through articles, creating pages of lines
 	int maxh = (int) pf.getImageableHeight ();
 	int lineh = font.getSize ();
@@ -91,16 +92,20 @@ public class MessagePrinter implements Printable {
      * This actually prints the given page.
      */
     public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
-	if (pageFormat != pf) {
-	    pf = pageFormat;
-	    pages = calculatePages();
-	}
-
-	if (pageIndex - offset >= pages.size ()) {
+	try {
+	    if (pageFormat != pf) {
+		pf = pageFormat;
+		pages = calculatePages();
+	    }
+	    
+	    if (pageIndex - offset >= pages.size ()) {
+		return Printable.NO_SUCH_PAGE;
+	    }
+	    
+	    renderPage (graphics, pf, pageIndex - offset);
+	    return Printable.PAGE_EXISTS;
+	} catch (MessagingException me) {
 	    return Printable.NO_SUCH_PAGE;
 	}
-
-	renderPage (graphics, pf, pageIndex - offset);
-	return Printable.PAGE_EXISTS;
     }
 }

@@ -296,28 +296,32 @@ public class MessageProxy {
      */
 
     public void printMessage() {
-	PrinterJob job = PrinterJob.getPrinterJob ();
-	Book book = new Book ();
-	MessagePrinter printer = new MessagePrinter(getMessageInfo());
-	PageFormat pf = job.pageDialog (job.defaultPage ());
-	int count = printer.getPageCount(pf);
-	book.append (printer, pf, count);
-	job.setPageable (book);
-	final PrinterJob externalJob = job;
-
-	if (job.printDialog ()) {
-	    Thread t = new Thread(new net.suberic.util.swing.RunnableAdapter() {
-		    public void run() {
-			try {
-			    externalJob.print ();
-			}
-			catch (PrinterException ex) {
-			    ex.printStackTrace ();
-			}
-		    }
-	    });
-	    t.start();
+	try {
+	    PrinterJob job = PrinterJob.getPrinterJob ();
+	    Book book = new Book ();
+	    MessagePrinter printer = new MessagePrinter(getMessageInfo());
+	    PageFormat pf = job.pageDialog (job.defaultPage ());
+	    int count = printer.getPageCount(pf);
+	    book.append (printer, pf, count);
+	    job.setPageable (book);
+	    final PrinterJob externalJob = job;
 	    
+	    if (job.printDialog ()) {
+		Thread t = new Thread(new net.suberic.util.swing.RunnableAdapter() {
+			public void run() {
+			    try {
+				externalJob.print ();
+			    }
+			    catch (PrinterException ex) {
+				ex.printStackTrace ();
+			    }
+			}
+		    });
+		t.start();
+		
+	    }
+	} catch (MessagingException me) {
+	    showError(Pooka.getProperty("error.Printing", "Error printing Message:  ") + "\n", me);
 	}
     }
 

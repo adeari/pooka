@@ -144,6 +144,12 @@ public class NewMessageInfo extends MessageInfo {
      * Gets the text part of the wrapped message.
      */
     public String getTextPart(boolean showFullHeaders) {
-	return net.suberic.pooka.MailUtilities.getTextPart(getMessage(), showFullHeaders);
+	try {
+	    return net.suberic.pooka.MailUtilities.getTextPart(getMessage(), showFullHeaders);
+	} catch (MessagingException me) {
+	    // since this is a NewMessageInfo, there really shouldn't be a 
+	    // messagingException here.
+	    return null;
+	}
     }
 }

@@ -900,6 +900,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    if (mp != null) {
 				mp.unloadTableInfo();
 				mp.loadTableInfo();
+				if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
+				    mi.refreshFlags();
+				else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
+				    mi.refreshHeaders();
 			    }
 			}
 		    } catch (MessagingException me) {

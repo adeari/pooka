@@ -72,7 +72,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      * actual implementation of the Dialog.
      */    
     public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showInternalConfirmDialog(this.getDesktopPane(), messageText, title, type);
+	return JOptionPane.showInternalConfirmDialog(Pooka.getMainPanel().getMessagePanel(), messageText, title, type);
     }
 
     /**
@@ -81,7 +81,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(this.getDesktopPane(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	JOptionPane.showInternalMessageDialog(Pooka.getMainPanel().getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -91,6 +91,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      */
     public void showError(String errorMessage, String title, Exception e) {
 	showError(errorMessage + e.getMessage(), title);
+	e.printStackTrace();
     }
 
     /**
@@ -99,7 +100,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      * implementation of the dialog.
      */
     public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInternalInputDialog(this.getDesktopPane(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**

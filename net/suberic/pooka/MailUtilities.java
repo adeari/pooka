@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import javax.mail.*;
 import javax.mail.internet.*;
+import java.io.IOException;
 
 public class MailUtilities {
     public MailUtilities() {
@@ -12,34 +13,45 @@ public class MailUtilities {
     /**
      * This parses the message given into an AttachmentBundle.
      */
-    private static AttachmentBundle parseAttachments(Message m, boolean showFullHeaders, boolean withHeaders) {
+    private static AttachmentBundle parseAttachments(Message m, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
 	AttachmentBundle bundle = new AttachmentBundle();
 
+	Object content = null;
 	try {
-	    Object content = m.getContent();
-
-	    if (content instanceof Multipart) {
-		ContentType ct = new ContentType(((Multipart)content).getContentType());
-
-		if (ct.getSubType().equalsIgnoreCase("alternative")) {
-		    Multipart mp = (Multipart)content;
-		    for (int i = 0; i < mp.getCount(); i++) {
-			MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
-			ContentType ct2 = new ContentType(mbp.getContentType());
-			if (ct2.getPrimaryType().equalsIgnoreCase("text") && ct2.getSubType().equalsIgnoreCase("plain")) {
+	    content = m.getContent();
+	} catch (IOException ioe) {
+	    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+	}
+	
+	if (content instanceof Multipart) {
+	    ContentType ct = new ContentType(((Multipart)content).getContentType());
+	    
+	    if (ct.getSubType().equalsIgnoreCase("alternative")) {
+		Multipart mp = (Multipart)content;
+		for (int i = 0; i < mp.getCount(); i++) {
+		    MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
+		    ContentType ct2 = new ContentType(mbp.getContentType());
+		    if (ct2.getPrimaryType().equalsIgnoreCase("text") && ct2.getSubType().equalsIgnoreCase("plain")) {
+			try {
 			    bundle.textPart = new StringBuffer((String)mbp.getContent());
-			    bundle.allText.append((String)mbp.getContent());
-			    break;
+			} catch (IOException ioe) {
+			    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
 			}
+
+			try {
+			    bundle.allText.append((String)mbp.getContent());
+			} catch (IOException ioe) {
+			    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+			}
+			break;
 		    }
-		} else {
-		    bundle.addAll(parseAttachments((Multipart)content, showFullHeaders));
 		}
-	    } else if (content instanceof String) {
-		    bundle.textPart = new StringBuffer((String)content);
-		    bundle.allText.append(content);
+	    } else {
+		bundle.addAll(parseAttachments((Multipart)content, showFullHeaders));
 	    }
-	} catch (Exception e) {
+	} else if (content instanceof String) {
+	    bundle.textPart = new StringBuffer((String)content);
+	    bundle.allText.append(content);
 	}
 	
 	// add the headers for the message to the main textPart.
@@ -53,52 +65,65 @@ public class MailUtilities {
 	}
 	return bundle;
     }
-
-    private static AttachmentBundle parseAttachments(Message m, boolean showFullHeaders) {
+    
+    private static AttachmentBundle parseAttachments(Message m, boolean showFullHeaders) throws MessagingException {
 	return parseAttachments(m, showFullHeaders, false);
     }
 
     /**
      * This parses a Mulitpart object into an AttachmentBundle.
      */
-    private static AttachmentBundle parseAttachments(Multipart mp, boolean showFullHeaders) {
+    private static AttachmentBundle parseAttachments(Multipart mp, boolean showFullHeaders) throws MessagingException {
 	AttachmentBundle bundle = new AttachmentBundle();
-	try {
-	    for (int i = 0; i < mp.getCount(); i++) {
-		MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
-		ContentType ct = new ContentType(mbp.getContentType());
-		if (ct.getPrimaryType().equalsIgnoreCase("text") && ct.getSubType().equalsIgnoreCase("plain")) {
-		    if (bundle.textPart == null) {
+	for (int i = 0; i < mp.getCount(); i++) {
+	    MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
+	    ContentType ct = new ContentType(mbp.getContentType());
+	    if (ct.getPrimaryType().equalsIgnoreCase("text") && ct.getSubType().equalsIgnoreCase("plain")) {
+		if (bundle.textPart == null) {
+		    try {
 			bundle.textPart = new StringBuffer((String)mbp.getContent());
-		    } else {
-			bundle.textAttachments.add(mbp);
-			bundle.allAttachments.add(mbp);
+		    } catch (IOException ioe) {
+			throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
 		    }
-		    bundle.allText.append((String)mbp.getContent());
-
-		} else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-		    bundle.addAll(parseAttachments((Multipart)mbp.getContent(), showFullHeaders));
-		} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-		    bundle.nonTextAttachments.add(mbp);
-		    bundle.allAttachments.add(mbp);
-		    Object msgContent = mbp.getContent();
-		    if (msgContent instanceof Message)
-			bundle.addAll(parseAttachments((Message)msgContent, showFullHeaders, true));
-		    else if (msgContent instanceof java.io.InputStream)
-			bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent), showFullHeaders, true));
-		    else
-			System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
 
 		} else {
-		    bundle.nonTextAttachments.add(mbp);
+		    bundle.textAttachments.add(mbp);
 		    bundle.allAttachments.add(mbp);
 		}
+		try {
+		    bundle.allText.append((String)mbp.getContent());
+		} catch (IOException ioe) {
+		    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+		}
+		
+	    } else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
+		try {
+		    bundle.addAll(parseAttachments((Multipart)mbp.getContent(), showFullHeaders));
+		} catch (IOException ioe) {
+		    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+		}
+
+	    } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+		bundle.nonTextAttachments.add(mbp);
+		bundle.allAttachments.add(mbp);
+		Object msgContent;
+		try {
+		    msgContent = mbp.getContent();
+		} catch (IOException ioe) {
+		    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+		}
+		if (msgContent instanceof Message)
+		    bundle.addAll(parseAttachments((Message)msgContent, showFullHeaders, true));
+		else if (msgContent instanceof java.io.InputStream)
+		    bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent), showFullHeaders, true));
+		else
+		    System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+		
+	    } else {
+		bundle.nonTextAttachments.add(mbp);
+		bundle.allAttachments.add(mbp);
 	    }
-	} catch (Exception e) {
-	    System.out.println("caught exception.");
-	    e.printStackTrace();
 	}
-	
 	return bundle;
     }
 
@@ -106,7 +131,7 @@ public class MailUtilities {
      * This gets the Text part of a message.  This is useful if you want
      * to display just the 'body' of the message without the attachments.
      */
-    public static String getTextPart(Message m, boolean showFullHeaders, boolean withHeaders) {
+    public static String getTextPart(Message m, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
 	AttachmentBundle bundle = parseAttachments(m, showFullHeaders, withHeaders);
 	if (bundle.textPart != null)
 	    return bundle.textPart.toString();
@@ -114,7 +139,7 @@ public class MailUtilities {
 	    return null;
     }
 
-    public static String getTextPart(Message m, boolean showFullHeaders) {
+    public static String getTextPart(Message m, boolean showFullHeaders) throws MessagingException {
 	return getTextPart(m, showFullHeaders, false);
     }
 
@@ -122,12 +147,12 @@ public class MailUtilities {
      * This method returns all of the attachments marked as 'inline' which
      * are also of text or message/rfc822 types.
      */
-    public static Vector getInlineTextAttachments(Message m, boolean showFullHeaders, boolean withHeaders) {
+    public static Vector getInlineTextAttachments(Message m, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
 	AttachmentBundle bundle = parseAttachments(m, showFullHeaders, withHeaders);
 	return bundle.textAttachments;
     }
 
-    public static Vector getInlineTextAttachments(Message m, boolean showFullHeaders) {
+    public static Vector getInlineTextAttachments(Message m, boolean showFullHeaders) throws MessagingException {
 	return getInlineTextAttachments(m, showFullHeaders, false);
     }
 
@@ -135,7 +160,7 @@ public class MailUtilities {
      * This returns the Attachments (basically, all the Parts in a Multipart
      * except for the main body of the message).
      */
-    public static Vector getAttachments(Message m, boolean showFullHeaders) {
+    public static Vector getAttachments(Message m, boolean showFullHeaders) throws MessagingException {
 	AttachmentBundle bundle = parseAttachments(m, showFullHeaders);
 	return bundle.allAttachments;
     }
@@ -145,7 +170,7 @@ public class MailUtilities {
      * The attachments are separated by the separator flag.
      */
 
-    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders, boolean withHeaders) {
+    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
 	StringBuffer returnValue = null;
 	String retString = MailUtilities.getTextPart(m, showFullHeaders, withHeaders);
 	if (retString != null && retString.length() > 0)
@@ -156,27 +181,25 @@ public class MailUtilities {
 	Vector attachments = MailUtilities.getInlineTextAttachments(m, showFullHeaders);
 	if (attachments != null && attachments.size() > 0) {
 	    for (int i = 0; i < attachments.size(); i++) {
+		Object content = null;
 		try {
-		    Object content = ((MimeBodyPart)attachments.elementAt(i)).getContent();
-		    returnValue.append(separator);
-		    if (content instanceof MimeMessage)
-			returnValue.append(getTextAndTextInlines((MimeMessage)content, separator, showFullHeaders));
-		    else
-			returnValue.append(content);
-		} catch (Exception e) {
-	    System.out.println("caught exception.");
-	    e.printStackTrace();
-
-		    // if we get an exception getting the content, just
-		    // ignore the attachment.
+		    content = ((MimeBodyPart)attachments.elementAt(i)).getContent();
+		} catch (IOException ioe) {
+		    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
 		}
+
+		returnValue.append(separator);
+		if (content instanceof MimeMessage)
+		    returnValue.append(getTextAndTextInlines((MimeMessage)content, separator, showFullHeaders));
+		else
+		    returnValue.append(content);
 	    }
 	}
-
+	
 	return returnValue.toString();
     }
-
-    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders) {
+    
+    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders) throws MessagingException {
 	return getTextAndTextInlines(m, separator, showFullHeaders, false);
     }
 
@@ -184,7 +207,7 @@ public class MailUtilities {
      * This returns the Attachments (basically, all the Parts in a Multipart
      * except for the main body of the message).
      */
-    public static Vector getAttachments(Multipart mp, boolean showFullHeaders) {
+    public static Vector getAttachments(Multipart mp, boolean showFullHeaders) throws MessagingException {
 	AttachmentBundle bundle = parseAttachments(mp, showFullHeaders);
 	return bundle.allAttachments;
     }
@@ -192,9 +215,9 @@ public class MailUtilities {
     /**
      * This returns the formatted header information for a message.
      */
-    public static StringBuffer getHeaderInformation (MimeMessage mMsg, boolean showFullHeaders) {
+    public static StringBuffer getHeaderInformation (MimeMessage mMsg, boolean showFullHeaders) throws MessagingException {
 	StringBuffer headerText = new StringBuffer();
-
+	
 	if (showFullHeaders) {
 	}
 	else {
@@ -205,11 +228,7 @@ public class MailUtilities {
 	    while (tokens.hasMoreTokens()) {
 		currentHeader=tokens.nextToken();
 		hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		try {
-		    hdrValue = mMsg.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
-		} catch (MessagingException me) {
-		    hdrValue = null;
-		}
+		hdrValue = mMsg.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
 		
 		if (hdrValue != null && hdrValue.length > 0) {
 		    headerText.append(hdrLabel + ":  ");
@@ -219,7 +238,7 @@ public class MailUtilities {
 			    headerText.append(", ");
 		    }
 		    headerText.append("\n");
-		    }
+		}
 	    }
 	    String separator = Pooka.getProperty("MessageWindow.separator", "");
 	    if (separator.equals(""))

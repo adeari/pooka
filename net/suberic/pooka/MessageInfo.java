@@ -84,6 +84,20 @@ public class MessageInfo {
     }
 
     /**
+     * Refreshes the flags object.
+     */
+    public void refreshFlags() throws MessagingException {
+	// this is a no-op for this implementation
+    }
+    
+    /**
+     * Refreshes the Headers object.
+     */
+    public void refreshHeaders() throws MessagingException {
+	// this is a no-op for this implementation
+    }
+
+    /**
      * This gets a particular property (From, To, Date, Subject, or just
      * about any Email Header) from the Message.
      */
