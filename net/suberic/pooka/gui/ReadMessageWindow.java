@@ -62,8 +62,8 @@ public class ReadMessageWindow extends MessageWindow {
 	} else {
 	    this.getContentPane().add("Center", new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
 	}
-	
-	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500")));
+
+	this.setSize(this.getDefaultMessageSize(editorPane.getFont()));
 	
     }
 
@@ -77,6 +77,18 @@ public class ReadMessageWindow extends MessageWindow {
 
     public JTextPane createMessagePanel(MessageProxy aMsg) {
 	editorPane = new JTextPane();
+
+	Font n = new Font("monospaced", Font.PLAIN, 10);
+
+	// this is what we really should do, more or less.
+	String fontName = Pooka.getProperty("MessageWindow.font.name", "Dialog");
+	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.font.size", "10"));
+
+	System.out.println("getting font for fontName " + fontName + ", size is " + fontSize);
+	Font f = new Font(fontName, Font.PLAIN, fontSize);
+	System.out.println("got font (name)" + f.getName() + " (family) " + f.getFamily() + " (fontName) " + f.getFontName() + " (size) " + f.getSize());
+	editorPane.setFont(f);
+
 	StringBuffer messageText = new StringBuffer();
 	
 	if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {

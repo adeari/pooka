@@ -100,6 +100,49 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      * UserProfile object.
      */
 
+    /**
+     * This method sets the size of the MessageWindow to the default size.
+     * In this case, the default size is taken from the MessageWindow.vsize
+     * property for the vertical size.  For the horizontal size, if
+     * MessageWindow.hsizeByCharLength is set to true, this method uses the
+     * MessageWindow.charLength property along with the configured font
+     * to determine the size of the window.  If this is not set, or set
+     * to false, then the MessageWindow.hsize property is used instead.
+     */
+    public Dimension getDefaultMessageSize(Font currentFont) {
+	int hsize = 500;
+	int vsize = 500;
+	
+	try {
+	    vsize = Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500"));
+	} catch (NumberFormatException nfe) {
+	    vsize=500;
+	}
+	
+	try {
+	    if (Pooka.getProperty("MessageWindow.hsizeByCharLength", "false").equalsIgnoreCase("true")) {
+		int charLength = Integer.parseInt(Pooka.getProperty("MessageWindow.charLength", "80"));
+		if (currentFont != null) {
+		    FontMetrics fm = this.getFontMetrics(currentFont);
+
+		    int[] firstWidths = fm.getWidths();
+		    int accumulator = 0;
+		    for (int i = 0; i < 256; i++)
+			accumulator+=firstWidths[i];
+		    hsize = accumulator / 256 * 80;
+		}
+	    } else {
+		hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500"));
+	    }
+	} catch (NumberFormatException nfe) {
+	    hsize=500;
+	}
+	
+	return new Dimension(hsize, vsize);
+
+    }
+
+
     public UserProfile getDefaultProfile() {
 	return getMessageProxy().getDefaultProfile();
     }

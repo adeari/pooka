@@ -61,8 +61,8 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 
 	this.getContentPane().add("Center", splitPane);
 	
-	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500")));
-	
+	this.setSize(this.getDefaultMessageSize(editorPane.getFont()));
+
 	msg.setMessageWindow(this);
 
 	toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
@@ -173,6 +173,12 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
     public JTextPane createMessagePanel(MessageProxy aMsg) {
 	JTextPane retval = new JTextPane();
 	
+	String fontName = Pooka.getProperty("MessageWindow.font.name", "monospaced");
+	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.font.size", "10"));
+	
+	Font f = new Font(fontName, Font.PLAIN, fontSize);
+	editorPane.setFont(f);
+
 	// see if this message already has a text part, and if so,
 	// include it.
 	
