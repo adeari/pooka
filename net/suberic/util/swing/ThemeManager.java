@@ -13,7 +13,7 @@ import net.suberic.util.*;
 public class ThemeManager implements ValueChangeListener, ItemCreator, ItemListChangeListener {
 
   private ItemManager manager;
-  private LinkedList listenerList = new LinkedList();
+  private WeakHashMap listenerList = new WeakHashMap();
   private VariableBundle sourceBundle;
   private String resourceString;
   
@@ -133,10 +133,25 @@ public class ThemeManager implements ValueChangeListener, ItemCreator, ItemListC
    * This notifies all listeners that the Theme list has changed.
    */
   public void fireItemListChanged(ItemListChangeEvent e) {
-    for (int i = 0; i < listenerList.size(); i++)
-      ((ItemListChangeListener)listenerList.get(i)).itemListChanged(e);
+    Iterator iter = listenerList.keySet().iterator();
+    while (iter.hasNext()) 
+      ((ItemListChangeListener)iter.next()).itemListChanged(e);
+  }
+
+  /**
+   * This adds a listener.
+   */
+  public void addItemListListener(ItemListChangeListener newListener) {
+    listenerList.put(newListener, null);
   }
   
+  /**
+   * This removes a listener.
+   */
+  public void removeItemListListener(ItemListChangeListener oldListener) {
+    listenerList.remove(oldListener);
+  }
+
   /**
    * Creates an item from the given sourceBundle, resourceString, and itemId.
    *

@@ -1,7 +1,7 @@
 package net.suberic.util.swing;
 
 import net.suberic.util.*;
-import java.util.LinkedList;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.plaf.metal.*;
 import javax.swing.plaf.*;
@@ -18,7 +18,7 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, V
 
   private VariableBundle bundle = null;
 
-  private LinkedList themeListenerList = new LinkedList();
+  private WeakHashMap themeListenerList = new WeakHashMap();
 
   protected ColorUIResource subPrimary1 = null;
   protected ColorUIResource subPrimary2 = null;
@@ -81,8 +81,8 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, V
    * Adds a ThemeListener to the ListenerList.
    */
   public void addThemeListener(ThemeListener tl) {
-    if (! themeListenerList.contains(tl))
-      themeListenerList.add(tl);
+    if (! themeListenerList.containsKey(tl))
+      themeListenerList.put(tl, null);
   }
   
   /**
@@ -96,8 +96,9 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, V
    * Notifies all registered ThemeListeners that this Theme has changed.
    */
   public void fireThemeChangedEvent() {
-    for (int i = 0; i < themeListenerList.size(); i++) {
-      ThemeListener current = (ThemeListener) themeListenerList.get(i);
+    Iterator iter = themeListenerList.keySet().iterator();
+    while (iter.hasNext()) {
+      ThemeListener current = (ThemeListener) iter.next();
       current.themeChanged(this);
     }
   }
