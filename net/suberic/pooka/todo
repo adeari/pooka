@@ -27,6 +27,15 @@ or not they're actually connected, instead of relying on the user.
 
 *) https:// url's don't get highlighted
 
+*) preview pane:  make it so the status bar is at the bottom, underneath
+	the readmessagedisplaypanel--or possibly on the status pane.
+	-- maybe change the toolbars so there's only 1?
+	-- make the separator show up at the right place.
+	-- ?? make it so you can compose messages in the main window ??
+	-- make it so it doesn't automatically display the first new message.
+
+*) make it so the default text/image viewer actually works.
+
 ---
 *) queuing of outgoing mails
 	todo on this:
@@ -139,6 +148,12 @@ error:  filterfoldercellrenderer has problems with search forms.
 	       window larger and then detach it, or if you move the split
 		pane divider, then it reverts to its original state when you
 		detach/attach the window.
+
+*) add a spell checker
+
+*) add threading of messages (?) 
+
+*) set priority (?)
 
 *) expand an unopened store in the folder tree that has folders and
 	subfolders.  connect to the store.  the subfolders close back up.
