@@ -136,7 +136,19 @@ public class NewMessageProxy extends MessageProxy {
 	    if (me instanceof MessagingException) {
 	      if (mailServer != null) {
 		SendFailedDialog sfd = getNewMessageUI().showSendFailedDialog(mailServer, (MessagingException) me);
-		System.err.println("done.");
+		if (sfd.resendMessage()) {
+		  OutgoingMailServer newServer = sfd.getMailServer();
+		  if (newServer != null) {
+		    String action = sfd.getMailServerAction();
+		    UserProfile profile = getNewMessageUI().getSelectedProfile();
+		    if (action == SendFailedDialog.S_SESSION_DEFAULT) {
+		      profile.setTemporaryMailServer(newServer);
+		    } else if (action == SendFailedDialog.S_CHANGE_DEFAULT) {
+		      Pooka.setProperty(profile.getUserProperty() + ".mailServer", newServer.getItemID());
+		    }
+		    newServer.sendMessage(getNewMessageInfo());
+		  }
+		}
 	      } else {
 		getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
 		me.printStackTrace(System.out);

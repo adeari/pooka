@@ -22,9 +22,9 @@ public class SendFailedDialog extends JPanel {
   static String S_SAVE_TO_OUTBOX = "outbox";
 
   // the mailserver action commands
-  static String S_NOTHING = "nothing";
-  static String S_SESSION_DEFAULT = "session";
-  static String S_CHANGE_DEFAULT = "change_default";
+  public static String S_NOTHING = "nothing";
+  public static String S_SESSION_DEFAULT = "session";
+  public static String S_CHANGE_DEFAULT = "change_default";
 
   // the MessagingException
   MessagingException mException;
@@ -35,8 +35,8 @@ public class SendFailedDialog extends JPanel {
   // the display panel.
   JTextArea mMessageDisplay;
 
-  // a JList that shows all available mailservers.
-  JList mMailServerList = null;
+  // a JComboBox that shows all available mailservers.
+  JComboBox mMailServerList = null;
 
   // a JRadioButton that shows the choices of what to do with the failed
   // send.
@@ -95,6 +95,7 @@ public class SendFailedDialog extends JPanel {
     JRadioButton abortButton = new JRadioButton();
     abortButton.setText(Pooka.getProperty(P_RESOURCE + ".cancel", "Cancel send"));
     abortButton.setActionCommand(S_ABORT);
+    abortButton.setSelected(true);
     choices.add(abortButton);
     returnValue.add(abortButton);
 
@@ -116,11 +117,20 @@ public class SendFailedDialog extends JPanel {
   }
 
   /**
-   * Creates a JList to show the choices of mailservers.
+   * Creates a JComboBox to show the choices of mailservers.
    */
-  public JList createMailServerList() {
+  public JComboBox createMailServerList() {
     Vector v = Pooka.getOutgoingMailManager().getOutgoingMailServerList();
-    JList returnValue = new JList(v);
+    Iterator it = v.iterator();
+    Vector idList = new Vector();
+    while (it.hasNext()) {
+      OutgoingMailServer current = (OutgoingMailServer) it.next();
+      idList.add(current.getItemID());
+    }
+    JComboBox returnValue = new JComboBox(idList);
+    if (mOriginalMailServer != null)
+      returnValue.setSelectedItem(mOriginalMailServer.getItemID());
+    
     return returnValue;
   }
 
@@ -139,6 +149,7 @@ public class SendFailedDialog extends JPanel {
     JRadioButton current = new JRadioButton();
     current.setText(Pooka.getProperty(P_RESOURCE + ".noDefault", "Keep default"));
     current.setActionCommand(S_NOTHING);
+    current.setSelected(true);
     choices.add(current);
     returnValue.add(current);
 
@@ -163,20 +174,28 @@ public class SendFailedDialog extends JPanel {
    * Whether or not to try a resend, or just fail.
    */
   public boolean resendMessage() {
-    return false;
+    if (mActionButtons.getSelection().getActionCommand() == S_SEND_OTHER_SERVER) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
    * The MailServer selected.
    */
   public OutgoingMailServer getMailServer() {
-    return null;
+    String selectedValue = (String) mMailServerList.getSelectedItem();
+    OutgoingMailServer returnValue = Pooka.getOutgoingMailManager().getOutgoingMailServer(selectedValue);
+    return returnValue;
   }
 
   /**
    * What to do with the selected MailServer.
    */
-  public int getMailServerAction() {
-    return -1;
+  public String getMailServerAction() {
+    String selectedValue = mServerDefaultButtons.getSelection().getActionCommand();
+    return selectedValue;
   }
 }
+

@@ -14,6 +14,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   String defaultDomain;
   String defaultDefaultDomain;
   OutgoingMailServer mailServer;
+  OutgoingMailServer mTempMailServer = null;
   String sendPrecommand;
   String sentFolderName;
   FolderInfo sentFolder;
@@ -452,6 +453,15 @@ public class UserProfile extends Object implements ValueChangeListener {
   }
 
   /**
+   * Sets a mail server for this session.
+   */
+  public void setTemporaryMailServer(OutgoingMailServer pTempServer) {
+    mTempMailServer = pTempServer;
+
+    loadMailServer();
+  }
+
+  /**
    * Returns the default domain.  This will be appended to any email 
    * address which doesn't include a domain.
    */
@@ -490,6 +500,12 @@ public class UserProfile extends Object implements ValueChangeListener {
    * property.
    */
   public void loadMailServer() {
+    if (mTempMailServer != null) {
+      mailServer = mTempMailServer;
+
+      return;
+    }
+    
     mailServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(mailServerName);
     if (mailServer == null) {
       mailServer = Pooka.getOutgoingMailManager().getDefaultOutgoingMailServer();

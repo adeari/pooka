@@ -202,7 +202,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * Message.sendImmediately setting is true, then we'll attempt to send
    * the message anyway.  
    */
-  public synchronized void sendMessage(NewMessageInfo nmi, boolean connect) throws javax.mail.MessagingException {
+  public synchronized void sendMessage(NewMessageInfo nmi, boolean connect) {
     final NewMessageInfo nmi_final = nmi;
     final boolean connect_final = connect;
     
@@ -328,7 +328,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * Virtually sends a message.  If the current status is connected, then
    * the message will actually be sent now.  
    */
-  public void sendMessage(NewMessageInfo nmi) throws javax.mail.MessagingException {
+  public void sendMessage(NewMessageInfo nmi) {
     sendMessage(nmi, false);
   }
 

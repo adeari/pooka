@@ -423,11 +423,7 @@ public class MessageInfo {
       final OutgoingMailServer mailServer = p.getMailServer();
       mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
 	  public void actionPerformed(java.awt.event.ActionEvent ae) {
-	    try {
-	      mailServer.sendMessage(final_nmi);
-	    } catch (MessagingException me) {
-	      getMessageProxy().showError(Pooka.getProperty("error.MessageUI.bounceFailed", "Failed to bounce Message."), me);
-	    }
+	    mailServer.sendMessage(final_nmi);
 	  }
 	}, new java.awt.event.ActionEvent(this, 0, "message-send"));
     }
