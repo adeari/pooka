@@ -209,7 +209,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage) {
-    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+    Pooka.getUIFactory().showError(errorMessage);
   }
   
   /**
@@ -218,8 +218,8 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, Exception e) {
-    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
+    Pooka.getUIFactory().showError(errorMessage, e);
+  }
   
   /**
    * This shows an Error Message window.  We include this so that
@@ -227,8 +227,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, String title, Exception e) {
-    showError(errorMessage + e.getMessage(), title);
-    e.printStackTrace();
+    Pooka.getUIFactory().showError(errorMessage, title, e);
   }
   
   /**

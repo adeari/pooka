@@ -1,3 +1,8 @@
+changed the display for some error message so that there's acutally a 
+space between the message and the error code.
+
+fixed a bug in which some message contents wouldn't should up in raw mode.
+
 modified Attachment handing some so that we should now handle misconfigured
 emails a little bit better.
 

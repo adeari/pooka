@@ -247,7 +247,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This shows an Error Message window.
    */
   public void showError(String errorMessage, String title, Exception e) {
-    showError(errorMessage + e.getMessage(), title);
+    showError(errorMessage + ":  " +  e.getMessage(), title);
     e.printStackTrace();
   }
   

@@ -57,15 +57,15 @@ public class MessageProxy {
 	
       } catch (IOException ioe) {
 	if (getMessageUI() != null)
-	  getMessageUI().showError("Error saving file:  " + ioe.getMessage());
+	  getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
 	else
-	  Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
+	  Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
 	cancelSave();
       } catch (MessagingException me) {
 	if (getMessageUI() != null)
-	  getMessageUI().showError("Error saving file:  " + me.getMessage());
+	  getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + me.getMessage());
 	else
-	  Pooka.getUIFactory().showError("Error saving file:  " + me.getMessage());
+	  Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + me.getMessage());
 	cancelSave();
       } finally {
 	if (outStream != null) {
@@ -1564,7 +1564,7 @@ public class MessageProxy {
       try {
 	getMessageInfo().cacheMessage();
       } catch (MessagingException me) {
-	showError(me.getMessage(), me);
+	showError(Pooka.getProperty("Pooka.cache.errorCachingMessage", "Error caching message"), me);
       }
       
       if (fw != null)
@@ -1608,7 +1608,7 @@ public class MessageProxy {
 	    });
 	}
       } catch (MessagingException me) {
-	showError(me.getMessage(), me);
+	showError(Pooka.getProperty("error.savingAddress", "Error saving Address"), me);
       }
       
       if (fw != null)

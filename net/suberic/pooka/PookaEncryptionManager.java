@@ -397,10 +397,15 @@ public class PookaEncryptionManager {
       // get user input
     }
     
-    if (key != null)
-      return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
-    else
+    if (key != null) {
+      if (key instanceof net.suberic.crypto.EncryptionKey) {
+	return ((EncryptionKey) key).getEncryptionUtils().signMessage(Pooka.getDefaultSession(), mMsg, key);
+      } else {
+	return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
+      }
+    } else {
       return mMsg;
+    }
   }
 
 }
