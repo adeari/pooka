@@ -57,6 +57,8 @@ public class PropertyEditorFactory {
 	    return createBooleanEditor(property);
 	else if (test.equals("Multi"))
 	    return createMultiEditor(property);
+	else if (test.equals("Tabbed"))
+	    return createTabbedEditor(property, property);
 	else
 	    return createBasicEditor(property);
     }
@@ -81,6 +83,8 @@ public class PropertyEditorFactory {
 	    return createBooleanEditor(property);
 	else if (test.equals("Multi"))
 	    return createMultiEditor(property);
+	else if (test.equals("Tabbed"))
+	    return createTabbedEditor(property, typeTemplate);
 	else
 	    return createBasicEditor(property);
     }
@@ -111,6 +115,10 @@ public class PropertyEditorFactory {
 
     private DefaultPropertyEditor createMultiEditor(String property) {
 	return new MultiEditorPane(property,this);
+    }
+
+    private DefaultPropertyEditor createTabbedEditor(String property, String typeTemplate) {
+	return new TabbedEditorPane(property, typeTemplate, this);
     }
 
     public VariableBundle getBundle() {
