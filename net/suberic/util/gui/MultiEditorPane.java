@@ -68,7 +68,8 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	this.setEnabled(isEnabled);
     }
 
-    public MultiEditorPane(String newProperty, PropertyEditorFactory newFactory) {
+    public MultiEditorPane(String newProperty,
+                           PropertyEditorFactory newFactory) {
 	this(newProperty, newFactory, true);
     }
     private Vector createEditedList(String origValue) {
@@ -120,6 +121,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	    //	    pep.setEnabled(false);
 
+            // save reference to new pane in hash table
 	    currentPanels.put(itemList.elementAt(i), pep);
 
 	    entryPanel.add((String)itemList.elementAt(i), pep);

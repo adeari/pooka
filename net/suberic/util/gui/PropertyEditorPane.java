@@ -8,10 +8,12 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
     PropertyEditorFactory factory;
     JInternalFrame container;
     
-    public PropertyEditorPane(PropertyEditorFactory newFactory, Vector properties, JInternalFrame newContainer) {
+    public PropertyEditorPane(PropertyEditorFactory newFactory, 
+                              Vector properties, 
+                              JInternalFrame newContainer) {
 	super(BoxLayout.Y_AXIS);
-
-	factory=newFactory;
+        
+	factory = newFactory;
 	container = newContainer;
 
 	DefaultPropertyEditor currentEditor;
@@ -19,7 +21,8 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
 	editors = new Vector();
 
 	for (int i = 0; i < properties.size(); i++) {
-	    currentEditor = factory.createEditor((String)properties.elementAt(i));
+	    currentEditor =
+              factory.createEditor((String)properties.elementAt(i));
 	    editors.add(currentEditor);
 	    this.add(currentEditor);
 	}
@@ -84,7 +87,7 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
     private JButton createButton(String label, Action e, boolean isDefault) {
 	JButton thisButton;
 	
-	thisButton = new JButton(factory.getBundle().getProperty("label." + label, label));
+        thisButton = new JButton(factory.getBundle().getProperty("label." + label, label));
 	try {
 	    thisButton.setMnemonic(factory.getBundle().getProperty("label." + label + ".mnemonic").charAt(0));
 	} catch (java.util.MissingResourceException mre) {
