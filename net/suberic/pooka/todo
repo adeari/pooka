@@ -1,13 +1,18 @@
-*) _really_ fix the window resizing problem.
-
-*) fix the new account creation / new mailbox creation so that the
-	folder display actually gets updated.  (jdk 1.3.1?)
 
 *) make it so the connection objects actually have a clue as to whether
 or not they're actually connected, instead of relying on the user.
 
+*) detach a message from the desktop pane.  do an open with.  it uses the
+	jdesktoppane, not a standalone window.
+
+*) detach a message.  reply to it.
+
+*) check:  new messages in subfolders in disconnected mode.
 
 ----------
+
+*) NPE -- is that from switching from preview to desktop?
+	-- check window menu from switching preview to desktop.
 
 *) make it so you can stop html displays from showing non-local images.
  	-- support RFC-2557??
