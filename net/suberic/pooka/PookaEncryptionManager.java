@@ -7,6 +7,7 @@ import java.util.Set;
 import java.io.File;
 import java.io.FileInputStream;
 import java.security.Key;
+import java.security.KeyStoreException;
 
 import javax.mail.internet.*;
 import javax.mail.*;
@@ -155,10 +156,18 @@ public class PookaEncryptionManager {
   public Set privateKeyAliases() throws java.security.KeyStoreException {
     Set returnValue = new java.util.HashSet();
     if (pgpKeyMgr != null) {
-      returnValue.addAll(pgpKeyMgr.privateKeyAliases());
+      try {
+	returnValue.addAll(pgpKeyMgr.privateKeyAliases());
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
     }
     if (smimeKeyMgr != null) {
-      returnValue.addAll(smimeKeyMgr.privateKeyAliases());
+      try {
+	returnValue.addAll(smimeKeyMgr.privateKeyAliases());
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
     }
 
     return returnValue;
@@ -173,13 +182,23 @@ public class PookaEncryptionManager {
 
       // check to see if this exists anywhere.
       if (pgpKeyMgr != null) {
-	if (pgpKeyMgr.containsPrivateKeyAlias(alias))
-	  return pgpKeyMgr.getPrivateKey(alias,password);
+	try {
+	  if (pgpKeyMgr.containsPrivateKeyAlias(alias))
+	    return pgpKeyMgr.getPrivateKey(alias,password);
+	} catch (KeyStoreException kse) {
+	  // FIXME ignore for now?
+	}
+	
       }
       
       if (smimeKeyMgr!= null) {
-	if (smimeKeyMgr.containsPrivateKeyAlias(alias))
-	  return smimeKeyMgr.getPrivateKey(alias, password);
+	try {
+	  if (smimeKeyMgr.containsPrivateKeyAlias(alias))
+	    return smimeKeyMgr.getPrivateKey(alias, password);
+	} catch (KeyStoreException kse) {
+	  // FIXME ignore for now?
+	}
+
       }
     }
     
@@ -192,11 +211,21 @@ public class PookaEncryptionManager {
   public Key getPrivateKey(String alias, char[] password) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
 
     Key returnValue = null;
-    if (pgpKeyMgr != null)
-      returnValue = pgpKeyMgr.getPrivateKey(alias, password);
+    if (pgpKeyMgr != null) {
+      try {
+	returnValue = pgpKeyMgr.getPrivateKey(alias, password);
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
+    }
 
-    if (returnValue == null && smimeKeyMgr != null)
-      returnValue = smimeKeyMgr.getPrivateKey(alias, password);
+    if (returnValue == null && smimeKeyMgr != null) {
+      try {
+	returnValue = smimeKeyMgr.getPrivateKey(alias, password);
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
+    }
 
     return returnValue;
   }
@@ -223,11 +252,21 @@ public class PookaEncryptionManager {
    */
   public Key getPublicKey(String alias) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
     Key returnValue = null;
-    if (pgpKeyMgr != null)
-      returnValue = pgpKeyMgr.getPublicKey(alias);
+    if (pgpKeyMgr != null) {
+      try {
+	returnValue = pgpKeyMgr.getPublicKey(alias);
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
+    }
 
-    if (returnValue == null && smimeKeyMgr != null) 
-      returnValue = smimeKeyMgr.getPublicKey(alias);
+    if (returnValue == null && smimeKeyMgr != null) {
+      try {
+	returnValue = smimeKeyMgr.getPublicKey(alias);
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
+    }
 
     return returnValue;
   }
@@ -245,10 +284,18 @@ public class PookaEncryptionManager {
   public Set publicKeyAliases() throws java.security.KeyStoreException {
     Set returnValue = new java.util.HashSet();
     if (pgpKeyMgr != null) {
-      returnValue.addAll(pgpKeyMgr.publicKeyAliases());
+      try {
+	returnValue.addAll(pgpKeyMgr.publicKeyAliases());
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
     }
     if (smimeKeyMgr != null) {
-      returnValue.addAll(smimeKeyMgr.publicKeyAliases());
+      try {
+	returnValue.addAll(smimeKeyMgr.publicKeyAliases());
+      } catch (KeyStoreException kse) {
+	// FIXME ignore for now?
+      }
     }
 
     return returnValue;
