@@ -539,9 +539,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 		    MessageChangedEvent mce = (MessageChangedEvent)actionEvent.getSource();
-		    MessageProxy mp = getMessageProxy(mce.getMessage());
-		    mp.unloadTableInfo();
-		    mp.loadTableInfo();
+		    // if the message is getting deleted, then we don't
+		    // really need to update the table info.  for that 
+		    // matter, it's likely that we'll get MessagingExceptions
+		    // if we do, anyway.
+		    try {
+			if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+			    MessageProxy mp = getMessageProxy(mce.getMessage());
+			    mp.unloadTableInfo();
+			    mp.loadTableInfo();
+			}
+		    } catch (MessagingException me) {
+			// if we catch a MessagingException, it just means
+			// that the message has already been expunged.
+		    }
+		    
 		    fireMessageChangedEvent(mce);
 		}
 	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
