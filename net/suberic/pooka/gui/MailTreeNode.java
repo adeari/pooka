@@ -41,7 +41,10 @@ public class MailTreeNode extends DefaultMutableTreeNode {
     }
 
     public Action getAction(String name) {
-	return (Action)commands.get(name);
+	if (commands != null)
+	    return (Action)commands.get(name);
+	else
+	    return null;
     }
 
     public Action[] getDefaultActions() {
