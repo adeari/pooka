@@ -93,6 +93,8 @@ public class MailUtilities {
 	    bundle.addAll(parseAttachments(mp));
 	  }
 	}
+      } else if (ct.getSubType().equalsIgnoreCase("encrypted")) {
+	bundle.getAttachments().add(new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m));
       } else {
 	bundle.addAll(parseAttachments((Multipart)m.getContent()));
       }
@@ -153,6 +155,8 @@ public class MailUtilities {
 	      bundle.addAll(parseAttachments(amp));
 	    }
 	  }
+	} else if (ct.getSubType().equalsIgnoreCase("encrypted")) {
+	  bundle.getAttachments().add(new net.suberic.pooka.crypto.CryptoAttachment(mbp));
 	} else {
 	  bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
 	}

@@ -32,6 +32,9 @@ public class MessageInfo {
   // the attachments on the message.
   AttachmentBundle attachments;
   
+  // the CryptoInfo for this Message.
+  net.suberic.pooka.crypto.MessageCryptoInfo cryptoInfo = null;
+
   // if the Message itself has been loaded via fetch()
   boolean fetched = false;
 
