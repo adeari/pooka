@@ -30,13 +30,6 @@
 	  
 *) fix error display with exception so that you can see the stack trace.
 
-*) disconneted:  use downloaded headers when available?
-*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
-	message.  read it.  disconnect there.  get a few new messages.
-	reconnect from original pooka.
-	-- works, but refresh of messages takes too long.  specifically
-	read messages?
-	
 *) new message count in icon
 
 *) add drag and drop

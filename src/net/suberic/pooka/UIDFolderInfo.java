@@ -233,38 +233,38 @@ public class UIDFolderInfo extends FolderInfo {
     
   }
   
-    /**
-     * Gets the removed UIDs.
-     */
-    protected long[] getRemovedMessages(long[] newUids, long uidValidity) {
-	Vector remainders = new Vector(uidToInfoTable.keySet());
-	
-	for (int i = 0; i < newUids.length; i++) {
-	    remainders.remove(new Long(newUids[i]));
-	}
-	
-	long[] returnValue = new long[remainders.size()];
-	for (int i = 0; i < remainders.size(); i++)
-	    returnValue[i] = ((Long) remainders.elementAt(i)).longValue();
-	
-	return returnValue;
-    }
-
-    protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
-      // sigh
-      
-      Vector proxies = new Vector();
-      for (int i = 0; i < messages.length; i++) {
-	MessageProxy mp = getMessageInfo(messages[i]).getMessageProxy();
-	mp.setRefresh(true);
-	proxies.add(mp);
-      }
-      
-      loaderThread.loadMessages(proxies);
-      
-    }
-  
+  /**
+   * Gets the removed UIDs.
+   */
+  protected long[] getRemovedMessages(long[] newUids, long uidValidity) {
+    Vector remainders = new Vector(uidToInfoTable.keySet());
     
+    for (int i = 0; i < newUids.length; i++) {
+      remainders.remove(new Long(newUids[i]));
+    }
+    
+    long[] returnValue = new long[remainders.size()];
+    for (int i = 0; i < remainders.size(); i++)
+      returnValue[i] = ((Long) remainders.elementAt(i)).longValue();
+    
+    return returnValue;
+  }
+  
+  protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
+    // sigh
+    
+    Vector proxies = new Vector();
+    for (int i = 0; i < messages.length; i++) {
+      MessageProxy mp = getMessageInfo(messages[i]).getMessageProxy();
+      mp.setRefresh(true);
+      proxies.add(mp);
+    }
+    
+    loaderThread.loadMessages(proxies);
+    
+  }
+  
+  
   protected void runMessagesAdded(MessageCountEvent mce)  {
     if (folderTableModel != null) {
       try {
@@ -301,7 +301,7 @@ public class UIDFolderInfo extends FolderInfo {
 	  
 	  // notify the message loaded thread.
 	  MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	  loaderThread.loadMessages(addedArray);
+	  loaderThread.loadMessages(addedArray, net.suberic.pooka.thread.LoadMessageThread.HIGH);
 	  
 	  // change the Message objects in the MessageCountEvent to 
 	  // our UIDMimeMessages.

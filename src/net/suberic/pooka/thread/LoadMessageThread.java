@@ -25,20 +25,18 @@ import java.util.*;
 
 public class LoadMessageThread extends Thread {
   private FolderInfo folderInfo;
-  private List loadedMessageInfo = new LinkedList();
   private List columnValues;
   private List loadQueue = new LinkedList();
   private List priorityLoadQueue = new LinkedList();
   private List messageLoadedListeners = new LinkedList();
   private int updateCheckMilliseconds = 60000;
   private int updateMessagesCount = 10;
-  private int loadedMessageCount = 0;
   private boolean sleeping = false;
 
   private boolean stopped = false;
 
-  public int NORMAL = 5;
-  public int HIGH = 10;
+  public static int NORMAL = 5;
+  public static int HIGH = 10;
 
   /**
    * This creates a new LoadMessageThread from a FolderInfo object.
@@ -75,21 +73,26 @@ public class LoadMessageThread extends Thread {
   }
   
   
+  /**
+   * Loads the messages in the queue.
+   */
   public void loadWaitingMessages() {
     
-    List messages = retrieveLoadQueue();
-    int numMessages = messages.size();
+    int updateCounter = 0;
+    int loadedMessageCount = 0;
     MessageProxy mp;
     
-    int updateCounter = 0;
-    
-    if (! stopped && numMessages > 0) {
+    // start this load section.
+    int queueSize = getQueueSize();    
+    int totalMessageCount = queueSize;
+    if (! stopped && queueSize > 0) {
       MessageLoadedListener display = getFolderInfo().getFolderDisplayUI();
       if (display != null)
 	this.addMessageLoadedListener(display);
       
-      fireMessageLoadedEvent(MessageLoadedEvent.LOADING_STARTING, getLoadedMessageCount(), messages.size());
+      fireMessageLoadedEvent(MessageLoadedEvent.LOADING_STARTING, 0, totalMessageCount);
       
+      // get the batch sizes.
       int fetchBatchSize = 50;
       int loadBatchSize = 25;
       try {
@@ -104,21 +107,25 @@ public class LoadMessageThread extends Thread {
       
       FetchProfile fetchProfile = getFolderInfo().getFetchProfile();
 
-      int i = numMessages - 1;
-      while ( ! stopped &&  i >= 0 ) {
+      // we'll stay in this while loop until the queue is empty
+      for (List messages = retrieveNextBatch(fetchBatchSize); ! stopped && messages != null; messages=retrieveNextBatch(fetchBatchSize)) {
+	totalMessageCount = messages.size() + getQueueSize() + loadedMessageCount;
 	if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
 	  synchronized(folderInfo.getFolderThread().getRunLock()) {
-	    for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
-	      mp=(MessageProxy)messages.get(i);
+	    // break when either we've been stopped or we're out of messages,
+	    for (int batchCount = 0; ! stopped && batchCount < messages.size(); batchCount++) {
+	      mp=(MessageProxy)messages.get(batchCount);
 	      
+	      // if the message hasn't been fetched, then fetch fetchBatchSize
+	      // worth of messages.
 	      if (! mp.getMessageInfo().hasBeenFetched()) {
 		try {
 		  List fetchList = new ArrayList();
-		  for (int j = i; fetchList.size() < fetchBatchSize && j >= 0; j--) {
+		  for (int j = batchCount; fetchList.size() < fetchBatchSize && j < messages.size(); j++) {
 		    MessageInfo fetchInfo = ((MessageProxy) messages.get(j)).getMessageInfo();
 		    if (! fetchInfo.hasBeenFetched()) {
 		      fetchList.add(fetchInfo);
-		      fetchInfo.setFetched(true);
+		      //fetchInfo.setFetched(true);
 		    }
 		  }
 		  
@@ -132,6 +139,8 @@ public class LoadMessageThread extends Thread {
 		
 	      }
 	      
+	      // now load each individual messageproxy.
+	      // and refresh each message.
 	      try {
 		if (! mp.isLoaded())
 		  mp.loadTableInfo();
@@ -144,22 +153,24 @@ public class LoadMessageThread extends Thread {
 		e.printStackTrace();
 	      }
 	      
+	      loadedMessageCount++;
 	      if (++updateCounter >= getUpdateMessagesCount()) {
-		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
+		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, loadedMessageCount, totalMessageCount);
 		updateCounter = 0;		   
 	      }
-	      loadedMessageCount++;
-	      i--;
 	    }
 	  } // end synchronized
 	} else {
-	  for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
-	    mp=(MessageProxy)messages.get(i);
+	  // break when either we've been stopped or we're out of messages,
+	  for (int batchCount = 0; ! stopped && batchCount < messages.size(); batchCount++) {
+	    mp=(MessageProxy)messages.get(batchCount);
 	    
+	    // if the message hasn't been fetched, then fetch fetchBatchSize
+	    // worth of messages.
 	    if (! mp.getMessageInfo().hasBeenFetched()) {
 	      try {
 		List fetchList = new ArrayList();
-		for (int j = i; fetchList.size() < fetchBatchSize && j >= 0; j--) {
+		for (int j = batchCount; fetchList.size() < fetchBatchSize && j < messages.size(); j++) {
 		  MessageInfo fetchInfo = ((MessageProxy) messages.get(j)).getMessageInfo();
 		  if (! fetchInfo.hasBeenFetched()) {
 		    fetchList.add(fetchInfo);
@@ -171,53 +182,52 @@ public class LoadMessageThread extends Thread {
 		toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
 		synchronized(folderInfo.getFolderThread().getRunLock()) {
 		  getFolderInfo().fetch(toFetch, fetchProfile);
-		} // end synchronized
+		}
 	      } catch(MessagingException me) {
 		System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
 		me.printStackTrace();
 	      }
 	      
 	    }
-	      
+	    
+	    // now load each individual messageproxy.
+	    // and refresh each message.
 	    try {
 	      synchronized(folderInfo.getFolderThread().getRunLock()) {
 		if (! mp.isLoaded())
 		  mp.loadTableInfo();
-		if (mp.needsRefresh()) {
+		if (mp.needsRefresh())
 		  mp.refreshMessage();
-		} else if (! mp.matchedFilters()) {
+		else if (! mp.matchedFilters()) {
 		  mp.matchFilters();
 		}
-	      } // end synchronized
+	      } // synchronized
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }
 	    
+	    loadedMessageCount++;
 	    if (++updateCounter >= getUpdateMessagesCount()) {
-	      fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
+	      fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, loadedMessageCount, totalMessageCount);
 	      updateCounter = 0;		   
 	    }
-	    loadedMessageCount++;
-	    i--;
 	  }
 	}
       }
 
       if (updateCounter > 0)
-	fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
+	fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, loadedMessageCount, totalMessageCount);
       
-      fireMessageLoadedEvent(MessageLoadedEvent.LOADING_COMPLETE, getLoadedMessageCount(), messages.size());
+      fireMessageLoadedEvent(MessageLoadedEvent.LOADING_COMPLETE, loadedMessageCount, totalMessageCount);
       
       if (display != null)
 	removeMessageLoadedListener(display);
     }
   }
   
-
   /**
    * Fires a new MessageLoadedEvent to each registered MessageLoadedListener.
-   */
-  
+   */  
   public void fireMessageLoadedEvent(int type, int numMessages, int max) {
     for (int i = 0; i < messageLoadedListeners.size(); i ++) {
       ((MessageLoadedListener)messageLoadedListeners.get(i)).handleMessageLoaded(new MessageLoadedEvent(this, type, numMessages, max));
@@ -254,14 +264,16 @@ public class LoadMessageThread extends Thread {
    */
   public synchronized void loadMessages(MessageProxy mp, int pPriority) {
     if (pPriority > NORMAL) {
-      priorityLoadQueue.add(mp);
+      if (! priorityLoadQueue.contains(mp))
+	priorityLoadQueue.add(mp);
+      loadQueue.remove(mp);
     } else {
-      loadQueue.add(mp);
+      if (! priorityLoadQueue.contains(mp) && ! loadQueue.contains(mp))
+	loadQueue.add(mp);
     }
     
     if (this.isSleeping())
       this.interrupt();
-    
   }
   
   /**
@@ -275,15 +287,7 @@ public class LoadMessageThread extends Thread {
    * Adds the MessageProxy(s) to the loadQueue.
    */
   public synchronized void loadMessages(MessageProxy[] mp, int pPriority) {
-    if (mp != null && mp.length > 0) {
-      if (pPriority > NORMAL) 
-	priorityLoadQueue.addAll(Arrays.asList(mp));
-      else
-	loadQueue.addAll(Arrays.asList(mp));
-    }
-    
-    if (this.isSleeping())
-      this.interrupt();
+    loadMessages(Arrays.asList(mp), pPriority);
   }
   
   /**
@@ -298,10 +302,14 @@ public class LoadMessageThread extends Thread {
    */
   public synchronized void loadMessages(List mp, int pPriority) {
     if (mp != null && mp.size() > 0) {
-      if (pPriority > NORMAL) 
-	priorityLoadQueue.addAll(mp);
-      else
-	loadQueue.addAll(mp);
+      if (pPriority > NORMAL) {
+	loadQueue.removeAll(mp);
+	addUniqueReversed(priorityLoadQueue, mp);
+      } else {
+	List copy = new ArrayList(mp);
+	copy.removeAll(priorityLoadQueue);
+	addUniqueReversed(loadQueue, copy);
+      }
     }
     
     if (this.isSleeping())
@@ -323,6 +331,17 @@ public class LoadMessageThread extends Thread {
     return returnValue;
   }
   
+  /**
+   * Adds all of the entries in toAdd to targetList, in reversed order.
+   */
+  private void addUniqueReversed(List targetList, List toAdd) {
+    for (int i = toAdd.size() - 1; i >= 0; i--) {
+      Object current = toAdd.get(i);
+      if (current != null && ! targetList.contains(current))
+	targetList.add(current);
+    }
+  }
+
   /**
    * Retrieves the next pCount messages from the queue, or returns null
    * if there are no entries in the queue.
@@ -377,7 +396,14 @@ public class LoadMessageThread extends Thread {
   public void setUpdateMessagesCount(int newValue) {
     updateMessagesCount = newValue;
   }
-  
+
+  /**
+   * Returns the total amount left in the queue.
+   */
+  public synchronized int getQueueSize() {
+    return loadQueue.size() + priorityLoadQueue.size();
+  }
+
   public List getColumnValues() {
     return columnValues;
   }
@@ -388,10 +414,6 @@ public class LoadMessageThread extends Thread {
   
   public FolderInfo getFolderInfo() {
     return folderInfo;
-  }
-  
-  public int getLoadedMessageCount() {
-    return loadedMessageCount;
   }
   
   public boolean isSleeping() {

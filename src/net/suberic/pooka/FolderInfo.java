@@ -1736,7 +1736,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	// notify the message loaded thread.
 	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	loaderThread.loadMessages(addedArray);
+	loaderThread.loadMessages(addedArray, LoadMessageThread.HIGH);
 	
 	fireMessageCountEvent(mce);
       }
