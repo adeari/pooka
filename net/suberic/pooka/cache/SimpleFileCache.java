@@ -482,26 +482,26 @@ public class SimpleFileCache implements MessageCache {
 	return returnValue;
     }
 
-    /**
-     * Gets a DataHandler from the cache.  Returns null if no handler is
-     * available in the cache.
-     */
-    protected DataHandler getHandlerFromCache(long uid) {
-	File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
-	if (f.exists()) {
-	    try {
-		FileInputStream fis = new FileInputStream(f);
-		MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
-		javax.activation.DataSource source = new WrappedMimePartDataSource (mm, this, uid);
-		DataHandler dh = new DataHandler(source);
-		return dh;
-	    } catch (Exception e) {
-		return null;
-	    } 
-	    //return new DataHandler(new FileDataSource(f));
-	} else
-	    return null;
-    }
+  /**
+   * Gets a DataHandler from the cache.  Returns null if no handler is
+   * available in the cache.
+   */
+  protected DataHandler getHandlerFromCache(long uid) {
+    File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
+    if (f.exists()) {
+      try {
+	FileInputStream fis = new FileInputStream(f);
+	MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
+	javax.activation.DataSource source = new WrappedMimePartDataSource (mm, this, uid);
+	DataHandler dh = new DataHandler(source);
+	return dh;
+      } catch (Exception e) {
+	return null;
+      } 
+      //return new DataHandler(new FileDataSource(f));
+    } else
+      return null;
+  }
   
   /**
    * Gets the InternetHeaders from the cache.  Returns null if no headers are
@@ -516,8 +516,13 @@ public class SimpleFileCache implements MessageCache {
       File f = new File(cacheDir, uid +DELIMETER + HEADER_EXT);
       if (f.exists())
 	try {
-	  returnValue = new InternetHeaders(new FileInputStream(f));
+	  FileInputStream fis = new FileInputStream(f);
+	  returnValue = new InternetHeaders(fis);
 	  cachedHeaders.put(new Long(uid), returnValue);
+	  try {
+	    fis.close();
+	  } catch (java.io.IOException ioe) {
+	  }
 	  return returnValue;
 	} catch (FileNotFoundException fnfe) {
 	  throw new MessagingException(fnfe.getMessage(), fnfe);
@@ -680,22 +685,22 @@ public class SimpleFileCache implements MessageCache {
 
   }	    
 
-    public void writeMsgFile() {
-	try {
-	    File msgListFile = new File(cacheDir, "messageList");
-	    if (! msgListFile.exists()) {
-		msgListFile.createNewFile();
-	    }
-	    BufferedWriter out = new BufferedWriter(new FileWriter(msgListFile));
-	    for (int i = 0; i < cachedMessages.size(); i++) {
-		out.write(((Long) cachedMessages.elementAt(i)).toString());
-		out.newLine();
-	    }
-	    out.flush();
-	    out.close();
-	} catch (Exception e) {
-	}
+  public void writeMsgFile() {
+    try {
+      File msgListFile = new File(cacheDir, "messageList");
+      if (! msgListFile.exists()) {
+	msgListFile.createNewFile();
+      }
+      BufferedWriter out = new BufferedWriter(new FileWriter(msgListFile));
+      for (int i = 0; i < cachedMessages.size(); i++) {
+	out.write(((Long) cachedMessages.elementAt(i)).toString());
+	out.newLine();
+      }
+      out.flush();
+      out.close();
+    } catch (Exception e) {
     }
+  }
 
     /**
      * Writes any offline changes made back to the server.
