@@ -175,6 +175,7 @@ UserProfile.default.allowedValues=UserProfile
 
 Store.propertyType=Multi
 Store.editableFields=server:protocol:user:password:defaultProfile
+Store.password.propertyType=Password
 
 Store.defaultProfile.propertyType=List
 Store.defaultProfile.allowedValues=UserProfile
