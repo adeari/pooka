@@ -139,14 +139,20 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    }
 	
 	    if (content != null) {
-		messageText.append(content);
-		editorPane.setEditable(false);
-		editorPane.setText(messageText.toString());
-		editorPane.setCaretPosition(0);
-
-		otherEditorPane.setEditable(false);
-		otherEditorPane.setText(messageText.toString());
-		otherEditorPane.setCaretPosition(0);
+		try {
+		    messageText.append(content);
+		    editorPane.setEditable(false);
+		    editorPane.setText(messageText.toString());
+		    editorPane.setCaretPosition(0);
+		    
+		    otherEditorPane.setEditable(false);
+		    otherEditorPane.setText(messageText.toString());
+		    otherEditorPane.setCaretPosition(0);
+		} catch (Exception e) {
+		    // we're just trying to avoid some parsing errors
+		    // in handling bad html.  probably not the best
+		    // way to do it.  FIXME
+		}
 	    } 
 
 	    if (getMessageProxy().hasAttachments()) {
