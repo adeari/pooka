@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.thread.*;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
@@ -41,6 +42,8 @@ public class MessageProxy {
     // The attachments
     Vector attachments;
 
+    public Action[] defaultActions;
+
     protected MessageProxy() {
     }
 
@@ -54,6 +57,17 @@ public class MessageProxy {
 	columnHeaders = newColumnHeaders;
 
 	commands = new Hashtable();
+	
+	ActionThread storeThread = folderInfo.getParentStore().getStoreThread();
+	
+	defaultActions = new Action[] {
+	    new ActionWrapper(new OpenAction(), storeThread),
+	    new ActionWrapper(new MoveAction(), storeThread),
+	    new ActionWrapper(new ReplyAction(), storeThread),
+	    new ActionWrapper(new ReplyAllAction(), storeThread),
+	    new ActionWrapper(new ForwardAction(), storeThread),
+	    new ActionWrapper(new DeleteAction(), storeThread)
+		};
 	
         Action[] actions = getActions();
         if (actions != null) {
@@ -417,15 +431,6 @@ public class MessageProxy {
     public Action[] getActions() {
 	return defaultActions;
     }
-
-    public Action[] defaultActions = {
-	new OpenAction(),
-	new MoveAction(),
-	new ReplyAction(),
-	new ReplyAllAction(),
-	new ForwardAction(),
-	new DeleteAction()
-    };
 
     public class OpenAction extends AbstractAction {
 	OpenAction() {
