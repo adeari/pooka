@@ -505,30 +505,31 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       return;
     } else { 
       try {
-	NetworkConnection currentConnection = getConnection();
-	if (currentConnection != null) {
-	  if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED)
-	    currentConnection.connect();
-
-	  if (connection.getStatus() != NetworkConnection.CONNECTED) {
-	    throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
-	  }
-	  
-	  store.connect();
-	} else {
-	  // Execute the precommand if there is one
-	  String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
-	  if (preCommand.length() > 0) {
-	    try {
-	      Process p = Runtime.getRuntime().exec(preCommand);
-	      p.waitFor();
-	    } catch (Exception ex) {
-	      System.out.println("Could not run precommand:");
-	      ex.printStackTrace();
+	// don't test for connections for mbox providers.
+	if (!protocol.equalsIgnoreCase("mbox")) {
+	  NetworkConnection currentConnection = getConnection();
+	  if (currentConnection != null) {
+	    if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED)
+	      currentConnection.connect();
+	    
+	    if (connection.getStatus() != NetworkConnection.CONNECTED) {
+	      throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
 	    }
 	  }
-	  store.connect();
 	}
+
+	// Execute the precommand if there is one
+	String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
+	if (preCommand.length() > 0) {
+	  try {
+	    Process p = Runtime.getRuntime().exec(preCommand);
+	    p.waitFor();
+	  } catch (Exception ex) {
+	    System.out.println("Could not run precommand:");
+	    ex.printStackTrace();
+	  }
+	}
+	store.connect();
       } catch (MessagingException me) {
 	Exception e = me.getNextException();
 	if (e != null && e instanceof java.io.InterruptedIOException) 

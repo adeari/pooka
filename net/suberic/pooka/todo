@@ -83,6 +83,8 @@ general ui
 
 *) add a search and replace for the message editors.
 
+*) expand an unopened store in the folder tree that has folders and
+	subfolders.  connect to the store.  the subfolders close back up.
 other
 -----
 *) loadMessageTracker?  it doesn't seem to show up anymore.
