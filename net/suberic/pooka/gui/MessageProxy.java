@@ -484,6 +484,15 @@ public class MessageProxy {
 	return loaded;
     }
 
+    /**
+     * This sets the loaded value for the MessageProxy to false.   This 
+     * should be called only if the TableInfo of the Message has been 
+     * changed and needs to be reloaded.
+     */
+    public void unloadTableInfo() {
+	loaded=false;
+    }
+
     public boolean hasLoadedAttachments() {
 	return attachmentsLoaded;
     }
@@ -499,7 +508,6 @@ public class MessageProxy {
     public Vector getAttachments() {
 	return attachments;
     }
-
 
     public Action getAction(String name) {
 	return (Action)commands.get(name);

@@ -10,13 +10,9 @@ a menu option and from the 'open with' dialog.
 
 *) create a Trash folder.
 
-*) add the ability to sort the FolderTable.
-
 *) add new/unread/urgent/etc flags to the FolderTable.
 	somewhat done.  left todo:
-	1)  make the tags update on a MessageChanged.
-	2)  make the recent/new one work --??
-	3)  make the tables sortable.
+	1)  make the recent/new one work --??
 
 *) fix tab navigation in the compose pane.
 

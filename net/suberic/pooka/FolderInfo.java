@@ -15,7 +15,7 @@ import net.suberic.util.ValueChangeListener;
  * for a Folder, the FolderInfo object has a reference to it.
  */
 
-public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer {
+public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer, MessageChangedListener {
 
     private Folder folder;
 
@@ -524,6 +524,18 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 	resetUnread();
 	fireMessageCountEvent(e);
+    }
+
+    /**
+     * This updates the TableInfo on the changed messages.
+     * 
+     * As defined by java.mail.MessageChangedListener.
+     */
+
+    public void messageChanged(MessageChangedEvent e) {
+	MessageProxy mp = getMessageProxy(e.getMessage());
+	mp.unloadTableInfo();
+	mp.loadTableInfo();
     }
 
     /**
