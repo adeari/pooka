@@ -12,7 +12,6 @@ import javax.swing.*;
  * This class will make an editor for a list of elements, where each of 
  * the elements has a set of subproperties.  
  */
-
 public class MultiEditorPane extends DefaultPropertyEditor implements ListSelectionListener {
     String property;
     VariableBundle sourceBundle;
@@ -31,18 +30,38 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     Hashtable originalPanels = new Hashtable();
     Hashtable currentPanels = new Hashtable();
 
+    /**
+     * Creates a new MultiEditorPane from the given properties.
+     */
     public MultiEditorPane(String newProperty, PropertyEditorFactory newFactory, boolean isEnabled) {
 	this.configureEditor(newFactory, newProperty, newProperty, newFactory.getBundle(), isEnabled);
     }
 
+    /**
+     * Creates a new MultiEditorPane from the given properties.
+     */
     public MultiEditorPane(String newProperty, String typeTemplate, PropertyEditorFactory newFactory, boolean isEnabled) {
 	this.configureEditor(newFactory, newProperty, typeTemplate, newFactory.getBundle(), isEnabled);
     }
 
+    /**
+     * Creates a new MultiEditorPane from the given properties.
+     */
     public MultiEditorPane(String newProperty, String typeTemplate, PropertyEditorFactory newFactory) {
 	this.configureEditor(newFactory, newProperty, typeTemplate, newFactory.getBundle(), true);
     }
 
+    /**
+     * Creates a new MultiEditorPane from the given properties.
+     */
+    public MultiEditorPane(String newProperty,
+                           PropertyEditorFactory newFactory) {
+	this(newProperty, newFactory, true);
+    }
+
+    /**
+     * Configures the MultiEditorPane using the given properties.
+     */
     public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String newTemplate, VariableBundle bundle, boolean isEnabled) { 
 	JLabel label;
 	property=propertyName;
@@ -94,11 +113,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	this.setEnabled(isEnabled);
     }
 
-    public MultiEditorPane(String newProperty,
-                           PropertyEditorFactory newFactory) {
-	this(newProperty, newFactory, true);
-    }
-
+    /**
+     * Creates the list of edited items.
+     */
     private Vector createEditedList(String origValue) {
 	Vector items = new Vector();
 	StringTokenizer tokens;
@@ -111,6 +128,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	return items;
     }	      
 
+    /**
+     * Creates the option box.
+     */
     private Box createOptionBox(JLabel label, JList itemList) {
 	Box optBox = new Box(BoxLayout.Y_AXIS);
 	optBox.add(label);
@@ -126,7 +146,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     /**
      * This creates a panel for each option.  It uses a CardLayout.
      */
-
     private JPanel createEntryPanel (Vector itemList, boolean original) {
 	JPanel entryPanel = new JPanel(new CardLayout());
 
@@ -169,10 +188,15 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	currentPanels.put("default", pep);
 
 	entryPanel.add("default", pep);
+	CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
+	entryLayout.show(entryPanel, "default");
 	    
 	return entryPanel;
     }
 
+    /**
+     * Creates the box which holds the "Add" and "Remove" buttons.
+     */
     private Box createButtonBox() {
 	Box buttonBox = new Box(BoxLayout.X_AXIS);
 	
@@ -188,11 +212,13 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	    }
 	}, false));
 
+	/*
 	buttonBox.add(createButton("Rename", new AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
 		editSelectedValue();
 	    }
 	}, false));
+	*/
 
 	return buttonBox;
     }
@@ -221,6 +247,8 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	if (selectedId != null)
 	    entryLayout.show(entryPanel, selectedId);
+	else
+	    entryLayout.show(entryPanel, "default");
 	  
     }
 
@@ -273,10 +301,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	boolean matchFound = false;
 
 	String newName = null;
-	if (this.getParentFrame() == null)
-	    newName = factory.showInputDialog(valueComponent, sourceBundle.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
-	else
-	    newName = factory.showInputDialog(this, sourceBundle.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
+	newName = factory.showInputDialog(this, sourceBundle.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
 
 	while (goodValue == false) {
 	    matchFound = false;
@@ -299,6 +324,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	return newName;
     }
 
+    /**
+     * This renames the selected property.
+     */
     public void renameProperty(String oldName, String newName) {
 	newName = getNewValueName();
 	if (newName != null) {
