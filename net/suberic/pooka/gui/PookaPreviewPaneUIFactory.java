@@ -24,14 +24,16 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 
   public boolean showing = false;
 
-    /**
-     * Constructor.
-     */
-    public PookaPreviewPaneUIFactory() {
-      editorFactory = new PropertyEditorFactory(Pooka.getResources());
-      pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
-    }
+  int maxErrorLine = 40;
 
+  /**
+   * Constructor.
+   */
+  public PookaPreviewPaneUIFactory() {
+    editorFactory = new PropertyEditorFactory(Pooka.getResources());
+    pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+  }
+  
   /**
    * Returns the ThemeManager for fonts and colors.
    */
@@ -138,7 +140,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
   public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
     JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
     jf.show();
-    }
+  }
   
   /**
    * Shows an Editor Window with the given title, which allows the user
@@ -158,80 +160,90 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     showEditorWindow(title, v, v);
   }
 
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the given property, which is in turn defined by the 
-     * given template.
-     */
-    public void showEditorWindow(String title, String property, String template) {
-	java.util.Vector prop = new java.util.Vector();
-	prop.add(property);
-	java.util.Vector templ = new java.util.Vector();
-	templ.add(template);
-	showEditorWindow(title, prop, templ);
-    }
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the given property, which is in turn defined by the 
+   * given template.
+   */
+  public void showEditorWindow(String title, String property, String template) {
+    java.util.Vector prop = new java.util.Vector();
+    prop.add(property);
+    java.util.Vector templ = new java.util.Vector();
+    templ.add(template);
+    showEditorWindow(title, prop, templ);
+  }
+  
+  /**
+   * This shows an Confirm Dialog window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */    
+  public int showConfirmDialog(String messageText, String title, int type) {
+    String displayMessage = formatMessage(messageText);
+    return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), displayMessage, title, type);
+  }
+  
 
-    /**
-     * This shows an Confirm Dialog window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-    */    
-    public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), messageText, title, type);
-    }
-
-
-    /**
-     * Shows a Confirm dialog with the given Object[] as the Message.
-     */
-    public int showConfirmDialog(Object[] messageComponents, String title, int type) {
-	return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), messageComponents, title, type);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title) {
-	JOptionPane.showMessageDialog(contentPanel.getUIComponent(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"));
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, Exception e) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring about the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-	e.printStackTrace();
-    }
-
+  /**
+   * Shows a Confirm dialog with the given Object[] as the Message.
+   */
+  public int showConfirmDialog(Object[] messageComponents, String title, int type) {
+    return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), messageComponents, title, type);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title) {
+    String displayErrorMessage = formatMessage(errorMessage);
+    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayErrorMessage, title, JOptionPane.ERROR_MESSAGE);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring abou the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, Exception e) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    showError(errorMessage + e.getMessage(), title);
+    e.printStackTrace();
+  }
+  
+  /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, '\n', 5);
+  }
+  
   /**
    * This shows an Input window.  We include this so that the 
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
   public String showInputDialog(String inputMessage, String title) {
-    return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+    String displayMessage = formatMessage(inputMessage);
+    return JOptionPane.showInputDialog(contentPanel.getUIComponent(), displayMessage, title, JOptionPane.QUESTION_MESSAGE);
   }
   
   /**
@@ -254,7 +266,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
-    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
+    String displayMessage = formatMessage(newMessage);
+    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, title, JOptionPane.PLAIN_MESSAGE);
   }
   
   /**

@@ -21,7 +21,9 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   ThemeManager pookaThemeManager = null;
 
   public boolean showing = false;
-    
+
+  int maxErrorLine = 40;
+
     /**
      * Constructor.
      */
@@ -204,7 +206,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * Shows a Confirm dialog.
    */
   public int showConfirmDialog(String message, String title, int type) {
-    return JOptionPane.showInternalConfirmDialog(messagePanel, message, title, type);
+    String displayMessage = formatMessage(message);
+    return JOptionPane.showInternalConfirmDialog(messagePanel, displayMessage, title, type);
   }
   
   /**
@@ -218,9 +221,10 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This shows an Error Message window.
    */
   public void showError(String errorMessage, String title) {
-    if (showing)
-      JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    else
+    String displayErrorMessage = formatMessage(errorMessage);
+    if (showing) {
+      JOptionPane.showInternalMessageDialog(getMessagePanel(), displayErrorMessage, title, JOptionPane.ERROR_MESSAGE);
+    } else
       System.out.println(errorMessage);
     
   }
@@ -248,10 +252,18 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   }
   
   /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, '\n', 5);
+  }
+
+  /**
    * This shows an Input window.
    */
   public String showInputDialog(String inputMessage, String title) {
-    return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+    String displayMessage = formatMessage(inputMessage);
+    return JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, title, JOptionPane.QUESTION_MESSAGE);
   }
   
   /**
@@ -267,7 +279,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
-    JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
+    String displayMessage = formatMessage(newMessage);
+    JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, title, JOptionPane.PLAIN_MESSAGE);
     }
   
   /**

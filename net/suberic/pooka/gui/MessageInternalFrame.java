@@ -222,6 +222,13 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   }
   
   /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return Pooka.getUIFactory().formatMessage(message);
+  }
+
+  /**
    * This shows a Message window.  We include this so that
    * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.

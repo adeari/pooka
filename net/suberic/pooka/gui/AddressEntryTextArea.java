@@ -510,6 +510,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
       });
 
     returnValue.setToolTipText(Pooka.getProperty("AddressBookEditor.buttonText", "Open Address Book"));
+    returnValue.setMargin(new java.awt.Insets(1,1,1,1));
     returnValue.setSize(width, height);
     return returnValue;
   }

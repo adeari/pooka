@@ -1,3 +1,6 @@
+fixed a bug where an address without a personal name couldn't be added to
+the address book.
+
 added a button for actually using the address list to pull in addresses
 to the to:, cc:, and bcc: fields.
 

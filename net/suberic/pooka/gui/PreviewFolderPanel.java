@@ -373,6 +373,12 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     e.printStackTrace();
   }
   
+  /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return Pooka.getUIFactory().formatMessage(message);
+  }
 
   // MessageLoadedListener
   

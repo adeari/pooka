@@ -680,7 +680,11 @@ public class MessageInfo {
 
       // let's not support multiple froms.
       AddressBookEntry entry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
-      entry.setPersonalName(addr.getPersonal());
+      String personalName = addr.getPersonal();
+      if (personalName == null) 
+	personalName = addr.getAddress();
+      
+      entry.setPersonalName(personalName);
       entry.setAddress(addr);
       book.addAddress(entry);
     }

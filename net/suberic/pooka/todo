@@ -1,59 +1,46 @@
-*) threading of attachment actions.
 
-*) address book:  make it so you can bring up your address book while 
-	addressing messages, and pull choices from there into your
-	address field.
-	-- make the button actually be the right size.
-	-- make it so you can add to the address book from the selection
-		panel.
+*) fix the display of the FolderTree -- right now, unopened stores are
+	squashed.
+
+*) fix connection failed message for ssl stores -- only fixable by sun?
+	-- make it so we only get one connection failed message for a store.
+*) fix protocol timeout for imap/ssl?
+
+*) fix:java.lang.NullPointerException
+	at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:357)
+	at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
+	at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
+  -- check received folder for that.
+
+*) search doesn't work properly for sent folders.
+	-- started, at least.
+*) make search window look different than normal window.
+
+*) startup:
+	--make sure that the outbox gets configured correctly as an outbox
+	--see why we got two INBOX entries
+	
+*) make new external windows come up not in 0,0.
+
+*) support windows registry attachment associations.
 
 *) make address book editable as soon as you create it.
 
-*) probably happens when you add an address without a personal name.
-   fix:  java.lang.NullPointerException
-	at java.util.Hashtable.put(Hashtable.java:375)
-	at java.util.Properties.setProperty(Properties.java:97)
-	at net.suberic.pooka.vcard.Vcard.setPersonalName(Vcard.java:127)
-	at net.suberic.pooka.MessageInfo.addAddress(MessageInfo.java:683)
-	at net.suberic.pooka.gui.MessageProxy$SaveAddressAction.actionPerformed(MessageProxy.java:1275)
-	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
+*) check disconnection/reconnection on network removal/restoral.
 
+*) forward to all.
+ 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
 	the readmessagedisplaypanel--or possibly on the status pane.
 	-- maybe change the toolbars so there's only 1?
 	-- ?? make it so you can compose messages in the main window ??
 
-	-- search --
-
-*) search doesn't work properly for sent folders.
-	-- started, at least.
-
-*) make search window look different than normal window.
-
-*) fix the display of the FolderTree -- right now, unopened stores are
-	squashed.
-
-*) fix connection failed message for ssl stores
-
-*) fix:java.lang.NullPointerException
-	at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:357)
-	at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
-	at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
-	-- check received folder for that.
-
-*) fix protocol grep timeout for imap/ssl?
-
-*) startup:
-	--make sure that the outbox gets configured correctly as an outbox
-	--see why we got two INBOX entries
-	
-*) check disconnection/reconnection on network removal/restoral.
- 
 -------
 
 *) document keybindings
 	-- keybindings for address book
+	-- keybindings for address entry panel
 	-- keybindings for saving attachments.
 	-- keybindings for opening folders.
 	-- keybindings for detachwindow
@@ -99,6 +86,11 @@ preview:
 *) splashscreen?
 
 *) umm, implement tile and cascade.  :)
+
+*) make it so you can add to the address book from the selection
+		panel.
+
+*) threading of attachment actions.
 
 +++++++
 

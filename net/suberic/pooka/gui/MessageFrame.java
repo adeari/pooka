@@ -222,6 +222,13 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   }
   
   /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return Pooka.getUIFactory().formatMessage(message);
+  }
+
+  /**
    * This shows an Input window.  We include this so that the 
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
