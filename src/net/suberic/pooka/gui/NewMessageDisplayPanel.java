@@ -64,9 +64,10 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
     
-    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
+    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
       addAttachmentPane();
-    
+    }
+
     editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     
     splitPane.setTopComponent(tabbedPane);

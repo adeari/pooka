@@ -673,6 +673,7 @@ public class MessageInfo {
       returnValue.attachments = new AttachmentBundle();
       Vector fromAttachments = attachments.getAttachments();
       if (fromAttachments != null) {
+	AttachmentBundle returnAttachments = returnValue.getAttachmentBundle();
 	for (int i = 0; i < fromAttachments.size(); i++) {
 	  Attachment current = (Attachment) fromAttachments.elementAt(i);
 	  Attachment newAttachment = null;
@@ -680,7 +681,7 @@ public class MessageInfo {
 	  javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
 	  mbp.setDataHandler(current.getDataHandler());
 	  newAttachment = new MBPAttachment(mbp);
-	  returnValue.addAttachment(newAttachment);
+	  returnAttachments.addAttachment(newAttachment, false);
 	}
 	returnValue.attachmentsLoaded=true;
       }

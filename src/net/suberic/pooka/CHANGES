@@ -1,3 +1,6 @@
+fixed forward with attachments so that it no longer tries to treat the 
+first attachment as the content of the message.
+
 smtp authentication no longer requires you to enter a password every time.
 
 applying folder filters to a set of messages now shows a status dialog.

@@ -57,7 +57,18 @@ class AttachmentBundle {
    * type of the Attachment and sets it as the text part, if appropriate.
    */
   synchronized void addAttachment(Attachment newAttach) {
-    addAttachment(newAttach, newAttach.getMimeType());
+    addAttachment(newAttach, newAttach.getMimeType(), true);
+  }
+
+  /**
+   * Adds an Attachment to the AttachmentBundle.  
+   *
+   * If allowTextPart is false,  then forces the Attachment to 
+   * be an attachment, rather than allowing it to be set as 
+   * the content.
+   */
+  synchronized void addAttachment(Attachment newAttach, boolean allowTextPart) {
+    addAttachment(newAttach, newAttach.getMimeType(), allowTextPart);
   }
 
   /**
@@ -82,14 +93,28 @@ class AttachmentBundle {
    * Adds an Attachment using the given ContentType.
    */
   synchronized void addAttachment(Attachment newAttach, ContentType ct) {
+    addAttachment(newAttach, ct, true);
+  } 
 
-    if ((textPart == null || textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
-      textPart = newAttach;
-    } else if (textPart == null && newAttach instanceof net.suberic.pooka.crypto.CryptoAttachment) {
-      textPart = newAttach;
+  /**
+   * Adds an Attachment using the given ContentType.
+   * 
+   * If allowTextPart is false,  then forces the Attachment to 
+   * be an attachment, rather than allowing it to be set as 
+   * the content.
+   */
+  synchronized void addAttachment(Attachment newAttach, ContentType ct, boolean allowTextPart) {
+    if (! allowTextPart) {
       allAttachments.add(newAttach);
     } else {
-      allAttachments.add(newAttach);
+      if ((textPart == null || textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
+	textPart = newAttach;
+      } else if (textPart == null && newAttach instanceof net.suberic.pooka.crypto.CryptoAttachment) {
+	textPart = newAttach;
+	allAttachments.add(newAttach);
+      } else {
+	allAttachments.add(newAttach);
+      }
     }
 
   }

@@ -6,9 +6,6 @@
 *) sign up for doc and release-engineering tasks
 
 -----
-
-*) ?? forward with attachments not working?
-
 *) queuing of outgoing mails
 	todo on this:
 	*)  add some sort of an administrative api to the NetworkConnection
