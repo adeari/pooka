@@ -91,9 +91,6 @@ public class PopInboxFolderInfo extends FolderInfo {
 	if (Pooka.isDebug())
 	    System.out.println("checking folder " + getFolderName());
 	
-	// i'm taking this almost directly from ICEMail; i don't know how
-	// to keep the stores/folders open, either.  :)
-	
 	Folder f = null;
 	try {
 	    if (isOpen() && popStore != null) {
@@ -117,10 +114,14 @@ public class PopInboxFolderInfo extends FolderInfo {
 			    msgsToAppend[i] = new MimeMessage((MimeMessage) msgs[i]);
 			}
 			getFolder().appendMessages(msgsToAppend);
-			for (int i = 0; i < msgs.length; i++) {
-			    msgs[i].setFlag(Flags.Flag.DELETED, true);
-			    if (Pooka.isDebug())
-				System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
+			if (! Pooka.getProperty(getFolderProperty() + ".leaveMessagesOnServer", "false").equalsIgnoreCase("true")) {
+			    for (int i = 0; i < msgs.length; i++) {
+				msgs[i].setFlag(Flags.Flag.DELETED, true);
+				if (Pooka.isDebug())
+				    System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
+			    }
+			} else if (Pooka.getProperty(getFolderProperty() + ".deleteOnServerOnLocalDelete", "false").equalsIgnoreCase("true")) {
+			    
 			}
 		    }
 		    f.close(true);
