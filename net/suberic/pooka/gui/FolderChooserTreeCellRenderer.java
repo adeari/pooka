@@ -12,7 +12,7 @@ import javax.swing.JTree;
  *
  */
 
-public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
+public class FolderChooserTreeCellRenderer extends DefaultTreeCellRenderer {
     /* grr.  it looks like the DefaultTreeCellRenderer returns the same
        component, which is annoying.  that means that we have to reset the
        font information each time.  or at least, that's what i'm doing. :)
@@ -25,7 +25,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
     Font defaultFont = null;
 
-    public DefaultFolderTreeCellRenderer() {
+    public FolderChooserTreeCellRenderer() {
 	super();
     }
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
@@ -68,8 +68,8 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	TreePath tp = tree.getPathForRow(row);
 
-	if (tp != null && tp.getLastPathComponent() instanceof FolderNode) {
-	    FolderNode node = (FolderNode)tp.getLastPathComponent();
+	if (tp != null && tp.getLastPathComponent() instanceof ChooserFolderNode) {
+	    ChooserFolderNode node = (ChooserFolderNode)tp.getLastPathComponent();
 	    
 	    try {
 		if (isSpecial(node))
@@ -134,7 +134,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	} else {
 	    // create the new font.
 	    String fontStyle;
-	    fontStyle = Pooka.getProperty("FolderTree.UnreadStyle", "BOLD");
+	    fontStyle = Pooka.getProperty("FolderChooser.subscribedStyle", "BOLD");
 
 	    Font f = null;
 	    
@@ -155,8 +155,8 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
      * Returns whether or not we should render the default style or a 
      * special style.
      */
-    public boolean isSpecial (FolderNode node) throws MessagingException {
-	return (node != null && node.getFolderInfo().getFolder().getUnreadMessageCount() > 0);
+    public boolean isSpecial (ChooserFolderNode node) throws MessagingException {
+	return (node != null && node.isSubscribed());
     }
 
     public Font getSpecialFont() {

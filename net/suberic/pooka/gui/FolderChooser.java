@@ -32,7 +32,7 @@ public class FolderChooser {
 	treeModel = new DefaultTreeModel(createTreeRoot());
 	subscribeNodes(treeModel);
 	tree = new JTree(treeModel);
-	tree.setCellRenderer(new DefaultFolderTreeCellRenderer(DefaultFolderTreeCellRenderer.SUBSCRIBED_FOLDER));
+	tree.setCellRenderer(new FolderChooserTreeCellRenderer());
 
 	tree.addMouseListener(new MouseAdapter() {
 		public void mouseClicked(MouseEvent e) {
