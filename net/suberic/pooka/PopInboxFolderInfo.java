@@ -140,11 +140,13 @@ public class PopInboxFolderInfo extends FolderInfo {
 				if (Pooka.isDebug())
 				    System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
 			    }
-			} else if (isDeletingOnServer()) {
-			    removeDeletedMessages(f, msgs);
 			}
 		    }
 		    
+		    if (isDeletingOnServer()) {
+			removeDeletedMessages(f);
+		    }
+
 		    f.close(true);
 		    popStore.close();
 		}
@@ -319,17 +321,16 @@ public class PopInboxFolderInfo extends FolderInfo {
 	return ((com.sun.mail.pop3.POP3Folder)f).getUID(m);
     }
 
-    public void removeDeletedMessages(Folder f, Message[] msgs) throws MessagingException {
+    public void removeDeletedMessages(Folder f) throws MessagingException {
 	try {
-	    getChangeAdapter().writeChanges((com.sun.mail.pop3.POP3Folder)f, msgs);
+	    getChangeAdapter().writeChanges((com.sun.mail.pop3.POP3Folder)f);
 	} catch (java.io.IOException ioe) {
 	    throw new MessagingException("Error", ioe);
 	}
     }
 
     public boolean isDeletingOnServer() {
-	
-	return Pooka.getProperty(getFolderProperty() + ".deleteOnServerOnLocalDelete", "false").equalsIgnoreCase("true");
+	return Pooka.getProperty(getParentStore().getStoreProperty() + ".deleteOnServerOnLocalDelete", "false").equalsIgnoreCase("true");
 	
     }
 

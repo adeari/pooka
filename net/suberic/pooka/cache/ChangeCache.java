@@ -345,7 +345,7 @@ public class ChangeCache {
     /**
      * Writes the changes in the file back to the server.
      */
-    public void writeChanges(com.sun.mail.pop3.POP3Folder f, Message[] msgs) throws IOException, MessagingException {
+    public void writeChanges(com.sun.mail.pop3.POP3Folder f) throws IOException, MessagingException {
 	boolean hasLock = false;
 	while (! hasLock) {
 	    synchronized(this) {
@@ -363,6 +363,8 @@ public class ChangeCache {
 	
 	try {
 	    if (cacheFile.exists()) {
+
+		Message[] msgs = f.getMessages();
 
 		BufferedReader in = new BufferedReader(new FileReader(cacheFile));
 		String nextLine = in.readLine();
@@ -427,8 +429,14 @@ public class ChangeCache {
 	}
     }
 
+    /**
+     * Gets the message from the pop folder indicated by the given uid.
+     */
     public Message getMessageByPopUID(String uid, com.sun.mail.pop3.POP3Folder f, Message[] msgs) throws MessagingException {
-	for (int i = msgs.length; i >=0; i--) {
+	// this is a really dumb algorithm.  we can do much better, especially
+	// if you consider that pop uids are sequential.
+	for (int i = msgs.length - 1; i >=0; i--) {
+	    String currentUid = f.getUID(msgs[i]);
 	    if (f.getUID(msgs[i]).equals(uid))
 		return msgs[i];
 	}
