@@ -12,6 +12,8 @@ public class UserProfile extends Object {
 
     String sentFolderName;
     FolderInfo sentFolder;
+    public boolean autoAddSignature = true;
+    public boolean signatureFirst = true;
 
     static Vector profileList = new Vector();
     static Vector mailPropertiesMap = null;

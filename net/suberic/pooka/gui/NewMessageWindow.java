@@ -215,8 +215,14 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	if (origText != null && origText.length() > 0) 
 	    retval.setText(origText);
 	
-	if (Pooka.getProperty("Pooka.newMessage.autoAddSignature", "false").equalsIgnoreCase("true")) {
+	UserProfile profile = getSelectedProfile();
+	if (profile.autoAddSignature) {
+	    if (profile.signatureFirst) {
+
+	    }
+
 	    addSignature();
+
 	}
 
 	// bodyInputPane.setContentType("text");
