@@ -47,14 +47,26 @@ public class FolderTableModel extends AbstractTableModel {
 	return (MessageProxy)(data.elementAt(rowNumber));
     }
 
+
+    /**
+     * This adds a Vector of new MessageProxys to the FolderTableModel.
+     */
     public void addRows(Vector newRows) {
 	addOrRemoveRows(newRows, FolderTableModel.ADD_MESSAGES);
     }
 
+    /**
+     * This removes a Vector of MessageProxys from the FolderTableModel.
+     */
     public void removeRows(Vector rowsDeleted) {
 	addOrRemoveRows(rowsDeleted, FolderTableModel.REMOVE_MESSAGES);
     }
 
+    /**
+     * This is a single synchronized method to make sure that we don't 
+     * add and/or delete two things at once.  This is usually called
+     * from addRows() or removeRows().
+     */
     
     public synchronized void addOrRemoveRows(Vector changedMsg, int addOrRem) {
 	int firstRow, lastRow;
