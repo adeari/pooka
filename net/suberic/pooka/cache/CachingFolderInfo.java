@@ -287,7 +287,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   
   public int getUnreadCount() {
     try {
-      unreadCount = getCache().getUnreadMessageCount();
+      if (getCache() != null) 
+	unreadCount = getCache().getUnreadMessageCount();
     } catch (MessagingException me) {
 
     }
@@ -296,7 +297,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   
   public int getMessageCount() {
     try {
-      messageCount = getCache().getMessageCount();
+      if (getCache() != null) 
+	messageCount = getCache().getMessageCount();
     } catch (MessagingException me) {
     }
     
