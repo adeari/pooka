@@ -17,10 +17,6 @@ password.
 
 *)  add context-sensitive menus (right-click menus)
 
-*) restore the Window Menu.
-
-*) restore the move messages between folders functionality.
-
 *)  fix the occasional NullPointerException in the FolderInfo (?) -- might
     be done already.
 
