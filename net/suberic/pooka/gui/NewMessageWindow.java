@@ -47,6 +47,8 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	headerPanel = createHeaderInputPanel(msg, inputTable);
 	editorPane = createMessagePanel(msg);
 
+	msg.setMessageWindow(this);
+
 	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
 
@@ -56,15 +58,13 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
 	    addAttachmentPane();
 	
+	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
 	splitPane.setTopComponent(tabbedPane);
-	splitPane.setBottomComponent(new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	splitPane.setBottomComponent(editorScrollPane);
 
 	this.getContentPane().add("Center", splitPane);
 	
-	this.setSize(this.getDefaultMessageSize(editorPane.getFont()));
-
-	msg.setMessageWindow(this);
-
 	toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
 	
 	toolbar.setActive(this.getActions());
@@ -76,7 +76,14 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 			getMessageProxy().setMessageWindow(null);
 		}
 	    });
-	
+
+	this.sizeWindow();
+    }
+
+    private void sizeWindow() {
+	editorScrollPane.setPreferredSize(getDefaultEditorPaneSize());
+	splitPane.resetToPreferredSizes();
+	this.resizeByWidth();
     }
 
     public void closeMessageWindow() {
@@ -173,11 +180,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
     public JTextPane createMessagePanel(MessageProxy aMsg) {
 	JTextPane retval = new JTextPane();
 	
-	String fontName = Pooka.getProperty("MessageWindow.font.name", "monospaced");
-	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.font.size", "10"));
-	
-	Font f = new Font(fontName, Font.PLAIN, fontSize);
-	editorPane.setFont(f);
+	setDefaultFont(retval);
 
 	// see if this message already has a text part, and if so,
 	// include it.

@@ -14,14 +14,15 @@ import java.io.File;
 
 public abstract class MessageWindow extends JInternalFrame implements UserProfileContainer {
 
-    MessagePanel parentContainer;
+    protected MessagePanel parentContainer;
 
-    MessageProxy msg;
-    JSplitPane splitPane = null;
-    AttachmentPane attachmentPanel = null;
-    JTextPane editorPane = null;
-    ConfigurableToolbar toolbar;
-    boolean hasAttachment = false;
+    protected MessageProxy msg;
+    protected JSplitPane splitPane = null;
+    protected AttachmentPane attachmentPanel = null;
+    protected JTextPane editorPane = null;
+    protected JScrollPane editorScrollPane = null;
+    protected ConfigurableToolbar toolbar;
+    protected boolean hasAttachment = false;
 
     //<sigh>
     JScrollPane attachmentScrollPane;
@@ -91,6 +92,60 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 	showError(errorMessage + e.getMessage(), title);
     }
 
+    public void setDefaultFont(JEditorPane jep) {
+	String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
+	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
+
+	Font f = new Font(fontName, Font.PLAIN, fontSize);
+	jep.setFont(f);
+    }
+
+    public Dimension getDefaultEditorPaneSize() {
+	int hsize = 500;
+	int vsize = 500;
+	
+	try {
+	    vsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "500"));
+	} catch (NumberFormatException nfe) {
+	    vsize=500;
+	}
+	
+	try {
+	    if (Pooka.getProperty("MessageWindow.editorPane.hsizeByCharLength", "false").equalsIgnoreCase("true")) {
+		int charLength = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.charLength", "80"));
+		Font currentFont = editorPane.getFont();
+		if (currentFont != null) {
+		    FontMetrics fm = this.getFontMetrics(currentFont);
+		    
+		    int[] firstWidths = fm.getWidths();
+		    int accumulator = 0;
+		    for (int i = 0; i < charLength; i++)
+			accumulator+=firstWidths[i];
+
+		    hsize = accumulator;
+
+		}
+	    } else {
+		hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.hsize", "500"));
+	    }
+	} catch (NumberFormatException nfe) {
+	    hsize=500;
+	}
+
+	Dimension retval = new Dimension(hsize, vsize);
+	retval = new Dimension(510, vsize);
+	return retval;
+    }
+
+    /**
+     * A convenience method to set the PreferredSize and Size of the
+     * component to that of the current preferred width.
+     */
+    public void resizeByWidth() {
+	int width = (int)this.getPreferredSize().getWidth();
+	this.setPreferredSize(new Dimension(width, width));
+	this.setSize(this.getPreferredSize());
+    }
     /**
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *
@@ -99,49 +154,6 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      * MessageWindow is editable, it returns the currently selected 
      * UserProfile object.
      */
-
-    /**
-     * This method sets the size of the MessageWindow to the default size.
-     * In this case, the default size is taken from the MessageWindow.vsize
-     * property for the vertical size.  For the horizontal size, if
-     * MessageWindow.hsizeByCharLength is set to true, this method uses the
-     * MessageWindow.charLength property along with the configured font
-     * to determine the size of the window.  If this is not set, or set
-     * to false, then the MessageWindow.hsize property is used instead.
-     */
-    public Dimension getDefaultMessageSize(Font currentFont) {
-	int hsize = 500;
-	int vsize = 500;
-	
-	try {
-	    vsize = Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500"));
-	} catch (NumberFormatException nfe) {
-	    vsize=500;
-	}
-	
-	try {
-	    if (Pooka.getProperty("MessageWindow.hsizeByCharLength", "false").equalsIgnoreCase("true")) {
-		int charLength = Integer.parseInt(Pooka.getProperty("MessageWindow.charLength", "80"));
-		if (currentFont != null) {
-		    FontMetrics fm = this.getFontMetrics(currentFont);
-
-		    int[] firstWidths = fm.getWidths();
-		    int accumulator = 0;
-		    for (int i = 0; i < 256; i++)
-			accumulator+=firstWidths[i];
-		    hsize = accumulator / 256 * 80;
-		}
-	    } else {
-		hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500"));
-	    }
-	} catch (NumberFormatException nfe) {
-	    hsize=500;
-	}
-	
-	return new Dimension(hsize, vsize);
-
-    }
-
 
     public UserProfile getDefaultProfile() {
 	return getMessageProxy().getDefaultProfile();

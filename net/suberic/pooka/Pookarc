@@ -13,6 +13,8 @@ Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600
 Pooka.messagePanel.vsize=570
 
+Pooka.attachmentPanel.vsize=100
+
 Pooka.replyPrefix=>
 Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
@@ -154,14 +156,15 @@ MessageWindow.backgroundColor=white
 MessageWindow.vsize=500
 MessageWindow.headerPanel.vsize=200
 
-MessageWindow.hsizeByCharLength=true
+MessageWindow.editorPane.hsizeByCharLength=true
 # if hsizeByFont=true
-MessageWindow.charLength=80
+MessageWindow.editorPane.charLength=80
 # if hsizeByFont=false
-MessageWindow.hsize=500
+MessageWindow.editorPane.hsize=500
+MessageWindow.editorPane.vsize=500
 
-MessageWindow.font.name=monospaced
-MessageWindow.font.size=10
+MessageWindow.editorPane.font.name=monospaced
+MessageWindow.editorPane.font.size=10
 
 MessageWindow.Header.DefaultHeaders=From:To:CC:Date:Subject
 MessageWindow.Header.ShowFullHeaders=false

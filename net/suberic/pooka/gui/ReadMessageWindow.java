@@ -19,7 +19,6 @@ public class ReadMessageWindow extends MessageWindow {
 
     int headerStyle = ReadMessageWindow.HEADERS_DEFAULT;
     boolean showFullHeaders = false;
-    JTextPane editorPane = null;
     ConfigurableToolbar toolbar;
 
     /**
@@ -40,6 +39,7 @@ public class ReadMessageWindow extends MessageWindow {
 	}
 
 	editorPane = createMessagePanel(msg);
+	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
 	
@@ -55,16 +55,61 @@ public class ReadMessageWindow extends MessageWindow {
 
 	    splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	    
-	    splitPane.setTopComponent(new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	    splitPane.setTopComponent(editorScrollPane);
 	    splitPane.setBottomComponent(attachmentScrollPane);
-	    splitPane.resetToPreferredSizes();
 	    this.getContentPane().add("Center", splitPane);
 	} else {
-	    this.getContentPane().add("Center", new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	    this.getContentPane().add("Center", editorScrollPane);
 	}
 
-	this.setSize(this.getDefaultMessageSize(editorPane.getFont()));
+	this.sizeWindow();
 	
+    }
+
+    private void sizeWindow() {
+	editorPane.setPreferredSize(getDefaultEditorPaneSize());
+	editorPane.setSize(editorPane.getPreferredSize());
+	editorScrollPane.setPreferredSize(getDefaultEditorPaneSize());
+	editorScrollPane.setSize(editorScrollPane.getPreferredSize());
+
+	if (attachmentPanel != null) {
+	    attachmentPanel.setPreferredSize(new Dimension((int)attachmentPanel.getPreferredSize().getWidth(), Integer.parseInt(Pooka.getProperty("Pooka.attachmentPanel.vsize", "100"))));
+	    attachmentPanel.setSize(attachmentPanel.getPreferredSize());
+	}
+	if (attachmentScrollPane != null) {
+	    attachmentScrollPane.setPreferredSize(new Dimension((int)attachmentScrollPane.getPreferredSize().getWidth(), Integer.parseInt(Pooka.getProperty("Pooka.attachmentPanel.vsize", "100"))));
+	    attachmentScrollPane.setSize(attachmentScrollPane.getPreferredSize());
+	}
+	
+	if (splitPane != null) {
+	    splitPane.resetToPreferredSizes();
+	}
+	this.resizeByWidth();
+    }
+
+    public void addNotify() {
+	super.addNotify();
+	this.sizeWindow();
+    }
+
+    public void sizeStatus() {
+
+	reportSize("editorScrollPane", editorScrollPane);
+	if (splitPane == null)
+	    System.out.println("no split pane.");
+	else 
+	    reportSize("splitPane", splitPane);
+	if (attachmentPanel == null) {
+	    System.out.println("no attachment.");
+	} else {
+	    reportSize("attachmentPanel", attachmentPanel);
+	    reportSize("attachmentScrollPane", attachmentScrollPane);
+	}
+	reportSize("MessageWindow", this);
+    }
+
+    private void reportSize(String name, Component comp) {
+	System.out.println(name + ":  size is " + comp.getSize() + ", prefSize is " + comp.getPreferredSize());
     }
 
     /**
@@ -76,18 +121,9 @@ public class ReadMessageWindow extends MessageWindow {
      */
 
     public JTextPane createMessagePanel(MessageProxy aMsg) {
-	editorPane = new JTextPane();
+	JTextPane retval = new JTextPane();
 
-	Font n = new Font("monospaced", Font.PLAIN, 10);
-
-	// this is what we really should do, more or less.
-	String fontName = Pooka.getProperty("MessageWindow.font.name", "Dialog");
-	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.font.size", "10"));
-
-	System.out.println("getting font for fontName " + fontName + ", size is " + fontSize);
-	Font f = new Font(fontName, Font.PLAIN, fontSize);
-	System.out.println("got font (name)" + f.getName() + " (family) " + f.getFamily() + " (fontName) " + f.getFontName() + " (size) " + f.getSize());
-	editorPane.setFont(f);
+	setDefaultFont(retval);
 
 	StringBuffer messageText = new StringBuffer();
 	
@@ -138,11 +174,11 @@ public class ReadMessageWindow extends MessageWindow {
 
 	    if (content != null) {
 		messageText.append(content);
-		editorPane.setEditable(false);
-		editorPane.setText(messageText.toString());
+		retval.setEditable(false);
+		retval.setText(messageText.toString());
 	    } 
 	 
-	    return editorPane;
+	    return retval;
 
 	} else
 	    return new JTextPane();
