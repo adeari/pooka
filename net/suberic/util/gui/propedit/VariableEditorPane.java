@@ -73,6 +73,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
    */
   public void showPanel(String selectedId) {
     boolean enableMe = true;
+    boolean resize = false;
     if (selectedId == null || selectedId.equals("")) {
       enableMe = false;
       // check to see the default.
@@ -100,9 +101,13 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 	
 	spe.setEnabled(enableMe && enabled);
 	valueComponent.add(selectedId, spe);
+	resize = true;
       }
     }
     layout.show(valueComponent, selectedId);
+    if (resize) {
+      doResize();
+    }
   }    
  
   /**

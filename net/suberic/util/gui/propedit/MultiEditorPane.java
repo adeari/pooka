@@ -249,6 +249,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    */
   public void valueChanged(ListSelectionEvent e) {
     
+    boolean resize = false;
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
     
     String selectedId = (String)((JList)e.getSource()).getSelectedValue();
@@ -266,11 +267,14 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 	editors.add(sep);
 	
 	entryPanel.add(selectedId, sep);
-	
+	resize = true;
       }
       entryLayout.show(entryPanel, selectedId);
     } else
       entryLayout.show(entryPanel, "___default");
+    
+    if (resize)
+      doResize();
   }
   
   /**

@@ -92,7 +92,8 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    */
   public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
-    jif.getContentPane().add(new PropertyEditorPane(mgr, properties, templates, jif));
+    PropertyEditorPane pep = new PropertyEditorPane(mgr, properties, templates, jif);
+    jif.getContentPane().add(pep);
     jif.setSize(100,100);
     jif.pack();
     return jif; 

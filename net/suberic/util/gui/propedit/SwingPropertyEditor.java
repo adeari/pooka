@@ -204,6 +204,13 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
+   * Gets the current labelComponent.
+   */
+  public java.awt.Container getLabelComponent() {
+    return valueComponent;
+  }
+
+  /**
    * Gets the PropertyEditorManager
    */
   public PropertyEditorManager getManager() {
@@ -248,4 +255,29 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     }
   }
 
+  /**
+   * Gets the parent PropertyEditorPane for the current valueComponent.
+   */
+  public PropertyEditorPane getPropertyEditorPane() {
+    try {
+      Class pepClass = Class.forName("net.suberic.util.gui.propedit.PropertyEditorPane");
+      if (pepClass != null) {
+	PropertyEditorPane pep = (PropertyEditorPane) SwingUtilities.getAncestorOfClass(pepClass, valueComponent);
+	return pep;
+      }
+    } catch (Exception e) {
+    }
+
+    return null;
+  }
+
+  /**
+   * Does a resize on the parent PropertyEditorPane, if any.
+   */
+  public void doResize() {
+    PropertyEditorPane pep = getPropertyEditorPane();
+    if (pep != null) {
+      pep.resizeEditor();
+    }
+  }
 }

@@ -6,10 +6,8 @@
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.
 	-- started.  todo:
-	*) general:  handle resize.
 	*) Variable:  default is wrong - should be disabled default.
 	*) FolderSelPane doesn't work. also, entryfield isn't disabled.
-	*) fix the filter editor.
 	*) add listeners:  intFilter, enabledIfOtherFilter.
 	*) enable Add Button for lists.
 	*) tabbedfield isn't disabled.

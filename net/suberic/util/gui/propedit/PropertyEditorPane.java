@@ -12,7 +12,9 @@ public class PropertyEditorPane extends Box {
   SwingPropertyEditor editor;
   PropertyEditorManager manager;
   Container container;
-  
+  Box buttonBox;
+  Box editorBox;
+
   /**
    * This contructor creates a PropertyEditor for the list of 
    * properties in the properties List.
@@ -40,7 +42,16 @@ public class PropertyEditorPane extends Box {
     
     editor = (SwingPropertyEditor) manager.createEditor(properties, templates);
 
-    this.add(editor);
+    editorBox = new Box(BoxLayout.X_AXIS);
+
+    if (editor.getValueComponent() != null) {
+      if (editor.getLabelComponent() != null)
+	editorBox.add(editor.getLabelComponent());
+      editorBox.add(editor.getValueComponent());
+    } else {
+      editorBox.add(editor);
+    }
+    this.add(editorBox);
     
     this.addButtons();
   }
@@ -90,7 +101,7 @@ public class PropertyEditorPane extends Box {
    * Adds the appropriate buttons (Ok, Accept, Cancel) to this component.
    */
   public void addButtons() {
-    Box buttonBox = new Box(BoxLayout.X_AXIS);
+    buttonBox = new Box(BoxLayout.X_AXIS);
     
     buttonBox.add(createButton("Ok", new AbstractAction() {
 	public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -157,4 +168,11 @@ public class PropertyEditorPane extends Box {
     return thisButton;
   }
   
+
+  /**
+   * Resizes this component.  Called when a subcomponent changes its size.
+   */
+  public void resizeEditor() {
+    container.setSize(container.getPreferredSize());
+  }
 }
