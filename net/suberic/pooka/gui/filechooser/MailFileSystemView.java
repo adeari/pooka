@@ -2,6 +2,7 @@ package net.suberic.pooka.gui.filechooser;
 import javax.swing.*;
 import javax.mail.*;
 import java.io.*;
+import net.suberic.pooka.Pooka;
 
 /**
  * This class implements a FileSystemView based on the available Folders in
@@ -61,15 +62,19 @@ public class MailFileSystemView
 	// want to call getFileByName with a relative path (in this case
 	// to the root directory) always.
 
-	System.out.println("running createFileObject2 on " + filename);
+	if (Pooka.isDebug())
+	    System.out.println("running createFileObject2 on " + filename);
 
 	FolderFileWrapper rootFile = ((FolderFileWrapper) getRoot());
 	if (rootFile == null) {
-	    System.out.println("root == null");
+	    if (Pooka.isDebug())
+		System.out.println("root == null");
 	    return null;
 	}
 
-	System.out.println("root != null");
+	if (Pooka.isDebug())
+	    System.out.println("root != null");
+
 	if (filename.equals("/")) {
 	    return rootFile;
 	}
@@ -79,7 +84,9 @@ public class MailFileSystemView
     }
 
     public File createNewFolder(File containingDir) {
-	System.out.println("running createNewFolder.");
+	if (Pooka.isDebug())
+	    System.out.println("running createNewFolder.");
+
 	try {
 	    Folder parentFolder = null;
 	    if (containingDir instanceof FolderFileWrapper) {
@@ -105,7 +112,9 @@ public class MailFileSystemView
     }
 
     public File[] getFiles(File dir, boolean useFileHiding) {
-	System.out.println("running getFiles.");
+	if (Pooka.isDebug())
+	    System.out.println("running getFiles.");
+
 	if (dir instanceof FolderFileWrapper) {
 	    return ((FolderFileWrapper)dir).listFiles();
 	} else {
@@ -122,7 +131,9 @@ public class MailFileSystemView
     }
 
     public File getHomeDirectory() {
-	System.out.println("running getHomeDirectory().");
+	if (Pooka.isDebug())
+	    System.out.println("running getHomeDirectory().");
+
 	if (root != null)
 	    return root;
 	else {
@@ -131,7 +142,9 @@ public class MailFileSystemView
     }
 
     public File getParentDirectory(File dir) {
-	System.out.println("running getParentDirectory");
+	if (Pooka.isDebug())
+	    System.out.println("running getParentDirectory");
+
 	if (dir == null)
 	    return null; // at root
 
@@ -149,7 +162,9 @@ public class MailFileSystemView
     }
 
     public File[] getRoots() {
-	System.out.println("calling getRoots() on MailFileSystemView.");
+	if (Pooka.isDebug())
+	    System.out.println("calling getRoots() on MailFileSystemView.");
+
 	if (root != null)
 	    return new File[] { root };
 	try {

@@ -2,6 +2,7 @@ package net.suberic.pooka.gui.filechooser;
 import javax.swing.*;
 import java.io.*;
 import javax.mail.*;
+import net.suberic.pooka.Pooka;
 
 // TODO make StoreFileWrapper for selecting from available stores
 // --jphekman
@@ -14,14 +15,29 @@ public class FolderFileWrapper extends File {
     private Folder folder;
     private FolderFileWrapper parent;
     private FolderFileWrapper[] children;
+    private String path;
     
     /**
-     * Creates a new FolderFileWrapper from a Folder.
+     * Creates a new FolderFileWrapper from a Folder.  This should only
+     * be used for direct children of the Folder.  
      */
     public FolderFileWrapper(Folder f, FolderFileWrapper p) {
 	super(f.getName());
 	folder = f;
 	parent = p;
+	path = f.getName();
+    }
+
+    /**
+     * Creates a new FolderFileWrapper from a Folder with the given path
+     * and parent.  This is used for making relative paths to files, i.e.
+     * a child of '/foo' called 'bar/baz'.
+     */
+    public FolderFileWrapper(Folder f, FolderFileWrapper p, String filePath) {
+	super(f.getName());
+	folder = f;
+	parent = p;
+	path = filePath;
     }
 
     /**
@@ -103,7 +119,21 @@ public class FolderFileWrapper extends File {
      * Returns this object.
      */
     public File getAbsoluteFile() {
-	return this;
+	if (this.isAbsolute())
+	    return this;
+	else 
+	    return new FolderFileWrapper(getFolder(), getRoot(), getAbsolutePath());
+    }
+
+    /**
+     * returns the root of this tree.
+     */
+    private FolderFileWrapper getRoot() {
+	FolderFileWrapper parent = this;
+	while (parent.getParent() != null) {
+	    parent = (FolderFileWrapper)parent.getParentFile();
+	}
+	return parent;
     }
     
     /**
@@ -111,10 +141,14 @@ public class FolderFileWrapper extends File {
      * the this on the parent and then appending this name.
      */
     public String getAbsolutePath() {
-	if (parent != null)
-	    return parent.getAbsolutePath() + "/" + getName();
-	else
-	    return "/" + getName();
+	if (isAbsolute())
+	    return getPath();
+	else {
+	    if (parent != null)
+		return parent.getAbsolutePath() + "/" + getPath();
+	    else
+		return "/";
+	}
     }
     
     /**
@@ -156,17 +190,17 @@ public class FolderFileWrapper extends File {
     }
 
     /**
-     * Returns getAbsolutePath().
+     * Returns the filePath variable.
      */
     public String getPath() {
-	return getAbsolutePath();
+	return path;
     }
 
     /**
-     * Returns, ummm, let's say, true.
+     * Returns true if this is an absolute reference, false otherwise.
      */
     public boolean isAbsolute() {
-	return true;
+	return (parent == null);
     }
 
     /**
@@ -378,13 +412,15 @@ public class FolderFileWrapper extends File {
     /* Only accepts relative filenames. */
     public FolderFileWrapper getFileByName(String filename) {
 
+	String origFilename = new String(filename);
+	if (filename == null || filename.length() < 1) {
+	    return this;
+	}
+
 	if (this.isAbsolute(filename))
 	    {
 		return null; // FIXME error
 	    }
-	if (filename == null || filename.length() < 1) {
-	    return this;
-	}
 
 	// strip out the /'s
 
@@ -403,16 +439,20 @@ public class FolderFileWrapper extends File {
 	}
 
 	FolderFileWrapper currentFile = getChildFile(filename);
-	if (currentFile != null && subdirFile != null) 
+	if (currentFile != null && subdirFile != null) {
 	    // recurse with rest of components
-	    return currentFile.getFileByName(subdirFile);
-	else {
+	    FolderFileWrapper tmp = currentFile.getFileByName(subdirFile);
+	    return new FolderFileWrapper(tmp.getFolder(), this, origFilename); 
+	} else {
 	    return currentFile;
 	}
+
     }
 
     private FolderFileWrapper getChildFile(String filename) {
-	System.out.println("calling getChildFile on " + getName() + " with filename " + filename);
+	if (Pooka.isDebug())
+	    System.out.println("calling getChildFile on " + getName() + " with filename " + filename);
+
 	if (children == null)
 	    loadChildren();
 
