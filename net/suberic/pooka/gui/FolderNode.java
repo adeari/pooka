@@ -229,7 +229,10 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    return null;
     }
     public Action[] getActions() {
-	return defaultActions;
+	if (getFolderInfo().getActions() != null)
+	    return javax.swing.text.TextAction.augmentList(getFolderInfo().getActions(), defaultActions);
+	else
+	    return defaultActions;
     }
 
     public Action[] defaultActions;

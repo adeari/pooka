@@ -4,6 +4,9 @@ import javax.mail.*;
 import javax.mail.event.*;
 import javax.swing.event.EventListenerList;
 import java.util.*;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import java.awt.event.ActionEvent;
 import net.suberic.pooka.gui.*;
 import net.suberic.pooka.thread.*;
 import net.suberic.pooka.event.*;
@@ -42,6 +45,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // GUI information.
     private FolderWindow folderWindow;
+    private Action[] defaultActions;
 
     private LoadMessageThread loaderThread;
     private FolderTracker folderTracker = null;
@@ -50,7 +54,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean loading = false;
     private boolean available = true;
     private boolean open = false;
-    private boolean unread = false;
+    private int unreadCount = 0;
+    private int messageCount = 0;
 
     private FolderInfo parentFolder = null;
     private StoreInfo parentStore = null;
@@ -70,6 +75,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    loadFolder();
 
 	updateChildren();
+
+	defaultActions = new Action[] {
+	    new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread())
+		};
     }
 
 
@@ -95,7 +104,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * parent Store.
      */
     public void loadFolder() {
-	if (isLoaded() || loading)
+	if (isLoaded() || (loading && children == null)) 
 	    return;
 
 	Folder[] tmpFolder;
@@ -297,12 +306,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    return -1;
 
 	try {
-	    int numUnread = getFolder().getUnreadMessageCount();
 	    int countUnread = 0;
 	    int i;
-	    if (numUnread > 0) {
+	    if (unreadCount > 0) {
 		Message[] messages = getFolder().getMessages();
-		for (i = messages.length - 1; ( i >= 0 && countUnread < numUnread) ; i--) {
+		for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
 		    if (!(messages[i].isSet(Flags.Flag.SEEN))) 
 		    countUnread++;
 		}
@@ -409,7 +417,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void fireMessageChangedEvent(MessageChangedEvent mce) {
 	// from the EventListenerList javadoc, including comments.
 
-	resetUnread();
+	resetMessageCounts();
 
 	if (Pooka.isDebug())
 	    System.out.println("firing message changed event.");
@@ -519,7 +527,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    getFolderTableModel().addRows(addedProxies);
 		}
-		resetUnread();
+		resetMessageCounts();
 		fireMessageCountEvent(mce);
 	    }
 	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
@@ -551,7 +559,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    getFolderTableModel().removeRows(removedProxies);
 		}
-		resetUnread();
+		resetMessageCounts();
 		fireMessageCountEvent(mce);
 	    }
 	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
@@ -613,7 +621,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    } else {
 		folder.open(mode);
 		open=true;
-		resetUnread();
+		resetMessageCounts();
 		if (getFolderNode() != null)
 		    getFolderNode().getParentContainer().repaint();
 	    }
@@ -674,6 +682,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
     
     // Accessor methods.
+
+    public Action[] getActions() {
+	return defaultActions;
+    }
 
     public Folder getFolder() {
 	return folder;
@@ -780,7 +792,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public boolean hasUnread() {
-	return unread;
+	return (unreadCount > 0);
+    }
+
+    public int getUnreadCount() {
+	return unreadCount;
+    }
+    
+    public int getMessageCount() {
+	return messageCount;
     }
 
     public FolderTracker getFolderTracker() {
@@ -792,16 +812,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
-     * This forces an update of the unread status.
+     * This forces an update of both the total and unread message counts.
      */
-    public void resetUnread() {
+    public void resetMessageCounts() {
 	try {
 	    if (Pooka.isDebug())
-		System.out.println("running resetUnread.  unread message count is " + getFolder().getUnreadMessageCount());
+		System.out.println("running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
 
-	    unread = (getFolder().getUnreadMessageCount() > 0);
+	    unreadCount = getFolder().getUnreadMessageCount();
+	    messageCount = getFolder().getMessageCount();
 	} catch (MessagingException me) {
-	    unread = false;
+	    // if we lose the connection to the folder, we'll leave the old
+	    // messageCount and set the unreadCount to zero.
+	    unreadCount = 0;
 	}
     }
 
@@ -847,4 +870,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public FolderInfo getTrashFolder() {
 	return getParentStore().getTrashFolder();
     }
+
+    class UpdateCountAction extends AbstractAction {
+	
+	UpdateCountAction() {
+	    super("folder-update");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    resetMessageCounts();
+	}
+    }
+
 }

@@ -17,16 +17,6 @@ different icon and different folder information (to: instead of from:).
 
 *) fix the NullPointerException in the DefaultFolderCellRenderer.
 
-*) currently, opening a folder will make it so none of the other folders
-at that level will open.  so if you have three folders under 'mail' and 
-open up the store by opening 'mail/foo', then 'mail/bar' and 'mail/baz'
-won't open up.
-
-*) change getUnreadMessages() to cache the information.  this has been the
-major cause of all of our deadlocks.  other choice could be to have the
-getUnreadMessages() invoke the Action thread to do the update.  i think
-caching is better.
-
 *) say...  i think the subjects in responses and forwards are ending with
 trailing \n's too often.  fix that.
 

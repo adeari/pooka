@@ -180,8 +180,9 @@ FolderTable.2xClickAction=message-open
 FolderTable.UnreadStyle=BOLD
 
 # -- Popup menus.
-FolderNode.popupMenu=Open:Close:New:Edit
+FolderNode.popupMenu=Open:Update:Close:New:Edit
 FolderNode.popupMenu.Open.Action=folder-open
+FolderNode.popupMenu.Update.Action=folder-update
 FolderNode.popupMenu.Close.Action=folder-close
 FolderNode.popupMenu.New.Action=file-new
 FolderNode.popupMenu.Edit.Action=file-edit
@@ -262,14 +263,14 @@ MessageWindow.Input.CC.MIMEHeader=CC
 MessageWindow.Input.BCC.MIMEHeader=BCC
 MessageWindow.Input.Subject.MIMEHeader=Subject
 
-UserProfile.fields=From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL
-UserProfile.fields.From.value=From
-UserProfile.fields.FromPerseonal.value=FromPersonal
-UserProfile.fields.ReplyTo.value=Return-Path
-UserProfile.fields.ReplyToPersonal.value=Return-PathPersonal
-UserProfile.fields.Organization.value=Organization
+UserProfile.mailHeaders.fields=From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL
+UserProfile.mailHeaders.fields.From.value=From
+UserProfile.mailHeaders.fields.FromPerseonal.value=FromPersonal
+UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
+UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
+UserProfile.mailHeaders.fields.Organization.value=Organization
 
-UserProfile.editableFields=From:FromPersonal:ReplyTo:ReplyToPersonal:Orgainization:Signature:sendMailURL
+UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Orgainization:mailHeaders.sendMailURL:signature:sentFolder
 UserProfile.propertyType=Multi
 
 UserProfile.default.propertyType=List

@@ -62,10 +62,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	public void updateMessageCount() {
 	    SwingUtilities.invokeLater(new RunnableAdapter() {
 		    public void run() {
-			try {
-			    messageCount.setText(getFolderInfo().getFolder().getUnreadMessageCount() + " " + Pooka.getProperty("FolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getFolder().getMessageCount() + " " + Pooka.getProperty("FolderStatusBar.totalMessages", "Total"));
-			} catch (MessagingException me) {
-			}
+			messageCount.setText(getFolderInfo().getUnreadCount() + " " + Pooka.getProperty("FolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getMessageCount() + " " + Pooka.getProperty("FolderStatusBar.totalMessages", "Total"));
 		    }
 		});
 	}
@@ -86,7 +83,8 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	defaultActions = new Action[] {
 	    new CloseAction(),
-	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getParentStore().getStoreThread())
+	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread())
+		
 		};
 
 	initWindow();
@@ -444,12 +442,18 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     }
 
     public Action[] getActions() {
+	Action[] returnValue;
 	MessageProxy m = getSelectedMessage();
 
 	if (m != null) 
-	    return TextAction.augmentList(m.getActions(), getDefaultActions());
+	    returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
 	else 
-	    return getDefaultActions();
+	    returnValue = getDefaultActions();
+
+	if (folderInfo.getActions() != null)
+	    returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
+
+	return returnValue;
     }
 
     public Action[] getDefaultActions() {
