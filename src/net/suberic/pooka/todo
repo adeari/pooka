@@ -18,8 +18,6 @@
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
 
-*) add status messages on shutdown.
-
 *) fix error display with exception so that you can see the stack trace.
 
 *) bug:  can't switch back to original theme in theme configuration (starts
@@ -49,6 +47,11 @@ say, like reacting to a mailto: link.
 ------
 
 *) separate out ui interfaces from swing implementations.
+
+*) add status messages on shutdown.
+	we'll need to do some work on that, because as of now, 
+	you end up waiting on the AwtEventThread, so no ui updates are
+	allowed.  
 
 *) check too many open files error on opening large cached folder?
 

@@ -104,7 +104,7 @@ public class ActionThread extends Thread {
    * not already running.
    */
   public synchronized void addToQueue(Action action, ActionEvent event) {
-    addToQueue(action, event, PRIORITY_HIGH);
+    addToQueue(action, event, PRIORITY_NORMAL);
   } 	
   
   /**

@@ -388,14 +388,18 @@ public class Pooka {
 	    
 	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 	      try {
-		currentStore.closeAllFolders(false, true);
-		currentStore.disconnectStore();
-		doneMap.put(currentStore, new Boolean(true));
+		if (currentStore.isConnected()) {
+		  currentStore.closeAllFolders(false, true);
+		  currentStore.disconnectStore();
+		  doneMap.put(currentStore, new Boolean(true));
+		} else {
+		  doneMap.put(currentStore, new Boolean(true));
+		}
 	      } catch (Exception e) {
-		// we really don't care.
+		doneMap.put(currentStore, new Boolean(true));
 	      }
 	    }
-	  }, storeThread), new java.awt.event.ActionEvent(getMainPanel(), 1, "store-close"));
+	  }, storeThread), new java.awt.event.ActionEvent(getMainPanel(), 1, "store-close"), net.suberic.util.thread.ActionThread.PRIORITY_HIGH);
       }
     }
     long sleepTime = 30000;
@@ -414,8 +418,10 @@ public class Pooka {
       for (int i = 0; done && i < v.size(); i++) {
 	Object key = v.get(i);
 	Boolean value = (Boolean) doneMap.get(key);
-	if (value != null && ! value.booleanValue())
+	if (value != null && ! value.booleanValue()) {
+	  uiFactory.showStatusMessage(Pooka.getProperty("info.exit.waiting", "Closing store ") + ((StoreInfo) key).getStoreID());
 	  done = false;
+	}
       }
     }
 
