@@ -6,6 +6,8 @@ import java.io.*;
 import javax.activation.*;
 import javax.mail.internet.*;
 
+import net.suberic.pooka.crypto.*;
+
 /**
  * A MessageInfo representing a new message.
  */
@@ -93,8 +95,11 @@ public class NewMessageInfo extends MessageInfo {
       }
       
       if (mEncryptMessage == CRYPTO_YES) {
-	// if we're forcing an encryption, then we aren't going to 
-	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+	if (getEncryptionKey() != null) {
+	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getEncryptionKey());
+	} else {
+	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+	}
       } else if (mEncryptMessage == CRYPTO_DEFAULT) {
 	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
       }
@@ -268,6 +273,7 @@ public class NewMessageInfo extends MessageInfo {
   public int getEncryptMessage() {
     return mEncryptMessage;
   }
+
   /**
    * Sets whether or not we want to encrypt this message.
    */
@@ -276,15 +282,45 @@ public class NewMessageInfo extends MessageInfo {
   }
 
   /**
+   * Sets the encryption key for encrypting this message.
+   */
+  public void setEncryptionKey(EncryptionKey pEncryptionKey) {
+    mEncryptionKey = pEncryptionKey;
+  }
+
+  /**
+   * Gets the encryption key we're using for this message.
+   */
+  public EncryptionKey getEncryptionKey() {
+    return mEncryptionKey;
+  }
+
+  /**
    * Returns whether we're planning on encrypting this message or not.
    */
   public int getSignMessage() {
     return mSignMessage;
   }
+
   /**
    * Sets whether or not we want to encrypt this message.
    */
   public void setSignMessage(int pSignMessage) {
     mSignMessage = pSignMessage;
   }
+  
+  /**
+   * Gets the encryption key we're using for this message.
+   */
+  public EncryptionKey getSignatureKey() {
+    return mSignatureKey;
+  }
+
+  /**
+   * Sets the encryption key for encrypting this message.
+   */
+  public void setSignatureKey(EncryptionKey pSignatureKey) {
+    mSignatureKey = pSignatureKey;
+  }
+
 }
