@@ -10,24 +10,30 @@
 *) make it so a move filter for a given folder defaults to that store,
 	at least, or possibly no store at all.
 
-*) queuing of outgoing mails
-	todo on this:
-	*)  add some sort of an administrative api to the NetworkConnection
-		so that the application and the admin tools (the bottom right
-		config) don't have the same restrictions (or lack thereof).
-		 -- somewhat started with the new test address api.
-	*) make it so there is some way for the NetworkConnection to detect
-		whether or not it's up.
-			-- started.  make sure it's enough.
-*) add support for jdk1.4
-	-- NetworkInterface classes
+*) outgoing mailserver improvements:
+	*) network connections - come up with a way to autotest that doesn't
+		take lots of time.
+	*) sending mail should try to autodetect mailserver to use
+		*) each server has a connection list, or 'any'
+		*) each server for the user checks the connections in order.
+		*) try to use the first available server
+	*) on failure to send
+		*) show error first.  save to outbox default?  work offine?
+		*) offer to save to outbox if available
+	*) offline setting???
 
 *) -- windows --
   *) support windows registry attachment associations.
 	-- check icemail
 	-- more or less added, but need to be able to access the library.
-*) test error message with OpenWith
-*) printing in windows can leave control characters at the end of lines
+
+*) -- windows testing --
+  *) test registry associations 
+     *) library included by hand
+     *) library included via webstart
+     *) set up a way to include library?
+  *) test error message with OpenWith
+  *) printing in windows can leave control characters at the end of lines
 	-- test.  shouldn't happen anymore.
 
 ---

@@ -148,6 +148,12 @@ public class NewMessageProxy extends MessageProxy {
 		    }
 		    newServer.sendMessage(getNewMessageInfo());
 		  }
+		} else if (sfd.getSaveToOutbox()) {
+		  try {
+		    mailServer.saveToOutbox(getNewMessageInfo());
+		  } catch (MessagingException outboxException) {
+		    getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + outboxException.getMessage());
+		  }
 		}
 	      } else {
 		getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());

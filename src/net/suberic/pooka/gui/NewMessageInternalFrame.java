@@ -354,7 +354,8 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
   public SendFailedDialog showSendFailedDialog(OutgoingMailServer server, javax.mail. MessagingException sfe) {
     SendFailedDialog sfd = new SendFailedDialog(server, sfe);
     sfd.configureComponent();
-    Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);
+    //Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);
+    JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), new Object[] { sfd }, "Error sending message", JOptionPane.QUESTION_MESSAGE);
     return sfd;
   }
 

@@ -1,6 +1,8 @@
 package net.suberic.pooka.gui;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.util.*;
 
@@ -46,6 +48,8 @@ public class SendFailedDialog extends JPanel {
   // chosen mailserver.
   ButtonGroup mServerDefaultButtons = null;
 
+  boolean sendButtonSelected = false;
+
   /**
    * Creates a new SendFailedDialog.
    */
@@ -62,6 +66,12 @@ public class SendFailedDialog extends JPanel {
 
     JPanel messagePanel = new JPanel();
     mMessageDisplay = new JTextArea(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + mException.getMessage());
+    JLabel testLabel = new JLabel();
+    
+    mMessageDisplay.setBackground(testLabel.getBackground());
+    mMessageDisplay.setFont(testLabel.getFont());
+    mMessageDisplay.setForeground(testLabel.getForeground());
+
     messagePanel.add(mMessageDisplay);
 
     JPanel buttonPanel = createActionPanel();
@@ -75,11 +85,18 @@ public class SendFailedDialog extends JPanel {
     choicePanel.setLayout(new BoxLayout(choicePanel, BoxLayout.X_AXIS));
 
     choicePanel.add(buttonPanel);
-    choicePanel.add(mMailServerList);
+
+    Box mailServerListBox = new Box(BoxLayout.Y_AXIS);
+    mailServerListBox.add(Box.createVerticalGlue());
+    mailServerListBox.add(mMailServerList);
+    mailServerListBox.add(Box.createVerticalGlue());
+    choicePanel.add(mailServerListBox);
     choicePanel.add(actionPanel);
 
     this.add(messagePanel);
     this.add(choicePanel);
+
+    reactivatePanels();
   }
 
   /**
@@ -99,7 +116,7 @@ public class SendFailedDialog extends JPanel {
     choices.add(abortButton);
     returnValue.add(abortButton);
 
-    JRadioButton sendButton = new JRadioButton();
+    final JRadioButton sendButton = new JRadioButton();
     sendButton.setText(Pooka.getProperty(P_RESOURCE + ".send", "Send using another server"));
     sendButton.setActionCommand(S_SEND_OTHER_SERVER);
     choices.add(sendButton);
@@ -113,6 +130,18 @@ public class SendFailedDialog extends JPanel {
 
     mActionButtons = choices;
 
+    sendButton.addChangeListener(new ChangeListener() {
+	public void stateChanged(ChangeEvent ce) {
+	  synchronized(sendButton) {
+	    boolean selected = sendButton.isSelected();
+	    if (selected != sendButtonSelected) {
+	      sendButtonSelected = selected;
+	      reactivatePanels();
+	    }
+	  }
+	}
+      });
+    
     return returnValue;
   }
 
@@ -171,6 +200,29 @@ public class SendFailedDialog extends JPanel {
   }
 
   /**
+   * Sets the appropriate panels as selected.
+   */
+  public void reactivatePanels() {
+    String actionCommand = mActionButtons.getSelection().getActionCommand();
+
+    if (actionCommand == S_SEND_OTHER_SERVER) {
+      mMailServerList.setEnabled(true);
+      Enumeration elements = mServerDefaultButtons.getElements();
+      while (elements.hasMoreElements()) {
+	AbstractButton ab = (AbstractButton) elements.nextElement();
+	ab.setEnabled(true);
+      }
+    } else {
+      mMailServerList.setEnabled(false);
+      Enumeration elements = mServerDefaultButtons.getElements();
+      while (elements.hasMoreElements()) {
+	AbstractButton ab = (AbstractButton) elements.nextElement();
+	ab.setEnabled(false);
+      }
+    }
+  }
+
+  /**
    * Whether or not to try a resend, or just fail.
    */
   public boolean resendMessage() {
@@ -179,6 +231,19 @@ public class SendFailedDialog extends JPanel {
     } else {
       return false;
     }
+  }
+
+  /**
+   * Wheter or not to save this message to the outbox for use later.
+   */
+  public boolean getSaveToOutbox() {
+    
+    if (mActionButtons.getSelection().getActionCommand() == S_SAVE_TO_OUTBOX) {
+      return true;
+    } else {
+      return false;
+    }
+
   }
 
   /**

@@ -61,7 +61,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     bundle.addValueChangeListener(this, getItemProperty() + ".server");
     bundle.addValueChangeListener(this, getItemProperty() + ".outbox");
 
-    mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
+    mailServerThread = new net.suberic.util.thread.ActionThread(getItemID() + " - smtp thread");
     mailServerThread.start();
   }
 
@@ -225,47 +225,17 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	sendTransport = prepareTransport(connect);
 	sendTransport.connect();
 	connected = true;
-      } catch (Exception me) {
-	// if the connection/mail transport isn't available.
-	me.printStackTrace();
-
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.connecting", "SMTP server not available; getting outbox."));
-
-	FolderInfo outbox = getOutbox();
-	
-	if (outbox != null) {
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.waitForLock", "SMTP server not available; waiting for outbox lock."));
-
-	  // we need the lock
-	  Object runLock = outbox.getFolderThread().getRunLock();
-	  synchronized(runLock) {
-	    try {
-	      if ( ! outbox.isConnected()) {
-		Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.opening", "SMTP server not available; opening outbox."));
-		outbox.openFolder(Folder.READ_WRITE);
-	      }
-	      
-	      Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.appending", "SMTP server not available; appending to outbox."));
-	      outbox.appendMessages(new MessageInfo[] { nmi });
-	    
-	      javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		  public void run() {
-		    Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
-		  }
-		});
-	      ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
-	    } catch(MessagingException nme) {
-	      ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
-	    }
+      } catch (MessagingException me) {
+	if (Pooka.getProperty("Pooka.outbox.autoSave", "false").equalsIgnoreCase("true")) {
+	  try {
+	    saveToOutbox(nmi);
+	  } catch (MessagingException nme) {
+	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
 	  }
 	} else {
-	  me.printStackTrace();
-	  MessagingException nme = new MessagingException("Connection unavailable, and no Outbox specified.");
-	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
+	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);	  
 	}
-	
       }
-
       
       // if the connection worked.
       if (connected) {
@@ -375,6 +345,49 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     }
     Transport sendTransport = session.getTransport(getSendMailURL()); 
     return sendTransport;
+  }
+
+  /**
+   * Saves the given message to the Outbox for sending later.
+   */
+  public void saveToOutbox(NewMessageInfo nmi) throws MessagingException {
+    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.connecting", "SMTP server not available; getting outbox."));
+
+    FolderInfo outbox = getOutbox();
+    
+    if (outbox != null) {
+      Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.waitForLock", "SMTP server not available; waiting for outbox lock."));
+      
+      // we need the lock
+      Object runLock = outbox.getFolderThread().getRunLock();
+      synchronized(runLock) {
+	try {
+	  if ( ! outbox.isConnected()) {
+	    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.opening", "SMTP server not available; opening outbox."));
+	    outbox.openFolder(Folder.READ_WRITE);
+	  }
+	  
+	  Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.appending", "SMTP server not available; appending to outbox."));
+	  outbox.appendMessages(new MessageInfo[] { nmi });
+	  
+	  if (Pooka.getProperty("Pooka.outbox.autoSave", "false").equalsIgnoreCase("true")) {
+	    // assume that if we aren't automatically saving to the outbox
+	    // that we did this explicitly.
+	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		  Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
+		}
+	      });
+	  }
+
+	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
+	} catch(MessagingException nme) {
+	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
+	}
+      }
+    } else {
+      throw new MessagingException("Error saving to Outbox -- no Outbox specified.");
+    }
   }
 
   /**

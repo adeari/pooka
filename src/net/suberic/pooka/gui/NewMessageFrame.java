@@ -331,7 +331,8 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
   public SendFailedDialog showSendFailedDialog(OutgoingMailServer server, javax.mail. MessagingException sfe) {
     SendFailedDialog sfd = new SendFailedDialog(server, sfe);
     sfd.configureComponent();
-    Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);
+    JOptionPane.showMessageDialog(Pooka.getMainPanel(), new Object[] { sfd }, "Error sending message", JOptionPane.QUESTION_MESSAGE);    
+    //Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);
     return sfd;
   }
 
