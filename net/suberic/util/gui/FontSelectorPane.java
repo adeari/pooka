@@ -129,33 +129,18 @@ public class FontSelectorPane extends DefaultPropertyEditor {
    */
   public void selectNewFont() {
     String fontText = valueDisplay.getText();
-    JFontChooser jfc = null;
+    Font f = null;
     if (fontText != null && fontText.length() > 0) {
-      Font f = Font.decode(fontText);
-      if (f != null)
-	jfc = new JFontChooser(f, (String)valueDisplay.getText());
+      f = Font.decode(fontText);
     }
-    if (jfc == null)
-      jfc = new JFontChooser();
 
-    //jfc.setMultiSelectionEnabled(false);
-    //jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    
-    Font returnValue = null;
-      //JFontChooser.showDialog(this,
-      //sourceBundle.getProperty("FontEditorPane.Select",
-      //				      "Select"), f);
+    String newFontText = JFontChooser.showStringDialog(this,
+			    sourceBundle.getProperty("FontEditorPane.Select",
+						     "Select"), f);
 
-    System.err.println("returnValue = " + returnValue);
-    if (returnValue != null) {
-      //Font returnFont = jfc.getSelectedFile();
-      System.err.println("returnValue.getPSName() = " + returnValue.getPSName());
-      System.err.println("returnValue.getName() = " + returnValue.getName());
-      System.err.println("returnValue.getFontName() = " + returnValue.getFontName());
-      
-      valueDisplay.setText(returnValue.toString());
-    }
-    
+    //System.err.println("new font text = " + newFontText);
+    if (newFontText != null)
+      valueDisplay.setText(newFontText);
   }
 
     //  as defined in net.suberic.util.gui.PropertyEditorUI
