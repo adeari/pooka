@@ -31,7 +31,7 @@ public class SimpleFileCache implements MessageCache {
     private HashMap dataHandlerCache = new HashMap();
 
     // the currently cached uid's
-    private long[] cachedMessages;
+    private Vector cachedMessages;
 
     /**
      * Creates a new SimpleFileCache for the given FolderInfo, in the
@@ -134,20 +134,53 @@ public class SimpleFileCache implements MessageCache {
 	return getFlags(uid, true);
     }
 
-    public boolean addMessage(MimeMessage m, long uid, int status) {
+    public boolean addMessage(MimeMessage m, long uid) throws MessagingException {
+	File outFile = new File(cacheDir, uid + "_msg.gz");
+	if (outFile.exists())
+	    outFile.delete();
 	
+	FileOutputStream fos = new FileOutputStream(outFile);
+	m.writeTo(fos);
+
+	fos.flush();
+	fos.close();
+	
+	if (! cachedMessages.contains(uid))
+	    cachedMessages.add(uid);
+	    
     }
 
     public boolean removeMessage(long uid) {
+	invalidateCache(new long[] { uid });
+	cachedMessages.remove(uid);
 
-    }
-
-    public Object getFromCache(long uid, int type) {
-
+	return true;
     }
 
     public boolean invalidateCache(long[] uids) {
+	if (uids != null) {
 
+	    for (int i = 0 ; i < uids.length; i++)
+		invalidateCache(uids[i]);
+
+	    return true;
+	} else
+	    return false;
+    }
+
+    public boolean invalidateCache(long[] uids) {
+	FilenameFilter filter = new FilenameFilter() {
+		public boolean accept(File dir, String name) {
+		    if (name.startsWith(uid + "_"))
+			return true;
+		    else
+			return false;
+		}
+	    };
+	
+	File[] matchingFiles = cacheDir.listFiles(filter);
+	for (int i = 0; i < matchingFiles.length; i++)
+	    matchingFiles[i].delete();
     }
 
     public long[] getAddedMessages(long[] uids) {
