@@ -39,6 +39,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default. 
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+    System.err.println("creating tep for " + propertyName + ", template " + template);
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
@@ -127,7 +128,9 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * Creates an editor pane for a group of values.
    */
   private SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    return (SwingPropertyEditor) manager.createEditor(subProperty, subTemplate);
+    CompositeEditorPane cep = new CompositeEditorPane();
+    cep.configureEditor(subProperty, subTemplate, manager, true);
+    return cep;
   }
   
 }

@@ -43,6 +43,16 @@ import net.suberic.util.VariableBundle;
 public class CompositeEditorPane extends CompositeSwingPropertyEditor {
   boolean scoped;
 
+  /**
+   * Creates a CompositeEditorPane.
+   */
+  public CompositeEditorPane() {
+
+  }
+
+  /**
+   * Creates a CompositeEditorPane editing the given list.
+   */
   public CompositeEditorPane(List properties, List templates, PropertyEditorManager mgr) {
     configureEditor(properties, templates, mgr);
   }
@@ -61,6 +71,7 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
+    enabled=isEnabled;
     originalValue = manager.getProperty(property, "");
     
     this.setBorder(BorderFactory.createEtchedBorder());
@@ -177,7 +188,8 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
    */
   public void configureEditor(List properties, List templates, PropertyEditorManager newManager) {
     manager=newManager;
-    
+    enabled = true;
+
     this.setBorder(BorderFactory.createEtchedBorder());
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");

@@ -93,8 +93,10 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     templates = new Vector();
     for (int i = 0; i < templateNames.size(); i++) {
-      template.add(new String(template + "." + (String)templateNames.get(i)));
+      templates.add(new String(template + "." + (String)templateNames.get(i)));
     }
+
+    editors = new Vector();
 
     // create entryPanels (the panels which show the subproperties
     // of each item in the optionList) for each option.
@@ -178,6 +180,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     }
     
     currentPanels.put("___default", pep);
+    editors.add(pep);
 
     entryPanel.add("___default", pep);
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
@@ -250,7 +253,9 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       if (newSelected == null) {
 	String rootProp = new String(property + "." + selectedId);
 	
-	SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate);
+	CompositeEditorPane pep = new CompositeEditorPane();
+	System.err.println("created pep for property " + rootProp + ", editorTempalte " + editorTemplate + ".editableFields");
+	pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
 
 	// save reference to new pane in hash table
 	currentPanels.put(selectedId, pep);
