@@ -158,7 +158,7 @@ public class StoreInfo implements ValueChangeListener {
 		if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
 		    childFolder = (FolderInfo)children.elementAt(i);
 	}
-	
+
 	if (childFolder != null && subFolderName != null)
 	    return childFolder.getChild(subFolderName);
 	else

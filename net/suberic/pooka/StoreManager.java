@@ -155,10 +155,15 @@ public class StoreManager implements ValueChangeListener {
      * The folderName should be in the form "/storename/folder/subfolder".
      */
     public FolderInfo getFolder(String folderName) {
-	if (folderName.length() < 1) {
+	if (folderName.length() >= 1) {
 	    int divider = folderName.indexOf('/', 1);
+	    while (divider == 0) {
+		folderName = folderName.substring(1);
+		divider = folderName.indexOf('/');
+	    }
+
 	    if (divider > 0) {
-		String storeName = folderName.substring(1, divider);
+		String storeName = folderName.substring(0, divider);
 		StoreInfo store = getStoreInfo(storeName);
 		if (store != null) {
 		    return store.getChild(folderName.substring(divider +1));

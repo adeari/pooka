@@ -254,6 +254,9 @@ public class UserProfile extends Object {
     public void loadSentFolder() {
 	sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
 
+	if (sentFolder != null) {
+	    sentFolder.setSentFolder(true);
+	} 
     }
 
     public String getSignature() {
