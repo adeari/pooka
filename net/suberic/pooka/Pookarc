@@ -8,7 +8,7 @@ Message.sendImmediately=true
 Pooka.hsize = 800
 Pooka.vsize = 600
 
-Pooka.folderPanel.hsize=200
+Pooka.folderPanel.hsize=180
 Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600
 Pooka.messagePanel.vsize=570
@@ -20,7 +20,7 @@ Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
 
 Pooka.lineWrap=true
-Pooka.lineLength=72
+Pooka.lineLength=76
 Pooka.displayTextAttachments=true
 
 Pooka.openFoldersOnConnect=true
