@@ -1,3 +1,5 @@
+fixed a couple of memory leaks
+
 the outbox folder now gets the correct toolbar in preview pane mode.
 
 switching pop local store from mbox to maildir.
