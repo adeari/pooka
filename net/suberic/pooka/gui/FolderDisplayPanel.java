@@ -145,20 +145,20 @@ public class FolderDisplayPanel extends JPanel {
 
 	Runnable runMe = new Runnable() {
 		public void run() {
-		    moveSelectionOnRemoval(removedProxiesTmp);
-		    
-		    getFolderTableModel().removeRows(removedProxiesTmp);
+		  moveSelectionOnRemoval(removedProxiesTmp);
+		  
+		  getFolderTableModel().removeRows(removedProxiesTmp);
 		}
-	    };
+	  };
 
 	if (! SwingUtilities.isEventDispatchThread())
-	    try {
-		SwingUtilities.invokeAndWait(runMe);
-		
-	    } catch (Exception e) {
-	    }
+	  try {
+	    SwingUtilities.invokeAndWait(runMe);
+	    
+	  } catch (Exception e) {
+	  }
 	else
-	    runMe.run();
+	  runMe.run();
     }
 
     /**
@@ -167,20 +167,21 @@ public class FolderDisplayPanel extends JPanel {
      * row.
      */
     public void moveSelectionOnRemoval(MessageChangedEvent e) {
-	try {
-	    // don't bother if we're just going to autoexpunge it...
-	    if ((!Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) && e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && (e.getMessage().isExpunged() || e.getMessage().getFlags().contains(Flags.Flag.DELETED))) {
+      try {
+	// don't bother if we're just going to autoexpunge it...
+	if ((!Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) && e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && (e.getMessage().isExpunged() || e.getMessage().getFlags().contains(Flags.Flag.DELETED))) {
+	  final Message changedMessage = e.getMessage();
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
 		MessageProxy selectedProxy = getSelectedMessage();
-		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage().equals(e.getMessage())) {
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run() {
-				selectNextMessage();
-			    }
-			});
+		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage().equals(changedMessage)) {
+		  selectNextMessage();
 		}
-	    }
-	} catch (MessagingException me) {
+	      }
+	    });
 	}
+      } catch (MessagingException me) {
+      }
     }
 
     /**
@@ -189,25 +190,27 @@ public class FolderDisplayPanel extends JPanel {
      * row.
      */
     public void moveSelectionOnRemoval(MessageCountEvent e) {
-	MessageProxy selectedProxy = getSelectedMessage();
-	Message[] removedMsgs = e.getMessages();
-	if (selectedProxy != null)  {
-	    boolean found = false;
-	    Message currentMsg = selectedProxy.getMessageInfo().getMessage();
-	    for (int i = 0; (currentMsg != null && found == false && i < removedMsgs.length); i++) {
+      final Message[] removedMsgs = e.getMessages();
+      
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    MessageProxy selectedProxy = getSelectedMessage();
+	    if (selectedProxy != null)  {
+	      boolean found = false;
+	      Message currentMsg = selectedProxy.getMessageInfo().getMessage();
+	      for (int i = 0; (currentMsg != null && found == false && i < removedMsgs.length); i++) {
 		if (currentMsg.equals(removedMsgs[i])) {
-		    found = true;
+		  found = true;
 		}
+	      }
+	      
+	      if (found) {
+		selectNextMessage();
+	      }
 	    }
-	    
-	    if (found) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-			    selectNextMessage();
-			}
-		    });
-	    }
-	}
+	  }
+	});
+      
     }
 
     /**
@@ -216,12 +219,22 @@ public class FolderDisplayPanel extends JPanel {
      * row.
      */
     private void moveSelectionOnRemoval(Vector removedProxies) {
-	MessageProxy selectedProxy = getSelectedMessage();
-	if (selectedProxy != null)  {
-	    if (removedProxies.contains(selectedProxy)) {
+      final Vector removed = removedProxies;
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    MessageProxy selectedProxy = getSelectedMessage();
+	    if (selectedProxy != null)  {
+	      if (removed.contains(selectedProxy)) {
 		selectNextMessage();
+	      }
 	    }
-	}
+	  }
+	};
+      
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
     }
 
     /**
@@ -430,23 +443,23 @@ public class FolderDisplayPanel extends JPanel {
      * the first message is selected.
      */
     public int selectNextMessage() {
-	int selectedRow = messageTable.getSelectedRow();
-	int newRow = selectedRow + 1;
-	boolean done = false;
-	while (! done && newRow < messageTable.getRowCount() ) {
-	    MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
-	    try {
-		if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
-		    newRow ++;
-		} else {
-		    done = true;
-		}
-	    } catch (MessagingException me) {
-		newRow ++;
-	    }
+      int selectedRow = messageTable.getSelectedRow();
+      int newRow = selectedRow + 1;
+      boolean done = false;
+      while (! done && newRow < messageTable.getRowCount() ) {
+	MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
+	try {
+	  if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+	    newRow ++;
+	  } else {
+	    done = true;
+	  }
+	} catch (MessagingException me) {
+	  newRow ++;
 	}
-	
-	return selectMessage(newRow);
+      }
+      
+      return selectMessage(newRow);
     }
 
     /**
@@ -498,23 +511,24 @@ public class FolderDisplayPanel extends JPanel {
      * @return  the index of the newly selected row.
      */
     public int selectMessage(int messageNumber) {
-	int rowCount = messageTable.getRowCount();
-
-	if (rowCount > 0) {
-	    int numberToSet = messageNumber;
-	    
-	    if (messageNumber < 0) {
-		numberToSet = 0;
-	    } else if (messageNumber >= rowCount) {
-		numberToSet = rowCount - 1;
-	    }
-	    messageTable.setRowSelectionInterval(numberToSet, numberToSet);
-	    makeSelectionVisible(numberToSet);
-	    return numberToSet;
-	} else {
-	    return -1;
+      int rowCount = messageTable.getRowCount();
+      
+      if (rowCount > 0) {
+	int numberToSet = messageNumber;
+	
+	if (messageNumber < 0) {
+	  numberToSet = 0;
+	} else if (messageNumber >= rowCount) {
+	  numberToSet = rowCount - 1;
 	}
+	messageTable.setRowSelectionInterval(numberToSet, numberToSet);
+	makeSelectionVisible(numberToSet);
+	return numberToSet;
+      } else {
+	return -1;
+      }
     }
+
     /**
      * This method takes the currently selected row(s) and returns the
      * appropriate MessageProxy object.

@@ -123,13 +123,13 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
 	updateMessageCount();
     }
     
-    public void updateMessageCount() {
-	SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    messageCount.setText(getFolderInfo().getUnreadCount() + " " + Pooka.getProperty("FolderFolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getMessageCount() + " " + Pooka.getProperty("FolderFolderStatusBar.totalMessages", "Total"));
-		}
-	    });
-
+  public void updateMessageCount() {
+    SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  messageCount.setText(getFolderInfo().getUnreadCount() + " " + Pooka.getProperty("FolderFolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getMessageCount() + " " + Pooka.getProperty("FolderFolderStatusBar.totalMessages", "Total"));
+	}
+      });
+    
     }
 
     /**

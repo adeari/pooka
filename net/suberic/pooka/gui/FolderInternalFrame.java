@@ -558,24 +558,28 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	getFolderStatusBar().messagesAdded(e);
     }
 
-    public void messagesRemoved(MessageCountEvent e) { 
-	getFolderStatusBar().messagesRemoved(e);
-	getFolderDisplay().moveSelectionOnRemoval(e);
-	Runnable updateAdapter = new Runnable() {
-		public void run() {
-		    getMessagePanel().getMainPanel().refreshActiveMenus();
-		    if (toolbar != null)
-			toolbar.setActive(getActions());
-		    if (keyBindings != null)
-			keyBindings.setActive(getActions());
-		}
-	    };
-	if (SwingUtilities.isEventDispatchThread())
-	    updateAdapter.run();
-	else
-	    SwingUtilities.invokeLater(updateAdapter);
-	
-    }
+  /**
+   * handles removed messages.
+   */
+  public void messagesRemoved(MessageCountEvent e) { 
+    getFolderStatusBar().messagesRemoved(e);
+    getFolderDisplay().moveSelectionOnRemoval(e);
+
+    Runnable updateAdapter = new Runnable() {
+	public void run() {
+	  getMessagePanel().getMainPanel().refreshActiveMenus();
+	  if (toolbar != null)
+	    toolbar.setActive(getActions());
+	  if (keyBindings != null)
+	    keyBindings.setActive(getActions());
+	}
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      updateAdapter.run();
+    else
+      SwingUtilities.invokeLater(updateAdapter);
+    
+  }
     
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
