@@ -61,19 +61,13 @@ public class PopInboxFolderInfo extends FolderInfo {
 	    if (! inboxFile.exists())
 		inboxFile.createNewFile();
 	} catch (Exception e) {
-	    System.out.println("caught exception: " + e);
-	    e.printStackTrace();
+	    Pooka.getUIFactory().showError(Pooka.getProperty("error.cannotCreatePopFolders", "Error:  could not create local folder."), e);
 	}
 	
 	changeAdapter = new ChangeCache(new File(mailHome));
 
 	try {
-	    // this will use a new session so we can get the corrent mbox
-	    // properties set.
-	    java.util.Properties sysProps = System.getProperties();
-	    sysProps.setProperty("mail.mbox.inbox", inboxFileName);
-	    sysProps.setProperty("mail.mbox.userhome", userHomeName);
-	    Session session = javax.mail.Session.getInstance(sysProps, Pooka.defaultAuthenticator);
+	    Session session = javax.mail.Session.getInstance(System.getProperties(), Pooka.defaultAuthenticator);
 
 	    if (Pooka.isDebug()) {
 		System.out.println("session.getProperty(mail.mbox.inbox) = " + session.getProperty("mail.mbox.inbox"));

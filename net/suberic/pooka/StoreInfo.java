@@ -108,6 +108,7 @@ public class StoreInfo implements ValueChangeListener, Item {
       store = s.getStore(url);
       available=true;
     } catch (NoSuchProviderException nspe) {
+      Pooka.getUIFactory().showError(Pooka.getProperty("error.loadingStore", "Unable to load Store ") + getStoreID(), nspe);
       available=false;
     }
     
@@ -180,8 +181,10 @@ public class StoreInfo implements ValueChangeListener, Item {
    */
   public Properties loadProperties() {
     Properties p = new Properties(System.getProperties());
+    
     p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
     p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
+
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
       p.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
       
@@ -190,6 +193,24 @@ public class StoreInfo implements ValueChangeListener, Item {
       p.setProperty("mail.imap.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "993"));
     }
     
+    // set the properties for the mbox backend of a pop mailbox
+    if (Pooka.getProperty(getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("pop3")) {
+      String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
+      if (mailHome.equals("")) {
+	mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+	if (mailHome.equals(""))
+	  mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+	
+	mailHome = mailHome + java.io.File.separator + storeID;
+      }
+      String inboxFileName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");
+      String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
+      
+      p.setProperty("mail.mbox.inbox", inboxFileName);
+      p.setProperty("mail.mbox.userhome", userHomeName);
+      
+    }
+
     return p;
   }
     
