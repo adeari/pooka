@@ -35,7 +35,11 @@ public class Attachment {
 		    mimeType = new ContentType("text/plain");
 		}
 		
+	    } else {
+		// fall back to text/plain.
+		mimeType = new ContentType("text/plain");
 	    }
+
 	}
 	size = mbp.getSize();
 	encoding = mbp.getEncoding();
@@ -61,6 +65,9 @@ public class Attachment {
 		    // fall back to text/plain.
 		    mimeType = new ContentType("text/plain");
 		}
+	    } else {
+		// fall back to text/plain.
+		mimeType = new ContentType("text/plain");
 		
 	    }
 	}
@@ -92,7 +99,9 @@ public class Attachment {
 		    // fall back to text/plain.
 		    mimeType = new ContentType("text/plain");
 		}
-		
+	    } else {
+		// fall back to text/plain.
+		mimeType = new ContentType("text/plain");
 	    }
 	}
 	size = msg.getSize();
@@ -206,7 +215,11 @@ public class Attachment {
     String getText(int maxLength, String truncationMessage) throws IOException {
 	if (maxLength >= size) {
 	    try {
-		return (String) handler.getContent();
+		Object o = handler.getContent();
+		if (o instanceof String)
+		    return (String) o;
+		else
+		    throw new UnsupportedEncodingException();
 	    } catch (UnsupportedEncodingException uee) {
 		/**
 		 * Just read the InputStream directly into a byte array and
