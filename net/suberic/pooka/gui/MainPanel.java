@@ -221,7 +221,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    // deleted messages.
 	    try {
 		((StoreInfo)v.elementAt(i)).closeAllFolders(false);
-	    } catch (javax.mail.MessagingException me) {
+	    } catch (Exception e) {
 		// we really don't care.
 	    }
 	}
