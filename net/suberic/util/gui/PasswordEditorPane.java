@@ -35,7 +35,7 @@ public class PasswordEditorPane extends DefaultPropertyEditor {
 	else
 	    defaultLabel = property.substring(dotIndex+1);
 
-	label = new JLabel(sourceBundle.getProperty(property + ".label", defaultLabel));
+	label = new JLabel(sourceBundle.getProperty(templateType + ".label", defaultLabel));
 	inputField = new JPasswordField(originalValue);
 	this.add(label);
 	this.add(inputField);

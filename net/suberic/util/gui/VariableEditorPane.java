@@ -24,6 +24,8 @@ public class VariableEditorPane extends DefaultPropertyEditor {
     String keyProperty;
     HashMap valueToTemplateMap = new HashMap();
 
+    JButton button;
+
     boolean scoped;
 
     public VariableEditorPane(String newProperty, String newTemplate, PropertyEditorFactory newFactory) {
@@ -64,7 +66,7 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 
 	String buttonLabel = sourceBundle.getProperty(template + ".button.label", template);
 	
-	JButton button = new JButton(buttonLabel);
+	button = new JButton(buttonLabel);
 	button.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 
@@ -72,7 +74,9 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 		}
 	    });
 
-	valueComponent = button;
+	valueComponent = new JPanel();
+	valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
+	valueComponent.add(button);
     }
 
     /**
@@ -136,7 +140,7 @@ public class VariableEditorPane extends DefaultPropertyEditor {
     }
 
     public void setEnabled(boolean newValue) {
-	((JButton) valueComponent).setEnabled(newValue);
+	button.setEnabled(newValue);
 	enabled=newValue;
     }
 }

@@ -28,7 +28,7 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	else
 	    defaultLabel = property.substring(dotIndex+1);
 
-	label = new JLabel(sourceBundle.getProperty(property + ".label", defaultLabel));
+	label = new JLabel(sourceBundle.getProperty(templateType + ".label", defaultLabel));
 	inputField = createComboBox();
 
 	this.add(label);
@@ -36,7 +36,9 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	this.setEnabled(isEnabled);
 
 	labelComponent = label;
-	valueComponent = inputField;
+	valueComponent = new JPanel();
+	valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
+	valueComponent.add(inputField);
     }
     
     public ListEditorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {

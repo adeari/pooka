@@ -27,6 +27,7 @@ public class StringEditorPane extends DefaultPropertyEditor {
 	sourceBundle=bundle;
 	originalValue = sourceBundle.getProperty(newProperty, "");
 
+
 	String defaultLabel;
 	int dotIndex = property.lastIndexOf(".");
 	if (dotIndex == -1) 

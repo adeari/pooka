@@ -2,9 +2,6 @@ beta 1
 ---------------
 
 caching:  pretty much the same as uid, no?  only difference is that we also have to add new messages/flag changes.  
-	   *)  add a ui for configuring caching. -- close to done.  main
-	       issue is that you can't dynamically switch between protocol
-	       types.
 	   *)  bug:  new message count isn't quite correct, is it?
 
 *) add pop3/local mail spool support.

@@ -70,6 +70,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	editors = new Vector();
 
 	GridBagConstraints constraints = new GridBagConstraints();
+	constraints.insets = new Insets(1,3,0,3);
 	GridBagLayout layout = (GridBagLayout) getLayout();
 	constraints.weightx = 1.0;
 	constraints.fill = GridBagConstraints.BOTH;
