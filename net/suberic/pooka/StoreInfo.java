@@ -232,22 +232,63 @@ public class StoreInfo implements ValueChangeListener {
     }
     
     /**
-     * This adds the given String to the folderList property.
+     * This adds the given folderString to the folderList property.
      */
-    void addToFolderList(String newFolderName) {
-	int firstSlash = newFolderName.indexOf('/');
-	while (firstSlash == 0) {
-	    newFolderName = newFolderName.substring(1);
-	    firstSlash = newFolderName.indexOf('/');
-	}
+    void addToFolderList(String addFolderName) {
+	String folderName;
+	Vector folderNames = Pooka.getResources().getPropertyAsVector(getStoreProperty() + ".folderList", "");
+	
+	boolean found = false;
 
-	if (firstSlash >= 0) {
+	for (int i = 0; i < folderNames.size(); i++) {
+	    folderName = (String) folderNames.elementAt(i);
+
+	    if (folderName.equals(addFolderName)) {
+		found=true;
+	    }
 	    
 	}
-
 	
+	if (!found) {
+	    String currentValue = Pooka.getProperty(getStoreProperty() + ".folderList");
+	    if (currentValue.equals(""))
+		Pooka.setProperty(getStoreProperty() + ".folderList", addFolderName);
+	    else
+		Pooka.setProperty(getStoreProperty() + ".folderList", currentValue + ":" + addFolderName);
+	}
+			      
     }
+    
+    /**
+     * This subscribes the Folder described by the given String to this
+     * StoreInfo.
+     */
 
+    public void subscribeFolder(String folderName) {
+	String subFolderName = null;
+	String childFolderName = null;
+	int firstSlash = folderName.indexOf('/');
+	while (firstSlash == 0) {
+	    folderName = folderName.substring(1);
+	    firstSlash = folderName.indexOf('/');
+	}
+
+	if (firstSlash > 0) {
+	    childFolderName = folderName.substring(0, firstSlash);
+	    if (firstSlash < folderName.length() -1)
+		subFolderName = folderName.substring(firstSlash +1);
+	    
+	} else
+	    childFolderName = folderName;
+
+	this.addToFolderList(childFolderName);
+
+	FolderInfo childFolder = getChild(childFolderName);
+
+	if (childFolder != null && subFolderName != null)
+	    childFolder.subscribeFolder(subFolderName);
+    }
+    
     /**
      * This method connects the Store, and sets the StoreInfo to know that
      * the Store should be connected.  You should use this method instead of
