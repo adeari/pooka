@@ -177,5 +177,18 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public String showInputDialog(Object[] inputPanes, String title) {
 	return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
     }
-    
+
+    /**
+     * Shows a status message.
+     */
+    public void showStatusMessage(String newMessage) {
+	Pooka.getMainPanel().getInfoPanel().setMessage(newMessage);
+    }
+
+    /**
+     * Clears the main status message panel.
+     */
+    public void clearStatus() {
+	Pooka.getMainPanel().getInfoPanel().clear();
+    }   
 }

@@ -221,19 +221,17 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     /**
      * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
      * 
-     * Not yet implemented.
      */
     public void showStatusMessage(String msg) {
-	System.out.println(getFolderInfo().getFolderID() + ":  " + msg);
+	Pooka.getUIFactory().showStatusMessage(getFolderInfo().getFolderID() + ":  " + msg);
     }
 
     /**
      * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
      * 
-     * Not yet implemented.
      */
     public void clearStatusMessage() {
-	// no-op.
+	Pooka.getUIFactory().clearStatus();
     }
 
     /**

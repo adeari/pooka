@@ -25,6 +25,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
     private ContentPanel contentPanel;
+    private InfoPanel infoPanel;
     private Session session;
     private MailQueue mailQueue;
     private UserProfile currentUser = null;
@@ -57,6 +58,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
 	contentPanel = Pooka.getUIFactory().createContentPanel();
 	folderPanel = new FolderPanel(this);
+	infoPanel = new InfoPanel();
+	infoPanel.setMessage("Pooka");
 	Pooka.getResources().addValueChangeListener(folderPanel, "Store");
 
 	this.setLeftComponent(folderPanel);
@@ -239,6 +242,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	return mainMenu;
     }
     
+    public InfoPanel getInfoPanel() {
+	return infoPanel;
+    }
+
     public void setMainMenu(ConfigurableMenuBar newMainMenu) {
 	mainMenu=newMainMenu;
     }

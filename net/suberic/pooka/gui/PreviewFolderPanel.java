@@ -166,7 +166,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      * Not yet implemented.
      */
     public void showStatusMessage(String msg) {
-	System.out.println(getFolderInfo().getFolderID() + ":  " + msg);
+	Pooka.getUIFactory().showStatusMessage(getFolderInfo().getFolderID() + ":  " + msg);   
     }
 
     /**
@@ -175,7 +175,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      * Not yet implemented.
      */
     public void clearStatusMessage() {
-	// no-op.
+	Pooka.getUIFactory().clearStatus();
     }
 
     /**

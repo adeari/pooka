@@ -65,5 +65,14 @@ public interface PookaUIFactory extends ErrorHandler {
      * Shows an Input window.
      */
     public String showInputDialog(Object[] inputPanels, String title);
- 
+
+    /**
+     * Shows a status message.
+     */
+    public void showStatusMessage(String newMessage);
+
+    /**
+     * Clears the main status message panel.
+     */
+    public void clearStatus();
 }
