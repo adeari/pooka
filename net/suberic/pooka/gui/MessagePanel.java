@@ -206,14 +206,15 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * de-iconified (if necessary) and selected.
      */
     public void openMessageWindow(MessageProxy m, boolean newMessage) {
-	MessageWindow messageWindow = (MessageWindow) m.getMessageUI();
+	JInternalFrame messageWindow = (JInternalFrame) m.getMessageUI();
 	if (messageWindow == null) {
-	    messageWindow = new ReadMessageWindow(this, m);
-	    m.setMessageUI(messageWindow);
+	    MessageUI mui = Pooka.getUIFactory().createMessageUI(m);
+	    m.setMessageUI(mui);
+	    messageWindow = (JInternalFrame) mui;
 	    newMessage = true;
 	} 
 
-	final MessageWindow newMessageWindow = messageWindow;
+	final JInternalFrame newMessageWindow = messageWindow;
 	final boolean isNew = newMessage;
 
 	Runnable openWindowCommand = new RunnableAdapter() {
