@@ -844,6 +844,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  // we need to autoCache either way.
 	  try {
 	    if (autoCache) {
+	      showStatusMessage(getFolderDisplayUI(), "caching " + i + " of " + addedMessages.length + " messages....");
 	      getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.MESSAGE, false);
 	    } else {
 	      getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
@@ -865,8 +866,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    if (Pooka.isDebug())
 	      System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
 	  } else {
-	    
-	    
 	    CachingMimeMessage newMsg = new CachingMimeMessage(CachingFolderInfo.this, uid);
 	    mi = new MessageInfo(newMsg, CachingFolderInfo.this);
 	    addedProxies.add(new MessageProxy(getColumnValues(), mi));
@@ -876,6 +875,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  
 	  try {
 	    if (autoCache) {
+	      showStatusMessage(getFolderDisplayUI(), getFolderID() + ":  " + Pooka.getProperty("info.UIDFolder.synchronizing.cachingMessages", "Caching") + " " + i + " " + Pooka.getProperty("info.UIDFolder.synchronizing.of", "of") + " " + addedMessages.length + Pooka.getProperty("info.UIDFolder.synchronizing.messages", "messages") + "....");
 	      getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.MESSAGE, false);
 	    } else {
 	      getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
@@ -888,6 +888,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       }
 
       getCache().writeMsgFile();
+
+      clearStatusMessage(getFolderDisplayUI());
 
       addedProxies.removeAll(applyFilters(addedProxies));
       if (addedProxies.size() > 0) {

@@ -2540,6 +2540,26 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     return mNamespace;
   }
 
+  /**
+   * Shows a status message, using the given FolderDisplayUI if not null.
+   */
+  public void showStatusMessage(net.suberic.pooka.gui.FolderDisplayUI pUI, String message) {
+    if (pUI != null)
+      pUI.showStatusMessage(message);
+    else
+      Pooka.getUIFactory().showStatusMessage(message);
+  }
+  
+  /**
+   * Clears the status message.
+   */
+  public void clearStatusMessage(net.suberic.pooka.gui.FolderDisplayUI pUI) {
+    if (pUI != null)
+      pUI.clearStatusMessage();
+    else
+      Pooka.getUIFactory().clearStatus();
+  }
+
   class EditPropertiesAction extends AbstractAction {
     
     EditPropertiesAction() {

@@ -1,3 +1,6 @@
+fixed autocaching support.  made it so we also show a status while downloading
+lots of new messages.
+
 added support for drag and drop.
 
 fixed expunging on backend filteres.

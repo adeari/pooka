@@ -7,10 +7,7 @@
      *) fix file export for attachments
      *) test with desktop/external apps.
 
-*) fix disconnected imap so that it shows when it's downloading lots
-	of messages.
-
-*) check efficience on copying a lot of messages.  looks like we're copying
+*) check efficiency on copying a lot of messages.  looks like we're copying
 	and/or loading each message individually.
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)

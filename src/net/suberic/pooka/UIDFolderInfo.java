@@ -264,7 +264,6 @@ public class UIDFolderInfo extends FolderInfo {
     
   }
   
-  
   protected void runMessagesAdded(MessageCountEvent mce)  {
     if (folderTableModel != null) {
       try {
@@ -273,6 +272,9 @@ public class UIDFolderInfo extends FolderInfo {
 	fp.add(FetchProfile.Item.ENVELOPE);
 	fp.add(FetchProfile.Item.FLAGS);
 	fp.add(UIDFolder.FetchProfileItem.UID);
+
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.fetchingMessages", "Fetching") + " " + addedMessages.length + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
+
 	getFolder().fetch(addedMessages, fp);
 	MessageInfo mi;
 	Vector addedProxies = new Vector();
@@ -294,6 +296,7 @@ public class UIDFolderInfo extends FolderInfo {
 	}
 	
 	addedProxies.removeAll(applyFilters(addedProxies));
+
 	if (addedProxies.size() > 0) {
 	  getFolderTableModel().addRows(addedProxies);
 	  setNewMessages(true);
@@ -315,6 +318,8 @@ public class UIDFolderInfo extends FolderInfo {
       } catch (MessagingException me) {
 	if (getFolderDisplayUI() != null)
 	  getFolderDisplayUI().showError(Pooka.getProperty("error.handlingMessages", "Error handling messages."), Pooka.getProperty("error.handlingMessages.title", "Error handling messages."), me);
+      } finally {
+	clearStatusMessage(getFolderDisplayUI());
       }
     }
     
@@ -620,5 +625,6 @@ public class UIDFolderInfo extends FolderInfo {
   public long getUIDValidity() {
     return uidValidity;
   }
+
 }
 
