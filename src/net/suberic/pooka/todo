@@ -10,14 +10,15 @@
 	    -- fix variable bundle to make sure that we close the stream
 	    -- better error messages
 	    -- come up with configuration/usage plan.
+	    -- make it so we can start as '--http URL' 
 	-- figure out problem spots:
 		*) pop3 support?
 			-- ruling out pop3 boxes.
 		*) outgoing mailboxes?
 			-- works fine.  would be better if we allowed sent
-			   folder and 
+			   folder and outbox to be reassigned on translation.
 		*) address books?
-			-- gives error on startup.
+			-- gives error on startup. -- still does.  sigh.
 		*) encryption key files
 			-- gives error.
 *) add support for running off of removable media (run from directory; cache/
@@ -31,6 +32,9 @@
 	*) usage
 	   - export for http usage needs to be put in the correct place
 		and tested.
+*) file list:  pgp/smime files, signature file, address book, ssl cert file,
+	mbox file (n/a).
+   -- also:  pooka home, mailcap file, pookarc file
 	
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.

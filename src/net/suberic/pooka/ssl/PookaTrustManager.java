@@ -205,7 +205,6 @@ public class PookaTrustManager implements X509TrustManager {
 	for (int i = 0; i < cert.length; i++) {
 	  if (cert[i] != null) {
 	    trustedCerts.add(cert[i]);
-	    System.err.println("added " + cert[i] + " to trusted certs.  trustedCerts.length = " + trustedCerts.size());
 	    
 	    if (fw != null) {
 	      fw.write("-----BEGIN CERTIFICATE-----");

@@ -63,10 +63,10 @@ public class Pooka {
    * -nf 
    * --noOpenSavedFolders    don't open saved folders on startup.
    * 
-   * -rc <filename>
-   * --rcfile <filename>     use the given file as the pooka startup file.
+   * -rc [FILE]
+   * --rcfile [FILE]    use the given file as the pooka startup file.
    *
-   * --http  runs with a configuration file loaded via http
+   * --http [URL]   runs with a configuration file loaded via http
    *
    * --help shows these options.
    */
