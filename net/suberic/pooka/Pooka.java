@@ -36,7 +36,7 @@ public class Pooka {
     localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
     
     try {
-      resources = new net.suberic.util.VariableBundle(new java.io.FileInputStream(localrc), new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka"));
+      resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka"));
     } catch (Exception e) {
       resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
     }

@@ -130,6 +130,7 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
 	buttonBox.add(createButton("Ok", new AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
 		setValue();
+		factory.getBundle().saveProperties();
 		if (container instanceof JInternalFrame) {
 		    try {
 			((JInternalFrame)container).setClosed(true);

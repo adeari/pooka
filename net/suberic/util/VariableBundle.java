@@ -19,6 +19,7 @@ public class VariableBundle extends Object {
   private Properties writableProperties;
   private ResourceBundle resources;
   private VariableBundle parentProperties;
+  private File saveFile;
   private Vector removeList = new Vector();
   private Hashtable VCListeners = new Hashtable();
   private Hashtable VCGlobListeners = new Hashtable();
@@ -54,6 +55,12 @@ public class VariableBundle extends Object {
 	parentProperties = newParentProperties;
 
     }
+
+  public VariableBundle(File propertiesFile, VariableBundle newParentProperties) throws java.io.FileNotFoundException {
+    this(new FileInputStream(propertiesFile), newParentProperties);
+    saveFile = propertiesFile;
+    
+  }
     
     public VariableBundle(InputStream propertiesFile, String resourceFile) {
 	this(propertiesFile, resourceFile, null);
@@ -167,6 +174,17 @@ public class VariableBundle extends Object {
 	    
     }
 
+
+    /**
+     * Saves the current properties in the VariableBundle to a file.  Note
+     * that this only saves the writableProperties of this particular
+     * VariableBundle--underlying defaults are not written.
+     */
+  public void saveProperties() {
+    if (saveFile != null) {
+      saveProperties(saveFile);
+    }
+  }
 
     /**
      * Saves the current properties in the VariableBundle to a file.  Note
