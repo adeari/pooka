@@ -10,6 +10,8 @@ public class UserProfile extends Object implements ValueChangeListener {
   String name;
   URLName sendMailURL;
   String mailServerName;
+  String defaultDomain;
+  String defaultDefaultDomain;
   OutgoingMailServer mailServer;
   String sendPrecommand;
   String sentFolderName;
@@ -68,9 +70,14 @@ public class UserProfile extends Object implements ValueChangeListener {
       sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
       sigGenerator=createSignatureGenerator();
       
+      setDefaultDomain(mainProperties.getProperty("UserProfile." + name + ".defaultDomain", ""));
+
       String fromAddr = (String)mailProperties.get("From");
       excludeAddresses = new Vector();
       excludeAddresses.add(fromAddr);
+      if (fromAddr.lastIndexOf('@') >0) {
+	defaultDefaultDomain = fromAddr.substring(fromAddr.lastIndexOf('@') + 1);
+      }
       Vector excludeProp = mainProperties.getPropertyAsVector("UserProfile." + name + ".excludeAddresses", "");
       excludeAddresses.addAll(excludeProp);
     }
@@ -373,7 +380,26 @@ public class UserProfile extends Object implements ValueChangeListener {
     
     loadMailServer();
   }
-  
+
+  /**
+   * Returns the default domain.  This will be appended to any email 
+   * address which doesn't include a domain.
+   */
+  public String getDefaultDomain() {
+    if (defaultDomain == null || defaultDomain.equals(""))
+      return defaultDefaultDomain;
+    else
+      return defaultDomain;
+  }
+
+  /**
+   * Sets the default domain.  This is what will be added to email
+   * addresses that don't include a domain.
+   */
+  public void setDefaultDomain(String newDomain) {
+    defaultDomain = newDomain;
+  }
+
   /**
    * Loads the sent folder from the UserProfile.username.sentFolder 
    * property.

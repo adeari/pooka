@@ -1,3 +1,7 @@
+*) default domain for outgoing addresses.
+	- test address matching. ('allen' shouldn't match 'allen@dback')
+	- test outbox failure.
+
 *) make address book editable as soon as you create it.
 	-- specifically, make it so you can hit 'apply' and then have
 	   the entry editors be enabled.
@@ -13,8 +17,6 @@
 	-- check icemail
 
 *) check disconnection/reconnection on network removal/restoral.
-
-*) default domain for outgoing addresses.
 
 -------
 

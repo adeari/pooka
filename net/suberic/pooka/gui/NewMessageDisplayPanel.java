@@ -344,6 +344,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	  String value = null;
 	  if (inputField instanceof AddressEntryTextArea) {
 	    value = ((AddressEntryTextArea) inputField).getParsedAddresses();
+	    value = ((NewMessageInfo)getMessageProxy().getMessageInfo()).convertAddressLine(value, getSelectedProfile());
 	  } else {
 	    value = ((EntryTextArea)(inputTable.get(key))).getText();
 	  }

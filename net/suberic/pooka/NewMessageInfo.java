@@ -82,6 +82,30 @@ public class NewMessageInfo extends MessageInfo {
   }
 
   /**
+   * Converts the given address line into an address line suitable for
+   * this NewMessageInfo.  Specifically, this goes through each address
+   * in the list and adds the UserProfile's defaultDomain to each entry
+   * which doesn't have a domain already.
+   */
+  public String convertAddressLine(String oldLine, UserProfile p) throws javax.mail.internet.AddressException {
+    StringBuffer returnValue = new StringBuffer();
+    InternetAddress[] addresses = InternetAddress.parse(oldLine, false);
+    for (int i = 0; i < addresses.length; i++) {
+      String currentAddress = addresses[i].getAddress();
+      if (currentAddress.lastIndexOf('@') < 0) {
+	currentAddress = currentAddress + "@" + p.getDefaultDomain();
+	addresses[i].setAddress(currentAddress);
+      }
+
+      returnValue.append(addresses[i].toString());
+      if (i+1 < addresses.length)
+	returnValue.append(", ");
+    }
+
+    return returnValue.toString();
+  }
+
+  /**
    * Saves the NewMessageInfo to the sentFolder associated with the 
    * given Profile, if any.
    */
@@ -111,80 +135,80 @@ public class NewMessageInfo extends MessageInfo {
     }
   }
 
-    /**
-     * Adds an attachment to this message.
-     */
-    public void addAttachment(Attachment attachment) {
-	attachments.getAttachments().add(attachment);
+  /**
+   * Adds an attachment to this message.
+   */
+  public void addAttachment(Attachment attachment) {
+    attachments.getAttachments().add(attachment);
+  }
+  
+  /**
+   * Removes an attachment from this message.
+   */
+  public int removeAttachment(Attachment part) {
+    if (attachments != null) {
+      int index = attachments.getAttachments().indexOf(part);	
+      attachments.getAttachments().remove(index);
+      return index;
     }
-
-    /**
-     * Removes an attachment from this message.
-     */
-    public int removeAttachment(Attachment part) {
-	if (attachments != null) {
-	    int index = attachments.getAttachments().indexOf(part);	
-	    attachments.getAttachments().remove(index);
-	    return index;
-	}
-	
-	return -1;
-    }
-
-    /**
-     * Attaches the given File to the message.
-     */
-    public void attachFile(File f) throws MessagingException {
-	// borrowing liberally from ICEMail here.
-	
-	MimeBodyPart mbp = new MimeBodyPart();
-	
-	FileDataSource fds = new FileDataSource(f);
-	
-	DataHandler dh = new DataHandler(fds);
-	
-	mbp.setFileName(f.getName());
-	
-	if (Pooka.getMimeTypesMap().getContentType(f).startsWith("text"))
-	    mbp.setDisposition(Part.ATTACHMENT);
-	else
-	    mbp.setDisposition(Part.INLINE);
-	
-	mbp.setDescription(f.getName());
-	    
-	mbp.setDataHandler( dh );
-
-	String type = dh.getContentType();
-
-	mbp.setHeader("Content-Type", type);
-
-	addAttachment(new MBPAttachment(mbp));
-    }
-
-    /**
-     * Returns the given header on the wrapped Message.
-     */
-    public String getHeader(String headerName, String delimeter) throws MessagingException {
-	return ((MimeMessage)getMessage()).getHeader(headerName, delimeter);
-    }
-
-    /**
-     * Gets the text part of the wrapped message.
-     */
-    public String getTextPart(boolean showFullHeaders) {
-	try {
-	    return (String) message.getContent();
-	} catch (java.io.IOException ioe) {
-	    // since this is a NewMessageInfo, there really shouldn't be an
-	    // IOException
-	    return null;
-	} catch (MessagingException me) {
+    
+    return -1;
+  }
+  
+  /**
+   * Attaches the given File to the message.
+   */
+  public void attachFile(File f) throws MessagingException {
+    // borrowing liberally from ICEMail here.
+    
+    MimeBodyPart mbp = new MimeBodyPart();
+    
+    FileDataSource fds = new FileDataSource(f);
+    
+    DataHandler dh = new DataHandler(fds);
+    
+    mbp.setFileName(f.getName());
+    
+    if (Pooka.getMimeTypesMap().getContentType(f).startsWith("text"))
+      mbp.setDisposition(Part.ATTACHMENT);
+    else
+      mbp.setDisposition(Part.INLINE);
+    
+    mbp.setDescription(f.getName());
+    
+    mbp.setDataHandler( dh );
+    
+    String type = dh.getContentType();
+    
+    mbp.setHeader("Content-Type", type);
+    
+    addAttachment(new MBPAttachment(mbp));
+  }
+  
+  /**
+   * Returns the given header on the wrapped Message.
+   */
+  public String getHeader(String headerName, String delimeter) throws MessagingException {
+    return ((MimeMessage)getMessage()).getHeader(headerName, delimeter);
+  }
+  
+  /**
+   * Gets the text part of the wrapped message.
+   */
+  public String getTextPart(boolean showFullHeaders) {
+    try {
+      return (String) message.getContent();
+    } catch (java.io.IOException ioe) {
+      // since this is a NewMessageInfo, there really shouldn't be an
+      // IOException
+      return null;
+    } catch (MessagingException me) {
 	    // since this is a NewMessageInfo, there really shouldn't be a
-	    // MessagingException
-	    return null;
-	}
+      // MessagingException
+      return null;
     }
-
+  }
+  
   /**
    * Marks the message as a draft message and then saves it to the outbox
    * folder given.
