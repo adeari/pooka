@@ -1,8 +1,10 @@
-package net.suberic.pooka.crypto;
+package net.suberic.pooka;
 
-import net.suberic.pooka.*;
+import net.suberic.pooka.crypto.*;
 import javax.mail.*;
 import javax.mail.internet.*;
+
+import java.util.*;
 
 /**
  * This stores the encyrption information about a particular MessageInfo. 
@@ -17,7 +19,10 @@ public class MessageCryptoInfo {
 
   // whether we've tried decrypting the message yet.
   boolean mCheckedDecryption = false;
-  
+
+  // whether or not the decryption was successful
+  boolean mDecryptSuccessful = false;
+
   // whether the signature matches or not
   boolean mSignatureValid = false;
 
@@ -90,5 +95,41 @@ public class MessageCryptoInfo {
 
     return mSignatureValid;
   }
-  
+
+  /**
+   * Tries to decrypt the message using the given Key.
+   */
+  public boolean decryptMessage(EncryptionKey key, boolean recheck) 
+  throws MessagingException, EncryptionException, java.io.IOException {
+    synchronized(this) {
+      if (mCheckedDecryption && ! recheck) {
+	return mDecryptSuccessful;
+      } else {
+	mCheckedDecryption = true;
+	// run through all of the attachments and decrypt them.
+	AttachmentBundle bundle = msgInfo.getAttachmentBundle();
+	List attachmentList = bundle.getAttachmentsAndTextPart();
+	for (int i = 0; i < attachmentList.size(); i++) {
+	  Object o = attachmentList.get(i);
+	  if (o instanceof CryptoAttachment) {
+	    CryptoAttachment ca = (CryptoAttachment) o;
+	    BodyPart bp = ca.decryptAttachment(Pooka.getCryptoManager().getDefaultEncryptionUtils(), key);
+	    
+	    // check to see what kind of attachment it is.  if it's a 
+	    // Multipart, then we need to expand it and add it to the 
+	    // attachment list.
+	    
+	    if (bp.getContent() instanceof Multipart) {
+	      AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
+	      bundle.addAll(newBundle);
+	    }
+	  }
+	}
+
+	mDecryptSuccessful = true;
+      }
+    }
+
+    return mDecryptSuccessful;
+  }
 }
