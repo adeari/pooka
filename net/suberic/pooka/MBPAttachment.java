@@ -6,17 +6,17 @@ import java.io.*;
 import java.util.*;
 
 public class MBPAttachment extends Attachment {
-
-    MimeBodyPart mbp;
-
-    public MBPAttachment(MimeBodyPart part) throws MessagingException {
-	super(part);
-	mbp = part;
-    }
-
-    public MimeBodyPart getMimeBodyPart() {
-	return mbp;
-    }
-    
+  
+  MimeBodyPart mbp;
+  
+  public MBPAttachment(MimeBodyPart part) throws MessagingException {
+    super(part);
+    mbp = part;
+  }
+  
+  public MimeBodyPart getMimeBodyPart() {
+    return mbp;
+  }
+  
 }
 

@@ -14,6 +14,8 @@
   *) key management
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
+	  - make sure you can reenter key passwords if you enter it incorrectly
+	    the first time.
   *) fix threading on encryption actions.
      *) !!! we're parsing each message on load now. !!!
   *) add keybindings for encryption/decryption.

@@ -233,9 +233,6 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	  Object runLock = outbox.getFolderThread().getRunLock();
 	  synchronized(runLock) {
 	    try {
-	      System.err.println("outbox is " + outbox.getFolderID());
-	      System.err.println("outbox.getStatus() = " + outbox.getStatus());
-	      System.err.println("outbox.isConnected() = " + outbox.isConnected());
 	      if ( ! outbox.isConnected()) {
 		outbox.openFolder(Folder.READ_WRITE);
 	      }

@@ -263,7 +263,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  if (Pooka.isDebug())
 	    System.out.println("got " + tmpParentFolder + " as Default Folder for store.");
 	  if (Pooka.isDebug())
-	    System.err.println("doing a list on default folder " + tmpParentFolder + " for folder " + mFolderName);
+	    System.out.println("doing a list on default folder " + tmpParentFolder + " for folder " + mFolderName);
 	  tmpFolder = tmpParentFolder.list(mFolderName);
 	}
 

@@ -27,39 +27,11 @@ public class CryptoAttachment extends Attachment {
   DataHandler msgDataHandler = null;
 
   /**
-   * Creates a CryptoAttachment out of a MimeBodyPart.
+   * Creates a CryptoAttachment out of a MimePart.
    */
-  public CryptoAttachment(MimeBodyPart mbp) throws MessagingException {
-    super(mbp);
-    ContentType ct = new ContentType(mbp.getContentType());
-    if (ct.getSubType().equalsIgnoreCase("encrypted"))
-      encrypted = true;
-    else if (ct.getSubType().equalsIgnoreCase("signed"))
-      signed = true;
-
-  }
-  
-  /**
-   * Returns if the signature matches.
-   */
-  public boolean checkSignature() 
-    throws MessagingException, java.io.IOException {
-    if (! signed)
-      return false;
-
-    // FIXME
-    return false;
-  }
-
-  /**
-   * Creates a CryptoAttachment out of a MimeMessage.  This is typically
-   * used when the content of a Message is too large to display, and
-   * therefore it needs to be treated as an attachment rather than
-   * as the text of the Message.
-   */
-  public CryptoAttachment(MimeMessage msg) throws MessagingException {
-    super(msg);
-    ContentType ct = new ContentType(msg.getContentType());
+  public CryptoAttachment(MimePart mp) throws MessagingException {
+    super(mp);
+    ContentType ct = new ContentType(mp.getContentType());
     if (ct.getSubType().equalsIgnoreCase("encrypted"))
       encrypted = true;
     else if (ct.getSubType().equalsIgnoreCase("signed"))
@@ -96,6 +68,7 @@ public class CryptoAttachment extends Attachment {
    * if the attachment is either not actually encrypted, or cannot be 
    * decrypted.
    */
+  /*
   public BodyPart getDecryptedBodyPart() 
     throws MessagingException, java.io.IOException {
     if (decryptedBodyPart != null)
@@ -103,10 +76,12 @@ public class CryptoAttachment extends Attachment {
 
     return null;
   }
+  */
 
   /**
    * Returns the DataHandler for this Attachment.
    */
+  /*
   public DataHandler getDataHandler() {
     if (encrypted) {
       try {
@@ -122,11 +97,12 @@ public class CryptoAttachment extends Attachment {
 
     return super.getDataHandler();
   }
-
+  */
 
   /**
    * Returns the MimeType.
    */
+  /*
   public ContentType getMimeType() {
     if (encrypted && decryptedBodyPart != null) {
       try {
@@ -139,5 +115,5 @@ public class CryptoAttachment extends Attachment {
 
     return super.getMimeType();
   }
-  
+  */  
 }

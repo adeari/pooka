@@ -19,20 +19,10 @@ public class KeyAttachment extends Attachment {
   boolean parsed = false;
 
   /**
-   * Creates a KeyAttachment out of a MimeBodyPart.
+   * Creates a KeyAttachment out of a MimePart.
    */
-  public KeyAttachment(MimeBodyPart mbp) throws MessagingException {
-    super(mbp);
-  }
-  
-  /**
-   * Creates a KeyAttachment out of a MimeMessage.  This is typically
-   * used when the content of a Message is too large to display, and
-   * therefore it needs to be treated as an attachment rather than
-   * as the text of the Message.
-   */
-  public KeyAttachment(MimeMessage msg) throws MessagingException {
-    super(msg);
+  public KeyAttachment(MimePart mp) throws MessagingException {
+    super(mp);
   }
 
   /**

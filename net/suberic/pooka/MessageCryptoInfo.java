@@ -86,42 +86,50 @@ public class MessageCryptoInfo {
    * Returns whether or not this message is signed.
    */
   public boolean isSigned() throws MessagingException {
-    /*
-    EncryptionUtils utils = getEncryptionUtils();
-    if (utils != null) {
-      return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.SIGNED);
-    } else
-      return false;
-    */
-    List attachments = mMsgInfo.getAttachments();
-    for (int i = 0 ; i < attachments.size(); i++) {
-      if (attachments.get(i) instanceof SignedAttachment) {
-	System.err.println("message is signed.");
-	return true;
-      }
-    }
 
-    return false;
+    if (mMsgInfo.hasLoadedAttachments()) {
+      List attachments = mMsgInfo.getAttachments();
+      for (int i = 0 ; i < attachments.size(); i++) {
+	if (attachments.get(i) instanceof SignedAttachment) {
+	  return true;
+	}
+      }
+
+      return false;
+    } else {
+      EncryptionUtils utils = getEncryptionUtils();
+      if (utils != null) {
+	return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.SIGNED);
+      } else
+	return false;
+    }
   }
 
   /**
    * Returns whether or not this message is encrypted.
    */
   public boolean isEncrypted() throws MessagingException {
-    /*
-    EncryptionUtils utils = getEncryptionUtils();
-    if (utils != null) {
-      return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
-    } else
-      return false;
-    */
-    List attachments = mMsgInfo.getAttachments();
-    for (int i = 0 ; i < attachments.size(); i++) {
-      if (attachments.get(i) instanceof CryptoAttachment) {
-	return true;
+
+    System.err.println("checking isEncrytped on " + mMsgInfo);
+    if (mMsgInfo.hasLoadedAttachments()) {
+      System.err.println("attachments loaded on " + mMsgInfo);
+      List attachments = mMsgInfo.getAttachments();
+      for (int i = 0 ; i < attachments.size(); i++) {
+	if (attachments.get(i) instanceof CryptoAttachment) {
+	  System.err.println("attachment " + i + " on " + mMsgInfo + " is a CryptoAttachment; returning true.");
+	  return true;
+	}
       }
+      System.err.println("no attachments on " + mMsgInfo + " is a CryptoAttachment; returning false.");
+      return false;
+    } else {
+      System.err.println(mMsgInfo + " not loaded; checking Message.");
+      EncryptionUtils utils = getEncryptionUtils();
+      if (utils != null) {
+	return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
+      } else
+	return false;
     }
-    return false;
   }
 
   /**
@@ -206,6 +214,8 @@ public class MessageCryptoInfo {
 	    // Multipart, then we need to expand it and add it to the 
 	    // attachment list.
 	    
+	    
+	    /*
 	    if (bp.getContent() instanceof Multipart) {
 	      AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
 	      bundle.addAll(newBundle);
@@ -213,6 +223,9 @@ public class MessageCryptoInfo {
 	      bundle.removeAttachment(ca);
 	      bundle.addAttachment(ca);
 	    }
+	    */
+	    //bundle.removeAttachment(ca);
+	    MailUtilities.handlePart((MimeBodyPart) bp, bundle);
 	  }
 	}
 

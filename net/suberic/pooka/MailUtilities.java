@@ -16,6 +16,7 @@ import net.suberic.crypto.EncryptionManager;
 import net.suberic.crypto.EncryptionUtils;
 
 public class MailUtilities {
+
   public MailUtilities() {
   }
   
@@ -25,7 +26,7 @@ public class MailUtilities {
   public static String decodeAddressString(Address[] addresses) {
     if (addresses == null)
       return null;
-
+    
     StringBuffer returnValue = new StringBuffer();
     for (int i = 0; i < addresses.length; i++) {
       if (addresses[i] != null) {
@@ -65,6 +66,9 @@ public class MailUtilities {
   public static AttachmentBundle parseAttachments(Message m) throws MessagingException, java.io.IOException {
     AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
 
+    handlePart((MimeMessage)m, bundle);
+
+    /*
     String encryptionType = EncryptionManager.checkEncryptionType((MimeMessage)m);
     EncryptionUtils utils = null;
     if (encryptionType != null) {
@@ -133,7 +137,8 @@ public class MailUtilities {
 	bundle.addAttachment(attachment, new ContentType(contentType));
       }
     }
-    
+    */
+
     return bundle;
   }
   
@@ -145,7 +150,7 @@ public class MailUtilities {
     for (int i = 0; i < mp.getCount(); i++) {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
       
-      handleBodyPart(mbp, bundle);
+      handlePart(mbp, bundle);
     }
     return bundle;
   }
@@ -153,12 +158,9 @@ public class MailUtilities {
   /**
    * Handles a MimeBodyPart.
    */
-  static void handleBodyPart(MimeBodyPart mbp, AttachmentBundle bundle) {
+  public static void handlePart(MimePart mp, AttachmentBundle bundle) throws MessagingException, java.io.IOException {
     
-    System.err.println("mbp.getContentType() = " + mbp.getContentType());
-    
-    String encryptionType = EncryptionManager.checkEncryptionType(mbp);
-    System.err.println("encryptionType = " + encryptionType);
+    String encryptionType = EncryptionManager.checkEncryptionType(mp);
     
     EncryptionUtils utils = null;
     if (encryptionType != null) {
@@ -170,20 +172,20 @@ public class MailUtilities {
     
     if (utils != null) {
       
-      int encryptionStatus = utils.getEncryptionStatus(mbp);
-      System.err.println("encryptionStatus = " + encryptionStatus);
+      int encryptionStatus = utils.getEncryptionStatus(mp);
+
       if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
-	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
-	
+	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mp);
 	bundle.addAttachment(newAttach);
       } else if (encryptionStatus == EncryptionUtils.SIGNED) {
 	// in the case of signed attachments, we should get the wrapped body.
 	
-	System.err.println("creating new signed attachment from mbp.");
-	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
+	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mp);
+
 	MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
 	
 	if (signedMbp != null) {
+	  /*
 	  String signedContentType = signedMbp.getContentType().toLowerCase();
 	  if (signedContentType.startsWith("multipart")) {
 	    bundle.addAll(parseAttachments((Multipart)signedMbp.getContent()));
@@ -202,32 +204,34 @@ public class MailUtilities {
 	  } else {
 	    bundle.addAttachment(new Attachment(signedMbp));
 	  }
+	  */
+	  handlePart(signedMbp, bundle);
 	}
 	
 	bundle.addAttachment(newAttach);
 	
       } else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
-	bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mbp));
+	  bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mp));
       } else {
 	// FIXME
-	bundle.addAttachment(new Attachment(mbp));
+	  bundle.addAttachment(new Attachment(mp));
       }
       
     } else {
-      ContentType ct = new ContentType(mbp.getContentType());
+      ContentType ct = new ContentType(mp.getContentType());
       if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 	if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	  parseAlternativeAttachment(bundle, mbp);
-	} else if (mbp.getContent() instanceof Multipart) {
-	  bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
+	  parseAlternativeAttachment(bundle, mp);
+	} else if (mp.getContent() instanceof Multipart) {
+	  bundle.addAll(parseAttachments((Multipart)mp.getContent()));
 	} else {
-	  Attachment attachment = new Attachment(mbp);
+	  Attachment attachment = new Attachment(mp);
 	  bundle.addAttachment(attachment);
 	}
       } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-	bundle.addAttachment(new Attachment(mbp));
+	bundle.addAttachment(new Attachment(mp));
 	Object msgContent;
-	msgContent = mbp.getContent();
+	msgContent = mp.getContent();
 	
 	if (msgContent instanceof Message)
 	  bundle.addAll(parseAttachments((Message)msgContent));
@@ -237,7 +241,7 @@ public class MailUtilities {
 	  System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
 	
       } else {
-	bundle.addAttachment(new Attachment(mbp), ct);
+	bundle.addAttachment(new Attachment(mp), ct);
       }
     }
   }

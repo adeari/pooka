@@ -491,68 +491,44 @@ public class MessageProxy {
 
 	MessageCryptoInfo cInfo = info.getCryptoInfo();
 	try {
-	  if (key == null) {
-	    key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());
-	  }
-	} catch (Exception e) {
-	  showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
-	}
+	  if (cInfo != null && cInfo.isEncrypted()) {
+	    
+	    if (key == null) {
+	      try {
+		key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());
+	      } catch (Exception e) {
+		showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
+	      }
+	    }
+	    // check the encryption
+	    
+	    try {
+	      cInfo.decryptMessage(key, true);
+	    } catch (Exception e) {
+	      showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
+	    }
 	  
-	int sigStatus = 0;
-	int encryptStatus = 0;
-	
-	try {
-	  boolean hasSignature = cInfo.isSigned();
-	  if (hasSignature) {
-	    if (cInfo.isSignatureValid()) {
-	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
-	    } else {
-	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
+	    MessageUI ui = getMessageUI();
+	    if (ui != null) {
+	    
+	      CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
 	      
+	      if (csd != null)
+		csd.cryptoUpdated(cInfo);
+	      try {
+		ui.refreshDisplay();
+	      } catch (MessagingException me) {
+		showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
+	      }
 	    }
-	  } else {
-	    sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.NOT_SIGNED;
 	  }
-	} catch (Exception e) {
-	  sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION;
-	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed:  "), e);
-	}
-	
-	// check the encryption
-	
-	try {
-	  boolean isEncrypted = cInfo.isEncrypted();
-	  if (isEncrypted) {
-	    if (cInfo.decryptMessage(key, true)) {
-	      encryptStatus = CryptoStatusDisplay.DECRYPTED_SUCCESSFULLY;
-	    } else {
-	      encryptStatus = CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY;
-	    }
-	  } else {
-	    encryptStatus = CryptoStatusDisplay.NOT_ENCRYPTED;
-	  }
-	} catch (Exception e) {
-	  encryptStatus = CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY;
-	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
-	}
-
-	MessageUI ui = getMessageUI();
-	if (ui != null) {
-	  
-	  CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
-
-	if (csd != null)
-	  csd.cryptoUpdated(sigStatus, encryptStatus);
-	  try {
-	    ui.refreshDisplay();
-	  } catch (MessagingException me) {
-	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
-	  }
+	} catch (MessagingException me) {
+	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
 	}
       }
     }
   }
-
+  
   /**
    * Attempts to check the signature on the given message.
    */
@@ -562,8 +538,6 @@ public class MessageProxy {
       MessageCryptoInfo cInfo = info.getCryptoInfo();
       try {
 	if (cInfo != null && cInfo.isSigned()) {
-	  int sigStatus = 0;
-	  int encryptStatus = 0;
 	  CryptoStatusDisplay csd = null;
 	  
 	  String fromString = "";
@@ -577,19 +551,19 @@ public class MessageProxy {
 	    keys = new java.security.Key[] { newKey };
 	  }
 	  
+	  if (keys != null) {
+	    boolean checked = false;
+	    for (int i = 0; (! checked) && i < keys.length; i++) {
+	      checked = cInfo.checkSignature(keys[i], true);
+	    }
+	  }
 	  MessageUI ui = getMessageUI();
 	  if (ui != null) {
 	    csd = ui.getCryptoStatusDisplay();
 	  }
 	  
-	  if (cInfo.checkSignature(keys[0], false)) {
-	    sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
-	  } else {
-	    sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
-	  }
-	  
 	  if (csd != null)
-	    csd.cryptoUpdated(sigStatus, encryptStatus);
+	    csd.cryptoUpdated(cInfo);
 	 
 	}
       } catch (Exception e) {

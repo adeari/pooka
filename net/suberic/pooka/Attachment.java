@@ -18,10 +18,10 @@ public class Attachment {
   /**
    * Creates an Attachment out of a MimeBodyPart.
    */
-  public Attachment(MimeBodyPart mbp) throws MessagingException {
-    handler = mbp.getDataHandler();
-    name = mbp.getFileName();
-    String type = mbp.getContentType();
+  public Attachment(MimePart mp) throws MessagingException {
+    handler = mp.getDataHandler();
+    name = mp.getFileName();
+    String type = mp.getContentType();
     try {
       mimeType = new ContentType(type);
     } catch (ParseException pe) {
@@ -41,18 +41,22 @@ public class Attachment {
       }
       
     }
-    size = mbp.getSize();
-    encoding = mbp.getEncoding();
+    size = mp.getSize();
+    encoding = mp.getEncoding();
   }
   
   /**
    * Creates an Attachment with the given MimeBodyPart, but with
    * the attached MimePart as the source for the Headers.  
    */
-  public Attachment(MimeBodyPart mbp, MimePart headerSource) throws MessagingException {
-    handler = mbp.getDataHandler();
-    name = mbp.getFileName();
-    String type = mbp.getContentType();
+  public Attachment(MimePart mp, MimePart headerSource) throws MessagingException {
+    handler = mp.getDataHandler();
+    if (mp instanceof MimeBodyPart)
+      name = mp.getFileName();
+    else 
+      name = Pooka.getProperty("message.unknownMessage", "Message Text");
+
+    String type = mp.getContentType();
     try {
       mimeType = new ContentType(type);
     } catch (ParseException pe) {
@@ -71,8 +75,8 @@ public class Attachment {
 	
       }
     }
-    size = mbp.getSize();
-    encoding = mbp.getEncoding();
+    size = mp.getSize();
+    encoding = mp.getEncoding();
     headers = parseHeaders(headerSource.getAllHeaders());
     headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
   }
@@ -83,6 +87,7 @@ public class Attachment {
    * therefore it needs to be treated as an attachment rather than
    * as the text of the Message.
    */
+  /*
   public Attachment(MimeMessage msg) throws MessagingException {
     handler = msg.getDataHandler();
     name = Pooka.getProperty("message.unknownMessage", "Message Text");
@@ -107,7 +112,8 @@ public class Attachment {
     size = msg.getSize();
     encoding = msg.getEncoding();
   }
-  
+  */
+
   public void setHeaderSource(MimePart headerSource) throws MessagingException {
     headers = parseHeaders(headerSource.getAllHeaders());
     headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
