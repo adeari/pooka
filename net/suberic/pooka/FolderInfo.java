@@ -10,6 +10,7 @@ import java.awt.event.ActionEvent;
 import net.suberic.pooka.gui.*;
 import net.suberic.pooka.thread.*;
 import net.suberic.pooka.event.*;
+import net.suberic.pooka.cache.*;
 import net.suberic.util.ValueChangeListener;
 import net.suberic.util.thread.ActionThread;
 
@@ -69,6 +70,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean trashFolder = false;
     
     protected boolean uidFolder = false;
+    protected MessageCache cache = null;
 
     /**
      * Creates a new FolderInfo from a parent FolderInfo and a Folder 
@@ -1403,6 +1405,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public FolderInfo getParentFolder() {
 	return parentFolder;
+    }
+
+    /**
+     * This returns the MessageCache associated with this FolderInfo,
+     * if any.
+     */
+    public MessageCache getCache() {
+	return cache;
     }
 
     /**
