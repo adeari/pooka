@@ -61,6 +61,9 @@ public class FolderTableModel extends AbstractTableModel {
 	return false;
     }
 
+    /**
+     * This returns the MessageProxy for the given row.
+     */
     public MessageProxy getMessageProxy(int rowNumber) {
 	try {
 	    return (MessageProxy)(data.elementAt(rowNumber));
@@ -69,6 +72,14 @@ public class FolderTableModel extends AbstractTableModel {
 	}
     }
 
+    /**
+     * This returns the row number for the given MessageProxy, 
+     * or -1 if the MessageProxy does not exist in the table.
+     */
+
+    public int getRowForMessage(MessageProxy mp) {
+	return data.indexOf(mp);
+    }
 
     /**
      * This adds a Vector of new MessageProxys to the FolderTableModel.

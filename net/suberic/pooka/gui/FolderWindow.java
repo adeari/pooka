@@ -195,9 +195,40 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 			//System.out.println("Sorting ..."); 
 			int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
 			boolean ascending = (shiftPressed == 0); 
+			
+			MessageProxy selectedMessage = null;
+
+			int rowsSelected = messageTable.getSelectedRowCount();
+
+			if (rowsSelected == 1) 
+			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+			else if (rowsSelected > 1)
+			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
+
 			((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
+
+			if (selectedMessage != null) {
+			    int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
+			    messageTable.setRowSelectionInterval(selectedIndex, selectedIndex);
+			    String javaVersion = System.getProperty("java.version");
+			    
+			    if (javaVersion.compareTo("1.3") >= 0) {
+				
+				// this really is awful.  i hope that they fix getCellRect() and
+				// scrollToRect in 1.3
+				
+				int rowHeight = messageTable.getRowHeight();
+				JScrollBar vsb = scrollPane.getVerticalScrollBar();
+				int newValue = Math.min(rowHeight * (selectedIndex - 1), vsb.getMaximum() - vsb.getModel().getExtent());
+				vsb.setValue(newValue);
+				newValue = Math.min(rowHeight * (selectedIndex - 1), vsb.getMaximum() - vsb.getModel().getExtent());
+				vsb.setValue(newValue);
+			    } else {
+				messageTable.scrollRectToVisible(messageTable.getCellRect(selectedIndex, 1, true));
+			    }
+			}
 		    }
-            }
+		}
 	    });
 	
 	
