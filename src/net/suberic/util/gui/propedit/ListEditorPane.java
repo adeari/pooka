@@ -9,12 +9,12 @@ import java.util.*;
  * An EditorPane which allows a user to select from a list of choices.
  */
 public class ListEditorPane extends SwingPropertyEditor {
-  int originalIndex;
-  JLabel label;
-  JComboBox inputField;
+  protected int originalIndex;
+  protected JLabel label;
+  protected JComboBox inputField;
   JButton addButton;
-  HashMap labelToValueMap = new HashMap();
-  int currentIndex = -1;
+  protected HashMap labelToValueMap = new HashMap();
+  protected int currentIndex = -1;
 
   /**
    * @param propertyName The property to be edited.  
@@ -58,7 +58,7 @@ public class ListEditorPane extends SwingPropertyEditor {
   /**
    * Creates the JComboBox with the appropriate options.
    */
-  private JComboBox createComboBox() {
+  protected JComboBox createComboBox() {
     String originalValue = manager.getProperty(property, "");
     String currentItem;
     originalIndex=-1;

@@ -1,3 +1,6 @@
+changed the theme selection menu so that we should see all of (and only) the
+available look and feels.
+
 040615 release
 --------------
 disconnection events now test the entire store to see if the connection

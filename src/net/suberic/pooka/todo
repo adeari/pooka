@@ -1,4 +1,4 @@
-*) fix theme selector to get all available themes.
+*) fix incorrect display of unread messages (?)
 
 *) add drag and drop
 	*) include message

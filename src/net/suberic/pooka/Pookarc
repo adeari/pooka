@@ -959,7 +959,8 @@ Pooka.theme._default=default
 Pooka.theme._default.propertyType=List
 Pooka.theme._default.allowedValues=Pooka.theme
 
-Pooka.looknfeel.propertyType=List
+Pooka.looknfeel.propertyType=LookAndFeel
+#Pooka.looknfeel.propertyType=List
 Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunststoff:GTK
 Pooka.looknfeel.listMapping.Metal.value=javax.swing.plaf.metal.MetalLookAndFeel
 Pooka.looknfeel.listMapping.Motif.value=com.sun.java.swing.plaf.motif.MotifLookAndFeel
@@ -1173,7 +1174,7 @@ FolderInfo.defaultDisplayFilters.Uncached.action.rgb=-8648439
 Pooka.background=0
 
 # PropertyEditors
-PropertyEditor=String:Boolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key
+PropertyEditor=String:Boolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key:LookAndFeel
 
 PropertyEditor.String.class=net.suberic.util.gui.propedit.StringEditorPane
 PropertyEditor.Boolean.class=net.suberic.util.gui.propedit.BooleanEditorPane
@@ -1192,6 +1193,7 @@ PropertyEditor.Filter.class=net.suberic.pooka.gui.filter.FilterEditorPane
 PropertyEditor.SearchTerm.class=net.suberic.pooka.gui.search.SearchEditorPane
 PropertyEditor.AddressList.class=net.suberic.pooka.gui.propedit.AddressBookEditorPane
 PropertyEditor.Key.class=net.suberic.pooka.gui.propedit.KeySelectorPane
+PropertyEditor.LookAndFeel.class=net.suberic.pooka.gui.propedit.LookAndFeelEditor
 
 PropertyEditor.filter.portFilter.class=net.suberic.util.gui.propedit.NumberFilter
 PropertyEditor.filter.portFilter.min=0
