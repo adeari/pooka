@@ -27,7 +27,8 @@ Pooka.openFoldersOnConnect=true
 
 MenuBar=File:Edit:Mail:Window:Help
 
-MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit
+#MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit
+MenuBar.File=NewMail:OpenFolder:OpenMessage:Close:Exit
 
 MenuBar.File.NewFolder.Action=folder-new
 MenuBar.File.NewFolder.Image=/net/suberic/pooka/gui/images/New.gif
@@ -44,7 +45,8 @@ MenuBar.File.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif
 
-MenuBar.Edit=UserConfig:StoreConfig:Folders:Undo:Select All:Cut:Copy:Paste
+#MenuBar.Edit=UserConfig:StoreConfig:Folders:Undo:Select All:Cut:Copy:Paste
+MenuBar.Edit=UserConfig:StoreConfig:Folders:Cut:Copy:Paste
 MenuBar.Edit.UserConfig.Action=cfg-users
 MenuBar.Edit.UserConfig.Label=User Configuration
 MenuBar.Edit.StoreConfig.Action=cfg-stores
@@ -62,7 +64,8 @@ MenuBar.Edit.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MenuBar.Edit.Paste.Action=paste-from-clipboard
 MenuBar.Edit.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge
+#MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge
+MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Reply.Action=message-reply
 MenuBar.Mail.ReplyAll.Action=message-reply-all
@@ -81,7 +84,8 @@ MenuBar.Help=About:License
 MenuBar.Help.About.Action=help-about
 MenuBar.Help.License.Action=help-license
 
-MainToolbar = FolderNew:FolderOpen:FolderClose:|:MessageNew:MessageOpen:MessageSave:MessageClose:|:Cut:Copy:Paste
+#MainToolbar = FolderNew:FolderOpen:FolderClose:|:MessageNew:MessageOpen:MessageSave:MessageClose:|:Cut:Copy:Paste
+MainToolbar = FolderOpen:MessageNew:MessageOpen:MessageClose:|:Cut:Copy:Paste
 MainToolbar.FolderNew.Action=folder-new
 MainToolbar.FolderNew.Image=/net/suberic/pooka/gui/images/New.gif
 MainToolbar.FolderOpen.Action=folder-open
