@@ -164,8 +164,7 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
 					 "Select"));
       
       if (returnValue == JFileChooser.APPROVE_OPTION) {
-	net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
-	  ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
+	java.io.File wrapper = jfc.getSelectedFile();
 	valueDisplay.setText(wrapper.getAbsolutePath());
       }
       

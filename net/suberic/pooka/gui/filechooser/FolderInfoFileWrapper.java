@@ -264,8 +264,14 @@ public class FolderInfoFileWrapper extends File {
     if (store != null)
       return true;
     
-    return (folder.getType() & javax.mail.Folder.HOLDS_FOLDERS) != 0;
+    if (folder != null) {
+      Vector v = folder.getChildren();
+      if (v != null)
+	return (v.size() > 0);
+    
+    }
 
+    return false;
   }
   
   /**
