@@ -50,7 +50,11 @@ public class StoreInfo implements ValueChangeListener, Item {
   
   // the Trash folder for this Store, if any.
   private FolderInfo trashFolder;
-  
+
+  // whether or not this store synchronizes with the subscribed folders
+  // automatically
+  private boolean useSubscribed = false;
+
   /**
    * Creates a new StoreInfo from a Store ID.
    */
@@ -111,7 +115,10 @@ public class StoreInfo implements ValueChangeListener, Item {
     
     if (Pooka.getProperty("Store." + storeID + ".folderList", "").equals(""))
       Pooka.setProperty("Store." + storeID + ".folderList", "INBOX");
-    
+
+    // check to see if we're using the subscribed property.
+    useSubscribed = Pooka.getProperty(getStoreProperty() + ".useSubscribed", "false").equalsIgnoreCase("true");
+
     Pooka.getResources().addValueChangeListener(this, getStoreProperty());
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".folderList");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".defaultProfile");
@@ -186,45 +193,46 @@ public class StoreInfo implements ValueChangeListener, Item {
     return p;
   }
     
-    /**
-     * This updates the children of the current store.  Generally called
-     * when the folderList property is changed.
-     */
-
-    public void updateChildren() {
-
-	Vector newChildren = new Vector();
-
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getStoreProperty() + ".folderList", "INBOX"), ":");
-	
-	if (Pooka.isDebug())
-	    System.out.println("Pooka.getProperty(" + getStoreProperty() + ".folderList = " + Pooka.getProperty(getStoreProperty() + ".folderList"));
-
-	String newFolderName;
-
-	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-	    newFolderName = (String)tokens.nextToken();
-	    FolderInfo childFolder = getChild(newFolderName);
-	    if (childFolder == null) {
-		if (popStore && newFolderName.equalsIgnoreCase("INBOX")) 
-		    childFolder = new PopInboxFolderInfo(this, newFolderName);
-		else if (Pooka.getProperty(getStoreProperty() + ".cachingEnabled", "false").equalsIgnoreCase("true") || Pooka.getProperty(getStoreProperty() + "." + newFolderName + ".cachingEnabled", "false").equalsIgnoreCase("true"))
-		    childFolder = new net.suberic.pooka.cache.CachingFolderInfo(this, newFolderName);
-		else if (Pooka.getProperty(getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
-		    childFolder = new UIDFolderInfo(this, newFolderName);
-		} else
-		    childFolder = new FolderInfo(this, newFolderName);
-		newChildren.add(childFolder);
-	    }
-	} 
-	children = newChildren;
-	if (Pooka.isDebug())
-	    System.out.println(getStoreID() + ":  in configureStore.  children.size() = " + children.size());
-
-	if (storeNode != null)
-	    storeNode.loadChildren();
-    }
+  /**
+   * This updates the children of the current store.  Generally called
+   * when the folderList property is changed.
+   */
+  
+  public void updateChildren() {
     
+    Vector newChildren = new Vector();
+    
+    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getStoreProperty() + ".folderList", "INBOX"), ":");
+    
+    if (Pooka.isDebug())
+      System.out.println("Pooka.getProperty(" + getStoreProperty() + ".folderList = " + Pooka.getProperty(getStoreProperty() + ".folderList"));
+    
+    String newFolderName;
+    
+    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+      newFolderName = (String)tokens.nextToken();
+      FolderInfo childFolder = getChild(newFolderName);
+      if (childFolder == null) {
+	if (popStore && newFolderName.equalsIgnoreCase("INBOX")) 
+	  childFolder = new PopInboxFolderInfo(this, newFolderName);
+	else if (Pooka.getProperty(getStoreProperty() + ".cachingEnabled", "false").equalsIgnoreCase("true") || Pooka.getProperty(getStoreProperty() + "." + newFolderName + ".cachingEnabled", "false").equalsIgnoreCase("true"))
+	  childFolder = new net.suberic.pooka.cache.CachingFolderInfo(this, newFolderName);
+	else if (Pooka.getProperty(getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
+	  childFolder = new UIDFolderInfo(this, newFolderName);
+	} else
+	  childFolder = new FolderInfo(this, newFolderName);
+      }
+      
+      newChildren.add(childFolder);
+    }
+    children = newChildren;
+    if (Pooka.isDebug())
+      System.out.println(getStoreID() + ":  in configureStore.  children.size() = " + children.size());
+    
+    if (storeNode != null)
+      storeNode.loadChildren();
+  }
+  
     /**
      * This goes through the list of children of this store and
      * returns the FolderInfo for the given childName, if one exists.
@@ -423,26 +431,30 @@ public class StoreInfo implements ValueChangeListener, Item {
      * the Store, if the children vector has not been loaded yet.
      */
     public void connectStore() throws MessagingException {
-	if (store.isConnected()) {
-	    connected=true;
-	    return;
-	} else { 
-	    try {
-		store.connect();
-	    } catch (MessagingException me) {
-		Exception e = me.getNextException();
-		if (e != null && e instanceof java.io.InterruptedIOException) 
-		    store.connect();
-		else
-		    throw me;
-	    }
-	    connected=true;
-
-	    if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
-		for (int i = 0; i < children.size(); i++)
-		    ((FolderInfo)children.elementAt(i)).openAllFolders(Folder.READ_WRITE);
+      if (store.isConnected()) {
+	connected=true;
+	return;
+      } else { 
+	try {
+	  store.connect();
+	} catch (MessagingException me) {
+	  Exception e = me.getNextException();
+	  if (e != null && e instanceof java.io.InterruptedIOException) 
+	    store.connect();
+	  else
+	    throw me;
 	}
+	connected=true;
 	
+	if (useSubscribed && protocol.equalsIgnoreCase("imap")) {
+	  synchSubscribed();
+	}
+
+	if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
+	  for (int i = 0; i < children.size(); i++)
+	    ((FolderInfo)children.elementAt(i)).openAllFolders(Folder.READ_WRITE);
+      }
+      
     }
     
     /**
@@ -504,6 +516,34 @@ public class StoreInfo implements ValueChangeListener, Item {
 	return returnValue;
     }
 
+  /**
+   * Synchronizes the locally stored subscribed folders list to the subscribed
+   * folder information from the IMAP server.
+   */
+  public void synchSubscribed() throws MessagingException {
+    Folder[] subscribedFolders = store.getDefaultFolder().list();
+    
+    StringBuffer newSubscribed = new StringBuffer();
+
+    for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
+      // sometimes listSubscribed() doesn't work.
+      if (subscribedFolders[i].isSubscribed()) {
+	String folderName = subscribedFolders[i].getName();
+	newSubscribed.append(folderName).append(':');
+      }
+    }
+
+    if (newSubscribed.length() > 0)
+      newSubscribed.deleteCharAt(newSubscribed.length() -1);
+    
+    // this will update our children vector.
+    Pooka.setProperty(getStoreProperty() + ".folderList", newSubscribed.toString());
+
+    for (int i = 0; children != null && i < children.size(); i++) {
+      FolderInfo fi = (FolderInfo) children.elementAt(i);
+      fi.synchSubscribed();
+    }
+  }
     // Accessor methods.
 
     public Store getStore() {

@@ -169,85 +169,88 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
     }
     
-    /**
-     * This actually loads up the Folder object itself.  This is used so 
-     * that we can have a FolderInfo even if we're not connected to the
-     * parent Store.
-     *
-     * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
-     * Once the parent store is connected, we can try to load the folder.  
-     * If the load is successful, we go to a CLOSED state.  If it isn't,
-     * then we can either return to NOT_LOADED, or INVALID.
-     */
-    public void loadFolder() {
-	boolean parentIsConnected = false;
-
-	if (isLoaded() || (loading && children == null)) 
-	    return;
-
-	Folder[] tmpFolder;
-	Folder tmpParentFolder;
-	
+  /**
+   * This actually loads up the Folder object itself.  This is used so 
+   * that we can have a FolderInfo even if we're not connected to the
+   * parent Store.
+   *
+   * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
+   * Once the parent store is connected, we can try to load the folder.  
+   * If the load is successful, we go to a CLOSED state.  If it isn't,
+   * then we can either return to NOT_LOADED, or INVALID.
+   */
+  public void loadFolder() {
+    boolean parentIsConnected = false;
+    
+    if (isLoaded() || (loading && children == null)) 
+      return;
+    
+    Folder[] tmpFolder;
+    Folder tmpParentFolder;
+    
+    try {
+      loading = true;
+      if (parentStore != null) {
 	try {
-	    loading = true;
-	    if (parentStore != null) {
-		try {
-		    if (Pooka.isDebug())
-			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
-
-		    if (! parentStore.isAvailable())
-			throw new MessagingException();
-
-		    if (!parentStore.isConnected())
-			parentStore.connectStore();
-		    Store store = parentStore.getStore();
-		    tmpParentFolder = store.getDefaultFolder();
-		    tmpFolder = tmpParentFolder.list(mFolderName);
-		} catch (MessagingException me) {
-		    if (Pooka.isDebug()) {
-			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
-			me.printStackTrace();
-		    }
-		    tmpFolder =null;
-		}
-	    } else {
-		if (!parentFolder.isLoaded())
-		    parentFolder.loadFolder();
-		if (!parentFolder.isLoaded()) {
-		    tmpFolder = null;
-		} else {
-		    tmpParentFolder = parentFolder.getFolder();
-		    if (tmpParentFolder != null) {
-			parentIsConnected = true;
-			tmpFolder = tmpParentFolder.list(mFolderName);
-		    } else {
-			tmpFolder = null;
-		    }
-		}
-	    }
-	    if (tmpFolder != null && tmpFolder.length > 0) {
-		setFolder(tmpFolder[0]);
-		type = getFolder().getType();
-		setStatus(CLOSED);
-	    } else {
-		if (parentIsConnected)
-		    setStatus(INVALID);
-		setFolder(null);
-	    }
+	  if (Pooka.isDebug())
+	    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
+	  
+	  if (! parentStore.isAvailable())
+	    throw new MessagingException();
+	  
+	  if (!parentStore.isConnected())
+	    parentStore.connectStore();
+	  Store store = parentStore.getStore();
+	  tmpParentFolder = store.getDefaultFolder();
+	  tmpFolder = tmpParentFolder.list(mFolderName);
 	} catch (MessagingException me) {
-	    if (Pooka.isDebug()) {
-		System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
-		me.printStackTrace();
-	    }
-	    setStatus(NOT_LOADED);
-	    setFolder(null);
-	} finally {
-	    loading = false;
+	  if (Pooka.isDebug()) {
+	    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
+	    me.printStackTrace();
+	  }
+	  tmpFolder =null;
 	}
-	
-	initializeFolderInfo();
+      } else {
+	if (!parentFolder.isLoaded())
+	  parentFolder.loadFolder();
+	if (!parentFolder.isLoaded()) {
+	  tmpFolder = null;
+	} else {
+	  tmpParentFolder = parentFolder.getFolder();
+	  if (tmpParentFolder != null) {
+	    parentIsConnected = true;
+	    tmpFolder = tmpParentFolder.list(mFolderName);
+	  } else {
+	    tmpFolder = null;
+	  }
+	}
+      }
+      if (tmpFolder != null && tmpFolder.length > 0) {
+	setFolder(tmpFolder[0]);
+	if (! getFolder().isSubscribed())
+	  getFolder().setSubscribed(true);
 
+	type = getFolder().getType();
+	setStatus(CLOSED);
+      } else {
+	if (parentIsConnected)
+	  setStatus(INVALID);
+	setFolder(null);
+      }
+    } catch (MessagingException me) {
+      if (Pooka.isDebug()) {
+	System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
+	me.printStackTrace();
+      }
+      setStatus(NOT_LOADED);
+      setFolder(null);
+    } finally {
+      loading = false;
     }
+    
+    initializeFolderInfo();
+    
+  }
 
     /**
      * This adds a listener to the Folder.
@@ -505,6 +508,42 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return returnValue;
     }
 
+  /**
+   * Synchronizes the locally stored subscribed folders list to the subscribed
+   * folder information from the IMAP server.
+   */
+  public void synchSubscribed() throws MessagingException {
+    // at this point we should get folder objects.
+
+    if (! isLoaded())
+      loadFolder();
+
+    if ((getType() & Folder.HOLDS_MESSAGES) != 0) {
+      Folder[] subscribedFolders = folder.list();
+      
+      StringBuffer newSubscribed = new StringBuffer();
+      
+      for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
+	// sometimes listSubscribed() doesn't work.
+	if (subscribedFolders[i].isSubscribed()) {
+	  String folderName = subscribedFolders[i].getName();
+	  newSubscribed.append(folderName).append(':');
+	}
+      }
+      
+      if (newSubscribed.length() > 0)
+	newSubscribed.deleteCharAt(newSubscribed.length() -1);
+      
+      // this will update our children vector.
+      Pooka.setProperty(getFolderProperty() + ".folderList", newSubscribed.toString());
+      
+      for (int i = 0; children != null && i < children.size(); i++) {
+	FolderInfo fi = (FolderInfo) children.elementAt(i);
+	fi.synchSubscribed();
+      }
+    }
+  }
+
     /**
      * Loads the column names and sizes.
      */
@@ -750,38 +789,38 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
     
-    /**
-     * This updates the children of the current folder.  Generally called
-     * when the folderList property is changed.
-     */
-
-    public void updateChildren() {
-	Vector newChildren = new Vector();
-
-	String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
-	if (childList != "") {
-	    StringTokenizer tokens = new StringTokenizer(childList, ":");
-	    
-	    String newFolderName;
-	
-	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-		newFolderName = (String)tokens.nextToken();
-		FolderInfo childFolder = getChild(newFolderName);
-		if (childFolder == null) {
-		    childFolder = new FolderInfo(this, newFolderName);
-		    newChildren.add(childFolder);
-		} else {
-		    newChildren.add(childFolder);
-		}
-	    }
-       
-	    children = newChildren;
-	    
-	    if (folderNode != null) 
-		folderNode.loadChildren();
+  /**
+   * This updates the children of the current folder.  Generally called
+   * when the folderList property is changed.
+   */
+  
+  public void updateChildren() {
+    Vector newChildren = new Vector();
+    
+    String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
+    if (childList != "") {
+      StringTokenizer tokens = new StringTokenizer(childList, ":");
+      
+      String newFolderName;
+      
+      for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+	newFolderName = (String)tokens.nextToken();
+	FolderInfo childFolder = getChild(newFolderName);
+	if (childFolder == null) {
+	  childFolder = new FolderInfo(this, newFolderName);
+	  newChildren.add(childFolder);
+	} else {
+	  newChildren.add(childFolder);
 	}
+      }
+      
+      children = newChildren;
+      
+      if (folderNode != null) 
+	folderNode.loadChildren();
     }
-
+  }
+  
     /**
      * This goes through the list of children of this folder and
      * returns the FolderInfo for the given childName, if one exists.
@@ -1000,63 +1039,67 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
-    /**
-     * This subscribes to the FolderInfo indicated by the given String.
-     * If this defines a subfolder, then that subfolder is added to this
-     * FolderInfo, if it doesn't already exist.
-     */
-    public void subscribeFolder(String folderName) {
-	String subFolderName = null;
-	String childFolderName = null;
-	int firstSlash = folderName.indexOf('/');
-	while (firstSlash == 0) {
-	    folderName = folderName.substring(1);
-	    firstSlash = folderName.indexOf('/');
-	}
-
-	if (firstSlash > 0) {
-	    childFolderName = folderName.substring(0, firstSlash);
-	    if (firstSlash < folderName.length() -1)
-		subFolderName = folderName.substring(firstSlash +1);
-	    
-	} else
-	    childFolderName = folderName;
-
-	this.addToFolderList(childFolderName);
-
-	FolderInfo childFolder = getChild(childFolderName);
-
-	if (childFolder != null && subFolderName != null)
-	    childFolder.subscribeFolder(subFolderName);	
+  /**
+   * This subscribes to the FolderInfo indicated by the given String.
+   * If this defines a subfolder, then that subfolder is added to this
+   * FolderInfo, if it doesn't already exist.
+   */
+  public void subscribeFolder(String folderName) {
+    String subFolderName = null;
+    String childFolderName = null;
+    int firstSlash = folderName.indexOf('/');
+    while (firstSlash == 0) {
+      folderName = folderName.substring(1);
+      firstSlash = folderName.indexOf('/');
     }
 
-    /**
-     * This adds the given folderString to the folderList of this
-     * FolderInfo.
-     */
-    void addToFolderList(String addFolderName) {
-	Vector folderNames = Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".folderList", "");
-	
-	boolean found = false;
+    if (firstSlash > 0) {
+      childFolderName = folderName.substring(0, firstSlash);
+      if (firstSlash < folderName.length() -1)
+	subFolderName = folderName.substring(firstSlash +1);
+    } else
+      childFolderName = folderName;
+    
+    this.addToFolderList(childFolderName);
+    
+    FolderInfo childFolder = getChild(childFolderName);
+    
+    if (childFolder != null && subFolderName != null)
+      childFolder.subscribeFolder(subFolderName);	
+    
+    if (childFolder.isLoaded() == false)
+      childFolder.loadFolder();
 
-	for (int i = 0; i < folderNames.size(); i++) {
-	    String folderName = (String) folderNames.elementAt(i);
-
-	    if (folderName.equals(addFolderName)) {
-		found=true;
-	    }
-	    
-	}
-	
-	if (!found) {
-	    String currentValue = Pooka.getProperty(getFolderProperty() + ".folderList", "");
-	    if (currentValue.equals(""))
-		Pooka.setProperty(getFolderProperty() + ".folderList", addFolderName);
-	    else
-		Pooka.setProperty(getFolderProperty() + ".folderList", currentValue + ":" + addFolderName);
-	}
-			      
+    updateChildren();
+  }
+  
+  /**
+   * This adds the given folderString to the folderList of this
+   * FolderInfo.
+   */
+  void addToFolderList(String addFolderName) {
+    Vector folderNames = Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".folderList", "");
+    
+    boolean found = false;
+    
+    for (int i = 0; i < folderNames.size(); i++) {
+      String folderName = (String) folderNames.elementAt(i);
+      
+      if (folderName.equals(addFolderName)) {
+	found=true;
+      }
+      
     }
+    
+    if (!found) {
+      String currentValue = Pooka.getProperty(getFolderProperty() + ".folderList", "");
+      if (currentValue.equals(""))
+	Pooka.setProperty(getFolderProperty() + ".folderList", addFolderName);
+      else
+	Pooka.setProperty(getFolderProperty() + ".folderList", currentValue + ":" + addFolderName);
+    }
+    
+  }
 
     /**
      * Remove the given String from the folderList property.  
@@ -1088,75 +1131,81 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Pooka.setProperty(getFolderProperty() + ".folderList", newValue.toString());
     }
 
-    /**
-     * This unsubscribes this FolderInfo and all of its children, if 
-     * applicable.
-     *
-     * This implementation just removes the defining properties from
-     * the Pooka resources.
-     */
-    public void unsubscribe() {
-	
-	if (children != null && children.size() > 0) {
-	    for (int i = 0; i < children.size(); i++) 
-		((FolderInfo)children.elementAt(i)).unsubscribe();
-	}
-
-	Pooka.getResources().removeValueChangeListener(this);
-	if (getFolderDisplayUI() != null)
-	    getFolderDisplayUI().closeFolderDisplay();
-
-	Pooka.getResources().removeProperty(getFolderProperty() + ".folderList");
-
-	if (parentFolder != null)
-	    parentFolder.removeFromFolderList(getFolderName());
-	else if (parentStore != null)
-	    parentStore.removeFromFolderList(getFolderName());
-	
+  /**
+   * This unsubscribes this FolderInfo and all of its children, if 
+   * applicable.
+   *
+   * This implementation just removes the defining properties from
+   * the Pooka resources.
+   */
+  public void unsubscribe() {
+    
+    if (children != null && children.size() > 0) {
+      for (int i = 0; i < children.size(); i++) 
+	((FolderInfo)children.elementAt(i)).unsubscribe();
     }
-
-    /**
-     * This returns whether or not this Folder is set up to use the 
-     * TrashFolder for the Store.  If this is a Trash Folder itself, 
-     * then return false.  If FolderProperty.useTrashFolder is set, 
-     * return that.  else go up the tree, until, in the end, 
-     * Pooka.useTrashFolder is returned.
-     */
-    public boolean useTrashFolder() {
-	if (isTrashFolder())
-	    return false;
-
-	String prop = Pooka.getProperty(getFolderProperty() + ".useTrashFolder", "");
-	if (!prop.equals(""))
-	    return (! prop.equalsIgnoreCase("false"));
-	
-	if (getParentFolder() != null)
-	    return getParentFolder().useTrashFolder();
-	else if (getParentStore() != null)
-	    return getParentStore().useTrashFolder();
+    
+    Pooka.getResources().removeValueChangeListener(this);
+    if (getFolderDisplayUI() != null)
+      getFolderDisplayUI().closeFolderDisplay();
+    
+    Pooka.getResources().removeProperty(getFolderProperty() + ".folderList");
+    
+    if (parentFolder != null)
+      parentFolder.removeFromFolderList(getFolderName());
+    else if (parentStore != null)
+      parentStore.removeFromFolderList(getFolderName());
+    
+    try {
+      if (folder != null)
+	folder.setSubscribed(false);
+    } catch (MessagingException me) {
+      Pooka.getUIFactory().showError(Pooka.getProperty("error.folder.unsubscribe", "Error unsubscribing on server from folder ") + getFolderID(), me);
+    }
+  }
+  
+  /**
+   * This returns whether or not this Folder is set up to use the 
+   * TrashFolder for the Store.  If this is a Trash Folder itself, 
+   * then return false.  If FolderProperty.useTrashFolder is set, 
+   * return that.  else go up the tree, until, in the end, 
+   * Pooka.useTrashFolder is returned.
+   */
+  public boolean useTrashFolder() {
+    if (isTrashFolder())
+      return false;
+    
+    String prop = Pooka.getProperty(getFolderProperty() + ".useTrashFolder", "");
+    if (!prop.equals(""))
+      return (! prop.equalsIgnoreCase("false"));
+    
+    if (getParentFolder() != null)
+      return getParentFolder().useTrashFolder();
+    else if (getParentStore() != null)
+      return getParentStore().useTrashFolder();
+    else
+      return (! Pooka.getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
+  }
+  
+  /**
+   * This removes all the messages in the folder, if the folder is a
+   * TrashFolder.
+   */
+  public void emptyTrash() {
+    if (isTrashFolder()) {
+      try {
+	Message[] allMessages = getFolder().getMessages();
+	getFolder().setFlags(allMessages, new Flags(Flags.Flag.DELETED), true);
+	getFolder().expunge();
+      } catch (MessagingException me) {
+	String m = Pooka.getProperty("error.trashFolder.EmptyTrashError", "Error emptying Trash:") +"\n" + me.getMessage();
+	if (getFolderDisplayUI() != null) 
+	  getFolderDisplayUI().showError(m);
 	else
-	    return (! Pooka.getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
+	  System.out.println(m);
+      }
     }
-
-    /**
-     * This removes all the messages in the folder, if the folder is a
-     * TrashFolder.
-     */
-    public void emptyTrash() {
-	if (isTrashFolder()) {
-	    try {
-		Message[] allMessages = getFolder().getMessages();
-		getFolder().setFlags(allMessages, new Flags(Flags.Flag.DELETED), true);
-		getFolder().expunge();
-	    } catch (MessagingException me) {
-		String m = Pooka.getProperty("error.trashFolder.EmptyTrashError", "Error emptying Trash:") +"\n" + me.getMessage();
-		if (getFolderDisplayUI() != null) 
-		    getFolderDisplayUI().showError(m);
-		else
-		    System.out.println(m);
-	    }
-	}
-    }
+  }
 
     /**
      * This resets the defaultActions.  Useful when this goes to and from

@@ -21,7 +21,7 @@ public class OutgoingFolderInfo extends FolderInfo {
   /**
    * Sends all available messages.
    */
-  public void sendAll() {
+  public void sendAll() throws javax.mail.MessagingException {
     
     Transport sendTransport = Pooka.getDefaultSession().getTransport(transportURL); 
     try {

@@ -518,7 +518,7 @@ Store.editableFields.storeConfig.imap.IMAP.scopeRoot=Store.editableFields
 Store.editableFields.storeConfig.imap.caching=cachingEnabled
 Store.editableFields.storeConfig.imap.caching.scoped=true
 Store.editableFields.storeConfig.imap.caching.scopeRoot=Store.editableFields
-Store.editableFields.storeConfig.imap.options=expungeOnExit
+Store.editableFields.storeConfig.imap.options=expungeOnExit:useSubscribed
 Store.editableFields.storeConfig.imap.options.scoped=true
 Store.editableFields.storeConfig.imap.options.scopeRoot=Store.editableFields
 
@@ -550,6 +550,8 @@ Store.editableFields.cachingEnabled.propertyType=Boolean
 Store.editableFields.cachingEnabled=false
 Store.editableFields.expungeOnExit.propertyType=Boolean
 Store.editableFields.expungeOnExit=false
+Store.editableFields.useSubscribed.propertyType=Boolean
+Store.editableFields.useSubscribed=false
 Store.editableFields.leaveMessagesOnServer.propertyType=Boolean
 Store.editableFields.leaveMessagesOnServer=false
 Store.editableFields.deleteOnServerOnLocalDelete.propertyType=Boolean
