@@ -100,7 +100,6 @@ public class MessagePrinter implements Printable {
     double scaledPageHeight = pageHeight/mScale;
 
     jtp.validate();
-    jtp.addNotify();
 
     View view = jtp.getUI().getRootView(jtp);
 
@@ -118,7 +117,6 @@ public class MessagePrinter implements Printable {
       pageExists = calculatePageBreak(view, allocation, currentPage);
 
       if (pageExists) {
-	//pageEnd = pageEnd + 3;
 	breakList.add(new Double(pageStart * mScale));
       }
     }
@@ -175,51 +173,44 @@ public class MessagePrinter implements Printable {
    */
   public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
     try {
+      // create the JTextPage if we haven't already.
       if (jtp == null) {
 	createTextPane();
       }
 
+      // paginate.
       if (mPageBreaks == null) {
 	doPageCalculation(pageFormat);
       }
 
-      //make sure not print empty pages
+      // if we're done, we're done.
       if(pageIndex >= mPageCount) { 
 	return Printable.NO_SUCH_PAGE;
       }
       
       if (mDisplay != null) {
+	// update the display
 	mDisplay.setCurrentPage(pageIndex + 1);
       }
       
       Graphics2D g2 = (Graphics2D)graphics;
 
+      // only print a single page.
       if (pageIndex + 1 < mPageCount) {
-	// only print the given amount of the page.
 	Rectangle origClip = g2.getClipBounds();
 	g2.clipRect(g2.getClipBounds().x, g2.getClipBounds().y, g2.getClipBounds().width, (int) (mPageBreaks[pageIndex + 1] - mPageBreaks[pageIndex]));
       }
-
+      
       //shift Graphic to line up with beginning of print-imageable region
       g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
       
       //shift Graphic to line up with beginning of next page to print
-      //g2.translate(0f, -pageIndex*pageHeight);
-      // testing orig
       g2.translate(0f, -mPageBreaks[pageIndex]);
       
       //scale the page so the width fits...
       g2.scale(mScale, mScale);
 
-      // testing new
-
-      //scale the page so the width fits...
-      //g2.scale(mScale, mScale);
-
-      //g2.translate(0f, -mPageBreaks[pageIndex]);
-      //end testing
-      
-      jtp.paint(g2); //repaint the page for printing
+      jtp.print(g2); 
       
       return Printable.PAGE_EXISTS;
       
@@ -230,7 +221,7 @@ public class MessagePrinter implements Printable {
   }
 
   /**
-   * Creates the appropriate 
+   * Creates the appropriate JTextPane.
    */
   public void createTextPane() throws MessagingException {
     jtp = new JTextPane();
@@ -309,7 +300,8 @@ public class MessagePrinter implements Printable {
     jtp.setContentType(contentType);
     jtp.setText(messageText.toString());
 
-    //jtp.addNotify();
+    jtp.setEditable(false);
+
     jtp.setSize(jtp.getPreferredSize());
 
     //jtp.setVisible(true);

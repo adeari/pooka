@@ -130,6 +130,8 @@ public class MessagePrinterDisplay implements PrintJobListener {
       updateDisplayPane();
       mDialogFrame.pack();
 
+      mDialogFrame.setSize(Math.max(mDialogFrame.getPreferredSize().width, 300), Math.max(mDialogFrame.getPreferredSize().height, 200));
+
       MessagePanel mp = ((PookaDesktopPaneUIFactory)Pooka.getUIFactory()).getMessagePanel();
       mp.add(mDialogFrame);
       mDialogFrame.setLocation(mp.getNewWindowLocation(mDialogFrame, true));
@@ -151,6 +153,7 @@ public class MessagePrinterDisplay implements PrintJobListener {
       }
       updateDisplayPane();
       mDialog.pack();
+      mDialog.setSize(Math.max(mDialog.getPreferredSize().width, 300), Math.max(mDialog.getPreferredSize().height, 200));
       mDialog.show();
     }
 

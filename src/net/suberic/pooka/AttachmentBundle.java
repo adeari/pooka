@@ -255,7 +255,7 @@ class AttachmentBundle {
 	  Enumeration allHdrs = headers.getAllHeaders();
 	  while (allHdrs.hasMoreElements()) {
 	    Header nextHeader = (Header) allHdrs.nextElement();
-	    headerText.append("<b>" + nextHeader.getName() + ":</b><nbsp><nbsp>");
+	    headerText.append("<b>" + nextHeader.getName() + ":</b>&nbsp;&nbsp;");
 	    headerText.append(MailUtilities.escapeHtml(nextHeader.getValue()));
 	    
 	    headerText.append("<br>\n");
@@ -278,7 +278,7 @@ class AttachmentBundle {
 	  hdrValue = MailUtilities.decodeText((String) headers.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader), ":"));
 	  if (hdrValue != null) {
 	    if (useHtml) {
-	      headerText.append("<b>" + hdrLabel + ":</b><nbsp><nbsp>");
+	      headerText.append("<b>" + hdrLabel + ":</b>&nbsp;&nbsp;");
 	      headerText.append(MailUtilities.escapeHtml(hdrValue));
 	      
 	      headerText.append("<br>\n");
