@@ -57,5 +57,17 @@
     </copy>
   </target>
 
+  <target name="dist-full" depends="compile">
+    <jar jarfile="${distdir}/pooka_full.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
+      <zipfileset src="${importdir}/activation.jar"/>
+      <zipfileset src="${importdir}/jcert.jar"/>
+      <zipfileset src="${importdir}/jnet.jar"/>
+      <zipfileset src="${importdir}/jsse.jar"/>
+      <zipfileset src="${importdir}/kunststoff.jar"/>
+      <zipfileset src="${importdir}/mail.jar"/>
+      <zipfileset src="${importdir}/mbox.jar"/>
+    </jar>
+  </target>
+
   <target name="all" depends="compile,dist,docs"/>
 </project>
