@@ -1,7 +1,6 @@
 package net.suberic.util.gui.propedit;
 import net.suberic.util.VariableBundle;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * This manages a set of PropertyEditors.  Basically, this acts as a
@@ -14,6 +13,8 @@ public class PropertyEditorManager {
   protected VariableBundle sourceBundle;
 
   protected PropertyEditorFactory propertyFactory;
+
+  protected HashMap pendingListenerMap = new HashMap();
 
   /**
    * Creates a new PropertyEditorManager.
@@ -60,6 +61,13 @@ public class PropertyEditorManager {
   }
 
   /**
+   * Gets the value of the given property.
+   */
+  public List getPropertyAsList(String property, String defaultValue) {
+    return sourceBundle.getPropertyAsVector(property, defaultValue);
+  }
+
+  /**
    * Sets the given property to the given value.
    */
   public void setProperty(String property, String value) {
@@ -95,6 +103,32 @@ public class PropertyEditorManager {
    * is saved until a PropertyEditorUI is registered.
    */
   public void addPropertyEditorListener(String property, PropertyEditorListener listener) {
+    PropertyEditorUI editor = (PropertyEditorUI) editorMap.get(property);
+    if ( editor != null) {
+      editor.addPropertyEditorListener(listener);
+    } else {
+      List listenerList = (List) pendingListenerMap.get(property);
+      if (listenerList == null) {
+	listenerList = new ArrayList();
+      }
+      listenerList.add(listener);
+      pendingListenerMap.put(property, listenerList);
+    }
+  }
 
+  /**
+   * Registers the given PropertyEditorUI as the editor for the given
+   * property.
+   */
+  public void registerEditor(String property, PropertyEditorUI editor) {
+    List listenerList = (List) pendingListenerMap.get(property);
+    if (listenerList != null) {
+      Iterator it = listenerList.iterator();
+      while (it.hasNext()) {
+	editor.addPropertyEditorListener((PropertyEditorListener) it.next());
+      }
+    }
+
+    editorMap.put(property, editor);
   }
 }
