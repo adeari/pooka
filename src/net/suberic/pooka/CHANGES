@@ -1,3 +1,5 @@
+fixed a NPE if you bounce a message.
+
 changed the error display so that we now have a button to show the
 stack trace.
 

@@ -435,11 +435,12 @@ OutboxFolderNode.popupMenu.Close.Action=folder-close
 OutboxFolderNode.popupMenu.Edit.Action=file-edit
 OutboxFolderNode.popupMenu.Send.Action=folder-send
 
-StoreNode.popupMenu=Open:Subscribe:Close:Edit
+StoreNode.popupMenu=Open:Subscribe:Close:Edit:Status
 StoreNode.popupMenu.Open.Action=file-open
 StoreNode.popupMenu.Close.Action=file-close
 StoreNode.popupMenu.Subscribe.Action=folder-subscribe
 StoreNode.popupMenu.Edit.Action=file-edit
+StoreNode.popupMenu.Status.Action=store-status
 
 MessageProxy.popupMenu=Open:OpenMulti:Move:Copy:Reply:ReplyAll:Forward:Delete:Filter
 MessageProxy.popupMenu.Open.Action=file-open

@@ -36,7 +36,8 @@ public class StoreNode extends MailTreeNode {
       new TestAction(),
       new NewFolderAction(),
       new ActionWrapper(new DisconnectAction(), getStoreInfo().getStoreThread()),
-      new EditAction()
+      new EditAction(),
+      new StatusAction()
     };
     
   }
@@ -400,6 +401,17 @@ public class StoreNode extends MailTreeNode {
 	
     public void actionPerformed(java.awt.event.ActionEvent e) {
       Pooka.getUIFactory().showEditorWindow(getStoreInfo().getStoreProperty(), getStoreInfo().getStoreProperty(), "Store.editableFields.editor");
+    }
+  }    
+
+  class StatusAction extends AbstractAction {
+    
+    StatusAction() {
+      super("store-status");
+    }
+    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      getStoreInfo().showStatus();
     }
   }    
 }

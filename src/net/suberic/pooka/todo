@@ -70,6 +70,15 @@
 
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
+
+*) fix disconnection handling really.
+   -) order of events.
+   -) handling of events, including timeouts and such.
+	- check isConnected() on IMAPStore
+	- check order of handlings; make sure we don't end up in a 
+	  situation where we wait too long to check the connection status.
+   -) make sure auto-reconnects work.
+   
 -----
 
 *) test w/gnu javamail -- ???

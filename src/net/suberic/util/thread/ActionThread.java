@@ -155,6 +155,13 @@ public class ActionThread extends Thread {
   }
 
   /**
+   * Returns a copy of the current action queue.
+   */
+  public java.util.List getQueue() {
+    return new Vector(actionQueue);
+  }
+
+  /**
    * Returns the name of the current action.
    */
   public String getCurrentActionName() {

@@ -881,19 +881,25 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Checks connection for this store.
    */
   public boolean checkConnection() {
+    getLogger().log(Level.FINER, "Checking connection for store " + getStoreID());
     Store realStore = getStore();
 	  
     if (realStore != null) {
-      if (! realStore.isConnected())
+      if (! realStore.isConnected()) {
+	getLogger().log(Level.FINER, getStoreID() + ":  isConnected() returns false.  returning false.");
+
 	return false;
-      else {
+	} else {
 	// that's not good enough.
 	try {
+	  getLogger().log(Level.FINER, getStoreID() + ":  getting default folder to check connection.");
 	  Folder f = realStore.getDefaultFolder();
 	} catch (Exception newe) {
+	  getLogger().log(Level.FINER, getStoreID() + ": getting default folder produced exception " + newe + "; returning false.");
 	  return false;
 	}
 
+	getLogger().log(Level.FINER, getStoreID() + ":  got default folder.  saying we're still connected.");
 	return true;
       }
     } else {
@@ -905,19 +911,48 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Shows the current status for this store and its thread.
    */
   public void showStatus() {
-    getLogger().log(Level.FINE, "Status for store " + getStoreID());
-    getLogger().log(Level.FINE, "Connected:  " + isConnected());
+    getLogger().log(Level.INFO, "Status for store " + getStoreID());
+    getLogger().log(Level.INFO, "Connected:  " + isConnected());
+    /*
     if (store != null) {
-      getLogger().log(Level.FINE, "store.isConnected():  " + store.isConnected());
+      getLogger().log(Level.INFO, "store.isConnected():  " + store.isConnected());
     } else {
-      getLogger().log(Level.FINE, "No store object.");
+      getLogger().log(Level.INFO, "No store object.");
     }
+    */
     if (storeThread != null) {
-      getLogger().log(Level.FINE, "Current Action:  " + storeThread.getCurrentActionName());
-      getLogger().log(Level.FINE, "Action Queue Size:  " + storeThread.getQueueSize());
+      getLogger().log(Level.INFO, "Current Action:  " + storeThread.getCurrentActionName());
+      getLogger().log(Level.INFO, "Action Queue Size:  " + storeThread.getQueueSize());
+      if (storeThread.getQueueSize() > 0) {
+	System.out.println("Queue:");
+	java.util.List queue = storeThread.getQueue();
+	for (int i = 0; i < queue.size(); i++) {
+	  net.suberic.util.thread.ActionEventPair current = (ActionEventPair) queue.get(i);
+	  System.out.println("  queue[" + i + "]:  " + pair.action.getValue(Action.NAME));
+	}
+      }
     } else {
-      getLogger().log(Level.FINE, "No Action Thread.");
+      getLogger().log(Level.INFO, "No Action Thread.");
     }
+
+    // jdk 1.5 only
+    try {
+      Class threadClass = Class.forName("java.lang.Thread");
+      
+      java.lang.reflect.Method stackTraceMethod = threadClass.getMethod("getStackTrace", new Class[0]);
+      if (stackTraceMethod != null) {
+	System.out.println("Stack Trace:");
+	Object returnValue = stackTraceMethod.invoke(storeThread, null);
+	Object[] objectArray = (Object[]) returnValue;
+	for (int i = 0; i < objectArray.length; i++) {
+	  System.out.println("  " + objectArray[i]);
+	}
+      }
+
+    } catch (Exception e) {
+      // ignore.  probably not on jdk 1.5.
+    }
+
   }
 
   // Accessor methods.
