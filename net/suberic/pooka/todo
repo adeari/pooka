@@ -4,6 +4,14 @@ raw input stream.
 *) connect server.  disconnect.  read message.  unread message count doesn't
 change.
 
+*) Preview mode:  open a folder.  unsubscribe to it.  try opening another
+folder.  get a NPE.
+
+*) add a way to delete folders
+
+*) make it so folder windows save their settings (window size, column width,
+sort order)
+
 -----
 
 *) printing in windows can leave control characters at the end of lines
