@@ -2,7 +2,7 @@
 nodes in the tree on the left) when a folder has new messages.  
 
 *)  Make sure that the stores and folders stay open--right now, if you leave
-them alone for long enough, they close and aren't reopened.
+them alone for long enough, they close and aren't reopened. -- done?
 
 *)  StatusBar on the FolderWindow should get updated when messages come in
 or are deleted.
@@ -18,7 +18,7 @@ or are deleted.
 *)  add send buttons and other appropriate commands to MessageWindow.
 
 *)  make the GUI Authenticator (which should come up when you don't enter
-your password in the Store Configuration) works--right now it doesn't.
+your password in the Store Configuration) work--right now it doesn't.
 
 *)  enable cut & paste
 
@@ -31,6 +31,9 @@ entered through a propertyEditor.
 
 *)  currently can't delete multiple messages at once.
 
+*)  make window selection work after windows are closed--currently, if you
+close your selected window, no window is selected.  it should be that the
+next window in the stack (?) gets selected automatically.
 open messages from the FolderWindow
 	can do.  todo on this:
 	customize settings--headers, window size.
