@@ -341,6 +341,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 
 		if (getFolderInfo().isOpen()) {
+		    if (getFolderInfo().getFolderTableModel() == null)
+			getFolderInfo().loadAllMessages();
+
 		    final int folderType = getFolder().getType();
 		    SwingUtilities.invokeLater(new Runnable() {
 			    public void run() {

@@ -374,14 +374,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * instead of calling getFolder.close().  If you don't, then the
      * FolderInfo will try to reopen the folder.
      */
-    public void closeFolder(boolean expunge) throws MessagingException {
+    public void closeFolder(boolean expunge, boolean closeDisplay) throws MessagingException {
 
-	unloadAllMessages();
-
-	if (getFolderDisplayUI() != null)
-	    getFolderDisplayUI().closeFolderDisplay();
-
-	setFolderDisplayUI(null);
+	if (closeDisplay) {
+	    unloadAllMessages();
+	    
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().closeFolderDisplay();
+	    
+	    setFolderDisplayUI(null);
+	}
 
 	/*
 	if (getFolderTracker() != null) {
@@ -399,6 +401,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	}
 
+    }
+    
+    public void closeFolder(boolean expunge) throws MessagingException {
+
+	closeFolder(expunge, true);
     }
 
     /**
@@ -422,7 +429,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	}  
 	
-	folder.close(expunge);
+	closeFolder(expunge, false);
 
 	if (otherException != null)
 	    throw otherException;
@@ -494,7 +501,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public FolderTableModel loadAllMessages() {
+    public void loadAllMessages() {
 	Vector messageProxies = new Vector();
 
 	FetchProfile fp = createColumnInformation();
@@ -531,7 +538,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (!loaderThread.isAlive())
 	    loaderThread.start();
 
-	return ftm;
+	folderTableModel = ftm;
     }
     
     /**
