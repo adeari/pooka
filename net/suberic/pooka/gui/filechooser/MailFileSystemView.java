@@ -47,6 +47,11 @@ public class MailFileSystemView
      * @filename a string representing an IMAP folder name.
      */
     public File createFileObject(File dir, String filename) {
+	if (dir != null)
+	    System.out.println("calling createFileObject on directory " + dir.getName() + " (" + dir.getPath() + "), filename " + filename);
+	else
+	    System.out.println("calling createFileObject on directory null, filename " + filename);
+	    
 	if (dir != null && dir instanceof FolderFileWrapper)
 	    return ((FolderFileWrapper)dir).getFileByName(filename);
 	else
@@ -63,7 +68,7 @@ public class MailFileSystemView
 	// to the root directory) always.
 
 	if (Pooka.isDebug())
-	    System.out.println("running createFileObject2 on " + filename);
+	    System.out.println("running createFileObject2 on filename" + filename);
 
 	FolderFileWrapper rootFile = ((FolderFileWrapper) getRoot());
 	if (rootFile == null) {

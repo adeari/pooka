@@ -169,6 +169,7 @@ public class FolderFileWrapper extends File {
      * Returns the Folder's name.
      */
     public String getName() {
+	System.out.println("calling getName on " + folder.getName());
 	return folder.getName();
     }
 
@@ -177,7 +178,7 @@ public class FolderFileWrapper extends File {
      */
     public String getParent() {
 	if (parent != null)
-	    return parent.getName();
+	    return parent.getAbsolutePath();
 	else
 	    return null;
     }
@@ -442,7 +443,9 @@ public class FolderFileWrapper extends File {
 	if (currentFile != null && subdirFile != null) {
 	    // recurse with rest of components
 	    FolderFileWrapper tmp = currentFile.getFileByName(subdirFile);
-	    return new FolderFileWrapper(tmp.getFolder(), this, origFilename); 
+	    System.out.println("created file " + 
+	    tmp.path = origFilename; 
+	    return tmp;
 	} else {
 	    return currentFile;
 	}
