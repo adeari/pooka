@@ -1,7 +1,10 @@
 *) fix error in encoded stream problem.
+	-- just better error (?)  or maybe print out as far as it goes.
 
 *) still an error in connecting, disconnecting, getting a new messages/deleting
 	old messages, reconnecting.
+
+*) support shared folders.
 
 *) bounce messages
 
