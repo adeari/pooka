@@ -20,6 +20,8 @@ up for top-level folders?).
 
 *) the first unread message keeps getting selected on the FolderWindow.
 
+*) fix marc's ClassCastException.
+
 ?????? alpha 2 or not ??????
 ----------------------------
 
@@ -45,6 +47,9 @@ screen for each with all the possible information (update time, colors,
 connection information, trash/sent folders, etc.) available, and make it
 so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
+
+*)  fix the out of memory problems--only load a certain amount of large
+messages.  for that matter, maybe also do an optimizeit audit.
 
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
