@@ -18,9 +18,6 @@
 		during that.  maybe even a progress bar?
 
 
-*) bug:  on startup, FolderSelectorPane is empty; have to unselect and 
-	reselect to get info.
-
 *) bug:  check to see if moving a message marks it as read.
 
 *) bug:  parse exception
@@ -44,6 +41,9 @@ javax.mail.internet.ParseException
 	new messages come in.
 
 *) add a way to put in custom headers into a new message.
+
+*) make it so selecting or scrolling in a messagepanel will remove the
+	new message icon.
 
 *) add support for running without any local files.
 	-- support for http: access?

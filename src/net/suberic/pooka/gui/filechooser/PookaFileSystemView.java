@@ -109,6 +109,9 @@ public class PookaFileSystemView
       storeName = filename;
     }
     
+    if (Pooka.isDebug())
+      System.out.println("store name is " + filename + ", file name is " + filePart);
+
     FolderInfoFileWrapper currentRoot = findRoot(storeName);
     if (currentRoot == null) {
       if (Pooka.isDebug())
@@ -116,7 +119,12 @@ public class PookaFileSystemView
       return new File(filename);
     }
     
-    return currentRoot.getFileByName(filePart);
+    File returnValue = currentRoot.getFileByName(filePart);
+
+    if (Pooka.isDebug())
+      System.out.println("returning " + returnValue + " for " + currentRoot + ".getFileByName(\"" + filePart + "\")");
+    
+    return returnValue;
     
   }
   
@@ -153,6 +161,9 @@ public class PookaFileSystemView
    * Gets the default starting directory for the file chooser.
    */
   public File getDefaultDirectory() {
+    if (Pooka.isDebug()) 
+      System.out.println("calling getDefaultDirectory()");
+
     return getDefaultRoot();
   }
 
@@ -225,7 +236,8 @@ public class PookaFileSystemView
     }
     if (dir == null)
       return null; // at root
-    
+    File returnValue = dir.getParentFile();
+
     return dir.getParentFile();
   }
   
@@ -262,7 +274,7 @@ public class PookaFileSystemView
    * returns true for all files in the roots array.
    */
   public boolean isRoot(File f) {
-    if (f.getParentFile() == null)
+    if (f.getParentFile() == null || f.getParentFile() == f)
       return true;
     else
       return false;
@@ -273,10 +285,15 @@ public class PookaFileSystemView
    * Returns true if the directory is traversable.
    */
   public Boolean isTraversable(File f) {
+    if (Pooka.isDebug()) {
+      System.out.println("pfsv:  checking isTraversable on file " + f);
+    }
+    
     if (f != null && f instanceof FolderInfoFileWrapper) {
       return new Boolean(true);
-    } else
+    } else {
       return new Boolean(false);
+    }
   }
   
   /*
@@ -393,14 +410,20 @@ public class PookaFileSystemView
   /* Not inherited. */
   
   public File getDefaultRoot() {
-    if (roots == null)
-      {
-	File[] localRoots = getRoots();
-	if (localRoots != null && localRoots.length > 0)
-	  return localRoots[0];
-	else
-	  return null;
-      }
+    if (Pooka.isDebug())
+      System.out.println("running getDefaultRoot().");
+
+    if (roots == null) {
+      File[] localRoots = getRoots();
+      if (localRoots != null && localRoots.length > 0)
+	return localRoots[0];
+      else
+	return null;
+    }
+    
+    if (Pooka.isDebug())
+      System.out.println("returning " + roots[0] + " as default root.");
+
     return roots[0];
   }
   

@@ -1,3 +1,6 @@
+worked around a sun bug in jdk1.4 which would result in the 
+FolderSelectorPane being empty the first time it was brought up.
+
 updated printing to use the new jdk 1.4 printing system.  also made 
 printing, err, work correctly now.
 

@@ -121,6 +121,8 @@ public class FolderSelectorPane extends SwingPropertyEditor {
       new JFileChooser(defaultRoot, mfsv);
     jfc.setMultiSelectionEnabled(false);
     jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    // workaround for bug in jdk 1.4
+    jfc.setCurrentDirectory(mfsv.createFileObject(defaultRoot));
     
     int returnValue =
       jfc.showDialog(Pooka.getMainPanel(),

@@ -22,6 +22,9 @@ public class FolderInfoFileWrapper extends File {
     super(f.getFolderName());
     folder = f;
     parent = p;
+    if (parent == null)
+      parent = this;
+
     path = f.getFolderName();
     if (Pooka.isDebug())
       if (p != null)
@@ -159,11 +162,11 @@ public class FolderInfoFileWrapper extends File {
    * returns the root of this tree.
    */
   private FolderInfoFileWrapper getRoot() {
-    FolderInfoFileWrapper parent = this;
-    while (parent.getParent() != null) {
-      parent = (FolderInfoFileWrapper)parent.getParentFile();
+    FolderInfoFileWrapper tmpParent = this;
+    while (tmpParent != null && tmpParent.getParent() != null && tmpParent.getParentFile() != tmpParent) {
+      tmpParent = (FolderInfoFileWrapper)tmpParent.getParentFile();
     }
-    return parent;
+    return tmpParent;
   }
   
   /**
@@ -254,7 +257,7 @@ public class FolderInfoFileWrapper extends File {
    * Returns true if this is an absolute reference, false otherwise.
    */
   public boolean isAbsolute() {
-    return (parent == null);
+    return (parent == null || parent == this);
   }
   
   /**
@@ -540,7 +543,7 @@ public class FolderInfoFileWrapper extends File {
       System.out.println("calling getFileByName(" + filename + ") on folder " + getName() + " (" + getPath() + ") (abs " + getAbsolutePath() + ")");
     
     String origFilename = new String(filename);
-    if (filename == null || filename.length() < 1 || (filename.equals("/") && getParentFile() == null)) {
+    if (filename == null || filename.length() < 1 || (filename.equals("/") && getParentFile() == null) || (filename.equals("/") && getParentFile() == this)) {
       if (Pooka.isDebug())
 	System.out.println("returning this for getFileByName()");
       return this;
