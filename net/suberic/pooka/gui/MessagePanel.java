@@ -123,6 +123,11 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
 	    pfp.getFolderInfo().setFolderDisplayUI(fif);
 	    openFolderWindow(pfp.getFolderInfo());
 	}
+
+	PreviewFolderPanel current = pcp.getCurrentPanel();
+	if (current != null) {
+	    current.getFolderDisplay().getMessageTable().getSelectionModel().removeListSelectionListener(pcp.getSelectionListener());
+	}
     }
 
     /**
