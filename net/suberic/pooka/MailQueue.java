@@ -74,35 +74,8 @@ public class MailQueue {
 	      sendTransport.sendMessage(m, m.getAllRecipients());
 	      
 	      ((NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
-	      /*
-	      javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		  public void run() {
-		    net.suberic.pooka.gui.MessageProxy proxy = nmi.getMessageProxy();
-		    if (proxy != null) {
-		      net.suberic.pooka.gui.MessageUI mui = proxy.getMessageUI();
-		      if (mui != null)
-			mui.closeMessageUI();
-		    }
-		  }
-		});
-	      */
-	      
 	    } catch (MessagingException me) {
 	      ((NewMessageProxy)nmi.getMessageProxy()).sendFailed(me);
-
-	      /*
-	      net.suberic.pooka.gui.MessageUI mui = null;
-	      net.suberic.pooka.gui.MessageProxy proxy = nmi.getMessageProxy();
-	      if (proxy != null) {			    
-		mui = proxy.getMessageUI();
-	      }
-	      
-	      if (mui != null)
-		mui.showError(Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message"), me);
-	      else
-		Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message"), me);
-		
-	      */
 	    }
 	  }
 	}, thread), new java.awt.event.ActionEvent(nmi, 1, "message-send"));

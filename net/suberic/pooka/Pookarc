@@ -76,6 +76,9 @@ Pooka.autoExpunge.propertyType=Boolean
 
 Pooka.fetchBatchSize=50
 
+Pooka.xmailer=Pooka
+Pooka.userProfileProperty=X-Pooka-UserProfile
+
 MenuBar=File:Edit:Mail:Config:Window:Help
 
 MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
@@ -191,6 +194,16 @@ FolderWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 FolderWindowToolbar.Search.Action=folder-search
 FolderWindowToolbar.Search.Image=/net/suberic/pooka/gui/images/Binocular.gif
 
+OutboxWindowToolbar=Down:Up:Open:Delete:Send
+OutboxWindowToolbar.Down.Action=message-next
+OutboxWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
+OutboxWindowToolbar.Up.Action=message-previous
+OutboxWindowToolbar.Up.Image=/net/suberic/pooka/gui/images/Up.gif
+OutboxWindowToolbar.Open.Action=file-open
+OutboxWindowToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
+OutboxWindowToolbar.Send.Action=folder-send
+OutboxWindowToolbar.Send.Image=/net/suberic/pooka/gui/images/Envelope.gif
+
 NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste:Print:|:Detach
 NewMessageWindowToolbar.Send.Action=message-send
 NewMessageWindowToolbar.Send.Image=/net/suberic/pooka/gui/images/Envelope.gif
@@ -288,6 +301,12 @@ TrashFolderNode.popupMenu.Close.Action=folder-close
 TrashFolderNode.popupMenu.Edit.Action=file-edit
 TrashFolderNode.popupMenu.Empty.Action=folder-empty
 
+OutboxFolderNode.popupMenu=Open:Send:Close:Edit
+OutboxFolderNode.popupMenu.Open.Action=file-open
+OutboxFolderNode.popupMenu.Close.Action=folder-close
+OutboxFolderNode.popupMenu.Edit.Action=file-edit
+OutboxFolderNode.popupMenu.Send.Action=folder-send
+
 StoreNode.popupMenu=Open:Subscribe:Close:Edit
 StoreNode.popupMenu.Open.Action=file-open
 StoreNode.popupMenu.Close.Action=file-close
@@ -304,6 +323,10 @@ MessageProxy.popupMenu.Reply.Action=message-reply
 MessageProxy.popupMenu.ReplyAll.Action=message-reply-all
 MessageProxy.popupMenu.Forward.Action=message-forward
 MessageProxy.popupMenu.Delete.Action=message-delete
+
+NewMessageProxy.popupMenu=OpenAsNew:Delete
+NewMessageProxy.popupMenu.OpenAsNew.Action=message-open-as-new
+NewMessageProxy.popupMenu.Delete.Action=message-delete
 
 MessageProxy.cachingPopupMenu=Open:Move:Copy:Reply:ReplyAll:Forward:Delete:Cache
 MessageProxy.cachingPopupMenu.Open.Action=file-open

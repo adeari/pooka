@@ -48,6 +48,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 
 	splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
 
+	
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 
 	this.setLayout(new BorderLayout());

@@ -199,6 +199,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
 	    if (getFolderInfo().isTrashFolder())
 		popupMenu.configureComponent("TrashFolderNode.popupMenu", Pooka.getResources());
+	    else if (getFolderInfo().isOutboxFolder())
+	      popupMenu.configureComponent("OutboxFolderNode.popupMenu", Pooka.getResources());
 	    else
 		popupMenu.configureComponent("FolderNode.popupMenu", Pooka.getResources());
 	}

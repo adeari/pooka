@@ -15,6 +15,9 @@ next release:
 	*)  make sure everything works properly if there is no outbox
 		configured.  throw an exception if there's no outbox and
 		the connection is down.
+	*)  fix the threading.  sending messages is on the awt thread right	
+		now.
+
 
 *) make search give a popup window saying it's running.
 

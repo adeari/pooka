@@ -1241,18 +1241,18 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * actions.
      */
     public void resetDefaultActions() {
-	if (isTrashFolder())
-	    defaultActions = new Action[] {
-		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-		new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread()),
-		new EditPropertiesAction()
-		    
-		    };
-	else
-	    defaultActions = new Action[] {
-		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-		new EditPropertiesAction()
-		    };
+      if (isTrashFolder()) {
+	defaultActions = new Action[] {
+	  new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+	  new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread()),
+	  new EditPropertiesAction()
+	    };
+	} else {
+	  defaultActions = new Action[] {
+	    new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+	    new EditPropertiesAction()
+	      };
+	}
     }
 
     // semi-accessor methods.

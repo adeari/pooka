@@ -219,6 +219,13 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
     public UserProfile getSelectedProfile() {
 	return getNewMessageDisplay().getSelectedProfile();
     }
+  
+  /**
+   * sets the currently selected Profile.
+   */
+  public void setSelectedProfile(UserProfile newProfile) {
+    getNewMessageDisplay().setSelectedProfile(newProfile);
+  }
 
     /**
      * Overrides JComponent.addNotify().

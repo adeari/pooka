@@ -16,4 +16,6 @@ public interface NewMessageUI extends MessageUI {
     public javax.mail.internet.InternetHeaders getMessageHeaders() throws javax.mail.MessagingException;
 
     public net.suberic.pooka.UserProfile getSelectedProfile();
+
+  public void setSelectedProfile(net.suberic.pooka.UserProfile newProfile);
 }

@@ -380,6 +380,15 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     public UserProfile getSelectedProfile() {
 	return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
     }
+  
+  /**
+   * sets the currently selected Profile.
+   */
+  public void setSelectedProfile(UserProfile newProfile) {
+    if (newProfile != null) {
+      ((JComboBox)(inputTable.get("UserProfile"))).setSelectedItem(newProfile);
+    }
+  }
 
     /**
      * Overrides JComponent.addNotify().

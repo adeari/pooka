@@ -30,6 +30,7 @@ public class NewMessageInfo extends MessageInfo {
     
     if (profile != null) {
       profile.populateMessage(mMsg);
+      mMsg.setHeader(Pooka.getProperty("Pooka.userProfileProperty", "X-Pooka-UserProfile"), profile.getName());
       urlName = profile.getSendMailURL();
       sendPrecommand = profile.getSendPrecommand();
     }
@@ -40,6 +41,8 @@ public class NewMessageInfo extends MessageInfo {
       message.setHeader(currentHeader.getName(), currentHeader.getValue());
     }
     
+    mMsg.setHeader("X-Mailer", Pooka.getProperty("Pooka.xmailer", "Pooka"));
+
     if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
       messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
     
@@ -71,13 +74,6 @@ public class NewMessageInfo extends MessageInfo {
       
       if (! sent)
 	Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
-      
-      /*
-      if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
-	getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
-	profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
-      }
-      */
     } else {
       throw new MessagingException(Pooka.getProperty("error.noMailURL", "Error sending Message:  No mail URL."));
     }

@@ -260,7 +260,8 @@ public class MessageProxy {
       new ActionWrapper(new PrintAction(), folderThread),
       new ActionWrapper(new SaveMessageAction(), folderThread),
       new ActionWrapper(new CacheMessageAction(), folderThread),
-      new ActionWrapper(new SaveAddressAction(), folderThread)
+      new ActionWrapper(new SaveAddressAction(), folderThread),
+      new ActionWrapper(new OpenAsNewAction(), folderThread)
 	};
     
     Action[] actions = getActions();
@@ -404,6 +405,30 @@ public class MessageProxy {
 	setMessageUI(getPookaUIFactory().createMessageUI(this));
       getMessageUI().openMessageUI();
       getMessageInfo().setSeen(true);
+    } catch (MessagingException me) {
+      showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
+    }
+  }
+  
+  /**
+   * This creates a NewMessageUI for this MessageProxy and then opens an
+   * editor for it.  If 
+   */
+  public void openWindowAsNew(boolean removeProxy) {
+    try {
+      // first create the NewMessageProxy from this MessageProxy.
+      Message newMessage = new MimeMessage((MimeMessage)getMessageInfo().getMessage());
+      NewMessageInfo nmi = new NewMessageInfo(newMessage);
+      NewMessageProxy nmp = new NewMessageProxy(nmi);
+      
+      MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp);
+
+      nmp.matchUserProfile();
+
+      nmu.openMessageUI();
+
+      if (removeProxy) 
+	deleteMessage();
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
     }
@@ -618,8 +643,15 @@ public class MessageProxy {
    */
   public void showPopupMenu(JComponent component, MouseEvent e) {
     ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
-    if (getMessageInfo().getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+    FolderInfo fi = getMessageInfo().getFolderInfo();
+    if ( fi != null ) {
+      if (fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
       popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());	
+      } else if (fi.isOutboxFolder()) {
+	popupMenu.configureComponent("NewMessageProxy.popupMenu", Pooka.getResources());	
+      } else {
+	popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
+      }
     } else {
       popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
     }
@@ -1033,6 +1065,28 @@ public class MessageProxy {
       } catch (MessagingException me) {
 	showError(me.getMessage(), me);
       }
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  
+  public class OpenAsNewAction extends AbstractAction {
+    OpenAsNewAction() {
+      super("message-open-as-new");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      openWindowAsNew(true);
       
       if (fw != null)
 	fw.setBusy(false);

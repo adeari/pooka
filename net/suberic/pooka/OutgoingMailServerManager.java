@@ -154,10 +154,23 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    */
   private void createOutgoingMailServerList() {
     manager = new ItemManager("OutgoingServer", Pooka.getResources(), this);
-    Vector v = getOutgoingMailServerList();
 
     manager.addItemListChangeListener(this);
   }
+
+  /**
+   * Tells all of the FolderInfos that are outboxes that they are, in fact,
+   * outboxes.
+   */
+  public void loadOutboxFolders() {
+    Vector v = getOutgoingMailServerList();
+
+    for (int i = 0; i < v.size(); i++) {
+      OutgoingMailServer oms = (OutgoingMailServer) v.get(i);
+      oms.loadOutboxFolder();
+    }
+  }
+
 
   /**
    * A special OutgoingMailServer that represents the 'default' value.

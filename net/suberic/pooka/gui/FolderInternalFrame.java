@@ -64,7 +64,10 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	
 	folderDisplay = new FolderDisplayPanel(getFolderInfo());
 
-	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
+	if (getFolderInfo() != null && getFolderInfo().isOutboxFolder())
+	  toolbar = new ConfigurableToolbar("OutboxWindowToolbar", Pooka.getResources());
+	else
+	  toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 	this.getContentPane().add("North", toolbar);
 	this.getContentPane().add("Center", folderDisplay);
 	this.getContentPane().add("South", getFolderStatusBar());

@@ -101,6 +101,8 @@ public class Pooka {
     storeManager = new StoreManager();
     
     storeManager.loadAllSentFolders();
+    outgoingMailManager.loadOutboxFolders();
+    
     
     frame.setBackground(Color.lightGray);
     frame.getContentPane().setLayout(new BorderLayout());

@@ -120,6 +120,26 @@ public class NewMessageProxy extends MessageProxy {
   }
   
   /**
+   * Matches the currently selected UserProfile to the one set in the
+   * NewMessageInfo.
+   */
+  public void matchUserProfile() {
+    NewMessageUI nmui = getNewMessageUI();
+    if (nmui != null) {
+      try {
+	String profileId = (String) getMessageInfo().getMessageProperty(Pooka.getProperty("Pooka.userProfileProperty", "X-Pooka-UserProfile"));
+	if (profileId != null && ! profileId.equals("")) {
+	  UserProfile profile = UserProfile.getProfile(profileId);
+	  if (profile != null)
+	    nmui.setSelectedProfile(profile);
+	}
+      } catch (MessagingException me) {
+	// no big deal...  we can just have the default user selected.
+      }
+    }    
+  }
+  
+  /**
    * This attaches a file to a given message.  Really, all it does is
    * calls getFileToAttach(), and then sends that to attachFile().
    */
