@@ -275,8 +275,8 @@ public class AttachmentPane extends JPanel {
 		    }
 		}
 		CommandInfo[] cmds = dh.getPreferredCommands();
-		if (cmds != null && cmds[cmds.length -1] != null) {
-		    Object beanViewer = dh.getBean(cmds[cmds.length -1]);
+		if (cmds != null && cmds[0] != null) {
+		    Object beanViewer = dh.getBean(cmds[0]);
 		    if (beanViewer instanceof Frame) {
 			Frame frameViewer = (Frame)beanViewer;
 			try {

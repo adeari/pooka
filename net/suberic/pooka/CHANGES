@@ -1,3 +1,8 @@
+added a new default mailcap file, either '.pooka_mailcap' or 
+'pooka_mailcap.txt'.  set it up so this file is the one written to by
+default.  also reset the 'make command default' so that it actually works
+properly.
+
 added more spacing between the headers and the message on html messages.
 
 added an icon for Pooka, and made it change icons when new messages come in.

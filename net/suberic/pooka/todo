@@ -4,11 +4,6 @@ top todo:
 
 *) add more font support
 
-*) fix the mimetypes/mailcap settings--we should use our own configuration
-file, with the defaults as a backup.  otherwise, you have the problem where
-if you set up a default handler for images, then, say, netscape also ends
-up getting configured the same way.
-
 *) have Pooka itself change its icon if you get new messages, in addition to 
 changing the title bar.
 	done.  todo:  get good icons.

@@ -20,20 +20,38 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	 * The file or resource named META-INF/mailcap.default 
 	 * (usually found only in the activation.jar file). 
 	 *
-	 * The file or resource named META-INF/mailcap. 
-	 * The file <java.home>/lib/mailcap. 
+	 * The file .pooka_mailcap (or pooka_mailcap.txt) in the user's home
+	 *    directory. 
 	 * The file .mailcap (or mailcap.txt) in the user's home directory. 
+	 * The file <java.home>/lib/mailcap. 
+	 * The file or resource named META-INF/mailcap. 
 	 */
 
 	mailcapMaps = new Vector();
 
-	InputStream is = new Object().getClass().getResourceAsStream("/META-INF/mailcap.default");
-	if (is != null)
-	    addMailcapFile(is);
+	InputStream is;
 
-	is = new Object().getClass().getResourceAsStream("/META-INF/mailcap");
-	if (is != null)
-	    addMailcapFile(is);
+	try {
+	  if (System.getProperty("file.separator").equals("\\")) {
+	    sourceFile = new File(System.getProperty("user.home") + "\\pooka_mailcap.txt");
+	    addMailcapFile(System.getProperty("user.home") + "\\pooka_mailcap.txt");
+	  } else {
+	    sourceFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap");
+	    addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap");
+	  }
+	}  catch (IOException ioe) {
+	  // if it doesn't exist, it's ok.
+	}
+	
+	try {
+	  if (System.getProperty("file.separator").equals("\\")) {
+	    addMailcapFile(System.getProperty("user.home") + "\\mailcap.txt");
+	  } else {
+	    addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
+	  }
+	}  catch (IOException ioe) {
+	  // if it doesn't exist, it's ok.
+	}
 
 	try {
 	    addMailcapFile(System.getProperty("java.home") + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + "mailcap");
@@ -41,28 +59,25 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	    // if it doesn't exist, it's ok.
 	}
 	
-	try {
-	    if (System.getProperty("file.separator").equals("\\")) {
-		addMailcapFile(System.getProperty("user.home") + "\\mailcap.txt");
-		sourceFile = new File(System.getProperty("user.home") + "\\mailcap.txt");
-	    } else {
-		addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
-		sourceFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
-	    }
-	}  catch (IOException ioe) {
-	    // if it doesn't exist, it's ok.
-	}
+	is = new Object().getClass().getResourceAsStream("/META-INF/mailcap");
+	if (is != null)
+	  addMailcapFile(is);
+
+	is = new Object().getClass().getResourceAsStream("/META-INF/mailcap.default");
+	if (is != null)
+	  addMailcapFile(is);
+
     }
 
     public FullMailcapCommandMap(String mailcapFilename) throws java.io.IOException {
-	this();
-	addMailcapFile(mailcapFilename);
+      this();
+      addMailcapFile(mailcapFilename);
     }
-
-    public FullMailcapCommandMap(InputStream is) {
-	this();
-	addMailcapFile(is);
-    }
+  
+  public FullMailcapCommandMap(InputStream is) {
+    this();
+    addMailcapFile(is);
+  }
 
     public CommandInfo[] getAllCommands(java.lang.String mimeType) {
 
@@ -71,16 +86,16 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
      * and calls getAllCommands() on each. 
      */
 
-	Vector foundCommands = new Vector();
-	    for (int i = mailcapMaps.size() - 1 ; i >= 0; i--) {
-		MailcapMap mc = (MailcapMap)mailcapMaps.elementAt(i);
-		CommandInfo[] cis = mc.getAllCommands(mimeType);
-		if (cis != null)
-		    for (int j = 0; j < cis.length; j++) {
-			foundCommands.add(cis[j]);
-		    }
-	    }
-
+      Vector foundCommands = new Vector();
+      for (int i = 0; i < mailcapMaps.size() ; i++) {
+	MailcapMap mc = (MailcapMap)mailcapMaps.elementAt(i);
+	CommandInfo[] cis = mc.getAllCommands(mimeType);
+	if (cis != null)
+	  for (int j = 0; j < cis.length; j++) {
+	    foundCommands.add(cis[j]);
+	  }
+      }
+      
 	
 	if (foundCommands.size() == 0)
 	    return null;
@@ -114,8 +129,8 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
     }
 
     public void addMailcap(java.lang.String mail_cap) {
-	MailcapMap mc = (MailcapMap)mailcapMaps.lastElement();
-	mc.addMailcapEntry(mail_cap);
+	MailcapMap mc = (MailcapMap)mailcapMaps.firstElement();
+	mc.addMailcapEntry(mail_cap, true);
 	if (sourceFile != null)
 	    writeEntryToSourceFile(mail_cap);
     }
@@ -170,6 +185,8 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 		outputFile.renameTo(new File(fileName));
 		oldSource.delete();
 	    } catch (Exception e) {
+	      System.out.println("caugh exception while writing source file:  " + e);
+	      e.printStackTrace();
 	    }
 	}
     }
@@ -280,46 +297,57 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	    return null;
 	}
 	
-	synchronized void addMailcapEntry(String mailcapLine) {
-	    String mimeType;
-	    String command;
-	    String verb;
+      public void addMailcapEntry(String mailcapLine) {
+	addMailcapEntry(mailcapLine, false);
+      }
+      
+      synchronized void addMailcapEntry(String mailcapLine, boolean prepend) {
+	String mimeType;
+	String command;
+	String verb;
+	
+	StringTokenizer tokens = new StringTokenizer(mailcapLine, ";");
+	if (tokens.hasMoreTokens()) {
+	  mimeType = stripWhiteSpace(new StringBuffer(tokens.nextToken()));
+	  Hashtable addTable;
+	  int i = mimeType.indexOf('/');
+	  if (( i != -1 ) && (i != mimeType.length()-1) && (mimeType.charAt(i+1) == '*')) {
+	    addTable = genericMap;
+	    mimeType = mimeType.substring(0, i-1);
+	  } else {
+	    addTable = specificMap;
+	  }
 
-	    StringTokenizer tokens = new StringTokenizer(mailcapLine, ";");
-	    if (tokens.hasMoreTokens()) {
-		mimeType = stripWhiteSpace(new StringBuffer(tokens.nextToken()));
-		Hashtable addTable;
-		int i = mimeType.indexOf('/');
-		if (( i != -1 ) && (i != mimeType.length()-1) && (mimeType.charAt(i+1) == '*')) {
-		   addTable = genericMap;
-		   mimeType = mimeType.substring(0, i-1);
+	  while (tokens.hasMoreTokens()) {
+	    String[] verbClass = parseCommand(stripWhiteSpace(new StringBuffer(tokens.nextToken())));
+	    if (verbClass != null) {
+	      Vector v = (Vector)addTable.get(mimeType);
+	      if (v != null) {
+		if (prepend) {
+		  v.add(0, new CommandInfo(verbClass[0], verbClass[1]));
 		} else {
-		    addTable = specificMap;
+		  v.add(new CommandInfo(verbClass[0], verbClass[1]));
 		}
+	      } else {
+		v = new Vector();
+		v.add(new CommandInfo(verbClass[0], verbClass[1]));
+		addTable.put(mimeType, v);
+	      }
+	    }   
+	  } // while
+	} // if tokens.hasMoreTokens()
+      }
 
-		while (tokens.hasMoreTokens()) {
-		    String[] verbClass = parseCommand(stripWhiteSpace(new StringBuffer(tokens.nextToken())));
-		    if (verbClass != null) {
-			Vector v = (Vector)addTable.get(mimeType);
-			if (v != null) 
-			    v.add(new CommandInfo(verbClass[0], verbClass[1]));
-			else {
-			    v = new Vector();
-			    v.add(new CommandInfo(verbClass[0], verbClass[1]));
-			    addTable.put(mimeType, v);
-			}
-		    }   
-		} // while
-	    } // if tokens.hasMoreTokens()
-	}
-
-	String getGenericMimeType(String original) {
-	    int slash = original.indexOf('/');
-	    if (slash == -1)
-		return original;
-	    else
-		return original.substring(0, slash);
-	}
+      /**
+       * 
+       */
+      String getGenericMimeType(String original) {
+	int slash = original.indexOf('/');
+	if (slash == -1)
+	  return original;
+	else
+	  return original.substring(0, slash);
+      }
 
 	boolean matches (CommandInfo ci, String verb) {
 	    return (ci.getCommandName().equals(verb));
