@@ -214,20 +214,28 @@ public class AttachmentPane extends JPanel {
 
 	table.addMouseListener(new MouseAdapter() {
 	    public void mousePressed(MouseEvent e) {
-		if (e.getClickCount() == 2) {
-		    Attachment selectedAttachment = getSelectedAttachment();
-		    String actionCommand = Pooka.getProperty("AttachmentPane.2xClickAction", "file-open");
-		    if (selectedAttachment != null) {
-			Action clickAction = getActionByName(actionCommand);
-			if (clickAction != null) {
-			    clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
-			    
-			}
-		    }
-		} else if (SwingUtilities.isRightMouseButton(e)) {
-		    getPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
-		} 
-	       
+	      if (e.getClickCount() == 2) {
+		Attachment selectedAttachment = getSelectedAttachment();
+		String actionCommand = Pooka.getProperty("AttachmentPane.2xClickAction", "file-open");
+		if (selectedAttachment != null) {
+		  Action clickAction = getActionByName(actionCommand);
+		  if (clickAction != null) {
+		    clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+		    
+		  }
+		}
+	      } else if (SwingUtilities.isRightMouseButton(e)) {
+		// see if anything is selected
+		int rowIndex = getTable().rowAtPoint(e.getPoint());
+		if (rowIndex != -1) {
+		  if (! getTable().isRowSelected(rowIndex)) {
+		    getTable().setRowSelectionInterval(rowIndex, rowIndex);
+		  }
+		  getPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
+		}
+		
+	      } 
+	      
 	    }
 	});
 

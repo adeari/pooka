@@ -1,3 +1,6 @@
+fixed an ArrayIndexOutOfBoundsException if you right-clicked on an entry
+in the AttachmentPane that wasn't selected.
+
 fixed a bug where the ExternalLauncher wasn't executing correctly if there
 was no wrapper specified.  this resulted in the inability to open attachments
 on windows.
