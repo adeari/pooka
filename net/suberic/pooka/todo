@@ -9,10 +9,6 @@ caching:  pretty much the same as uid, no?  only difference is that we also have
 	 *)  some messages aren't parsed properly by the mbox provider
 	 *)  the mbox provider isn't safe for mailboxes that are edited by
 	     other processes.
-	 *)  need to add support for keeping the messages in the mailbox
-	     while you have them on disk.
-	 *)  update the ui so that you can properly configure pop/mbox/imap
-	     store separately.
 
 *) support for ssl?
 
