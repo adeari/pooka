@@ -61,6 +61,7 @@ public class ChangeCache {
 	    while (nextLine != null) {
 		out.write(nextLine);
 		out.newLine();
+		nextLine = in.readLine();
 	    }
 	    
 	    in.close();
