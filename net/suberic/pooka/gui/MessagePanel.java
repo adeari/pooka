@@ -42,8 +42,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
      */
     public void activateFrame(JInternalFrame f) {
       super.activateFrame(f);
-      
-      f.requestFocus();
     }
     
     /**

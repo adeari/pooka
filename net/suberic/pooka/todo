@@ -1,26 +1,29 @@
-*) printing in windows can leave control characters at the end of lines
-
-*) make there a build option for help only, so i can switch it in 
-	WebStart.
-
-*) regexp? (add search/replace to editor)
-  -- started.  todo:
-	*) add feature to NewMessage
-	*) add replace feature
-		-- check the caret location, too.
-	*) fix the focus on the find window
-	
-*) change the keybinding for the address book.  otherwise you get address book
-	entries while you're navigating the to field.
-
-*) check why the bcc field sometimes doesn't show the address book icon.
-
-*) more doc
-
 *) fix the problem with things like MissingStartBoundary by getting the
 raw input stream.
 
+*) connect server.  disconnect.  read message.  unread message count doesn't
+change.
+
 -----
+
+*) printing in windows can leave control characters at the end of lines
+
+*) regexp? (add search/replace to editor)
+  -- started.  todo:
+		--  ??? jdk bug ???
+	*) add feature to NewMessage
+	*) add replace feature
+		-- check the caret location, too.
+	
+*) check why the bcc field sometimes doesn't show the address book icon.
+
+*) change the keybinding for the address book.  otherwise you get address book
+	entries while you're navigating the to field.
+
+*) more doc
+
+*) make there a build option for help only, so i can switch it in 
+	WebStart.
 
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
@@ -149,6 +152,10 @@ preview:
 
 *) add support for other mail formats, like maildir (and maybe hotmail?).
 	shift pop3 backing from mbox to maildir.
+
+*) spam filtering
+
+*) new message count in icon
 
 *) queuing of outgoing mails
 	todo on this:

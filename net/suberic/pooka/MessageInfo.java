@@ -718,12 +718,9 @@ public class MessageInfo {
    * Returns the real, modifiable message that this MessageInfo is
    * wrapping.
    */
-  public Message getRealMessage() {
+  public Message getRealMessage() throws MessagingException {
     if (getFolderInfo() != null) {
-      try {
-	return getFolderInfo().getRealMessage(this);
-      } catch (MessagingException me) {
-      }
+      return getFolderInfo().getRealMessage(this);
     }
     return message;
   }

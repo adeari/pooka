@@ -707,11 +707,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       // either the JFrame or nothing has the keyboard focus.
       Object newValue = pce.getNewValue();
       Object oldValue = pce.getOldValue();
-      // if seems like 
+      // if seems like it, pass it on to a default.
       if ((newValue == null && oldValue == null) || newValue instanceof JFrame) {
 	passFocus();
       } else {
-	
 	refreshActiveMenus();
 	refreshCurrentUser();
       }
