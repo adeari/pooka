@@ -1,13 +1,7 @@
 alpha release
 -------------
 
-*)  fix the MessageWindow sizes.  we need to have it size up to be charLength
-+ size of scrollbar.
-
 *)  enable keybindings so they work properly.
-
-*) add a ValueChangeListener for the UserProfile properties.  right now
-the UserProfile only gets updated at startup.
 
 *) make the mailcap mappings for the attachments work properly.
 

@@ -1,5 +1,5 @@
 package net.suberic.pooka;
-import net.suberic.util.VariableBundle;
+import net.suberic.util.*;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
@@ -10,6 +10,12 @@ public class UserProfile extends Object {
     String name;
     static Vector profileList = new Vector();
     static Vector profileMap = null;
+    public static ValueChangeListener vcl = new ValueChangeAdapter() {
+	    public void valueChanged(String changedValue) {
+		if (changedValue.equals("UserProfile") )
+		    UserProfile.updateProfilesFromProperty();
+	    }
+	};
 
     public UserProfile(String newName, Properties newProps) {
 	mailProperties = newProps;
@@ -64,6 +70,31 @@ public class UserProfile extends Object {
 		throw new MessagingException("", uee);
 	    }
 	}
+    }
+
+    /**
+     * This method updates the ProfileList from the UserProfile property.
+     */
+
+    static public void updateProfilesFromProperty() {
+	Vector currentValues = Pooka.getResources().getPropertyAsVector("UserProfile", "");
+	Vector oldValues = new Vector(profileList);
+	Vector newValues = new Vector();
+	Vector removeValues = new Vector();
+
+	for (int i = 0; i < currentValues.size(); i++) {
+	    UserProfile up = getProfile((String)currentValues.elementAt(i));
+	    if (up == null)
+		newValues.add(currentValues.elementAt(i));
+	    else
+		oldValues.removeElement(up);
+	}
+
+	for (int i = 0; i < oldValues.size(); i++)
+	    removeValues.add(((UserProfile)oldValues.elementAt(i)).getName());
+
+	createProfilesFromList(Pooka.getResources(), newValues);
+	removeProfilesFromList(Pooka.getResources(), removeValues);
     }
 
     static public void createProfiles(VariableBundle mainProperties) {

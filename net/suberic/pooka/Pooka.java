@@ -24,6 +24,7 @@ public class Pooka {
 	dateFormatter = new java.text.SimpleDateFormat(Pooka.getProperty("DateFormat", "EEE, MMM dd, yyyy, hh:mm"));
 
 	UserProfile.createProfiles(resources);
+	resources.addValueChangeListener(UserProfile.vcl, "UserProfile");
 
 	mailcap = new FullMailcapCommandMap();
 
