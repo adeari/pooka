@@ -361,30 +361,32 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    System.out.println(this + ":  folder loaded.  making sure parent store is connected.  status is " + status);
 
 	//if (status != CONNECTED) {
-	    if (!getParentStore().isConnected())
-		getParentStore().connectStore();
-	    //}
-
+	if (!getParentStore().isConnected())
+	  getParentStore().connectStore();
+	//}
+	
 	if (Pooka.isDebug())
 	    System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
-
+	
 	if (status == CLOSED || status == LOST_CONNECTION) {
-	    if (Pooka.isDebug())
-		System.out.println(this + ":  isLoaded() and isAvailable().");
-	    if (folder.isOpen()) {
-		if (folder.getMode() == mode)
-		    return;
-		else { 
-		    folder.close(false);
-		    openFolder(mode);
-		}
-	    } else {
-		folder.open(mode);
-		updateFolderOpenStatus(true);
-		resetMessageCounts();
+	  if (Pooka.isDebug())
+	    System.out.println(this + ":  isLoaded() and isAvailable().");
+	  if (folder.isOpen()) {
+	    if (folder.getMode() == mode)
+	      return;
+	    else { 
+	      folder.close(false);
+	      openFolder(mode);
 	    }
+	  } else {
+	    folder.open(mode);
+	    updateFolderOpenStatus(true);
+	    resetMessageCounts();
+	  }
+	} else if (status == INVALID) {
+	  throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
 	}
-
+	
     }
 
     /**
