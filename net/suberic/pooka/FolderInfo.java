@@ -206,7 +206,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    parentStore.connectStore();
 	  Store store = parentStore.getStore();
 	  tmpParentFolder = store.getDefaultFolder();
+	  if (Pooka.isDebug())
+	    System.out.println("got " + tmpParentFolder + " as Default Folder for store.");
 	  tmpFolder = tmpParentFolder.list(mFolderName);
+	  if (Pooka.isDebug())
+	    System.out.println("got " + tmpFolder + " as Folder for folder " + getFolderID() + ".");
 	} catch (MessagingException me) {
 	  if (Pooka.isDebug()) {
 	    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);

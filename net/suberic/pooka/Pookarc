@@ -851,8 +851,8 @@ NewAccountPooka.protocol.allowedValues=imap:pop3:mbox
 NewAccountPooka.protocol=imap
 NewAccountPooka.useSSL.propertyType=Boolean
 NewAccountPooka.useSSL=false
-NewAccountPooka.useSent.propertyType=Boolean
-NewAccountPooka.useSent=true
+NewAccountPooka.leaveOnServer.propertyType=Boolean
+NewAccountPooka.leaveOnServer=true
 NewAccountPooka.enableDisconnected.propertyType=Boolean
 NewAccountPooka.enableDisconnected=false
 NewAccountPooka.pookaDirectory.propertyType=Directory
@@ -908,17 +908,17 @@ NewAccountPooka.optionPanel.allowedValues.pop3=NewAccountPooka.optionPanel.pop3
 NewAccountPooka.optionPanel.allowedValues.mbox=NewAccountPooka.optionPanel.mbox
 
 NewAccountPooka.optionPanel.imap.propertyType=Composite
-NewAccountPooka.optionPanel.imap=pookaDirectory:useSent:useSSL:enableDisconnected
+NewAccountPooka.optionPanel.imap=pookaDirectory:useSSL:enableDisconnected
 NewAccountPooka.optionPanel.imap.scoped=true
 NewAccountPooka.optionPanel.imap.scopeRoot=NewAccountPooka
 
 NewAccountPooka.optionPanel.pop3.propertyType=Composite
-NewAccountPooka.optionPanel.pop3=pookaDirectory:useSent:useSSL
+NewAccountPooka.optionPanel.pop3=pookaDirectory:useSSL:leaveOnServer
 NewAccountPooka.optionPanel.pop3.scoped=true
 NewAccountPooka.optionPanel.pop3.scopeRoot=NewAccountPooka
 
 NewAccountPooka.optionPanel.mbox.propertyType=Composite
-NewAccountPooka.optionPanel.mbox=pookaDirectory:useSent
+NewAccountPooka.optionPanel.mbox=pookaDirectory
 NewAccountPooka.optionPanel.mbox.scoped=true
 NewAccountPooka.optionPanel.mbox.scopeRoot=NewAccountPooka
 

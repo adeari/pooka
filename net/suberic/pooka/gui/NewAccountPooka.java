@@ -7,6 +7,7 @@ import net.suberic.util.gui.propedit.*;
 import javax.swing.*;
 import java.util.*;
 import java.io.File;
+import java.net.*;
 
 import javax.mail.MessagingException;
 
@@ -133,6 +134,7 @@ public class NewAccountPooka {
 
     } catch (Exception e) {
       e.printStackTrace();
+      System.out.println("e is " + e + "; e.getMessage() is " + e.getMessage());
       handleInvalidEntry(e.getMessage());
     }
 
@@ -171,24 +173,33 @@ public class NewAccountPooka {
      * and Store entry.
      */
     String protocol = manager.getProperty("NewAccountPooka.protocol", "");
-
-    String userName = manager.getProperty("NewAccountPooka.userName", "");
     String fullName = manager.getProperty("NewAccountPooka.fullName", "");
-    String password = manager.getProperty("NewAccountPooka.password", "");
-    String serverName = manager.getProperty("NewAccountPooka.serverName", "");
-
-    if (protocol.equalsIgnoreCase("mbox"))
-      userName = localUser;
-
-    if (userName.equals("") || serverName.equals("") || protocol.equals("")) {
-      throw new Exception();
-    }
-
+    String userName;
     String accountName;
-    if (protocol.equalsIgnoreCase("mbox")) {
-      accountName = userName + "_local";
-    } else {
+
+    if (! protocol.equalsIgnoreCase("mbox")) {
+      userName = manager.getProperty("NewAccountPooka.userName", "");
+      String password = manager.getProperty("NewAccountPooka.password", "");
+      String serverName = manager.getProperty("NewAccountPooka.serverName", "");
+      
+      if (userName.equals("")) {
+	throw new Exception("Must have a username.");
+      } else if (serverName.equals("")) {
+	throw new Exception("Must have a servername.");
+      } else if (protocol.equals("")) {
+	throw new Exception("Must have a valid protocol.");
+      }
+      
       accountName = userName + "@" + serverName;
+      
+      props.setProperty("Store." + accountName + ".server", serverName);
+      props.setProperty("Store." + accountName + ".user", userName);
+      props.setProperty("Store." + accountName + ".password", password);
+      props.setProperty("Store." + accountName + ".defaultProfile", accountName);
+      props.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
+    } else {
+      userName = localUser;
+      accountName = userName + "_local";
     }
 
     // set up the user.
@@ -203,13 +214,8 @@ public class NewAccountPooka {
     // set up mail server information
     
     props.setProperty("Store", accountName);
-    props.setProperty("Store." + accountName + ".server", serverName);
     props.setProperty("Store." + accountName + ".protocol", protocol);
-    props.setProperty("Store." + accountName + ".user", userName);
-    props.setProperty("Store." + accountName + ".password", password);
-    props.setProperty("Store." + accountName + ".defaultProfile", accountName);
-    props.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
-      
+
     if (protocol.equalsIgnoreCase("imap")) {
       props.setProperty("Store." + accountName + ".useSubscribed", "true");
       props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
@@ -217,6 +223,10 @@ public class NewAccountPooka {
     } else if (protocol.equalsIgnoreCase("pop3")) {
       props.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
       props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
+      props.setProperty("Store." + accountName + ".leaveMessagesOnServer", manager.getProperty("NewAccountPooka.leaveOnServer", "true"));
+      if (manager.getProperty("NewAccountPooka.leaveOnServer", "true").equalsIgnoreCase("true")) {
+	props.setProperty("Store." + accountName + ".deleteOnServerOnLocalDelete", "true");
+      }
     } else if (protocol.equalsIgnoreCase("mbox")) {
       props.setProperty("Store." + accountName + ".inboxLocation", manager.getProperty("NewAccountPooka.inboxLocation", "/var/spool/mail/" + System.getProperty("user.name")));
     }
@@ -264,7 +274,13 @@ public class NewAccountPooka {
    * Tests the connection to the given server and port.
    */
   public void testConnection(String serverName, int port) throws Exception {
-
+    try {
+      InetAddress addr = InetAddress.getByName(serverName);
+      Socket testSocket = new Socket(addr, port);
+      testSocket.close();
+    } catch (UnknownHostException uhe) {
+      throw new Exception("Unknown host:  " + serverName);
+    }
   }
 
   /**
@@ -284,25 +300,33 @@ public class NewAccountPooka {
       props.setProperty("Store.local.useInbox", "false");
       props.setProperty("Store.local.folderList", "sent:outbox");
       props.setProperty("Store.local.protocol", "mbox");
-
-      String pookaDirName = props.getProperty("Pooka.cacheDirectory");
-
-      File sentFile = new File(pookaDirName + File.separator + "sent");
-      if (! sentFile.exists())
-	sentFile.createNewFile();
-
-      File outboxFile = new File(pookaDirName + File.separator + "outbox");
-      if (! outboxFile.exists())
-	outboxFile.createNewFile();
-      
-      props.setProperty("Store.local.mailDirectory", pookaDirName);
-
-
     } else {
       // we're fine if not.
       props.setProperty("Store." + localStoreName + ".folderList", "INBOX:sent:outbox");
     }
-
+    String pookaDirName = props.getProperty("Pooka.cacheDirectory");
+    String mailDirName = pookaDirName + File.separator + localStoreName;
+    String subFolderDirName = mailDirName + File.separator + manager.getProperty("Pooka.subFolderName", "folders");
+    
+    File mailDir = new File(mailDirName);
+    if (! mailDir.exists())
+      mailDir.mkdirs();
+    
+    File subFolderDir = new File(subFolderDirName);
+    if (! subFolderDir.exists())
+      subFolderDir.mkdirs();
+    
+    File sentFile = new File(subFolderDirName + File.separator + "sent");
+    if (! sentFile.exists())
+      sentFile.createNewFile();
+    
+    File outboxFile = new File(subFolderDirName + File.separator + "outbox");
+    if (! outboxFile.exists())
+      outboxFile.createNewFile();
+    
+    props.setProperty("Store.local.mailDir", mailDirName);
+    
+    
     // actually configure said folders.
     
     String outgoingServer = props.getProperty("OutgoingServer");
@@ -320,7 +344,7 @@ public class NewAccountPooka {
 
     File pookaDir = new File(pookaDirName);
     if (! pookaDir.exists())
-      pookaDir.mkdir();
+      pookaDir.mkdirs();
 
     String sslFileName = pookaDirName + File.separator + "sslCertificates";
 
@@ -329,6 +353,7 @@ public class NewAccountPooka {
       sslFile.createNewFile();
 
     props.setProperty("Pooka.cacheDirectory", pookaDirName);
+    props.setProperty("Pooka.defaultMailSubDir", pookaDirName);
 
     props.setProperty("Pooka.sslCertFile", sslFileName);
 
@@ -402,10 +427,6 @@ public class NewAccountPooka {
       
       thread.addToQueue(connectionAction, new java.awt.event.ActionEvent(this, 0, "connectStore"));
     }
-
-  }
-
-  public void testSmtpConnection() {
 
   }
 

@@ -199,16 +199,30 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
     p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
 
+    // set up ssl
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
       //p.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
       p.setProperty("mail.imap.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
       p.setProperty("mail.imap.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
-      
       p.setProperty("mail.imap.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "993"));
+
+
+      p.setProperty("mail.pop3.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
+      p.setProperty("mail.pop3.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
+      p.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "995"));
     }
     
-    // set the properties for the mbox backend of a pop mailbox
-    if (Pooka.getProperty(getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("pop3")) {
+    /*
+     * set the properties for mbox folders, and for the mbox backend of 
+     * a pop3 mailbox.  properties set are:
+     *
+     * mail.mbox.inbox:  the location of the INBOX for this mail store.  for
+     *   pop3 stores, this is the location of the local copy of the inbox.
+     *   for mbox stores, this should be the local inbox file.
+     * mail.mbox.userhome:  the location of all subfolders.
+     */ 
+
+    if (! Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("imap")) {
       String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
       if (mailHome.equals("")) {
 	mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
@@ -217,14 +231,20 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	
 	mailHome = mailHome + java.io.File.separator + storeID;
       }
-      String inboxFileName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");
+      String inboxFileName;
+      if (Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("pop3")) {
+      inboxFileName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");
+      } else {
+	inboxFileName = Pooka.getProperty(getStoreProperty() + ".inboxLocation", "/var/spool/mail/" + System.getProperty("user.name"));
+      }
       String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
       
+      if (Pooka.isDebug())
+	System.out.println("for store " + getStoreID() + ", inboxFileName = " + inboxFileName + "; userhome = " + userHomeName);
       p.setProperty("mail.mbox.inbox", inboxFileName);
       p.setProperty("mail.mbox.userhome", userHomeName);
       
-    }
-
+    } 
     return p;
   }
     

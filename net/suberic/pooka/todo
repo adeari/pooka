@@ -1,14 +1,4 @@
-
-*) make the NewAccountPooka make a more fully-featured account; i.e. allow
-	for laptop configurations, sent folder configuration, etc.
-	include the .pooka directory configuration.
-	started:  todo:
-	*) configure sent folder
-	*) configure outbox.
-	*) make us test the connection to the configured servers first.
-	*) pop:  keep message on folder, etc.
-	*) gen:  actually make .pooka dir config do something. -- somewhat
-			done.
+*) add pop3 ssl support.
 
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.
@@ -17,25 +7,17 @@
 
 *) queuing of outgoing mails
 	todo on this:
-	*)  fix the local mail store so that it doesn't necessarily put
-		in an INBOX for everything.  this is so we can set up a
-		local mail store for IMAP users without having to fake
-		out the INBOX for it.
 	*)  add some sort of an administrative api to the NetworkConnection
 		so that the application and the admin tools (the bottom right
 		config) don't have the same restrictions (or lack thereof).
 		 -- somewhat started with the new test address api.
-	*)  change the new user setup so that it configures an outbox
-		automatically.
-	*)  change the new user setup so that it configures a sent folder
-		automatically.
 	*) make it so there is some way for the NetworkConnection to detect
 		whether or not it's up.
 			-- started.  make sure it's enough.
 
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
-	-- make a disconnected icon.
+	-- make a disconnected icon.  -- red plus?
 
 *) splashscreen?
 
