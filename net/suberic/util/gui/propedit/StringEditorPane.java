@@ -88,7 +88,19 @@ public class StringEditorPane extends SwingPropertyEditor {
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() {
-    inputField.setText(originalValue);
+    String fieldValue = inputField.getText();
+    if (! (fieldValue.equals(currentValue) && fieldValue.equals(originalValue))) {
+      // something has changed, so we'll have to deal with it.
+      try {
+	if (! currentValue.equals(originalValue)) {
+	  firePropertyChangingEvent(originalValue);
+	  currentValue = originalValue;
+	}
+	inputField.setText(originalValue);
+      } catch (PropertyValueVetoException pvve) {
+	manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + originalValue + ":  " + pvve.getReason());
+      }
+    }
   }
 
   /**

@@ -136,16 +136,37 @@ public class ListEditorPane extends SwingPropertyEditor {
     String editedProperty = manager.getProperty(editorTemplate + ".allowedValues", "");
     Vector v = new Vector();
     v.add(editedProperty);
-    manager.getFactory().showNewEditorWindow("Add property", v);
+    manager.getFactory().showNewEditorWindow("Add property", v, v, manager);
   }
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI
   
+  /**
+   * This writes the currently configured value in the PropertyEditorUI
+   * to the source VariableBundle.
+   */
   public void setValue() {
-    if (isEnabled() && isChanged())
-      manager.setProperty(property, (String)labelToValueMap.get(inputField.getSelectedItem()));
+    int newIndex = inputField.getSelectedIndex();
+    String currentValue = (String)labelToValueMap.get(inputField.getSelectedItem());
+    try {
+      if (newIndex != currentIndex) {
+	firePropertyChangingEvent(currentValue);
+	currentIndex = newIndex;
+      }
+      if (isEnabled() && isChanged()) { 
+	manager.setProperty(property, currentValue);
+	firePropertyChangedEvent(currentValue);
+      }
+    } catch (PropertyValueVetoException pvve) {
+      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());
+      inputField.setSelectedIndex(currentIndex);
+    } 
   }
-  
+    
+  /**
+   * Returns the current values of the edited properties as a 
+   * java.util.Properties object.
+   */
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
     
@@ -154,14 +175,28 @@ public class ListEditorPane extends SwingPropertyEditor {
     return retProps;
   }
   
+  /**
+   * This resets the editor to the original (or latest set, if setValue() 
+   * has been called) value of the edited property.
+   */
   public void resetDefaultValue() {
+    // this will be handled by the ItemListener we have on the inputField,
+    // so we don't have to notify listeners here.
     inputField.setSelectedIndex(originalIndex);
   }
   
+  /**
+   * Returns whether or not the current list selection has changed from
+   * the last save.
+   */
   public boolean isChanged() {
     return (!(originalIndex == inputField.getSelectedIndex()));
   }
   
+  /**
+   * Sets the enabled property of the PropertyEditorUI.  Disabled 
+   * editors should not be able to do setValue() calls.
+   */
   public void setEnabled(boolean newValue) {
     if (inputField != null) {
       inputField.setEnabled(newValue);
@@ -169,4 +204,19 @@ public class ListEditorPane extends SwingPropertyEditor {
     }
   }
 
+  /**
+   * This listens to the property that it currently providing the list
+   * of allowed values for this List.  If it changes, then the allowed
+   * values list also is updated.
+   */
+  public class ListEditorListener extends PropertyEditorAdapter {
+    
+    /**
+     * Called after a property changes.
+     */
+    public void propertyChanged(String newValue) {
+      
+    }
+    
+  }
 }

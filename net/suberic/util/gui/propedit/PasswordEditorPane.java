@@ -87,7 +87,27 @@ public class PasswordEditorPane extends StringEditorPane {
       retProps.setProperty(property, scrambleString(value));
     return retProps;
   }
-  
+
+  /**
+   * This resets the editor to the original (or latest set, if setValue() 
+   * has been called) value of the edited property.
+   */
+  public void resetDefaultValue() {
+    String fieldValue = new String(((JPasswordField)inputField).getPassword());
+    if (! (fieldValue.equals(currentValue) && fieldValue.equals(originalValue))) {
+      // something has changed, so we'll have to deal with it.
+      try {
+	if (! currentValue.equals(originalValue)) {
+	  firePropertyChangingEvent(originalValue);
+	  currentValue = originalValue;
+	}
+	inputField.setText(originalValue);
+      } catch (PropertyValueVetoException pvve) {
+	manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + originalValue + ":  " + pvve.getReason());
+      }
+    }
+  }
+
   // the list of characters to use for scrambling.
   private static char[] scrambleChars = new char[] {'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', 'G', 'g', 'H', 'h', 'I', 'i', 'J', 'j', 'K', 'k', 'L', 'l', 'M', 'm', 'N', 'n', 'O', 'o', 'P', 'p', 'Q', 'q', 'R', 'r', 'S', 's', 'T', 't', 'U', 'u', 'V', 'v', 'W', 'w', 'X', 'x', 'Y', 'y', 'Z', 'z'};
   

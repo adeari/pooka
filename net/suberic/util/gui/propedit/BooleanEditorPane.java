@@ -97,6 +97,8 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() {
+    // this will be handled by the listener on the inputField, so we don't
+    // have to send any events here.
     inputField.setSelected(originalBoolean);
   }
   
