@@ -1,3 +1,7 @@
+made it so by default the ssl seeding is done with /dev/urandom instead of
+using the very very slow seeding that SecureRandom uses.  this speeds
+up initial ssl connections by a huge factor.
+
 020703 release
 --------------
 
