@@ -195,10 +195,10 @@ public class MessageProxy {
      * Deletes the Message from the current Folder.  If a Trash folder is
      * set, this method moves the message into the Trash folder.  If no
      * Trash folder is set, this marks the message as deleted.  In addition,
-     * if the Pooka.autoExpunge property is set to true, it also expunges
+     * if the autoExpunge variable is set to true, it also expunges
      * the message from the mailbox.
      */
-    public void deleteMessage() {
+    public void deleteMessage(boolean autoExpunge) {
 
 	FolderInfo trashFolder = getMessagePanel().getMainPanel().getFolderPanel().getTrashFolder();
 	if ((trashFolder != null) && (trashFolder != getFolderInfo()))
@@ -206,7 +206,7 @@ public class MessageProxy {
 	else {
 	    try {
 		message.setFlag(Flags.Flag.DELETED, true);
-		if ( Pooka.getProperty("Pooka.autoExpunge", "true").equals("true") )
+		if ( autoExpunge )
 		    folderInfo.getFolder().expunge();
 	    } catch (MessagingException me) {
 		if (folderInfo != null && folderInfo.getFolderWindow() != null)
@@ -216,6 +216,15 @@ public class MessageProxy {
 	
 	if (getMessageWindow() != null)
 	    getMessageWindow().closeMessageWindow();
+    }
+
+    /**
+     * A convenience method which sets autoExpunge by the value of 
+     * Pooka.autoExpunge, and then calls deleteMessage(boolean autoExpunge)
+     * with that value.
+     */
+    public void deleteMessage() {
+	deleteMessage(Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
     }
 
     /**

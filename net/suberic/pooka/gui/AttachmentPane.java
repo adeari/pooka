@@ -131,7 +131,7 @@ public class AttachmentPane extends JPanel {
 			    
 			}
 		    }
-		} else if (e.isPopupTrigger()) {
+		} else if (SwingUtilities.isRightMouseButton(e)) {
 		    getPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
 		} 
 	       

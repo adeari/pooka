@@ -114,8 +114,16 @@ public class MultiMessageProxy extends MessageProxy{
      */
     public void deleteMessages() {
 	for (int i = 0; i < messages.size(); i++) {
-	    ((MessageProxy)messages.elementAt(i)).deleteMessage();
+	    ((MessageProxy)messages.elementAt(i)).deleteMessage(false);
 	}
+
+	if (Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"))
+	    try {
+		folderInfo.getFolder().expunge();
+	    } catch (MessagingException me) {
+		if (folderInfo != null && folderInfo.getFolderWindow() != null)
+		    JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n" + me.getMessage());
+	    }
     }
 
     public Message getMessage() { return null; }

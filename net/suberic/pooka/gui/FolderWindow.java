@@ -112,6 +112,16 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	setStatusBar(new StatusBar());
 	getFolderInfo().addMessageCountListener(getStatusBar());
 	getFolderInfo().addMessageChangedListener(getStatusBar());
+	getFolderInfo().addMessageCountListener(new MessageCountAdapter() {
+		public void messagesRemoved(MessageCountEvent e) {
+		    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
+		    if (toolbar != null)
+			toolbar.setActive(getActions());
+		    if (keyBindings != null)
+			keyBindings.setActive(getActions());
+		}
+	    });
+		    
 
 	this.getContentPane().add("South", getStatusBar());
 
@@ -141,7 +151,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	    }
 
 	    public void mousePressed(MouseEvent e) {
-		if (e.isPopupTrigger()) {
+		if (SwingUtilities.isRightMouseButton(e)) {
 		    // see if anything is selected
 		    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
 		    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
@@ -373,6 +383,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
     public Action[] getActions() {
 	MessageProxy m = getSelectedMessage();
+
 	if (m != null) 
 	    return TextAction.augmentList(m.getActions(), getDefaultActions());
 	else 

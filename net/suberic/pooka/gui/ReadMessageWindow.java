@@ -68,7 +68,7 @@ public class ReadMessageWindow extends MessageWindow {
 	editorPane.addMouseListener(new MouseAdapter() {
 		
 		public void mousePressed(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
+		    if (SwingUtilities.isRightMouseButton(e)) {
 			showPopupMenu(editorPane, e);
 		    }
 		}

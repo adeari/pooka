@@ -46,7 +46,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 	    }
 
 		public void mousePressed(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
+		    if (SwingUtilities.isRightMouseButton(e)) {
 			// see if anything is selected
 			TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
 			if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
