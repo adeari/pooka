@@ -1,8 +1,11 @@
 package net.suberic.pooka.gui;
 import javax.swing.tree.*;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.util.Hashtable;
+import java.awt.event.*;
+import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.pooka.Pooka;
+
 
 public class MailTreeNode extends DefaultMutableTreeNode {
 
@@ -15,11 +18,36 @@ public class MailTreeNode extends DefaultMutableTreeNode {
     // this is only used for the FolderChooser
     private boolean subscribed = false;
 
+    ConfigurablePopupMenu popupMenu;
+
     MailTreeNode(Object userObj, JComponent parent) {
 	super(userObj);
 
 	parentContainer = parent;
 
+    }
+
+    /**
+     * This shows the PopupMenu for this component.  If no PopupMenu has
+     * been created yet, then one is created and shown.
+     */
+    public void showPopupMenu(JComponent component, MouseEvent e) {
+	configurePopupMenu();
+
+	if (popupMenu != null)
+	    popupMenu.show(component, e.getX(), e.getY());
+	    
+    }
+
+    /**
+     * This creates the current PopupMenu if there is not one.  It then
+     * will configure the PopupMenu with the current actions.
+     *
+     * This implementation simply returns; subclasses should override this
+     * method to create a custom PopupMenu.
+     */
+    public void configurePopupMenu() {
+    
     }
 
     protected void setCommands() {

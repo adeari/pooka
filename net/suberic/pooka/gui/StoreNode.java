@@ -84,6 +84,22 @@ public class StoreNode extends MailTreeNode {
 	
     }
 
+    /**
+     * This  creates the current PopupMenu if there is not one.  It then
+     * will configure the PopupMenu with the current actions.
+     *
+     * Overrides MailTreeNode.configurePopupMenu();
+     */
+
+    public void configurePopupMenu() {
+	if (popupMenu == null) {
+	    popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
+	    popupMenu.configureComponent("StoreNode.popupMenu", Pooka.getResources());
+	}
+
+	popupMenu.setActive(getActions());
+    }
+
     public String getStoreID() {
 	if (store != null)
 	    return store.getStoreID();

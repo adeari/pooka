@@ -30,6 +30,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 	this.getViewport().add(folderTree);
 
 	folderTree.addMouseListener(new MouseAdapter() {
+		
 	    public void mouseClicked(MouseEvent e) {
 		if (e.getClickCount() == 2) {
 		    MailTreeNode tmpNode = getSelectedNode();
@@ -43,7 +44,17 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 		    }
 		}
 	    }
-	});
+
+		public void mousePressed(MouseEvent e) {
+		    if (e.isPopupTrigger()) {
+			MailTreeNode tmpNode = getSelectedNode();
+			if (tmpNode != null) {
+			    tmpNode.showPopupMenu(FolderPanel.this, e);
+			    
+			}
+		    }
+		}
+	    });
 	folderTree.addTreeSelectionListener(getMainPanel());
 	folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
     }

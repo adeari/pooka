@@ -154,6 +154,19 @@ FolderTable.Subject.value=Subject
 FolderTable.2xClickAction=message-open
 FolderTable.UnreadStyle=BOLD
 
+# -- Popup menus.
+FolderNode.popupMenu=Open:Close:New:Edit
+FolderNode.popupMenu.Open.Action=folder-open
+FolderNode.popupMenu.Close.Action=folder-close
+FolderNode.popupMenu.New.Action=file-new
+FolderNode.popupMenu.Edit.Action=file-edit
+
+StoreNode.popupMenu=Open:Subscribe:Close:Edit
+StoreNode.popupMenu.Open.Action=folder-open
+StoreNode.popupMenu.Close.Action=file-close
+StoreNode.popupMenu.Subscribe.Action=folder-subscribe
+StoreNode.popupMenu.Edit.Action=file-edit
+
 AttachmentPane=ContentType
 AttachmentPane.ContentType=Content-Type
 AttachmentPane.Actions=Open:OpenWith:SaveAs
@@ -164,6 +177,8 @@ AttachmentPane.NewMsgActions=Remove
 AttachmentPane.NewMsgActions.Remove.Action=file-remove
 
 AttachmentPane.2xClickAction=file-open
+
+# -- end popup menus.
 
 MessageWindow.backgroundColor=white
 MessageWindow.vsize=500
