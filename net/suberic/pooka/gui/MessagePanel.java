@@ -26,8 +26,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      */
     class ExtendedDesktopManager extends net.suberic.util.swing.ScrollingDesktopManager {
 
-	ExtendedDesktopManager() {
-	    super();
+	public ExtendedDesktopManager(JDesktopPane pane, JScrollPane scrollPane) {
+	    super(pane, scrollPane);
 	}
 
 	/**
@@ -75,7 +75,6 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      */
     public MessagePanel(MainPanel newMainPanel) {
 	mainPanel=newMainPanel;
-	this.setDesktopManager(new ExtendedDesktopManager());
 	//this.setAutoscrolls(true);
 	this.setSize(1000, 1000);
 	
@@ -195,7 +194,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public Action[] defaultActions = {
-	new newMessageAction()
+	new newMessageAction(), 
+	new testAction()
     };
 
     public Action[] getDefaultActions() {
@@ -221,6 +221,17 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
 	public void actionPerformed(ActionEvent e) {
 	    createNewMessage();
+	}
+
+    }
+
+    public class testAction extends AbstractAction {
+	testAction() {
+	    super("test");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    ((net.suberic.util.swing.ScrollingDesktopManager)MessagePanel.this.getDesktopManager()).printstats((MessagePanel.this), Pooka.getMainPanel().getMessageScrollPane(), "test" );
 	}
 
     }
