@@ -28,4 +28,11 @@ public class EncryptionManager {
 
     return defaultUtils;
   }
+
+  /**
+   * Returns the given EncryptionKey, or null if no such key exists.
+   */
+  public EncryptionKey getEncryptionKey(String keyId) {
+    return null;
+  }
 }

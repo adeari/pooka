@@ -3,6 +3,7 @@ import net.suberic.pooka.*;
 import net.suberic.util.gui.ConfigurablePopupMenu;
 import net.suberic.util.thread.*;
 import net.suberic.pooka.gui.filter.DisplayFilter;
+import net.suberic.pooka.gui.crypto.*;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
@@ -153,6 +154,9 @@ public class MessageProxy {
 
   // whether this should be displayed as html, text, or raw RFC822.
   int displayMode = getDefaultDisplayMode();
+
+  // the current display of the encryption status.
+  CryptoStatusDisplay mCryptoStatusDisplay = null;
 
   // the default actions for this MessageProxy.
   public Action[] defaultActions = null;
@@ -475,6 +479,70 @@ public class MessageProxy {
     MessageInfo info = getMessageInfo();
     if (info != null)
       info.runBackendFilters();
+  }
+
+
+  /**
+   * Attempts to decrypt the given message.
+   */
+  public void decryptMessage() {
+    MessageInfo info = getMessageInfo();
+    if (info != null) {
+      if (info.hasEncryption()) {
+
+	net.suberic.pooka.crypto.EncryptionKey key = getDefaultProfile().getEncryptionKey();
+
+	MessageCryptoInfo cInfo = info.getCryptoInfo();
+	int sigStatus = 0;
+	int encryptStatus = 0;
+
+	try {
+	  boolean hasSignature = cInfo.isSigned();
+	  if (hasSignature) {
+	    if (cInfo.isSignatureValid()) {
+	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
+	    } else {
+	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
+	      
+	    }
+	  } else {
+	    sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.NOT_SIGNED;
+	  }
+	} catch (Exception e) {
+	  sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION;
+	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
+	}
+	  
+	// check the encryption
+
+	try {
+	  boolean isEncrypted = cInfo.isEncrypted();
+	  if (isEncrypted) {
+	    if (cInfo.decryptMessage(key, true)) {
+	      encryptStatus = CryptoStatusDisplay.DECRYPTED_SUCCESSFULLY;
+	    } else {
+	      encryptStatus = CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY;
+	    }
+	  } else {
+	    encryptStatus = CryptoStatusDisplay.NOT_ENCRYPTED;
+	  }
+	} catch (Exception e) {
+	  encryptStatus = CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY;
+	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed"), e);
+	}
+	
+	CryptoStatusDisplay csd = getCryptoStatusDisplay();
+	if (csd != null)
+	  csd.cryptoUpdated(sigStatus, encryptStatus);
+      }
+    }
+  }
+
+  /**
+   * Returns the CryptoStatusDisplay for this MessageProxy, if any.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
+    return mCryptoStatusDisplay;
   }
 
   /**
@@ -1080,7 +1148,8 @@ public class MessageProxy {
 	new ActionWrapper(new CacheMessageAction(), folderThread),
 	new ActionWrapper(new SaveAddressAction(), folderThread),
 	new ActionWrapper(new OpenAsNewAction(), folderThread),
-	new ActionWrapper(new FilterAction(), folderThread)
+	new ActionWrapper(new FilterAction(), folderThread),
+	new ActionWrapper(new DecryptAction(), folderThread)
       };
 
       commands = new Hashtable();
@@ -1505,6 +1574,27 @@ public class MessageProxy {
 	fw.setBusy(true);;
 	
       runBackendFilters();
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class DecryptAction extends AbstractAction {
+    DecryptAction() {
+      super("message-decrypt");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      decryptMessage();
       
       if (fw != null)
 	fw.setBusy(false);

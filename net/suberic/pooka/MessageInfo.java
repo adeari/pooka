@@ -884,6 +884,13 @@ public class MessageInfo {
   }
 
   /**
+   * Returns the cryptoInfo object for this MessageInfo.
+   */
+  public MessageCryptoInfo getCryptoInfo() {
+    return cryptoInfo;
+  }
+
+  /**
    * Returns the attachments for this MessageInfo.  If the attachments
    * have not yet been loaded, attempts to load the attachments.
    */

@@ -20,6 +20,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   public boolean signatureFirst = true;
   private SignatureGenerator sigGenerator;
   private AddressBook addressBook;
+  private String encryptionKeyId;
   
   private Vector excludeAddresses;
   
@@ -81,7 +82,9 @@ public class UserProfile extends Object implements ValueChangeListener {
       Vector excludeProp = mainProperties.getPropertyAsVector("UserProfile." + name + ".excludeAddresses", "");
       excludeAddresses.addAll(excludeProp);
     }
-    
+
+    encryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".defaultEncryptionKeyId", "");
+
     String addressBookId = mainProperties.getProperty("UserProfile." + name + ".addressBook", "");
     if (!addressBookId.equals("")) {
       addressBook = Pooka.getAddressBookManager().getAddressBook(addressBookId);
@@ -470,6 +473,19 @@ public class UserProfile extends Object implements ValueChangeListener {
     Pooka.setProperty("UserProfile." + name + ".signature", newValue);
   }
   
+  /**
+   * Returns the default encryption key for this profile, if any.
+   */
+  public net.suberic.pooka.crypto.EncryptionKey getEncryptionKey() {
+    if (encryptionKeyId != null && encryptionKeyId.length() > 0) {
+      net.suberic.pooka.crypto.EncryptionKey returnValue = Pooka.getCryptoManager().getEncryptionKey(encryptionKeyId);
+      return returnValue;
+    }
+
+    return null;
+  }
+
+
   public AddressMatcher getAddressMatcher() {
     if (addressBook != null)
       return addressBook.getAddressMatcher();

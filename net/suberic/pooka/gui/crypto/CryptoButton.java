@@ -36,16 +36,7 @@ import java.util.Hashtable;
  * file if you want to internationalize your application.
  */
 
-public class CryptoButton extends JButton implements ConfigurableUI {
-
-  public static int NOT_ENCRYPTED = 0;
-  public static int UNCHECKED_ENCRYPTED = 1;
-  public static int DECRYPTED_SUCCESSFULLY = 5;
-  public static int DECRYPTED_UNSUCCESSFULLY = 10;
-  public static int UNCHECKED_SIGNED = 15;
-  public static int SIGNATURE_VERIFIED = 20;
-  public static int SIGNATURE_BAD = 25;
-  public static int SIGNATURE_FAILED_VERIFICATION = 30;
+public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatusDisplay {
 
   // the various icons
   ImageIcon notEncryptedIcon;
@@ -97,7 +88,7 @@ public class CryptoButton extends JButton implements ConfigurableUI {
     
     setActionCommand(cmd);
     
-    cryptoUpdated(NOT_ENCRYPTED);
+    cryptoUpdated(NOT_ENCRYPTED, NOT_ENCRYPTED);
   }
 
   /**
@@ -228,8 +219,8 @@ public class CryptoButton extends JButton implements ConfigurableUI {
   /**
    * Updates the encryption information.
    */
-  public void cryptoUpdated(int newStatus) {
-    currentStatus = newStatus;
+  public void cryptoUpdated(int newSignatureStatus, int newEncryptionStatus) {
+    currentStatus = newEncryptionStatus;
 
     if (currentStatus == NOT_ENCRYPTED) {
       setIcon(notEncryptedIcon);
