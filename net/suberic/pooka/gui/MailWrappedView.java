@@ -3,6 +3,7 @@ import javax.swing.text.WrappedPlainView;
 import javax.swing.text.Segment;
 import javax.swing.text.Element;
 import net.suberic.pooka.MailUtilities;
+import net.suberic.pooka.Pooka;
 
 /**
  * This class extends javax.swing.text.WrappedPlainView.  Its primary
@@ -43,6 +44,12 @@ public class MailWrappedView extends WrappedPlainView {
     }
 
     public int getCharacterLength() {
+	try {
+	    String wrapLengthString = Pooka.getProperty("Pooka.lineLength");
+	    characterLength = Integer.parseInt(wrapLengthString);
+	} catch (Exception e) {
+	    characterLength = 72;
+	}
 	return characterLength;
     }
 
