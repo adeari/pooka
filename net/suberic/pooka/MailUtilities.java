@@ -115,8 +115,13 @@ public class MailUtilities {
      */
 
     public static String getTextAndTextInlines(Message m, String separator) {
+	StringBuffer returnValue = null;
+	String retString = MailUtilities.getTextPart(m);
+	if (retString != null && retString.length() > 0)
+	    returnValue = new StringBuffer(retString);
+	else
+	    returnValue = new StringBuffer();
 
-	StringBuffer returnValue = new StringBuffer(MailUtilities.getTextPart(m));
 	Vector attachments = MailUtilities.getInlineTextAttachments(m);
 	if (attachments != null && attachments.size() > 1) {
 	    for (int i = 0; i < attachments.size(); i++) {
