@@ -234,7 +234,13 @@ public class VirtualFolderInfo extends FolderInfo {
 	}
     }
 
-    
+    /**
+     * don't add new messages to this FolderInfo.
+     */
+    protected void runMessagesAdded(MessageCountEvent mce) {
+      return;
+    }
+
     /**
      * This forces an update of both the total and unread message counts.
      */
