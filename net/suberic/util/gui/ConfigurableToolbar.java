@@ -45,7 +45,7 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
 	if ((toolbarID != null) && (vars.getProperty(toolbarID, "") != "")) {
 	    StringTokenizer tokens = new StringTokenizer(vars.getProperty(toolbarID, ""), ":");
 	    while (tokens.hasMoreTokens()) {
-		JButton b = createToolButton(tokens.nextToken(), vars);
+		JButton b = createToolButton(toolbarID + "." + tokens.nextToken(), vars);
 		if (b != null) {
 		    this.add(b);
 		}
@@ -55,8 +55,12 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
 
     protected JButton createToolButton(String key, VariableBundle vars) {
 	JButton bi;
+
 	try {
-	    java.net.URL url =this.getClass().getResource(vars.getProperty("MainToolbar." + key + ".Image"));
+	    java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".Image"));
+	    if (url == null)
+		return null;
+
 	    bi = new JButton(new ImageIcon(url));
 	    
 	} catch (MissingResourceException mre) {
@@ -64,11 +68,11 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
 	}
 	
 	try {
-	    bi.setToolTipText(vars.getProperty("MainToolbar." +key+ ".ToolTip"));
+	    bi.setToolTipText(vars.getProperty(key+ ".ToolTip"));
 	} catch (MissingResourceException mre) {
 	}
 	
-	String cmd = vars.getProperty("MainToolbar." + key + ".Action", key);
+	String cmd = vars.getProperty(key + ".Action", key);
 	
 	bi.setActionCommand(cmd);
 	
