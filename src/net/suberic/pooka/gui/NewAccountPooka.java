@@ -69,7 +69,7 @@ public class NewAccountPooka {
     
     //propertyVector.add("NewAccountPooka.firstPanel");
     propertyVector.add("NewAccountPooka");
-
+    
     JInternalFrame firstEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.entryWindowMessage.title", "Enter Email Account Information"), true, false, false, false);
     JComponent contentPane = (JComponent) firstEntryWindow.getContentPane();
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
@@ -79,19 +79,19 @@ public class NewAccountPooka {
     JTextArea jta = new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client."));
     jta.setMargin(new java.awt.Insets(5, 15, 5, 15));
     jta.setEditable(false);
-
+    
     JLabel jl = new JLabel("test");
     jta.setBackground(jl.getBackground());
     //jta.setForeground(jl.getForeground());
     jta.setFont(jl.getFont());
-
+    
     contentPane.add(jta);
     
     contentPane.add(new PropertyEditorPane(manager,
 					   propertyVector,
 					   propertyVector,
 					   firstEntryWindow));
-
+    
     firstEntryWindow.pack();
     firstEntryWindow.show();
     firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -101,11 +101,11 @@ public class NewAccountPooka {
 	      public void run() {
 		handleFirstEntry();
 	      }
-	    });
+	      });
 	}
       });
     
-
+    
     java.awt.Point p = getMessagePanel().getNewWindowLocation(firstEntryWindow, true);
     firstEntryWindow.setLocation(p);
     getMessagePanel().add(firstEntryWindow);
@@ -114,7 +114,6 @@ public class NewAccountPooka {
       firstEntryWindow.setSelected(true);
     } catch (java.beans.PropertyVetoException pve) {
     }
-    
   }
   
   /**
@@ -123,32 +122,95 @@ public class NewAccountPooka {
   public void handleFirstEntry() {
     Properties props = new java.util.Properties();
     
-    try {
-      String smtpName = configureSMTP(manager, props);
-      String accountName = configureUserStore(manager, props, smtpName);
+    int continueHandling = javax.swing.JOptionPane.NO_OPTION;
+    
+    String smtpName = "";
+    String accountName = "";
 
-      testConnections(props);
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION)
+      try {
+	smtpName = configureSMTP(manager, props);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
 
-      createFiles(props);
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION)
+      try {
+	accountName = configureUserStore(manager, props, smtpName);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION)
+      try {
+	testConnections(props);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION )
+      try {
+	createFiles(props);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION )
+      try {
+	setupFolders(props);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION )
+      try {
+	setupAddressBook(props);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION )
+      try {
+	saveProperties(props);
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+      
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION )
+      try {
+	Pooka.getStoreManager().loadAllSentFolders();
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION ) 
+      try {
+	Pooka.getOutgoingMailManager().loadOutboxFolders();
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
+    
+    if (continueHandling == javax.swing.JOptionPane.NO_OPTION )
+      try {
+	openInbox();
+      } catch (Exception e) {
+	e.printStackTrace();
+	continueHandling = handleInvalidEntry(e.getMessage());
+      }
 
-      setupFolders(props);
-
-      setupAddressBook(props);
-
-      saveProperties(props);
-
-      Pooka.getStoreManager().loadAllSentFolders();
-      Pooka.getOutgoingMailManager().loadOutboxFolders();
-
-      openInbox();
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      handleInvalidEntry(e.getMessage());
-    }
-
+    if (continueHandling != javax.swing.JOptionPane.NO_OPTION )
+      showFirstEntryWindow();
   }
-
+  
   /**
    * Configures the outgoing mail server for the new user.
    */
@@ -486,7 +548,7 @@ public class NewAccountPooka {
     
   }
   
-  public void handleInvalidEntry(String message) {
+  public int handleInvalidEntry(String message) {
     StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
     if (message != null && message.length() > 0) {
       errorMessage.append("\n");
@@ -500,9 +562,7 @@ public class NewAccountPooka {
     jta.setBackground(jl.getBackground());
     jta.setFont(jl.getFont());
     
-    int continueResponse = Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.OK_CANCEL_OPTION);
-    if (continueResponse == javax.swing.JOptionPane.OK_OPTION)
-      showFirstEntryWindow();
+    return Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_CANCEL_OPTION);
     
   }
 

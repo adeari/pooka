@@ -257,14 +257,18 @@ public class UIDFolderInfo extends FolderInfo {
     
     Vector proxies = new Vector();
     for (int i = 0; i < messages.length; i++) {
-      MessageProxy mp = getMessageInfo(messages[i]).getMessageProxy();
+      // FIXME 
+      MessageInfo mi =  getMessageInfo(messages[i]);
+      MessageProxy mp = mi.getMessageProxy();
+      mi.setFetched(false);
       mp.setRefresh(true);
       proxies.add(mp);
     }
     
     getLogger().log(Level.FINE, "updating flags for " + proxies.size() + " messages.");
 
-    loaderThread.loadMessages(proxies);
+    //loaderThread.loadMessages(proxies);
+    mMessageLoader.loadMessages(proxies);
     
   }
   
@@ -345,7 +349,8 @@ public class UIDFolderInfo extends FolderInfo {
 	  
 	  // notify the message loaded thread.
 	  MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	  loaderThread.loadMessages(addedArray, net.suberic.pooka.thread.LoadMessageThread.HIGH);
+	  //loaderThread.loadMessages(addedArray, net.suberic.pooka.thread.LoadMessageThread.HIGH);
+	  mMessageLoader.loadMessages(addedArray, net.suberic.pooka.thread.MessageLoader.HIGH);
 	  
 	  // change the Message objects in the MessageCountEvent to 
 	  // our UIDMimeMessages.

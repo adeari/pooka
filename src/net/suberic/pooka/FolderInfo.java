@@ -97,7 +97,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   protected BackendMessageFilter[] backendFilters = null;
   protected MessageFilter[] displayFilters = null;
 
-  protected LoadMessageThread loaderThread;
+  //protected LoadMessageThread loaderThread;
+  protected MessageLoader mMessageLoader = null;
   private FolderTracker folderTracker = null;
   
   protected boolean loading = false;
@@ -597,8 +598,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This closes the current Folder as well as all subfolders.
    */
   public void closeAllFolders(boolean expunge, boolean shuttingDown) throws MessagingException {
+    /*
     if (shuttingDown && loaderThread != null) {
       loaderThread.stopThread();
+    }
+    */
+
+    if (shuttingDown && mMessageLoader != null) {
+      mMessageLoader.stopLoading();
     }
     
     synchronized(getFolderThread().getRunLock()) {
@@ -885,8 +892,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       
       fetchProfile = createColumnInformation();
 
+      /*
       if (loaderThread == null) 
 	loaderThread = createLoaderThread();
+      */
+      if (mMessageLoader == null) 
+	mMessageLoader = createMessageLoader();
       
       try {
 	updateFolderStatusForLoading();
@@ -932,10 +943,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	loadMessageTableInfos(loadImmediately);
 	
+	/*
 	loaderThread.loadMessages(messageProxies);
 	
 	if (!loaderThread.isAlive())
 	  loaderThread.start();
+	*/
+	mMessageLoader.loadMessages(messageProxies);
+
 	
       } finally {
 	updateDisplay(false);
@@ -1046,9 +1061,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	MessageProxy mp = (MessageProxy) allProxies.get(i);
 	mp.unloadTableInfo();
       }
-      
+
+      /*
       if (loaderThread != null)
 	loaderThread.loadMessages(allProxies);
+      */
+
+      if (mMessageLoader != null)
+	mMessageLoader.loadMessages(allProxies);
       
     }
   }
@@ -1064,8 +1084,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	mp.clearMatchedFilters();
       }
       
+      /*
       if (loaderThread != null)
 	loaderThread.loadMessages(allProxies);
+      */
+
+      if (mMessageLoader != null)
+	mMessageLoader.loadMessages(allProxies);
       
     }
   }
@@ -1243,6 +1268,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public LoadMessageThread createLoaderThread() {
     LoadMessageThread lmt = new LoadMessageThread(this);
     return lmt;
+  }
+
+  /**
+   * creates the MessageLoader.
+   */
+  public MessageLoader createMessageLoader() {
+    MessageLoader ml = new MessageLoader(this);
+    return ml;
   }
   
   /**
@@ -1764,7 +1797,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	// notify the message loaded thread.
 	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	loaderThread.loadMessages(addedArray, LoadMessageThread.HIGH);
+	//loaderThread.loadMessages(addedArray, LoadMessageThread.HIGH);
+	mMessageLoader.loadMessages(addedArray, MessageLoader.HIGH);
 	
 	fireMessageCountEvent(mce);
       }

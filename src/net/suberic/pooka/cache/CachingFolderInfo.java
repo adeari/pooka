@@ -274,7 +274,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       for (int i = 0; i < allProxies.size(); i++) {
 	((MessageProxy) allProxies.get(i)).clearMatchedFilters();
       }
-      loaderThread.loadMessages(allProxies);
+      //loaderThread.loadMessages(allProxies);
+      mMessageLoader.loadMessages(allProxies);
     }
   }
 
@@ -912,7 +913,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
 	// notify the message loaded thread.
 	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	loaderThread.loadMessages(addedArray, net.suberic.pooka.thread.LoadMessageThread.HIGH);
+	//loaderThread.loadMessages(addedArray, net.suberic.pooka.thread.LoadMessageThread.HIGH);
+	mMessageLoader.loadMessages(addedArray, net.suberic.pooka.thread.MessageLoader.HIGH);
 
 	// change the Message objects in the MessageCountEvent to 
 	// our UIDMimeMessages.

@@ -1,6 +1,15 @@
 *) starting: if the info can't be connected to, you should have an option
 	to accept anyway.
 
+*) change the message loading thread so that stuff actually happens
+	on the main store thread. thought:  loadmessagethread becomes
+	a class that has a queue, and adds an action to the store thread
+	when it has stuff to do.  that action loads a number of the waiting
+	messages, then, if there are more messages, adds another action
+	to the store thread.  ????
+     *) note: when we lose a connection and reconnect, we need to 
+	refetch at least part of the messages (?)
+	
 *) open store.  close store.  first, all the folders open anyway.  second,
 	the folders opening are opening with a null action.  third, after
 	the closing, the previously-loaded messages all go to 'loading'.
@@ -49,6 +58,9 @@ next release
 
 *) "please reopen" message shouldn't come up when you've requested a
 	store/folder close. (caching, maybe normal uid?)
+
+*) fix tableinfos so that you after a disconnect/reconnect you don't
+	have to re-fetch the headers, only the flags.
 
 *) add an option to build.xml for compiling with deprecation enabled.
 
