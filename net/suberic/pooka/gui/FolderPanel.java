@@ -15,7 +15,7 @@ import java.util.Vector;
 /**
  * This class displays the Stores and Folders for Pooka.
  */
-public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer {
+public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer, net.suberic.util.swing.UpdatableUI {
     MainPanel mainPanel=null;
     JTree folderTree;
     DefaultTreeModel folderModel;
@@ -99,44 +99,25 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
    * Configures the interfaceStyle for this Pane.
    */
   public void configureInterfaceStyle() {
-    java.util.HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getFolderPanelStyle();
+        
+    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
     
-    Color c = null;
-
-    c = (Color) uiStyle.get("background");
-    if (c != null) {
-      folderTree.setBackground(c);
-    }
-
-    c = (Color) uiStyle.get("foreground");
-    if (c != null) {
-      folderTree.setForeground(c);
-    }
-
-    /*
-      c = uiStyle.get("disabledText");
-      if (c != null) {
-      folderTree.setDisabledText(c);
-      }
-      
-      c = uiStyle.get("select");
-      if (c != null) {
-      folderTree.setSelectColor(c);
-      }
-      
-      c = uiStyle.get("focus");
-      if (c != null) {
-      folderTree.setFocusColor(c);
-      }
-      
-    */
-
-    Font f = (Font) uiStyle.get("font");
-    if (f != null) {
-      folderTree.setFont(f);
-    }
 
   }
+
+ /**
+   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * for this UI.
+   */
+  public UpdatableUIManager.UIConfig getUIConfig(UpdatableUIManager uuim) {
+    String id = Pooka.getProperty("Pooka.folderPanel.uiConfig", "");
+    if (id != null && ! id.equals("")) {
+      return uuim.getUIConfig(id);
+    } 
+    
+    return null;
+  }
+
 
     /**
      * This returns the currently highlighted node on the FolderTree.

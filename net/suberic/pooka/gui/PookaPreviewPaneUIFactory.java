@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.PropertyEditorFactory;
+import net.suberic.util.swing.UpdatableUIManager;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
 import javax.swing.JScrollPane;
@@ -18,7 +19,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
   PreviewContentPanel contentPanel = null;
   PropertyEditorFactory editorFactory = null;
 
-  PookaUIManager pookaUIManager = null;
+  UpdatableUIManager pookaUIManager = null;
 
   public boolean showing = false;
 
@@ -27,13 +28,13 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
      */
     public PookaPreviewPaneUIFactory() {
       editorFactory = new PookaExternalPropertyEditorFactory(Pooka.getResources());
-      pookaUIManager = new PookaUIManager();
+      pookaUIManager = new UpdatableUIManager("Pooka.uiConfig", Pooka.getResources());
     }
 
   /**
-   * Returns the PookaUIManager for fonts and colors.
+   * Returns the UpdatableUIManager for fonts and colors.
    */
-  public PookaUIManager getPookaUIManager() {
+  public UpdatableUIManager getPookaUIManager() {
     return pookaUIManager;
   }
 

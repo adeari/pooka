@@ -85,43 +85,57 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
    */
   public void configureEditor(PropertyEditorFactory newFactory, String newProperty, String newTemplate, VariableBundle bundle, boolean isEnabled) {
     
-    //System.out.println("creating CompositeEditorPane for " + newProperty + " with template " + newTemplate);
     this.setBorder(BorderFactory.createEtchedBorder());
     factory = newFactory;
     property = newProperty;
     template = newTemplate;
     enabled=isEnabled;
-    
+
+    debug = bundle.getProperty("editors.debug", "false").equalsIgnoreCase("true");
+
+    if (debug) {
+      System.out.println("creating CompositeEditorPane for " + newProperty + " with template " + newTemplate);
+    }
+
     scoped = bundle.getProperty(template + ".scoped", "false").equalsIgnoreCase("true");
-    //System.out.println("bundle.getProperty (" + template + ".scoped) = " +  bundle.getProperty(template + ".scoped", "false") + " = " + scoped);
-    
+    if (debug) {
+      System.out.println("bundle.getProperty (" + template + ".scoped) = " +  bundle.getProperty(template + ".scoped", "false") + " = " + scoped);
+    }
     Vector properties = new Vector();
     Vector templates = new Vector();
     
     if (scoped) {
-      //System.out.println("testing for template " + template);
+      if (debug) {
+	System.out.println("testing for template " + template);
+      }
       String scopeRoot = bundle.getProperty(template + ".scopeRoot", template);
-      //System.out.println("scopeRoot is " + scopeRoot);
+      if (debug) {
+	System.out.println("scopeRoot is " + scopeRoot);
+      }
       Vector templateNames = bundle.getPropertyAsVector(template, "");
-      //System.out.println("templateNames = getProp(" + template + ") = " + bundle.getProperty(template, ""));
+      if (debug) {
+	System.out.println("templateNames = getProp(" + template + ") = " + bundle.getProperty(template, ""));
+      }
+
       for (int i = 0; i < templateNames.size() ; i++) {
 	String propToEdit = null;
 	String currentSubProperty =  (String) templateNames.elementAt(i);
 	if (bundle.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false")) {
 	  propToEdit = property;
-	  //properties.add(property);
 	} else {
 	  propToEdit = property + "." + (String) templateNames.elementAt(i);
-	  //properties.add(property + "." + (String) templateNames.elementAt(i));
 	}
 	String templateToEdit = scopeRoot + "." + (String) templateNames.elementAt(i);
 	properties.add(propToEdit);
 	templates.add(templateToEdit);
-	//templates.add(scopeRoot + "." + (String) templateNames.elementAt(i));
-	//System.out.println("adding " + propToEdit + ", template " + templateToEdit);
+	if (debug) {
+	  System.out.println("adding " + propToEdit + ", template " + templateToEdit);
+	}
       }
     } else {
-      //System.out.println("creating prop list for Composite EP using " + property + ", " + template);
+      if (debug) {
+	System.out.println("creating prop list for Composite EP using " + property + ", " + template);
+      }
       properties = bundle.getPropertyAsVector(property, "");
       templates = bundle.getPropertyAsVector(template, "");
     }
@@ -133,7 +147,6 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.insets = new Insets(1,3,0,3);
     
-    //GridBagLayout layout = (GridBagLayout) getLayout();
     GridBagLayout layout = new GridBagLayout();
     JPanel contentPanel = new JPanel();
     contentPanel.setLayout(layout);
@@ -141,7 +154,10 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     constraints.weightx = 1.0;
     constraints.fill = GridBagConstraints.BOTH;
     
-    //System.out.println("creating editors for " + properties.size() + " properties.");
+    
+    if (debug) {
+      System.out.println("creating editors for " + properties.size() + " properties.");
+    }
     for (int i = 0; i < properties.size(); i++) {
       currentEditor =
 	factory.createEditor((String)properties.elementAt(i), (String) templates.elementAt(i));
@@ -150,14 +166,12 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
       
       if (currentEditor.labelComponent != null) {
 	layout.setConstraints(currentEditor.labelComponent, constraints);
-	//this.add(currentEditor.labelComponent);
 	contentPanel.add(currentEditor.labelComponent);
       }
       
       if (currentEditor.valueComponent != null) {
 	constraints.gridwidth=GridBagConstraints.REMAINDER;
 	layout.setConstraints(currentEditor.valueComponent, constraints);
-	//this.add(currentEditor.valueComponent);
 	contentPanel.add(currentEditor.valueComponent);
       }
       
@@ -166,7 +180,6 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
       
     }
     
-    //JScrollPane jsp = new JScrollPane(contentPanel);
     this.add(contentPanel);
     alignEditorSizes();
   }

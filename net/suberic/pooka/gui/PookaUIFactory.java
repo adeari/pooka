@@ -5,7 +5,7 @@ public interface PookaUIFactory extends ErrorHandler {
   /**
    * Returns the PookaUIManager for fonts and colors.
    */
-  public PookaUIManager getPookaUIManager();
+  public net.suberic.util.swing.UpdatableUIManager getPookaUIManager();
 
     /**
      * Creates an appropriate MessageUI object for the given MessageProxy.

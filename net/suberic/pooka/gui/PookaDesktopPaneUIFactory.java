@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.PropertyEditorFactory;
+import net.suberic.util.swing.UpdatableUIManager;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
 import javax.swing.JInternalFrame;
@@ -15,7 +16,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   
   MessagePanel messagePanel = null;
   PropertyEditorFactory editorFactory = null;
-  PookaUIManager pookaUIManager = null;
+  UpdatableUIManager pookaUIManager = null;
 
   public boolean showing = false;
     
@@ -23,15 +24,15 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
      * Constructor.
      */
     public PookaDesktopPaneUIFactory() {
-      pookaUIManager = new PookaUIManager();
+      pookaUIManager = new UpdatableUIManager("Pooka.uiConfig", Pooka.getResources());
  
       editorFactory = new PookaDesktopPropertyEditorFactory(Pooka.getResources());
     }
 
   /**
-   * Returns the PookaUIManager for fonts and colors.
+   * Returns the UpdatableUIManager for fonts and colors.
    */
-  public PookaUIManager getPookaUIManager() {
+  public UpdatableUIManager getPookaUIManager() {
     return pookaUIManager;
   }
 

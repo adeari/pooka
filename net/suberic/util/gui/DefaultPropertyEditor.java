@@ -7,6 +7,9 @@ import java.awt.Dimension;
  * A Swing implementation of the PropertyEditorUI.
  */
 public abstract class DefaultPropertyEditor extends JPanel implements PropertyEditorUI {
+  // debug flag
+  protected boolean debug = false;
+
     // shows whether or not this component is enabled.
     protected boolean enabled;
 

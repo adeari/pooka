@@ -472,7 +472,7 @@ UserProfile.propertyType=Multi
 UserProfile.editableFields.scoped=true
 UserProfile.editableFields=editor
 
-UserProfile.editableFields.editor=user:config:uiConfig:labelUiConfig
+UserProfile.editableFields.editor=user:config:uiConfig
 UserProfile.editableFields.editor.propertyType=Tabbed
 UserProfile.editableFields.editor.propertyScoped=true
 UserProfile.editableFields.editor.addSubProperty=false
@@ -489,14 +489,11 @@ UserProfile.editableFields.editor.config.propertyType=Composite
 UserProfile.editableFields.editor.config.signatureFile.propertyType=File
 
 UserProfile.editableFields.editor.uiConfig.scoped=true
-UserProfile.editableFields.editor.uiConfig.addSubProperty=true
-UserProfile.editableFields.editor.uiConfig.scopeRoot=UIConfig.editableFields
-UserProfile.editableFields.editor.uiConfig=font:background:foreground:disabledText:select:focus
-
-UserProfile.editableFields.editor.labelUiConfig.scoped=true
-UserProfile.editableFields.editor.labelUiConfig.addSubProperty=true
-UserProfile.editableFields.editor.labelUiConfig.scopeRoot=UIConfig.editableFields
-UserProfile.editableFields.editor.labelUiConfig=font:background:foreground:disabledText:select:focus
+UserProfile.editableFields.editor.uiConfig.addSubProperty=false
+UserProfile.editableFields.editor.uiConfig.scopeRoot=UserProfile.editableFields.uiConfig
+UserProfile.editableFields.editor.uiConfig=uiConfig
+UserProfile.editableFields.uiConfig.uiConfig.propertyType=List
+UserProfile.editableFields.uiConfig.uiConfig.allowedValues=Pooka.uiConfig
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
@@ -625,9 +622,11 @@ Folder.editableFields.backendFilters.editableFields.action.propertyType=Filter
 Folder.editableFields.backendFilters.editableFields.action.filterType=backend
 
 Folder.editableFields.uiConfig.scoped=true
-Folder.editableFields.uiConfig.addSubProperty=true
-Folder.editableFields.uiConfig.scopeRoot=UIConfig.editableFields
-Folder.editableFields.uiConfig=font:background:foreground:disabledText:select:focus
+Folder.editableFields.uiConfig.addSubProperty=false
+Folder.editableFields.uiConfig.scopeRoot=Folder.editableFields.uiConfig
+Folder.editableFields.uiConfig=uiConfig
+Folder.editableFields.uiConfig.uiConfig.propertyType=List
+Folder.editableFields.uiConfig.uiConfig.allowedValues=Pooka.uiConfig
 
 Folder.editableFields.defaultProfile.propertyType=List
 Folder.editableFields.defaultProfile.allowedValues=UserProfile
