@@ -48,9 +48,9 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 
     private boolean updating = false;
 
-    private Method getScrollModeMethod = null;
+  //private Method getScrollModeMethod = null;
     
-    private Method setScrollModeMethod = null;
+  //private Method setScrollModeMethod = null;
 
     private static Integer SIMPLE_SCROLL_MODE;
 
@@ -214,7 +214,7 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
     public void updateDesktopSize() {
 	if (!updating && scrollPane != null && scrollPane.isShowing()) {
 	    updating = true;
-	    int oldValue = saveScrollMode();
+	    //int oldValue = saveScrollMode();
 
 	    JScrollBar hsb = scrollPane.getHorizontalScrollBar();
 	    JScrollBar vsb = scrollPane.getVerticalScrollBar();
@@ -349,11 +349,12 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	    
 	    vsb.setValue(vval - min_y);
 
-	    resetScrollMode(oldValue);
+	    //resetScrollMode(oldValue);
 
 	    updating = false;
 	}
     }
+  /*
 
     public int saveScrollMode() {
 	JViewport viewport = scrollPane.getViewport();
@@ -397,7 +398,6 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	}
 
     }
-
     private void configureScrollMethods() {
 	// heh.  this will be lots and lots of fun.
 	Class viewportClass = scrollPane.getViewport().getClass();
@@ -421,6 +421,7 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	
     }
 
+  */
 
     /**
      * This sets the scrollPane object.  It also removes this as a 

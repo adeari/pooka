@@ -151,7 +151,11 @@ public class VariableBundle extends Object {
   public void setProperty(String propertyName, String propertyValue) {
     temporaryProperties.remove(propertyName);
     writableProperties.setProperty(propertyName, propertyValue);
-    unRemoveProperty(propertyName);
+    if (propertyValue == null || propertyValue.equalsIgnoreCase("")) {
+      removeProperty(propertyName);
+    } else {
+      unRemoveProperty(propertyName);
+    }
     fireValueChanged(propertyName);
   }
   
