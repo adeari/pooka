@@ -1,12 +1,16 @@
 package net.suberic.pooka.gui;
 import javax.mail.*;
+import javax.mail.internet.*;
 import javax.swing.*;
 import java.util.Hashtable;
+import java.util.Vector;
 import net.suberic.pooka.Pooka;
 import java.awt.event.ActionEvent;
+import java.io.*;
 
 public class NewMessageProxy extends MessageProxy {
     Hashtable commands;
+    Vector attachments = null;
 
     public NewMessageProxy(Message newMessage) {
 	message=newMessage;
@@ -55,8 +59,18 @@ public class NewMessageProxy extends MessageProxy {
 		
 		urlName = msgWindow.populateMessageHeaders(getMessage());
 		if (urlName != null) {
-		    getMessage().setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
-		    
+		    if (attachments != null && attachments.size() > 1) {
+			MimeBodyPart mbp = new MimeBodyPart();
+			mbp.setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
+			MimeMultipart multipart = new MimeMultipart();
+			multipart.addBodyPart(mbp);
+			for (int i = 0; i < attachments.size(); i++) 
+			    multipart.addBodyPart((BodyPart)attachments.elementAt(i));
+			getMessage().setContent(multipart);
+		    } else {
+			getMessage().setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
+		    }
+	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
 		}
 		getMessageWindow().setModified(false);
@@ -73,9 +87,56 @@ public class NewMessageProxy extends MessageProxy {
     }
     
     /**
-     * not implemented yet.
+     * This attaches a file to a given message.  Really, all it does is
+     * calls getFileToAttach(), and then sends that to attachFile().
      */
-    public void attachFile() {
+    public void attach() {
+	File[] f = getFileToAttach();
+	if (f != null)
+	    for (int i = 0; i < f.length; i++)
+		attachFile(f[i]);
+    }
+
+    /**
+     * This calls on the MessageWindow to bring up a FileDialog to choose
+     * the file to attach to the message.  If no choice is made, this 
+     * method returns null.
+     */
+    public File[] getFileToAttach() {
+	return getMessageWindow().getFiles(Pooka.getProperty("MessageWindow.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageWindow.attachFileDialog.buttonText", "Attach"));
+    }
+
+    /**
+     * This actually attaches the File to the Message.  Any errors are 
+     * sent to the MessageWindow to display.  
+     *
+     * This also sets the 'hasAttachment' property on the MessageWindow
+     * to true.
+     */
+    public void attachFile(File f) {
+	try {
+	    FileInputStream fis = new FileInputStream(f);
+	    MimeBodyPart mbp = new MimeBodyPart(fis);
+	    if (attachments == null)
+		attachments = new Vector();
+	    attachments.add(mbp);
+	    getMessageWindow().updateAttachmentPane();
+	} catch (Exception e) {
+	    getMessageWindow().showError(Pooka.getProperty("error.MessageWindow.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageWindow.unableToAttachFile.title", "Unable to Attach File."), e);
+	}
+	
+    }
+
+    /**
+     * This removes the given MimeBodyPart from the list of attachments.
+     * I figure that you're likely only to be removing attachments from 
+     * the attachment list itself, so you should be able to get the
+     * correct underlying object.
+     */
+    public void detachFile(MimeBodyPart mbp) {
+	if (attachments != null)
+	    attachments.remove(mbp);
+	getMessageWindow().updateAttachmentPane();
     }
 
     public Message getMessage() {
@@ -111,7 +172,7 @@ public class NewMessageProxy extends MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    attachFile();
+	    attach();
 	}
     }
     

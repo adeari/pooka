@@ -11,6 +11,7 @@ import javax.swing.text.TextAction;
 import java.util.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
+import java.io.File;
 
 public class MessageWindow extends JInternalFrame {
 
@@ -28,6 +29,7 @@ public class MessageWindow extends JInternalFrame {
     Hashtable inputTable = null;
     JEditorPane editorPane = null;
     ConfigurableToolbar toolbar;
+    boolean hasAttachment = false;
 
     /**
      * Creates a MessageWindow from the given Message.
@@ -104,7 +106,7 @@ public class MessageWindow extends JInternalFrame {
     public void closeMessageWindow() {
 	
 	if (isModified()) {
-	    int saveDraft = JOptionPane.showInternalConfirmDialog(this.getDesktopPane(), Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
+	    int saveDraft = showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
 	    switch (saveDraft) {
 	    case JOptionPane.YES_OPTION:
 		//this.saveDraft();
@@ -321,6 +323,57 @@ public class MessageWindow extends JInternalFrame {
 	    return urlName;
 	}
 	return null;
+    }
+
+    /**
+     * Pops up a JFileChooser and returns the results.
+     */
+    public File[] getFiles(String title, String buttonText) {
+	JFileChooser jfc = new JFileChooser();
+	jfc.setDialogTitle(title);
+	jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+	jfc.setMultiSelectionEnabled(true);
+	int a = jfc.showDialog(this, buttonText);
+	if (a == JFileChooser.APPROVE_OPTION)
+	    return jfc.getSelectedFiles();
+	else
+	    return null;
+    }
+
+    /**
+     * This updates the attachment panel.  This should be called when an
+     * attachment is added, removed, or changed on the underlying 
+     * MessageInfo object.
+     */
+    public void updateAttachmentPane() {
+
+    }
+
+    /**
+     * This shows an Confirm Dialog window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */    
+    public int showConfirmDialog(String messageText, String title, int type) {
+	return JOptionPane.showInternalConfirmDialog(this.getDesktopPane(), messageText, title, type);
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage, String title) {
+	JOptionPane.showInternalMessageDialog(this.getDesktopPane(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage, String title, Exception e) {
+	showError(errorMessage + e.getMessage(), title);
     }
 
     public String getMessageText() {
