@@ -3,8 +3,6 @@ the password on the screen' part.
 
 *)  Add the ability to subscribe to/add new folders in the GUI.
 
-*)  add ability to attach files to the sent messages.
-
 *)  add context-sensitive menus (right-click menus)
 
 *)  make the GUI Authenticator (which should come up when you don't enter
@@ -12,6 +10,8 @@ your password in the Store Configuration) work--right now it doesn't.  note:
 it actually works ok (just ok) when you start it up from scratch--but when
 you make a new Store without a password, it shows up lots and lots of times
 and basically just fails all over the place.
+
+*)  add the ability to forward messages (oops)
 
 *)  make cut & paste work from the Toolbar.
 
@@ -22,8 +22,6 @@ and basically just fails all over the place.
 *)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
 
-*)  currently can't delete multiple messages at once.
-
 *)  all MessagingExceptions should be handled correctly, not ignored.
 
 *)  the piece of code that keeps the Stores open only starts up if you open
@@ -32,6 +30,10 @@ for a while, your connection to your Store can go down.
 
 *) add a ValueChangeListener for the UserProfile properties.  right now
 the UserProfile only gets updated at startup.
+
+*) make the mailcap mappings for the attachments work properly.
+
+-------
 
 open messages from the FolderWindow
 	can do.  todo on this:
@@ -50,7 +52,6 @@ create and send message
 user profiles/information
 	can do.  todo:
 	make it actually get the correct default profile.
-	make entry list defaults not editable.
 	make sure that the sendMailURL is properly updated as soon as it's
 		entered.  i think right now you have to restart, or reopen
 		folders, or something like that.
@@ -83,11 +84,6 @@ write profile changes to disk immediately on setting (?)
 
 BUGS
 ---------
-Send is enabled for read (non-editable) messages.
-
-actions on messageProxy aren't available for MessageWindow--and ones on 
-MessageWindow aren't available for the selected message in the table.
-
 updates of pkamailrc aren't handled correctly--some lines aren't deleted.
 
 actions on FolderPanel are always available in the menu.
