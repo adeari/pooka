@@ -201,7 +201,8 @@ Store.password.propertyType=Password
 Store.defaultProfile.propertyType=List
 Store.defaultProfile.allowedValues=UserProfile
 
-ExternalLauncher.cmdWrapper./=sh -c "%v;rm %s"
+ExternalLauncher.fileHandler./=%v; rm %s
+ExternalLauncher.cmdWrapper./=sh -c %v
 
 NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
 NewAccountPooka.password.propertyType=Password
