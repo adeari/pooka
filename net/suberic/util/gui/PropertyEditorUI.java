@@ -31,6 +31,12 @@ public interface PropertyEditorUI {
      * This configures an editor for the given propertyName in the 
      * VariableBundle bundle.
      */
+    public void configureEditor(String propertyName, String template, VariableBundle bundle, boolean isEnabled);
+
+    /**
+     * This configures an editor for the given propertyName in the 
+     * VariableBundle bundle.
+     */
     public void configureEditor(String propertyName, VariableBundle bundle, boolean isEnabled);
 
     /**
