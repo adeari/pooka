@@ -176,17 +176,27 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       if (content != null) {
 	try {
 	  messageText.append(content);
+
 	  editorPane.setEditable(false);
 	  editorPane.setText(messageText.toString());
 	  editorPane.setCaretPosition(0);
-	  
+	    
 	  otherEditorPane.setEditable(false);
 	  otherEditorPane.setText(messageText.toString());
 	  otherEditorPane.setCaretPosition(0);
 	} catch (Exception e) {
-	  // we're just trying to avoid some parsing errors
-	  // in handling bad html.  probably not the best
-	  // way to do it.  FIXME
+	  // if we can't show the html, just set the type as text/plain.
+
+	  editorPane.setContentType("text/plain");
+	  otherEditorPane.setContentType("text/plain");
+
+	  editorPane.setEditable(false);
+	  editorPane.setText(messageText.toString());
+	  editorPane.setCaretPosition(0);
+	    
+	  otherEditorPane.setEditable(false);
+	  otherEditorPane.setText(messageText.toString());
+	  otherEditorPane.setCaretPosition(0);
 	}
       } 
       
