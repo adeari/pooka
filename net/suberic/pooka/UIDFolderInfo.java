@@ -337,9 +337,10 @@ public class UIDFolderInfo extends FolderInfo {
 		}
 	    }
 	    newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), uidRemovedMessages);
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().removeRows(removedProxies);
 	    resetMessageCounts();
-	    fireMessageCountEvent(newMce);
-	    getFolderTableModel().removeRows(removedProxies);
+	    fireMessageCountEvent(mce);
 	} else {
 	    resetMessageCounts();
 	    fireMessageCountEvent(mce);

@@ -144,7 +144,6 @@ public class FolderTableModel extends AbstractTableModel {
 			else
 			    fireTableRowsDeleted(rowNumber, rowNumber);
 			
-			
 		    }
 		}
 	    }

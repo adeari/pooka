@@ -28,4 +28,5 @@ public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, Act
 
     public void clearStatusMessage();
 
+    public void removeRows(java.util.Vector removedProxies);
 }

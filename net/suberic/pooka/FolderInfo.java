@@ -1151,6 +1151,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		
     }
 
+    /**
+     * As defined in javax.mail.MessageCountListener.
+     *
+     * This runs when we get a notification that messages have been
+     * removed from the mail server.
+     *
+     * This implementation just moves the handling of the event to the
+     * FolderThread, where it runs runMessagesRemoved().
+     */
     public void messagesRemoved(MessageCountEvent e) {
 	if (Pooka.isDebug())
 	    System.out.println("Messages Removed.");
@@ -1165,6 +1174,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
     }
     
+    /**
+     * This does the real work when messages are removed.  This can be
+     * overridden by subclasses.
+     */
     protected void runMessagesRemoved(MessageCountEvent mce) {
 	if (folderTableModel != null) {
 	    Message[] removedMessages = mce.getMessages();
@@ -1186,9 +1199,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    messageToInfoTable.remove(mi);
 		}
 	    }
-	    resetMessageCounts();
-	    fireMessageCountEvent(mce);
-	    getFolderTableModel().removeRows(removedProxies);
+	    if (getFolderDisplayUI() != null) {
+		getFolderDisplayUI().removeRows(removedProxies);
+		resetMessageCounts();
+		fireMessageCountEvent(mce);
+	    } else {
+		resetMessageCounts();
+		fireMessageCountEvent(mce);
+		getFolderTableModel().removeRows(removedProxies);
+	    }
 	} else {
 	    resetMessageCounts();
 	    fireMessageCountEvent(mce);

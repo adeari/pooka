@@ -349,6 +349,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
     public void messagesRemoved(MessageCountEvent e) { 
 	getFolderStatusBar().messagesRemoved(e);
+	getFolderDisplay().moveSelectionOnRemoval(e);
 	Runnable updateAdapter = new Runnable() {
 		public void run() {
 		    Pooka.getMainPanel().refreshActiveMenus();
@@ -364,48 +365,19 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
 	getFolderStatusBar().messageChanged(e);
-	try {
-	    if (e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && e.getMessage().getFlags().contains(Flags.Flag.DELETED)) {
-		MessageProxy selectedProxy = getFolderDisplay().getSelectedMessage();
-		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage().equals(e.getMessage())) {
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run() {
-				selectNextMessage();
-			    }
-			});
-		}
-	    }
-	} catch (MessageRemovedException me) {
-	    // -- sigh.  if the message has been removed, then we need to
-	    // handle it differently.
-	    
-	    try {
-		MessageProxy selectedProxy = getFolderDisplay().getSelectedMessage();
-		if ( selectedProxy != null && (selectedProxy.getMessageInfo().getMessage() == null || selectedProxy.getMessageInfo().getMessage().isExpunged() || selectedProxy.getMessageInfo().getMessage().getFlags().contains(Flags.Flag.DELETED))) {
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run() {
-				selectNextMessage();
-			    }
-			});
-		}
-	    } catch (MessageRemovedException mre) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-			    selectNextMessage();
-			}
-		    });
-	    } catch (MessagingException me2) {
-	    }
-	} catch (MessagingException me) {
-	}
-	
+	getFolderDisplay().moveSelectionOnRemoval(e);
+
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
 		    getFolderDisplay().repaint();
 		}
 	    });
     }
-    
+
+    public void removeRows(java.util.Vector removedProxies) {
+	getFolderDisplay().removeRows(removedProxies);
+    }
+
     /**
      * Gets the folderStatusBar.
      */

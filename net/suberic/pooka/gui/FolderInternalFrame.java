@@ -550,7 +550,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 
     public void messagesRemoved(MessageCountEvent e) { 
 	getFolderStatusBar().messagesRemoved(e);
-	moveSelectionOnRemoval(e);
+	getFolderDisplay().moveSelectionOnRemoval(e);
 	Runnable updateAdapter = new Runnable() {
 		public void run() {
 		    getMessagePanel().getMainPanel().refreshActiveMenus();
@@ -570,7 +570,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
 	getFolderStatusBar().messageChanged(e);
-	moveSelectionOnRemoval(e);
+	getFolderDisplay().moveSelectionOnRemoval(e);
 	
 	SwingUtilities.invokeLater(new Runnable() {
 		public void run() {
@@ -586,7 +586,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      */
     private void moveSelectionOnRemoval(MessageChangedEvent e) {
 	try {
-	    if (e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && (e.getMessage().isExpunged() || e.getMessage().getFlags().contains(Flags.Flag.DELETED))) {
+	    // don't bother if we're just going to autoexpunge it...
+	    if ((!Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) && e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && (e.getMessage().isExpunged() || e.getMessage().getFlags().contains(Flags.Flag.DELETED))) {
 		MessageProxy selectedProxy = getSelectedMessage();
 		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage().equals(e.getMessage())) {
 		    SwingUtilities.invokeLater(new Runnable() {
@@ -606,19 +607,14 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * row.
      */
     private void moveSelectionOnRemoval(MessageCountEvent e) {
-	System.out.println("seeing if we're selected or not.");
 	MessageProxy selectedProxy = getSelectedMessage();
 	Message[] removedMsgs = e.getMessages();
 	if (selectedProxy != null)  {
-	    System.out.println("selectedProxy isn't null.");
 	    boolean found = false;
 	    Message currentMsg = selectedProxy.getMessageInfo().getMessage();
 	    for (int i = 0; (found == false && i < removedMsgs.length); i++) {
 		if (currentMsg.equals(removedMsgs[i])) {
-		    System.out.println("found is true.");
 		    found = true;
-		} else {
-		    System.out.println("not found for message " + i + ".");
 		}
 	    }
 	    
@@ -630,6 +626,10 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 		    });
 	    }
 	}
+    }
+
+    public void removeRows(java.util.Vector removedProxies) {
+	getFolderDisplay().removeRows(removedProxies);
     }
 
     /**
