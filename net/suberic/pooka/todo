@@ -1,25 +1,3 @@
-alpha 2
-----------
-
-*) bug:  fix what happens if you try sending out a bad email.  also, while
-	we're at it, make sure that the from: and smtp: information get 
-	updated live.
-
-*)  get JFileChooser to work with the mail stores.  sort of done; still
-	need to deal with disconnection issues.
-
--- final checks before alpha 2 release.
-
-*) bug:  check the internal frame / window focus issue--make sure that 
-	the selected frame always has keyboard focus, and that the keyboard
-	focus defaults to a reasonable place.
-
-*) add keyboard control for everything, including switching between internal
-frames and the folderPanel.  oh, and making it so you can get at the menus.
-	-- most of that's done.  need to check on alt+f under jdk 1.2.2, and
-	...  probably just do another run through for all the options before
-	we finish.
-
 after alpha 2
 ----------------
 
@@ -32,6 +10,9 @@ after alpha 2
 *) add a search and replace for the message editors.
 
 *) add pop3/local mail spool support.
+
+*) fix the jfilechooser so it doesn't disconnect all of our folders when you
+use it--or at least so it doesn't matter if it does.
 
 *) make a way to edit the mailcap bindings other than just the 'make default'
 option.

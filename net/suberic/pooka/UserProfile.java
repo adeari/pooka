@@ -5,7 +5,7 @@ import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
 
-public class UserProfile extends Object {
+public class UserProfile extends Object implements ValueChangeListener {
     Properties mailProperties;
     String name;
     URLName sendMailURL;
@@ -29,10 +29,23 @@ public class UserProfile extends Object {
     public UserProfile(String newName, VariableBundle mainProperties) {
 	if (mailPropertiesMap == null)
 	    createMailPropertiesMap(mainProperties);
+	
+	name = newName;
+	
+	initializeFromProperties(mainProperties);
 
+	profileList.addElement(this);
+	
+	registerChangeListeners();
+    }
+
+    /**
+     * This populates the UserProfile from the Pooka properties list.
+     * Useful on creation as well as when any of the properties change.
+     */
+    public void initializeFromProperties(VariableBundle mainProperties) {
 	if (mailPropertiesMap != null) {
 	    
-	    name = newName;
 	    mailProperties = new Properties();
 	    String profileKey;
 
@@ -46,10 +59,43 @@ public class UserProfile extends Object {
 	    sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
 	    sigGenerator=createSignatureGenerator();
 
-	    profileList.addElement(this);
 	}
+
     }
 
+    /**
+     * Registers this UserProfile as a ValueChangeListener for all of its
+     * source properties.
+     */
+    private void registerChangeListeners() {
+	VariableBundle resources = Pooka.getResources();
+	if (mailPropertiesMap != null) {
+	    
+	    String profileKey;
+	    
+	    
+	    for (int i = 0; i < mailPropertiesMap.size(); i++) {
+		profileKey = (String)mailPropertiesMap.elementAt(i);
+		resources.addValueChangeListener(this, "UserProfile." + name + ".mailHeaders." + profileKey);
+	    }
+	    
+	}
+	resources.addValueChangeListener(this, "UserProfile." + name + ".sentFolder");
+	
+	resources.addValueChangeListener(this, "UserProfile." + name + ".sendMailURL");
+	    
+	
+    }
+
+    /**
+     * Modifies the UserProfile if any of its source values change.
+     *
+     * As specified in net.suberic.util.ValueChangeListener.
+     */
+    public void valueChanged(String changedValue) {
+	initializeFromProperties(Pooka.getResources());
+    }
+    
     public void finalize() {
 	profileList.removeElement(this);
     }
@@ -180,9 +226,11 @@ public class UserProfile extends Object {
 
 	for (int i = 0; i < removeProfileKeys.size(); i++) {
 	    UserProfile tmpProfile = getProfile((String)removeProfileKeys.elementAt(i));
-	    if (tmpProfile != null)
+	    if (tmpProfile != null) { 
 		profileList.removeElement(tmpProfile);
-	    tmpProfile = null;
+		Pooka.getResources().removeValueChangeListener(tmpProfile);
+		tmpProfile = null;
+	    }
 	}
     }
 

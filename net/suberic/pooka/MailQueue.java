@@ -3,6 +3,13 @@ import net.suberic.pooka.gui.*;
 import javax.mail.*;
 import java.util.*;
 
+/**
+ * The basics for an outgoing mail queue.
+ *
+ * This class is basically a placeholder for now, since i realized that if
+ * you're connected all the time, you don't need a send queue, and if you're
+ * running in disconnected mode, this queue won't do.
+ */
 public class MailQueue {
     Hashtable transportTable;
     Session session;
@@ -19,6 +26,7 @@ public class MailQueue {
      * sendQueued().
      */
     public void sendMessage(Message m, URLName transportURL) throws MessagingException {
+	/*
 	Vector transportQueue = (Vector)transportTable.get(transportURL);
 	if (transportQueue == null) {
 	    transportQueue = new Vector();
@@ -29,6 +37,15 @@ public class MailQueue {
 	if (Pooka.getProperty("Message.sendImmediately", "false").equals("true")) {
 	    sendQueued();
 	}
+	*/
+
+	Transport sendTransport;
+
+	sendTransport = session.getTransport(transportURL); 
+	sendTransport.connect();
+
+	sendTransport.sendMessage(m, m.getAllRecipients());
+	
 
     }
 
@@ -40,6 +57,9 @@ public class MailQueue {
      * Messages but not others, it will send the ones that it can, and return
      * a MessagingException with all the individual sub-exceptions tacked
      * on to it using MessagingException.setNextException().
+     *
+     * Note:  do not use this method.  i am now just keeping it here as
+     * a placeholder until i implement a real outgoing message queue.
      */
     public void sendQueued() throws MessagingException {
 	Enumeration keys = transportTable.keys();
@@ -82,4 +102,6 @@ public class MailQueue {
     }
 }
     
+
+
 
