@@ -64,10 +64,9 @@ public class LoadMessageThread extends Thread {
      * folder.  It should keep the connection open for us, though.
      */
     public void checkFolder() {
-	try  {
-	    getFolderInfo().getFolder().getNewMessageCount();
-	} catch (MessagingException me) {
-	}
+	if (Pooka.isDebug())
+	    System.out.println("checking folder " + getFolderInfo().getFolderName());
+	getFolderInfo().resetUnread();
     }
 
     public void loadWaitingMessages() {
