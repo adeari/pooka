@@ -28,7 +28,7 @@ public class LoadMessageThread extends Thread {
     private Vector columnValues;
     private Vector loadQueue = new Vector();
     private Vector messageLoadedListeners = new Vector();
-    private int updateCheckMilliseconds = -1;
+    private int updateCheckMilliseconds = 60000;
     private int updateMessagesCount = 10;
     private int loadedMessageCount = 0;
     
@@ -41,6 +41,7 @@ public class LoadMessageThread extends Thread {
     }
 
     public void run() {
+	int uptime = 0;
 	this.setPriority(1);
 	while (true) {
 	    loadWaitingMessages();
@@ -48,7 +49,7 @@ public class LoadMessageThread extends Thread {
 	    try {
 		if (updateCheckMilliseconds < 1) {
 		    while (updateCheckMilliseconds < 1)
-			sleep(1000000);
+			sleep(60000);
 		} else { 
 		    sleep(updateCheckMilliseconds);
 		    checkFolder();
@@ -58,7 +59,15 @@ public class LoadMessageThread extends Thread {
 	}
     }
 
+    /**
+     * This just checks to see if we can get a NewMessageCount from the
+     * folder.  It should keep the connection open for us, though.
+     */
     public void checkFolder() {
+	try  {
+	    getFolderInfo().getFolder().getNewMessageCount();
+	} catch (MessagingException me) {
+	}
     }
 
     public void loadWaitingMessages() {
@@ -89,6 +98,7 @@ public class LoadMessageThread extends Thread {
 	    
 	    removeMessageLoadedListener(lmt);
 	    getFolderInfo().getFolderWindow().getStatusBar().remove(lmt);
+	    getFolderInfo().getFolderWindow().getStatusBar().repaint();
 	}
     }
     
