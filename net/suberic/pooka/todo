@@ -29,6 +29,12 @@ and basically just fails all over the place.
 
 *)  enable keybindings so they work properly.
 
+*)  fix what happens if you select an unreachable/incorrectly written
+mailbox--right now it hangs.
+
+*)  associated with above, multithread properly--too many actions happen
+on the main i/o thread.
+
 *)  make cut & paste work from the Toolbar.
 
 *)  make the FolderChooser less clunky.  add the ability to create and
