@@ -113,6 +113,7 @@ preview:
 	for that.  slimpgp or cyptix.  s/mime is available from together
 	(@ sourceforge).
 
+*) add ldap support
 
 ----------------------
 
