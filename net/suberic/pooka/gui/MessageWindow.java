@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.TextAction;
 import java.util.*;
+import javax.swing.text.JTextComponent;
 
 public class MessageWindow extends JInternalFrame {
 
@@ -238,16 +239,17 @@ public class MessageWindow extends JInternalFrame {
     }
 
     public JComponent createBodyPanel(MessageProxy aMsg) {
+	editorPane = new JEditorPane();
+	
 	if (isEditable()) {
-	    editorPane = new JEditorPane();
 	    
 	    // see if this message already has a text part, and if so,
 	    // include it.
-
+	    
 	    String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage());
 	    if (origText != null && origText.length() > 0) 
 		editorPane.setText(origText);
-
+	    
 	    //	    bodyInputPane.setContentType("text");
 	    editorPane.setSize(200,300);
 	    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
@@ -256,8 +258,10 @@ public class MessageWindow extends JInternalFrame {
 		javax.mail.internet.MimeMessage mMsg = (javax.mail.internet.MimeMessage) aMsg.getMessage();
 		String content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
 		if (content != null) {
-		    JTextArea bodyPane = new JTextArea(content, 20, 40);
-		    return new JScrollPane(bodyPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		    editorPane.setEditable(false);
+		    editorPane.setText(content);
+		    editorPane.setSize(200,300);
+		    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		} else { 
 		    
 		    /* nothing found.  return a blank TextArea. */
@@ -283,7 +287,6 @@ public class MessageWindow extends JInternalFrame {
 		    UserProfile up =  (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
 		    up.populateMessage(mMsg);
 		    urlName = new URLName(up.getMailProperties().getProperty("sendMailURL", "smtp://localhost/"));
-		    System.out.println("set sendMailURL to " + urlName);
 		} else {
 		    String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
 		    String value = ((JTextField)(inputTable.get(key))).getText();
@@ -299,9 +302,6 @@ public class MessageWindow extends JInternalFrame {
 	}
     }
 
-
-	
-	
     public boolean isEditable() {
 	return editable;
     }
@@ -320,11 +320,58 @@ public class MessageWindow extends JInternalFrame {
     }
 
     public JEditorPane getEditorPane() {
-	if (isEditable())
-	    return editorPane;
-	else
-	    return null;
+	return editorPane;
     }
+
+    //------- Actions ----------//
+
+    /**
+     * performTextAction grabs the focused component on the MessageWindow
+     * and, if it is a JTextComponent, tries to get it to perform the
+     * appropriate ActionEvent.
+     */
+    public void performTextAction(String name, ActionEvent e) {
+	Action[] textActions;
+
+	Component focusedComponent = getFocusedComponent(this);
+
+	// this is going to suck more.
+
+	if (focusedComponent != null) {
+	    if (focusedComponent instanceof JTextComponent) {
+		JTextComponent fTextComp = (JTextComponent) focusedComponent;
+		textActions = fTextComp.getActions();
+		Action selectedAction = null;
+		for (int i = 0; (selectedAction == null) && i < textActions.length; i++) {
+		    if (textActions[i].getValue(Action.NAME).equals(name))
+			selectedAction = textActions[i];
+		}
+		
+		if (selectedAction != null) {
+		    selectedAction.actionPerformed(e);
+		}
+	    }
+	}
+    }
+
+    private Component getFocusedComponent(Container container) {
+	Component[] componentList = container.getComponents();
+	
+	Component focusedComponent = null;
+	
+	// this is going to suck.
+	
+	for (int i = 0; (focusedComponent == null) && i < componentList.length; i++) {
+	    if (componentList[i].hasFocus())
+		focusedComponent = componentList[i];
+	    else if (componentList[i] instanceof Container) 
+		focusedComponent=getFocusedComponent((Container)componentList[i]);
+	    
+	}
+	
+	return focusedComponent;
+	
+    }	
 
     public Action[] getActions() {
 	if (msg.getActions() != null) {
@@ -349,7 +396,10 @@ public class MessageWindow extends JInternalFrame {
 
     public Action[] defaultActions = {
 	new CloseAction(),
-	new SendAction()
+	new SendAction(),
+	new CutAction(),
+	new CopyAction(),
+	new PasteAction()
     };
 
     class CloseAction extends AbstractAction {
@@ -378,6 +428,38 @@ public class MessageWindow extends JInternalFrame {
 	}
     }
 
+    class CutAction extends AbstractAction {
+	
+	CutAction() {
+	    super("cut-to-clipboard");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    performTextAction((String)getValue(Action.NAME), e);
+	}
+    }
+
+    class CopyAction extends AbstractAction {
+	
+	CopyAction() {
+	    super("copy-to-clipboard");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    performTextAction((String)getValue(Action.NAME), e);
+	}
+    }
+
+    class PasteAction extends AbstractAction {
+	
+	PasteAction() {
+	    super("paste-from-clipboard");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    performTextAction((String)getValue(Action.NAME), e);
+	}
+    }
 }
 
 
