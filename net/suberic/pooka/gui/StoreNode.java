@@ -7,6 +7,7 @@ import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.StoreInfo;
 import net.suberic.util.thread.ActionWrapper;
+import net.suberic.pooka.gui.search.*;
 import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.mail.event.*;
@@ -197,7 +198,9 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
+
 	    JInternalFrame jif = new JInternalFrame();
+	    
 	    SearchEntryForm sef = new SearchEntryForm(Pooka.getSearchManager());
 	    jif.getContentPane().add(sef.getPanel());
 

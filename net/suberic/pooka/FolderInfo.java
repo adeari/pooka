@@ -521,8 +521,38 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	LoadMessageThread lmt = new LoadMessageThread(this);
 	return lmt;
     }
+
+    /**
+     * This sets the given Flag for all the MessageInfos given.
+     */
+    public void setFlags(MessageInfo[] msgs, Flags flag, boolean value) throws MessagingException {
+	Message[] m = new Message[msgs.length];
+	for (int i = 0; i < msgs.length; i++) {
+	    m[i] = msgs[i].getMessage();
+	}
+
+	getFolder().setFlags(m, flag, value);
+    }
+
+    /**
+     * This copies the given messages to the given FolderInfo.
+     */
+    public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+	Message[] m = new Message[msgs.length];
+	for (int i = 0; i < msgs.length; i++) {
+	    m[i] = msgs[i].getMessage();
+	}
+
+	getFolder().copyMessages(m, targetFolder.getFolder());
+    }
     
-    
+    /**
+     * This expunges the deleted messages from the Folder.
+     */
+    public void expunge() throws MessagingException {
+	getFolder().expunge();
+    }
+
     /**
      * This handles the MessageLoadedEvent.
      *

@@ -221,9 +221,9 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 			int rowsSelected = messageTable.getSelectedRowCount();
 
 			if (rowsSelected == 1) 
-			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+			    selectedMessage = getFolderInfo().getMessageInfo(messageTable.getSelectedRow()).getMessageProxy();
 			else if (rowsSelected > 1)
-			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
+			    selectedMessage = getFolderInfo().getMessageInfo(messageTable.getSelectedRows()[0]).getMessageProxy();
 
 			((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
 
@@ -294,7 +294,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     public void searchFolder() {
 	javax.mail.search.SearchTerm term = new javax.mail.search.SubjectTerm("info");
 	try {
-	    MessageProxy[] matches = getFolderInfo().search(term);
+	    MessageInfo[] matches = getFolderInfo().search(term);
 	} catch (Exception e) {
 	    System.out.println("caught exception.");
 	}
@@ -310,14 +310,14 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	int rowsSelected = messageTable.getSelectedRowCount();
 
 	if (rowsSelected == 1) 
-	    return getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+	    return getFolderInfo().getMessageInfo(messageTable.getSelectedRow()).getMessageProxy();
 	else if (rowsSelected < 1) 
 	    return null;
 	else {
 	    Vector msgSelected= new Vector();
 	    int[] selectedRows = messageTable.getSelectedRows();
 	    for (int i = 0; i < selectedRows.length; i++) 
-		msgSelected.add(getFolderInfo().getMessageProxy(selectedRows[i]));
+		msgSelected.add(getFolderInfo().getMessageInfo(selectedRows[i]).getMessageProxy());
 	    return new MultiMessageProxy(selectedRows, msgSelected, this);
 	}
     }
