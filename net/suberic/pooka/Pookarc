@@ -100,6 +100,30 @@ MainToolbar.Copy.Image=images/Copy.gif
 MainToolbar.Paste.Action=paste-from-clipboard
 MainToolbar.Paste.Image=images/Paste.gif
 
+NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste
+NewMessageWindowToolbar.Send.Action=message-send
+NewMessageWindowToolbar.Send.Image=images/Envelope.gif
+NewMessageWindowToolbar.AttachFile.Action=attach-file
+NewMessageWindowToolbar.AttachFile.Image=images/Pin.gif
+NewMessageWindowToolbar.Cut.Action=cut-to-clipboard
+NewMessageWindowToolbar.Cut.Image=images/Cut.gif
+NewMessageWindowToolbar.Copy.Action=copy-to-clipboard
+NewMessageWindowToolbar.Copy.Image=images/Copy.gif
+NewMessageWindowToolbar.Paste.Action=paste-from-clipboard
+NewMessageWindowToolbar.Paste.Image=image/Paste.gif
+
+MessageWindowToolbar=Reply:ReplyAll:Forward::Cut:Copy
+MessageWindowToolbar.Reply.Action=message-reply
+MessageWindowToolbar.Reply.Image=images/Reply.gif
+MessageWindowToolbar.ReplyAll.Action=message-reply-all
+MessageWindowToolbar.ReplyAll.Image=images/ReplyAll.gif
+MessageWindowToolbar.Forward.Action=message-forward
+MessageWindowToolbar.Forward.Image=images/Forward.gif
+MessageWindowToolbar.Cut.Action=cut-to-clipboard
+MessageWindowToolbar.Cut.Image=images/Cut.gif
+MessageWindowToolbar.Copy.Action=copy-to-clipboard
+MessageWindowToolbar.Copy.Image=images/Copy.gif
+
 FolderPanel.2xClickAction=folder-open
 
 FolderTable=SentDate:From:Subject
