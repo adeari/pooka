@@ -87,7 +87,7 @@ public class NewMessageProxy extends MessageProxy {
 	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
 		    try {
-			if (profile.getSentFolder() != null)
+			if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null)
 			    profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
 		    } catch (MessagingException me) {
 			getMessageWindow().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
