@@ -15,7 +15,10 @@ public class FileResourceManager extends ResourceManager {
    */
   public VariableBundle createVariableBundle(String fileName, VariableBundle defaults) {
     try {
-      return new net.suberic.util.VariableBundle(new java.io.File(fileName), defaults);
+      java.io.File f = new java.io.File(fileName);
+      if (! f.exists())
+	f.createNewFile();
+      return new net.suberic.util.VariableBundle(f, defaults);
     } catch (java.io.IOException ioe) {
       //new net.suberic.util.VariableBundle(url.openStream(), "net.suberic.pooka.Pooka");
       return defaults;

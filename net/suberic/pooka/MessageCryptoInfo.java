@@ -110,20 +110,15 @@ public class MessageCryptoInfo {
    */
   public boolean isEncrypted() throws MessagingException {
 
-    System.err.println("checking isEncrytped on " + mMsgInfo);
     if (mMsgInfo.hasLoadedAttachments()) {
-      System.err.println("attachments loaded on " + mMsgInfo);
       List attachments = mMsgInfo.getAttachments();
       for (int i = 0 ; i < attachments.size(); i++) {
 	if (attachments.get(i) instanceof CryptoAttachment) {
-	  System.err.println("attachment " + i + " on " + mMsgInfo + " is a CryptoAttachment; returning true.");
 	  return true;
 	}
       }
-      System.err.println("no attachments on " + mMsgInfo + " is a CryptoAttachment; returning false.");
       return false;
     } else {
-      System.err.println(mMsgInfo + " not loaded; checking Message.");
       EncryptionUtils utils = getEncryptionUtils();
       if (utils != null) {
 	return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
