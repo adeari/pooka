@@ -37,11 +37,12 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      * Creates an empty PreviewFolderPanel.
      */
     public PreviewFolderPanel(PreviewContentPanel newContentPanel) {
-	contentPanel = newContentPanel;
+      contentPanel = newContentPanel;
 
-	this.setSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.previewPanel.folderSize", "200"))));
+      this.setSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.previewPanel.folderSize", "200"))));
+      this.setPreferredSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200"))));
 
-	folderDisplay = new FolderDisplayPanel();
+      folderDisplay = new FolderDisplayPanel();
     }
 
     /**

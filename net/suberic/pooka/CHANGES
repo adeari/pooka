@@ -1,3 +1,7 @@
+preview pane mode now gives a resonable size for the message table.
+
+nested subfolders were not being cached when in disconnected imap mode.
+
 fixed a bug where responding or forwarding a message with a null subject
 would result in a NullPointerException
 

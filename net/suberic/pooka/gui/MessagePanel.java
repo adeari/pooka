@@ -134,6 +134,12 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       current.getFolderDisplay().getMessageTable().getSelectionModel().removeListSelectionListener(pcp.getSelectionListener());
     }
   }
+
+  public void savePanelSize() {
+    Pooka.setProperty("Pooka.contentPanel.hsize", Integer.toString(getUIComponent().getWidth()));
+    Pooka.setProperty("Pooka.contentPanel.vsize", Integer.toString(getUIComponent().getHeight()));
+  }
+  
   
   /**
    * This opens a new FolderWindow for the given FolderInfo, and sets

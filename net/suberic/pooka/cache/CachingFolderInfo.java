@@ -820,7 +820,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		newFolderName = (String)tokens.nextToken();
 		FolderInfo childFolder = getChild(newFolderName);
 		if (childFolder == null) {
-		    if (Pooka.getProperty(getFolderProperty() + "." + newFolderName + ".cacheMessages", "false").equalsIgnoreCase("true"))
+		    if (! Pooka.getProperty(getFolderProperty() + "." + newFolderName + ".cacheMessages", "true").equalsIgnoreCase("false"))
 			childFolder = new CachingFolderInfo(this, newFolderName);
 		    else if (Pooka.getProperty(getParentStore().getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
 			childFolder = new UIDFolderInfo(this, newFolderName);

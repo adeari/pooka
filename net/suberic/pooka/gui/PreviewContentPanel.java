@@ -56,10 +56,12 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 	this.add("North", toolbar);
 	this.add("Center", splitPanel);
 
-	this.setPreferredSize(new java.awt.Dimension(Integer.parseInt(Pooka.getProperty("Pooka.messagePanel.hsize", "600")), Integer.parseInt(Pooka.getProperty("Pooka.messagePanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
+	this.setPreferredSize(new java.awt.Dimension(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.hsize", "600")), Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
 	this.setSize(getPreferredSize());
-	folderDisplay.setPreferredSize(new java.awt.Dimension(Integer.parseInt(Pooka.getProperty("Pooka.messagePanel.hsize", "600")), Integer.parseInt(Pooka.getProperty("Pooka.folderDisplay.vsize", "200"))));
+	folderDisplay.setPreferredSize(new java.awt.Dimension(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.hsize", "600")), Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200"))));
 	folderDisplay.setSize(folderDisplay.getPreferredSize());
+
+	splitPanel.setDividerLocation(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200")));
 
 	selectionListener = new ListSelectionListener() {
 		public void valueChanged(javax.swing.event.ListSelectionEvent e) {
@@ -108,6 +110,12 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     
     if (selectedID != null)
       showFolder(selectedID);
+  }
+  
+  public void savePanelSize() {
+    Pooka.setProperty("Pooka.contentPanel.hsize", Integer.toString(getUIComponent().getWidth()));
+    Pooka.setProperty("Pooka.contentPanel.vsize", Integer.toString(getUIComponent().getHeight()));
+    Pooka.setProperty("Pooka.contentPanel.dividerLocation", Integer.toString(splitPanel.getDividerLocation()));
   }
   
   /**
