@@ -363,10 +363,13 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       if (! userName.equals(""))
 	sysProps.setProperty("mail.smtp.user", userName);
       String password = Pooka.getProperty(getItemProperty() + ".password", "");
-      if (! password.equals(""))
-	sysProps.setProperty("mail.smtp.password", password);
 
-      session = javax.mail.Session.getInstance(sysProps, Pooka.defaultAuthenticator);
+      if (! password.equals("")) {
+	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
+	sysProps.setProperty("mail.smtp.password", password);
+      }
+
+      session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password, (net.suberic.pooka.gui.SimpleAuthenticator) Pooka.defaultAuthenticator));
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	session.setDebug(true);
     }
@@ -427,4 +430,37 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     return sendMailURL;
   }
   
+  /**
+   * An Authenticator that first tries the configured User and Password,
+   * then uses the underlying Authenticator.
+   */
+  class FailoverAuthenticator extends net.suberic.pooka.gui.SimpleAuthenticator {
+
+    String mUser;
+    String mPassword;
+    boolean firstTry = true;
+    
+    Authenticator mAuth;
+    
+    /**
+     * Creates an Authenticator that will try using the given username and
+     * password, and if that fails, then will try a ui dialog.
+     */
+    public FailoverAuthenticator(String pUser, String pPassword, net.suberic.pooka.gui.SimpleAuthenticator pAuth) {
+      super(pAuth.getFrame());
+      mUser = pUser;
+      mPassword = pPassword;
+    }
+
+    protected PasswordAuthentication getPasswordAuthentication() {
+      if (firstTry) {
+	firstTry = false;
+
+	return new PasswordAuthentication(mUser, mPassword);
+      } else {
+	return super.getPasswordAuthentication();
+      }
+    }
+
+  }
 }

@@ -1,3 +1,5 @@
+smtp authentication no longer requires you to enter a password every time.
+
 applying folder filters to a set of messages now shows a status dialog.
 
 unsuccessful open attachment commands now show an error.

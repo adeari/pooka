@@ -7,8 +7,6 @@
 
 -----
 
-*) fix smtp auth password
-
 *) ?? forward with attachments not working?
 
 *) queuing of outgoing mails

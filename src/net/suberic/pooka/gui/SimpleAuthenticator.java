@@ -123,4 +123,8 @@ public class SimpleAuthenticator extends Authenticator {
 	gb.setConstraints(cmp, c);
 	return (cmp);
     }
+
+  public Frame getFrame() {
+    return frame;
+  }
 }
