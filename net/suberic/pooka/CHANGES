@@ -1,3 +1,8 @@
+changed the display of newly received messages.  now if you try to display
+messages before they're loaded, instead of loading the messages on the
+AWT thread, you just show 'loading' for each frame.  when the table info
+is loaded, the FolderDisplay gets updated with the new values.
+
 made it so that the ReadMessageDisplay only populates one JEditorPane,
 instead of 2 like it used to.
 

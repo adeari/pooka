@@ -56,13 +56,13 @@ public class FolderTableModel extends AbstractTableModel {
 	return "null";
       else {
 	if (! mp.isLoaded()) {
-	  return ("loading...");
+	  return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
 	} else {
 	  return ((MessageProxy)data.elementAt(row)).getTableInfo().elementAt(col);
 	}
       }
     } catch (ArrayIndexOutOfBoundsException ae) {
-      return "exception";
+      return  (net.suberic.pooka.Pooka.getProperty("FolderTableModel.exceptionCell", "exception"));
     }
   }
   
