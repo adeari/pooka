@@ -399,6 +399,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	messagesRemoved(mce);
       }
       
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.updatingFlags", "Updating flags..."));
+      else
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.updatingFlags", "Updating flags..."));
       updateFlags(uids, messages, cacheUidValidity);
       
     } finally {

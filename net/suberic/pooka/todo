@@ -1,11 +1,6 @@
 	-- disconnected imap --
 
-*) no way to cache messages as they come in.
-
 *) fully cached filter doesn't work anymore.
-
-*) get rid of the 'comparing new messages...' status message after you're
-	done!
 
 *) in general, make reconnecting/resynching (with disconnected imap or
 	with the uid system) use the LoadMessageThread.  also make the

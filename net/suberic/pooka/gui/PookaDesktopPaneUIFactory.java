@@ -262,7 +262,15 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
      * Clears the main status message panel.
      */
     public void clearStatus() {
-	Pooka.getMainPanel().getInfoPanel().clear();
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    Pooka.getMainPanel().getInfoPanel().clear();
+	  }
+	};
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
     }   
 
     /**
