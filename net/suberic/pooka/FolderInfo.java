@@ -2039,11 +2039,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       
       public void actionPerformed(ActionEvent e) {
 	if (isOutboxFolder())
-	  try {
-	    mailServer.sendAll();
-	  } catch (MessagingException me) {
-	    Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
-	  }
+	  mailServer.sendAll();
       }
     }
 

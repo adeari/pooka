@@ -6,6 +6,7 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 import net.suberic.util.*;
+import net.suberic.util.thread.*;
 
 /**
  * <p>Represents a mail server than can be used to send outgoing messages.
@@ -28,6 +29,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   NetworkConnection.ConnectionLock connectionLock = null;
 
   boolean sending = false;
+
+  ActionThread mailServerThread = null;
 
   /**
    * <p>Creates a new OutgoingMailServer from the given property.</p>
@@ -57,6 +60,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     bundle.addValueChangeListener(this, getItemProperty() + ".connection");
     bundle.addValueChangeListener(this, getItemProperty() + ".server");
     bundle.addValueChangeListener(this, getItemProperty() + ".outbox");
+
+    mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
   }
 
   /**
@@ -107,7 +112,22 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   /**
    * Sends all available messages in the outbox.
    */
-  public synchronized void sendAll() throws javax.mail.MessagingException {
+  public void sendAll() {
+    mailServerThread.addToQueue(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent ae) {
+	  try {
+	    internal_sendAll();
+	  } catch (javax.mail.MessagingException me) {
+	    Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+	  }
+	}
+      }, new java.awt.event.ActionEvent(this, 0, "message-send-all"));
+  }
+
+  /**
+   * Sends all available messages in the outbox.
+   */
+  protected synchronized void internal_sendAll() throws javax.mail.MessagingException {
     
     try {
       sending = true;
@@ -174,7 +194,17 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * the message anyway.  
    */
   public synchronized void sendMessage(NewMessageInfo nmi, boolean connect) throws javax.mail.MessagingException {
+    final NewMessageInfo nmi_final = nmi;
+    final boolean connect_final = connect;
     
+    mailServerThread.addToQueue(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent ae) {
+	  internal_sendMessage(nmi_final, connect_final);
+	}
+      }, new java.awt.event.ActionEvent(this, 0, "message-send-all"));
+  }
+
+  private synchronized void internal_sendMessage(NewMessageInfo nmi, boolean connect) {
     sending = true;
 
     try {
@@ -218,11 +248,24 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	  } catch (MessagingException me) {
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(me);	  
 	  }
-	  // whether or not the send failed. try sending all the other messages,
-	  // in the queue, too.
-	  sendAll(sendTransport);
+	  // whether or not the send failed. try sending all the other 
+	  // messages in the queue, too.
+	  try {
+	    sendAll(sendTransport);
+	  } catch (MessagingException exp) {
+	    final MessagingException me = exp;
+	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		  Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.outboxSendFailed", "Failed to send all messages in Outbox:  "), me);
+		}
+	      });
+	  }
 	} finally {
-	  sendTransport.close();
+	  try {
+	    sendTransport.close();
+	  } catch (MessagingException me) {
+	    // we don't care.
+	  }
 	}
       }
     } finally {
@@ -300,16 +343,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    */
   public void connectionStatusChanged(NetworkConnection connection, int newStatus) {
     if (newStatus == NetworkConnection.CONNECTED && ! sending && Pooka.getProperty(getItemProperty() + ".sendOnConnect", "false").equalsIgnoreCase("true")) {
-      NetworkConnection.ConnectionLock lock = null;
-      try {
-	lock = connection.getConnectionLock();
-	sendAll();
-      } catch (MessagingException me) {
-	Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
-      } finally {
-	if (lock != null)
-	  lock.release();
-      }
+      sendAll();
     }
   }
 

@@ -198,6 +198,8 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
 
       underlyingServer = getOutgoingMailServer(defaultServerId);
       outboxID = Pooka.getProperty("OutgoingServer._default.outbox");
+
+      mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
     }
     
     /**
@@ -206,7 +208,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
      * What this will do actually is send all of the default server's
      * messages, and then send the underlying server's messages, if any.
      */
-    public void sendAll() throws javax.mail.MessagingException {
+    protected void internal_sendAll() throws javax.mail.MessagingException {
       
       NetworkConnection connection = getConnection();
       

@@ -2,8 +2,6 @@ next release:
 
 *) add queuing of outgoing mails (?)
 	todo on this:
-	*)  make it fault tolerant so that if you still have the old
-		sendMailURL, things still work.
 	*)  fix the local mail store so that it doesn't necessarily put
 		in an INBOX for everything.  this is so we can set up a
 		local mail store for IMAP users.
