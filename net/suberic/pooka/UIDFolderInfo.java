@@ -84,7 +84,7 @@ public class UIDFolderInfo extends FolderInfo {
 	      MessageInfo mi;
 	      
 	      for (int i = 0; i < msgs.length; i++) {
-		long uid = ((UIDFolder)getFolder()).getUID(msgs[i]);
+		long uid = getUID(msgs[i]);
 		UIDMimeMessage newMessage = new UIDMimeMessage(this, uid);
 		mi = new MessageInfo(newMessage, this);
 
@@ -212,7 +212,7 @@ public class UIDFolderInfo extends FolderInfo {
       long[] uids = new long[messages.length];
       
       for (int i = 0; i < messages.length; i++) {
-	uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
+	uids[i] = getUID(messages[i]);
       }
       
       if (Pooka.isDebug())
@@ -526,99 +526,116 @@ public class UIDFolderInfo extends FolderInfo {
 	//folderTableModel = null;
     }
 
-    /**
-     * This method closes the Folder.  If you open the Folder using 
-     * openFolder (which you should), then you should use this method
-     * instead of calling getFolder.close().  If you don't, then the
-     * FolderInfo will try to reopen the folder.
-     */
-    public void closeFolder(boolean expunge, boolean closeDisplay) throws MessagingException {
-
-	if (closeDisplay && getFolderDisplayUI() != null)
-	    getFolderDisplayUI().closeFolderDisplay();
-
-	if (isLoaded() && isAvailable()) {
-	    if (isConnected()) {
-		try {
-		    getFolder().close(expunge);
-		} catch (java.lang.IllegalStateException ise) {
-		    throw new MessagingException(ise.getMessage(), ise);
-		}
-	    }
-	    setStatus(CLOSED);
+  /**
+   * This method closes the Folder.  If you open the Folder using 
+   * openFolder (which you should), then you should use this method
+   * instead of calling getFolder.close().  If you don't, then the
+   * FolderInfo will try to reopen the folder.
+   */
+  public void closeFolder(boolean expunge, boolean closeDisplay) throws MessagingException {
+    
+    if (closeDisplay && getFolderDisplayUI() != null)
+      getFolderDisplayUI().closeFolderDisplay();
+    
+    if (isLoaded() && isAvailable()) {
+      if (isConnected()) {
+	try {
+	  getFolder().close(expunge);
+	} catch (java.lang.IllegalStateException ise) {
+	  throw new MessagingException(ise.getMessage(), ise);
 	}
-
+      }
+      setStatus(CLOSED);
     }
+    
+  }
 
-    public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
-	if (m instanceof UIDMimeMessage)
-	    return (UIDMimeMessage) m;
-
-	// it's not a UIDMimeMessage, so it must be a 'real' message.
-	long uid = ((UIDFolder)getFolder()).getUID(m);
-	MessageInfo mi = getMessageInfoByUid(uid);
-	if (mi != null)
-	    return (UIDMimeMessage) mi.getMessage();
-	
-	// doesn't already exist.  just create a new one.
-	return new UIDMimeMessage(this, uid);
+  // UID / UIDMimeMessage / etc. methods.
+  
+  /**
+   * Returns the UIDMimeMessage for the given Message.
+   */
+  public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
+    if (m instanceof UIDMimeMessage)
+      return (UIDMimeMessage) m;
+    
+    // it's not a UIDMimeMessage, so it must be a 'real' message.
+    long uid = getUID(m);
+    MessageInfo mi = getMessageInfoByUid(uid);
+    if (mi != null)
+      return (UIDMimeMessage) mi.getMessage();
+    
+    // doesn't already exist.  just create a new one.
+    return new UIDMimeMessage(this, uid);
+  }
+  
+  /**
+   * gets the 'real' message for the given MessageInfo.
+   */
+  public Message getRealMessage(MessageInfo mi) throws MessagingException {
+    Message wrappingMessage = mi.getMessage();
+    if (wrappingMessage instanceof UIDMimeMessage)
+      return ((UIDMimeMessage)wrappingMessage).getMessage();
+    else
+      return wrappingMessage;
+  }
+  
+  /**
+   * Returns the "real" message from the underlying folder that matches up
+   * to the given UID.
+   */
+  public javax.mail.internet.MimeMessage getRealMessageById(long uid) throws MessagingException {
+    Folder f = getFolder();
+    if (f != null && f instanceof UIDFolder) {
+      javax.mail.internet.MimeMessage m = null;
+      try {
+	m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
+	return m;
+      } catch (IllegalStateException ise) {
+	throw new MessagingException(ise.getMessage());
+      }
+    } else {
+      throw new MessagingException("Error:  Folder unavailable or is not a UIDFolder");
     }
-
-    /**
-     * gets the 'real' message for the given MessageInfo.
-     */
-    public Message getRealMessage(MessageInfo mi) throws MessagingException {
-      Message wrappingMessage = mi.getMessage();
-      if (wrappingMessage instanceof UIDMimeMessage)
-	return ((UIDMimeMessage)wrappingMessage).getMessage();
-      else
-	return wrappingMessage;
+  }
+  
+  /**
+   * gets the MessageInfo for the given Message.
+   */
+  public MessageInfo getMessageInfo(Message m) {
+    if (m instanceof UIDMimeMessage)
+      return (MessageInfo) messageToInfoTable.get(m);
+    else {
+      try {
+	long uid = getUID(m);
+	return getMessageInfoByUid(uid);
+      } catch (MessagingException me) {
+	return null;
+      }
     }
+  }
+  
+  /**
+   * Returns the MessageInfo associated with the given uid.
+   */
+  public MessageInfo getMessageInfoByUid(long uid) {
+    return (MessageInfo) uidToInfoTable.get(new Long(uid));
+  }
+  
 
-    /**
-     * gets the MessageInfo for the given Message.
-     */
-    public MessageInfo getMessageInfo(Message m) {
-	if (m instanceof UIDMimeMessage)
-	    return (MessageInfo) messageToInfoTable.get(m);
-	else {
-	    try {
-		long uid = ((UIDFolder)getFolder()).getUID(m);
-		return getMessageInfoByUid(uid);
-	    } catch (MessagingException me) {
-		return null;
-	    }
-	}
+  /**
+   * Gets the UID for the given Message.
+   */
+  public long getUID(Message m) throws MessagingException {
+    if (m instanceof UIDMimeMessage)
+      return ((UIDMimeMessage)m).getUID();
+    else {
+      return ((UIDFolder)getFolder()).getUID(m);
     }
+  }
 
-    /**
-     * Returns the MessageInfo associated with the given uid.
-     */
-    public MessageInfo getMessageInfoByUid(long uid) {
-	return (MessageInfo) uidToInfoTable.get(new Long(uid));
-    }
-
-    /**
-     * Returns the "real" message from the underlying folder that matches up
-     * to the given UID.
-     */
-    public javax.mail.internet.MimeMessage getRealMessageById(long uid) throws MessagingException {
-	Folder f = getFolder();
-	if (f != null && f instanceof UIDFolder) {
-	    javax.mail.internet.MimeMessage m = null;
-	    try {
-		m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
-		return m;
-	    } catch (IllegalStateException ise) {
-		throw new MessagingException(ise.getMessage());
-	    }
-	} else {
-	    throw new MessagingException("Error:  Folder unavailable or is not a UIDFolder");
-	}
-    }
-
-    public long getUIDValidity() {
-	return uidValidity;
-    }
+  public long getUIDValidity() {
+    return uidValidity;
+  }
 }
 

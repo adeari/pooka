@@ -15,91 +15,97 @@ import javax.activation.DataHandler;
  */
 public class SimpleFileCache implements MessageCache {
 
-    // FIXME:  why isn't anything synchronized?
+  // FIXME:  why isn't anything synchronized?
+  
+  public static int CONTENT = 0;
+  public static int HEADERS = 1;
+  public static int FLAGS = 2;
+  public static int FLAGS_AND_HEADERS = 3;
+  
+  public static int ADDED = 10;
+  public static int REMOVED = 11;
+  
+  public static String DELIMETER = "_";
+  public static String CONTENT_EXT = "msg";
+  public static String HEADER_EXT = "hdr";
+  public static String FLAG_EXT = "flag";
+  
+  protected long uidValidity;
+  
+  
+  // the source FolderInfo.
+  private CachingFolderInfo folderInfo;
+  
+  // the directory in which the cache is stored.
+  private File cacheDir;
+  
+  // the UIDValidity
+  private long newUidValidity;
+  
+  // the currently cached uid's
+  private Vector cachedMessages;
+  
+  // the currently cached Flags.
+  private HashMap cachedFlags;
+  
+  // the currently cached Headers.
+  private HashMap cachedHeaders;
+  
+  // the place where we store changes to happen later...
+  private ChangeCache changes = null;
+  
+  // the last local UID used.
+  long lastLocalUID = -1;
+
+  /**
+   * Creates a new SimpleFileCache for the given FolderInfo, in the
+   * directory provided.
+   */
+  public SimpleFileCache(CachingFolderInfo folder, String directoryName) throws IOException {
+    folderInfo = folder;
+    cacheDir = new File(directoryName);
+    if ( ! cacheDir.exists() )
+      cacheDir.mkdirs();
+    else if (! cacheDir.isDirectory())
+      throw new IOException("not a directory.");
     
-    public static int CONTENT = 0;
-    public static int HEADERS = 1;
-    public static int FLAGS = 2;
-    public static int FLAGS_AND_HEADERS = 3;
-
-    public static int ADDED = 10;
-    public static int REMOVED = 11;
-
-    public static String DELIMETER = "_";
-    public static String CONTENT_EXT = "msg";
-    public static String HEADER_EXT = "hdr";
-    public static String FLAG_EXT = "flag";
+    changes = new ChangeCache(cacheDir);
     
-    protected long uidValidity;
-
-    // the source FolderInfo.
-    private CachingFolderInfo folderInfo;
-
-    // the directory in which the cache is stored.
-    private File cacheDir;
-
-    // the UIDValidity
-    private long newUidValidity;
-
-    // the currently cached uid's
-    private Vector cachedMessages;
-
-    // the currently cached Flags.
-    private HashMap cachedFlags;
-
-    // the currently cached Headers.
-    private HashMap cachedHeaders;
-
-    // the place where we store changes to happen later...
-    private ChangeCache changes = null;
-
-    /**
-     * Creates a new SimpleFileCache for the given FolderInfo, in the
-     * directory provided.
-     */
-
-    public SimpleFileCache(CachingFolderInfo folder, String directoryName) throws IOException {
-	folderInfo = folder;
-	cacheDir = new File(directoryName);
-	if ( ! cacheDir.exists() )
-	    cacheDir.mkdirs();
-	else if (! cacheDir.isDirectory())
-	    throw new IOException("not a directory.");
-
-	changes = new ChangeCache(cacheDir);
-
-	loadCache();
+    loadCache();
+  }
+  
+  /**
+   * Returns the datahandler for the given message uid.
+   */
+  public DataHandler getDataHandler(long uid, long newUidValidity, boolean saveToCache) throws MessagingException {
+    if (newUidValidity != uidValidity) {
+      throw new StaleCacheException(uidValidity, newUidValidity);
     }
-
-    public DataHandler getDataHandler(long uid, long newUidValidity, boolean saveToCache) throws MessagingException {
-	if (newUidValidity != uidValidity) {
-	    throw new StaleCacheException(uidValidity, newUidValidity);
-	}
-
-	DataHandler h = getHandlerFromCache(uid);
-	if (h != null) {
-	    return h;
-	} else {
-	    if (getFolderInfo().shouldBeConnected()) {
-		MimeMessage m = getFolderInfo().getRealMessageById(uid);
-		if (m != null) {
-		    h = m.getDataHandler();
-		    if (saveToCache)
-			cacheMessage(m, uid, newUidValidity, MESSAGE);
-		    return h;
-		} else
-		    throw new MessagingException("No such message:  " + uid);
-	    } else {
-		throw new NotCachedException("Message is not cached, and folder is not available.");
-	    }
-	}
+    
+    DataHandler h = getHandlerFromCache(uid);
+    if (h != null) {
+      return h;
+    } else {
+      if (getFolderInfo().shouldBeConnected()) {
+	MimeMessage m = getFolderInfo().getRealMessageById(uid);
+	if (m != null) {
+	  h = m.getDataHandler();
+	  if (saveToCache)
+	    cacheMessage(m, uid, newUidValidity, MESSAGE);
+	  return h;
+	} else
+	  throw new MessagingException("No such message:  " + uid);
+      } else {
+	throw new NotCachedException("Message is not cached, and folder is not available.");
+      }
     }
-
-    /**
-     * Returns the datahandler for the given message uid.
-     */
-    public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException {
-	return getDataHandler(uid, uidValidity, true);
+  }
+  
+  /**
+   * Returns the datahandler for the given message uid.
+   */
+  public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException {
+    return getDataHandler(uid, uidValidity, true);
     }
     
     /**
@@ -365,82 +371,83 @@ public class SimpleFileCache implements MessageCache {
    * This method changes both the client cache as well as the server, if
    * the server is available.
    */
-  
   public long[] appendMessages(MessageInfo[] msgs) throws MessagingException {
     if (getFolderInfo().shouldBeConnected()) {
       getFolderInfo().appendMessages(msgs);
     } else {
-      try {
-	getChangeAdapter().appendMessages(new long[] {});
-      } catch (java.io.IOException ioe) {
-	throw new MessagingException("Error adding message to Cache Adapter.", ioe);
+      LocalMimeMessage[] localMsgs = new LocalMimeMessage[msgs.length];
+      for (int i = 0; i < localMsgs.length; i++) {
+	Message m = msgs[i].getMessage();
+	localMsgs[i] = new LocalMimeMessage((MimeMessage)m);
       }
+      MessageCountEvent mce = new MessageCountEvent(null, MessageCountEvent.ADDED, false, localMsgs);
+      getFolderInfo().messagesAdded(mce);
     }
-
+    
     return new long[] {};
   }
-  
-    /**
-     * Removes all messages marked as 'DELETED'  from the given folder.  
-     * Returns the uids of all the removed messages.
-     *
-     * Note that if any message fails to be removed, then the ones
-     * that have succeeded should be returned in the long[].
-     *
-     * This method changes both the client cache as well as the server, if
-     * the server is available.
-     */
-    public void expungeMessages() throws MessagingException {
-	try {
-	    getChangeAdapter().expunge();
-	    Vector removedMessages = new Vector();
-	    for (int i = cachedMessages.size() -1; i >= 0; i--) {
-		long uid = ((Long) cachedMessages.elementAt(i)).longValue();
-		Flags f = getFlagsFromCache(uid);
-		if (f.contains(Flags.Flag.DELETED)) {
-		    Message m = getFolderInfo().getMessageInfoByUid(uid).getMessage();
-		    ((CachingMimeMessage)m).setExpungedValue(true);
-		    removedMessages.add(m);
-		}
-	    }
 
-	    if (removedMessages.size() > 0) {
-		Message[] rmMsg = new Message[removedMessages.size()];
-		for (int i = 0; i < removedMessages.size(); i++) 
-		    rmMsg[i] = (Message) removedMessages.elementAt(i);
-
-		MessageCountEvent mce = new MessageCountEvent(getFolderInfo().getFolder(), MessageCountEvent.REMOVED, true, rmMsg);
-		getFolderInfo().messagesRemoved(mce);
-	    }
-	} catch (IOException ioe) {
-	    throw new MessagingException(ioe.getMessage(), ioe);
+  /**
+   * Removes all messages marked as 'DELETED'  from the given folder.  
+   * Returns the uids of all the removed messages.
+   *
+   * Note that if any message fails to be removed, then the ones
+   * that have succeeded should be returned in the long[].
+   *
+   * This method changes both the client cache as well as the server, if
+   * the server is available.
+   */
+  public void expungeMessages() throws MessagingException {
+    try {
+      getChangeAdapter().expunge();
+      Vector removedMessages = new Vector();
+      for (int i = cachedMessages.size() -1; i >= 0; i--) {
+	long uid = ((Long) cachedMessages.elementAt(i)).longValue();
+	Flags f = getFlagsFromCache(uid);
+	if (f.contains(Flags.Flag.DELETED)) {
+	  Message m = getFolderInfo().getMessageInfoByUid(uid).getMessage();
+	  ((CachingMimeMessage)m).setExpungedValue(true);
+	  removedMessages.add(m);
 	}
-    }
-
-    /**
-     * This returns the uid's of the message which exist in updatedUids, but
-     * not in the current list of messsages.
-     */ 
-    public long[] getAddedMessages(long[] uids, long newUidValidity) throws StaleCacheException {
-	if (newUidValidity != uidValidity) {
-	    throw new StaleCacheException(uidValidity, newUidValidity);
-	}
-	long[] added = new long[uids.length];
-	int addedCount = 0;
+      }
+      
+      if (removedMessages.size() > 0) {
+	Message[] rmMsg = new Message[removedMessages.size()];
+	for (int i = 0; i < removedMessages.size(); i++) 
+	  rmMsg[i] = (Message) removedMessages.elementAt(i);
 	
-	for (int i = 0; i < uids.length; i++) {
-	    if (! cachedMessages.contains(new Long(uids[i]))) {
-		added[addedCount++]=uids[i];
-	    }
-	}
-
-	long[] returnValue = new long[addedCount];
-	if (addedCount > 0) 
-	    System.arraycopy(added, 0, returnValue, 0, addedCount);
-
-	return returnValue;
+	MessageCountEvent mce = new MessageCountEvent(getFolderInfo().getFolder(), MessageCountEvent.REMOVED, true, rmMsg);
+	getFolderInfo().messagesRemoved(mce);
+      }
+    } catch (IOException ioe) {
+      throw new MessagingException(ioe.getMessage(), ioe);
     }
-
+  }
+  
+  /**
+   * This returns the uid's of the message which exist in updatedUids, but
+   * not in the current list of messsages.
+   */ 
+  public long[] getAddedMessages(long[] uids, long newUidValidity) throws StaleCacheException {
+    if (newUidValidity != uidValidity) {
+      throw new StaleCacheException(uidValidity, newUidValidity);
+    }
+    long[] added = new long[uids.length];
+    int addedCount = 0;
+    
+    for (int i = 0; i < uids.length; i++) {
+      if (! cachedMessages.contains(new Long(uids[i]))) {
+	added[addedCount++]=uids[i];
+      }
+    }
+    
+    long[] returnValue = new long[addedCount];
+    if (addedCount > 0) 
+      System.arraycopy(added, 0, returnValue, 0, addedCount);
+    
+    return returnValue;
+  }
+  
     /**
      * This returns the uid's of the message which exist in the current
      * list of messages, but no longer exist in the updatedUids.
@@ -827,6 +834,30 @@ public class SimpleFileCache implements MessageCache {
 
 	return returnValue;
     }
+
+  /**
+   * A class representing a local, cache-only message.
+   */
+  public class LocalMimeMessage extends javax.mail.internet.MimeMessage {
+    
+    long uid;
+
+    public LocalMimeMessage(MimeMessage m) throws MessagingException {
+      super(m);
+      uid = generateLocalUID();
+    }
+
+    public long getUID() {
+      return uid;
+    }
+  }
+
+  /**
+   * Generates a local UID.
+   */
+  public synchronized long generateLocalUID() {
+    return lastLocalUID--;
+  }
 }
 
 

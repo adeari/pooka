@@ -277,7 +277,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    long[] uids = new long[messages.length];
 	    
 	    for (int i = 0; i < messages.length; i++) {
-	      uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
+	      uids[i] = getUID(messages[i]);
 	    }
       
 	    MessageInfo mi;
@@ -383,7 +383,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (cacheStatus != -1) {
 	for (int i = 0; i < messages.length; i++) {
 	  Message m = messages[i].getRealMessage();
-	  long uid = ((UIDFolder)getFolder()).getUID(m);
+	  long uid = getUID(m);
 	  getCache().cacheMessage((MimeMessage)m, uid, cache.getUIDValidity(), cacheStatus);	
 	}
       }
@@ -588,7 +588,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       long[] uids = new long[messages.length];
       
       for (int i = 0; i < messages.length; i++) {
-	uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
+	uids[i] = getUID(messages[i]);
       }
       
       if (Pooka.isDebug())
@@ -678,7 +678,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  
 	  long uid = -1;
 	  try {
-	    uid = ((UIDFolder)getFolder()).getUID(addedMessages[i]);
+	    uid = getUID(addedMessages[i]);
 	  } catch (MessagingException me) {
 	  }
 
@@ -769,7 +769,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	// not a CachingMimeMessage.
 	long uid = -1;
 	try {
-	  uid =((UIDFolder)getFolder()).getUID(removedMessages[i]);
+	  uid = getUID(removedMessages[i]);
 	} catch (MessagingException me) {
 	  
 	}
@@ -826,11 +826,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
 	Message msg = mce.getMessage();
 	long uid = -1;
-	if (msg != null && msg instanceof CachingMimeMessage) {
-	  uid = ((CachingMimeMessage) msg).getUID();
-	} else {
-	  uid = ((UIDFolder)getFolder()).getUID(msg);
-	}
+	uid = getUID(msg);
 
 	if (msg != null){
 	  if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
@@ -915,7 +911,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		MimeMessage realMessage = getRealMessageById(uid);
 		getCache().cacheMessage(realMessage, uid, uidValidity, cacheStatus);
 	    } else if (m instanceof MimeMessage) {
-		long uid = ((UIDFolder)getFolder()).getUID(m);
+		long uid = getUID(m);
 		getCache().cacheMessage((MimeMessage)m, uid, uidValidity, cacheStatus);
 	    } else {
 		throw new MessagingException(Pooka.getProperty("error.CachingFolderInfo.unknownMessageType", "Error:  unknownMessageType."));
@@ -1061,6 +1057,17 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
   public boolean isLoaded() {
     return (getFolder() != null && cache != null);
+  }
+
+  /**
+   * Gets the UID for the given Message.
+   */
+  public long getUID(Message m) throws MessagingException {
+    if (m instanceof SimpleFileCache.LocalMimeMessage) {
+      return ((SimpleFileCache.LocalMimeMessage) m).getUID();
+    } else {
+      return super.getUID(m);
+    }
   }
 }
 
