@@ -1,5 +1,5 @@
 *) add drag and drop
-   *) FIX THREADING!!! -- just try doing a big copy into a folde with a 
+   *) FIX THREADING!!! -- just try doing a big copy into a folder with a 
 	paste operation!!!
 
    *) on win/osx:
@@ -8,10 +8,14 @@
      *) test with desktop/external apps.
 
 *) make status icon for store itself.
+	behavior:
+	normal icon if not opened (?)
 
 *) test w/gnu javamail -- ???
+*) test w/javamail 1.3.2.
 
 -----
+*) add a real debug system.
 
 *) add support for running without any local files.
 	-- support for http: access?

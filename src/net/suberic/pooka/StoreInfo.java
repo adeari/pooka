@@ -169,6 +169,19 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	    }
 	    
 	  }
+
+	  public void closed(ConnectionEvent e) {
+	    if (Pooka.isDebug())
+	      System.out.println("Store " + getStoreID() + " closed.");
+
+	    try {
+	      disconnectStore();
+	    } catch (MessagingException me) {
+	      if (Pooka.isDebug())
+		System.out.println("error disconnecting Store:  " + me.getMessage());
+	    }
+	    
+	  }
 	});
     }
     
@@ -237,6 +250,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   void loadImapProperties(Properties p) {
     p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
     p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
+
+    p.setProperty("mail.imaps.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
+    p.setProperty("mail.imaps.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
     
     // set up ssl
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
@@ -735,6 +751,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * StoreInfo will try to reconnect the store.
    */
   public void disconnectStore() throws MessagingException {
+    if (Pooka.isDebug()) {
+      System.out.println("disconnecting store " + getStoreID());
+    }
     MessagingException storeException = null;
     if (!(store.isConnected())) {
       connected=false;
@@ -851,6 +870,30 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     for (int i = 0; children != null && i < children.size(); i++) {
       FolderInfo fi = (FolderInfo) children.get(i);
       fi.synchSubscribed();
+    }
+  }
+
+  /**
+   * Checks connection for this store.
+   */
+  public boolean checkConnection() {
+    Store realStore = getStore();
+	  
+    if (realStore != null) {
+      if (! realStore.isConnected())
+	return false;
+      else {
+	// that's not good enough.
+	try {
+	  Folder f = realStore.getDefaultFolder();
+	} catch (Exception newe) {
+	  return false;
+	}
+
+	return true;
+      }
+    } else {
+      return false;
     }
   }
 

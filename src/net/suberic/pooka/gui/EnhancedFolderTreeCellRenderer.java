@@ -234,7 +234,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedStoreIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.disconnectedStoreIcon", "images/ClosedMailbox.gif"));
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.disconnectedStoreIcon", "images/mailbox.gif"));
       if (url != null) {
 	setDisconnectedStoreIcon(new ImageIcon(url));
 	setIcon(getDisconnectedStoreIcon());
@@ -247,7 +247,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedStoreIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.connectedStoreIcon", "images/OpenMailbox.gif"));
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.connectedStoreIcon", "images/OpenMailbox.png"));
       if (url != null) {
 	setConnectedStoreIcon(new ImageIcon(url));
 	setIcon(getConnectedStoreIcon());

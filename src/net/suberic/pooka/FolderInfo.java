@@ -370,13 +370,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 	
 	// check to see if the parent store is still open.
+	
 	StoreInfo parentStoreInfo = getParentStore();
 	if (parentStoreInfo != null) {
-	  Store realParentStore = parentStoreInfo.getStore();
-	  
-	  if (realParentStore != null) {
-	    realParentStore.isConnected();
-	  }
+	  parentStoreInfo.checkConnection();
 	}
       
 	if (getFolderDisplayUI() != null) {
@@ -406,7 +403,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Store realParentStore = parentStoreInfo.getStore();
 
 	if (realParentStore != null) {
-	  realParentStore.isConnected();
+	  parentStoreInfo.checkConnection();
 	}
       }
       
