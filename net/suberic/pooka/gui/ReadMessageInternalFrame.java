@@ -23,6 +23,12 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     public ReadMessageInternalFrame(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
 	super(newParentContainer, newMsgProxy);
 
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (getMessageDisplay() != null)
+		getMessageDisplay().requestFocus();
+	    }
+	  });
     }
 
     public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
@@ -47,6 +53,13 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	Point loc = source.getLocationOnScreen();
 	SwingUtilities.convertPointFromScreen(loc, parentContainer);
 	this.setLocation(loc);
+
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (getMessageDisplay() != null)
+		getMessageDisplay().requestFocus();
+	    }
+	  });
     }
 
     /**

@@ -24,6 +24,13 @@ public class ReadMessageFrame extends MessageFrame {
 	super(newMsgProxy);
 
 	configureMessageFrame();
+
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (getMessageDisplay() != null)
+		getMessageDisplay().requestFocus();
+	    }
+	  });
     }
 
     /**
@@ -48,6 +55,14 @@ public class ReadMessageFrame extends MessageFrame {
 	toolbar.setActive(this.getActions());
 
 	this.setLocation(source.getLocationOnScreen());
+
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (getMessageDisplay() != null)
+		getMessageDisplay().requestFocus();
+	    }
+	  });
+
     }
 
     protected void configureMessageFrame() {
