@@ -243,19 +243,28 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	scrollPane.getViewport().add(messageTable);
 
 	int firstUnread = getFolderInfo().getFirstUnreadMessage();
-
-	/*
-	 // hey--getCellRect doesn't seem to be working in 1.3.  moving this
-	 // to addNotify().
-	if (firstUnread > -1) {
+	if (firstUnread < 0)
+	    firstUnread = messageTable.getRowCount();
+	else 
 	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
-
-	    messageTable.scrollRectToVisible(messageTable.getCellRect(firstUnread, 1, true));
-	} else {
-	    messageTable.scrollRectToVisible(messageTable.getCellRect(messageTable.getRowCount(), 1, true));
-	}
-	*/
 	
+	String javaVersion = System.getProperty("java.version");
+
+        if (javaVersion.compareTo("1.3") >= 0) {
+
+	    // this really is awful.  i hope that they fix getCellRect() and
+	    // scrollToRect in 1.3
+
+	    int rowHeight = messageTable.getRowHeight();
+	    JScrollBar vsb = scrollPane.getVerticalScrollBar();
+	    int newValue = Math.min(rowHeight * (firstUnread - 1), vsb.getMaximum() - vsb.getModel().getExtent());
+	    vsb.setValue(newValue);
+	    newValue = Math.min(rowHeight * (firstUnread - 1), vsb.getMaximum() - vsb.getModel().getExtent());
+	    vsb.setValue(newValue);
+	} else {
+	    messageTable.scrollRectToVisible(messageTable.getCellRect(firstUnread, 1, true));
+	}
+
 	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 	this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -314,40 +323,6 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	} catch (MessagingException me) {
 	    JOptionPane.showInternalMessageDialog(getDesktopPane(), Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
 	}   
-    }
-
-    /**
-     * Overrides JComponent.addNotify().
-     *
-     * We override addNotify() here to scroll the MessageTable to the proper
-     * location in jdk 1.3. 
-     */
-    public void addNotify() {
-	super.addNotify();
-
-	int firstUnread = getFolderInfo().getFirstUnreadMessage();
-	if (firstUnread < 0)
-	    firstUnread = messageTable.getRowCount();
-	else 
-	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
-	
-	String javaVersion = System.getProperty("java.version");
-
-        if (javaVersion.compareTo("1.3") >= 0) {
-
-	    // this really is awful.  i hope that they fix getCellRect() and
-	    // scrollToRect in 1.3
-
-	    int rowHeight = messageTable.getRowHeight();
-	    JScrollBar vsb = scrollPane.getVerticalScrollBar();
-	    int newValue = Math.min(rowHeight * (firstUnread - 1), vsb.getMaximum() - vsb.getModel().getExtent());
-	    vsb.setValue(newValue);
-	    newValue = Math.min(rowHeight * (firstUnread - 1), vsb.getMaximum() - vsb.getModel().getExtent());
-	    vsb.setValue(newValue);
-	} else {
-	    messageTable.scrollRectToVisible(messageTable.getCellRect(firstUnread, 1, true));
-	}
-
     }
 
     // Accessor methods.
