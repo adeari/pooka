@@ -1138,6 +1138,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * opened folder.
      */
     public void openFolder(int mode) throws MessagingException {
+
 	if (! isLoaded())
 	    loadFolder();
 	
@@ -1400,6 +1401,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public boolean isOpen() {
 	return (status == CONNECTED);
+    }
+
+    public boolean shouldBeOpen() {
+	return (status < PASSIVE);
     }
 
     public boolean isAvailable() {

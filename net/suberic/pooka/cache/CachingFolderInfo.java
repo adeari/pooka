@@ -117,9 +117,10 @@ public class CachingFolderInfo extends FolderInfo {
 		    s.connectStore();
 		
 		openFolder(Folder.READ_WRITE);
+	    } else {
+		synchronizeCache();
 	    }
 
-	    synchronizeCache();
 	    if (isAvailable() && status == PASSIVE)
 		closeFolder(false);
 
@@ -133,6 +134,8 @@ public class CachingFolderInfo extends FolderInfo {
 	if (isNowOpen) {
 	    try {
 		uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
+		if (getFolderTableModel() != null)
+		    synchronizeCache();
 	    } catch (Exception e) { }
 	    status = CONNECTED;
 	    
@@ -187,6 +190,7 @@ public class CachingFolderInfo extends FolderInfo {
      * Folder.
      */
     public void synchronizeCache() throws MessagingException {
+	System.out.println("sync cache.");
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
@@ -197,7 +201,13 @@ public class CachingFolderInfo extends FolderInfo {
 	    getCache().setUIDValidity(uidValidity);
 	}
 
+	FetchProfile fp = new FetchProfile();
+	fp.add(FetchProfile.Item.ENVELOPE);
+	fp.add(FetchProfile.Item.FLAGS);
+	fp.add(UIDFolder.FetchProfileItem.UID);
 	Message[] messages = getFolder().getMessages();
+	getFolder().fetch(messages, fp);
+
 	long[] uids = new long[messages.length];
 
 	for (int i = 0; i < messages.length; i++) {
@@ -230,6 +240,17 @@ public class CachingFolderInfo extends FolderInfo {
 	    messagesRemoved(mce);
 	    
 	}
+
+	updateFlags(uids, messages, cacheUidValidity);
+	
+    }
+
+    protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
+	System.out.println("updating cache.");
+	for (int i = 0; i < messages.length; i++) {
+	    getCache().cacheMessage((MimeMessage)messages[i], uids[i], uidValidity, SimpleFileCache.FLAGS);
+	}
+	
     }
 
     
@@ -244,7 +265,7 @@ public class CachingFolderInfo extends FolderInfo {
 		messageToInfoTable.put(addedMessages[i], mp);
 		uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
 		try {
-		    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.HEADERS);
+		    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
 		} catch (MessagingException me) {
 		    System.out.println("caught exception:  " + me);
 		    me.printStackTrace();
@@ -266,7 +287,7 @@ public class CachingFolderInfo extends FolderInfo {
 		messageToInfoTable.put(newMsg, mp);
 		uidToInfoTable.put(new Long(uid), mp);
 		try {
-		    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.HEADERS);
+		    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
 		} catch (MessagingException me) {
 		    System.out.println("caught exception:  " + me);
 		    me.printStackTrace();
@@ -453,6 +474,42 @@ public class CachingFolderInfo extends FolderInfo {
     }
 
     /**
+     * Unloads all messages.  This should be run if ever the current message
+     * information becomes out of date, as can happen when the connection
+     * to the folder goes down.
+     *
+     * Note that for this implementation, we just keep everything; we only
+     * need to worry when we do the cache synchronization.
+     */
+    public void unloadAllMessages() {
+	//folderTableModel = null;
+    }
+
+    /**
+     * This method closes the Folder.  If you open the Folder using 
+     * openFolder (which you should), then you should use this method
+     * instead of calling getFolder.close().  If you don't, then the
+     * FolderInfo will try to reopen the folder.
+     */
+    public void closeFolder(boolean expunge) throws MessagingException {
+
+	if (getFolderTracker() != null) {
+	    getFolderTracker().removeFolder(this);
+	    setFolderTracker(null);
+	}
+
+	if (isLoaded() && isAvailable()) {
+	    setStatus(CLOSED);
+	    try {
+		getFolder().close(expunge);
+	    } catch (java.lang.IllegalStateException ise) {
+		throw new MessagingException(ise.getMessage(), ise);
+	    }
+	}
+
+    }
+
+    /**
      * This returns the MessageCache associated with this FolderInfo,
      * if any.
      */
@@ -475,8 +532,12 @@ public class CachingFolderInfo extends FolderInfo {
 	Folder f = getFolder();
 	if (f != null && f instanceof UIDFolder) {
 	    javax.mail.internet.MimeMessage m = null;
-	    m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
-	    return m;
+	    try {
+		m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
+		return m;
+	    } catch (IllegalStateException ise) {
+		return null;
+	    }
 	} else {
 	    return null;
 	}

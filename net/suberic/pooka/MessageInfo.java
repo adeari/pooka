@@ -145,9 +145,13 @@ public class MessageInfo {
 	    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		getFolderInfo().openFolder(Folder.READ_WRITE);
-		loadAttachmentInfo();
-		return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+		if (getFolderInfo().shouldBeOpen()) {
+		    getFolderInfo().openFolder(Folder.READ_WRITE);
+		    loadAttachmentInfo();
+		    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+		} else {
+		    throw fce;
+		}
 	    } catch (java.io.IOException ioe) {
 		throw new MessagingException(ioe.getMessage()); 
 	    }
@@ -180,9 +184,13 @@ public class MessageInfo {
 	    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		getFolderInfo().openFolder(Folder.READ_WRITE);
-		loadAttachmentInfo();
-		return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+		if (getFolderInfo().shouldBeOpen()) {
+		    getFolderInfo().openFolder(Folder.READ_WRITE);
+		    loadAttachmentInfo();
+		    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+		} else {
+		    throw fce;
+		}
 	    } catch (java.io.IOException ioe) {
 		throw new MessagingException(ioe.getMessage()); 
 	    }
@@ -208,9 +216,13 @@ public class MessageInfo {
 	    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		getFolderInfo().openFolder(Folder.READ_WRITE);
-		loadAttachmentInfo();
-		return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+		if (getFolderInfo().shouldBeOpen()) {
+		    getFolderInfo().openFolder(Folder.READ_WRITE);
+		    loadAttachmentInfo();
+		    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+		} else {
+		    throw fce;
+		}
 	    } catch (java.io.IOException ioe) {
 		throw new MessagingException(ioe.getMessage()); 
 	    }
@@ -236,9 +248,13 @@ public class MessageInfo {
 	    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		getFolderInfo().openFolder(Folder.READ_WRITE);
-		loadAttachmentInfo();
-		return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+		if (getFolderInfo().shouldBeOpen()) {
+		    getFolderInfo().openFolder(Folder.READ_WRITE);
+		    loadAttachmentInfo();
+		    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+		} else {
+		    throw fce;
+		}
 	    } catch (java.io.IOException ioe) {
 		throw new MessagingException(ioe.getMessage()); 
 	    }
