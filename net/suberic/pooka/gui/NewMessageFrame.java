@@ -248,12 +248,6 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
   
   /**
    * Pops up a JFileChooser and returns the results.
-   *
-   * Note:  i'd like to have this working so that you can attach multiple
-   * files at once, but it seems that the JFileChooser really doesn't 
-   * want to return an array with anything in it for getSelectedFiles().  
-   * So for now, I'll leave the Pooka API as is, but only ever return a 
-   * single entry in the File array.
    */
   public File[] getFiles(String title, String buttonText) {
     JFileChooser jfc;
@@ -265,13 +259,13 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
       
     jfc.setDialogTitle(title);
     jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    jfc.setMultiSelectionEnabled(false);
+    jfc.setMultiSelectionEnabled(true);
     int a = jfc.showDialog(this, buttonText);
     
     Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", jfc.getCurrentDirectory().getPath(), true);
 
     if (a == JFileChooser.APPROVE_OPTION)
-      return new File[] {jfc.getSelectedFile()};
+      return jfc.getSelectedFiles();
     else
       return null;
   }

@@ -286,13 +286,13 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
       
     jfc.setDialogTitle(title);
     jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    jfc.setMultiSelectionEnabled(false);
+    jfc.setMultiSelectionEnabled(true);
     int a = jfc.showDialog(this, buttonText);
     
     Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", jfc.getCurrentDirectory().getPath(), true);
 
     if (a == JFileChooser.APPROVE_OPTION)
-      return new File[] {jfc.getSelectedFile()};
+      return jfc.getSelectedFiles();
     else
       return null;
   }

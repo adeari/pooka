@@ -1,3 +1,6 @@
+modified the attachment filechooser to select for multiple files, now that
+that's supported in swing.
+
 added status messages while sending new messages.  this is to make sure that
 users always know what the status of their outgoing messages is.
 
