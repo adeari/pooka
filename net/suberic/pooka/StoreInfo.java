@@ -334,13 +334,28 @@ public class StoreInfo implements ValueChangeListener {
      * StoreInfo will try to reconnect the store.
      */
     public void disconnectStore() throws MessagingException {
+	MessagingException storeException = null;
 	if (!(store.isConnected())) {
 	    connected=false;
 	    return;
 	} else {
-	    connected=false;
-	    store.close();
-	    closeAllFolders(false);
+	    try {
+		store.close();
+	    } catch (MessagingException me) {
+		storeException = me;
+	    } finally {
+		connected=false;
+		try {
+		    closeAllFolders(false);
+		} catch (MessagingException folderMe) {
+		    if (storeException != null)
+			throw folderMe;
+		    else {
+			storeException.setNextException(folderMe);
+			throw storeException;
+		    }
+		}
+	    }
 	}
     }
 

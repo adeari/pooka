@@ -949,6 +949,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (! isLoaded())
 	    loadFolder();
 	
+	if (!getParentStore().isConnected())
+	    getParentStore().connectStore();
+
 	if (isLoaded() && isAvailable()) {
 	    if (folder.isOpen()) {
 		if (folder.getMode() == mode)
@@ -1021,16 +1024,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * FolderInfo will try to reopen the folder.
      */
     public void closeFolder(boolean expunge) throws MessagingException {
+	if (getFolderTracker() != null) {
+	    getFolderTracker().removeFolder(this);
+	    setFolderTracker(null);
+	}
+
 	if (isLoaded()) {
 	    if (folder.isOpen()) {
 		open=false;
 		folder.close(expunge);
 	    }
-	}
-
-	if (getFolderTracker() != null) {
-	    getFolderTracker().removeFolder(this);
-	    setFolderTracker(null);
 	}
     }
 
@@ -1038,14 +1041,23 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * This closes the curernt Folder as well as all subfolders.
      */
     public void closeAllFolders(boolean expunge) throws MessagingException {
+	MessagingException otherException = null;
 	Vector folders = getChildren();
 	if (folders != null) {
 	    for (int i = 0; i < folders.size(); i++) {
-		((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
+		try {
+		    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
+		} catch (MessagingException me) {
+		    if (otherException == null)
+			otherException = me;
+		}
 	    }
 	}  
-
+	
 	closeFolder(expunge);
+
+	if (otherException != null)
+	    throw otherException;
     }
     
     // Accessor methods.
