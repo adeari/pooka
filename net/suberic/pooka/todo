@@ -1,14 +1,6 @@
 next release:
 
-******* fix email so that you don't try to send the message before you've
-updated the to: list!
-
 *) add queuing of outgoing mails (?)
-
-*) make vcard address book at least come close to working for simple cases.
-	should work for groups.
-	editor should work for new address books.
-	make editor take 'external' editors.
 
 *) fix "got an empty/null added or deleted event" message after a search has
 	been done.
@@ -19,15 +11,12 @@ updated the to: list!
 
 *) add support for authenticated smtp.
 
-*) test new system with pop3/mbox to make sure it still works.
-
 beta 1
 ---------------
 
 *) add address book/ldap support.
 	now:
 	1)  add ldap support
-	2)  make it support aliases/lists properly
 
 	later:
 	1)  make sure the matches go with the entry--i.e. if you match the

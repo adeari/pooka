@@ -137,29 +137,31 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     final long lastModifiedTime = lastKeyTime;
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
 
-    final String entryString = getAddressText();
-
-    if (needToMatch(entryString)) {
-      final net.suberic.pooka.AddressBookEntry[] matchedEntries = matcher.match(entryString);
-
-      try {
-	SwingUtilities.invokeAndWait(new Runnable() {
-	    public void run() {
-	      // make sure no keys have been pressed since we did the match.
-	      if (lastModifiedTime == lastKeyTime) {
-		if (matchedEntries.length > 0) {
-		  String newAddress = matchedEntries[0].getID(); 
-		  if (!newAddress.equalsIgnoreCase(entryString))
-		    updateAddressText(newAddress);
-		} else {
-		  updateAddressText(entryString + Pooka.getProperty("error.noMatchingAddresses", "<no matching addresses>"));
+    if (matcher != null) {
+      final String entryString = getAddressText();
+      
+      if (needToMatch(entryString)) {
+	final net.suberic.pooka.AddressBookEntry[] matchedEntries = matcher.match(entryString);
+	
+	try {
+	  SwingUtilities.invokeAndWait(new Runnable() {
+	      public void run() {
+		// make sure no keys have been pressed since we did the match.
+		if (lastModifiedTime == lastKeyTime) {
+		  if (matchedEntries.length > 0) {
+		    String newAddress = matchedEntries[0].getID(); 
+		    if (!newAddress.equalsIgnoreCase(entryString))
+		      updateAddressText(newAddress);
+		  } else {
+		    updateAddressText(entryString + Pooka.getProperty("error.noMatchingAddresses", "<no matching addresses>"));
+		  }
+		  
+		  lastMatchedTime = System.currentTimeMillis();
 		}
-		
-		lastMatchedTime = System.currentTimeMillis();
 	      }
-	    }
-	  });
-      } catch (Exception e) {
+	    });
+	} catch (Exception e) {
+	}
       }
     }
   }

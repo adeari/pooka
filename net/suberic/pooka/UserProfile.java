@@ -451,8 +451,13 @@ public class UserProfile extends Object implements ValueChangeListener {
   public AddressMatcher getAddressMatcher() {
     if (addressBook != null)
       return addressBook.getAddressMatcher();
-    else
-      return null;
+    else {
+      AddressBook defaultBook = Pooka.getAddressBookManager().getDefault();
+      if (defaultBook != null)
+	return defaultBook.getAddressMatcher();
+      else
+	return null;
+    }
   }
 
   public AddressBook getAddressBook() {

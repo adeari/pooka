@@ -139,8 +139,14 @@ public class AddressBookManager implements ValueChangeListener {
       AddressBook currentAddressBook = getAddressBook(addressBookID);
       if (currentAddressBook != null)
 	newAddressBookList.add(currentAddressBook);
-      else 
+      else {
+	currentAddressBook = createAddressBook(addressBookID);
 	newAddressBookList.add(createAddressBook(addressBookID));
+
+	if (Pooka.getProperty("AddressBook._default", "").equalsIgnoreCase(""))
+	  Pooka.setProperty("AddressBook._default", addressBookID);
+	
+      }
     }
     
     
