@@ -96,10 +96,12 @@ public class MailUtilities {
 			} else {
 			    if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 				Vector v = getAttachments((MimeMultipart)mbp.getContent());
-				attachments.addAll(v);
+				if (v != null && v.size() > 0)
+				    attachments.addAll(v);
 			    } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
 				Vector v = getAttachments((Message)mbp.getContent());
-				attachments.addAll(v);
+				if (v != null && v.size() > 0)
+				    attachments.addAll(v);
 			    } else {
 				attachments.add(mbp);
 			    }  
@@ -109,10 +111,12 @@ public class MailUtilities {
 			
 			if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 			    Vector v = getAttachments((MimeMultipart)mbp.getContent());
-			    attachments.addAll(v);
+			    if (v != null && v.size() > 0)
+				attachments.addAll(v);
 			} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
 				Vector v = getAttachments((Message)mbp.getContent());
-				attachments.addAll(v);
+				if (v != null && v.size() > 0)
+				    attachments.addAll(v);
 			    } else {
 			    
 				attachments.add(mbp);
@@ -182,7 +186,8 @@ public class MailUtilities {
 		ContentType ct = new ContentType(mbp.getContentType());
 		if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 		    Vector v = getAttachments((MimeMultipart)mbp.getContent());
-		    attachments.addAll(v);
+		    if (v != null && v.size() > 0)
+			attachments.addAll(v);
 		} else
 		    
 		    attachments.add(mbp);
