@@ -39,6 +39,7 @@ public class Pooka {
 	frame.setBackground(Color.lightGray);
 	frame.getContentPane().setLayout(new BorderLayout());
 	panel = new MainPanel(frame);
+	panel.configureMainPanel();
 	frame.getContentPane().add("North", panel.getMainToolbar());
 	frame.getContentPane().add("Center", panel);
 	frame.setJMenuBar(panel.getMainMenu());
