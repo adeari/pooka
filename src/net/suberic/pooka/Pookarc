@@ -298,7 +298,7 @@ NewMessageWindowToolbar.Sign.Image=/org/javalobby/icons/20x20png/Draw.png
 NewMessageWindowToolbar.Encrypt.Action=message-encrypt
 NewMessageWindowToolbar.Encrypt.Image=/org/javalobby/icons/20x20png/Lock.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Print:Find:DisplayStyle:HeaderStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:Spam:|:Copy:|:SaveAddress:|:Detach:|:Print:Find:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -307,6 +307,8 @@ MessageWindowToolbar.Forward.Action=message-forward
 MessageWindowToolbar.Forward.Image=/org/javalobby/icons/20x20png/Forward.png
 MessageWindowToolbar.Delete.Action=message-delete
 MessageWindowToolbar.Delete.Image=/org/javalobby/icons/20x20png/DeleteEnvelope.png
+MessageWindowToolbar.Spam.Action=message-spam
+MessageWindowToolbar.Spam.Image=/org/javalobby/icons/20x20png/ThumbDown.gif
 MessageWindowToolbar.Copy.Action=copy-to-clipboard
 MessageWindowToolbar.Copy.Image=/org/javalobby/icons/20x20png/Copy.png
 MessageWindowToolbar.SaveAddress.Action=message-save-address

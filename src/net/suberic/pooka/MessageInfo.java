@@ -712,17 +712,25 @@ public class MessageInfo {
    * Runs the configured spam action on this message.
    */
   public void runSpamAction() {
-    FilterAction spamFilter = MessageFilter.generateFilterAction("Pooka.spamAction");
+    FilterAction spamFilter = null;
+    try {
+      spamFilter = MessageFilter.generateFilterAction("Pooka.spamAction");
+    } catch (Exception e) {
+      int configureNow = Pooka.getUIFactory().showConfirmDialog("Spam action currently not configured.  Would you like to configure it now?", "Configure Spam action", javax.swing.JOptionPane.YES_NO_OPTION);
+      if (configureNow == javax.swing.JOptionPane.YES_OPTION) {
+	// show configure screen.
+	Vector valuesToEdit = new Vector();
+	valuesToEdit.add("Pooka.spamAction");
+	Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("Preferences.Spam.label", "Spam"), valuesToEdit);
+      }
+      
+    }
     if (spamFilter != null) {
       Vector v = new Vector();
       v.add(this.getMessageProxy());
       spamFilter.performFilter(v);
-    } else {
-      int configureNow = Pooka.getUIFactory().showConfirmDialog("Spam action currently not configured.  Would you like to configure it now?", "Configure Spam action", javax.swing.JOptionPane.YES_NO_OPTION);
-      if (configureNow == javax.swing.JOptionPane.YES_OPTION) {
-	// show configure screen.
-      }
-    }
+      return;
+    } 
   }
 
   /**

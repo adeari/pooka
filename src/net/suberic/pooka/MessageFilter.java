@@ -34,25 +34,24 @@ public class MessageFilter {
       // FIXME:  we should actually handle this.
       
       pe.printStackTrace();
+    } catch (InstantiationException ie) {
+      ie.printStackTrace();
+    } catch (IllegalAccessException iae) {
+      iae.printStackTrace();
+    } catch (ClassNotFoundException cnfe) {
+      cnfe.printStackTrace();
     }
   }
   
   /**
    * Generates a FilterAction from the given property.
    */
-  
-  public static FilterAction generateFilterAction(String actionProperty) {
+  public static FilterAction generateFilterAction(String actionProperty) throws ClassNotFoundException, InstantiationException , IllegalAccessException {
     String className = Pooka.getProperty(actionProperty + ".class", "");
-    try {
-      Class filterClass = Class.forName(className);
-      FilterAction newAction = (FilterAction)filterClass.newInstance();
-      newAction.initializeFilter(actionProperty);
-      return newAction;
-    } catch (Exception e) {
-      System.out.println("caught exception initializing filter " + e);
-      e.printStackTrace();
-    }
-    return null;
+    Class filterClass = Class.forName(className);
+    FilterAction newAction = (FilterAction)filterClass.newInstance();
+    newAction.initializeFilter(actionProperty);
+    return newAction;
   }
   
   // accessor methods.
