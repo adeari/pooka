@@ -44,8 +44,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       super.activateFrame(f);
       
       f.requestFocus();
-      mainPanel.refreshActiveMenus();
-      mainPanel.refreshCurrentUser();
     }
     
     /**
@@ -62,10 +60,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
 	  allFrames[0].setSelected(true);
 	} catch (java.beans.PropertyVetoException pve) {
 	}
-
-      // is this necessary?
-      mainPanel.refreshActiveMenus();
-      mainPanel.refreshCurrentUser();
     }
     
   }

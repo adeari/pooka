@@ -5,6 +5,7 @@ import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.beans.*;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
@@ -33,9 +34,15 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   private UserProfile currentUser = null;
   private ConfigurableKeyBinding keyBindings;
 
+  protected PookaFocusManager focusManager;
+
   private boolean newMessageFlag = false;
   private String standardTitle = Pooka.getProperty("Title", "Pooka");
   private String newMessageTitle = Pooka.getProperty("Title.withNewMessages", "* Pooka *");
+  
+  // status
+  private static int CONTENT_LAST = 0;
+  private static int FOLDER_LAST = 5;
   
   private ImageIcon standardIcon = null;
   private ImageIcon newMessageIcon = null;
@@ -100,149 +107,182 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
       });
     
-      // set the initial currentUser
+    focusManager = new PookaFocusManager();
+
+    // set the initial currentUser
     refreshCurrentUser();
     
     // select the content panel.
     contentPanel.getUIComponent().requestFocus();
   }
 
-    /**
-     * This gets all the actinos associated with this panel.  Useful for
-     * populating the MenuBar and Toolbar.
-     *
-     * The method actually returns the Panel's defaultActions plus the
-     * actions of the folderPanel and/or contentPanel, depending on which
-     * one currently has the focus.
-     */    
-    public Action[] getActions() {
-	Action[] actions = getDefaultActions();
-	Component focusedComponent = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-	if (focusedComponent != null) {
-	    if (folderPanel != null) 
-		if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel))
-		    if (folderPanel.getActions() != null)
-			actions = TextAction.augmentList(folderPanel.getActions(), actions);
-	    if (contentPanel != null) 
-		if (SwingUtilities.isDescendingFrom(focusedComponent, contentPanel.getUIComponent()))
-		    if (contentPanel.getActions() != null) 
-			actions = TextAction.augmentList(contentPanel.getActions(), actions);
+  /**
+   * This gets all the actinos associated with this panel.  Useful for
+   * populating the MenuBar and Toolbar.
+   *
+   * The method actually returns the Panel's defaultActions plus the
+   * actions of the folderPanel and/or contentPanel, depending on which
+   * one currently has the focus.
+   */    
+  public Action[] getActions() {
+    Action[] actions = getDefaultActions();
+    Component focusedComponent = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+
+    boolean foundParent = false;
+
+    if (focusedComponent != null) {
+      if (contentPanel != null) {
+	if (SwingUtilities.isDescendingFrom(focusedComponent, contentPanel.getUIComponent())) {
+	  foundParent = true;
+	  focusManager.setLastStatus(CONTENT_LAST);
+	  if (contentPanel.getActions() != null) {
+	    actions = TextAction.augmentList(contentPanel.getActions(), actions);
+	  }
 	}
-	return actions;
-    }
+      }
 
-
-    /**
-     * Called by ExtendedDesktopManager every time the focus on the windows
-     * changes.  Resets the Actions associated with the menu items and toolbar
-     * to the ones in the active window.
-     *
-     * Also called when the selected message in a FolderWindow is changed.
-     */
-
-    public void refreshActiveMenus() {
-	mainMenu.setActive(getActions());
-	mainToolbar.setActive(getActions());
-	keyBindings.setActive(getActions());
-	setNewMessageFlag(false);
-    }
-
-    /**
-     * refreshCurrentUser() is called to get a new value for the currently
-     * selected item.  In MainPanel, all it does is tries to get a 
-     * UserProfile from the currently selected object in the ContentPanel.
-     * If there is no object in the ContentPanel which gives a default
-     * UserProfile, it then checks the FolderPanel.  If neither of these
-     * returns a UserProfile, then the default UserProfile is returned.
-     */
-    protected void refreshCurrentUser() {
-	UserProfile selectedProfile = getDefaultProfile();
-	if (selectedProfile != null) {
-	    currentUser = selectedProfile;
-	} else {
-	    currentUser = UserProfile.getDefaultProfile();
-	}
-    }
-
-    /**
-     * This resets the title of the main Frame to have the newMessageFlag
-     * or not, depending on if there are any new messages or not.
-     */
-    protected void resetFrameTitle() {
-      String currentTitle = getParentFrame().getTitle();
-      Image currentIcon = getCurrentIcon();
-
-      if (getNewMessageFlag()) {
-	if (!currentTitle.equals(newMessageTitle))
-	  getParentFrame().setTitle(newMessageTitle);
-
-	if (currentIcon != getNewMessageIcon()) {
-	  setCurrentIcon(getNewMessageIcon());
-	}
-      } else {
-	if (!currentTitle.equals(standardTitle))
-	  getParentFrame().setTitle(standardTitle);
-
-	if (currentIcon != getStandardIcon()) {
-	  setCurrentIcon(getStandardIcon());
+      if (! foundParent && folderPanel != null) {
+	if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel)) {
+	  foundParent = true;
+	  focusManager.setLastStatus(FOLDER_LAST);
+	  if (folderPanel.getActions() != null) {
+	    actions = TextAction.augmentList(folderPanel.getActions(), actions);
+	  }
 	}
       }
     }
 
-    /**
-     * As defined in net.suberic.pooka.UserProfileContainer.
-     *
-     * Note that this method can return null, and is primarily used to 
-     * get the currentUser.  If you want to get the current default 
-     * profile, use getCurrentUser() instead.
-     */
-    public UserProfile getDefaultProfile() {
-	UserProfile returnValue = null;
-
-	if (contentPanel != null) {
-	    returnValue = contentPanel.getDefaultProfile();
+    if (! foundParent) {
+      // if no parent is found, get the actions from the last selected 
+      // item.
+      int lastStatus = focusManager.getLastStatus();
+      if (lastStatus == CONTENT_LAST && contentPanel != null) {
+	if (contentPanel.getActions() != null) {
+	  actions = TextAction.augmentList(contentPanel.getActions(), actions);
 	}
-
-	if (returnValue != null)
-	    return returnValue;
-
+      } else if (lastStatus == FOLDER_LAST && folderPanel != null) {
+	if (folderPanel.getActions() != null) {
+	  actions = TextAction.augmentList(folderPanel.getActions(), actions);
+	}
+	
+      }
+    }
+    return actions;
+  }
+  
+  
+  /**
+   * Called by ExtendedDesktopManager every time the focus on the windows
+   * changes.  Resets the Actions associated with the menu items and toolbar
+   * to the ones in the active window.
+   *
+   * Also called when the selected message in a FolderWindow is changed.
+   */
+  
+  public void refreshActiveMenus() {
+    Action[] currentActions = getActions();
+    mainMenu.setActive(currentActions);
+    mainToolbar.setActive(currentActions);
+    keyBindings.setActive(currentActions);
+    setNewMessageFlag(false);
+  }
+  
+  /**
+   * refreshCurrentUser() is called to get a new value for the currently
+   * selected item.  In MainPanel, all it does is tries to get a 
+   * UserProfile from the currently selected object in the ContentPanel.
+   * If there is no object in the ContentPanel which gives a default
+   * UserProfile, it then checks the FolderPanel.  If neither of these
+   * returns a UserProfile, then the default UserProfile is returned.
+   */
+  protected void refreshCurrentUser() {
+    UserProfile selectedProfile = getDefaultProfile();
+    if (selectedProfile != null) {
+      currentUser = selectedProfile;
+    } else {
+      currentUser = UserProfile.getDefaultProfile();
+    }
+  }
+  
+  /**
+   * This resets the title of the main Frame to have the newMessageFlag
+   * or not, depending on if there are any new messages or not.
+   */
+  protected void resetFrameTitle() {
+    String currentTitle = getParentFrame().getTitle();
+    Image currentIcon = getCurrentIcon();
+    
+    if (getNewMessageFlag()) {
+      if (!currentTitle.equals(newMessageTitle))
+	getParentFrame().setTitle(newMessageTitle);
+      
+      if (currentIcon != getNewMessageIcon()) {
+	setCurrentIcon(getNewMessageIcon());
+      }
+    } else {
+      if (!currentTitle.equals(standardTitle))
+	getParentFrame().setTitle(standardTitle);
+      
+      if (currentIcon != getStandardIcon()) {
+	setCurrentIcon(getStandardIcon());
+      }
+    }
+  }
+  
+  /**
+   * As defined in net.suberic.pooka.UserProfileContainer.
+   *
+   * Note that this method can return null, and is primarily used to 
+   * get the currentUser.  If you want to get the current default 
+   * profile, use getCurrentUser() instead.
+   */
+  public UserProfile getDefaultProfile() {
+    UserProfile returnValue = null;
+    
+    if (contentPanel != null) {
+      returnValue = contentPanel.getDefaultProfile();
+    }
+    
+    if (returnValue != null)
+      return returnValue;
+    
 	if (folderPanel != null)
-	    returnValue = folderPanel.getDefaultProfile();
-
+	  returnValue = folderPanel.getDefaultProfile();
+	
 	return returnValue;
-
-    }
-
-    public UserProfile getCurrentUser() {
-	return currentUser;
+	
+  }
+  
+  public UserProfile getCurrentUser() {
+    return currentUser;
+  }
+  
+  /**
+   * This exits Pooka.
+   */
+  
+  public void exitPooka(int exitValue) {
+    if (! processUnsentMessages())
+      return;
+    
+    if (contentPanel instanceof MessagePanel && 
+	((MessagePanel)contentPanel).isSavingWindowLocations()) {
+      ((MessagePanel)contentPanel).saveWindowLocations();
     }
     
-    /**
-     * This exits Pooka.
-     */
+    Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
+    Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
+    Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
+    Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
+    contentPanel.savePanelSize();
     
-    public void exitPooka(int exitValue) {
-      if (! processUnsentMessages())
-	return;
-      
-      if (contentPanel instanceof MessagePanel && 
-	  ((MessagePanel)contentPanel).isSavingWindowLocations()) {
-	((MessagePanel)contentPanel).saveWindowLocations();
-      }
-      
-      Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
-      Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
-      Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
-      Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
-      contentPanel.savePanelSize();
-      
-      if (contentPanel.isSavingOpenFolders()) {
-	contentPanel.saveOpenFolders();
-      }
-      
-      Pooka.exitPooka(exitValue);
+    if (contentPanel.isSavingOpenFolders()) {
+      contentPanel.saveOpenFolders();
     }
-
+    
+    Pooka.exitPooka(exitValue);
+  }
+  
   /**
    * Checks to see if there are any unsent messages.  If there are,
    * then find out if we want to save them as drafts, send them, or 
@@ -624,8 +664,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
     
     public void actionPerformed(ActionEvent e) {
-      java.awt.KeyboardFocusManager kfm = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
-
       try {
 	MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
 	nmu.openMessageUI();
@@ -637,4 +675,43 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     
   }
 
+
+  /**
+   * Keeps the menus and configured Actions current by following the 
+   * keyboard focus.
+   */
+  public class PookaFocusManager implements PropertyChangeListener {
+    
+    int lastStatus = CONTENT_LAST;
+    
+    /**
+     * Creates a new PookaFocusManager.
+     */
+    public PookaFocusManager() {
+      KeyboardFocusManager kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+      kfm.addPropertyChangeListener("permanentFocusOwner", this);
+    }
+    
+    /**
+     * Called when the focus changes.
+     */
+    public void propertyChange(java.beans.PropertyChangeEvent pce) {
+      refreshActiveMenus();
+      refreshCurrentUser();
+    }
+    
+    /**
+     * Returns the last panel that had focus.
+     */
+    public int getLastStatus() {
+      return lastStatus;
+    }
+    
+    /**
+     * Sets the last panel that had focus.
+     */
+    public void setLastStatus(int newStatus) {
+      lastStatus = newStatus;
+    }
+  }
 }

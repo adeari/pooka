@@ -6,10 +6,14 @@
 *) add a check for java version to make sure that you're running the 
 correct version of pooka for the jdk.
 
-	-- regexp?
-	    (add search/replace to editor)
-*) add a search and replace for the message editors.
-
+*) regexp? (add search/replace to editor)
+  -- started.  todo:
+	*) add feature to NewMessage
+	*) add replace feature
+		-- check the caret location, too.
+	*) make it work the first time :)
+	*) make focus return to the editor when done
+	
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
 

@@ -99,6 +99,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 	folderTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
 	      getMainPanel().refreshActiveMenus();
+	      getMainPanel().refreshCurrentUser();
 	      keyBindings.setActive(getActions());
 	    }
 	  });

@@ -456,7 +456,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       actionList = TextAction.augmentList(actionList, getMessageProxy().getActions());
     
     Action[] subActions = null;
-    Component focusOwner = SwingUtilities.findFocusOwner(this);
+    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     if (focusOwner != null) {
 
       if (editorPane != null && SwingUtilities.isDescendingFrom(focusOwner, editorPane)) {

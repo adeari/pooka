@@ -587,7 +587,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     
     Runnable updateAdapter = new Runnable() {
 	public void run() {
-	  getMessagePanel().getMainPanel().refreshActiveMenus();
+	  //getMessagePanel().getMainPanel().refreshActiveMenus();
 	  if (toolbar != null)
 	    toolbar.setActive(getActions());
 	  if (keyBindings != null)
