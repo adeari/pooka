@@ -1,5 +1,5 @@
-after release
--------------
+alpha 2
+----------
 
 *) make MailUtilities handle nested attachments properly.  also honour
 multipart/alternative content.
@@ -10,13 +10,22 @@ password.
 
 *)  add context-sensitive menus (right-click menus)
 
+*) restore the Window Menu.
+
+*) restore the move messages between folders functionality.
+
+*)  fix the occasional NullPointerException in the FolderInfo (?)
+
 *)  fix what happens if you select an unreachable/incorrectly written
 mailbox--right now it hangs.
 
 *)  associated with above, multithread properly--too many actions happen
 on the main i/o thread.
 
-*)  fix the occasional NullPointerException in the FolderInfo (?)
+*) need to separate requests out into different threads.  right now, it's way
+too easy for the entire client to hang if your network connection hangs, be
+it checking to see if there are new messages, loading the information on 
+current messages, etc.
 
 *)  fix the response window size when there are lots of people in the 
 address fields--right now it makes the entire window huge.
@@ -25,15 +34,20 @@ address fields--right now it makes the entire window huge.
 
 *)  fix the actions update when a message is unselected/deleted.
 
+*)  add a way to edit the mailcap file.
+
+*)  make the windows detachable.
+
+*) create a Trash folder.
+
+after alpha 2
+----------------
+
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
 
 *)  make the subscribe/unsubscribe folder functionality more easilty
 available.
-
-*)  make the windows detachable.
-
-*)  add a way to edit the mailcap file.
 
 *)  implement a way to make a custom FolderCellRenderer for a property.
 
@@ -50,11 +64,6 @@ for a while, your connection to your Store can go down.
 
 *) takes too long to open a window where there are a lot of new messages.
 
-*) need to separate requests out into different threads.  right now, it's way
-too easy for the entire client to hang if your network connection hangs, be
-it checking to see if there are new messages, loading the information on 
-current messages, etc.
-
 *) fix the display of the messages in the FolderWindow--right now, you get
 too much date info, not enough Subject.
 
@@ -63,12 +72,6 @@ too much date info, not enough Subject.
 *) add a search and replace for the message editors.
 
 *) add something to search through all messages in the folder.
-
-*) restore the Window Menu.
-
-*) restore the move messages between folders functionality.
-
-*) create a Trash folder.
 
 *) add the ability to print
 
