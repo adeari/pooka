@@ -93,6 +93,8 @@ Pooka.fetchBatchSize=50
 Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
 
+EncryptionManager.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
+
 Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
 Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png
 
