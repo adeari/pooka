@@ -305,7 +305,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    
 		    /*
-		      if (open == true) {
+		    if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
 			    if (!(store.isConnected()))
@@ -321,7 +321,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    }
 			}
 		    }
-		    */
+		    
 
 		    try {
 			closeFolder(false);
@@ -330,6 +330,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    System.out.println("Failure marking FolderInfo " + getFolderID() + " as closed:  " + ex.getMessage());
 		    }
 		    
+		    */
+
+		    if (status == CONNECTED) {
+			setStatus(LOST_CONNECTION);
+		    }
 		}
 		
 		public void disconnected(ConnectionEvent e) {
@@ -357,12 +362,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			}
 		    }
 		    */
-		    
+		    /*
 		    try {
 			closeFolder(false);
 		    } catch (MessagingException me) {
 			if (Pooka.isDebug())
 			    System.out.println("Failure marking FolderInfo " + getFolderID() + " as closed:  " + me.getMessage());
+		    }
+		    */
+		    if (status == CONNECTED) {
+			setStatus(LOST_CONNECTION);
 		    }
 		    
 		}
