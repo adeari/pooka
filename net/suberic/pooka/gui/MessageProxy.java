@@ -203,7 +203,8 @@ public class MessageProxy {
 	    new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
 	    new ActionWrapper(new ForwardQuotedAction(), folderThread),
 	    new ActionWrapper(new DeleteAction(), folderThread),
-	    new ActionWrapper(new PrintAction(), folderThread)
+	    new ActionWrapper(new PrintAction(), folderThread),
+	    new ActionWrapper(new SaveMessageAction(), folderThread)
 		};
 	
         Action[] actions = getActions();
@@ -369,7 +370,12 @@ public class MessageProxy {
 	    nmui.openMessageUI();
 	    
 	} catch (MessagingException me) {
-	    getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+	    if (getMessageUI() != null)
+		getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+	    else
+		Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+	    
+	    me.printStackTrace();
 	}
 	
 	if (fw != null)
@@ -403,6 +409,25 @@ public class MessageProxy {
 		showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", me);
 	    }
 	}
+    }
+
+    /**
+     * Opens up a dialog to save the message to a file.
+     */
+    public void saveMessageToFile() {
+	JFileChooser saveChooser = new JFileChooser();
+	
+	int saveConfirm = saveChooser.showSaveDialog(Pooka.getMainPanel().getContentPanel().getUIComponent());
+
+	if (saveConfirm == JFileChooser.APPROVE_OPTION) 
+	    try {
+		getMessageInfo().saveMessageAs(saveChooser.getSelectedFile());
+	    } catch (MessagingException exc) {
+		if (getMessageUI() != null)
+		    getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+		else
+		    Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+	    }
     }
 
     public void showError(String message, Exception ex) {
@@ -755,6 +780,7 @@ public class MessageProxy {
 	}
     }
 
+
     public class PrintAction extends AbstractAction {
 	PrintAction() {
 	    super("file-print");
@@ -775,6 +801,25 @@ public class MessageProxy {
 	}
     }
 
+    public class SaveMessageAction extends AbstractAction {
+	SaveMessageAction() {
+	    super("file-save-as");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
+	    if (fw != null)
+		fw.setBusy(true);;
+	    saveMessageToFile();
+
+	    if (fw != null)
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(false);
+	}
+    }
 }
 
 

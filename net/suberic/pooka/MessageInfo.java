@@ -8,6 +8,7 @@ import javax.mail.event.*;
 import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.io.*;
 
 public class MessageInfo {
     // the wrapped Message 
@@ -498,23 +499,36 @@ public class MessageInfo {
 
 	// handle attachments.
 	if (method == FORWARD_AS_ATTACHMENT) {
-	    /*
+
 	    javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
 	    mbp.setDataHandler(getRealMessage().getDataHandler());
 	    returnValue.addAttachment(new MBPAttachment(mbp));
 	    returnValue.attachmentsLoaded=true;
-	    */
+
+	    /*
 	    try {
-		java.io.PipedOutputStream pos = new java.io.PipedOutputStream();
-		java.io.PipedInputStream pis = new java.io.PipedInputStream(pos);
-		getRealMessage().writeTo(pos);
+		final java.io.PipedOutputStream pos = new java.io.PipedOutputStream();
+		final java.io.PipedInputStream pis = new java.io.PipedInputStream(pos);
+
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+			    try {
+				getRealMessage().writeTo(pos);
+				pos.flush();
+				pos.close();
+			    } catch (java.io.IOException ioe) {
+			    } catch (MessagingException me) {
+			    } 
+			}
+		    });
+		t.start();
 		returnValue.addAttachment(new MBPAttachment(new javax.mail.internet.MimeBodyPart(pis)));
-		
 	    } catch (java.io.IOException ioe) {
 		MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
 		me.setNextException(ioe);
 		throw me;
 	    }
+	    */
 	    returnValue.attachmentsLoaded=true;
 	} else if (withAttachments) {
 	    returnValue.attachments = new AttachmentBundle();
@@ -568,8 +582,16 @@ public class MessageInfo {
     /**
      * Saves the message to the given filename.
      */
-    public void saveMessageAs(String fileName) {
-	
+    public void saveMessageAs(File saveFile) throws MessagingException{
+	try {
+	    FileOutputStream fos = new FileOutputStream(saveFile);
+	    getRealMessage().writeTo(fos);
+	} catch (IOException ioe) {
+	    MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
+	    me.setNextException(ioe);
+	    throw me;
+
+	}
     }
 
     /**
