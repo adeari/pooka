@@ -80,9 +80,9 @@ public class FilterFolderCellRenderer extends DefaultTableCellRenderer {
 	    MessageProxy msg = ftm.getMessageProxy(row);
 
 	    if ( msg != null) {
-		DisplayFilter[] matchingFilters = msg.getMatchingFilters();
+		MessageFilter[] matchingFilters = msg.getMatchingFilters();
 		for (int i = 0; i < matchingFilters.length; i++)
-		    matchingFilters[i].apply(returnValue);
+		    ((DisplayFilter)matchingFilters[i].getAction()).apply(returnValue);
 	    }
 	}
 	return returnValue;

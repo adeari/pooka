@@ -120,7 +120,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   HashMap tableInfo;
   
   // matching Filters.
-  DisplayFilter[] matchingFilters;
+  MessageFilter[] matchingFilters;
   
   // the column Headers for the FolderInfo Vector; used for loading the
   // tableInfo.
@@ -356,7 +356,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	}
 
 	// check for the matching filters, also.
-	DisplayFilter[] newMatchingFilters = doFilterMatch();
+	MessageFilter[] newMatchingFilters = doFilterMatch();
 	if (newMatchingFilters == null) {
 	  if (matchingFilters != null)
 	    hasChanged = true;
@@ -366,8 +366,8 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	  hasChanged = true;
 	} else {
 	  for (int i = 0; hasChanged != true && i < newMatchingFilters.length; i++) {
-	    DisplayFilter newValue = newMatchingFilters[i];
-	    DisplayFilter oldValue = matchingFilters[i];
+	    MessageFilter newValue = newMatchingFilters[i];
+	    MessageFilter oldValue = matchingFilters[i];
 	    if (newValue != oldValue) {
 	      hasChanged = true;
 	    }
@@ -451,7 +451,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * This returns a list of matching filters, or null if there are no
    * filters.
    */
-  private DisplayFilter[] doFilterMatch() {
+  private MessageFilter[] doFilterMatch() {
     MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
     if (folderFilters != null) {
       Vector tmpMatches = new Vector();
@@ -459,15 +459,15 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	if (folderFilters[i].getSearchTerm() instanceof net.suberic.pooka.filter.DeleteInProgressSearchTerm) {
 	  // big hack.
 	  if (isDeleteInProgress()) {
-	    tmpMatches.add(folderFilters[i].getAction());
+	    tmpMatches.add(folderFilters[i]);
 	  }
 	} else if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
-	  tmpMatches.add(folderFilters[i].getAction());
+	  tmpMatches.add(folderFilters[i]);
       }
       
-      DisplayFilter[] newMatchingFilters = new DisplayFilter[tmpMatches.size()];
+      MessageFilter[] newMatchingFilters = new MessageFilter[tmpMatches.size()];
       for (int i = 0; i < tmpMatches.size(); i++) {
-	newMatchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
+	newMatchingFilters[i] = (MessageFilter) tmpMatches.elementAt(i);
       }
 
       return newMatchingFilters;
@@ -1347,15 +1347,73 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * Returns the matching filters for this MessageProxy.
    */
-  public net.suberic.pooka.gui.filter.DisplayFilter[] getMatchingFilters() {
-    if (filtersMatched)
+  public MessageFilter[] getMatchingFilters() {
+    if (filtersMatched) {
       return matchingFilters;
+    }
     else {
       if (isLoaded()) {
 	matchFilters();
 	return matchingFilters;
       } else {
-	return new DisplayFilter[0];
+	return new MessageFilter[0];
+      }
+    }
+  }
+
+  /**
+   * A shortcut for getting the deleted status of this message.  This
+   * method is safe to use on the AWTEventThread.
+   */
+  public boolean isDeleted() throws MessagingException {
+    // if there's a delete in progress, return true.
+    if (isDeleteInProgress())
+      return true;
+
+    // if we're on the appropriate thread, go ahead and check the flags.
+    if (Thread.currentThread() == getMessageInfo().getFolderInfo().getFolderThread()) {
+      return getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
+    } else {
+      // testing; let's see what filter info we can get.
+      if (matchedFilters()) {
+	boolean deletedFound = false;
+	for (int i = 0; ! deletedFound && i < matchingFilters.length; i++) {
+	  if (matchingFilters[i].getProperty().equalsIgnoreCase("FolderInfo.defaultDisplayFilters.Deleted")) {
+	    deletedFound =true;
+	  }
+	}
+
+	//return getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
+	return deletedFound;
+      } else {
+	// oh well.
+	return getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
+      }
+    }
+  }
+
+  /**
+   * A shortcut for getting the read/unread status of this message.  This
+   * method is safe to use on the AWTEventThread.
+   */
+  public boolean isUnread() throws MessagingException {
+    // if we're on the appropriate thread, go ahead and check the flags.
+    if (Thread.currentThread() == getMessageInfo().getFolderInfo().getFolderThread()) {
+      return getMessageInfo().getFlags().contains(Flags.Flag.SEEN);
+    } else {
+      // testing; let's see what filter info we can get.
+      if (matchedFilters()) {
+	boolean foundUnread = false;
+	for (int i = 0; ! foundUnread && i < matchingFilters.length; i++) {
+	  if (matchingFilters[i].getProperty().equalsIgnoreCase("FolderInfo.defaultDisplayFilters.Unread"))
+	    foundUnread = true;
+	  
+	}
+	//return ! getMessageInfo().getFlags().contains(Flags.Flag.SEEN);
+	return foundUnread;
+      } else {
+	// oh well.
+	return ! getMessageInfo().getFlags().contains(Flags.Flag.SEEN);
       }
     }
   }

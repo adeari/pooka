@@ -12,7 +12,12 @@ public class ExternalLauncher implements CommandObject, Runnable {
 
   private String verb;
   private DataHandler dh;
+
+  // for, err, showing progress in downloading the temporary file.
+  private net.suberic.util.swing.ProgressDialog mDialog;
   
+  private File mTmpFile = null;
+
   public ExternalLauncher() {
   };
   
@@ -30,7 +35,23 @@ public class ExternalLauncher implements CommandObject, Runnable {
     verb = newVerb;
     dh = newDh;
   }
-  
+
+  /**
+   * Sets a ProgressDialog for watching the downloading of the temporary
+   * file.
+   */
+  public void setProgressDialog(net.suberic.util.swing.ProgressDialog pDialog) {
+    mDialog = pDialog;
+  }
+
+  /**
+   * Gets the ProgressDialog for watching the downloading of the temporary
+   * file.
+   */
+  public net.suberic.util.swing.ProgressDialog getProgressDialog() {
+    return mDialog;
+  }
+
   /**
    * This starts the run() method in a separate Thread.  It is implemented
    * this way so as to present the same interface as a CommandObject which
@@ -57,88 +78,113 @@ public class ExternalLauncher implements CommandObject, Runnable {
       if (dotLoc > 0) {
 	extension = filename.substring(dotLoc);
       }
-      File tmpFile = File.createTempFile("pooka_", extension);
+      mTmpFile = File.createTempFile("pooka_", extension);
 
-      FileOutputStream fos = new FileOutputStream(tmpFile);
-      dh.writeTo(fos);
-      fos.close();
-      
-      String fileHandler = Pooka.getProperty("ExternalLauncher.fileHandler." + java.io.File.separator, null);
-      String wrapper = Pooka.getProperty("ExternalLauncher.cmdWrapper." + java.io.File.separator, null);
-      String fileName = tmpFile.getAbsolutePath();
-      
-      String parsedVerb;
-      String[] cmdArray;
-      
-      String origParsedCommand = substituteString(verb, "%s", fileName);
+      boolean cancelled = false;
 
-      if (fileHandler != null && wrapper != null) { 
-	
-	parsedVerb = substituteString(fileHandler, "%v", verb);
-	parsedVerb = substituteString(parsedVerb, "%s", fileName);
-	
-	StringTokenizer tok = new StringTokenizer(wrapper);
-	cmdArray = new String[tok.countTokens()];
-	for (int i = 0; tok.hasMoreTokens(); i++) {
-	  String currentString = tok.nextToken();
-	  if (currentString.equals("%v"))
-	    cmdArray[i] = parsedVerb;
-	  else
-	    cmdArray[i]=currentString;
-	} 
+      if (mDialog == null) {
+	FileOutputStream fos = new FileOutputStream(mTmpFile);
+	dh.writeTo(fos);
+	fos.close();
       } else {
-	parsedVerb = substituteString(verb, "%s", fileName);
+	mDialog.show();
+	InputStream decodedIS = dh.getInputStream();
+	BufferedOutputStream outStream = new BufferedOutputStream(new FileOutputStream(mTmpFile));
+	int b=0;
+	byte[] buf = new byte[32768];
 	
-	cmdArray = parseCommandString(parsedVerb);
+	b = decodedIS.read(buf);
+	while (b != -1 && ! cancelled) {
+	  outStream.write(buf, 0, b);
+	  mDialog.setValue(mDialog.getValue() + b);
+	  if (mDialog.isCancelled())
+	    cancelled = true;
+
+	  b = decodedIS.read(buf);
+	}
 	
-	tmpFile.deleteOnExit();
+	outStream.close();
       }
+      
+      if (! cancelled) {
+	mDialog.dispose();
 
-      try {
-        if (Pooka.isDebug()) {
-	  System.out.println("running external command " + parsedVerb);
-        }
-
-	Process p = Runtime.getRuntime().exec(cmdArray);
-
-	long startTime = System.currentTimeMillis();
+	String fileHandler = Pooka.getProperty("ExternalLauncher.fileHandler." + java.io.File.separator, null);
+	String wrapper = Pooka.getProperty("ExternalLauncher.cmdWrapper." + java.io.File.separator, null);
+	String fileName = mTmpFile.getAbsolutePath();
+	
+	String parsedVerb;
+	String[] cmdArray;
+	
+	String origParsedCommand = substituteString(verb, "%s", fileName);
+	
+	if (fileHandler != null && wrapper != null) { 
+	  
+	  parsedVerb = substituteString(fileHandler, "%v", verb);
+	  parsedVerb = substituteString(parsedVerb, "%s", fileName);
+	  
+	  StringTokenizer tok = new StringTokenizer(wrapper);
+	  cmdArray = new String[tok.countTokens()];
+	  for (int i = 0; tok.hasMoreTokens(); i++) {
+	    String currentString = tok.nextToken();
+	    if (currentString.equals("%v"))
+	      cmdArray[i] = parsedVerb;
+	    else
+	      cmdArray[i]=currentString;
+	  } 
+	} else {
+	  parsedVerb = substituteString(verb, "%s", fileName);
+	  
+	  cmdArray = parseCommandString(parsedVerb);
+	  
+	  mTmpFile.deleteOnExit();
+	}
 	
 	try {
-	  p.waitFor();
-	} catch (InterruptedException ie) {
-	}
-
-	int exitValue = p.exitValue();
-
-	if (Pooka.isDebug()) {
-	    System.out.println("finished external command " + parsedVerb);
-	}
-
-	if (exitValue != 0) {
-	  long externalTimeoutMillis = 5000;
-	  try {
-	    externalTimeoutMillis = Long.parseLong(Pooka.getProperty("ExternalLauncher.externalTimeoutMillis", "5000"));
-	  } catch (NumberFormatException nfe) {
-	    // just use the default.
+	  if (Pooka.isDebug()) {
+	    System.out.println("running external command " + parsedVerb);
 	  }
-	  if (System.currentTimeMillis() - startTime < externalTimeoutMillis) {
-	    if (Pooka.isDebug())
-	      System.out.println("external command " + parsedVerb + ":  exitValue is " + exitValue + " and timeout < externalTimeoutMillis; showing error.");
 	  
-	    showError(origParsedCommand, p);
+	  Process p = Runtime.getRuntime().exec(cmdArray);
+	  
+	  long startTime = System.currentTimeMillis();
+	  
+	  try {
+	    p.waitFor();
+	  } catch (InterruptedException ie) {
 	  }
+	  
+	  int exitValue = p.exitValue();
+	  
+	  if (Pooka.isDebug()) {
+	    System.out.println("finished external command " + parsedVerb);
+	  }
+	  
+	  if (exitValue != 0) {
+	    long externalTimeoutMillis = 5000;
+	    try {
+	      externalTimeoutMillis = Long.parseLong(Pooka.getProperty("ExternalLauncher.externalTimeoutMillis", "5000"));
+	    } catch (NumberFormatException nfe) {
+	      // just use the default.
+	    }
+	    if (System.currentTimeMillis() - startTime < externalTimeoutMillis) {
+	      if (Pooka.isDebug())
+		System.out.println("external command " + parsedVerb + ":  exitValue is " + exitValue + " and timeout < externalTimeoutMillis; showing error.");
+	      
+	      showError(origParsedCommand, p);
+	    }
+	  }
+	} catch (java.io.IOException processIoe) {
+	  Pooka.getUIFactory().showError("Error running process " + processIoe.getMessage());
+	  processIoe.printStackTrace();
 	}
-      } catch (java.io.IOException processIoe) {
-        Pooka.getUIFactory().showError("Error running process " + processIoe.getMessage());
-	processIoe.printStackTrace();
-      }
-      
+      } // if ! cancelled
     } catch (java.io.IOException ioe) {
       Pooka.getUIFactory().showError("Error opening temp file " + ioe.getMessage());
       ioe.printStackTrace();
     }
   }
-
+  
   /**
    * Shows an error.
    */
@@ -209,4 +255,12 @@ public class ExternalLauncher implements CommandObject, Runnable {
 
     return cmdArray;
   }
+
+  public void cancelSave() {
+    try {
+      mTmpFile.delete();
+    } catch (Exception e) {}
+    mDialog.dispose();
+  }
+
 }

@@ -333,7 +333,7 @@ public class AttachmentPane extends JPanel {
 	    new ActionWrapper(new OpenAction(), storeThread),
 	    new ActionWrapper(new OpenWithAction(), storeThread),
 	    new ActionWrapper(new SaveAsAction(), storeThread)
-	      };
+	  };
 	}
   }
   

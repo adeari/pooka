@@ -9,6 +9,7 @@ import javax.activation.*;
 
 import net.suberic.pooka.*;
 import net.suberic.util.swing.*;
+import net.suberic.util.thread.*;
 
 import com.ice.jni.dde.JNIDDE;
 import com.ice.jni.registry.*;
@@ -79,12 +80,15 @@ public class AttachmentHandler {
    * for the Attachment's Mime type.
    */
   public void openAttachment(Attachment pAttachment) {
+    // called on the folder thread.
+
     if (pAttachment != null) {
       DataHandler dh = null;
       dh = pAttachment.getDataHandler();
       
       if (dh != null) {
 	dh.setCommandMap(Pooka.getMailcap());
+
 	if (Pooka.isDebug()) {
 	  CommandInfo[] cis = dh.getAllCommands();
 	  if (cis != null && cis.length > 0) {
@@ -94,7 +98,8 @@ public class AttachmentHandler {
 	  } else {
 	    System.out.println("No commands for mimetype.");
 	  }
-	}
+	} // end debug
+
 	CommandInfo[] cmds = dh.getPreferredCommands();
 	if (cmds != null && cmds[0] != null) {
 	  Object beanViewer = dh.getBean(cmds[0]);
@@ -128,7 +133,30 @@ public class AttachmentHandler {
 	  } else if (cmds[0].getCommandClass().equals("net.suberic.pooka.ExternalLauncher")) {
 	    try {
 	      ExternalLauncher el = new ExternalLauncher();
+
+	      // create a progress dialog for the external launcher
+	      int attachmentSize = pAttachment.getSize();
+	      if (pAttachment.getEncoding() != null && pAttachment.getEncoding().equalsIgnoreCase("base64"))
+		attachmentSize = (int) (attachmentSize * .73);
+	      
+	      ProgressDialog dlg;
+	      if (getMessageUI() != null) {
+		dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+	      } else {
+		dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+	      }
+	      
+	      final ExternalLauncher fLauncher = el;
+	      dlg.addCancelListener(new ProgressDialogListener() {
+		  public void dialogCancelled() {
+		    fLauncher.cancelSave();
+		  }
+		});
+	      
+	      el.setProgressDialog(dlg);
+	      
 	      el.setCommandContext(cmds[0].getCommandName(), null);
+
 	      el.show();
 	    } catch (IOException ioe) {
 	      //
@@ -179,6 +207,9 @@ public class AttachmentHandler {
    * with the given Component as a content pane and the given title.
    */
   private void openAttachmentWindow(Component pContent, String pTitle, boolean pResize) {
+    // threading:  this can be called on any thread, since it calls
+    // SwingUtilities.invokeLater().
+
     final Component content = pContent;
     final String title = pTitle;
     final boolean resize = pResize;
@@ -256,54 +287,108 @@ public class AttachmentHandler {
     if (Pooka.isDebug())
       System.out.println("calling AttachmentHandler.openWith()");
 
-    String mType;
     try {
-      mType = pAttachment.getMimeType().toString();
-      if (mType.indexOf(';') != -1)
-	mType = mType.substring(0, mType.indexOf(';'));
-      
-      String inputMessage = Pooka.getProperty("AttchmentPane.openWith.message", "Enter the command with which \nto open the attchment.");
-      String inputTitle = Pooka.getProperty("AttachmentPane.openWith.title", "Open Attachment With");
-      String makeDefaultLabel = Pooka.getProperty("AttachmentPane.openWith.makeDefaultMessage", "Make default command?");
-      
-      JLabel toggleMsgLabel = new JLabel(makeDefaultLabel);
-      toggleMsgLabel.setForeground(Color.getColor("Black"));
-      JRadioButton toggleButton = new JRadioButton();
-      JPanel togglePanel = new JPanel();
-      togglePanel.add(toggleMsgLabel);
-      togglePanel.add(toggleButton);
+      String mimeType = pAttachment.getMimeType().toString();
+      if (mimeType.indexOf(';') != -1)
+	mimeType = mimeType.substring(0, mimeType.indexOf(';'));
 
-      Object[] messageArray = new Object[2];
-      messageArray[0] = inputMessage;
-      messageArray[1] = togglePanel;
-      String cmd = null;
-      if (getMessageUI() != null)
-	cmd = getMessageUI().showInputDialog(messageArray, inputTitle);
-      else
-	cmd = Pooka.getUIFactory().showInputDialog(messageArray, inputTitle);
+      final String mType = mimeType;
       
-      if (cmd != null) {
-	if (cmd.indexOf("%s") == -1)
-	  cmd = cmd.concat(" %s");
-	
-	if (toggleButton.isSelected()) {
-	  String newMailcap = new String(mType.toLowerCase() + ";" + cmd);
-	  ((FullMailcapCommandMap)Pooka.getMailcap()).addMailcap(newMailcap);
-	}
-	
-	DataHandler dh = null;
-	
-	dh = pAttachment.getDataHandler();
-	if (dh != null) {
-	  dh.setCommandMap(Pooka.getMailcap());
-	  ExternalLauncher el = new ExternalLauncher();
-	  el.setCommandContext(cmd, dh);
-	  if (Pooka.isDebug())
-	    System.out.println("opening external launcher with ");
+      final Attachment fAttachment = pAttachment;
 
-	  el.show();
-	}
+      // have to get the ActionThread for later.
+      ActionThread actionThread = null;
+      Thread currentThread = Thread.currentThread();
+      if (currentThread instanceof ActionThread) {
+	actionThread = (ActionThread) currentThread;
       }
+      final ActionThread fActionThread = actionThread;
+      
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+
+	    String inputMessage = Pooka.getProperty("AttchmentPane.openWith.message", "Enter the command with which \r\nto open the attchment.");
+	    String inputTitle = Pooka.getProperty("AttachmentPane.openWith.title", "Open Attachment With");
+	    String makeDefaultLabel = Pooka.getProperty("AttachmentPane.openWith.makeDefaultMessage", "Make default command?");
+
+	    JLabel toggleMsgLabel = new JLabel(makeDefaultLabel);
+	    toggleMsgLabel.setForeground(Color.getColor("Black"));
+	    JRadioButton toggleButton = new JRadioButton();
+	    JPanel togglePanel = new JPanel();
+	    togglePanel.add(toggleMsgLabel);
+	    togglePanel.add(toggleButton);
+
+	    Object[] messageArray = new Object[2];
+	    messageArray[0] = inputMessage;
+	    messageArray[1] = togglePanel;
+	    String cmd = null;
+	    if (getMessageUI() != null)
+	      cmd = getMessageUI().showInputDialog(messageArray, inputTitle);
+	    else
+	      cmd = Pooka.getUIFactory().showInputDialog(messageArray, inputTitle);
+      
+	    if (cmd != null) {
+	      if (cmd.indexOf("%s") == -1)
+		cmd = cmd.concat(" %s");
+	
+	      if (toggleButton.isSelected()) {
+		String newMailcap = new String(mType.toLowerCase() + ";" + cmd);
+		((FullMailcapCommandMap)Pooka.getMailcap()).addMailcap(newMailcap);
+	      }
+	
+
+	      final DataHandler dh = fAttachment.getDataHandler();
+	      final String fCmd = cmd;
+	      
+	      if (dh != null) {
+		AbstractAction action = new AbstractAction() {
+		    public void actionPerformed(java.awt.event.ActionEvent ae) {
+		      try {
+			dh.setCommandMap(Pooka.getMailcap());
+			ExternalLauncher el = new ExternalLauncher();
+
+			el.setCommandContext(fCmd, dh);
+			
+			// create a progress dialog for the external launcher
+			int attachmentSize = fAttachment.getSize();
+			if (fAttachment.getEncoding() != null && fAttachment.getEncoding().equalsIgnoreCase("base64"))
+			  attachmentSize = (int) (attachmentSize * .73);
+			
+			ProgressDialog dlg;
+			if (getMessageUI() != null) {
+			  dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+			} else {
+			  dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+			}
+			
+			final ExternalLauncher fLauncher = el;
+			dlg.addCancelListener(new ProgressDialogListener() {
+			    public void dialogCancelled() {
+			      fLauncher.cancelSave();
+			    }
+			  });
+			
+			el.setProgressDialog(dlg);
+			
+			if (Pooka.isDebug())
+			  System.out.println("opening external launcher with ");
+			el.show();
+		      } catch (Exception elException) {
+			getMessageUI().showError("Error opening attachment", elException);
+		      }
+		    }
+		  };
+
+		if (fActionThread != null) {
+		  fActionThread.addToQueue(action, new java.awt.event.ActionEvent(AttachmentHandler.this, 0, "attachment-open"));
+		} else {
+		  action.actionPerformed( new java.awt.event.ActionEvent(AttachmentHandler.this, 0, "attachment-open"));
+		}
+	      }
+	    }
+	  }
+	});
+      
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -316,28 +401,39 @@ public class AttachmentHandler {
    * calls saveFileAs() to save the file.
    */
   public void saveAttachment(Attachment pAttachment, Component pComponent) {
+    // usually called on the folder thread.  so we need to throw the
+    // filechooser over to the AWTEvent thread.
 
     if (pAttachment != null) {
-      JFileChooser saveChooser;
-      String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
-      if (currentDirectoryPath == "")
-	saveChooser = new JFileChooser();
-      else
-	saveChooser = new JFileChooser(currentDirectoryPath);
+      final Attachment fAttachment = pAttachment;
+      final Component fComponent = pComponent;
+      final String fileName = pAttachment.getName();
+
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    JFileChooser saveChooser;
+	    String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+	    if (currentDirectoryPath == "")
+	      saveChooser = new JFileChooser();
+	    else
+	      saveChooser = new JFileChooser(currentDirectoryPath);
+	    
+	    if (fileName != null)
+	      saveChooser.setSelectedFile(new File(fileName));
       
-      String fileName = pAttachment.getName();
-      if (fileName != null)
-	saveChooser.setSelectedFile(new File(fileName));
-      
-      int saveConfirm = saveChooser.showSaveDialog(pComponent);
-      Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", saveChooser.getCurrentDirectory().getPath(), true);
-      if (saveConfirm == JFileChooser.APPROVE_OPTION) {
-	try {
-	  saveFileAs(pAttachment, saveChooser.getSelectedFile());
-	} catch (IOException exc) {
-	  showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
-	}
-      }
+	    int saveConfirm = saveChooser.showSaveDialog(fComponent);
+	    Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", saveChooser.getCurrentDirectory().getPath(), true);
+	    if (saveConfirm == JFileChooser.APPROVE_OPTION) {
+	      try {
+		// saveFileAs creates a new thread, so don't bother
+		// dispatching this somewhere else.
+		saveFileAs(fAttachment, saveChooser.getSelectedFile());
+	      } catch (IOException exc) {
+		showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+	      }
+	    }
+	  }
+	});
     }
   }
   

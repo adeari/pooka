@@ -1,12 +1,52 @@
-*) bug:  can't switch back to original theme in theme configuration (starts
-	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
+*) bug:  jdk1.5 close window doesn't call exit, rather just quits.
 
-*) support jdk 1.5
-   *) JOptionPane error on initial startup; hangs.
-	done?  test?
-   *) ?? add support for ocean theme 
+*) bug:  on AWT-EventQueue:
+	*) test.  put debug statement in getFlags() to print a warning
+		if we're not on the right thread.
+	*) also, add null display action for matchees on deleted.
+	*) decouple isDeleted() and isUnread() from filters.
+"AWT-EventQueue-0" prio=1 tid=0x083fef60 nid=0x1047 waiting for monitor entry [0x467c0000..0x467c1840]
+        at com.sun.mail.imap.IMAPFolder.getMessageByUID(IMAPFolder.java:1484)
+	- waiting to lock <0x6253c3f0> (a com.sun.mail.imap.IMAPFolder)
+	at net.suberic.pooka.UIDFolderInfo.getRealMessageById(UIDFolderInfo.java:624)
+	at net.suberic.pooka.UIDMimeMessage.getMessage(UIDMimeMessage.java:571)
+        at net.suberic.pooka.UIDMimeMessage.getFlags(UIDMimeMessage.java:408)
+        - locked <0x62c28968> (a net.suberic.pooka.UIDMimeMessage)
+        at net.suberic.pooka.MessageInfo.getFlags(MessageInfo.java:136)
+        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:540)
+        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:520)
+        at net.suberic.pooka.gui.FolderDisplayPanel.selectNextMessage(FolderDisplayPanel.java:493)
+        at net.suberic.pooka.gui.FolderInternalFrame.selectNextMessage(FolderInternalFrame.java:363)
+        at net.suberic.pooka.gui.FolderDisplayPanel$8.actionPerformed(FolderDisplayPanel.java:406)
+        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:3194)
+        at javax.swing.SwingUtilities.notifyAction(SwingUtilities.java:1571)
+        at javax.swing.JComponent.processKeyBinding(JComponent.java:2730)
+        at javax.swing.JTable.processKeyBinding(JTable.java:3458)
+        at javax.swing.JComponent.processKeyBindings(JComponent.java:2765)
+        at javax.swing.JComponent.processKeyEvent(JComponent.java:2693)
+        at java.awt.Component.processEvent(Component.java:5265)
+        at java.awt.Container.processEvent(Container.java:1966)
+        at java.awt.Component.dispatchEventImpl(Component.java:3955)
+        at java.awt.Container.dispatchEventImpl(Container.java:2024)
+        at java.awt.Component.dispatchEvent(Component.java:3803)
+        at java.awt.KeyboardFocusManager.redispatchEvent(KeyboardFocusManager.java:1810)
+        at java.awt.DefaultKeyboardFocusManager.dispatchKeyEvent(DefaultKeyboardFocusManager.java:668)
+        at java.awt.DefaultKeyboardFocusManager.preDispatchKeyEvent(DefaultKeyboardFocusManager.java:916)
+        at java.awt.DefaultKeyboardFocusManager.typeAheadAssertions(DefaultKeyboardFocusManager.java:794)
+        at java.awt.DefaultKeyboardFocusManager.dispatchEvent(DefaultKeyboardFocusManager.java:632)
+        at java.awt.Component.dispatchEventImpl(Component.java:3841)
+        at java.awt.Container.dispatchEventImpl(Container.java:2024)
+        at java.awt.Window.dispatchEventImpl(Window.java:1766)
+        at java.awt.Component.dispatchEvent(Component.java:3803)
+        at java.awt.EventQueue.dispatchEvent(EventQueue.java:463)
+        at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:234)
+        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:163)
+        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:157)        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:149)        at java.awt.EventDispatchThread.run(EventDispatchThread.java:110)
 
-*) fix TLS/SSL support for SMTP with new javamail 1.3.2.
+
+*) ?? add support for ocean theme in jdk 1.5 ??
+
+*) modify date format so that it only defaults to MM/dd/yy in the US.
 
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:
@@ -14,30 +54,40 @@
 	   connections each time.
 	*) use separate threads for each folder so we can do the ssl
 	   negotiation in parallel.
-*) take shutdown off of awt thread.
-*) test timeouts; make sure that javamail timeout doesn't apply while
-   data is still being transferred.  or for ssl for that matter.
-*) test what happens if your connection fails during a LoadMessageThread action.
-*) add a way to tell what a store's (and folder's) current thread is up to.
-
-*) fix AttachmentPane.openAction from showing dialog on store thread instead
-	of AWTEventThread.
-*) fix open as attachment so that we get some indication of what's happening.
-   esp for long downloads and process failures.
-
-*) modify date format so that it only defaults to MM/dd/yy in the US.
 
 *) fix cryptix inclusion from webstart.
 
+modifying:
+----------
+*) add a way to tell what a store's (and folder's) current thread is up to.
+
+*) move todo list and CHANGES file to top directory.   
+
+-------
+testing:
+*) jdk 1.5
+   *) JOptionPane error on initial startup; hangs.
+	done?  test?
+
+*) fix TLS/SSL support for SMTP with new javamail 1.3.2.
+	*) what's up with that?  test.
+
+*) test timeouts; make sure that javamail timeout doesn't apply while
+   data is still being transferred.  or for ssl for that matter.
+*) test what happens if your connection fails during a LoadMessageThread action.
 *) fix disconnection handling really.
    -) order of events. -- make sure the Store check is high priority.
    -) handling of events, including timeouts and such.
 	- check order of handlings; make sure we don't end up in a 
 	  situation where we wait too long to check the connection status.
    -) make sure auto-reconnects work.
+   -) ?:  when you close the store, should we notify all of the folders
+	that they're closing, too?
 
-*) move todo list and CHANGES file to top directory.   
+*) AttachmentPane:  test on windows to make sure that we're using the
+   correct defaults.  maybe test with PDF?
 
+next release
 -----------
 
 *) add an option to build.xml for compiling with deprecation enabled.
@@ -201,6 +251,9 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	-- see pooka_problems from plc
 
 *) html with text attachment should show text attachment at the end. (??)
+
+*) modify built-in java display code to show download dialog for showing
+	attachments.
 
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.

@@ -537,7 +537,8 @@ public class FolderDisplayPanel extends JPanel {
       MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
       try {
 
-	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED) || (unread && mp.getMessageInfo().getFlags().contains(Flags.Flag.SEEN))) {
+	//if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED) || (unread && mp.getMessageInfo().getFlags().contains(Flags.Flag.SEEN))) {
+	if ((removedProxies != null && removedProxies.contains(mp)) || mp.isDeleted() || (unread && !mp.isUnread())) {
 	  newRow ++;
 	} else {
 	  done = true;
@@ -611,7 +612,8 @@ public class FolderDisplayPanel extends JPanel {
     while (! done && newRow >= 0 ) {
       MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
       try {
-	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED) || (unread && mp.getMessageInfo().getFlags().contains(Flags.Flag.SEEN))) {
+	//if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED) || (unread && mp.getMessageInfo().getFlags().contains(Flags.Flag.SEEN))) {
+	if ((removedProxies != null && removedProxies.contains(mp)) || mp.isDeleted() || (unread && !mp.isUnread())) {
 	  newRow--;
 	} else {
 	  done = true;

@@ -918,6 +918,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     boolean infoIsConnected = isConnected();
     getLogger().log(Level.INFO, "Connected:  " + infoIsConnected);
     statusBuffer.append("Connected:  " + infoIsConnected + "\r\n");
+    /*
     if (store != null) {
       boolean storeIsConnected = store.isConnected();
       getLogger().log(Level.INFO, "store.isConnected():  " + storeIsConnected);
@@ -925,6 +926,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     } else {
       getLogger().log(Level.INFO, "No store object.");
     }
+    */
 
     if (storeThread != null) {
       String currentAction = storeThread.getCurrentActionName();
@@ -955,7 +957,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       if (stackTraceMethod != null) {
 	System.out.println("Stack Trace:");
 	statusBuffer.append("Stack Trace:\r\n");
-	Object returnValue = stackTraceMethod.invoke(storeThread, null);
+	Object returnValue = stackTraceMethod.invoke(storeThread, (Object[]) null);
 	Object[] objectArray = (Object[]) returnValue;
 	for (int i = 0; i < objectArray.length; i++) {
 	  String stackLine = "  " + objectArray[i];

@@ -12,6 +12,8 @@ public class MessageFilter {
   private SearchTerm searchTerm;
   private FilterAction action;
   
+  private String mProperty;
+
   /**
    * Create a MessageFilter from a SearchTerm and a FilterAction.
    */
@@ -26,6 +28,8 @@ public class MessageFilter {
    *
    */
   public MessageFilter(String sourceProperty) {
+    mProperty = sourceProperty;
+
     try {
       searchTerm = Pooka.getSearchManager().generateSearchTermFromProperty(sourceProperty + ".searchTerm");
       
@@ -70,5 +74,12 @@ public class MessageFilter {
   
   public void setAction(FilterAction newAction) {
     action=newAction;
+  }
+
+  /**
+   * Returns the source property used to create this.
+   */
+  public String getProperty() {
+    return mProperty;
   }
 }

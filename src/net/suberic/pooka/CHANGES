@@ -1,3 +1,13 @@
+moved shutdown off of the AWTEvent thread.  also moved the shutdown action
+to a higher priority.
+
+modified ExternalLauncher so that it shows a download dialog and a cancel
+button.
+
+fixed AttachmentPane.openAction from showing dialog on store thread instead
+of AWTEventThread.  Also changed the file chooser on the Attachment save
+dialog to be on the AWTEventThread.
+
 made it so the FolderTracker's actions run at a lower priority.  also fixed
 the tracking function so that it calculates the next update time after the
 first one has finished, rather than before.

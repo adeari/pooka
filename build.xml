@@ -104,6 +104,47 @@
     <replace file="${builddir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
   </target>
 
+  <target name="compile-dep" depends="init">
+    <tstamp>
+      <format property="today" pattern="yyMMdd" locale="en"/>
+    </tstamp>
+    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true">
+      <compilerarg value="-deprecation"/>
+    </javac>
+    <copy todir="${builddir}/net/suberic/pooka">
+      <fileset dir="${sourcedir}/net/suberic/pooka">
+        <include name="Pookarc"/>
+        <include name="*.properties"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/net/suberic/pooka/gui/images">
+      <fileset dir="${sourcedir}/net/suberic/pooka/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/net/suberic/util/gui/propedit/images">
+      <fileset dir="${sourcedir}/net/suberic/util/gui/propedit/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/net/suberic/util/gui/images">
+      <fileset dir="${sourcedir}/net/suberic/util/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/org/javalobby/icons/20x20png">
+      <fileset dir="${iconsdir}/javalobby/icons/20x20png">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+    <copy file="${importdir}/ICE_JNIDDE.dll" todir="${builddir}"/>
+    <copy todir="${builddir}/net/suberic/pooka/doc">
+      <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
+    </copy>
+    <replace file="${builddir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
+  </target>
+
   <target name="dist" depends="compile">
     <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"/> 
     <copy todir="${distdir}">
