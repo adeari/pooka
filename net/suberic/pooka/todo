@@ -7,8 +7,6 @@ change.
 *) Preview mode:  open a folder.  unsubscribe to it.  try opening another
 folder.  get a NPE.
 
-*) add a way to delete folders
-
 *) make it so folder windows save their settings (window size, column width,
 sort order)
 

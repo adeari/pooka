@@ -339,12 +339,13 @@ SentFolderTable.Subject.value=Subject
 SentFolderTable.Subject.size=260
 
 # -- Popup menus.
-FolderNode.popupMenu=Open:Update:Close:Edit:Unsubscribe
+FolderNode.popupMenu=Open:Update:Close:Edit:Unsubscribe:Delete
 FolderNode.popupMenu.Open.Action=file-open
 FolderNode.popupMenu.Update.Action=folder-update
 FolderNode.popupMenu.Close.Action=folder-close
 FolderNode.popupMenu.Edit.Action=file-edit
 FolderNode.popupMenu.Unsubscribe.Action=folder-unsubscribe
+FolderNode.popupMenu.Delete.Action=folder-delete
 
 TrashFolderNode.popupMenu=Open:Empty:Close:Edit
 TrashFolderNode.popupMenu.Open.Action=file-open

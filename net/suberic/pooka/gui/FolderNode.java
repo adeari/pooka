@@ -37,7 +37,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       new ActionWrapper(new OpenAction(), folderInfo.getFolderThread()),
       new ActionWrapper(new CloseAction(), folderInfo.getFolderThread()),
       new UnsubscribeAction(),
-      new NewFolderAction()
+      new NewFolderAction(),
+      new DeleteAction()
     };
     
     Action[] actions = defaultActions;
@@ -332,6 +333,43 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   }
   
   /**
+   * This opens up a dialog asking if the user wants to delete 
+   * the current Folder.  If the user chooses 'yes', then
+   * getFolderInfo().delete() is called.
+   */
+  public void deleteFolder() {
+    String message;
+    if (isLeaf())
+      message = Pooka.getProperty("Folder.deleteConfirm", "Do you really want to delete from the following folder?");
+    else
+      message = Pooka.getProperty("Folder.deleteConfirm.notLeaf", "Do you really want to delete \nthis folder and all its children?");
+    
+    int response = Pooka.getUIFactory().showConfirmDialog(message + "\n" + getFolderInfo().getFolderName(), Pooka.getProperty("Folder.deleteConfirm.title", "Delete Folder"), JOptionPane.YES_NO_OPTION);
+    
+    if (response == JOptionPane.YES_OPTION) {
+      message = Pooka.getProperty("Folder.deleteConfirm.secondMessage", "Are you sure?  This will permanently remove the folder and all of its messages");
+      int responseTwo = Pooka.getUIFactory().showConfirmDialog(message, Pooka.getProperty("Folder.deleteConfirm.secondMessage.title", "Are you sure?"), JOptionPane.YES_NO_OPTION);
+      if (responseTwo == JOptionPane.YES_OPTION) {
+	
+	getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	      try {
+		getFolderInfo().delete();
+	      } catch(MessagingException me) {
+		final Exception fme = me;
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		      Pooka.getUIFactory().showError("Error deleting folder:  ", fme);
+		    }
+		  });
+	      }
+	    }
+	  } , new java.awt.event.ActionEvent(this, 0, "folder-delete"));
+      }
+    }
+  }
+  
+  /**
    * This opens up a dialog asking if the user wants to subscribe to a 
    * subfolder.
    */
@@ -523,6 +561,18 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     public void actionPerformed(ActionEvent e) {
       unsubscribeFolder();
+    }
+    
+  }
+  
+  class DeleteAction extends AbstractAction {
+    
+    DeleteAction() {
+      super("folder-delete");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      deleteFolder();
     }
     
   }
