@@ -215,12 +215,14 @@ public abstract class MessageDisplayPanel extends JPanel {
       // if we get an exception, just ignore it and use the default.
     }
     
+    /* ignore for now.
     if (f == null) {
       String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
       int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
       
       f = new Font(fontName, Font.PLAIN, fontSize);
     }
+    */
     
     if (f != null)
       jep.setFont(f);

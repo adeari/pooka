@@ -122,7 +122,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Configures the InterfaceStyle for this component.
    */
   public void configureInterfaceStyle() {
-     Runnable runMe = new Runnable() {
+    Runnable runMe = new Runnable() {
 	public void run() {
 	  try {
 	    Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this);
@@ -131,7 +131,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 	  } catch (Exception e) {
 	  }
 	}
-       };
+      };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       SwingUtilities.invokeLater(runMe);
@@ -168,16 +168,21 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     // we should really only be getting messages from our own current themes,
     // but, hey, it never hurts to check.
     if (currentTheme != null && currentTheme == theme) {
-      SwingUtilities.invokeLater(new Runnable() {
+      Runnable r = new Runnable() {
 	  public void run() {
 	    try {
 	      Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this, true);
 	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
 	    } catch (Exception e) {
 	    }
-
+	    
 	  }
-	});
+	};
+      if (SwingUtilities.isEventDispatchThread()) {
+	r.run();
+      } else {
+	SwingUtilities.invokeLater(r);
+      }
     }
   }
 
@@ -188,12 +193,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    */
   public MetalTheme getTheme(ThemeManager tm) {
     MessageProxy mp = getMessageProxy();
-    if (mp == null)
-      return null;
-    
+    if (mp == null) {
+      return tm.getDefaultTheme();
+    }
+
     MessageInfo mi = mp.getMessageInfo();
-    if (mi == null)
-      return null;
+    if (mi == null) {
+      return tm.getDefaultTheme();
+    }
 
     FolderInfo fi = mi.getFolderInfo();
     if (fi != null) {

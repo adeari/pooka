@@ -240,7 +240,7 @@ MainToolbar.Paste.Image=/org/javalobby/icons/20x20png/Paste.png
 MainToolbar.Print.Action=file-print
 MainToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 
-FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Spam:Print:Update:Search
+FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Print:Spam:Update:Search
 FolderWindowToolbar.Down.Action=message-next
 FolderWindowToolbar.Down.Image=/org/javalobby/icons/20x20png/Down.png
 FolderWindowToolbar.Up.Action=message-previous
@@ -298,7 +298,7 @@ NewMessageWindowToolbar.Sign.Image=/org/javalobby/icons/20x20png/Draw.png
 NewMessageWindowToolbar.Encrypt.Action=message-encrypt
 NewMessageWindowToolbar.Encrypt.Image=/org/javalobby/icons/20x20png/Lock.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:Spam:|:Copy:|:SaveAddress:|:Detach:|:Print:Find:DisplayStyle:HeaderStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Print:Spam:Find:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all

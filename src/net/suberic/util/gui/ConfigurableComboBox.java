@@ -23,6 +23,8 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
 
   protected Hashtable commands = new Hashtable();
 
+  String mKey = null;
+
   int minWidth = -1;
   int minHeight = -1;
 
@@ -52,6 +54,8 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
    */
   public void configureComponent(String key, VariableBundle vars) {
     this.setRenderer(new ConfigurableComboRenderer());
+
+    mKey = key;
 
     StringTokenizer iKeys = null;
     try {
@@ -91,6 +95,10 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
 
     this.setMaximumSize(this.getPreferredSize());
 
+    String toolTip = vars.getProperty(key + ".ToolTip", "");
+    if (toolTip != "") {
+      setToolTipText(toolTip);
+    }
   }
 
 

@@ -17,6 +17,9 @@ public class MessagePrinterDisplay implements PrintJobListener {
   public static int PAGINATING = 5;
   public static int PRINTING = 10;
 
+  public static int CANCELED = -5;
+  public static int FAILED = -10;
+
   MessagePrinter mPrinter = null;
   DocPrintJob mJob = null;
 
@@ -145,6 +148,8 @@ public class MessagePrinterDisplay implements PrintJobListener {
     JLabel jl = new JLabel();
     mDisplayPane.setBackground(jl.getBackground());
     mDisplayPane.setFont(jl.getFont());
+    java.awt.Insets newMargin = new java.awt.Insets(10,10,10,10);
+    mDisplayPane.setMargin(newMargin);
 
     if (mInternal) {
       mDialogFrame = new JInternalFrame("Printing", true, false, false, true);
@@ -195,7 +200,7 @@ public class MessagePrinterDisplay implements PrintJobListener {
       try {
 	((CancelablePrintJob) mJob).cancel();
       } catch (PrintException e) {
-	showError("Error canceling job:  ", e);
+	showError(Pooka.getProperty("PrintDisplay.message.errorCanceling", "Error canceling job:  "), e);
       }
     }
   }
@@ -265,7 +270,6 @@ public class MessagePrinterDisplay implements PrintJobListener {
    * Shows an error.
    */
   public void showError(String text) {
-    dispose();
     Pooka.getUIFactory().showError(text);
   }
 
@@ -273,7 +277,6 @@ public class MessagePrinterDisplay implements PrintJobListener {
    * Shows an error.
    */
   public void showError(String text, Exception e) {
-    dispose();
     Pooka.getUIFactory().showError(text, e);
   }
 
@@ -288,11 +291,17 @@ public class MessagePrinterDisplay implements PrintJobListener {
   }
   
   public void printJobCanceled(PrintJobEvent pje) {
-    showError("Canceled.");
+    setStatus(CANCELED);
+    showError(Pooka.getProperty("PrintDisplay.message.canceled", "Canceled."));
+    dispose();
   }
 
   public void printJobFailed(PrintJobEvent pje) {
-    showError("Failed");
+    if (getStatus() > CANCELED) {
+      setStatus(FAILED);
+      showError(Pooka.getProperty("PrintDisplay.message.failed", "Failed."));
+      dispose();
+    }
   }
   
   public void printJobNoMoreEvents(PrintJobEvent pje) {
@@ -300,8 +309,7 @@ public class MessagePrinterDisplay implements PrintJobListener {
   }
   
   public void printJobRequiresAttention(PrintJobEvent pje) {
-    showError("Needs attention.");
+    showError(Pooka.getProperty("PrintDisplay.message.needsAttention", "Needs attention."));
   }
-
 
 }

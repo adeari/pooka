@@ -1098,7 +1098,8 @@ public class MessageProxy {
 		    try {
 		      final_job.print(myDoc, final_attributes); 
 		    } catch (PrintException pe) {
-		      mpd.showError("Failed to print", pe);
+		      if (mpd.getStatus() != MessagePrinterDisplay.CANCELED)
+			mpd.showError("Failed to print", pe);
 		    } 	
 		  }
 		};
