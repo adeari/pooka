@@ -51,7 +51,10 @@ public class AddressBookSelectionPanel extends JPanel {
     JPanel filterPanel = createFilterPanel();
     createAddressTable();
     choiceBox.add(filterPanel);
-    choiceBox.add(new JScrollPane(addressTable));
+
+    JScrollPane addressPane = new JScrollPane(addressTable);
+    addressPane.setPreferredSize(new java.awt.Dimension(200,200));
+    choiceBox.add(addressPane);
     addressBox.add(choiceBox);
 
     JPanel selectionPanel = createSelectionPanel();
@@ -59,7 +62,9 @@ public class AddressBookSelectionPanel extends JPanel {
 
     createConfirmedTable();
 
-    addressBox.add(new JScrollPane(confirmedTable));
+    JScrollPane confirmedPane = new JScrollPane(confirmedTable);
+    confirmedPane.setPreferredSize(new java.awt.Dimension(200,200));
+    addressBox.add(confirmedPane);
 
     this.add(addressBox);
 
@@ -92,8 +97,8 @@ public class AddressBookSelectionPanel extends JPanel {
   void createAddressTable() {
     AddressBookTableModel addressModel = new AddressBookTableModel();
     addressTable = new JTable(addressModel);
-    addressTable.getColumnModel().getColumn(0).setPreferredWidth(50);
-    addressTable.getColumnModel().getColumn(1).setPreferredWidth(50);
+    addressTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    addressTable.getColumnModel().getColumn(1).setPreferredWidth(100);
     doFilter("");
   }
 
@@ -103,8 +108,8 @@ public class AddressBookSelectionPanel extends JPanel {
   void createConfirmedTable() {
     AddressBookTableModel confirmedModel = new AddressBookTableModel();
     confirmedTable = new JTable(confirmedModel);
-    confirmedTable.getColumnModel().getColumn(0).setPreferredWidth(50);
-    confirmedTable.getColumnModel().getColumn(1).setPreferredWidth(50);
+    confirmedTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+    confirmedTable.getColumnModel().getColumn(1).setPreferredWidth(100);
   }
 
   /**
@@ -370,7 +375,7 @@ public class AddressBookSelectionPanel extends JPanel {
       if (col == 0)
 	return "Name";
       
-      if (col == 2)
+      if (col == 1)
 	return "Address";
 
       return "";
