@@ -83,16 +83,22 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * populating the MenuBar and Toolbar.
      *
      * The method actually returns the Panel's defaultActions plus the
-     * actions of the folderPanel and messagePanel.
+     * actions of the folderPanel and/or messagePanel, depending on which
+     * one currently has the focus.
      */    
     public Action[] getActions() {
 	Action[] actions = getDefaultActions();
-	if (folderPanel != null) 
-	    if (folderPanel.getActions() != null)
-		actions = TextAction.augmentList(folderPanel.getActions(), actions);
-	if (messagePanel != null) 
-	    if (messagePanel.getActions() != null) 
-		actions = TextAction.augmentList(messagePanel.getActions(), actions);
+	Component focusedComponent = SwingUtilities.findFocusOwner(this);
+	if (focusedComponent != null) {
+	    if (folderPanel != null) 
+		if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel))
+		    if (folderPanel.getActions() != null)
+			actions = TextAction.augmentList(folderPanel.getActions(), actions);
+	    if (messagePanel != null) 
+		if (SwingUtilities.isDescendingFrom(focusedComponent, messagePanel))
+		    if (messagePanel.getActions() != null) 
+			actions = TextAction.augmentList(messagePanel.getActions(), actions);
+	}
 	return actions;
     }
 
