@@ -187,11 +187,21 @@ public class MessageCryptoInfo {
    */
   public boolean decryptMessage(java.security.Key key, boolean recheck) 
   throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+    return decryptMessage(key, recheck, true);
+  }
+
+  /**
+   * Tries to decrypt the message using the given Key.
+   */
+  public boolean decryptMessage(java.security.Key key, boolean recheck, boolean changeStatusOnFailure) 
+  throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     synchronized(this) {
       if (mCheckedDecryption && ! recheck) {
 	return mDecryptSuccessful;
       } else {
-	mCheckedDecryption = true;
+	if (changeStatusOnFailure)
+	  mCheckedDecryption = true;
+
 	// run through all of the attachments and decrypt them.
 	AttachmentBundle bundle = mMsgInfo.getAttachmentBundle();
 	List attachmentList = bundle.getAttachmentsAndTextPart();
@@ -225,6 +235,7 @@ public class MessageCryptoInfo {
 	}
 
 	mDecryptSuccessful = true;
+	mCheckedDecryption = true;
       }
     }
 
@@ -238,18 +249,6 @@ public class MessageCryptoInfo {
     try {
       String cryptType = getEncryptionType();
       
-      /*
-	Key defaultKey = defaultProfile.getPrivateKey(cryptType);
-	if (defaultKey != null) {
-	try {
-	if (decryptMessage(defaultKey, true))
-	return true;
-	} catch (Exception e) {
-	// ignore for now.
-	}
-	}
-      */
-      
       // why not just try all of the private keys?  at least, all the
       // ones we have available.
       //java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys(cryptType);
@@ -258,15 +257,24 @@ public class MessageCryptoInfo {
       if (privateKeys != null) {
 	for (int i = 0 ; i < privateKeys.length; i++) {
 	  try {
-	    if (decryptMessage(privateKeys[i], true))
-	      return true;
+	    if (privateKeys[i] instanceof EncryptionKey) {
+	      // only try if the encryption type matches.
+	      if (((EncryptionKey)privateKeys[i]).getEncryptionUtils().getType().equals(cryptType)) {
+		if (decryptMessage(privateKeys[i], true, false))
+		  return true;
+	      }
+	    } else {
+	      if (decryptMessage(privateKeys[i], true, false))
+		return true;
+	    }
 	  } catch (Exception e) {
-	    // ignore for now.
+	    e.printStackTrace();
 	  }
 	}
 	
       }
     } catch (Exception e) {
+      e.printStackTrace();
     }
     return false;
   }  

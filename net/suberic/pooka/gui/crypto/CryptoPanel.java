@@ -164,10 +164,8 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       } else if (currentSigStatus == SIGNATURE_VERIFIED) {
 	signatureButton.setIcon(signatureVerifiedIcon);
 	signatureButton.setToolTipText(signatureVerifiedTooltip);
-	System.err.println("proxy = " + proxy);
 	if (proxy != null) {
 	  Action checkSigAction = proxy.getAction("message-signature-status");
-	  System.err.println(" got action for message-signature-status:  " + checkSigAction);
 	  if (checkSigAction != null)
 	    updateAction(signatureButton, checkSigAction);
 	}
@@ -212,7 +210,6 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       } else {
 	encryptionButton.setIcon(notEncryptedIcon);
 	encryptionButton.setToolTipText(notEncryptedTooltip);
-	System.err.println("notEncryptedTooltip=" + notEncryptedTooltip);
 	if (proxy != null) {
 	  Action decryptAction = proxy.getAction("message-encryption-status");
 	  if (decryptAction != null)

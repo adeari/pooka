@@ -34,10 +34,16 @@ public class CryptoKeySelector {
     String alias = showKeySet(privateKeys, message, Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key."));
     if (alias == null) 
       return null;
+
+    java.security.Key returnValue = null;
+    try {
+      returnValue = Pooka.getCryptoManager().getPrivateKey(alias);
+    } catch (java.security.UnrecoverableKeyException uke) {
+      char[] password = showPassphraseDialog(alias);
+      returnValue = Pooka.getCryptoManager().getPrivateKey(alias, password);
+    }
     
-    char[] passphrase = showPassphraseDialog(alias);
-    return Pooka.getCryptoManager().getPrivateKey(alias, passphrase);
-    
+    return returnValue;
   }
     
   /**

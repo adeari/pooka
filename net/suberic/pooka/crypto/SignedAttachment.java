@@ -32,9 +32,7 @@ public class SignedAttachment extends Attachment {
     throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
 
     Object content = getDataHandler().getContent();
-    System.err.println("content = " + content);
     if (content instanceof MimeMultipart) {
-      ((MimeMultipart) content).writeTo(System.err);
       return utils.checkSignature((MimeMultipart) content, key);
     } else {
       return false;

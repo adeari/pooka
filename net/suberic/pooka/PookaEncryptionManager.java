@@ -207,24 +207,25 @@ public class PookaEncryptionManager {
    * Returns the Private key for the given alias.
    */
   public Key getPrivateKey(String alias) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+    KeyStoreException caughtException = null;
+
     // first check to see if this is in the cache.
     Key cachedKey = (Key) cachedPrivateKeys.get(alias);
     if (cachedKey != null)
       return cachedKey;
 
     if (pgpKeyMgr != null || smimeKeyMgr != null) {
-      char[] password = getPasswordForAlias(alias, false);
 
       // check to see if this exists anywhere.
       if (pgpKeyMgr != null) {
 	try {
 	  if (pgpKeyMgr.containsPrivateKeyAlias(alias)) {
-	    Key returnValue = pgpKeyMgr.getPrivateKey(alias,password);
+	    Key returnValue = pgpKeyMgr.getPrivateKey(alias, null);
 	    cachedPrivateKeys.put(alias, returnValue);
 	    return returnValue;
 	  }
 	} catch (KeyStoreException kse) {
-	  // FIXME ignore for now?
+	  caughtException = kse;
 	}
 	
       }
@@ -232,17 +233,21 @@ public class PookaEncryptionManager {
       if (smimeKeyMgr!= null) {
 	try {
 	  if (smimeKeyMgr.containsPrivateKeyAlias(alias)) {
-	    Key returnValue = smimeKeyMgr.getPrivateKey(alias, password);
+	    Key returnValue = smimeKeyMgr.getPrivateKey(alias, null);
 	    cachedPrivateKeys.put(alias, returnValue);
 	    return returnValue;
 	  }
 	} catch (KeyStoreException kse) {
-	  // FIXME ignore for now?
+	  if (caughtException == null)
+	    caughtException = kse;
 	}
-
+	
       }
     }
     
+    if (caughtException != null)
+      throw caughtException;
+
     return null;
   }
 
@@ -250,6 +255,8 @@ public class PookaEncryptionManager {
    * Returns the Private key for the given alias.
    */
   public Key getPrivateKey(String alias, char[] password) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+
+    KeyStoreException caughtException = null;
 
     // first check to see if this is in the cache.
     Key cachedKey = (Key) cachedPrivateKeys.get(alias);
@@ -261,7 +268,7 @@ public class PookaEncryptionManager {
       try {
 	returnValue = pgpKeyMgr.getPrivateKey(alias, password);
       } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+	  caughtException = kse;
       }
     }
 
@@ -269,7 +276,8 @@ public class PookaEncryptionManager {
       try {
 	returnValue = smimeKeyMgr.getPrivateKey(alias, password);
       } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+	if (caughtException == null)
+	  caughtException = kse;
       }
     }
 
@@ -277,14 +285,10 @@ public class PookaEncryptionManager {
       cachedPrivateKeys.put(alias, returnValue);
     }
 
-    return returnValue;
-  }
+    if (returnValue == null && caughtException != null)
+      throw caughtException;
 
-  /**
-   * Returns the password for this alias.
-   */
-  protected char[] getPasswordForAlias(String alias, boolean check) {
-    return net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog(alias);
+    return returnValue;
   }
 
   /**
