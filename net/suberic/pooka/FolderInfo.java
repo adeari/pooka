@@ -68,6 +68,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean sentFolder = false;
     private boolean trashFolder = false;
     
+    protected boolean uidFolder = false;
+
     /**
      * Creates a new FolderInfo from a parent FolderInfo and a Folder 
      * name.
@@ -199,19 +201,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		}
 	    }
 	    if (tmpFolder != null && tmpFolder.length > 0) {
-		folder = tmpFolder[0];
+		setFolder(tmpFolder[0]);
 		available = true;
 		folder.addMessageChangedListener(this);
 	    } else {
 		available = false;
 		open = false;
-		folder = null;
+		setFolder(null);
 	    }
 	    loaded = true;
 	} catch (MessagingException me) {
 	    loaded = false;
 	    open = false;
-	    folder = null;
+	    setFolder(null);
 	} finally {
 	    loading = false;
 	}
@@ -1092,6 +1094,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     private void setFolder(Folder newValue) {
 	folder=newValue;
+	uidFolder = (folder instanceof UIDFolder);
     }
 
     /**
@@ -1121,6 +1124,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public String getFolderProperty() {
 	return "Store." + getFolderID();
+    }
+
+    /**
+     * Returns whether or not this FolderInfo wraps a UIDFolder or not.
+     *
+     * Note that this will return false until the Folder has been loaded.
+     */
+    public boolean isUIDFolder() {
+	return uidFolder;
     }
 
     public Vector getChildren() {
