@@ -9,7 +9,8 @@
 
 *) startup:
 	--make sure that the outbox gets configured correctly as an outbox
-	--see why we got two INBOX entries
+	--check subscribing to subfolders w/disconnected/ssl
+*) check disconnected imap adding nested folders (foo/bar/baz/bear)
 
 *) support windows registry attachment associations.
 

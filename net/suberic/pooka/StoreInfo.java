@@ -695,12 +695,20 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     
     StringBuffer newSubscribed = new StringBuffer();
 
+    ArrayList subscribedNames = new ArrayList();
+
     for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
       // sometimes listSubscribed() doesn't work.
+      // and sometimes list() returns duplicate entries for some reason.
       if (subscribedFolders[i].isSubscribed()) {
 	String folderName = subscribedFolders[i].getName();
-	newSubscribed.append(folderName).append(':');
+	if (! subscribedNames.contains(folderName))
+	  subscribedNames.add(folderName);
       }
+    }
+    
+    for (int i = 0; i < subscribedNames.size(); i++) {
+      newSubscribed.append((String)subscribedNames.get(i)).append(':');
     }
 
     if (newSubscribed.length() > 0)
