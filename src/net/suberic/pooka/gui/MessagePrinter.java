@@ -47,8 +47,6 @@ public class MessagePrinter implements Printable {
     double pageHeight = pageFormat.getImageableHeight();
     double pageWidth = pageFormat.getImageableWidth(); 
 
-    boolean needsResize = false;
-
     java.awt.Dimension minSize = jtp.getMinimumSize();
 
     double newWidth = Math.max(minSize.getWidth(), pageWidth);
@@ -75,17 +73,7 @@ public class MessagePrinter implements Printable {
 
     //mScale = 1;
     
-    mPageCount = (int)Math.ceil(mScale * panelHeight / pageHeight);
-    
     int counter = 0;
-
-    /*
-    mPageBreaks = new double[mPageCount];
-
-    for (int i = 0 ; i < mPageCount; i++) {
-      mPageBreaks[i] = i*pageHeight;
-    }
-    */
 
     paginate(pageHeight);
 
@@ -97,34 +85,6 @@ public class MessagePrinter implements Printable {
 
   }
 
-  /**
-   * Paginates.
-   */
-  /*
-    public void paginate(double pageHeight, double panelHeight) {
-    double minSize = pageHeight * .8;
-
-    java.util.List breakList = new java.util.ArrayList();
-    
-    View view = jtp.getUI().getRootView(jtp);
-
-    double pageBreak = 0;
-    while (pageBreak < panelHeight) {
-      breakList.add(new Double(pageBreak));
-      double minBreak = pageBreak + minSize;
-      pageBreak += pageHeight;
-      double lastExcellent = -1;
-      double lastGood = -1;
-      for (double i = pageBreak; lastExcellent == -1 && i > minBreak; i--) {
-	int breakWeight = 
-      }
-
-    }
-  }
-  */
-
-  Shape allocation = null;
-  
   double pageEnd = 0;
   
   /**
@@ -138,25 +98,25 @@ public class MessagePrinter implements Printable {
     pageEnd = 0;
 
     double scaledPageHeight = pageHeight/mScale;
+
     jtp.validate();
     View view = jtp.getUI().getRootView(jtp);
+
     double pageWidth = jtp.getSize().getWidth();
     
+    Rectangle allocation = new Rectangle(0, 0, jtp.getSize().width, jtp.getSize().height);
+
     while (pageExists) {
-      pageStart += pageEnd;
+      pageStart = pageEnd;
       pageEnd = pageStart + scaledPageHeight;
 
       Rectangle currentPage = new Rectangle();
       currentPage.setRect(0d, pageStart, pageWidth, scaledPageHeight);
 
-      System.err.println("testing with pageStart = " + pageStart + "; pageEnd = " + pageEnd);
       pageExists = calculatePageBreak(view, allocation, currentPage);
-      System.err.println("pageExists = " + pageExists);
 
       if (pageExists) {
-	breakList.add(new Double(pageStart));
-	System.err.println("adding page " + breakList.size());
-	System.err.println("pageStart = " + pageStart + "; pageEnd = " + pageEnd);
+	breakList.add(new Double(pageStart * mScale));
       }
     }
 
@@ -172,40 +132,34 @@ public class MessagePrinter implements Printable {
    */
   public boolean calculatePageBreak(View view, Shape allocation, Rectangle currentPage) {
     boolean returnValue = false;
+
     // only check leaf views--if it's a branch, get the children.
     if (view.getViewCount() > 0) {
       for (int i = 0; i < view.getViewCount(); i++) {
-        allocation = view.getChildAllocation(i,allocation);
-        if (allocation != null) {
+	Shape childAllocation = view.getChildAllocation(i,allocation);
+        if (childAllocation != null) {
           View childView = view.getView(i);
-          if (calculatePageBreak(childView,allocation,currentPage)) {
+          if (calculatePageBreak(childView,childAllocation,currentPage)) {
 	    returnValue = true;
           }
         }
       }
     } else {
-      //  I
-      System.err.println("allocation.getBounds().getMaxY() = " + allocation.getBounds().getMaxY() + "; currentPage.getY() = " + currentPage.getY());
       if (allocation.getBounds().getMaxY() >= currentPage.getY()) {
         returnValue = true;
-	//  II
         if ((allocation.getBounds().getHeight() > currentPage.getHeight()) &&
 	    (allocation.intersects(currentPage))) {
         } else {
-	  //  III
           if (allocation.getBounds().getY() >= currentPage.getY()) {
             if (allocation.getBounds().getMaxY() <= currentPage.getMaxY()) {
             } else {
-	      //  IV
               if (allocation.getBounds().getY() < pageEnd) {
                 pageEnd = allocation.getBounds().getY();
-		System.err.println("changing pageEnd to " + pageEnd);
               }
             }
           }
         }
       }
-      
     }
 
     return returnValue;
@@ -234,16 +188,31 @@ public class MessagePrinter implements Printable {
       }
       
       Graphics2D g2 = (Graphics2D)graphics;
-      
+
+      if (pageIndex + 1 < mPageCount) {
+	// only print the given amount of the page.
+	Rectangle origClip = g2.getClipBounds();
+	g2.clipRect(g2.getClipBounds().x, g2.getClipBounds().y, g2.getClipBounds().width, (int) (mPageBreaks[pageIndex + 1] - mPageBreaks[pageIndex]));
+      }
+
       //shift Graphic to line up with beginning of print-imageable region
       g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
       
       //shift Graphic to line up with beginning of next page to print
       //g2.translate(0f, -pageIndex*pageHeight);
+      // testing orig
       g2.translate(0f, -mPageBreaks[pageIndex]);
       
       //scale the page so the width fits...
       g2.scale(mScale, mScale);
+
+      // testing new
+
+      //scale the page so the width fits...
+      //g2.scale(mScale, mScale);
+
+      //g2.translate(0f, -mPageBreaks[pageIndex]);
+      //end testing
       
       jtp.paint(g2); //repaint the page for printing
       
