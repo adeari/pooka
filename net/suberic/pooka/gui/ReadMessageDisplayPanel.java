@@ -127,11 +127,13 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    attachmentPanel = new AttachmentPane(msg);
 	    attachmentScrollPane.setViewportView(attachmentPanel);
 	    ((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
+
 	    if (splitPane != null && attachmentPanel != null) {
 		splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
 	    } else {
 		splitPane.setDividerLocation(400);
 	    }
+
 	} else {
 	    ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
 	}
@@ -211,7 +213,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    this.setPreferredSize(prefSize);
 	    if (splitPane != null && attachmentPanel != null) {
 		splitPane.setPreferredSize(prefSize);
-		splitPane.setDividerLocation((int)(splitPane.getPreferredSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+		splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
 	    }
 	} else {
 	this.setSize(prefSize);
