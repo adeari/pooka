@@ -18,6 +18,8 @@ public class Pooka {
 
     static public StoreManager storeManager;
 
+    static public PookaUIFactory uiFactory;
+
     static public boolean openFolders = true;
 
     static public void main(String argv[]) {
@@ -66,6 +68,8 @@ public class Pooka {
 	frame.pack();
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
         frame.show();
+
+	uiFactory = new PookaDesktopPaneUIFactory(panel.getMessagePanel());
 
 	if (getProperty("Store", "").equals("")) {
 	    NewAccountPooka nap = new NewAccountPooka(panel.getMessagePanel());
@@ -147,6 +151,10 @@ public class Pooka {
 
     static public SearchTermManager getSearchManager() {
 	return searchManager;
+    }
+
+    static public PookaUIFactory getUIFactory() {
+	return uiFactory;
     }
 }
 

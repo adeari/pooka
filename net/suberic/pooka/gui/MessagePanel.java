@@ -119,10 +119,10 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public void openFolderWindow(FolderInfo f, boolean selectWindow) {
 
 	FolderWindow newFolderWindow;
-	newFolderWindow = f.getFolderWindow();
+	newFolderWindow = (FolderWindow) f.getFolderDisplayUI();
 	if (newFolderWindow == null) {
 	    newFolderWindow = new FolderWindow(f, this);
-	    f.setFolderWindow(newFolderWindow);
+	    f.setFolderDisplayUI(newFolderWindow);
 	    newFolderWindow.pack();
 	    newFolderWindow.setVisible(false);
 	    this.add(newFolderWindow);
@@ -205,14 +205,13 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * for it is created.  If one does exist, then that window is
      * de-iconified (if necessary) and selected.
      */
-    public void openMessageWindow(MessageProxy m) {
-	boolean newMessage = false;
-	MessageWindow messageWindow = m.getMessageWindow();
+    public void openMessageWindow(MessageProxy m, boolean newMessage) {
+	MessageWindow messageWindow = (MessageWindow) m.getMessageUI();
 	if (messageWindow == null) {
 	    messageWindow = new ReadMessageWindow(this, m);
-	    m.setMessageWindow(messageWindow);
+	    m.setMessageUI(messageWindow);
 	    newMessage = true;
-	}
+	} 
 
 	final MessageWindow newMessageWindow = messageWindow;
 	final boolean isNew = newMessage;

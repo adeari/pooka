@@ -42,7 +42,7 @@ public class NewMessageProxy extends MessageProxy {
     /**
      * This sends the Message associated with this MessageProxy.
      *
-     * If this MessageProxy has a MessageWindow associated with it, it 
+     * If this MessageProxy has a MessageUI associated with it, it 
      * will try to load the information from it, and then send the message.
      * Otherwise, it will just try sending the message as-is.
      *
@@ -50,35 +50,35 @@ public class NewMessageProxy extends MessageProxy {
      * also pop up and error window if there are any problems sending the 
      * queued messages.  
      *
-     * If there is a MessageWindow associated with this Proxy, and either 
+     * If there is a MessageUI associated with this Proxy, and either 
      * there are no errors sending the message, or the Message is just added 
      * to the Queue and not sent yet, the Window will also be closed.
      *
      */
     public void send() {
-	if (getNewMessageWindow() != null) { 
+	if (getNewMessageUI() != null) { 
 	    try {
-		UserProfile profile = getNewMessageWindow().getSelectedProfile();
-		InternetHeaders headers = getNewMessageWindow().getMessageHeaders();
+		UserProfile profile = getNewMessageUI().getSelectedProfile();
+		InternetHeaders headers = getNewMessageUI().getMessageHeaders();
 
-		String messageText = getMessageWindow().getMessageText();
+		String messageText = getMessageUI().getMessageText();
 
-		String messageContentType = getMessageWindow().getMessageContentType();
+		String messageContentType = getMessageUI().getMessageContentType();
 		getNewMessageInfo().sendMessage(profile, headers, messageText, messageContentType);
 
 		try {
 		    getNewMessageInfo().saveToSentFolder(profile);
 		} catch (MessagingException me) {
-		    getMessageWindow().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+		    getMessageUI().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 		}
-		getNewMessageWindow().setModified(false);
-		getMessageWindow().closeMessageWindow();
+		getNewMessageUI().setModified(false);
+		getMessageUI().closeMessageUI();
 	    } catch (MessagingException me) {
 		if (me instanceof SendFailedException) {
-		    JOptionPane.showInternalMessageDialog(getMessageWindow().getDesktopPane(), Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+		    getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
 		    me.printStackTrace(System.out);
 		} else {
-		    JOptionPane.showInternalMessageDialog(getMessageWindow().getDesktopPane(), Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+		    getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
 		    me.printStackTrace(System.out);
 		}
 	    }
@@ -98,28 +98,28 @@ public class NewMessageProxy extends MessageProxy {
     }
 
     /**
-     * This calls on the MessageWindow to bring up a FileDialog to choose
+     * This calls on the MessageUI to bring up a FileDialog to choose
      * the file to attach to the message.  If no choice is made, this 
      * method returns null.
      */
     public File[] getFileToAttach() {
-	return getNewMessageWindow().getFiles(Pooka.getProperty("MessageWindow.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageWindow.attachFileDialog.buttonText", "Attach"));
+	return getNewMessageUI().getFiles(Pooka.getProperty("MessageUI.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageUI.attachFileDialog.buttonText", "Attach"));
     }
 
     /**
      * This actually attaches the File to the Message.  Any errors are 
-     * sent to the MessageWindow to display.  
+     * sent to the MessageUI to display.  
      *
-     * This also sets the 'hasAttachment' property on the MessageWindow
+     * This also sets the 'hasAttachment' property on the MessageUI
      * to true.
      */
     public void attachFile(File f) {
 	try {
 	    getNewMessageInfo().attachFile(f);
 
-	    getNewMessageWindow().attachmentAdded(getNewMessageInfo().getAttachments().size() -1);
+	    getNewMessageUI().attachmentAdded(getNewMessageInfo().getAttachments().size() -1);
 	} catch (Exception e) {
-	    getMessageWindow().showError(Pooka.getProperty("error.MessageWindow.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageWindow.unableToAttachFile.title", "Unable to Attach File."), e);
+	    getMessageUI().showError(Pooka.getProperty("error.MessageUI.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageUI.unableToAttachFile.title", "Unable to Attach File."), e);
 	}
 	
     }
@@ -133,16 +133,16 @@ public class NewMessageProxy extends MessageProxy {
     public void detachFile(MimeBodyPart mbp) {
 	int index = getNewMessageInfo().removeAttachment(mbp);
 	if (index != -1)
-	    getNewMessageWindow().attachmentRemoved(index);
+	    getNewMessageUI().attachmentRemoved(index);
     }
 
     /**
-     * a convenience method which returns the current MessageWindow as
-     * a NewMessageWindow.
+     * a convenience method which returns the current MessageUI as
+     * a NewMessageUI.
      */
-    public NewMessageWindow getNewMessageWindow() {
-	if (getMessageWindow() instanceof NewMessageWindow)
-	    return (NewMessageWindow)getMessageWindow();
+    public NewMessageUI getNewMessageUI() {
+	if (getMessageUI() instanceof NewMessageUI)
+	    return (NewMessageUI)getMessageUI();
 	else
 	    return null;
     }

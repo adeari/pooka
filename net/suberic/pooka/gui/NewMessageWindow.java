@@ -16,7 +16,7 @@ import java.io.File;
 /**
  * A window for entering new messages.
  */
-public class NewMessageWindow extends MessageWindow implements ItemListener {
+public class NewMessageWindow extends MessageWindow implements ItemListener, NewMessageUI {
 
     JTabbedPane tabbedPane = null;
     Container headerPanel = null;
@@ -55,7 +55,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	headerPanel = createHeaderInputPanel(msg, inputTable);
 	editorPane = createMessagePanel(msg);
 
-	msg.setMessageWindow(this);
+	msg.setMessageUI(this);
 
 	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
@@ -85,8 +85,8 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 		public void internalFrameClosed(InternalFrameEvent e) {
-		    if (getMessageProxy().getMessageWindow() == NewMessageWindow.this)
-			getMessageProxy().setMessageWindow(null);
+		    if (getMessageProxy().getMessageUI() == NewMessageWindow.this)
+			getMessageProxy().setMessageUI(null);
 		}
 	    });
 	
@@ -118,7 +118,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
      *
      * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
      */
-    public void closeMessageWindow() {
+    public void closeMessageUI() {
 	
 	if (isModified()) {
 	    int saveDraft = showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
@@ -565,7 +565,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    closeMessageWindow();
+	    closeMessageUI();
 	}
     }
 

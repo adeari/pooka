@@ -12,7 +12,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
 
-public abstract class MessageWindow extends JInternalFrame implements UserProfileContainer {
+public abstract class MessageWindow extends JInternalFrame implements MessageUI {
 
     protected MessagePanel parentContainer;
 
@@ -24,6 +24,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
     protected ConfigurableToolbar toolbar;
     protected ConfigurableKeyBinding keyBindings;
     protected boolean hasAttachment = false;
+    protected boolean addedToDesktop = false;
 
     //<sigh>
     JScrollPane attachmentScrollPane;
@@ -40,12 +41,12 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 
 	this.getContentPane().setLayout(new BorderLayout());
 
-	msg.setMessageWindow(this);
+	msg.setMessageUI(this);
 	
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 		public void internalFrameClosed(InternalFrameEvent e) {
-		    if (getMessageProxy().getMessageWindow() == MessageWindow.this)
-			getMessageProxy().setMessageWindow(null);
+		    if (getMessageProxy().getMessageUI() == MessageWindow.this)
+			getMessageProxy().setMessageUI(null);
 		}
 	    });
 	
@@ -58,7 +59,20 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 
     protected abstract void configureMessageWindow();
 
-    public void closeMessageWindow() {
+    /**
+     * This opens the MessageWindow by calling 
+     * getParentContainer().openMessageWindow(getMessageProxy());
+     */
+    public void openMessageUI() {
+	
+	getParentContainer().openMessageWindow(getMessageProxy(), !addedToDesktop);
+	addedToDesktop = true;
+    }
+
+    /**
+     * This closes the MessageWindow.
+     */
+    public void closeMessageUI() {
 	try {
 	    this.setClosed(true);
 	} catch (java.beans.PropertyVetoException e) {
@@ -76,12 +90,30 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
     }
 
     /**
+     * This shows an Confirm Dialog window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */    
+    public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
+	return JOptionPane.showInternalConfirmDialog(Pooka.getMainPanel().getMessagePanel(), messageText, title, optionType, iconType);
+    }
+
+    /**
      * This shows an Error Message window.  We include this so that
      * the MessageProxy can call the method without caring abou the
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title) {
 	JOptionPane.showInternalMessageDialog(Pooka.getMainPanel().getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"));
     }
 
     /**
@@ -101,6 +133,15 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      */
     public String showInputDialog(String inputMessage, String title) {
 	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+    }
+
+    /**
+     * This shows an Input window.  We include this so that the 
+     * MessageProxy can call the method without caring about the actual
+     * implementation of the dialog.
+     */
+    public String showInputDialog(Object[] inputPanes, String title) {
+	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**
@@ -170,6 +211,20 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 	this.setPreferredSize(new Dimension(width, width));
 	this.setSize(this.getPreferredSize());
     }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.MessageUI.
+     * 
+     * This implementation sets the cursor to either Cursor.WAIT_CURSOR
+     * if busy, or Cursor.DEFAULT_CURSOR if not busy.
+     */
+    public void setBusy(boolean newValue) {
+	if (newValue)
+	    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	else
+	    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
     /**
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *
@@ -236,7 +291,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    closeMessageWindow();
+	    closeMessageUI();
 	}
     }
 

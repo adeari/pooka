@@ -29,7 +29,10 @@ public class MessageProxy {
     Hashtable commands;
 
     // The Window associated with this MessageProxy.
-    MessageWindow msgWindow;
+    MessageUI msgWindow;
+
+    // The GUI factory used by this MessageProxy.
+    PookaUIFactory uiFactory;
 
     public Action[] defaultActions;
 
@@ -195,13 +198,13 @@ public class MessageProxy {
     }
 
     /**
-     * this opens a MessageWindow for this Message.
+     * this opens a MessageUI for this Message.
      */
     public void openWindow() {
 	try {
-	    FolderWindow fw = getFolderWindow();
-	    if (fw != null)
-		fw.getMessagePanel().openMessageWindow(this);
+	    if (getMessageUI() == null)
+		setMessageUI(getPookaUIFactory().createMessageUI(this));
+	    getMessageUI().openMessageUI();
 	    getMessageInfo().setSeen(true);
 	} catch (MessagingException me) {
 	    showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
@@ -234,7 +237,7 @@ public class MessageProxy {
 	    this.close();
 	} catch (MessagingException me) {
 	    if (me instanceof NoTrashFolderException) {
-		if (JOptionPane.showInternalConfirmDialog(getMessageInfo().getFolderInfo().getFolderWindow(), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION)
+		if (getMessageUI().showConfirmDialog(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION)
 		    try {
 			getMessageInfo().remove(autoExpunge);
 			this.close();
@@ -248,19 +251,18 @@ public class MessageProxy {
     }
 
     public void showError(String message, Exception ex) {
-	if (getMessageInfo().getFolderInfo() != null && getMessageInfo().getFolderInfo().getFolderWindow() != null)
-	    JOptionPane.showInternalMessageDialog(getMessageInfo().getFolderInfo().getFolderWindow().getDesktopPane(), message + ex.getMessage());
+	getMessageUI().showError(message + ex.getMessage());
     }
 
     /**
      * Closes this MessageProxy. 
      *
-     * For this implementation, the only result is that the MessageWindow,
+     * For this implementation, the only result is that the MessageUI,
      * if any, is closed.
      */
     public void close() {
-	if (getMessageWindow() != null)
-	    getMessageWindow().closeMessageWindow();
+	if (getMessageUI() != null)
+	    getMessageUI().closeMessageUI();
     }
 
     /**
@@ -377,16 +379,9 @@ public class MessageProxy {
 	    try {
 		getMessageInfo().setSeen(newValue);
 	    } catch (MessagingException me) {
-		showError( Pooka.getProperty("error.MessageWindow.setSeenFailed", "Failed to set Seen flag to ") + newValue + "\n", me);
+		showError( Pooka.getProperty("error.MessageUI.setSeenFailed", "Failed to set Seen flag to ") + newValue + "\n", me);
 	    }
 	}
-    }
-
-    public MessagePanel getMessagePanel() {
-	if (getMessageInfo().getFolderInfo() != null && getMessageInfo().getFolderInfo().getFolderWindow() != null)
-	    return getMessageInfo().getFolderInfo().getFolderWindow().getMessagePanel();
-	else
-	    return null;
     }
 
     public boolean isLoaded() {
@@ -402,11 +397,11 @@ public class MessageProxy {
 	loaded=false;
     }
 
-    public MessageWindow getMessageWindow() {
+    public MessageUI getMessageUI() {
 	return msgWindow;
     }
 
-    public void setMessageWindow(MessageWindow newValue) {
+    public void setMessageUI(MessageUI newValue) {
 	msgWindow = newValue;
     }
 
@@ -414,14 +409,32 @@ public class MessageProxy {
 	return messageInfo;
     }
 
-    public FolderWindow getFolderWindow() {
+    public FolderDisplayUI getFolderDisplayUI() {
 	FolderInfo fi = getMessageInfo().getFolderInfo();
 	if (fi != null)
-	    return fi.getFolderWindow();
+	    return fi.getFolderDisplayUI();
 	else
 	    return null;
 	    
     }
+
+    /**
+     * Returns the UI Factory currently being used by this MessageProxy.
+     */
+    public PookaUIFactory getPookaUIFactory() {
+	if (uiFactory != null)
+	    return uiFactory;
+	else
+	    return Pooka.getUIFactory();
+    }
+
+    /**
+     * Sets the UI Factory currently being used by this MessageProxy.
+     */
+    public void setPookaUIFactory(PookaUIFactory puif) {
+	uiFactory = puif;
+    }
+
     public Action getAction(String name) {
 	return (Action)commands.get(name);
     }
@@ -437,12 +450,12 @@ public class MessageProxy {
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {
 
-	    FolderWindow fw = getFolderWindow();
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    openWindow();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
 	}
     }
 
@@ -452,16 +465,16 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-	    FolderWindow fw = getFolderWindow();
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    moveMessage((FolderInfo)getValue("target"));
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);;
 	}
 
     }
@@ -473,23 +486,24 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
 
-	    FolderWindow fw = getFolderWindow();
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    try {
 		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().populateReply(false);
-		getMessagePanel().createNewMessage(m);
-
+		NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
+		MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+		nmui.openMessageUI();
 	    } catch (MessagingException me) {
-		showError(Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n", me);
+		showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
 	    }
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);;
 	}
     }
 
@@ -500,23 +514,25 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-	    FolderWindow fw = getFolderWindow();
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    try {
 		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().populateReply(true);
 
-		getMessagePanel().createNewMessage(m);
+		NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
+		MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+		nmui.openMessageUI();
 
 	    } catch (MessagingException me) {
-		showError(Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n", me);
+		showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
 	    }
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);;
 	}
     }
 
@@ -527,23 +543,25 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-	    FolderWindow fw = getFolderWindow();
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    try {
 		javax.mail.internet.MimeMessage m = (MimeMessage) getMessageInfo().populateForward();
-		getMessagePanel().createNewMessage(m);
+		NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
+		MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+		nmui.openMessageUI();
 
 	    } catch (MessagingException me) {
-		JOptionPane.showInternalMessageDialog(getMessagePanel(), Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+		getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
 	    }
 
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);;
 	}
     }
 
@@ -553,15 +571,15 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-	    FolderWindow fw = getFolderWindow();
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    deleteMessage();
 	   
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
 	}
     }
 
@@ -571,17 +589,17 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
-	    FolderWindow fw = getFolderWindow();
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		fw.setBusy(true);;
 	    printMessage();
 
 	    if (fw != null)
-		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
-	    if (getMessageWindow() != null)
-		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(false);
 	}
     }
 

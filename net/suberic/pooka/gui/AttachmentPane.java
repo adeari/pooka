@@ -255,7 +255,7 @@ public class AttachmentPane extends JPanel {
 	    Object[] messageArray = new Object[2];
 	    messageArray[0] = inputMessage;
 	    messageArray[1] = togglePanel;
-	    String cmd = JOptionPane.showInternalInputDialog(message.getMessageWindow().getDesktopPane(), messageArray, inputTitle, JOptionPane.QUESTION_MESSAGE);
+	    String cmd = message.getMessageUI().showInputDialog(messageArray, inputTitle);
 	    
 	    if (cmd != null) {
 		if (cmd.indexOf("%s") == -1)
@@ -305,7 +305,7 @@ public class AttachmentPane extends JPanel {
 		try {
 		    saveFileAs(mbp, saveChooser.getSelectedFile());
 		} catch (IOException exc) {
-		    message.getMessageWindow().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+		    message.getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
 		}
 	}
     }

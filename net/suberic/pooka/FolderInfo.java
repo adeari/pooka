@@ -44,7 +44,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private Vector columnSizes;
 
     // GUI information.
-    private FolderWindow folderWindow;
+    private FolderDisplayUI folderDisplayUI;
     private Action[] defaultActions;
 
     //filters
@@ -710,8 +710,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 
 	Pooka.getResources().removeValueChangeListener(this);
-	if (getFolderWindow() != null)
-	    getFolderWindow().closeFolderWindow();
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().closeFolderDisplay();
 
 	Pooka.getResources().removeProperty(getFolderProperty() + ".folderList");
 
@@ -757,8 +757,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		getFolder().expunge();
 	    } catch (MessagingException me) {
 		String m = Pooka.getProperty("error.trashFolder.EmptyTrashError", "Error emptying Trash:") +"\n" + me.getMessage();
-		if (getFolderWindow() != null) 
-		    getFolderWindow().showError(m);
+		if (getFolderDisplayUI() != null) 
+		    getFolderDisplayUI().showError(m);
 		else
 		    System.out.println(m);
 	    }
@@ -1042,10 +1042,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	unloadAllMessages();
 
-	if (getFolderWindow() != null)
-	    getFolderWindow().setEnabled(false);
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().setEnabled(false);
 
-	setFolderWindow(null);
+	setFolderDisplayUI(null);
 
 	if (getFolderTracker() != null) {
 	    getFolderTracker().removeFolder(this);
@@ -1182,12 +1182,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	columnSizes = newValue;
     }
 
-    public FolderWindow getFolderWindow() {
-	return folderWindow;
+    public FolderDisplayUI getFolderDisplayUI() {
+	return folderDisplayUI;
     }
 
-    public void setFolderWindow(FolderWindow newValue) {
-	folderWindow = newValue;
+    public void setFolderDisplayUI(FolderDisplayUI newValue) {
+	folderDisplayUI = newValue;
     }
 
     public boolean isOpen() {

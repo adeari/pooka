@@ -20,7 +20,7 @@ import net.suberic.util.swing.*;
  * class.
  */
 
-public class FolderWindow extends JInternalFrame implements UserProfileContainer {
+public class FolderWindow extends JInternalFrame implements FolderDisplayUI {
     JTable messageTable = null;
     JScrollPane scrollPane = null;
     FolderInfo folderInfo = null;
@@ -80,7 +80,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	setFolderInfo(newFolderInfo);
 
-	getFolderInfo().setFolderWindow(this);
+	getFolderInfo().setFolderDisplayUI(this);
 
 	defaultActions = new Action[] {
 	    new CloseAction(),
@@ -282,7 +282,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 		public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-		    getFolderInfo().setFolderWindow(null);
+		    getFolderInfo().setFolderDisplayUI(null);
 		}
 	    });
 
@@ -331,9 +331,16 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     }
 
     /**
+     * This opens the FolderWindow.
+     */
+    public void openFolderDisplay() {
+	getMessagePanel().openFolderWindow(getFolderInfo());
+    }
+
+    /**
      * This closes the FolderWindow.
      */
-    public void closeFolderWindow(){
+    public void closeFolderDisplay(){
 	try {
 	    this.setClosed(true);
 	} catch (java.beans.PropertyVetoException e) {
@@ -352,12 +359,55 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     }
 
     /**
-     * This shows an error message.
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
      */
-    public void showError(String message) {
-	JOptionPane.showInternalMessageDialog(getDesktopPane(), message);
+    public void showError(String errorMessage, String title) {
+	JOptionPane.showInternalMessageDialog(Pooka.getMainPanel().getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
     }
-    
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"));
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring about the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage, String title, Exception e) {
+	showError(errorMessage + e.getMessage(), title);
+	e.printStackTrace();
+    }
+
+    /**
+     * This shows an Input window.  We include this so that the 
+     * MessageProxy can call the method without caring about the actual
+     * implementation of the dialog.
+     */
+    public String showInputDialog(String inputMessage, String title) {
+	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+    }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
+     * This implementation sets the cursor to either Cursor.WAIT_CURSOR
+     * if busy, or Cursor.DEFAULT_CURSOR if not busy.
+     */
+    public void setBusy(boolean newValue) {
+	if (newValue)
+	    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	else
+	    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    }
+
     // Accessor methods.
 
     public MessagePanel getMessagePanel() {
@@ -513,7 +563,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    closeFolderWindow();
+	    closeFolderDisplay();
 	}
     }
 

@@ -113,7 +113,7 @@ public class SimpleAuthenticator extends Authenticator {
 	
 	if (result == JOptionPane.OK_OPTION)
 	    return new PasswordAuthentication(username.getText(),
-						password.getText());
+						new String(password.getPassword()));
 	else
 	    return null;
     }

@@ -8,9 +8,12 @@ import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.StoreInfo;
 import net.suberic.util.thread.ActionWrapper;
 import net.suberic.pooka.gui.search.*;
+import net.suberic.pooka.gui.filechooser.*;
+import java.io.File;
 import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.mail.event.*;
+
 
 public class StoreNode extends MailTreeNode {
     
@@ -199,8 +202,13 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
+	    MailFileSystemView mfsv = new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo().getStore());
+	    File f = mfsv.createFileObject("/");
+	    File[] files = mfsv.getFiles(f, false);
 
+	    /*
 	    try {
+		
 		Store s = Pooka.getStoreManager().getStoreInfo("mailtest").getStore();
 		System.out.println("got store.");
 		if (!s.isConnected()) {
@@ -223,7 +231,7 @@ public class StoreNode extends MailTreeNode {
 		System.out.println("got messaging exception.");
 		me.printStackTrace();
 	    }
-	    
+	    */
 
 	    /*
 	    JInternalFrame jif = new JInternalFrame();

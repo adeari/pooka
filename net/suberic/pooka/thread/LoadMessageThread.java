@@ -4,6 +4,7 @@ import net.suberic.pooka.*;
 import net.suberic.pooka.event.*;
 import net.suberic.pooka.gui.LoadMessageTracker;
 import net.suberic.pooka.gui.MessageProxy;
+import net.suberic.pooka.gui.FolderWindow;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.util.*;
@@ -69,7 +70,9 @@ public class LoadMessageThread extends Thread {
 	if (numMessages > 0) {
 	    LoadMessageTracker lmt = new LoadMessageTracker(getLoadedMessageCount(), 0, numMessages);
 	    this.addMessageLoadedListener(lmt);
-	    getFolderInfo().getFolderWindow().getStatusBar().add(lmt);
+	    
+	    // FIXME
+	    ((FolderWindow)getFolderInfo().getFolderDisplayUI()).getStatusBar().add(lmt);
 	    
 	    for(int i=numMessages-1; i >= 0; i--) {
 		mp=(MessageProxy)messages.elementAt(i);
@@ -85,8 +88,10 @@ public class LoadMessageThread extends Thread {
 		fireMessageLoadedEvent();
 	    
 	    removeMessageLoadedListener(lmt);
-	    getFolderInfo().getFolderWindow().getStatusBar().remove(lmt);
-	    getFolderInfo().getFolderWindow().getStatusBar().repaint();
+	    
+	    // FIXME
+	    ((FolderWindow)getFolderInfo().getFolderDisplayUI()).getStatusBar().remove(lmt);
+	    ((FolderWindow)getFolderInfo().getFolderDisplayUI()).getStatusBar().repaint();
 	}
     }
     
