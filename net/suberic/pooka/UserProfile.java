@@ -67,36 +67,74 @@ public class UserProfile extends Object {
     }
 
     static public void createProfiles(VariableBundle mainProperties) {
-	profileMap = new Vector();
+	StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile", ""), ":");
+	Vector newProfiles = new Vector();
+	while (tokens.hasMoreTokens())
+	    newProfiles.add(tokens.nextToken());
+	createProfilesFromList(mainProperties, newProfiles);
+    }
 
-	// Initialize Profile Map
-
-	StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL"), ":");
-	while (tokens.hasMoreTokens()) {
-	    profileMap.addElement(tokens.nextToken());
-	}
-
+    /**
+     * This creates a new Profile for each Profile specified in the 
+     * newProfileKeys Vector.
+     */ 
+    static public void createProfilesFromList(VariableBundle mainProperties, Vector newProfileKeys) {
+	
+	if (profileMap == null)
+	    createProfileMap(mainProperties);
+	
 	// Create each Profile
 
-	tokens = new StringTokenizer(mainProperties.getProperty("UserProfile", ""), ":");
-	
 	String currentProfileName, profileKey;
 	Properties userProperties;;
 	UserProfile tmpProfile;
 
-	while (tokens.hasMoreTokens()) {
-	    currentProfileName = (String)(tokens.nextToken());
-
+	for (int j = 0; j < newProfileKeys.size(); j++) {
+	    currentProfileName = (String)(newProfileKeys.elementAt(j));
+	    
 	    // don't add it if it's empty.
 	    if (currentProfileName.length() > 0) {
 		userProperties = new Properties();
-
+		
 		for (int i = 0; i < profileMap.size(); i++) {
 		    profileKey = (String)profileMap.elementAt(i);
 		    userProperties.put(profileKey, mainProperties.getProperty("UserProfile." + currentProfileName + "." + profileKey, ""));
 		}
 		tmpProfile = new UserProfile(currentProfileName, userProperties);
 	    }
+	}
+    }
+
+    /**
+     * This creates the profile map that we'll use to create new 
+     * Profile objects.
+     */
+    static public void createProfileMap(VariableBundle mainProperties) {
+	profileMap = new Vector();
+	
+	// Initialize Profile Map
+	
+	StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL"), ":");
+	while (tokens.hasMoreTokens()) {
+	    profileMap.addElement(tokens.nextToken());
+	}
+	
+    }
+
+    /**
+     * This removes each profile specified in the Vector removeKeys.
+     * Each entry in the removeKeys Vector should be the String which 
+     * returns the corresponding Profile to be removed.
+     */
+    static public void removeProfilesFromList(VariableBundle mainProperties, Vector removeProfileKeys) {
+	if (removeProfileKeys == null)
+	    return;
+
+	for (int i = 0; i < removeProfileKeys.size(); i++) {
+	    UserProfile tmpProfile = getProfile((String)removeProfileKeys.elementAt(i));
+	    if (tmpProfile != null)
+		profileList.removeElement(tmpProfile);
+	    tmpProfile = null;
 	}
     }
 
