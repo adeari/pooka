@@ -18,7 +18,7 @@ import javax.swing.border.*;
  *
  */
 
-public class MessagePanel extends JDesktopPane implements UserProfileContainer {
+public class MessagePanel extends JDesktopPane implements ContentPanel {
     /**
      * ExtendedDesktopManager is just a Desktop Manager which also
      * calls refreshActiveMenus() and refreshCurrentUser()  when the 
@@ -71,6 +71,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     // end internal class ExtendedDesktopManager
 
     MainPanel mainPanel;
+    JComponent UIComponent;
     ConfigurableKeyBinding keyBindings;
     boolean savingWindowLocations = false;
     boolean savingOpenFolders = false;
@@ -118,54 +119,51 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      */
     public void openFolderWindow(FolderInfo f, boolean selectWindow) {
 
+	// first, get the newFolderWindow and make sure it's a JInternalFrame.
 	JInternalFrame newFolderWindow;
 	newFolderWindow = (JInternalFrame) f.getFolderDisplayUI();
 	if (newFolderWindow == null) {
 	    FolderDisplayUI fui = Pooka.getUIFactory().createFolderDisplayUI(f);
 	    newFolderWindow = (JInternalFrame) fui;
 	    f.setFolderDisplayUI(fui);
+	    
 	    newFolderWindow.pack();
 	    newFolderWindow.setVisible(false);
+	}
+
+	if (newFolderWindow.getDesktopPane() != this) {
 	    this.add(newFolderWindow);
+	    String folderProperty = f.getFolderProperty();
 	    try {
-		String folderProperty = f.getFolderProperty();
 		int x = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.x"));
 		int y = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.y"));
 		int layer = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.layer"));
 		int position = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.position"));
-
+		
 		newFolderWindow.setLocation(x, y);
 		setLayer(newFolderWindow, layer, position);
-		
-		if ( selectWindow || Pooka.getProperty(folderProperty + ".windowLocation.selected", "false").equalsIgnoreCase("true"))
-		    try {
-			newFolderWindow.setSelected(true);
-		    } catch (java.beans.PropertyVetoException e) {
-		    } 
 	    } catch (Exception e) {
 		newFolderWindow.setLocation(getNewWindowLocation(newFolderWindow));
-		if (selectWindow)
-		    try {
-			newFolderWindow.setSelected(true);
-		    } catch (java.beans.PropertyVetoException pve) {
-		    } 
 	    }
-	    
+	    if (Pooka.getProperty(folderProperty + ".windowLocation.selected", "false").equalsIgnoreCase("true"))
+		selectWindow = true;
+	} else if (newFolderWindow.isIcon()) {
+	    try {
+		newFolderWindow.setIcon(false);
+	    } catch (java.beans.PropertyVetoException e) {
+	    } 
+	}
+	
+	if (!newFolderWindow.isVisible())
 	    newFolderWindow.setVisible(true);
-
-	} else {
-	    if (newFolderWindow.isIcon())
-		try {
-		    newFolderWindow.setIcon(false);
-		} catch (java.beans.PropertyVetoException e) {
-		} 
+	
+	if (selectWindow) 
 	    try {
 		newFolderWindow.setSelected(true);
 	    } catch (java.beans.PropertyVetoException e) {
 	    } 
-	}
-
     }
+
 
     /**
      * This returns an available location for JComponent c to be placed
@@ -252,7 +250,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * Calls createNewMessage(Message m) with a new MimeMessage object.
      */
     public void createNewMessage() {
-	createNewMessage(new MimeMessage(getMainPanel().getSession()));
+	createNewMessage(new MimeMessage(Pooka.getMainPanel().getSession()));
     }
 
     /**
@@ -261,30 +259,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      * MessagePanel and set it as Active.
      */
     public void createNewMessage(javax.mail.Message m) {
-	final MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(new NewMessageInfo(m)));
-
-
-	Runnable openWindowCommand = new RunnableAdapter() {
-		public void run() {
-
-		    MessagePanel.this.add(newMessageWindow);
-
-		    newMessageWindow.setVisible(true);
-		    try {
-			newMessageWindow.setSelected(true);
-		    } catch (java.beans.PropertyVetoException e) {
-		    }
-		}
-	    };
-	if (SwingUtilities.isEventDispatchThread())
-	    openWindowCommand.run();
-	else 
-	    try {
-		SwingUtilities.invokeAndWait(openWindowCommand);
-	    } catch (Exception e) {
-		// shouldn't happen.
-	    }
-
+	NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
+	openMessageWindow(nmp, true);
     }
 
     /**
@@ -313,8 +289,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	JInternalFrame current = (JInternalFrame) currentUI;
 
 	// we have to do these as absolute values.
-	int x = current.getX() + getMainPanel().getMessageScrollPane().getHorizontalScrollBar().getValue();
-	int y = current.getY() + getMainPanel().getMessageScrollPane().getVerticalScrollBar().getValue();
+	int x = current.getX() + ((JScrollPane)getUIComponent()).getHorizontalScrollBar().getValue();
+	int y = current.getY() + ((JScrollPane)getUIComponent()).getVerticalScrollBar().getValue();
 	int layer = getLayer(current);
 	int position = getPosition(current);
 	boolean selected = current.isSelected();
@@ -464,8 +440,50 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	}
     }
 
+    /**
+     * This method shows a help screen.  At the moment, it just takes the
+     * given URL, creates a JInteralFrame and a JEditorPane, and then shows
+     * the doc with those components.
+     */
+    public void showHelpScreen(String title, java.net.URL url) {
+	JInternalFrame jif = new JInternalFrame(title, true, true, true);
+	JEditorPane jep = new JEditorPane();
+	try {
+	    jep.setPage(url);
+	} catch (IOException ioe) {
+	    jep.setText(Pooka.getProperty("err.noHelpPage", "No help available."));
+	}
+	jep.setEditable(false);
+	jif.setSize(500,500);
+	jif.getContentPane().add(new JScrollPane(jep));
+	this.add(jif);
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException e) {
+	} 
+	
+    }
+
+    /**
+     * Returns the MainPanel for this component.
+     */
     public MainPanel getMainPanel() {
-	return mainPanel;
+	return Pooka.getMainPanel();
+    }
+
+    /**
+     * Returns the UIComponent for this ContentPanel.
+     */
+    public JComponent getUIComponent() {
+	return UIComponent;
+    }
+
+    /**
+     * Sets the UIComponent for this ContentPanel.
+     */
+    public void setUIComponent(JComponent newComp) {
+	UIComponent = newComp;
     }
 
     /**

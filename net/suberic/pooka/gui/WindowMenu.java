@@ -12,7 +12,7 @@ import net.suberic.util.*;
 public class WindowMenu extends ConfigurableMenu {
 
     int originalMenuCount;
-    MessagePanel messagePanel;
+    MessagePanel messagePanel = null;
     
     public WindowMenu() {
 	super();
@@ -29,7 +29,8 @@ public class WindowMenu extends ConfigurableMenu {
 	super.configureComponent(key, vars);
 	
 	originalMenuCount = this.getMenuComponentCount();
-	messagePanel = Pooka.getMainPanel().getMessagePanel();
+	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel)
+	    messagePanel = (MessagePanel) Pooka.getMainPanel().getContentPanel();
     }
 
     /**
@@ -47,15 +48,17 @@ public class WindowMenu extends ConfigurableMenu {
      * component.
      */
     public void refreshWindows() {
-	for (int k = this.getMenuComponentCount(); k > originalMenuCount; k--)
-	    this.remove(k-1);
-	
-	JInternalFrame[] allFrames = messagePanel.getAllFrames();
-	for(int j = 0; j < allFrames.length; j++) {
-	    JMenuItem mi = new JMenuItem(allFrames[j].getTitle());
-	    mi.addActionListener(new ActivateWindowAction());
-	    mi.setActionCommand(String.valueOf(messagePanel.getIndexOf(allFrames[j])));
-	    this.add(mi);
+	if (messagePanel != null) {
+	    for (int k = this.getMenuComponentCount(); k > originalMenuCount; k--)
+		this.remove(k-1);
+	    
+	    JInternalFrame[] allFrames = messagePanel.getAllFrames();
+	    for(int j = 0; j < allFrames.length; j++) {
+		JMenuItem mi = new JMenuItem(allFrames[j].getTitle());
+		mi.addActionListener(new ActivateWindowAction());
+		mi.setActionCommand(String.valueOf(messagePanel.getIndexOf(allFrames[j])));
+		this.add(mi);
+	    }
 	}
     }
 
@@ -66,10 +69,12 @@ public class WindowMenu extends ConfigurableMenu {
 	}
 
         public void actionPerformed(ActionEvent e) {
-	    try { 
-		((JInternalFrame)(messagePanel.getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
-	    } catch (java.beans.PropertyVetoException pve) {
-	    } catch (NumberFormatException nfe) {
+	    if (messagePanel != null) {
+		try { 
+		    ((JInternalFrame)(messagePanel.getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
+		} catch (java.beans.PropertyVetoException pve) {
+		} catch (NumberFormatException nfe) {
+		}
 	    }
 	}
     }

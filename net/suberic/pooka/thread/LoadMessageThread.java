@@ -72,8 +72,10 @@ public class LoadMessageThread extends Thread {
 	    this.addMessageLoadedListener(lmt);
 	    
 	    // FIXME
-	    FolderInternalFrame fif = (FolderInternalFrame) getFolderInfo().getFolderDisplayUI();
-	    fif.getStatusBar().add(lmt);
+	    if (getFolderInfo().getFolderDisplayUI() instanceof FolderInternalFrame) {
+		FolderInternalFrame fif = (FolderInternalFrame) getFolderInfo().getFolderDisplayUI();
+		fif.getStatusBar().add(lmt);
+	    }
 	    
 	    for(int i=numMessages-1; i >= 0; i--) {
 		mp=(MessageProxy)messages.elementAt(i);
@@ -91,8 +93,10 @@ public class LoadMessageThread extends Thread {
 	    removeMessageLoadedListener(lmt);
 	    
 	    // FIXME
-	    ((FolderInternalFrame)getFolderInfo().getFolderDisplayUI()).getStatusBar().remove(lmt);
-	    ((FolderInternalFrame)getFolderInfo().getFolderDisplayUI()).getStatusBar().repaint();
+	    if (getFolderInfo().getFolderDisplayUI() instanceof FolderInternalFrame) {
+		((FolderInternalFrame)getFolderInfo().getFolderDisplayUI()).getStatusBar().remove(lmt);
+		((FolderInternalFrame)getFolderInfo().getFolderDisplayUI()).getStatusBar().repaint();
+	    }
 	}
     }
     

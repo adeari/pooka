@@ -101,6 +101,9 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	this.getContentPane().add("Center", folderDisplay);
 	this.getContentPane().add("South", getStatusBar());
 	
+	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+	this.setSize(this.getPreferredSize());
+
 	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
 	
 	keyBindings.setActive(getActions());
@@ -216,7 +219,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(Pooka.getMainPanel().getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -244,7 +247,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * implementation of the dialog.
      */
     public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+	return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**
@@ -263,7 +266,15 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     // Accessor methods.
 
     public MessagePanel getMessagePanel() {
-	return messagePanel;
+	if (messagePanel != null)
+	    return messagePanel;
+	else {
+	    ContentPanel cp = Pooka.getMainPanel().getContentPanel();
+	    if (cp instanceof MessagePanel)
+		return (MessagePanel) cp;
+	    else
+		return null;
+	}
     }
 
     public FolderDisplayPanel getFolderDisplay() {

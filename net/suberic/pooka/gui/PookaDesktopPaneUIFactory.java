@@ -2,7 +2,8 @@ package net.suberic.pooka.gui;
 import net.suberic.util.gui.PropertyEditorFactory;
 import net.suberic.pooka.Pooka;
 import javax.swing.JInternalFrame;
-
+import javax.swing.JScrollPane;
+import javax.swing.JOptionPane;
 
 /**
  * This is an implementation of PookaUIFactory which creates InternalFrame
@@ -16,9 +17,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     /**
      * Constructor.
      */
-    public PookaDesktopPaneUIFactory(MessagePanel newMessagePanel) {
-	messagePanel = newMessagePanel;
-
+    public PookaDesktopPaneUIFactory() {
+	
 	editorFactory = new PookaDesktopPropertyEditorFactory(Pooka.getResources());
     }
 
@@ -46,6 +46,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
 	// a FolderInfo can only have one FolderDisplayUI.
 	
+
 	if (fi.getFolderDisplayUI() != null)
 	    return fi.getFolderDisplayUI();
 
@@ -69,6 +70,21 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * Creates a JPanel which will be used to show messages and folders.
+     *
+     * This implementation creates an instance of MessagePanel.
+     */
+    public ContentPanel createContentPanel() {
+	messagePanel = new MessagePanel(Pooka.getMainPanel());
+	messagePanel.setSize(1000,1000);
+	JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
+	messagePanel.setUIComponent(messageScrollPane);
+	
+	return messagePanel;
+    }
+
+    /**
      * Returns the MessagePanel associated with this Factory.
      */
     public MessagePanel getMessagePanel() {
@@ -81,4 +97,41 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public PropertyEditorFactory getEditorFactory() {
 	return editorFactory;
     }
+
+    /**
+     * Shows a Confirm dialog.
+     */
+    public int showConfirmDialog(String message, String title, int type) {
+	return JOptionPane.showInternalConfirmDialog(messagePanel, message, title, type);
+    }
+
+    /**
+     * This shows an Error Message window.
+     */
+    public void showError(String errorMessage, String title) {
+	JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * This shows an Error Message window.  
+     */
+    public void showError(String errorMessage) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"));
+    }
+
+    /**
+     * This shows an Error Message window.
+     */
+    public void showError(String errorMessage, String title, Exception e) {
+	showError(errorMessage + e.getMessage(), title);
+	e.printStackTrace();
+    }
+
+    /**
+     * This shows an Input window.
+     */
+    public String showInputDialog(String inputMessage, String title) {
+	return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+    }
+    
 }

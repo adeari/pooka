@@ -19,14 +19,17 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     public static int HEADERS_DEFAULT = 0;
     public static int HEADERS_FULL = 1;
 
-    int headerStyle = ReadMessageWindow.HEADERS_DEFAULT;
+    int headerStyle = ReadMessageDisplayPanel.HEADERS_DEFAULT;
     boolean showFullHeaders = false;
+
+    JComponent currentComponent;
     
     /**
      * Creates an empty MessageDisplayPanel.
      */
     public ReadMessageDisplayPanel() {
 	super();
+
     }
 
     /**
@@ -42,35 +45,61 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
      * from the MessageProxy.
      */
     public void configureMessageDisplay() throws MessagingException {
-	editorPane = createMessagePanel(msg);
-	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	
-	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
-	    attachmentPanel = new AttachmentPane(msg);
-	    attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	if (msg != null) {
+	    editorPane = createMessagePanel(msg);
+	    editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    
-	    splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	    
-	    splitPane.setTopComponent(editorScrollPane);
-	    splitPane.setBottomComponent(attachmentScrollPane);
-	    this.add("Center", splitPane);
-	} else {
-	    this.add("Center", editorScrollPane);
-	}
-	
-	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
-	keyBindings.setActive(getActions());
-	
-	editorPane.addMouseListener(new MouseAdapter() {
+	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
+		attachmentPanel = new AttachmentPane(msg);
+		attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
-		public void mousePressed(MouseEvent e) {
-		    if (SwingUtilities.isRightMouseButton(e)) {
-			showPopupMenu(editorPane, e);
-		    }
+		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		
+		splitPane.setTopComponent(editorScrollPane);
+		splitPane.setBottomComponent(attachmentScrollPane);
+		this.add("Center", splitPane);
+		if (currentComponent != null) {
+		    System.out.println("removing current rmdp component");
+		    this.remove(currentComponent);
 		}
-	    });
+		currentComponent = splitPane;
+		this.repaint();
+	    } else {
+		this.add("Center", editorScrollPane);
+		if (currentComponent != null) {
+		    System.out.println("removing current rmdp component");
+		    this.remove(currentComponent);
+		}
+		currentComponent = editorScrollPane;
+		this.repaint();
+	    }
+	    
+	    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+	    keyBindings.setActive(getActions());
+	    
+	    editorPane.addMouseListener(new MouseAdapter() {
+		    
+		    public void mousePressed(MouseEvent e) {
+			if (SwingUtilities.isRightMouseButton(e)) {
+			    showPopupMenu(editorPane, e);
+			}
+		    }
+		});
+	} else {
+	    editorPane = new JTextPane();
+	    editorPane.setText("this is a test to see if it makes a difference to have a message there in the beginning.");
+	    editorPane.setEditable(false);
+	    splitPane = null;
+	    editorScrollPane = null;
+	    this.add("Center", editorPane);
+	    if (currentComponent != null) {
+		System.out.println("removing current rmdp component");
+		this.remove(currentComponent);
+	    }
+	    currentComponent=editorPane;
+	}
     }
-
+	
     /**
      * This clears the ReadMessageDisplayPanel.
      */
@@ -180,17 +209,19 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
      */
     public void sizeToDefault() {
 	Dimension prefSize = getDefaultEditorPaneSize();
-	JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
-	if (vsb != null)
-	    prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
-	editorScrollPane.setPreferredSize(prefSize);
-	this.setPreferredSize(prefSize);
-	if (splitPane != null && attachmentPanel != null) {
-	    splitPane.setPreferredSize(prefSize);
-	    splitPane.setDividerLocation((int)(splitPane.getPreferredSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+	if (editorPane != null && editorScrollPane != null) {
+	    JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
+	    if (vsb != null)
+		prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
+	    editorScrollPane.setPreferredSize(prefSize);
+	    this.setPreferredSize(prefSize);
+	    if (splitPane != null && attachmentPanel != null) {
+		splitPane.setPreferredSize(prefSize);
+		splitPane.setDividerLocation((int)(splitPane.getPreferredSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+	    }
+	} else {
+	    this.setSize(prefSize);
 	}
-	    
-	    
     }
 
     public void addNotify() {
@@ -207,9 +238,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     public Action[] getActions() {
 	
-	Action[] actionList;
+	Action[] actionList = null;
 	
-	actionList = msg.getActions();
+	if (msg != null)
+	    actionList = msg.getActions();
 
 	if (actionList != null) {
 	    if (editorPane != null && editorPane.getActions() != null) 

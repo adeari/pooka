@@ -84,7 +84,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * actual implementation of the Dialog.
     */    
     public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showInternalConfirmDialog(Pooka.getMainPanel().getMessagePanel(), messageText, title, type);
+	return JOptionPane.showInternalConfirmDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), messageText, title, type);
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * actual implementation of the Dialog.
      */    
     public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-	return JOptionPane.showInternalConfirmDialog(Pooka.getMainPanel().getMessagePanel(), messageText, title, optionType, iconType);
+	return Pooka.getUIFactory().showConfirmDialog(messageText, title, optionType);
     }
 
     /**
@@ -102,7 +102,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(Pooka.getMainPanel().getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	Pooka.getUIFactory().showError(errorMessage, title);
     }
 
     /**
@@ -130,7 +130,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * implementation of the dialog.
      */
     public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+	return Pooka.getUIFactory().showInputDialog(inputMessage, title);
     }
 
     /**
@@ -139,7 +139,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * implementation of the dialog.
      */
     public String showInputDialog(Object[] inputPanes, String title) {
-	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+	return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**

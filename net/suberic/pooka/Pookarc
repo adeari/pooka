@@ -16,6 +16,8 @@ Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600
 Pooka.messagePanel.vsize=570
 
+Pooka.previewPanel.folderSize=200
+
 Pooka.attachmentPanel.vsize=100
 
 Pooka.replyPrefix=>

@@ -16,19 +16,17 @@ import net.suberic.util.gui.*;
  * The main panel for PookaMail
  * 
  * @author  Allen Petersen
- * @version 0.7 02/28/2000
+ * @version 0.9 10/27/2000
  */
 
-public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer {
+public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer, ActionContainer {
     private ConfigurableMenuBar mainMenu;
     private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
-    private MessagePanel messagePanel;
-    private JScrollPane messageScrollPane;
+    private ContentPanel contentPanel;
     private Session session;
     private MailQueue mailQueue;
     private UserProfile currentUser = null;
-    private PropertyEditorFactory editorFactory = new PookaPropertyEditorFactory(Pooka.getResources());
     private ConfigurableKeyBinding keyBindings;
     private boolean newMessageFlag = false;
     private String standardTitle = Pooka.getProperty("Title", "Pooka");
@@ -56,15 +54,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	// this.setLayout(new BorderLayout());
 	// create the menu bar.
 
-	messagePanel = new MessagePanel(this);
-	messagePanel.setSize(1000,1000);
-	messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
+	contentPanel = Pooka.getUIFactory().createContentPanel();
 	folderPanel = new FolderPanel(this);
 	Pooka.getResources().addValueChangeListener(folderPanel, "Store");
 
 	this.setLeftComponent(folderPanel);
-	this.setRightComponent(messageScrollPane);
+	this.setRightComponent(contentPanel.getUIComponent());
 	this.setDividerLocation(folderPanel.getPreferredSize().width);
 
 	mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
@@ -102,7 +97,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * populating the MenuBar and Toolbar.
      *
      * The method actually returns the Panel's defaultActions plus the
-     * actions of the folderPanel and/or messagePanel, depending on which
+     * actions of the folderPanel and/or contentPanel, depending on which
      * one currently has the focus.
      */    
     public Action[] getActions() {
@@ -113,57 +108,14 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 		if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel))
 		    if (folderPanel.getActions() != null)
 			actions = TextAction.augmentList(folderPanel.getActions(), actions);
-	    if (messagePanel != null) 
-		if (SwingUtilities.isDescendingFrom(focusedComponent, messagePanel))
-		    if (messagePanel.getActions() != null) 
-			actions = TextAction.augmentList(messagePanel.getActions(), actions);
+	    if (contentPanel != null) 
+		if (SwingUtilities.isDescendingFrom(focusedComponent, contentPanel.getUIComponent()))
+		    if (contentPanel.getActions() != null) 
+			actions = TextAction.augmentList(contentPanel.getActions(), actions);
 	}
 	return actions;
     }
 
-    /**
-     * This selects the menu with the key accelerator that matches the
-     * character 'key'.
-     */
-    /*
-      //doesn't seem to be necessary.
-    public void selectMenu(char key) {
-	System.out.println("looking for mnemonic that matches " + key + "(" + (int)key + ")");
-	for (int i = 0; i < mainMenu.getMenuCount(); i++) {
-	    JMenu m = mainMenu.getMenu(i);
-	    if (m != null)
-		System.out.println("m.getMnemonic = " + m.getMnemonic());
-
-	    if (m != null && m.getMnemonic() == (int)key)
-		m.setSelected(true);
-	}
-    }
-    */
-
-    /**
-     * This method shows a help screen.  At the moment, it just takes the
-     * given URL, creates a JInteralFrame and a JEditorPane, and then shows
-     * the doc with those components.
-     */
-    public void showHelpScreen(String title, java.net.URL url) {
-	JInternalFrame jif = new JInternalFrame(title, true, true, true);
-	JEditorPane jep = new JEditorPane();
-	try {
-	    jep.setPage(url);
-	} catch (IOException ioe) {
-	    jep.setText(Pooka.getProperty("err.noHelpPage", "No help available."));
-	}
-	jep.setEditable(false);
-	jif.setSize(500,500);
-	jif.getContentPane().add(new JScrollPane(jep));
-	getMessagePanel().add(jif);
-	jif.setVisible(true);
-	try {
-	    jif.setSelected(true);
-	} catch (java.beans.PropertyVetoException e) {
-	} 
-	
-    }
 
     /**
      * Called by ExtendedDesktopManager every time the focus on the windows
@@ -183,8 +135,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     /**
      * refreshCurrentUser() is called to get a new value for the currently
      * selected item.  In MainPanel, all it does is tries to get a 
-     * UserProfile from the currently selected object in the MessagePanel.
-     * If there is no object in the MessagePanel which gives a default
+     * UserProfile from the currently selected object in the ContentPanel.
+     * If there is no object in the ContentPanel which gives a default
      * UserProfile, it then checks the FolderPanel.  If neither of these
      * returns a UserProfile, then the default UserProfile is returned.
      */
@@ -222,8 +174,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     public UserProfile getDefaultProfile() {
 	UserProfile returnValue = null;
 
-	if (messagePanel != null) {
-	    returnValue = messagePanel.getDefaultProfile();
+	if (contentPanel != null) {
+	    returnValue = contentPanel.getDefaultProfile();
 	}
 
 	if (returnValue != null)
@@ -245,22 +197,26 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      */
     
     public void exitPooka(int exitValue) {
-	if (messagePanel.isSavingWindowLocations()) {
-	    messagePanel.saveWindowLocations();
-	    Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
-	    Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
-	    Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
-	    Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
-	    Pooka.setProperty("Pooka.messagePanel.hsize", Integer.toString(messagePanel.getWidth()));
-	    Pooka.setProperty("Pooka.messagePanel.vsize", Integer.toString(messagePanel.getHeight()));
+	if (contentPanel instanceof MessagePanel && 
+	    ((MessagePanel)contentPanel).isSavingWindowLocations()) {
+	    ((MessagePanel)contentPanel).saveWindowLocations();
 	}
-	if (messagePanel.isSavingOpenFolders())
-	    messagePanel.saveOpenFolders();
 	
-
+	Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
+	Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
+	Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
+	Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
+	Pooka.setProperty("Pooka.messagePanel.hsize", Integer.toString(contentPanel.getUIComponent().getWidth()));
+	Pooka.setProperty("Pooka.messagePanel.vsize", Integer.toString(contentPanel.getUIComponent().getHeight()));
+	
+	if (contentPanel instanceof MessagePanel && 
+	    ((MessagePanel)contentPanel).isSavingOpenFolders()) {
+	    ((MessagePanel)contentPanel).saveOpenFolders();
+	}
+	
 	Pooka.resources.saveProperties(new File(Pooka.localrc));
 	System.exit(exitValue);
-
+	
     }
 
     // Accessor methods.
@@ -290,12 +246,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
         mainToolbar = newMainToolbar;
     }
 
-    public MessagePanel getMessagePanel() {
-	return messagePanel;
-    }
-
-    public JScrollPane getMessageScrollPane() {
-	return messageScrollPane;
+    public ContentPanel getContentPanel() {
+	return contentPanel;
     }
 
     public FolderPanel getFolderPanel() {
@@ -308,10 +260,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     public MailQueue getMailQueue() {
 	return mailQueue;
-    }
-
-    public PropertyEditorFactory getEditorFactory() {
-	return editorFactory;
     }
 
     public boolean getNewMessageFlag() {
@@ -379,7 +327,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
         public void actionPerformed(ActionEvent e) {
 	    try { 
-		((JInternalFrame)(messagePanel.getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
+		((JInternalFrame)(((MessagePanel)contentPanel).getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) {
 	    } catch (NumberFormatException nfe) {
 	    }
@@ -393,19 +341,11 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
         public void actionPerformed(ActionEvent e) {
-	    JDesktopPane msgPanel = getMessagePanel();
 	    Vector valuesToEdit = new Vector();
 	    valuesToEdit.add("UserProfile");
 	    valuesToEdit.add("UserProfile.default");
 
-	    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), valuesToEdit);
-	    msgPanel.add(jif);
-	    jif.setVisible(true);
-	    try {
-		jif.setSelected(true);
-	    } catch (java.beans.PropertyVetoException pve) {
-	    }
-	    
+	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), valuesToEdit);
 	}
     }
 
@@ -417,18 +357,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
         public void actionPerformed(ActionEvent e) {
-	    JDesktopPane msgPanel = getMessagePanel();
 	    Vector valuesToEdit = new Vector();
 	    valuesToEdit.add("Store");
 
-	    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
-	    msgPanel.add(jif);
-	    jif.setVisible(true);
-	    try {
-		jif.setSelected(true);
-	    } catch (java.beans.PropertyVetoException pve) {
-	    }
-	    
+	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
 	}
     }
 
@@ -441,7 +373,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	public void actionPerformed(ActionEvent e) {
 	    String fileName="About.html";
 	    String dir="/net/suberic/pooka/doc";
-	    showHelpScreen(Pooka.getProperty("MenuBar.Help.About.Label", "About Pooka"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
+	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.About.Label", "About Pooka"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
 	    
 	}
     }
@@ -455,7 +387,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	public void actionPerformed(ActionEvent e) {
 	    String fileName="COPYING";
 	    String dir="/net/suberic/pooka";
-	    showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
+	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
 	}
     }
 
@@ -466,7 +398,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    messagePanel.requestFocus();
+	    contentPanel.getUIComponent().requestFocus();
 	}
     }
 

@@ -48,6 +48,11 @@ public class Pooka {
 	javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
 	searchManager = new SearchTermManager("Search");
 
+	if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+	    uiFactory=new PookaPreviewPaneUIFactory();
+	else
+	    uiFactory = new PookaDesktopPaneUIFactory();
+
 	JFrame frame = new JFrame("Pooka");
 	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
 	defaultSession = javax.mail.Session.getDefaultInstance(System.getProperties(), auth);
@@ -69,19 +74,15 @@ public class Pooka {
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
         frame.show();
 
-	if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-	    uiFactory=new PookaPreviewPaneUIFactory(panel.getMessagePanel());
-	else
-	    uiFactory = new PookaDesktopPaneUIFactory(panel.getMessagePanel());
+	if (panel.getContentPanel() instanceof MessagePanel) {
 
-	if (getProperty("Store", "").equals("")) {
-	    NewAccountPooka nap = new NewAccountPooka(panel.getMessagePanel());
-	    nap.start();
-	} else {
-	    if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true"))
-		panel.getMessagePanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
+	    if (getProperty("Store", "").equals("")) {
+		NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());
+		nap.start();
+	    } else if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true"))
+		((MessagePanel)panel.getContentPanel()).openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
 	}
-
+	
 	panel.refreshActiveMenus();
     }
 

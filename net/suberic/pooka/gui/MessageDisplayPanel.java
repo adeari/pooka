@@ -34,7 +34,7 @@ public abstract class MessageDisplayPanel extends JPanel {
      * Creates an empty MessageDisplayPanel.
      */
     public MessageDisplayPanel() {
-	this.setLayout(new BorderLayout());
+	this.setLayout(new CardLayout());
     }
 
     /**
@@ -78,7 +78,7 @@ public abstract class MessageDisplayPanel extends JPanel {
 	}
 	
 	try {
-	    if (Pooka.getProperty("MessageWindow.editorPane.hsizeByCharLength", "false").equalsIgnoreCase("true")) {
+	    if (Pooka.getProperty("MessageWindow.editorPane.hsizeByCharLength", "false").equalsIgnoreCase("true") && editorPane != null) {
 		int charLength = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.charLength", "80"));
 		Font currentFont = editorPane.getFont();
 		if (currentFont != null) {
@@ -121,7 +121,10 @@ public abstract class MessageDisplayPanel extends JPanel {
     public abstract void sizeToDefault();
 
     public UserProfile getDefaultProfile() {
-	return getMessageProxy().getDefaultProfile();
+	if (getMessageProxy() != null)
+	    return getMessageProxy().getDefaultProfile();
+	else
+	    return null;
     }
 
     public JTextPane getEditorPane() {

@@ -246,7 +246,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	else
 	    message = Pooka.getProperty("Folder.unsubscribeConfirm.notLeaf", "Do you really want to unsubscribe from \nthis folder and all its children?");
 	
-	int response = JOptionPane.showInternalConfirmDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), message + "\n" + getFolderInfo().getFolderName(), Pooka.getProperty("Folder.unsubscribeConfirm.title", "Unsubscribe from Folder"), JOptionPane.YES_NO_OPTION);
+	int response = Pooka.getUIFactory().showConfirmDialog(message + "\n" + getFolderInfo().getFolderName(), Pooka.getProperty("Folder.unsubscribeConfirm.title", "Unsubscribe from Folder"), JOptionPane.YES_NO_OPTION);
 	
 	if (response == JOptionPane.YES_OPTION)
 	    getFolderInfo().unsubscribe();
@@ -305,8 +305,15 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 
 		if (getFolderInfo().isOpen()) {
-		    if ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0)
-			((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel().openFolderWindow(folderInfo);
+		    if ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0) {
+			if (getFolderInfo().getFolderDisplayUI() != null)
+			    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+			else {
+			    getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
+			    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+			}
+			
+		    }
 		    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) != 0) {
 			javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
 			folderTree.expandPath(folderTree.getSelectionPath());
@@ -314,11 +321,11 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		}
 	    } catch (MessagingException me) {
 	    }
-	((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
-
+	
     }
-
+    
     class UnsubscribeAction extends AbstractAction {
 
 	UnsubscribeAction() {
