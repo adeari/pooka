@@ -68,7 +68,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 	    });
 	folderTree.addTreeSelectionListener(new TreeSelectionListener() {
 		public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
-		    getMainPanel().refreshActiveMenus(getMainPanel().getMainMenu());
+		    getMainPanel().refreshActiveMenus();
 		    keyBindings.setActive(getActions());
 		}
 	    });
@@ -200,6 +200,22 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
     public void valueChanged(String changedValue) {
 	if (changedValue.equals("Store"))
 	    refreshStores();
+    }
+
+    /**
+     * This returns all the StoreInfos associated with this FolderPanel.
+     */
+    public Vector getAllStoreInfos() {
+	Vector returnValue = new Vector();
+	MailTreeNode root = (MailTreeNode) getFolderTree().getModel().getRoot();
+	java.util.Enumeration storeNodes = root.children();
+	while (storeNodes.hasMoreElements()) {
+	    StoreInfo inf = ((StoreNode)storeNodes.nextElement()).getStoreInfo();
+	    returnValue.add(inf);
+	}
+
+	return returnValue;
+	
     }
 
     /**
