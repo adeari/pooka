@@ -1,7 +1,7 @@
 #This is the resource file for Pooka.  Note that all of the labels and key
 #bindings for the menus, etc., are found in locale/Pooka_<Locale>.properties
 
-Pooka.debug=true
+Pooka.debug=false
 
 Message.sendImmediately=true
 

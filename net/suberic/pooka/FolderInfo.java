@@ -72,17 +72,13 @@ public class FolderInfo {
 
 	    for (int i = 0; i < msgs.length; i++) {
 		mp = new MessageProxy(getColumnValues(), msgs[i], this);
-		System.out.println("Created MessageProxy " + i);
 
 		messageProxies.add(mp);
-		mp.loadTableInfo();
 	    }
 
-		System.out.println("total size of messageProxies is " + messageProxies.size());
+	    //loaderThread.loadMessages(messageProxies);
 
-		//	    loaderThread.loadMessages(messageProxies);
-
-		//	    loaderThread.start();
+	    //	    loaderThread.start();
 
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
