@@ -7,6 +7,7 @@ import javax.activation.*;
 import javax.mail.internet.*;
 
 import net.suberic.pooka.crypto.*;
+import java.security.Key;
 
 /**
  * A MessageInfo representing a new message.
@@ -24,13 +25,13 @@ public class NewMessageInfo extends MessageInfo {
   // whether or not we want to sign this message
   int mSignMessage = CRYPTO_DEFAULT;
 
-  // the EncryptionKey to use to sign this.  if null, then use the default
+  // the Key to use to sign this.  if null, then use the default
   // key for the UserProfile.
-  net.suberic.pooka.crypto.EncryptionKey mSignatureKey = null;
+  Key mSignatureKey = null;
 
-  // the EncryptionKey to use to encrypt this.  if null, then use the default
+  // the Key to use to encrypt this.  if null, then use the default
   // key for the recipient(s).
-  net.suberic.pooka.crypto.EncryptionKey mEncryptionKey = null;
+  Key mKey = null;
 
 
   /**
@@ -96,9 +97,9 @@ public class NewMessageInfo extends MessageInfo {
       }
       
       if (mEncryptMessage == CRYPTO_YES) {
-	System.err.println("encrypting with " + getEncryptionKey());
-	if (getEncryptionKey() != null) {
-	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getEncryptionKey());
+	System.err.println("encrypting with " + getKey());
+	if (getKey() != null) {
+	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getKey());
 	  message.writeTo(System.out);
 	} else {
 	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
@@ -287,15 +288,15 @@ public class NewMessageInfo extends MessageInfo {
   /**
    * Sets the encryption key for encrypting this message.
    */
-  public void setEncryptionKey(EncryptionKey pEncryptionKey) {
-    mEncryptionKey = pEncryptionKey;
+  public void setKey(Key pKey) {
+    mKey = pKey;
   }
 
   /**
    * Gets the encryption key we're using for this message.
    */
-  public EncryptionKey getEncryptionKey() {
-    return mEncryptionKey;
+  public Key getKey() {
+    return mKey;
   }
 
   /**
@@ -315,14 +316,14 @@ public class NewMessageInfo extends MessageInfo {
   /**
    * Gets the encryption key we're using for this message.
    */
-  public EncryptionKey getSignatureKey() {
+  public Key getSignatureKey() {
     return mSignatureKey;
   }
 
   /**
    * Sets the encryption key for encrypting this message.
    */
-  public void setSignatureKey(EncryptionKey pSignatureKey) {
+  public void setSignatureKey(Key pSignatureKey) {
     mSignatureKey = pSignatureKey;
   }
 

@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.security.Key;
 
 import javax.mail.internet.*;
 import javax.mail.*;
@@ -44,11 +45,11 @@ public class PookaEncryptionManager {
     String pgpPrivatePwString = sourceBundle.getProperty(key + ".pgp.keyStore.private.password", "");
 
     try {
-      EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils(EncryptionManager.PGP);
+      EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
       if (pgpUtils != null) {
 	pgpKeyMgr = pgpUtils.createKeyManager();
-	pgpKeyMgr.loadPrivateKeystore(pgpPrivateFilename, pgpPrivatePwString.toCharArray());
-	pgpKeyMgr.loadPublicKeystore(pgpPublicFilename, null);
+	pgpKeyMgr.loadPrivateKeystore(new FileInputStream(new File(pgpPrivateFilename)), pgpPrivatePwString.toCharArray());
+	pgpKeyMgr.loadPublicKeystore(new FileInputStream(new File(pgpPublicFilename)), null);
       }
     } catch (Exception e) {
       // FIXME
@@ -61,11 +62,11 @@ public class PookaEncryptionManager {
     String smimePrivatePwString = sourceBundle.getProperty(key + ".smime.keyStore.private.password", "");
 
     try {
-      EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils(EncryptionManager.SMIME);
+      EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
       if (smimeUtils != null) {
 	smimeKeyMgr = smimeUtils.createKeyManager();
-	smimeKeyMgr.loadPrivateKeystore(smimePrivateFilename, smimePrivatePwString.toCharArray());
-	smimeKeyMgr.loadPublicKeystore(smimePublicFilename, null);
+	smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
+	smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), null);
       }
     } catch (Exception e) {
       // FIXME
@@ -78,14 +79,14 @@ public class PookaEncryptionManager {
   /**
    * Returns the private key(s) for the given email address.
    */
-  public EncryptionKey[] getPrivateKeys(String address) {
+  public Key[] getPrivateKeys(String address) {
     return null;
   }
 
   /**
    * Returns the Private key for the given alias.
    */
-  public EncryptionKey getPrivateEncryptionKey(String alias) {
+  public Key getPrivateKey(String alias) {
 
     if (pgpKeyMgr != null || smimeKeyMgr != null) {
       char[] password = getPasswordForAlias(alias, false);
@@ -128,7 +129,7 @@ public class PookaEncryptionManager {
   /**
    * Returns the Private key for the given alias.
    */
-  public EncryptionKey getPublicEncryptionKey(String alias) {
+  public Key getPublicKey(String alias) {
     EncryptionKeyManager mgr = getKeyManager();
     if (mgr != null) {
       try {
@@ -143,7 +144,7 @@ public class PookaEncryptionManager {
   /**
    * Returns the public key(s) for the given email address.
    */
-  public EncryptionKey[] getPublicKeys(String address) {
+  public Key[] getPublicKeys(String address) {
 
     EncryptionKeyManager mgr = getKeyManager();
     if (mgr != null) {
@@ -160,12 +161,12 @@ public class PookaEncryptionManager {
   public MimeMessage encryptMessage(MimeMessage mMsg) {
     
     // if we don't have a key, see if we can get a default.
-    EncryptionKey key = null;
+    Key key = null;
     Address[] recipients = mMsg.getRecipients(Message.RecipientType.TO);
     for (int i = 0; key == null && i < recipients.length; i++) {
       if (recipients[i] instanceof InternetAddress) {
 	String inetAddr = ((InternetAddress) recipients[i]).getAddress();
-	EncryptionKey[] matchingKeys = getPublicKeys(inetAddr);
+	Key[] matchingKeys = getPublicKeys(inetAddr);
 	if (matchingKeys != null) {
 	  for (int j = 0; key != null && j < matchingKeys.length; j++) {
 	    key = matchingKeys[j];
@@ -180,10 +181,10 @@ public class PookaEncryptionManager {
   /**
    * Encrypts the given message.  If there's no key, return null.
    */
-  public MimeMessage encryptMessage(MimeMessage mMsg, EncryptionKey key)
+  public MimeMessage encryptMessage(MimeMessage mMsg, Key key)
     throws MessagingException  {
     if (key != null) {
-      return getDefaultEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+      return EncryptionManager.getEncryptionUtils(mMsg).encryptMessage(Pooka.getDefaultSession(), mMsg, key);
     } else
       return mMsg;
   }
@@ -191,7 +192,7 @@ public class PookaEncryptionManager {
   /**
    * Signs the given message.
    */
-  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, EncryptionKey key) 
+  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, Key key) 
     throws MessagingException, java.io.IOException  {
     if (key == null) {
       key = profile.getEncryptionKey();
@@ -202,7 +203,7 @@ public class PookaEncryptionManager {
     }
     
     if (key != null)
-      return getDefaultEncryptionUtils().signMessage(Pooka.getDefaultSession(), mMsg, key);
+      return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
     else
       return mMsg;
   }

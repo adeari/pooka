@@ -1,6 +1,7 @@
 package net.suberic.pooka;
 
 import net.suberic.pooka.crypto.*;
+import net.suberic.crypto.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -38,7 +39,7 @@ public class MessageCryptoInfo {
    */
   public boolean isSigned() throws MessagingException {
     // FIXME
-    return Pooka.getCryptoManager().getDefaultEncryptionUtils().isEncrypted(msgInfo.getMessage());
+    return (net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) msgInfo.getMessage()) != null);
   }
 
   /**
@@ -46,7 +47,7 @@ public class MessageCryptoInfo {
    */
   public boolean isEncrypted() throws MessagingException {
     // FIXME
-    return Pooka.getCryptoManager().getDefaultEncryptionUtils().isEncrypted(msgInfo.getMessage());
+    return (net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) msgInfo.getMessage()) != null);
   }
 
   /**
@@ -86,9 +87,9 @@ public class MessageCryptoInfo {
    * Returns whether or not the signature is valid.  If <code>recheck</code>
    * is set to <code>true</code>, then checks again with the latest keys.
    */
-  public boolean checkSignature(EncryptionKey key, boolean recheck) throws EncryptionException, MessagingException, java.io.IOException {
+  public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException {
     if (recheck || ! hasCheckedSignature()) {
-      EncryptionUtils cryptoUtils = Pooka.getCryptoManager().getDefaultEncryptionUtils();
+      EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils((MimeMessage) msgInfo.getMessage());
       mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)msgInfo.getMessage(), key);
       mCheckedSignature = true;
     }
@@ -99,8 +100,8 @@ public class MessageCryptoInfo {
   /**
    * Tries to decrypt the message using the given Key.
    */
-  public boolean decryptMessage(EncryptionKey key, boolean recheck) 
-  throws MessagingException, EncryptionException, java.io.IOException {
+  public boolean decryptMessage(java.security.Key key, boolean recheck) 
+  throws MessagingException, java.io.IOException {
     synchronized(this) {
       if (mCheckedDecryption && ! recheck) {
 	return mDecryptSuccessful;
@@ -113,7 +114,11 @@ public class MessageCryptoInfo {
 	  Object o = attachmentList.get(i);
 	  if (o instanceof CryptoAttachment) {
 	    CryptoAttachment ca = (CryptoAttachment) o;
-	    BodyPart bp = ca.decryptAttachment(Pooka.getCryptoManager().getDefaultEncryptionUtils(), key);
+
+	    // FIXME
+	    EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils("PGP");
+
+	    BodyPart bp = ca.decryptAttachment(cryptoUtils, key);
 	    
 	    // check to see what kind of attachment it is.  if it's a 
 	    // Multipart, then we need to expand it and add it to the 

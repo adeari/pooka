@@ -1,9 +1,13 @@
 package net.suberic.pooka.crypto;
 
 import net.suberic.pooka.*;
+import net.suberic.crypto.*;
+
 import javax.mail.internet.*;
 import javax.mail.*;
 import javax.activation.DataHandler;
+
+import java.security.Key;
 
 import java.io.*;
 
@@ -38,14 +42,12 @@ public class CryptoAttachment extends Attachment {
    * Returns if the signature matches.
    */
   public boolean checkSignature() 
-    throws MessagingException, EncryptionException, java.io.IOException {
+    throws MessagingException, java.io.IOException {
     if (! signed)
       return false;
 
-    PGPMimeEncryptionUtils utils = new PGPMimeEncryptionUtils();
-    utils.setPGPProviderImpl(new net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl());
-
-    return utils.checkSignature((MimeMultipart)getContent(), null);
+    // FIXME
+    return false;
   }
 
   /**
@@ -69,8 +71,8 @@ public class CryptoAttachment extends Attachment {
   /**
    * Tries to decrypt this Attachment.
    */
-  public BodyPart decryptAttachment(EncryptionUtils utils, EncryptionKey key)
-    throws EncryptionException, MessagingException, java.io.IOException {
+  public BodyPart decryptAttachment(EncryptionUtils utils, Key key)
+    throws MessagingException, java.io.IOException {
     
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
@@ -109,11 +111,11 @@ public class CryptoAttachment extends Attachment {
    * decrypted.
    */
   public BodyPart getDecryptedBodyPart() 
-    throws EncryptionException, MessagingException, java.io.IOException {
+    throws MessagingException, java.io.IOException {
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
 
-    throw new EncryptionException("not decrypted yet.");
+    return null;
   }
 
   /**

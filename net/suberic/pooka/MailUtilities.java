@@ -9,7 +9,7 @@ import java.io.UnsupportedEncodingException;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import net.suberic.pooka.crypto.EncryptionUtils;
+import net.suberic.crypto.EncryptionManager;
 
 public class MailUtilities {
   public MailUtilities() {
@@ -62,7 +62,7 @@ public class MailUtilities {
     AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
 
     System.err.println("checking " + ((MimeMessage)m).getContentType() + " for isEncrypted.");
-    if (EncryptionUtils.isEncrypted((MimeMessage) m)) {
+    if (EncryptionManager.checkEncryptionType((MimeMessage) m) != null) {
       System.err.println("it is.");
       Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
       
@@ -173,7 +173,7 @@ public class MailUtilities {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
       
       System.err.println("checking " + mbp.getContentType() + " for isEncrypted.");
-      if (EncryptionUtils.isEncrypted(mbp)) {
+      if (EncryptionManager.checkEncryptionType(mbp) != null) {
 	System.err.println("it is.");
 	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
 	bundle.getAttachments().add(newAttach);

@@ -38,7 +38,7 @@ public class Pooka {
   static public SearchTermManager searchManager;
   static public NetworkConnectionManager connectionManager;
   static public OutgoingMailServerManager outgoingMailManager;
-  static public EncryptionManager cryptoManager;
+  static public PookaEncryptionManager cryptoManager;
   static public net.suberic.pooka.resource.ResourceManager resourceManager;
 
   // the main Pooka panel.
@@ -145,7 +145,7 @@ public class Pooka {
     javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
 
 
-    cryptoManager = new EncryptionManager(resources, "EncryptionManager");
+    cryptoManager = new PookaEncryptionManager(resources, "EncryptionManager");
 
     searchManager = new SearchTermManager("Search");
     
@@ -504,7 +504,7 @@ public class Pooka {
    * The EncryptionManager, not surprisingly, manages Pooka's encryption
    * facilities.
    */
-  public static EncryptionManager getCryptoManager() {
+  public static PookaEncryptionManager getCryptoManager() {
     return cryptoManager;
   }
 
