@@ -87,7 +87,6 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
      * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
      */
     public void closeMessageUI() {
-	
 	if (isModified()) {
 	    int saveDraft = showConfirmDialog(Pooka.getProperty("error.saveDraft.message", "This message has unsaved changes.  Would you like to save a draft copy?"), Pooka.getProperty("error.saveDraft.title", "Save Draft"), JOptionPane.YES_NO_CANCEL_OPTION);
 	    switch (saveDraft) {

@@ -40,7 +40,7 @@ Pooka.forwardStyle.allowedValues=prefixed:not prefixed
 
 Pooka.lineWrap=true
 Pooka.lineWrap.propertyType=Boolean
-Pooka.lineLength=78
+Pooka.lineLength=76
 Pooka.displayTextAttachments=true
 Pooka.displayTextAttachments.propertyType=Boolean
 Pooka.attachmentDisplayMaxLength=100000
@@ -92,11 +92,11 @@ MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif
 
 #MenuBar.Edit=UserConfig:StoreConfig:Folders:Undo:Select All:Cut:Copy:Paste
-MenuBar.Edit=UserConfig:StoreConfig:Preferences:Cut:Copy:Paste
+MenuBar.Edit=UserConfig:StoreConfig:AddressBook:Preferences:Cut:Copy:Paste
 MenuBar.Edit.UserConfig.Action=cfg-users
 MenuBar.Edit.StoreConfig.Action=cfg-stores
 MenuBar.Edit.Folders.Action=folder-subscribe
-MenuBar.Edit.Folders.Label=Folders
+MenuBar.Edit.AddressBook.Action=cfg-address-book
 MenuBar.Edit.Preferences.Action=cfg-prefs
 MenuBar.Edit.Undo.Action=undo-action
 MenuBar.Edit.Undo.Image=/net/suberic/pooka/gui/images/Undo.gif

@@ -2,6 +2,11 @@ beta 1
 ---------------
 
 *) add address book/ldap support.
+	now:
+	1)  add editor for address list.
+	2)  add ldap support
+	
+	later:
 	1)  make sure the matches go with the entry--i.e. if you match the
 	    actual address, have the actual address appear first.
 	2)  make it test for valid email addresses
