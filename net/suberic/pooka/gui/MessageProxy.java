@@ -105,7 +105,10 @@ public class MessageProxy {
 
     // the information for the FolderTable
     Vector tableInfo;
-    
+
+    // matching Filters.
+    net.suberic.pooka.gui.filter.DisplayFilter[] matchingFilters;
+
     // the column Headers for the FolderInfo Vector; used for loading the
     // tableInfo.
     Vector columnHeaders;
@@ -621,6 +624,13 @@ public class MessageProxy {
      */
     public void setPookaUIFactory(PookaUIFactory puif) {
 	uiFactory = puif;
+    }
+
+    /**
+     * Returns the matching filters for this MessageProxy.
+     */
+    public net.suberic.pooka.gui.filter.DisplayFilter[] getMatchingFilters() {
+	return matchingFilters;
     }
 
     public Action getAction(String name) {
