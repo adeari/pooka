@@ -142,7 +142,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	
 	hasLoaded=true;
 	
-	((javax.swing.tree.DefaultTreeModel)(((FolderPanel)getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(this);
+	//	((javax.swing.tree.DefaultTreeModel)(((FolderPanel)getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(this);
     }
 
     /**
@@ -158,8 +158,11 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
     public FolderNode popChild(String childName, Vector childrenList) {
 	if (children != null) {
 	    for (int i = 0; i < childrenList.size(); i++)
-		if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName))
-		    return (FolderNode)childrenList.elementAt(i);
+		if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
+		    FolderNode fn = (FolderNode)childrenList.elementAt(i);
+		    childrenList.remove(fn);
+		    return fn;
+		}
 	}
 	
 	// no match.

@@ -81,6 +81,8 @@ public class StoreNode extends MailTreeNode {
 	    // another recursive call to getChildCount();
 	    insert(node, i);
 	} 
+
+	hasLoaded=true;
     }
 
     public String getStoreID() {

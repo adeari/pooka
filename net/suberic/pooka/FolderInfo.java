@@ -50,7 +50,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
      */
     
     public FolderInfo(FolderInfo parent, String fname) {
-	System.out.println("new FolderInfo created for " +fname);
 	setFolderID(parent.getFolderID() + "." + fname);
 	folderName = fname;
 	
@@ -81,7 +80,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
      */
     
     public FolderInfo(StoreInfo parent, String fname) {
-	System.out.println("new FolderInfo created for " +fname);
 	setFolderID(parent.getStoreID() + "." + fname);
 	folderName = fname;
 	
@@ -111,7 +109,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
      * is returned.
      */
     private void initializeFolderInfo() {
-	System.out.println("initializing FolderInfo for " + getFolderProperty());
 	folder.addMessageCountListener(this);
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
@@ -258,7 +255,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
      */
 
     public void updateChildren() {
-	System.out.println("got update for folder " + getFolderID());
 	try {
 	    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) == 0) {
 		return;
@@ -284,8 +280,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 	
 	children = newChildren;
 	
-	if (folderNode != null)
+	if (folderNode != null) 
 	    folderNode.loadChildren();
+	    
     }
 
     /**
@@ -355,9 +352,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
      */
 
     public void valueChanged(String changedValue) {
-	System.out.println("value for folder " + getFolderProperty() + " changed.");
 	if (changedValue.equals(getFolderProperty() + ".folderList")) {
 	    updateChildren();
+	    if (folderNode != null) {
+		((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
+	    }
 	}
     }
 
