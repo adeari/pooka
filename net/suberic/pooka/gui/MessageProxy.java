@@ -62,7 +62,6 @@ public class MessageProxy {
      */
     public synchronized void loadTableInfo() {
 	if (!loaded) {
-	    System.out.println("loading Message " + message.toString());
 	    int columnCount = columnHeaders.size();
 	    
 	    tableInfo = new Vector();
@@ -261,7 +260,6 @@ public class MessageProxy {
 
     public Vector getTableInfo() {
 	if (isLoaded()) {
-	    System.out.println("is loaded--returning table info.");
 	    return tableInfo;
 	} else {
 	    loadTableInfo();
@@ -282,7 +280,6 @@ public class MessageProxy {
     }
 
     public void setSeen(boolean newValue) {
-	System.out.println("setting seen");
 	if (newValue != seen) {
 	    seen=newValue;
 	    try {
