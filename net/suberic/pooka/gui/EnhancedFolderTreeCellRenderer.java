@@ -39,9 +39,9 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
    */
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
     // from super().
-
+    
     String stringValue = tree.convertValueToText(value, sel,
-					     expanded, leaf, row, hasFocus);
+		      			 expanded, leaf, row, hasFocus);
     
     this.hasFocus = hasFocus;
     setText(stringValue);
@@ -84,7 +84,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	FolderNode node = (FolderNode)lastPath;
 	
 	FolderInfo fi = node.getFolderInfo();
-
+	
 	if (isSpecial(node)) {
 	  setFontToSpecial();
 	} else {
@@ -103,7 +103,6 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    else 
 	      setIconToSubfolder();
 	  } else if (folderInfo.isConnected()) {
-	    
 	    if (folderInfo.notifyNewMessagesNode() && folderInfo.hasNewMessages()) {
 	      setIconToOpenWithNew();
 	    } else
@@ -130,10 +129,12 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       } else {
 	setIconToRoot();
       }
+    } else {
+      setIconToDisconnected();
     }
     return this;
   }
-
+  
   /**
    * Sets the icon to the unavailable icon.
    */

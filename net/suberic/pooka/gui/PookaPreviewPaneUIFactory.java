@@ -7,6 +7,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import java.awt.*;
 
 /**
  * This is an implementation of PookaUIFactory which creates a single
@@ -66,6 +67,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
       mui = new ReadMessageFrame(mp);
     
     mp.setMessageUI(mui);
+
+    applyNewWindowLocation((JFrame)mui);
     return mui;
   }
   
@@ -139,6 +142,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    */
   public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
     JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
+    jf.pack();
+    applyNewWindowLocation(jf);
     jf.show();
   }
   
@@ -362,6 +367,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     JFrame jf = new JFrame("Choose Address");
     jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
     jf.pack();
+    applyNewWindowLocation(jf);
     jf.show();
   }
 
@@ -371,5 +377,63 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    */
   public void setShowing(boolean newValue) {
     showing=newValue;
+  }
+
+  /**
+   * Determines the location for new windows.
+   */
+  public void applyNewWindowLocation(JFrame f) {
+    String javaVersion = System.getProperty("java.version");
+    
+    if (javaVersion.compareTo("1.3") >= 0) {
+      try {
+	Point newLocation = getNewWindowLocation(f);
+	f.setLocation(newLocation);
+      } catch (Exception e) {
+      }
+    }
+  }
+
+  int lastX = 20;
+  int lastY = 20;
+  boolean firstPlacement = true;
+
+  /**
+   * Determines the location for new windows.
+   */
+  public Point getNewWindowLocation(JFrame f) throws Exception {
+    if (firstPlacement) {
+      Point location = Pooka.getMainPanel().getParentFrame().getLocation();
+      lastX = location.x;
+      lastY = location.y;
+      firstPlacement = false;
+    }
+    GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+    
+    // FIXME - remove when we don't support 1.2 anymore.
+    // Rectangle bounds = conf.getBounds();
+    Class confClass = conf.getClass();
+    java.lang.reflect.Method boundsMethod = confClass.getMethod("getBounds", new Class[0]);
+    Object returnValue = boundsMethod.invoke(conf, new Object[0]);
+    Rectangle bounds = (Rectangle) returnValue;
+    
+    int baseDelta = 20;
+    
+    Dimension componentSize = f.getSize();
+    
+    int currentX = lastX + baseDelta;
+    int currentY = lastY + baseDelta;
+    if (currentX + componentSize.width > bounds.x + bounds.width) {
+      currentX = bounds.x;
+    }
+
+    if (currentY + componentSize.height > bounds.y + bounds.height) {
+      currentY = bounds.y;
+    }
+
+    lastX = currentX;
+    lastY = currentY;
+    
+    return new Point(currentX, currentY);
   }
 }
