@@ -1,5 +1,7 @@
 package net.suberic.pooka.gui.filter;
+import net.suberic.pooka.Pooka;
 import javax.swing.*;
+import java.util.Vector;
 import java.util.Properties;
 
 /**
@@ -40,7 +42,14 @@ public class FlagFilterEditor extends FilterEditor {
      * Gets the values that would be set by this FilterEditor.
      */
     public java.util.Properties getValue() {
-	Properties props = fsp.getValue();
+	Properties props = new Properties();
+	String oldFlag = sourceBundle.getProperty(property + ".flag", "");
+	if (! oldFlag.equals((String) flagBox.getSelectedItem()))
+	    props.setProperty(property + ".flag", (String) flagBox.getSelectedItem());
+
+	String oldValue = sourceBundle.getProperty(property + ".value", "");
+	if (! oldFlag.equals((String) trueFalseBox.getSelectedItem()))
+	    props.setProperty(property + ".value", (String) trueFalseBox.getSelectedItem());
 
 	String oldClassName = sourceBundle.getProperty(property + ".class", "");
 	if (!oldClassName.equals(FILTER_CLASS))
@@ -53,12 +62,17 @@ public class FlagFilterEditor extends FilterEditor {
      * Sets the values represented by this FilterEditor in the sourceBundle.
      */
     public void setValue() {
+	String oldFlag = sourceBundle.getProperty(property + ".flag", "");
+	if (! oldFlag.equals((String) flagBox.getSelectedItem()))
+	    sourceBundle.setProperty(property + ".flag", (String) flagBox.getSelectedItem());
 
-	fsp.setValue();
+	String oldValue = sourceBundle.getProperty(property + ".value", "");
+	if (! oldFlag.equals((String) trueFalseBox.getSelectedItem()))
+	    sourceBundle.setProperty(property + ".value", (String) trueFalseBox.getSelectedItem());
 
 	String oldClassName = sourceBundle.getProperty(property + ".class", "");
 	if (!oldClassName.equals(FILTER_CLASS))
 	    sourceBundle.setProperty(property + ".class", FILTER_CLASS);
     }
-    
+
 }
