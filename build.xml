@@ -113,7 +113,7 @@
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka_full.manifest"> 
+    <jar jarfile="${distdir}/pooka_11_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka_full.manifest"> 
       <zipfileset src="${activation_dist_lib}"/>
       <zipfileset src="${javahelp_dist_lib}"/>
       <zipfileset src="${mail_dist_lib}"/>
@@ -121,7 +121,7 @@
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
     </jar>
-    <!-- <signjar jar="${distdir}/pooka_${today}.jar" alias="pooka" storepass=""/> -->
+    <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
   </target>
 
   <target name="dist-jnlp" depends="compile-jnlp">
