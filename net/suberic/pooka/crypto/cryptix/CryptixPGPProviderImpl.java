@@ -1,5 +1,7 @@
 package net.suberic.pooka.crypto.cryptix;
 
+import java.io.*;
+
 import net.suberic.pooka.*;
 import net.suberic.pooka.crypto.*;
 
@@ -60,4 +62,36 @@ public class CryptixPGPProviderImpl implements PGPProviderImpl {
     throws EncryptionException {
     return null;
   }
+
+   /**
+   * Signs a section of text.
+   */
+  public byte[] sign(InputStream rawStream, EncryptionKey key)
+    throws EncryptionException {
+    return null;
+  }
+ 
+  /**
+   * Checks a signature against a section of text.
+   */
+  public boolean checkSignature(InputStream rawStream,
+				byte[] signature, EncryptionKey key)
+    throws EncryptionException {
+    return false;
+  }
+ 
+  /**
+   * Returns a KeyStore provider.
+   */
+  public EncryptionKeyManager createKeyManager() {
+    return null;
+  }
+ 
+  /**
+   * Returns a KeyStore provider.
+   */
+  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException {
+    return null;
+  }
+
 }
