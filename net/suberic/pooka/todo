@@ -12,8 +12,6 @@ it actually works ok (just ok) when you start it up from scratch--but when
 you make a new Store without a password, it shows up lots and lots of times
 and basically just fails all over the place.
 
-*)  add the ability to forward messages (oops)
-
 *)  enable keybindings so they work properly.
 
 *)  make cut & paste work from the Toolbar.
