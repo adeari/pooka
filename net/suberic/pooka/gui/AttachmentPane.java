@@ -11,6 +11,7 @@ import javax.activation.*;
 import javax.swing.table.AbstractTableModel;
 
 import net.suberic.util.thread.*;
+import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import java.awt.*;
 
@@ -108,8 +109,7 @@ public class AttachmentPane extends JPanel {
     
     Attachment attachment;
     File saveFile;
-    JDialog jd;
-    JProgressBar progressBar;
+    ProgressDialog dialog;
     boolean running = true;
     
     SaveAttachmentThread(Attachment newAttachment, File newSaveFile) {
@@ -129,8 +129,8 @@ public class AttachmentPane extends JPanel {
 	if (attachment.getEncoding().equalsIgnoreCase("base64"))
 	  attachmentSize = (int) (attachmentSize * .73);
 	
-	createDialog(attachmentSize);
-	jd.show();
+	dialog = createDialog(attachmentSize);
+	dialog.show();
 	
 	outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
 	int b=0;
@@ -139,12 +139,12 @@ public class AttachmentPane extends JPanel {
 	b = decodedIS.read(buf);
 	while (b != -1 && running) {
 	  outStream.write(buf, 0, b);
-	  progressBar.setValue(progressBar.getValue() + b);
+	  dialog.setValue(dialog.getValue() + b);
+	  if (dialog.isCancelled())
+	    running=false;
+
 	  b = decodedIS.read(buf);
-	  
 	}
-	
-	jd.dispose();
 	
       } catch (IOException ioe) {
 	Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
@@ -156,38 +156,26 @@ public class AttachmentPane extends JPanel {
 	    outStream.close();
 	  } catch (IOException ioe) {}
 	}
+	if (dialog != null)
+	  dialog.dispose();
       }
     }
     
-    public void createDialog(int attachmentSize) {
-      progressBar = new JProgressBar(0, attachmentSize);
-      progressBar.setBorderPainted(true);
-      progressBar.setStringPainted(true);
-      
-      jd = new JDialog();
-      jd.getContentPane().setLayout(new BoxLayout(jd.getContentPane(), BoxLayout.Y_AXIS));
-      JLabel nameLabel = new JLabel(saveFile.getName());
-      JPanel buttonPanel = new JPanel();
-      JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
-      cancelButton.addActionListener(new ActionListener() {
-	  public void actionPerformed(ActionEvent e) {
+    public ProgressDialog createDialog(int attachmentSize) {
+      ProgressDialog dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, saveFile.getName(), saveFile.getName());
+      dlg.addCancelListener(new ProgressDialogListener() {
+	  public void dialogCancelled() {
 	    cancelSave();
 	  }
 	});
-      buttonPanel.add(cancelButton);
-      
-      jd.getContentPane().add(nameLabel);
-      jd.getContentPane().add(progressBar);
-      jd.getContentPane().add(buttonPanel);
-      
-      jd.pack();
+      return dlg;
     }
     
     public void cancelSave() {
       try {
 	saveFile.delete();
       } catch (Exception e) {}
-      jd.dispose();
+      dialog.dispose();
     }
   }
 

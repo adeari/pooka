@@ -1,6 +1,9 @@
 package net.suberic.pooka.gui;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.List;
+
+import net.suberic.util.swing.*;
 
 
 /**
@@ -18,6 +21,7 @@ public class ProgressDialogImpl implements ProgressDialog {
 
   JLabel nameLabel;
   JPanel buttonPanel;
+  List listenerList = new java.util.ArrayList();
 
   /**
    * Creates a ProgressDialogImpl with the given minimum, maximum, and
@@ -139,6 +143,17 @@ public class ProgressDialogImpl implements ProgressDialog {
    */
   public void cancelAction() {
     cancelled = true;
+    for (int i = 0; i < listenerList.size(); i++) {
+      ProgressDialogListener current = (ProgressDialogListener) listenerList.get(i);
+      current.dialogCancelled();
+    }
+  }
+
+  /**
+   * Adds a ProgressDialogListener.
+   */
+  public void addCancelListener(ProgressDialogListener listener) {
+    listenerList.add(listener);
   }
 
   /**

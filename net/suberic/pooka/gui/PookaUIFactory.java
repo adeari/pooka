@@ -1,4 +1,5 @@
 package net.suberic.pooka.gui;
+import net.suberic.util.swing.ProgressDialog;
 
 public interface PookaUIFactory extends ErrorHandler {
 

@@ -1,7 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
 import net.suberic.util.gui.propedit.DesktopPropertyEditorFactory;
-import net.suberic.util.swing.ThemeManager;
+import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
 import javax.swing.JInternalFrame;

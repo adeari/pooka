@@ -1,7 +1,5 @@
 *) threading of attachment actions.
 
-*) switch attachment progress dialog to use a ProgressDialog.
-
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
 	address field.
@@ -52,6 +50,7 @@ preview:
 	    get new messages.  doesn't work properly.
 	*)  reading a message in disconnected mode doesn't actually mark
 	     it read. -- ?? test.  seems to work.
+	*)  add:  autocache up to a certain size.
 
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store. -- get testcase?

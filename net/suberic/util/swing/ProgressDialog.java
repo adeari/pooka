@@ -1,4 +1,4 @@
-package net.suberic.pooka.gui;
+package net.suberic.util.swing;
 
 /**
  * An interface for any UI component which displays the progress for a
@@ -50,6 +50,11 @@ public interface ProgressDialog {
    * Cancels the current action.
    */
   public void cancelAction();
+
+  /**
+   * Adds a cancel action listener.
+   */
+  public void addCancelListener(ProgressDialogListener listener);
 
   /**
    * Returns whether or not this action has been cancelled.
