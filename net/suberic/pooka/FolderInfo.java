@@ -37,14 +37,26 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // messages.
     public static int DISCONNECTED = 15;
 
+    // folder is just simply closed.
+    public static int CLOSED = 18;
+
     // Folder doesn't seem to exist on server, but exists in cache.
     public static int CACHE_ONLY = 20;
-
-    // folder does not exist on server
-    public static int INVALID = 25;
     
-    protected int status;
+    // folder is not yet loaded.
+    public static int NOT_LOADED = 25;
 
+    // folder does not exist on server or in cache.
+    public static int INVALID = 30;
+
+    // shows the current status of the FolderInfo.
+    protected int status = NOT_LOADED;
+
+    // shows the preferred state of the FolderInfo.  should be CONNECTED,
+    // PASSIVE, DISCONNECTED, or CLOSED.
+    protected int preferred_state;
+
+    // the Folder wrapped by this FolderInfo.
     private Folder folder;
 
     // The is the folder ID: storeName.parentFolderName.folderName
@@ -77,10 +89,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     protected LoadMessageThread loaderThread;
     private FolderTracker folderTracker = null;
 
-    private boolean loaded = false;
     private boolean loading = false;
-    private boolean available = true;
-    protected boolean open = false;
     private int unreadCount = 0;
     private int messageCount = 0;
     private boolean newMessages = false;
@@ -110,7 +119,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	createFilters();
 
 	resetDefaultActions();
-
+	
+	
     }
 
 
@@ -253,23 +263,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	    if (tmpFolder != null && tmpFolder.length > 0) {
 		setFolder(tmpFolder[0]);
-		available = true;
+		setStatus(CLOSED);
 		folder.addMessageChangedListener(this);
 	    } else {
 		if (Pooka.isDebug())
 		    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  setting available to false.");
-		available = false;
-		open = false;
+		setStatus(INVALID);
 		setFolder(null);
 	    }
-	    loaded = true;
 	} catch (MessagingException me) {
 	    if (Pooka.isDebug()) {
 		System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
 		me.printStackTrace();
 	    }
-	    loaded = false;
-	    open = false;
+	    setStatus(NOT_LOADED);
 	    setFolder(null);
 	} finally {
 	    loading = false;
@@ -675,7 +682,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
     
     /**
-     * creates the loaded thread.
+     * creates the loader thread.
      */
     public LoadMessageThread createLoaderThread() {
 	LoadMessageThread lmt = new LoadMessageThread(this);
@@ -1173,10 +1180,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     protected void updateFolderOpenStatus(boolean isNowOpen) {
-	if (isNowOpen)
-	    open = true;
-	else
-	    open = false;
+	if (isNowOpen) {
+	    setStatus(CONNECTED);
+	} else {
+	    setStatus(CLOSED);
+	}
     }
 
     /**
@@ -1239,7 +1247,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 
 	if (isLoaded() && isAvailable()) {
-	    open=false;
+	    setStatus(CLOSED);
 	    try {
 		folder.close(expunge);
 	    } catch (java.lang.IllegalStateException ise) {
@@ -1400,15 +1408,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public boolean isOpen() {
-	return open;
+	return (status == CONNECTED);
     }
 
     public boolean isAvailable() {
-	return available;
+	return (status != INVALID);
     }
 
     public boolean isLoaded() {
-	return loaded;
+	return (status < NOT_LOADED);
     }
 
     public boolean hasUnread() {
@@ -1513,6 +1521,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	else {
 	    return null;
 	}
+    }
+
+    /**
+     * sets the status.
+     */
+    public void setStatus(int newStatus) {
+	status = newStatus;
+    }
+
+    /**
+     * gets the status.
+     */
+    public int getStatus() {
+	return status;
     }
 
     public ActionThread getFolderThread() {

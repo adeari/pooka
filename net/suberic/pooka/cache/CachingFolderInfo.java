@@ -135,9 +135,10 @@ public class CachingFolderInfo extends FolderInfo {
 	    try {
 		uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
 	    } catch (Exception e) { }
-	    open = true;
+	    status = CONNECTED;
+	    
 	} else
-	    open = false;
+	    status = CLOSED;
     }
 
     /**
