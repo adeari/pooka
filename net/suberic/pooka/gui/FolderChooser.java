@@ -42,6 +42,30 @@ public class FolderChooser {
 	return sn;
     }
 
+    /**
+     * This adds the Folder represented by node to the list of subscribed
+     * folders.
+     *
+     * Note that changes are not made until saveSubscribedList() is called.
+     */
+    public void subscribeFolder(FolderNode node) {
+    }
+
+    /**
+     * This removes the Folder represented by node from the lsit of 
+     * subscribed folders.
+     *
+     * Note that changes are not made until saveSubscribedList() is called.
+     */
+    public void unsubscribeFolder(FolderNode node) {
+    }
+
+    /**
+     * This saves the subscribed list described in the FolderChooser to
+     * the main Pooka configuration.  Called by the 'Ok' button.
+     */
+    public void saveSubscribedList() {
+    }
 
     /**
      * Shows the FolderChooser.  This depends on the implementation.
@@ -52,10 +76,6 @@ public class FolderChooser {
 
     public Container getFrame() {
 	return frame;
-    }
-
-    public Folder getSelectedFolder() {
-	return null;
     }
 
 }
