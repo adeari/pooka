@@ -74,7 +74,7 @@ public class MailQueue {
 
 			} catch (MessagingException me) {
 			    net.suberic.pooka.gui.MessageUI mui = null;
-			    net.suberic.pooka.gui.MessageProxy proxy = mui.getMessageProxy();
+			    net.suberic.pooka.gui.MessageProxy proxy = nmi.getMessageProxy();
 			    if (proxy != null) {			    
 				mui = proxy.getMessageUI();
 			    }
