@@ -42,8 +42,16 @@ public class PropertyEditorManager {
    * Registers the given PropertyEditorUI as the editor for the given
    * Property.
    */
-  public void registerPropertyEditor(String property, PropertyEditorUI peui) {
-    editorMap.put(property, peui);
+  public void registerPropertyEditor(String property, PropertyEditorUI editor) {
+    List listenerList = (List) pendingListenerMap.get(property);
+    if (listenerList != null) {
+      Iterator it = listenerList.iterator();
+      while (it.hasNext()) {
+	editor.addPropertyEditorListener((PropertyEditorListener) it.next());
+      }
+    }
+
+    editorMap.put(property, editor);
   }
 
   /**
@@ -121,22 +129,6 @@ public class PropertyEditorManager {
       listenerList.add(listener);
       pendingListenerMap.put(property, listenerList);
     }
-  }
-
-  /**
-   * Registers the given PropertyEditorUI as the editor for the given
-   * property.
-   */
-  public void registerEditor(String property, PropertyEditorUI editor) {
-    List listenerList = (List) pendingListenerMap.get(property);
-    if (listenerList != null) {
-      Iterator it = listenerList.iterator();
-      while (it.hasNext()) {
-	editor.addPropertyEditorListener((PropertyEditorListener) it.next());
-      }
-    }
-
-    editorMap.put(property, editor);
   }
 
 }

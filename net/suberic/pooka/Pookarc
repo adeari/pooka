@@ -504,6 +504,7 @@ UserProfile.editableFields.editor.uiConfig.scopeRoot=UserProfile.editableFields.
 UserProfile.editableFields.editor.uiConfig=theme
 UserProfile.editableFields.uiConfig.theme.propertyType=List
 UserProfile.editableFields.uiConfig.theme.allowedValues=Pooka.theme
+UserProfile.editableFields.uiConfig.theme._includeAddButton
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
@@ -511,6 +512,7 @@ UserProfile.editableFields.sentFolder.onlySubscribed=true
 
 UserProfile.editableFields.mailServer.propertyType=List
 UserProfile.editableFields.mailServer.allowedValues=OutgoingServer
+UserProfile.editableFields.mailServer._includeAddButton
 
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
@@ -536,6 +538,7 @@ OutgoingServer.editableFields.editor.connection.propertyType=Composite
 
 OutgoingServer.editableFields.connection.propertyType=List
 OutgoingServer.editableFields.connection.allowedValues=Connection
+OutgoingServer.editableFields.connection._includeAddButton=true
 OutgoingServer.editableFields.authenticated.propertyType=Boolean
 OutgoingServer.editableFields.authenticated=false
 OutgoingServer.editableFields.password.propertyType=Password
@@ -640,9 +643,11 @@ Folder.editableFields.uiConfig.scopeRoot=Folder.editableFields.uiConfig
 Folder.editableFields.uiConfig=theme
 Folder.editableFields.uiConfig.theme.propertyType=List
 Folder.editableFields.uiConfig.theme.allowedValues=Pooka.theme
+Folder.editableFields.uiConfig.theme._includeAddButton=true
 
 Folder.editableFields.defaultProfile.propertyType=List
 Folder.editableFields.defaultProfile.allowedValues=UserProfile
+Folder.editableFields.defaultProfile._includeAddButton=true
 Folder.editableFields.useTrashFolder.propertyType=Boolean
 Folder.editableFields.notifyNewMessagesMain.propertyType=Boolean
 Folder.editableFields.notifyNewMessagesNode.propertyType=Boolean
@@ -680,9 +685,11 @@ Store.editableFields.trashFolder.selectionRoot=currentStore
 Store.editableFields.trashFolder.onlySubscribed=true
 Store.editableFields.defaultProfile.propertyType=List
 Store.editableFields.defaultProfile.allowedValues=UserProfile
+Store.editableFields.defaultProfile._includeAddButton=true
 Store.editableFields.mailCheckTime=5
 Store.editableFields.connection.propertyType=List
 Store.editableFields.connection.allowedValues=Connection
+Store.editableFields.connection._includeAddButton=true
 
 Store.editableFields.storeConfig.removeString=.storeConfig
 Store.editableFields.storeConfig.allowedValues.imap=Store.editableFields.storeConfig.imap
@@ -764,8 +771,10 @@ Pooka.SSL.useSecureRandom=false
 
 Pooka.messagePanel.theme.propertyType=List
 Pooka.messagePanel.theme.allowedValues=Pooka.theme
+Pooka.messagePanel.theme._includeAddButton=true
 Pooka.folderPanel.theme.propertyType=List
 Pooka.folderPanel.theme.allowedValues=Pooka.theme
+Pooka.folderPanel.theme._includeAddButton=true
 
 Pooka.theme=default
 Pooka.theme.propertyType=Multi

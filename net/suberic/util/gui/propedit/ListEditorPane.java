@@ -64,10 +64,13 @@ public class ListEditorPane extends SwingPropertyEditor {
     Vector items = new Vector();
     StringTokenizer tokens;
     
-    if (manager.getProperty(manager.getProperty(editorTemplate + ".allowedValues", ""), "") != "")
-      tokens = new StringTokenizer(manager.getProperty(manager.getProperty(editorTemplate + ".allowedValues", ""), ""), ":");
-    else
+    String allowedValuesString = manager.getProperty(editorTemplate + ".allowedValues", "");
+    if (manager.getProperty(allowedValuesString, "") != "") {
+      tokens = new StringTokenizer(manager.getProperty(allowedValuesString, ""), ":");
+      manager.addPropertyEditorListener(allowedValuesString, new ListEditorListener());
+    } else {
       tokens = new StringTokenizer(manager.getProperty(editorTemplate + ".allowedValues", ""), ":");
+    }
     
     for (int i=0; tokens.hasMoreTokens(); i++) {
       currentItem = tokens.nextToken();

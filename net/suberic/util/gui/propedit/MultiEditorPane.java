@@ -342,6 +342,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       }
       
       optionListModel.removeElement(selValue);
+      firePropertyChangedEvent(getStringFromList(tmpListModel));
       
       this.setChanged(true);
     } catch (PropertyValueVetoException pvve) {
@@ -542,6 +543,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     enabled = newValue;
   }
+
 }
 
 
