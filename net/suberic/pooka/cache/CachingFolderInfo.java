@@ -247,6 +247,11 @@ public class CachingFolderInfo extends FolderInfo {
 		addedProxies.add(new MessageProxy(getColumnValues(), mp));
 		messageToInfoTable.put(addedMessages[i], mp);
 		uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
+		try {
+		    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.HEADERS);
+		} catch (MessagingException me) {
+		}
+
 	    } else {
 		// it's a 'real' message from the server.
 		
@@ -261,7 +266,10 @@ public class CachingFolderInfo extends FolderInfo {
 		addedProxies.add(new MessageProxy(getColumnValues(), mp));
 		messageToInfoTable.put(newMsg, mp);
 		uidToInfoTable.put(new Long(uid), mp);
-		
+		try {
+		    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.HEADERS);
+		} catch (MessagingException me) {
+		}
 	    }
 	}
 	addedProxies.removeAll(applyFilters(addedProxies));

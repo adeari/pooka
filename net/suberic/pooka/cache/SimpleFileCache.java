@@ -258,8 +258,11 @@ public class SimpleFileCache implements MessageCache {
 	    bos.flush();
 	    bos.close();
 	    
-	    if (! cachedMessages.contains(new Long(uid)))
+	    if (! cachedMessages.contains(new Long(uid))) {
 		cachedMessages.add(new Long(uid));
+		System.out.println("writing message file; caching a new message.");
+		writeMsgFile();
+	    }
 	    
 	} catch (IOException ioe) {
 	    throw new MessagingException(ioe.getMessage(), ioe);
@@ -283,16 +286,13 @@ public class SimpleFileCache implements MessageCache {
      */
     public boolean invalidateCache(long[] uids, int status) {
 	for (int i = 0; i < uids.length; i++) {
-	    System.out.println("running invalidate cache for " + uids[i] + ", " + status);
 	    FilenameFilter filter = new CacheFilenameFilter(uids[i], status);
 	    File[] matchingFiles = cacheDir.listFiles(filter);
 	    for (int j = 0; j < matchingFiles.length; j++)
 		matchingFiles[j].delete();
 	    if (status == CONTENT) {
-		System.out.println("removing " + uids[i] + " from cache.");
 		cachedMessages.remove(new Long(uids[i]));
-	    } else {
-		System.out.println(status + " != " + CONTENT + "; not removing from cache.");
+		writeMsgFile();
 	    }
 	}
 
@@ -305,10 +305,11 @@ public class SimpleFileCache implements MessageCache {
      */
     public void invalidateCache() {
 	File[] matchingFiles = cacheDir.listFiles();
-	for (int j = 0; j < matchingFiles.length; j++) {
-	    if (matchingFiles[j].isFile())
-		matchingFiles[j].delete();
-	}
+	if (matchingFiles != null)
+	    for (int j = 0; j < matchingFiles.length; j++) {
+		if (matchingFiles[j].isFile())
+		    matchingFiles[j].delete();
+	    }
 
 	cachedMessages = new Vector();
     }
@@ -545,23 +546,18 @@ public class SimpleFileCache implements MessageCache {
      */
     public void loadCache() {
 	cachedMessages = new Vector();
-
-	FilenameFilter filter = new FilenameFilter() {
-		public boolean accept(File dir, String name) {
-		    if (name.indexOf(DELIMETER + HEADER_EXT) > -1)
-			return true;
-		    else
-			return false;
-		}		
-	    };
-
-	String[] cacheFilenames = cacheDir.list(filter);
 	
-	for (int i = 0; i < cacheFilenames.length; i++) {
-	    Long uid = new Long(cacheFilenames[i].substring(0, cacheFilenames[i].indexOf(DELIMETER + HEADER_EXT)));
-	    cachedMessages.add(uid);
+	File msgListFile = new File(cacheDir, "messageList");
+	if (msgListFile.exists()) {
+	    try {
+		BufferedReader in = new BufferedReader(new FileReader(msgListFile));
+		for (String nextLine = in.readLine(); nextLine != null; nextLine = in.readLine()) {
+		    Long l = new Long(nextLine);
+		    cachedMessages.add(l);
+		}
+	    } catch (Exception e) { }
 	}
-
+	
 	File validityFile = new File(cacheDir, "validity");
 	if (validityFile.exists()) {
 	    try {
@@ -572,6 +568,24 @@ public class SimpleFileCache implements MessageCache {
 	}
     }	    
 
+    public void writeMsgFile() {
+	try {
+	    File msgListFile = new File(cacheDir, "messageList");
+	    if (! msgListFile.exists()) {
+		msgListFile.createNewFile();
+	    }
+	    BufferedWriter out = new BufferedWriter(new FileWriter(msgListFile));
+	    System.out.println("cachedMessages.size() == " + cachedMessages.size());
+	    for (int i = 0; i < cachedMessages.size(); i++) {
+		out.write(((Long) cachedMessages.elementAt(i)).toString());
+		out.newLine();
+	    }
+	    out.flush();
+	    out.close();
+	} catch (Exception e) {
+	}
+    }
+    
     public CachingFolderInfo getFolderInfo() {
 	return folderInfo;
     }
