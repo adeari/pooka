@@ -125,6 +125,8 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
 	JFileChooser jfc =
 	    new JFileChooser(defaultRoot, mfsv);
 	    jfc.setMultiSelectionEnabled(false);
+	    jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+
 	    int returnValue =
 		jfc.showDialog(Pooka.getMainPanel(),
 			       Pooka.getProperty("FolderEditorPane.Select",
