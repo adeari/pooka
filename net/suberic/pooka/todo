@@ -4,9 +4,14 @@ alpha 2
 *)  add a way to edit the mailcap file.  this should be doable both from
 a menu option and from the 'open with' dialog.
 
-*) create a Trash folder.
+*) create a Trash folder.  add a ui.  you should be able to:  create a new
+folder; assign a folder to be a trash folder for a store; see an icon that
+says [trash with stuff | empty trash folder]; empty the trash.
 
-*) create a Sent folder.
+*) create a Sent folder.  should be able to assign one just as with the
+trash folder, except maybe the sent folder should be by user profile rather
+than by store.  sent folder needs to have a different display--both a 
+different icon and different folder information (to: instead of from:).
 
 *) fix the signature
 
@@ -16,6 +21,14 @@ a menu option and from the 'open with' dialog.
 at that level will open.  so if you have three folders under 'mail' and 
 open up the store by opening 'mail/foo', then 'mail/bar' and 'mail/baz'
 won't open up.
+
+*) change getUnreadMessages() to cache the information.  this has been the
+major cause of all of our deadlocks.  other choice could be to have the
+getUnreadMessages() invoke the Action thread to do the update.  i think
+caching is better.
+
+*) say...  i think the subjects in responses and forwards are ending with
+trailing \n's too often.  fix that.
 
 ?????? alpha 2 or not ??????
 ----------------------------
