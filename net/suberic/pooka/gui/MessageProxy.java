@@ -559,46 +559,41 @@ public class MessageProxy {
   public void checkSignature() {
     MessageInfo info = getMessageInfo();
     if (info != null) {
-      if (info.hasEncryption()) {
-
-	java.security.Key key = getDefaultProfile().getEncryptionKey();
-
-	MessageCryptoInfo cInfo = info.getCryptoInfo();
-	int sigStatus = 0;
-	int encryptStatus = 0;
-
-	CryptoStatusDisplay csd = null;
-	MessageUI ui = getMessageUI();
-	if (ui != null) {
-	  csd = ui.getCryptoStatusDisplay();
-	}
-
-	try {
-	  boolean hasSignature = cInfo.isSigned();
-	  if (hasSignature) {
-	    if (cInfo.isSignatureValid()) {
-	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
-	    } else {
-	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
-	    }
-	  } else {
-	    sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.NOT_SIGNED;
-	  }
-	} catch (Exception e) {
-	  sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION;
-	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
-	}
+      MessageCryptoInfo cInfo = info.getCryptoInfo();
+      try {
+	if (cInfo != null && cInfo.isSigned()) {
+	  int sigStatus = 0;
+	  int encryptStatus = 0;
+	  CryptoStatusDisplay csd = null;
 	  
-	if (csd != null)
-	  csd.cryptoUpdated(sigStatus, encryptStatus);
-	
-	if (getMessageUI() != null) {
-	  try {
-	    getMessageUI().refreshDisplay();
-	  } catch (MessagingException me) {
-	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed"), me);
+	  String fromString = "";
+	  Address[] fromAddr = getMessageInfo().getMessage().getFrom();
+	  if (fromAddr != null && fromAddr.length > 0) {
+	    fromString = ((javax.mail.internet.InternetAddress)fromAddr[0]).getAddress();
 	  }
+	  java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(fromString);
+	  if (keys == null || keys.length < 0) {
+	    java.security.Key newKey = CryptoKeySelector.selectPublicKey();
+	    keys = new java.security.Key[] { newKey };
+	  }
+	  
+	  MessageUI ui = getMessageUI();
+	  if (ui != null) {
+	    csd = ui.getCryptoStatusDisplay();
+	  }
+	  
+	  if (cInfo.checkSignature(keys[0], false)) {
+	    sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
+	  } else {
+	    sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
+	  }
+	  
+	  if (csd != null)
+	    csd.cryptoUpdated(sigStatus, encryptStatus);
+	 
 	}
+      } catch (Exception e) {
+	showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
       }
     }
   }

@@ -267,32 +267,27 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
 
     System.err.println("cryptStatus = " + currentCryptStatus + ", sigStaus = " + currentSigStatus);
 
-    if (currentCryptStatus == NOT_ENCRYPTED) {
+    if (currentCryptStatus == NOT_ENCRYPTED || currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
       if (currentSigStatus == NOT_SIGNED) {
-	setIcon(notEncryptedIcon);
-      } else if (currentStatus == UNCHECKED_SIGNED) {
+	if (currentCryptStatus == NOT_ENCRYPTED)
+	  setIcon(notEncryptedIcon);
+	else
+	  setIcon(decryptedSuccessfullyIcon);
+      } else if (currentSigStatus == UNCHECKED_SIGNED) {
 	setIcon(uncheckedSignedIcon);
-      } else if (currentStatus == SIGNATURE_VERIFIED) {
+      } else if (currentSigStatus == SIGNATURE_VERIFIED) {
 	setIcon(signatureVerifiedIcon);
-      } else if (currentStatus == SIGNATURE_BAD) {
+      } else if (currentSigStatus == SIGNATURE_BAD) {
 	setIcon(signatureBadIcon);
-      } else if (currentStatus == SIGNATURE_FAILED_VERIFICATION) {
+      } else if (currentSigStatus == SIGNATURE_FAILED_VERIFICATION) {
 	setIcon(signatureFailedVerificationIcon);
       }
     } else if (currentCryptStatus == UNCHECKED_ENCRYPTED) {
-	setIcon(uncheckedEncryptedIcon);
-      } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
-	setIcon(decryptedSuccessfullyIcon);
-      } else if (currentStatus == DECRYPTED_UNSUCCESSFULLY) {
+      setIcon(uncheckedEncryptedIcon);
+    } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
+      setIcon(decryptedSuccessfullyIcon);
+    } else if (currentCryptStatus == DECRYPTED_UNSUCCESSFULLY) {
       setIcon(decryptedUnsuccessfullyIcon);
-    } else if (currentStatus == UNCHECKED_SIGNED) {
-      setIcon(uncheckedSignedIcon);
-    } else if (currentStatus == SIGNATURE_VERIFIED) {
-      setIcon(signatureVerifiedIcon);
-    } else if (currentStatus == SIGNATURE_BAD) {
-      setIcon(signatureBadIcon);
-    } else if (currentStatus == SIGNATURE_FAILED_VERIFICATION) {
-      setIcon(signatureFailedVerificationIcon);
     } else {
       setIcon(notEncryptedIcon);
     }
