@@ -7,6 +7,7 @@ import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
 import java.util.StringTokenizer;
 import javax.swing.*;
+import javax.mail.event.*;
 
 public class StoreNode extends MailTreeNode {
     
@@ -22,6 +23,29 @@ public class StoreNode extends MailTreeNode {
 	storeID=storePrefix;
 	displayName=Pooka.getProperty("Store." + storeID + ".displayName", storeID);
 	setCommands();
+	store.addConnectionListener(new ConnectionAdapter() {
+		public void closed(ConnectionEvent e) {
+		    System.out.println("Folder " + displayName + " closed.");
+		    if (connected == true) {
+			try {
+			    connectStore();
+			} catch (MessagingException me) {
+			    System.out.println("Disconnected from store " + displayName + " and unable to reconnect:  " + me.getMessage());
+			}
+		    }
+		}
+
+		public void disconnected(ConnectionEvent e) {
+		    System.out.println("Folder " + displayName + " closed.");
+		    if (connected == true) {
+			try {
+			    connectStore();
+			} catch (MessagingException me) {
+			    System.out.println("Disconnected from store " + displayName + " and unable to reconnect:  " + me.getMessage());
+			}
+		    }
+		}
+	    });
     }
     
     /**
@@ -123,6 +147,23 @@ public class StoreNode extends MailTreeNode {
 	} else 
 	    return false;
     }
+
+    /**
+     * Here we set the connection value that we _want_ to have.  We
+     * also try to open or close the connection, as appropriate.
+     */
+    public void setConnected(boolean newValue) {
+	connected=newValue;
+	if (store != null && store.isConnected() != newValue) {
+	    if (newValue)
+		try {
+		    connectStore();
+		} catch (MessagingException me) {
+		    System.out.println("Error connecting to store:  " + me.getMessage());
+		}
+	}
+    }
+	    
     
     public Action[] defaultActions = new Action[] {new OpenAction()
 	};
