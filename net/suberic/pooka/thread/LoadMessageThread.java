@@ -38,11 +38,11 @@ public class LoadMessageThread extends Thread {
     
     public LoadMessageThread(FolderInfo newFolderInfo) {
 	folderInfo = newFolderInfo;
+	this.setPriority(1);
     }
 
     public void run() {
 	int uptime = 0;
-	this.setPriority(1);
 	while (true) {
 	    loadWaitingMessages();
 	    
@@ -52,30 +52,10 @@ public class LoadMessageThread extends Thread {
 			sleep(60000);
 		} else { 
 		    sleep(updateCheckMilliseconds);
-		    checkFolder();
 		}
 	    } catch (InterruptedException ie) {
 	    }
 	}
-    }
-
-    /**
-     * This just checks to see if we can get a NewMessageCount from the
-     * folder.  As a brute force method, it also attempts to open the 
-     * folder read_write at every check, catching and throwing away any
-     * Exceptions that happen.  It's nasty, but it _should_ keep the 
-     * Folder open..
-     */
-    public void checkFolder() {
-	if (Pooka.isDebug())
-	    System.out.println("checking folder " + getFolderInfo().getFolderName());
-	
-	try {
-	    getFolderInfo().getFolder().open(Folder.READ_WRITE);
-	} catch (Exception e) {
-	}
-
-	getFolderInfo().resetUnread();
     }
 
     public void loadWaitingMessages() {
