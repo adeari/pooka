@@ -1788,9 +1788,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return folder;
     }
 
-    protected void setFolder(Folder newValue) {
-	folder=newValue;
-    }
+  protected void setFolder(Folder newValue) {
+    folder=newValue;
+  }
 
     /**
      * This returns the FolderID, such as "myStore.INBOX".
@@ -2084,16 +2084,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    return null;
 	}
     }
-
-    /**
-     * sets the status.
-     */
-    public void setStatus(int newStatus) {
-	synchronized(this) {
-	    status = newStatus;
-	}
+  
+  /**
+   * sets the status.
+   */
+  public void setStatus(int newStatus) {
+    synchronized(this) {
+      status = newStatus;
     }
-
+  }
+  
     /**
      * gets the status.
      */

@@ -7,12 +7,20 @@ preview:
 	*)  check sent folder with disconnected / especially not using
 		the NetworkConnection object. -- note:  ok with the
 		NetworkConnection.
+	      -- making that work better.  now we add the message, but
+	         it shows up as not cached.  also, change the algorithm
+	         for numbering.
 	*)  disconnected:  think that you're still connected.  lose connection.
 	    get new messages.  doesn't work properly.
+	*)  reading a message in disconnected mode doesn't actually mark
+	     it read.
 
 *) run a debug log on the communications with the imap server; make sure
 that we get all of the important information in the body tag.  -- ?? check
 the filters, especially.
+
+*) if you detach a message and then close the window, opening the 
+message again should create a new, still-attached message.
 
 --------
 

@@ -161,7 +161,7 @@ public class UIDFolderInfo extends FolderInfo {
   
   protected void updateFolderOpenStatus(boolean isNowOpen) {
     if (isNowOpen) {
-      status = CONNECTED;
+      setStatus(CONNECTED);
       try {
 	uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
 	if (getFolderTableModel() != null)
@@ -169,7 +169,7 @@ public class UIDFolderInfo extends FolderInfo {
       } catch (Exception e) { }
       
     } else
-      status = CLOSED;
+      setStatus(CLOSED);
   }
   
   /**

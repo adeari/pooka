@@ -108,16 +108,18 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    setStatus(CACHE_ONLY);
 	  else
 	    setStatus(INVALID);
-	  setFolder(null);
+	  setFolder(new FolderProxy(getFolderName()));
 	}
-      } 
+      } else {
+	setFolder(new FolderProxy(getFolderName()));
+      }
     } catch (MessagingException me) {
       if (Pooka.isDebug()) {
 	System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
 	me.printStackTrace();
       }
       setStatus(NOT_LOADED);
-      setFolder(null);
+      setFolder(new FolderProxy(getFolderName()));
     } finally {
       initializeFolderInfo();
       loading = false;
@@ -186,6 +188,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
       }
     } catch (MessagingException me) {
+      System.err.println("error:  " + me);
+      me.printStackTrace();
       setStatus(DISCONNECTED);
     }
   }
@@ -879,6 +883,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (isConnected()) {
 	super.appendMessages(msgs);
       } else {
+	// make sure we've loaded
+	if (! isLoaded())
+	  loadFolder();
 	getCache().appendMessages(msgs);
       }
     } else {
@@ -1056,7 +1063,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   }
 
   public boolean isLoaded() {
-    return (getFolder() != null && cache != null);
+    return (getFolder() != null && ( ! (getFolder() instanceof FolderProxy)) && cache != null);
   }
 
   /**

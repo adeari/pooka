@@ -1,3 +1,6 @@
+fixed a bug which prevented you from deleting a message from a 
+disconnected folder.
+
 in preview pane mode, when you open up a folder, the keyboard focus now
 shifts to the message table.
 

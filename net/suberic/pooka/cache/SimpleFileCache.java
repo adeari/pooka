@@ -380,7 +380,7 @@ public class SimpleFileCache implements MessageCache {
 	Message m = msgs[i].getMessage();
 	localMsgs[i] = new LocalMimeMessage((MimeMessage)m);
       }
-      MessageCountEvent mce = new MessageCountEvent(null, MessageCountEvent.ADDED, false, localMsgs);
+      MessageCountEvent mce = new MessageCountEvent(getFolderInfo().getFolder(), MessageCountEvent.ADDED, false, localMsgs);
       getFolderInfo().messagesAdded(mce);
     }
     
