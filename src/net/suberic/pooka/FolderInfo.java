@@ -315,7 +315,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 
       if (mFolderThread == null) {
-	mFolderThread = new ActionThread(parentStore.getStoreID() + "." + getFolderID() + " - ActionThread");
+	mFolderThread = new ActionThread(getParentStore().getStoreID() + "." + getFolderID() + " - ActionThread");
 	mFolderThread.start();
       }
       
