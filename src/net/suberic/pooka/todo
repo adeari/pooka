@@ -6,6 +6,8 @@ header.
 
 *) add a place in preferences to enabled debug.
 
+*) check too many open files error on opening large cached folder?
+
 *) add drag and drop
 	*) include message
 	*) move message

@@ -388,7 +388,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     }
     
 
-    retval.setTransferHandler(new net.suberic.pooka.gui.dnd.NewMessageTransferHandler());
+    //retval.setTransferHandler(new net.suberic.pooka.gui.dnd.NewMessageTransferHandler());
 
     // bodyInputPane.setContentType("text");
     return retval;
