@@ -20,7 +20,7 @@ public class NewAccountPooka {
   // this is such a mess.
 
   private MessagePanel messagePanel = null;
-  private VariableBundle properties = null;
+  private PropertyEditorManager manager = null;
   private PropertyEditorFactory factory = null;
   private String accountName = null;
   private Vector propertyList = new Vector();
@@ -43,9 +43,12 @@ public class NewAccountPooka {
     
     if (JOptionPane.showInternalConfirmDialog(getMessagePanel(), Pooka.getProperty("NewAccountPooka.introMessage", "Welcome to Pooka.\nIt seems that you don't yet have an Email account configured.\n\nWould you like to configure one now?"), Pooka.getProperty("NewAccountPooka.introMessage.title", "New Account Pooka"), JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
       
-      setProperties(initializeProperties());
-      PropertyEditorFactory factory = new PropertyEditorFactory(getProperties());
+      PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
       setFactory(factory);
+      
+      manager = new PropertyEditorManager(Pooka.getResources(), factory);
+      manager.setWriteChanges(false);
+
       showFirstEntryWindow();
     }
   }
@@ -67,18 +70,18 @@ public class NewAccountPooka {
     // is there a way to make this wrap automatically, without adding
     // explicit newlines?
     JTextArea jta = new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client."));
+    jta.setEditable(false);
 
+    JLabel jl = new JLabel("test");
     jta.setBackground(jl.getBackground());
     //jta.setForeground(jl.getForeground());
     jta.setFont(jl.getFont());
     contentPane.add(jta);
     
-    PropertyEditorManager mgr = new PropertyEditorManager(getProperties(), factory);
-    contentPane.add(new PropertyEditorPane(mgr,
+    contentPane.add(new PropertyEditorPane(manager,
 					   propertyVector,
 					   propertyVector,
 					   firstEntryWindow));
-    contentPane.add(new JLabel("foo"));
     firstEntryWindow.pack();
     firstEntryWindow.show();
     firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -102,29 +105,17 @@ public class NewAccountPooka {
     
   }
   
-  public VariableBundle initializeProperties() {
-    /*
-     * this sets up the tempoary VariableBundle which we'll use during
-     * this wizard.
-     */
-    
-    VariableBundle vb = new VariableBundle(new java.util.Properties(), Pooka.getResources());
-    return vb;
-  }
-  
-  
   public void handleFirstEntry() {
     /*
      * this converts the initial entires into an appropriate UserProfile
      * and Store entry.
      */
-    VariableBundle vb = getProperties();
-    String userName = vb.getProperty("NewAccountPooka.firstPanel.userName", "");
-    String fullName = vb.getProperty("NewAccountPooka.firstPanel.fullName", "");
-    String password = vb.getProperty("NewAccountPooka.firstPanel.password", "");
-    String serverName = vb.getProperty("NewAccountPooka.firstPanel.serverName", "");
-    String protocol = vb.getProperty("NewAccountPooka.firstPanel.protocol", "");
-    String smtpServerName = vb.getProperty("NewAccountPooka.firstPanel.smtpServer", "");
+    String userName = manager.getProperty("NewAccountPooka.firstPanel.userName", "");
+    String fullName = manager.getProperty("NewAccountPooka.firstPanel.fullName", "");
+    String password = manager.getProperty("NewAccountPooka.firstPanel.password", "");
+    String serverName = manager.getProperty("NewAccountPooka.firstPanel.serverName", "");
+    String protocol = manager.getProperty("NewAccountPooka.firstPanel.protocol", "");
+    String smtpServerName = manager.getProperty("NewAccountPooka.firstPanel.smtpServer", "");
     
     if (userName.equals("") || serverName.equals("") || protocol.equals("") || smtpServerName.equals(""))
       invalidFirstEntry();
@@ -133,50 +124,50 @@ public class NewAccountPooka {
 
       // set up the smtp server
 
-      vb.setProperty("OutgoingServer", smtpServerName);
-      vb.setProperty("OutgoingServer." + smtpServerName + ".server", smtpServerName);
+      manager.setProperty("OutgoingServer", smtpServerName);
+      manager.setProperty("OutgoingServer." + smtpServerName + ".server", smtpServerName);
       propertyList.add("OutgoingServer." + smtpServerName + ".server");
-      vb.setProperty("OutgoingServer." + smtpServerName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
+      manager.setProperty("OutgoingServer." + smtpServerName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
       propertyList.add("OutgoingServer." + smtpServerName + ".connection");
 
-      vb.setProperty("OutgoingServer._default", smtpServerName);
+      manager.setProperty("OutgoingServer._default", smtpServerName);
       propertyList.add("OutgoingServer._default");
 
       // set up the user.
 
-      vb.setProperty("UserProfile", accountName);
+      manager.setProperty("UserProfile", accountName);
       propertyList.add("UserProfile." + accountName + ".mailHeaders.From");
-      vb.setProperty("UserProfile." + accountName + ".mailHeaders.From", accountName);
-      vb.setProperty("UserProfile." + accountName + ".mailHeaders.FromPersonal", fullName);
+      manager.setProperty("UserProfile." + accountName + ".mailHeaders.From", accountName);
+      manager.setProperty("UserProfile." + accountName + ".mailHeaders.FromPersonal", fullName);
       propertyList.add("UserProfile." + accountName + ".mailHeaders.FromPersonal");
-      vb.setProperty("UserProfile." + accountName + ".mailServer", smtpServerName);
+      manager.setProperty("UserProfile." + accountName + ".mailServer", smtpServerName);
       propertyList.add("UserProfile." + accountName + ".mailServer");
 
-      vb.setProperty("UserProfile.default", accountName);
+      manager.setProperty("UserProfile.default", accountName);
       propertyList.add("UserProfile.default");
 
 
       // set up mail server information
 
-      vb.setProperty("Store", accountName);
-      vb.setProperty("Store." + accountName + ".server", serverName);
+      manager.setProperty("Store", accountName);
+      manager.setProperty("Store." + accountName + ".server", serverName);
       propertyList.add("Store." + accountName + ".server");
-      vb.setProperty("Store." + accountName + ".protocol", protocol);
+      manager.setProperty("Store." + accountName + ".protocol", protocol);
       propertyList.add("Store." + accountName + ".protocol");
-      vb.setProperty("Store." + accountName + ".user", userName);
+      manager.setProperty("Store." + accountName + ".user", userName);
       propertyList.add("Store." + accountName + ".user");
-      vb.setProperty("Store." + accountName + ".password", password);
+      manager.setProperty("Store." + accountName + ".password", password);
       propertyList.add("Store." + accountName + ".password");
-      vb.setProperty("Store." + accountName + ".defaultProfile", accountName);
+      manager.setProperty("Store." + accountName + ".defaultProfile", accountName);
       propertyList.add("Store." + accountName + ".defaultProfile");
-      vb.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
+      manager.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
       propertyList.add("Store." + accountName + ".connection");
       
       if (protocol.equalsIgnoreCase("POP3")) {
-	vb.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
+	manager.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
 	propertyList.add("OutgoingServer." + smtpServerName + ".sendOnConnect");
       } else {
-	vb.setProperty("Store." + accountName + ".useSubscribed", "true");
+	manager.setProperty("Store." + accountName + ".useSubscribed", "true");
 	propertyList.add("Store." + accountName + ".useSubscribed");
       }
 
@@ -264,8 +255,7 @@ public class NewAccountPooka {
     JInternalFrame secondEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.secondWindowMessage.title", "Outgoing Email Server"), false, false, false, false);
     secondEntryWindow.getContentPane().setLayout(new BoxLayout(secondEntryWindow.getContentPane(), BoxLayout.Y_AXIS));
     secondEntryWindow.getContentPane().add(new JTextArea(Pooka.getProperty("NewAccountPooka.secondWindowMessage", "Please enter the URL for your outgoing email.")));
-    PropertyEditorManager mgr = new PropertyEditorManager(getProperties(), factory);
-    secondEntryWindow.getContentPane().add(new PropertyEditorPane(mgr, propertyVector, secondEntryWindow));
+    secondEntryWindow.getContentPane().add(new PropertyEditorPane(manager, propertyVector, secondEntryWindow));
     secondEntryWindow.pack();
     secondEntryWindow.show();
     secondEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -336,18 +326,18 @@ public class NewAccountPooka {
     transferProperty("Store");
 
     //if (!Pooka.getProperty("OutgoingServer", "").equals(""))
-    //Pooka.setProperty("OutgoingServer", Pooka.getProperty("OutgoingServer", "") + ":" + getProperties().getProperty("OutgoingServer", ""));
+    //Pooka.setProperty("OutgoingServer", Pooka.getProperty("OutgoingServer", "") + ":" + manager.getProperty("OutgoingServer", ""));
     //else
     transferProperty("OutgoingServer");
   }
 
   /**
-   * Transfers the given property from our local VariableBundle to the 
+   * Transfers the given property from our local PropertyEditorManager
    * main Pooka properties list.
    */
   public void transferProperty(String propertyName) {
-    if (!(getProperties().getProperty(propertyName, "").equals(""))) {
-      Pooka.setProperty(propertyName, getProperties().getProperty(propertyName, ""));
+    if (!(manager.getProperty(propertyName, "").equals(""))) {
+      Pooka.setProperty(propertyName, manager.getProperty(propertyName, ""));
     }
   }
 
@@ -376,14 +366,6 @@ public class NewAccountPooka {
   
   public void setFactory(PropertyEditorFactory newValue) {
     factory=newValue;
-  }
-  
-  public VariableBundle getProperties() {
-    return properties;
-  }
-  
-  public void setProperties(VariableBundle newValue) {
-    properties=newValue;
   }
   
 }

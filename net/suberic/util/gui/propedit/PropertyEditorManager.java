@@ -16,6 +16,10 @@ public class PropertyEditorManager {
 
   protected HashMap pendingListenerMap = new HashMap();
 
+  protected boolean writeChanges = true;
+
+  protected Properties localProps = new Properties();
+
   /**
    * Creates a new PropertyEditorManager.
    */
@@ -65,6 +69,12 @@ public class PropertyEditorManager {
    * Gets the value of the given property.
    */
   public String getProperty(String property, String defaultValue) {
+    // check the localProps first
+    if (! writeChanges) {
+      String tmpValue = (String) localProps.get(property);
+      if (tmpValue != null)
+	return tmpValue;
+    }
     return sourceBundle.getProperty(property, defaultValue);
   }
 
@@ -72,6 +82,13 @@ public class PropertyEditorManager {
    * Gets the value of the given property.
    */
   public List getPropertyAsList(String property, String defaultValue) {
+    // check the localProps first
+    if (! writeChanges) {
+      String tmpValue = (String) localProps.get(property);
+      if (tmpValue != null) {
+	return VariableBundle.convertToVector(tmpValue);
+      }
+    }
     return sourceBundle.getPropertyAsVector(property, defaultValue);
   }
 
@@ -79,14 +96,19 @@ public class PropertyEditorManager {
    * Sets the given property to the given value.
    */
   public void setProperty(String property, String value) {
-    sourceBundle.setProperty(property, value);
+    if (! writeChanges) {
+      localProps.setProperty(property, value);
+    } else {
+      sourceBundle.setProperty(property, value);
+    }
   }
 
   /**
    * Removes the given property.
    */
   public void removeProperty(String property) {
-    sourceBundle.removeProperty(property);
+    if (writeChanges) 
+      sourceBundle.removeProperty(property);
   }
 
   /**
@@ -109,7 +131,8 @@ public class PropertyEditorManager {
    * Commits the changes to the underlying VariableBundle.
    */
   public void commit() {
-    sourceBundle.saveProperties();
+    if (writeChanges) 
+      sourceBundle.saveProperties();
   }
 
   /**
@@ -148,6 +171,13 @@ public class PropertyEditorManager {
     return null;
   }
 
+  /**
+   * Sets whether or not this PEM should write its changes to the source
+   * VariableBundle.  
+   */
+  public void setWriteChanges(boolean newValue) {
+    writeChanges = newValue;
+  }
 
 }
 

@@ -160,170 +160,176 @@ public class VariableBundle extends Object {
 	return tokens;
     }
 
-    /**
-     * Returns a property which has multiple values separated by a ':' (colon)
-     * as a java.util.Vector.
-     */
-
-    public Vector getPropertyAsVector(String propertyName, String defaultValue) {
-	Vector returnValue = new Vector();
-	StringTokenizer tokens = new StringTokenizer(getProperty(propertyName, defaultValue), ":");
-	while (tokens.hasMoreElements())
-	    returnValue.add(tokens.nextElement());
-	return returnValue;
-	    
-    }
-
-
-    /**
-     * Saves the current properties in the VariableBundle to a file.  Note
-     * that this only saves the writableProperties of this particular
-     * VariableBundle--underlying defaults are not written.
-     */
+  /**
+   * Converts a value which has multiple values separated by a ':' (colon)
+   * to a java.util.Vector.
+   */
+  public static Vector convertToVector(String value) {
+    Vector returnValue = new Vector();
+    StringTokenizer tokens = new StringTokenizer(value, ":");
+    while (tokens.hasMoreElements())
+      returnValue.add(tokens.nextElement());
+    return returnValue;
+  }
+  
+  /**
+   * Converts the given property value to a Vector using the convertToVector
+   * call.
+   */
+  public Vector getPropertyAsVector(String propertyName, String defaultValue) {
+    return convertToVector(getProperty(propertyName, defaultValue));
+  }
+  
+  
+  /**
+   * Saves the current properties in the VariableBundle to a file.  Note
+   * that this only saves the writableProperties of this particular
+   * VariableBundle--underlying defaults are not written.
+   */
   public void saveProperties() {
     if (saveFile != null) {
       saveProperties(saveFile);
     }
   }
-
-    /**
-     * Saves the current properties in the VariableBundle to a file.  Note
-     * that this only saves the writableProperties of this particular
-     * VariableBundle--underlying defaults are not written.
-     */
-    public void saveProperties(File saveFile) {
-      if (writableProperties.size() > 0) { 
-	File outputFile;
-	String currentLine, key;
-	int equalsLoc;
+  
+  /**
+   * Saves the current properties in the VariableBundle to a file.  Note
+   * that this only saves the writableProperties of this particular
+   * VariableBundle--underlying defaults are not written.
+   */
+  public void saveProperties(File saveFile) {
+    if (writableProperties.size() > 0) { 
+      File outputFile;
+      String currentLine, key;
+      int equalsLoc;
+      
+      try {
+	if (!saveFile.exists())
+	  saveFile.createNewFile();
 	
-	try {
-	  if (!saveFile.exists())
-	    saveFile.createNewFile();
-	  
-	  outputFile  = saveFile.createTempFile(saveFile.getName(), ".tmp", saveFile.getParentFile());
-	  
-	  BufferedReader readSaveFile = new BufferedReader(new FileReader(saveFile));
-	  BufferedWriter writeSaveFile = new BufferedWriter(new FileWriter(outputFile));
-	  currentLine = readSaveFile.readLine();
-	  while (currentLine != null) {
-	    equalsLoc = currentLine.indexOf('=');
-	    if (equalsLoc != -1) {
-	      String rawKey = currentLine.substring(0, equalsLoc);
-	      key = unEscapeString(rawKey);
-
-	      if (!propertyIsRemoved(key)) {
-		if (writableProperties.getProperty(key, "").equals("")) {
-
-		  writeSaveFile.write(currentLine);
-		  writeSaveFile.newLine();
-
-		} else {
-		  writeSaveFile.write(rawKey + "=" + escapeWhiteSpace(writableProperties.getProperty(key, "")));
-		  writeSaveFile.newLine();
-		  properties.setProperty(key, writableProperties.getProperty(key, ""));
-		  writableProperties.remove(key);
-		}
-		removeProperty(key);
-	      }
-	      
-	    } else {
-	      writeSaveFile.write(currentLine);
-	      writeSaveFile.newLine();
-	    }
-	    currentLine = readSaveFile.readLine();
-	  }
-	  
-	  // write out the rest of the writableProperties
-	  
-	  Enumeration propsLeft = writableProperties.keys();
-	  while (propsLeft.hasMoreElements()) {
-	    String nextKey = (String)propsLeft.nextElement();
-	    String nextKeyEscaped = escapeWhiteSpace(nextKey);
-	    String nextValueEscaped = escapeWhiteSpace(writableProperties.getProperty(nextKey, ""));
-	    writeSaveFile.write(nextKeyEscaped + "=" + nextValueEscaped);
-	    writeSaveFile.newLine();
+	outputFile  = saveFile.createTempFile(saveFile.getName(), ".tmp", saveFile.getParentFile());
+	
+	BufferedReader readSaveFile = new BufferedReader(new FileReader(saveFile));
+	BufferedWriter writeSaveFile = new BufferedWriter(new FileWriter(outputFile));
+	currentLine = readSaveFile.readLine();
+	while (currentLine != null) {
+	  equalsLoc = currentLine.indexOf('=');
+	  if (equalsLoc != -1) {
+	    String rawKey = currentLine.substring(0, equalsLoc);
+	    key = unEscapeString(rawKey);
 	    
-	    properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
-	    writableProperties.remove(nextKey);
+	    if (!propertyIsRemoved(key)) {
+	      if (writableProperties.getProperty(key, "").equals("")) {
+		
+		writeSaveFile.write(currentLine);
+		writeSaveFile.newLine();
+		
+	      } else {
+		writeSaveFile.write(rawKey + "=" + escapeWhiteSpace(writableProperties.getProperty(key, "")));
+		writeSaveFile.newLine();
+		properties.setProperty(key, writableProperties.getProperty(key, ""));
+		writableProperties.remove(key);
+	      }
+	      removeProperty(key);
+	    }
+	    
+	  } else {
+	    writeSaveFile.write(currentLine);
+	    writeSaveFile.newLine();
 	  }
-	  
-	  clearRemoveList();
-	  
-	  readSaveFile.close();
-	  writeSaveFile.flush();
-	  writeSaveFile.close();
-	  
-	  // if you don't delete the .old file first, then the
-	  // rename fails under Windows.
-	  String oldSaveName = saveFile.getAbsolutePath() + ".old";
-	  File oldSave = new File (oldSaveName);
-	  if (oldSave.exists())
-	    oldSave.delete();
-	  
-	  String fileName = new String(saveFile.getAbsolutePath());
-	  saveFile.renameTo(oldSave);
-	  outputFile.renameTo(new File(fileName));
-	  
-	} catch (Exception e) {
-	  System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + saveFile.getName() + ": " + e.getMessage()));
-	  e.printStackTrace(System.err);
+	  currentLine = readSaveFile.readLine();
 	}
 	
+	// write out the rest of the writableProperties
+	
+	Enumeration propsLeft = writableProperties.keys();
+	while (propsLeft.hasMoreElements()) {
+	  String nextKey = (String)propsLeft.nextElement();
+	  String nextKeyEscaped = escapeWhiteSpace(nextKey);
+	  String nextValueEscaped = escapeWhiteSpace(writableProperties.getProperty(nextKey, ""));
+	  writeSaveFile.write(nextKeyEscaped + "=" + nextValueEscaped);
+	  writeSaveFile.newLine();
+	  
+	  properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
+	  writableProperties.remove(nextKey);
+	}
+	
+	clearRemoveList();
+	
+	readSaveFile.close();
+	writeSaveFile.flush();
+	writeSaveFile.close();
+	
+	// if you don't delete the .old file first, then the
+	// rename fails under Windows.
+	String oldSaveName = saveFile.getAbsolutePath() + ".old";
+	File oldSave = new File (oldSaveName);
+	if (oldSave.exists())
+	  oldSave.delete();
+	
+	String fileName = new String(saveFile.getAbsolutePath());
+	saveFile.renameTo(oldSave);
+	outputFile.renameTo(new File(fileName));
+	
+      } catch (Exception e) {
+	System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + saveFile.getName() + ": " + e.getMessage()));
+	e.printStackTrace(System.err);
       }
+      
     }
-
-    /*
-     * Converts encoded &#92;uxxxx to unicode chars
-     * and changes special saved chars to their original forms
-     *
-     * ripped directly from java.util.Properties; hope they don't mind.
-     */
-    private String loadConvert (String theString) {
-        char aChar;
-        int len = theString.length();
-        StringBuffer outBuffer = new StringBuffer(len);
-
-        for(int x=0; x<len; ) {
-            aChar = theString.charAt(x++);
-            if (aChar == '\\') {
-                aChar = theString.charAt(x++);
-                if(aChar == 'u') {
-                    // Read the xxxx
-                    int value=0;
-		    for (int i=0; i<4; i++) {
-		        aChar = theString.charAt(x++);
-		        switch (aChar) {
-		          case '0': case '1': case '2': case '3': case '4':
-		          case '5': case '6': case '7': case '8': case '9':
-		             value = (value << 4) + aChar - '0';
-			     break;
-			  case 'a': case 'b': case 'c':
-                          case 'd': case 'e': case 'f':
-			     value = (value << 4) + 10 + aChar - 'a';
-			     break;
-			  case 'A': case 'B': case 'C':
-                          case 'D': case 'E': case 'F':
-			     value = (value << 4) + 10 + aChar - 'A';
-			     break;
-			  default:
-                              throw new IllegalArgumentException(
-                                           "Malformed \\uxxxx encoding.");
-                        }
-                    }
-                    outBuffer.append((char)value);
-                } else {
-                    if (aChar == 't') aChar = '\t';
-                    else if (aChar == 'r') aChar = '\r';
-                    else if (aChar == 'n') aChar = '\n';
-                    else if (aChar == 'f') aChar = '\f';
-                    outBuffer.append(aChar);
-                }
-            } else
-                outBuffer.append(aChar);
-        }
-        return outBuffer.toString();
+  }
+  
+  /*
+   * Converts encoded &#92;uxxxx to unicode chars
+   * and changes special saved chars to their original forms
+   *
+   * ripped directly from java.util.Properties; hope they don't mind.
+   */
+  private String loadConvert (String theString) {
+    char aChar;
+    int len = theString.length();
+    StringBuffer outBuffer = new StringBuffer(len);
+    
+    for(int x=0; x<len; ) {
+      aChar = theString.charAt(x++);
+      if (aChar == '\\') {
+	aChar = theString.charAt(x++);
+	if(aChar == 'u') {
+	  // Read the xxxx
+	  int value=0;
+	  for (int i=0; i<4; i++) {
+	    aChar = theString.charAt(x++);
+	    switch (aChar) {
+	    case '0': case '1': case '2': case '3': case '4':
+	    case '5': case '6': case '7': case '8': case '9':
+	      value = (value << 4) + aChar - '0';
+	      break;
+	    case 'a': case 'b': case 'c':
+	    case 'd': case 'e': case 'f':
+	      value = (value << 4) + 10 + aChar - 'a';
+	      break;
+	    case 'A': case 'B': case 'C':
+	    case 'D': case 'E': case 'F':
+	      value = (value << 4) + 10 + aChar - 'A';
+	      break;
+	    default:
+	      throw new IllegalArgumentException(
+						 "Malformed \\uxxxx encoding.");
+	    }
+	  }
+	  outBuffer.append((char)value);
+	} else {
+	  if (aChar == 't') aChar = '\t';
+	  else if (aChar == 'r') aChar = '\r';
+	  else if (aChar == 'n') aChar = '\n';
+	  else if (aChar == 'f') aChar = '\f';
+	  outBuffer.append(aChar);
+	}
+      } else
+	outBuffer.append(aChar);
     }
+    return outBuffer.toString();
+  }
 
     /*
      * Converts unicodes to encoded &#92;uxxxx

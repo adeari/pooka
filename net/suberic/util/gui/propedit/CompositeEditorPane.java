@@ -156,17 +156,20 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
       currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
       
-      if (currentEditor.labelComponent != null) {
-	layout.setConstraints(currentEditor.labelComponent, constraints);
-	contentPanel.add(currentEditor.labelComponent);
-      }
-      
       if (currentEditor.valueComponent != null) {
+	if (currentEditor.labelComponent != null) {
+	  layout.setConstraints(currentEditor.labelComponent, constraints);
+	  contentPanel.add(currentEditor.labelComponent);
+	}
 	constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
 	layout.setConstraints(currentEditor.valueComponent, constraints);
 	contentPanel.add(currentEditor.valueComponent);
+      } else {
+	constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
+	layout.setConstraints(currentEditor, constraints);
+	contentPanel.add(currentEditor);
       }
-      
+
       constraints.weightx = 0.0;
       constraints.gridwidth = 1;
       

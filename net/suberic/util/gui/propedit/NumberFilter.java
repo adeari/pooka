@@ -42,7 +42,6 @@ public class NumberFilter implements ConfigurablePropertyEditorListener {
    */
   public void propertyChanging(PropertyEditorUI source, String property, String newValue) throws PropertyValueVetoException {
     try {
-      System.err.println("newValue = '" + newValue + "'");
       if (newValue != null && newValue.length() > 0 ) {
 	int currentValue = Integer.parseInt(newValue);
 	if (checkMin) {
