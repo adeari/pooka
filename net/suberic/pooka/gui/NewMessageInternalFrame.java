@@ -113,7 +113,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
       } 
     }
      
-    return null;
+    return tm.getDefaultTheme();
   }   
 
   /**

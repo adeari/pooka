@@ -153,7 +153,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
       return tm.getTheme(id);
     } 
     
-    return null;
+    return tm.getDefaultTheme();
   }
 
   /**

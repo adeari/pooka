@@ -124,10 +124,11 @@ public class ReadMessageFrame extends MessageFrame {
       String id = Pooka.getProperty(fi.getFolderProperty() + ".theme", "");
       if (id != null && ! id.equals("")) {
 	return tm.getTheme(id);
-      } 
+      }
     } 
 
-    return null;
+    return tm.getDefaultTheme();
+    
   }
 
     /**

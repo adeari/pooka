@@ -792,6 +792,10 @@ Pooka.theme.editableFields.smallFont._enabledBox=true
 Pooka.theme.editableFields.monospacedFont.propertyType=Font
 Pooka.theme.editableFields.monospacedFont._enabledBox=true
 
+Pooka.theme._default=default
+Pooka.theme._default.propertyType=List
+Pooka.theme._default.allowedValues=Pooka.theme
+
 Pooka.looknfeel.propertyType=List
 Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunststoff
 Pooka.looknfeel.listMapping.Metal.value=javax.swing.plaf.metal.MetalLookAndFeel

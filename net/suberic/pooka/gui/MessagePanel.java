@@ -657,7 +657,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       return tm.getTheme(id);
     } 
     
-    return null;
+    return tm.getDefaultTheme();
   }
 
   /**

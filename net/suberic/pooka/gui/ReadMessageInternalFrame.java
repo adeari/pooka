@@ -129,7 +129,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
       } 
     } 
 
-    return null;
+    return tm.getDefaultTheme();
   }
 
     public void detachWindow() {

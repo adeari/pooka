@@ -2,14 +2,21 @@
 *) bug:  in preview mode, select multiple messages, including the last
 	one.  delete.  get error.
 
+*) make it so starting up is quicker (?).  -- check with threading, maybe?
+	either multiple threads for folders, or maybe check the threading
+	and connections for javamail.
+
+*) fix the network connection test so that it doesn't hang if the
+	network is up, but the test host is unreachable.
+
 *) detach a message from the desktop pane.  do an open with.  it uses the
 	jdesktoppane, not a standalone window.
 
 *) detach a message.  reply to it.
 
-*) check:  new messages in subfolders in disconnected mode.
-
 ----------
+
+*) splashscreen?
 
 *) NPE -- is that from switching from preview to desktop?
 	-- check window menu from switching preview to desktop.
@@ -34,10 +41,12 @@
 	*)  add some sort of an administrative api to the NetworkConnection
 		so that the application and the admin tools (the bottom right
 		config) don't have the same restrictions (or lack thereof).
+		 -- somewhat started with the new test address api.
 	*)  change the new user setup so that it configures an outbox
 		automatically.
 	*) make it so there is some way for the NetworkConnection to detect
 		whether or not it's up.
+			-- started.  make sure it's enough.
 
 	-- search --
 
@@ -69,6 +78,9 @@
 
 *)  ?? if network connection goes down, pooka hangs on exit.
 
+*) disconnected from store (like if the server goes down) doesn't result in 
+icons changing?  test.
+
 +++++++
 
 *) add support for jdk1.4
@@ -87,9 +99,6 @@
 say, like reacting to a mailto: link.
 
 *) add a search and replace for the message editors.
-
-*) disconnected from folder (like if the server goes down) doesn't result in 
-icons changing?  test.
 
 	-- disconnected imap --
 

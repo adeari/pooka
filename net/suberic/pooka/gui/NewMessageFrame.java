@@ -113,7 +113,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
       } 
     }
      
-    return null;
+    return tm.getDefaultTheme();
   }   
 
 
