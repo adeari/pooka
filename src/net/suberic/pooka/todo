@@ -281,10 +281,7 @@ preview:
 
 *) threading of attachment actions.
 
-+++ version 1.1 +++++++++++++++ 
-
 *) add support for jdk1.4
-	-- new printing system.
 	-- NetworkInterface classes
 
 *) add ldap support
@@ -413,6 +410,22 @@ should only be a few of these left.
 *) add ability of setting return values by hand (not by UserProfile) on 
 	new messages.
 
+
+*) mail import?
+
+*) follow-ups?
+
+*) write html mail?
+
+*) 'advanced searching'
+
+*) search folders
+
+*) 'do not download this mail' rule
+
+*) labels?
+
+*) message threading
 
 *) make an option where message windows size to the viewport of the
 desktop pane.
