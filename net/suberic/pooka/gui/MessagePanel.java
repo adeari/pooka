@@ -45,7 +45,7 @@ public class MessagePanel extends JDesktopPane {
     }
 
     public void openFolderWindow(FolderInfo f) {
-	FolderWindow newFolderWindow = new FolderWindow(f);
+	FolderWindow newFolderWindow = new FolderWindow(f, this);
 	newFolderWindow.pack();
 	this.add(newFolderWindow);
 	try {
