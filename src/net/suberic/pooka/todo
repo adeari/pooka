@@ -1,14 +1,18 @@
 *) bug:  can't switch back to original theme in theme configuration (starts
 	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
 
------------
+*) change FolderTracker to use events rather than synchronizing on the
+   folder lock.
+
+*) connecting when server is down:  connection refused error message
+	really terribly formatted.
+
 *) support jdk 1.5
    *) JOptionPane error on initial startup; hangs.
 	done?  test?
-   *) add support for ocean theme 
+   *) ?? add support for ocean theme 
 
 *) fix TLS/SSL support for SMTP with new javamail 1.3.2.
-*) fix non-plaintext-password support with imap (logindisabled)
 
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:
@@ -19,7 +23,31 @@
 *) take shutdown off of awt thread.
 *) test timeouts; make sure that javamail timeout doesn't apply while
    data is still being transferred.  or for ssl for that matter.
-	
+*) test what happens if your connection fails during a LoadMessageThread action.
+*) add a way to tell what a store's (and folder's) current thread is up to.
+
+*) fix AttachmentPane.openAction from showing dialog on store thread instead
+	of AWTEventThread.
+*) fix open as attachment so that we get some indication of what's happening.
+   esp for long downloads and process failures.
+
+*) modify date format so that it only defaults to MM/dd/yy in the US.
+
+*) fix cryptix inclusion from webstart.
+
+*) fix disconnection handling really.
+   -) order of events.
+   -) handling of events, including timeouts and such.
+	- check isConnected() on IMAPStore
+	  -- download javamail source.  sigh.
+	- check order of handlings; make sure we don't end up in a 
+	  situation where we wait too long to check the connection status.
+   -) make sure auto-reconnects work.
+   
+-----------
+
+*) fix non-plaintext-password support with imap (logindisabled)
+
 *) add support for running without any local files.
    *) big tasks:  
       *) url access for all file resources
@@ -57,29 +85,9 @@
 *) fix problem with starting up work account and having it select first
 	message (???)
 
-*) add a way to tell what a store's (and folder's) current thread is up to.
-
-*) fix AttachmentPane.openAction from showing dialog on store thread instead
-	of AWTEventThread.
-*) fix open as attachment so that we get some indication of what's happening.
-   esp for long downloads and process failures.
-
-*) modify date format so that it only defaults to MM/dd/yy in the US.
-
-*) fix cryptix inclusion from webstart.
-
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
 
-*) fix disconnection handling really.
-   -) order of events.
-   -) handling of events, including timeouts and such.
-	- check isConnected() on IMAPStore
-	  -- download javamail source.  sigh.
-	- check order of handlings; make sure we don't end up in a 
-	  situation where we wait too long to check the connection status.
-   -) make sure auto-reconnects work.
-   
 -----
 
 *) test w/gnu javamail -- ???

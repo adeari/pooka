@@ -456,6 +456,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * opened folder.
      */
     public void openFolder(int mode) throws MessagingException {
+      //System.err.println("timing:  opening folder " + getFolderID());
+      //long currentTime = System.currentTimeMillis();
 
       getLogger().log(Level.FINE, this + ":  checking parent store.");
       
@@ -493,6 +495,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
       }
       
+      //System.err.println("timing:  opening folder " + getFolderID() + " took " + (System.currentTimeMillis() - currentTime) + " milliseconds.");
+
     }
   
   /**
@@ -529,7 +533,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
       }
     }
-  
+
+  /**
+   * Handles the threading of doing an openAllFolders.
+   */
   private void doOpenFolders(FolderInfo fi, int mode) {
     if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
       final FolderInfo current = fi;
@@ -542,8 +549,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     } else {
       fi.openAllFolders(mode);
     }
-
-
   }
   
   /**
@@ -563,12 +568,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       setFolderDisplayUI(null);
     }
     
-    /*
-      if (getFolderTracker() != null) {
+    if (getFolderTracker() != null) {
       getFolderTracker().removeFolder(this);
       setFolderTracker(null);
-      }
-    */
+    }
     
     if (isLoaded() && isValid()) {
       setStatus(CLOSED);
@@ -1089,18 +1092,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // to keep the stores/folders open, either.  :)
     
     if (isConnected()) {
-      //try {
-      //Store s = getParentStore().getStore();
       Folder current = getFolder();
       if (current != null && current.isOpen()) {
 	current.getNewMessageCount();
 	current.getUnreadMessageCount();
       }
-      //} catch ( MessagingException me ) {
-      //  if ( ! s.isConnected() )
-      //    s.connect();
-      //}
-      
       resetMessageCounts();
     }
   }
@@ -1110,7 +1106,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * there are no unread messages, or if the FolderTableModel is not
    * set or empty.
    */
-  
   public int getFirstUnreadMessage() {
     getLogger().log(Level.FINE, "getting first unread message");
     
@@ -1590,7 +1585,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This deletes the underlying Folder.
    */
   public void delete() throws MessagingException {
-    
     if (! isLoaded())
       loadFolder();
 
@@ -1600,7 +1594,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     unsubscribe();
 
-    f.close(true);
+    if (f.isOpen())
+      f.close(true);
     f.delete(true);
   }
   

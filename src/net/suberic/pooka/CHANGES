@@ -1,4 +1,7 @@
-fixed a bug in the LIstEditor where values that hadn't changed were reported
+fixed a display bug in which a line that was the exact length of the display
+field then followed by a newline would add in an extra, unnecessary newline.
+
+fixed a bug in the ListEditor where values that hadn't changed were reported
 as having changed.
 
 modified the connection checks on folder closes so it should be more efficient.

@@ -112,52 +112,57 @@ public class LoadMessageThread extends Thread {
 	totalMessageCount = messages.size() + getQueueSize() + loadedMessageCount;
 	if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
 	  synchronized(folderInfo.getFolderThread().getRunLock()) {
-	    // break when either we've been stopped or we're out of messages,
-	    for (int batchCount = 0; ! stopped && batchCount < messages.size(); batchCount++) {
-	      mp=(MessageProxy)messages.get(batchCount);
-	      
-	      // if the message hasn't been fetched, then fetch fetchBatchSize
-	      // worth of messages.
-	      if (! mp.getMessageInfo().hasBeenFetched()) {
-		try {
-		  List fetchList = new ArrayList();
-		  for (int j = batchCount; fetchList.size() < fetchBatchSize && j < messages.size(); j++) {
-		    MessageInfo fetchInfo = ((MessageProxy) messages.get(j)).getMessageInfo();
-		    if (! fetchInfo.hasBeenFetched()) {
-		      fetchList.add(fetchInfo);
-		      //fetchInfo.setFetched(true);
+	    try {
+	      folderInfo.getFolderThread().setCurrentActionName("Loading messages.");
+	      // break when either we've been stopped or we're out of messages,
+	      for (int batchCount = 0; ! stopped && batchCount < messages.size(); batchCount++) {
+		mp=(MessageProxy)messages.get(batchCount);
+		
+		// if the message hasn't been fetched, then fetch fetchBatchSize
+		// worth of messages.
+		if (! mp.getMessageInfo().hasBeenFetched()) {
+		  try {
+		    List fetchList = new ArrayList();
+		    for (int j = batchCount; fetchList.size() < fetchBatchSize && j < messages.size(); j++) {
+		      MessageInfo fetchInfo = ((MessageProxy) messages.get(j)).getMessageInfo();
+		      if (! fetchInfo.hasBeenFetched()) {
+			fetchList.add(fetchInfo);
+			//fetchInfo.setFetched(true);
+		      }
 		    }
+		  
+		    MessageInfo[] toFetch = new MessageInfo[fetchList.size()];
+		    toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
+		    getFolderInfo().fetch(toFetch, fetchProfile);
+		  } catch(MessagingException me) {
+		    System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+		    me.printStackTrace();
 		  }
 		  
-		  MessageInfo[] toFetch = new MessageInfo[fetchList.size()];
-		  toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
-		  getFolderInfo().fetch(toFetch, fetchProfile);
-		} catch(MessagingException me) {
-		  System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
-		  me.printStackTrace();
 		}
 		
-	      }
-	      
-	      // now load each individual messageproxy.
-	      // and refresh each message.
-	      try {
-		if (! mp.isLoaded())
+		// now load each individual messageproxy.
+		// and refresh each message.
+		try {
+		  if (! mp.isLoaded())
 		  mp.loadTableInfo();
-		if (mp.needsRefresh())
-		  mp.refreshMessage();
-		else if (! mp.matchedFilters()) {
-		  mp.matchFilters();
+		  if (mp.needsRefresh())
+		    mp.refreshMessage();
+		  else if (! mp.matchedFilters()) {
+		    mp.matchFilters();
 		}
-	      } catch (Exception e) {
-		e.printStackTrace();
+		} catch (Exception e) {
+		  e.printStackTrace();
+		}
+		
+		loadedMessageCount++;
+		if (++updateCounter >= getUpdateMessagesCount()) {
+		  fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, loadedMessageCount, totalMessageCount);
+		  updateCounter = 0;		   
+		}
 	      }
-	      
-	      loadedMessageCount++;
-	      if (++updateCounter >= getUpdateMessagesCount()) {
-		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, loadedMessageCount, totalMessageCount);
-		updateCounter = 0;		   
-	      }
+	    } finally {
+	      folderInfo.getFolderThread().setCurrentActionName("");
 	    }
 	  } // end synchronized
 	} else {

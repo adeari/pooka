@@ -207,23 +207,67 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    */
   public int showConfirmDialog(String message, String title, int type) {
     String displayMessage = formatMessage(message);
-    return JOptionPane.showInternalConfirmDialog(messagePanel, displayMessage, title, type);
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    final String fDisplayMessage = displayMessage;
+    final String fTitle = title;
+    final int fType = type;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fDisplayMessage, fTitle, fType));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getInt();
   }
   
   /**
    * Shows a Confirm dialog with the given Object[] as the Message.
    */
   public int showConfirmDialog(Object[] messageComponents, String title, int type) {
-    return JOptionPane.showInternalConfirmDialog(messagePanel, messageComponents, title, type);
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    final Object[] fMessageComponents = messageComponents;
+    final String fTitle = title;
+    final int fType = type;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fMessageComponents, fTitle, fType));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getInt();
   }
   
   /**
    * This shows an Error Message window.
    */
   public void showError(String errorMessage, String title) {
-    String displayErrorMessage = formatMessage(errorMessage);
+    final String displayErrorMessage = formatMessage(errorMessage);
+    final String fTitle = title;
+
     if (showing) {
-      JOptionPane.showInternalMessageDialog(getMessagePanel(), displayErrorMessage, title, JOptionPane.ERROR_MESSAGE);
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    JOptionPane.showInternalMessageDialog(getMessagePanel(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
+	  }
+	});
     } else
       System.out.println(errorMessage);
     
@@ -247,9 +291,15 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This shows an Error Message window.
    */
   public void showError(String errorMessage, String title, Exception e) {
-    String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
+    final String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
+    final Exception fE = e;
+    final String fTitle = title;
     if (showing) {
-      JOptionPane.showInternalMessageDialog(getMessagePanel(), createErrorPanel(displayErrorMessage, e), title, JOptionPane.ERROR_MESSAGE);
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    JOptionPane.showInternalMessageDialog(getMessagePanel(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
+	  }
+	});
     } else
       System.out.println(errorMessage);
 
@@ -260,15 +310,33 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This formats a display message.
    */
   public String formatMessage(String message) {
-    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, '\n', 5);
+    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
   }
 
   /**
    * This shows an Input window.
    */
   public String showInputDialog(String inputMessage, String title) {
-    String displayMessage = formatMessage(inputMessage);
-    return JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, title, JOptionPane.QUESTION_MESSAGE);
+    final String displayMessage = formatMessage(inputMessage);
+    final String fTitle = title;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getString();
   }
   
   /**
@@ -277,15 +345,49 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * implementation of the dialog.
    */
   public String showInputDialog(Object[] inputPanes, String title) {
-    return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+    final String fTitle = title;
+    final Object[] fInputPanes = inputPanes;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getString();
   }
   
   /**
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
-    String displayMessage = formatMessage(newMessage);
-    JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, title, JOptionPane.PLAIN_MESSAGE);
+    final String displayMessage = formatMessage(newMessage);
+    final String fTitle = title;
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+	}
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
     }
   
   /**

@@ -167,4 +167,11 @@ public class ActionThread extends Thread {
   public String getCurrentActionName() {
     return mCurrentActionName;
   }
+
+  /**
+   * Sets the name of the current action.
+   */
+  public void setCurrentActionName(String pCurrentActionName) {
+    mCurrentActionName = pCurrentActionName;
+  }
 }

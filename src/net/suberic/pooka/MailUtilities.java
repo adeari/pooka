@@ -223,6 +223,12 @@ public class MailUtilities {
     for (int caret = breakLength; breakLocation == -1 && caret >= 0; caret--) {
       if (Character.isWhitespace(buffer.charAt(caret))) {
 	breakLocation=caret + 1;
+	if (breakLocation < buffer.length()) {
+	  // check to see if the next character is a line feed of some sort.
+	  char nextChar = buffer.charAt(breakLocation);
+	  if (nextChar == '\n' || nextChar == 'r')
+	    breakLocation ++;
+	}
       } 
     }
     
@@ -235,7 +241,7 @@ public class MailUtilities {
   /**
    * This takes a String and word wraps it at length wrapLength.
    */
-  public static String wrapText(String originalText, int wrapLength, char lineBreak, int tabSize) {
+  public static String wrapText(String originalText, int wrapLength, String lineBreak, int tabSize) {
     if (originalText == null)
       return null;
     
@@ -268,13 +274,17 @@ public class MailUtilities {
   /**
    * This just acts as an indexOf on a StringBuffer.
    */
-  public static int indexOf(StringBuffer buffer, char toFind, int start) {
+  public static int indexOf(StringBuffer buffer, String toFind, int start) {
+    /*
     for (int i = start; i < buffer.length(); i++) {
       if (toFind == buffer.charAt(i))
 	return i;
     }
     
     return -1;
+    */
+
+    return buffer.indexOf(toFind, start);
   }
 
   /**
@@ -297,7 +307,7 @@ public class MailUtilities {
     } catch (Exception e) {
       tabSize = 8;
     }
-    return wrapText(originalText, wrapLength, '\n', tabSize);
+    return wrapText(originalText, wrapLength, "\r\n", tabSize);
   }
   
   /**

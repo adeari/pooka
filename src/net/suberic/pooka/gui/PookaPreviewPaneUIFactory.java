@@ -185,7 +185,26 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    */    
   public int showConfirmDialog(String messageText, String title, int type) {
     String displayMessage = formatMessage(messageText);
-    return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), displayMessage, title, type);
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    final String fDisplayMessage = displayMessage;
+    final String fTitle = title;
+    final int fType = type;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fDisplayMessage, fTitle, fType));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getInt();
   }
   
 
@@ -193,7 +212,26 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * Shows a Confirm dialog with the given Object[] as the Message.
    */
   public int showConfirmDialog(Object[] messageComponents, String title, int type) {
-    return JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), messageComponents, title, type);
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    final Object[] fMessageComponents = messageComponents;
+    final String fTitle = title;
+    final int fType = type;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fMessageComponents, fTitle, fType));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getInt();
   }
   
   /**
@@ -202,8 +240,19 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, String title) {
-    String displayErrorMessage = formatMessage(errorMessage);
-    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayErrorMessage, title, JOptionPane.ERROR_MESSAGE);
+    final String displayErrorMessage = formatMessage(errorMessage);
+    final String fTitle = title;
+
+    if (showing) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
+	  }
+	});
+    } else
+      System.out.println(errorMessage);
+    
+    
   }
   
   /**
@@ -230,12 +279,18 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, String title, Exception e) {
-    String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
+    final String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
+    final Exception fE = e;
+    final String fTitle = title;
     if (showing) {
-      JOptionPane.showMessageDialog(contentPanel.getUIComponent(), createErrorPanel(displayErrorMessage, e), title, JOptionPane.ERROR_MESSAGE);
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
+	  }
+	});
     } else
       System.out.println(errorMessage);
-
+    
     //e.printStackTrace();
   }
   
@@ -243,7 +298,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * This formats a display message.
    */
   public String formatMessage(String message) {
-    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, '\n', 5);
+    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
   }
   
   /**
@@ -252,8 +307,26 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * implementation of the dialog.
    */
   public String showInputDialog(String inputMessage, String title) {
-    String displayMessage = formatMessage(inputMessage);
-    return JOptionPane.showInputDialog(contentPanel.getUIComponent(), displayMessage, title, JOptionPane.QUESTION_MESSAGE);
+    final String displayMessage = formatMessage(inputMessage);
+    final String fTitle = title;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getString();
   }
   
   /**
@@ -262,7 +335,27 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * implementation of the dialog.
    */
   public String showInputDialog(Object[] inputPanes, String title) {
-    return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+    final String fTitle = title;
+    final Object[] fInputPanes = inputPanes;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getString();
+
   }
   
   /**
@@ -276,8 +369,23 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
-    String displayMessage = formatMessage(newMessage);
-    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, title, JOptionPane.PLAIN_MESSAGE);
+    final String displayMessage = formatMessage(newMessage);
+    final String fTitle = title;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+	}
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
   }
   
   /**

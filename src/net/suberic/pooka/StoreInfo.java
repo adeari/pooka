@@ -270,6 +270,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       //p.setProperty("mail.imaps.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".port", "993"));
     }
 
+    // use a dedicated store connection.
+    p.setProperty("mail.imap.separatestoreconnection", "true");
+    p.setProperty("mail.imaps.separatestoreconnection", "true");
   }
 
   /**
@@ -909,23 +912,35 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Shows the current status for this store and its thread.
    */
   public void showStatus() {
+    StringBuffer statusBuffer = new StringBuffer();
     getLogger().log(Level.INFO, "Status for store " + getStoreID());
-    getLogger().log(Level.INFO, "Connected:  " + isConnected());
+    statusBuffer.append("Status for store " + getStoreID() + "\r\n");
+    boolean infoIsConnected = isConnected();
+    getLogger().log(Level.INFO, "Connected:  " + infoIsConnected);
+    statusBuffer.append("Connected:  " + infoIsConnected + "\r\n");
     if (store != null) {
-      getLogger().log(Level.INFO, "store.isConnected():  " + store.isConnected());
+      boolean storeIsConnected = store.isConnected();
+      getLogger().log(Level.INFO, "store.isConnected():  " + storeIsConnected);
+      statusBuffer.append("store.isConnected():  " + storeIsConnected + "\r\n");
     } else {
       getLogger().log(Level.INFO, "No store object.");
     }
 
     if (storeThread != null) {
-      getLogger().log(Level.INFO, "Current Action:  " + storeThread.getCurrentActionName());
-      getLogger().log(Level.INFO, "Action Queue Size:  " + storeThread.getQueueSize());
+      String currentAction = storeThread.getCurrentActionName();
+      getLogger().log(Level.INFO, "Current Action:  " + currentAction);
+      statusBuffer.append("Current Action:  " + currentAction + "\r\n");
+      int queueSize = storeThread.getQueueSize();
+      getLogger().log(Level.INFO, "Action Queue Size:  " + queueSize);
+      statusBuffer.append("Action Queue Size:  " + queueSize +"\r\n");
       if (storeThread.getQueueSize() > 0) {
 	System.out.println("Queue:");
 	java.util.List queue = storeThread.getQueue();
 	for (int i = 0; i < queue.size(); i++) {
 	  net.suberic.util.thread.ActionThread.ActionEventPair current = (net.suberic.util.thread.ActionThread.ActionEventPair) queue.get(i);
-	  System.out.println("  queue[" + i + "]:  " + current.action.getValue(javax.swing.Action.NAME));
+	  String queueString = "  queue[" + i + "]:  " + current.action.getValue(javax.swing.Action.NAME); 
+	  System.out.println(queueString);
+	  statusBuffer.append(queueString + "\r\n");
 	}
       }
     } else {
@@ -939,10 +954,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       java.lang.reflect.Method stackTraceMethod = threadClass.getMethod("getStackTrace", new Class[0]);
       if (stackTraceMethod != null) {
 	System.out.println("Stack Trace:");
+	statusBuffer.append("Stack Trace:\r\n");
 	Object returnValue = stackTraceMethod.invoke(storeThread, null);
 	Object[] objectArray = (Object[]) returnValue;
 	for (int i = 0; i < objectArray.length; i++) {
-	  System.out.println("  " + objectArray[i]);
+	  String stackLine = "  " + objectArray[i];
+	  System.out.println(stackLine);
+	  statusBuffer.append(stackLine + "\r\n");
 	}
       }
 
@@ -950,6 +968,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       // ignore.  probably not on jdk 1.5.
     }
 
+    Pooka.getUIFactory().showMessage(statusBuffer.toString(), "Status for " + getStoreID());
   }
 
   // Accessor methods.
