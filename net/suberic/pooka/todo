@@ -1,6 +1,8 @@
 alpha 2
 ----------
 
+*) enable voice control
+
 *) make MailUtilities handle nested attachments properly.  also honour
 multipart/alternative content.
 
@@ -44,6 +46,8 @@ address fields--right now it makes the entire window huge.
 
 *) create a Trash folder.
 
+*) make the DesktopPane scroll/resize properly.
+
 after alpha 2
 ----------------
 
@@ -85,7 +89,23 @@ too much date info, not enough Subject.
 
 *) add ability to reply/forward with attachments, or as inline, and so forth
 
-*) enable voice control
+*) add copying messages.
+
+*) add undo/redo support
+
+*) select all/all messages
+
+*) add interfaces for all of the features.  :)
+
+*) add support for mail filters.
+
+*) add more font support
+
+*) add 'edit message as new'
+
+*) add address book and alias support
+
+*) add ldap support
 
 -------
 
