@@ -1,9 +1,14 @@
 beta 1
 ---------------
 
-*) add ability to reply/forward with attachments, or as inline, and so forth
+*)  fix the out of memory problems--only load a certain amount of large
+messages.  for that matter, maybe also do an optimizeit audit.
 
-*) bug:  send mail seems to be on the awt event thread.
+*) add address book and alias support
+
+*) add copying messages.
+
+*) add ability to reply/forward with attachments, or as inline, and so forth
 
 *) bug:  no dialog is shown when you do a save-as for an attachment.
 
@@ -22,7 +27,13 @@ ones that come in while you're already connected are labelled like that.
 
 ui engine
 ---------
-*)  make the windows detachable.
+*)  make the windows detachable. 
+	-- done, at least for read messages and new message.
+	-- to fix:  1)  location isn't quite right for top-level frame to
+	   intenral frame change.
+	-- 2)  make it not get included for preview pane ui windows.
+	-- 3)  make it available for folder windows?
+
 
 *) fix all of the thread issues that i've introduced.  :)
 
@@ -35,8 +46,6 @@ so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
 
 *) add the ability to save messages to files.
-
-*) add copying messages.
 
 *) add undo/redo support
 
@@ -70,10 +79,7 @@ searching
 
 other
 -----
-*)  fix the out of memory problems--only load a certain amount of large
-messages.  for that matter, maybe also do an optimizeit audit.
-
-*) add address book and alias support
+*) bug:  send mail seems to be on the awt event thread.
 
 *) fix bug with showing a new message--right now, if your imap connection is
 hanging and you try to show a new message, the entire app will hang.
