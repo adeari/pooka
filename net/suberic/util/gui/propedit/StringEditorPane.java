@@ -42,6 +42,7 @@ public class StringEditorPane extends SwingPropertyEditor {
 	    try {
 	      firePropertyChangingEvent(inputField.getText());
 	      currentValue = inputField.getText();
+	      firePropertyChangedEvent(currentValue);
 	    } catch (PropertyValueVetoException pvve) {
 	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + inputField.getText() + ":  " + pvve.getReason());
 	      inputField.setText(currentValue);
@@ -64,11 +65,11 @@ public class StringEditorPane extends SwingPropertyEditor {
   public void setValue() throws PropertyValueVetoException {
     if (isEnabled() && !(inputField.getText().equals(currentValue))) {
       firePropertyChangingEvent(inputField.getText());
+      firePropertyChangedEvent(inputField.getText());
     }
 
     if (isEnabled() && !(inputField.getText().equals(originalValue))) {
       manager.setProperty(property, inputField.getText());
-      firePropertyChangedEvent(inputField.getText());
     }
   }
   
@@ -95,6 +96,7 @@ public class StringEditorPane extends SwingPropertyEditor {
 	if (! currentValue.equals(originalValue)) {
 	  firePropertyChangingEvent(originalValue);
 	  currentValue = originalValue;
+	  firePropertyChangedEvent(originalValue);
 	}
 	inputField.setText(originalValue);
       } catch (PropertyValueVetoException pvve) {

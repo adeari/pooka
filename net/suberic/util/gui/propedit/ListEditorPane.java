@@ -103,6 +103,7 @@ public class ListEditorPane extends SwingPropertyEditor {
 	    String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
 	    try {
 	      firePropertyChangingEvent(newValue);
+	      firePropertyChangedEvent(newValue);
 	      currentIndex = newIndex;
 	    } catch (PropertyValueVetoException pvve) {
 	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
@@ -151,11 +152,11 @@ public class ListEditorPane extends SwingPropertyEditor {
     try {
       if (newIndex != currentIndex) {
 	firePropertyChangingEvent(currentValue);
+	firePropertyChangedEvent(currentValue);
 	currentIndex = newIndex;
       }
       if (isEnabled() && isChanged()) { 
 	manager.setProperty(property, currentValue);
-	firePropertyChangedEvent(currentValue);
       }
     } catch (PropertyValueVetoException pvve) {
       manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());

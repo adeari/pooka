@@ -43,10 +43,10 @@ public class BooleanEditorPane extends SwingPropertyEditor {
 	  }
 	  try {
 	    firePropertyChangingEvent(newValue);
+	    firePropertyChangedEvent(newValue);
 	  } catch (PropertyValueVetoException pvve) {
 	    manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());
 	    inputField.setSelected(! inputField.isSelected());
-	    
 	  }
 	}
       });
@@ -70,9 +70,8 @@ public class BooleanEditorPane extends SwingPropertyEditor {
 	  newValue = "true";
 	else
 	  newValue = "false";
-
+	
 	manager.setProperty(property, newValue);
-	firePropertyChangedEvent(newValue);
       }
 
     }

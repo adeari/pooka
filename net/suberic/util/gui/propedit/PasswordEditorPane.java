@@ -41,6 +41,7 @@ public class PasswordEditorPane extends StringEditorPane {
 	  if (! newPassword.equals(currentValue)) {
 	    try {
 	      firePropertyChangingEvent(newPassword);
+	      firePropertyChangedEvent(newPassword);
 	      currentValue = newPassword;
 	    } catch (PropertyValueVetoException pvve) {
 	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + ":  " + pvve.getReason());
@@ -66,11 +67,11 @@ public class PasswordEditorPane extends StringEditorPane {
     
     if (isEnabled() && ! (value.equals(currentValue))) {
       firePropertyChangingEvent(value);
+      firePropertyChangedEvent(value);
     }
     
     if (isEnabled() && !(value.equals(originalValue))) {
       manager.setProperty(property, scrambleString(value));
-      firePropertyChangedEvent(value);
     }
   }
   
@@ -99,6 +100,7 @@ public class PasswordEditorPane extends StringEditorPane {
       try {
 	if (! currentValue.equals(originalValue)) {
 	  firePropertyChangingEvent(originalValue);
+	  firePropertyChangedEvent(originalValue);
 	  currentValue = originalValue;
 	}
 	inputField.setText(originalValue);
