@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import net.suberic.pooka.gui.*;
 import net.suberic.pooka.thread.*;
 import net.suberic.pooka.event.*;
-import net.suberic.pooka.cache.*;
 import net.suberic.util.ValueChangeListener;
 import net.suberic.util.thread.ActionThread;
 
@@ -69,9 +68,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean sentFolder = false;
     private boolean trashFolder = false;
     
-    protected boolean uidFolder = false;
-    protected MessageCache cache = null;
-
     /**
      * Creates a new FolderInfo from a parent FolderInfo and a Folder 
      * name.
@@ -417,17 +413,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    if (!(getFolder().isOpen())) {
 		openFolder(Folder.READ_WRITE);
 	    }
+
 	    Message[] msgs = folder.getMessages();
 	    folder.fetch(msgs, fp);
 	    MessageInfo mi;
-
+	    
 	    for (int i = 0; i < msgs.length; i++) {
 		mi = new MessageInfo(msgs[i], this);
-
+		
 		messageProxies.add(new MessageProxy(getColumnValues() , mi));
 		messageToInfoTable.put(msgs[i], mi);
 	    }
-
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	}
@@ -1209,7 +1205,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     private void setFolder(Folder newValue) {
 	folder=newValue;
-	uidFolder = (folder instanceof UIDFolder);
     }
 
     /**
@@ -1239,15 +1234,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public String getFolderProperty() {
 	return "Store." + getFolderID();
-    }
-
-    /**
-     * Returns whether or not this FolderInfo wraps a UIDFolder or not.
-     *
-     * Note that this will return false until the Folder has been loaded.
-     */
-    public boolean isUIDFolder() {
-	return uidFolder;
     }
 
     public Vector getChildren() {
@@ -1315,14 +1301,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    addMessageCountListener(display);
 	    getFolder().addConnectionListener(display);
 	}
-    }
-
-    public javax.mail.internet.MimeMessage getMessageById(long uid) throws MessagingException {
-	if (folder != null && folder instanceof UIDFolder) {
-	    javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage) ((UIDFolder) folder).getMessageByUID(uid);
-	    return m;
-	}
-	return null;
     }
 
     /**
@@ -1425,14 +1403,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public FolderInfo getParentFolder() {
 	return parentFolder;
-    }
-
-    /**
-     * This returns the MessageCache associated with this FolderInfo,
-     * if any.
-     */
-    public MessageCache getCache() {
-	return cache;
     }
 
     /**
