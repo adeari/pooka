@@ -3,6 +3,24 @@ beta 1
 
 bug:  openwith doesn't work under preview.
 
+*) bug:  there's a problem either with line wrapping or with the size of the
+ReadMessageWindow.  They should be the same size, such that if you read a
+message that you wrote, the lines will wrap at the correct place.
+
+*) bug:  if you subscribe to a subfolder underneath another, already subscribed
+subfolder (i.e. you're subscribed to IMAP/foo, and then subscribe to 
+IMAP/zeta), then the parent folder gets renamed to the above subfolder (so
+you end up with foo/foo and foo/zeta).
+
+*) add ability to reply/forward with attachments, or as inline, and so forth
+
+*) add the ability for reply-all to exclude your own email address.
+
+*) bug:  send mail seems to be on the awt event thread.
+
+*) bug:  drop-down list, especially for defaultProfile, isn't populated
+properly when you add a new Mail Store.
+
 ui engine
 ---------
 *)  make the windows detachable.
@@ -19,18 +37,12 @@ a big ui overhaul.
 
 *) add the ability to save messages to files.
 
-*) add ability to reply/forward with attachments, or as inline, and so forth
-
 *) add copying messages.
 
 *) add undo/redo support
 
-*) add the ability for reply-all to exclude your own email address.
-
 protocol support
 ----------------
-*) add pop3/local mail spool support.
-
 *) add disconnected imap support.  thoughts:  1)  cache headers so that we
 can make an InternetHeaders object.  2)  cache full messages so we can get
 all the information we need off the Message.  3)  effectively have a 'real'
@@ -40,12 +52,12 @@ disconnected mode.
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.
 
+*) add pop3/local mail spool support.
+
 *) support for ssl?
 
 searching
 ---------
-*) add a search and replace for the message editors.
-
 *) add something to search through all messages in the folder.
 
 *) add support for mail filters.
@@ -54,6 +66,9 @@ searching
 	match type:  (not) contains, is, begins with, ends with, is before,
 	 	     is after
 	actions:  move to folder, change priority, delete, mark read
+
+*) add a search and replace for the message editors.
+
 other
 -----
 *)  fix the out of memory problems--only load a certain amount of large
@@ -67,18 +82,7 @@ hanging and you try to show a new message, the entire app will hang.
 *) same bug can happen when getting the attachment count from the Attachment
 Panel.  we need to cache that.
 
-*) bug:  there's a problem either with line wrapping or with the size of the
-ReadMessageWindow.  They should be the same size, such that if you read a
-message that you wrote, the lines will wrap at the correct place.
-
-*) bug:  send mail seems to be on the awt event thread.
-
 *) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
-
-*) bug:  if you subscribe to a subfolder underneath another, already subscribed
-subfolder (i.e. you're subscribed to IMAP/foo, and then subscribe to 
-IMAP/zeta), then the parent folder gets renamed to the above subfolder (so
-you end up with foo/foo and foo/zeta).
 
 *) loadMessageTracker?
 
