@@ -340,6 +340,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 		String folderID = ((FolderWindow)allFrames[i]).getFolderInfo().getFolderID();
 		if (! isFirst)
 		    savedFolderValues.append(":");
+
+		isFirst = false;
 		
 		savedFolderValues.append(folderID);
 	    }
