@@ -320,14 +320,15 @@ public class NewAccountPooka {
     if (! subFolderDir.exists())
       subFolderDir.mkdirs();
     
-    File sentFile = new File(subFolderDirName + File.separator + "sent");
-    if (! sentFile.exists())
+    /*
+      File sentFile = new File(subFolderDirName + File.separator + "sent");
+      if (! sentFile.exists())
       sentFile.createNewFile();
-    
-    File outboxFile = new File(subFolderDirName + File.separator + "outbox");
-    if (! outboxFile.exists())
+      
+      File outboxFile = new File(subFolderDirName + File.separator + "outbox");
+      if (! outboxFile.exists())
       outboxFile.createNewFile();
-    
+    */
     props.setProperty("Store.local.mailDir", mailDirName);
     
     
