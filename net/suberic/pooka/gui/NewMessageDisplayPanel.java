@@ -184,10 +184,10 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	
 	UserProfile profile = getSelectedProfile();
 	if (profile.autoAddSignature) {
+	    retval.setCaretPosition(retval.getDocument().getLength());
 	    if (profile.signatureFirst) {
 
 	    }
-
 	    addSignature(retval);
 
 	}
