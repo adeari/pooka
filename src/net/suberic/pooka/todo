@@ -7,15 +7,6 @@
 
 -----
 
-*) printing
-	timing--jtextpane creation should happen after dialog
-		should also show status - loading message, paginating,
-		printing page 1 of...  etc.  should be able to cancel
-		during that.  maybe even a progress bar?
-
-*) fix getFirstUnreadMessage on CachingFolderInfo to make sure that we've
-	fetched all of the messages first.
-
 *) make it so selecting or scrolling in a messagepanel will remove the
 	new message icon.
 
@@ -41,6 +32,10 @@
 *) make spam button available, and give it a keybinding.  also make it so
 	hitting an unconfigured spam button gives you a choice to configure
 	it.
+
+*) printing
+	*) handle cancel better
+	*) better layout of printer frame.  center things?
 
 *) fix error display with exception so that you can see the stack trace.
 

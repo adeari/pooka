@@ -1,3 +1,7 @@
+optimized IMAP folder loading so that we initially fetch the SEEN flag,
+and then pre-fetch the messages we'll actually display (by loading around
+the getFirstUnreadMessage() value)
+
 fixed notifyNewMessagesMain and Node so that they actually work.
 
 added a button for using custom headers on an outgoing mail message.

@@ -400,6 +400,13 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException {
     // if we're connected, go ahead and fetch these.
 
+    if (Pooka.isDebug()) {
+      if (messages == null)
+	System.out.println("cachingFolderInfo:  fetching with null messages.");
+      else
+	System.out.println("cachingFolderInfo:  fetching " + messages.length + " messages.");
+    }
+
     int cacheStatus = -1;
     boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);
     boolean doHeaders = (profile.contains(FetchProfile.Item.ENVELOPE) || profile.contains(FetchProfile.Item.CONTENT_INFO));
@@ -413,6 +420,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
     
     if (isConnected()) {
+      
+      if (Pooka.isDebug()) {
+	System.out.println("CachingFolderInfo:  running fetch against folder.");
+      }
       super.fetch(messages, profile);
       
       if (cacheStatus != -1) {
@@ -493,7 +504,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  long[] uids = getCache().getMessageUids();
 	  
 	  for (i = uids.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
-	    if (!(getMessageInfoByUid(uids[i]).getFlags().contains(Flags.Flag.SEEN))) 
+	    MessageInfo mi = getMessageInfoByUid(uids[i]);
+
+	    if (! mi.getFlags().contains(Flags.Flag.SEEN))
 	      countUnread++;
 	  }
 	  if (Pooka.isDebug())
@@ -624,6 +637,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
       FetchProfile fp = new FetchProfile();
       fp.add(UIDFolder.FetchProfileItem.UID);
+      // adding FLAGS to make getFirstUnreadMessage() more efficient
+      fp.add(FetchProfile.Item.FLAGS);
+
       if (Pooka.isDebug())
 	System.out.println("getting messages.");
 

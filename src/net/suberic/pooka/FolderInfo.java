@@ -862,10 +862,28 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	updateCache();
 
 	Vector loadImmediately = null;
+
+	int loadBatchSize = 25;
 	
-	if (messageProxies.size() > 25) {
+	if (messageProxies.size() > loadBatchSize) {
+	  // get the first unread.
+	  int firstUnread = messageProxies.size();
+	  if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {	  
+	    firstUnread = getFirstUnreadMessage();
+	  }
+
+	  int lastLoaded = messageProxies.size() - 1;
+	  int firstLoaded = messageProxies.size() - loadBatchSize - 1;
+
+	  if (firstUnread > -1) {
+	    if (firstUnread < firstLoaded) {
+	      firstLoaded = Math.max(0, firstUnread - 5);
+	      lastLoaded = firstLoaded + loadBatchSize;
+	    }
+	  }
+
 	  loadImmediately = new Vector();
-	  for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
+	  for (int i = lastLoaded; i > firstLoaded; i--) {
 	    loadImmediately.add(messageProxies.get(i));
 	  }
 	} else {
@@ -1085,7 +1103,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    countUnread++;
 	}
 	if (Pooka.isDebug())
-	  System.out.println("Returning " + i);
+	  System.out.println("Returning " + (i + 1));
 	return i + 1;
       } else { 
 	if (Pooka.isDebug())

@@ -51,6 +51,8 @@ public class UIDFolderInfo extends FolderInfo {
     // get the UIDs first.
     FetchProfile uidProfile = new FetchProfile();
     uidProfile.add(UIDFolder.FetchProfileItem.UID);
+    // adding FLAGS to make getFirstUnreadMessage() more efficient
+    uidProfile.add(FetchProfile.Item.FLAGS);
     
     getFolder().fetch(msgs, uidProfile);
     
