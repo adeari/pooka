@@ -63,13 +63,13 @@ public class MessageInfo {
       attachmentsLoaded = true;
       if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && cryptoInfo.isEncrypted()) {
 	if (cryptoInfo.autoDecrypt(getDefaultProfile())) {
-	  attachments = MailUtilities.parseAttachments(getMessage());
+	  //attachments = MailUtilities.parseAttachments(getMessage());
 	}
       }
       
       if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") && cryptoInfo.isSigned()) {
 	if (cryptoInfo.autoCheckSignature((javax.mail.internet.InternetAddress) getMessage().getFrom()[0])) {
-	  attachments = MailUtilities.parseAttachments(getMessage());
+	  //attachments = MailUtilities.parseAttachments(getMessage());
 	}
       }
 

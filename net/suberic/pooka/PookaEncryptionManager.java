@@ -133,7 +133,7 @@ public class PookaEncryptionManager {
    * Returns all private keys that have been cached.
    */
   public Key[] getCachedPrivateKeys() {
-    return (Key[]) cachedPrivateKeys.entrySet().toArray(new Key[0]);
+    return (Key[]) cachedPrivateKeys.values().toArray(new Key[0]);
   }
   
   /**

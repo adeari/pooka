@@ -218,6 +218,7 @@ public class MessageCryptoInfo {
       // ones we have available.
       //java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys(cryptType);
       java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys();
+      
       if (privateKeys != null) {
 	for (int i = 0 ; i < privateKeys.length; i++) {
 	  try {
@@ -230,7 +231,6 @@ public class MessageCryptoInfo {
 	
       }
     } catch (Exception e) {
-
     }
     return false;
   }  
