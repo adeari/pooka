@@ -117,6 +117,42 @@ public class ListEditorPane extends SwingPropertyEditor {
   }
   
   /**
+   * Updates the combo box with the new value(s).
+   */
+  private void updateComboBox(String newValue) {
+    Vector items = new Vector();
+    StringTokenizer tokens = new StringTokenizer(newValue, ":");
+    String currentValue = (String) inputField.getSelectedItem();
+
+    String currentItem;
+    for (int i=0; tokens.hasMoreTokens(); i++) {
+      currentItem = tokens.nextToken();
+      
+      String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
+      if (itemLabel.equals(""))
+	itemLabel = currentItem.toString();
+      
+      String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
+      if (itemValue.equals(""))
+	itemValue = currentItem.toString();
+      
+      if (itemValue.equals(originalValue)) {
+	originalIndex=i;
+      }
+      if (itemValue.equals(currentValue)) {
+	currentIndex=i;
+      }
+      items.add(itemLabel);
+      labelToValueMap.put(itemLabel, itemValue);
+    }
+
+    ComboBoxModel newModel = new DefaultComboBoxModel(items);
+    newModel.setSelectedItem(currentValue);
+    inputField.setModel(newModel);
+
+  }
+
+  /**
    * Creates a button to add a new value to the List.
    */
   public JButton createAddButton() {
@@ -216,7 +252,7 @@ public class ListEditorPane extends SwingPropertyEditor {
      * Called after a property changes.
      */
     public void propertyChanged(String newValue) {
-      
+      updateComboBox(newValue);
     }
     
   }

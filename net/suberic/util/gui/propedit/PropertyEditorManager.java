@@ -88,4 +88,13 @@ public class PropertyEditorManager {
   public void commit() {
     sourceBundle.saveProperties();
   }
+
+  /**
+   * Adds the given PropertyEditorListener as a listener to the editor
+   * for the given property.  If no editor exists yet, then the listener
+   * is saved until a PropertyEditorUI is registered.
+   */
+  public void addPropertyEditorListener(String property, PropertyEditorListener listener) {
+
+  }
 }
