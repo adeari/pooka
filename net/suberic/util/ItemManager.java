@@ -16,7 +16,12 @@ public class ItemManager implements ValueChangeListener {
   private String resourceString;
   private VariableBundle sourceBundle;
   private ItemCreator itemCreator;
-  
+
+  /**
+   * Create an ItemManager which loads information from the given 
+   * VariableBundle using the given newResourceString, and creates new
+   * Items using the given ItemCreator.
+   */
   public ItemManager(String newResourceString, VariableBundle newSourceBundle, ItemCreator newItemCreator) {
     resourceString = newResourceString;
     sourceBundle = newSourceBundle;
@@ -38,6 +43,14 @@ public class ItemManager implements ValueChangeListener {
   }
   
   /**
+   * This returns the Item with the given itemName if it exists; otherwise,
+   * returns null.
+   */
+  public synchronized Item getItem(String itemID) {
+    return (Item)itemIdMap.get(itemID);
+  }
+
+  /**
    * This adds the item with the given name to the item list.
    */
   public synchronized void addItem(String itemName) {
@@ -51,7 +64,8 @@ public class ItemManager implements ValueChangeListener {
     if (itemName != null && itemName.length > 0) {
       StringBuffer itemString = new StringBuffer();
       for (int i = 0 ; i < itemName.length; i++) {
-	if (getItem(itemName[i]) == null) 
+	Item currentItem = getItem(itemName[i]);
+	if (currentItem == null || ! itemList.contains(currentItem)) 
 	  itemString.append(itemName[i] + ":");
       }
       if (itemString.length() > 0)
@@ -70,7 +84,19 @@ public class ItemManager implements ValueChangeListener {
    * This adds the given items to the items list.
    */
   public synchronized void addItem(Item[] newItem) {
-
+    if (newItem != null) {
+      String[] itemNames = new String[newItem.length];
+      for (int i = 0; i < itemNames.length; i++) {
+	itemNames[i] = newItem[i].getItemID();
+	// we'll go ahead and add this here.  this will make it so, later
+	// on, when we add the item to the main list, we get this Item,
+	// rather than creating a new one.
+	if (getItem(itemNames[i]) == null)
+	  itemIdMap.put(itemNames[i], newItem[i]);
+      }
+      
+      addItem(itemNames);
+    }
   }
   
   /**
@@ -156,22 +182,6 @@ public class ItemManager implements ValueChangeListener {
     }
   }
 
-  /**
-   * This returns the Item with the given itemName if it exists
-   * in the allItems Vector; otherwise, returns null.
-   */
-  public synchronized Item getItem(String itemID) {
-    Vector allItems = getItems();
-    for (int i = 0; i < allItems.size(); i++) {
-      Item si = (Item)(allItems.elementAt(i));
-      
-      if (si.getItemID().equals(itemID)) {
-	return si;
-      }
-    }	
-    return null;
-  }
-  
   /**
    * As defined in net.suberic.util.ValueChangeListener.
    * 
