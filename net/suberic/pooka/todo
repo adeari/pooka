@@ -22,7 +22,8 @@ address fields--right now it makes the entire window huge.
 
 *)  fix the actions update when a message is unselected/deleted.
 
-*)  add a way to edit the mailcap file.
+*)  add a way to edit the mailcap file.  this should be doable both from
+a menu option and from the 'open with' dialog.
 
 *)  make the windows detachable.
 
@@ -32,6 +33,10 @@ address fields--right now it makes the entire window huge.
 
 after alpha 2
 ----------------
+
+*)  make a sent folder.
+
+*)  fix the signature.
 
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
@@ -45,10 +50,6 @@ available.
 entered through a propertyEditor.
 
 *)  all MessagingExceptions should be handled correctly, not ignored.
-
-*)  the piece of code that keeps the Stores open only starts up if you open
-a FolderWindow.  so if you just start up the program and don't open any windows
-for a while, your connection to your Store can go down.
 
 *) delete for multiple messages takes way too long.
 
@@ -93,6 +94,9 @@ too much date info, not enough Subject.
 
 *) add pgp/gpg support.
 
+*) add ability to edit received messages, so you can do things like remove
+attachments that you don't want to keep (?)
+
 -------
 
 open messages from the FolderWindow
@@ -121,8 +125,6 @@ closing the window doesn't exit program.
 make an update Thread -- sort of done.  need to institute update time.
 
 attachments available from message list.
-
-implement Window Menu as Dynamic Menu.
 
 the Spice is life
 
