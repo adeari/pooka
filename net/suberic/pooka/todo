@@ -4,18 +4,20 @@ next release:
 	todo on this:
 	*)  make it so you can manually send the messages in the mail queue.
 	*)  make it so the mail queue automatically flushes when you 
-		connect.
+		connect--if you want it to.
 	*)  make it fault tolerant so that if you still have the old
 		sendMailURL, things still work.
 	*)  fix the local mail store so that it doesn't necessarily put
-		in an INBOX for everything.
+		in an INBOX for everything.  this is so we can set up a
+		local mail store for IMAP users.
 	*)  fix the UIDFolderInfo so that you can add new messages directly
-		to it.
-	*)  fix the threading.  sending messages is on the awt thread right	
+		to it.  -done
+	*)  fix the threading.  sending messages is on the awt thread right
 		now.
-	*)  make mbox stores ignore the NetworkConnection.
+	*)  make mbox stores ignore the NetworkConnection.  
 
-*) make search give a popup window saying it's running.
+*) make search give a popup window saying it's running, or at least something
+	that makes it obvious that _something's_ going on.
 
 *) make search window look different than normal window.
 
@@ -45,16 +47,12 @@ beta 1
 
 *) make disconnected imap use LoadMessageTracker.
 	make disconnected imap not show messages that aren't there!
-	for that matter, make normal imap folders use the lmt again, too.
 
 error:  filterfoldercellrenderer has problems with search forms.
 
 *) caching messages marks them as read.
 
 *) no way to cache messages as they come in.
-
-*) searches don't show a busy icon, or give any other notification that
-they're running.
 
 ---------------
 
@@ -87,10 +85,10 @@ general ui
 
 other
 -----
-*) loadMessageTracker?
+*) loadMessageTracker?  it doesn't seem to show up anymore.
 
-*) have it change its icon if you get new messages, in addition to changing
-the title bar.
+*) have Pooka itself change its icon if you get new messages, in addition to 
+changing the title bar.
 
 *) bug:  if you go into the multi configuration editors and it's empty, you
 should more or less be forced to create a new entity.  otherwise you'll start
@@ -186,6 +184,10 @@ attachments that you don't want to keep (?)
 
 *) make required fields for the gui properties.
 
+*) check it to see if we can still get the same kind of 
+	folders-always-available performance while not keeping a separate
+	imapd connection open for each folder.
+
 make an update Thread -- sort of done.  need to institute update time.
 
 attachments available from message list.
@@ -193,6 +195,4 @@ attachments available from message list.
 the Spice is life
 
 write profile changes to disk immediately on setting (?)
-
-add support for using an external editor, like emacs.
 
