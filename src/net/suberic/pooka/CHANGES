@@ -12,6 +12,9 @@ fixed a minor bug in which clearing a preview-pane mode message with a
 custom theme would result in the message flashing for a moment with a 
 default font.
 
+fixed a bug where, in preview pane mode, messages with attachments wouldn't
+get their themes set correctly.
+
 made it so selecting or scrolling in a messagepanel will remove the
 new message icon.
 

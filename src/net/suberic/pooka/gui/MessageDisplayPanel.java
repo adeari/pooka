@@ -28,7 +28,7 @@ public abstract class MessageDisplayPanel extends JPanel {
   protected boolean hasAttachment = false;
   protected ConfigurableKeyBinding keyBindings;
   
-  protected boolean mFontSet = false;
+  protected HashMap mFontSetMap = new HashMap();
 
   protected Matcher currentMatcher = null;
 
@@ -198,6 +198,7 @@ public abstract class MessageDisplayPanel extends JPanel {
     return retval;
   }
 
+
   /**
    * This sets the default font for the editorPane to a font determined
    * by the MessageWindow.editorPane.font (.name and .size) properties.
@@ -205,7 +206,18 @@ public abstract class MessageDisplayPanel extends JPanel {
    * I believe that if the font cannot be found or instantiated, 
    * nothing should happen, but i'm not sure.  :)
    */
-  public void setDefaultFont(JEditorPane jep) {
+  public void setDefaultFont() {
+    setDefaultFont(getEditorPane());
+  }
+
+  /**
+   * This sets the default font for the editorPane to a font determined
+   * by the MessageWindow.editorPane.font (.name and .size) properties.
+   * 
+   * I believe that if the font cannot be found or instantiated, 
+   * nothing should happen, but i'm not sure.  :)
+   */
+  protected void setDefaultFont(JEditorPane jep) {
     Font f = null;
     try {
       net.suberic.util.swing.ThemeSupporter ts = (net.suberic.util.swing.ThemeSupporter)getMessageUI();
@@ -217,7 +229,7 @@ public abstract class MessageDisplayPanel extends JPanel {
       // if we get an exception, just ignore it and use the default.
     }
     
-    if (f == null && ! mFontSet) {
+    if (f == null && mFontSetMap.get(jep) == null) {
       String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
       int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
       
@@ -226,7 +238,7 @@ public abstract class MessageDisplayPanel extends JPanel {
     
     if (f != null) {
       jep.setFont(f);
-      mFontSet = true;
+      mFontSetMap.put(jep, new Boolean(true));
     }
   }
 

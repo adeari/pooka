@@ -21,8 +21,6 @@ specifications in the html itself.
 *) bug:  NPE when adding a new (user?  smtp server) and accepting the default
 	with a new pooka config.
 
-*) still not fixed font:  make sure it happens for both editorPanes.
-
 --?
 
 *) add support for running without any local files.

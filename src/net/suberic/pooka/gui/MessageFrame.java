@@ -89,7 +89,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
 	public void run() {
 	  try {
 	    Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
-	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	    getMessageDisplay().setDefaultFont();
 	    getMessageDisplay().sizeToDefault();
 	    MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
 	  } catch (Exception e) {
@@ -129,14 +129,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
    * Called when the specifics of a Theme change.
    */
   public void themeChanged(ConfigurableMetalTheme theme) {
-    // we should really only be getting messages from our own curren themes,
+    // we should really only be getting messages from our own current themes,
     // but, hey, it never hurts to check.
     if (currentTheme != null && currentTheme == theme) {
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    try {
 	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
-	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	      getMessageDisplay().setDefaultFont();
 	      getMessageDisplay().sizeToDefault();
               MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
 	    } catch (Exception e) {

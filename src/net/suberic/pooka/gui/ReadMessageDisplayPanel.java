@@ -95,8 +95,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-    setDefaultFont(editorPane);
-    
     // temp
     
     otherEditorPane = new JTextPane();
@@ -106,7 +104,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     otherEditorPane.addMouseMotionListener(hmh);
     otherScrollPane = new JScrollPane(otherEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     
-    setDefaultFont(otherEditorPane);
+    setDefaultFont();
     
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     
@@ -358,6 +356,16 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	      } else {
 		splitPane.setDividerLocation(400);
 	      }
+
+	      // set the theme for the attachmentpanel.
+	      MessageUI mui = getMessageUI();
+	      if (mui instanceof net.suberic.util.swing.ThemeSupporter) {
+		try {
+		  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, attachmentPanel, true);
+		} catch (Exception etwo) {
+		  System.err.println("error setting theme:  " + etwo);
+		}
+	      }
 	      
 	    } else {
 	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITHOUT_ATTACHMENTS);
@@ -534,6 +542,22 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       this.setSize(prefSize);
     }
   }
+  
+  /**
+   * This sets the default font for the editorPane to a font determined
+   * by the MessageWindow.editorPane.font (.name and .size) properties.
+   * 
+   * I believe that if the font cannot be found or instantiated, 
+   * nothing should happen, but i'm not sure.  :)
+   */
+  public void setDefaultFont() {
+    if (editorPane != null)
+      setDefaultFont(editorPane);
+
+    if (otherEditorPane != null) 
+      setDefaultFont(otherEditorPane);
+  }
+
   
   public void addNotify() {
     super.addNotify();

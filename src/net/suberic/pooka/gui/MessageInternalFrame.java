@@ -90,7 +90,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	public void run() {
 	  try {
 	    Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageInternalFrame.this, MessageInternalFrame.this);
-	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	    getMessageDisplay().setDefaultFont();
 	    getMessageDisplay().sizeToDefault();
 	    MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
 	    
@@ -138,7 +138,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	  public void run() {
 	    try {
 	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageInternalFrame.this, MessageInternalFrame.this, true);
-	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	      getMessageDisplay().setDefaultFont();
 	      getMessageDisplay().sizeToDefault();
 	      MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
 

@@ -61,7 +61,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     
     selectionListener = new ListSelectionListener() {
 	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-	  selectedMessageChanged();
+	  if (! e.getValueIsAdjusting())
+	    selectedMessageChanged();
 	}
       };
     
@@ -126,7 +127,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 	public void run() {
 	  try {
 	    Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this);
-	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	    getMessageDisplay().setDefaultFont();
 	    getMessageDisplay().sizeToDefault();
 	  } catch (Exception e) {
 	  }
@@ -172,7 +173,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 	  public void run() {
 	    try {
 	      Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this, true);
-	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	      getMessageDisplay().setDefaultFont();
 	    } catch (Exception e) {
 	    }
 	    
@@ -486,9 +487,11 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Refreshes the display.
    */
   public void refreshDisplay() throws javax.mail.MessagingException {
-    configureInterfaceStyle();
     messageDisplay.resetEditorText();
-    if ( SwingUtilities.isDescendingFrom(java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), messageDisplay) && messageDisplay.getMessageUI() == null ) {
+    configureInterfaceStyle();
+    
+    java.awt.Component fOwner = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    if (fOwner != null && messageDisplay != null && SwingUtilities.isDescendingFrom(fOwner, messageDisplay) && messageDisplay.getMessageUI() == null) {
       if (current != null) {
 	current.requestFocus();
       }
