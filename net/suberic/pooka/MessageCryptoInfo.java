@@ -278,4 +278,11 @@ public class MessageCryptoInfo {
   public boolean isDecryptedSuccessfully() {
     return mDecryptSuccessful;
   }
+
+  /**
+   * Returns the MessageInfo.
+   */
+  public MessageInfo getMessageInfo() {
+    return mMsgInfo;
+  }
 }

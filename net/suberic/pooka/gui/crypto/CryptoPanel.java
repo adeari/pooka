@@ -77,7 +77,9 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
     JButton returnValue = new JButton();
     if (notEncryptedIcon != null)
       returnValue.setIcon(notEncryptedIcon);
-    returnValue.setSize(20,20);
+    returnValue.setSize(25,25);
+    returnValue.setPreferredSize(new java.awt.Dimension(25,25));
+    returnValue.setMaximumSize(new java.awt.Dimension(25,25));
     return returnValue;
   }
   
@@ -88,7 +90,9 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
     JButton returnValue = new JButton();
     if (notSignedIcon != null)
       returnValue.setIcon(notSignedIcon);
-    returnValue.setSize(20,20);
+    returnValue.setPreferredSize(new java.awt.Dimension(25,25));
+    returnValue.setMaximumSize(new java.awt.Dimension(25,25));
+    returnValue.setSize(25,25);
     return returnValue;
   }
   
@@ -96,7 +100,13 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
    * Updates the encryption information.
    */
   public void cryptoUpdated(int newSignatureStatus, int newEncryptionStatus) {
+    cryptoUpdated(newSignatureStatus, newEncryptionStatus, null);
+  }
 
+  /**
+   * Updates the encryption information.
+   */
+  public void cryptoUpdated(int newSignatureStatus, int newEncryptionStatus, net.suberic.pooka.gui.MessageProxy proxy) {
     if (newSignatureStatus != currentSigStatus) {
       currentSigStatus = newSignatureStatus;
 
@@ -106,6 +116,11 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       } else if (currentSigStatus == UNCHECKED_SIGNED) {
 	signatureButton.setIcon(uncheckedSignedIcon);
 	signatureButton.setToolTipText(uncheckedSignedTooltip);
+	if (proxy != null) {
+	  Action checkSigAction = proxy.getAction("message-check-signature");
+	  if (checkSigAction != null)
+	    signatureButton.setAction(checkSigAction);
+	}
       } else if (currentSigStatus == SIGNATURE_VERIFIED) {
 	signatureButton.setIcon(signatureVerifiedIcon);
 	signatureButton.setToolTipText(signatureVerifiedTooltip);
@@ -121,6 +136,11 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       if (currentCryptStatus == UNCHECKED_ENCRYPTED) {
 	encryptionButton.setIcon(uncheckedEncryptedIcon);
 	encryptionButton.setToolTipText(uncheckedEncryptedTooltip);
+	if (proxy != null) {
+	  Action decryptAction = proxy.getAction("message-decrypt");
+	  if (decryptAction != null)
+	    encryptionButton.setAction(decryptAction);
+	}
       } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
 	encryptionButton.setIcon(decryptedSuccessfullyIcon);
 	encryptionButton.setToolTipText(decryptedSuccessfullyTooltip);
@@ -141,6 +161,7 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
   public void cryptoUpdated(net.suberic.pooka.MessageCryptoInfo cryptoInfo) {
 
     try {
+      
       int sigStatus = NOT_SIGNED;
       int cryptStatus = NOT_ENCRYPTED;
       
@@ -168,8 +189,12 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
 	}
       }
       
-      
-      cryptoUpdated(sigStatus, cryptStatus);
+      net.suberic.pooka.gui.MessageProxy proxy = null;
+      net.suberic.pooka.MessageInfo info = cryptoInfo.getMessageInfo();
+      if (info != null)
+	proxy = info.getMessageProxy();
+
+      cryptoUpdated(sigStatus, cryptStatus, proxy);
 
     } catch (javax.mail.MessagingException me) {
       // ignore here.
