@@ -60,6 +60,8 @@ say, like reacting to a mailto: link.
 
 *) fix AttachmentPane.openAction from showing dialog on store thread instead
 	of AWTEventThread.
+*) fix open as attachment so that we get some indication of what's happening.
+   esp for long downloads and process failures.
 
 *) modify date format so that it only defaults to MM/dd/yy in the US.
 
