@@ -247,8 +247,13 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This shows an Error Message window.
    */
   public void showError(String errorMessage, String title, Exception e) {
-    showError(errorMessage + ":  " +  e.getMessage(), title);
-    e.printStackTrace();
+    String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
+    if (showing) {
+      JOptionPane.showInternalMessageDialog(getMessagePanel(), createErrorPanel(displayErrorMessage, e), title, JOptionPane.ERROR_MESSAGE);
+    } else
+      System.out.println(errorMessage);
+
+    //e.printStackTrace();
   }
   
   /**
@@ -382,5 +387,16 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     java.awt.Window mainWindow = SwingUtilities.getWindowAncestor(messagePanel);
     java.awt.Window componentWindow = SwingUtilities.getWindowAncestor(c);
     return (mainWindow == componentWindow);
+  }
+
+  /**
+   * Creates the panels for showing an error message.
+   */
+  public Object[] createErrorPanel(String message, Exception e) {
+    Object[] returnValue = new Object[2];
+    returnValue[0] = message;
+    returnValue[1] = new net.suberic.util.swing.ExceptionDisplayPanel(Pooka.getProperty("error.showStackTrace", "Stack Trace"), e);
+
+    return returnValue;
   }
 }

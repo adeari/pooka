@@ -35,6 +35,13 @@
 *) file list:  pgp/smime files, signature file, address book, ssl cert file,
 	mbox file (n/a).
    -- also:  pooka home, mailcap file, pookarc file
+
+*) check out situation with multiple connections.  see if we can speed
+   up things that way.  possibilities:
+	*) reuse our connections so we don't have to renegotiate ssl
+	   connections each time.
+	*) use separate threads for each folder so we can do the ssl
+	   negotiation in parallel.
 	
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
