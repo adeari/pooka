@@ -68,7 +68,7 @@ public class UIDFolderInfo extends FolderInfo {
 		    uidToInfoTable.put(new Long(uid), mi);
 		}
 	    } catch (MessagingException me) {
-		System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
+		Pooka.getUIFactory().showError(Pooka.getProperty("Pooka.error.errorLoadingMessages", "Error loading message for folder ") + getFolderID(), me);
 	    }
 	    
 	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
