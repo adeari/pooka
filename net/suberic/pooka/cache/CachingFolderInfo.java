@@ -533,23 +533,26 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
     }
 
-    /**
-     * This copies the given messages to the given FolderInfo.
-     */
-    public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
-	targetFolder.appendMessages(msgs);
-    }
+  /**
+   * This copies the given messages to the given FolderInfo.
+   */
+  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+    if (isConnected())
+      super.copyMessages(msgs, targetFolder);
+    else
+      targetFolder.appendMessages(msgs);
+  }
 
-    /**
-     * This appends the given message to the given FolderInfo.
-     */
-    public void appendMessages(MessageInfo[] msgs) throws MessagingException {
-	if (isAvailable()) {
-	    super.appendMessages(msgs);
-	} else {
-	    throw new MessagingException("cannot append messages to an unavailable folder.");
-	}
+  /**
+   * This appends the given message to the given FolderInfo.
+   */
+  public void appendMessages(MessageInfo[] msgs) throws MessagingException {
+    if (isAvailable()) {
+      super.appendMessages(msgs);
+    } else {
+      throw new MessagingException("cannot append messages to an unavailable folder.");
     }
+  }
     
     /**
      * This expunges the deleted messages from the Folder.

@@ -284,35 +284,35 @@ public class MessageInfo {
 	return getHtmlAndTextInlines(getHtmlAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
     }
 
-    /**
-     * Moves the Message into the target Folder.
-     */
-    public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
-	try {
-	    folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
-	} catch (MessagingException me) {
-	    throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
-	}
-	
-	try {
-	    remove(expunge);
-	} catch (MessagingException me) {
-	    throw new MessagingException(Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n", me);
-	}
+  /**
+   * Moves the Message into the target Folder.
+   */
+  public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
+    try {
+      folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
+    } catch (MessagingException me) {
+      throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
     }
-
-    /**
-     * Copies the Message into the target Folder.
-     */
-    public void copyMessage(FolderInfo targetFolder) throws MessagingException {
-	try {
-	    folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
-	} catch (MessagingException me) {
-	    throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
-	}
-
+    
+    try {
+      remove(expunge);
+    } catch (MessagingException me) {
+      throw new MessagingException(Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n", me);
     }
-
+  }
+  
+  /**
+   * Copies the Message into the target Folder.
+   */
+  public void copyMessage(FolderInfo targetFolder) throws MessagingException {
+    try {
+      folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
+    } catch (MessagingException me) {
+      throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+    }
+    
+  }
+  
     /**
      * A convenience method which sets autoExpunge by the value of 
      * Pooka.autoExpunge, and then calls moveMessage(targetFolder, autoExpunge)

@@ -1,10 +1,18 @@
 beta 1
 ---------------
 
-search: 
-filter editor:  fix the color button size.  
-	add a filter editor for delete, move, and font.
-	
+*) pop3 folder doesn't come up properly.
+
+*) add support for proxy server
+
+*) add queuing of outgoing emails.
+
+*) make disconnected imap use LoadMessageTracker.
+
+*) bug:  search window shows new messages as they come in.
+
+*) enh:  make search window look different from normal message window.
+
 error:  filterfoldercellrenderer has problems with search forms.
 
 *) caching messages marks them as read.

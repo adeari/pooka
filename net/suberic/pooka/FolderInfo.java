@@ -864,29 +864,39 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	getFolder().setFlags(m, flag, value);
     }
 
-    /**
-     * This copies the given messages to the given FolderInfo.
-     */
-    public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
-	Message[] m = new Message[msgs.length];
-	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = getRealMessage(msgs[i]);
-	}
-
-	getFolder().copyMessages(m, targetFolder.getFolder());
+  /**
+   * This copies the given messages to the given FolderInfo.
+   */
+  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+    if (! targetFolder.isAvailable()) 
+      targetFolder.loadFolder(Folder.READ_WRITE);
+    
+    Folder target = targetFolder.getFolder();
+    if (target != null) {
+      Message[] m = new Message[msgs.length];
+      for (int i = 0; i < msgs.length; i++) {
+	m[i] = getRealMessage(msgs[i]);
+      }
+      
+      getFolder().copyMessages(m, target);
+    } else {
+      targetFolder.appendMessages(msgs);
     }
+  }
 
-    /**
-     * This appends the given message to the given FolderInfo.
-     */
-    public void appendMessages(MessageInfo[] msgs) throws MessagingException {
-	Message[] m = new Message[msgs.length];
-	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = getRealMessage(msgs[i]);
-	}
-
-	getFolder().appendMessages(m);
+  /**
+   * This appends the given message to the given FolderInfo.
+   */
+  public void appendMessages(MessageInfo[] msgs) throws MessagingException {
+    if (! isSortaOpen())
+      openFolder(Folder.READ_WRITE);
+    Message[] m = new Message[msgs.length];
+    for (int i = 0; i < msgs.length; i++) {
+      m[i] = getRealMessage(msgs[i]);
     }
+    
+    getFolder().appendMessages(m);
+  }
     
     /**
      * This expunges the deleted messages from the Folder.
