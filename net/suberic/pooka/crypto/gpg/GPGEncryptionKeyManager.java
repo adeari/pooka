@@ -83,7 +83,7 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
 	int keyDateEnd = currentLine.indexOf(' ', keyIdEnd + 1);
 	System.err.println("keyTypeEnd=" + keyTypeEnd + ", id " + keyIdEnd + ", keyDate " + keyDateEnd);
 	String keyAlias = currentLine.substring(keyDateEnd + 1);
-	EncryptionKey key = new GPGEncryptionKey(keyAlias, "");
+	EncryptionKey key = new GPGEncryptionKey(keyAlias, new String(password));
 	publicKeyMap.put(keyAlias, key);
 	System.err.println("adding public alias for '" + keyAlias + "'");
 	currentLine = resultReader.readLine();
@@ -135,7 +135,7 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
 	int keyDateEnd = currentLine.indexOf(' ', keyIdEnd + 1);
 	System.err.println("keyTypeEnd=" + keyTypeEnd + ", id " + keyIdEnd + ", keyDate " + keyDateEnd);
 	String keyAlias = currentLine.substring(keyDateEnd + 1);
-	EncryptionKey key = new GPGEncryptionKey(keyAlias, "");
+	EncryptionKey key = new GPGEncryptionKey(keyAlias, new String(password));
 	privateKeyMap.put(keyAlias, key);
 	System.err.println("adding private alias for '" + keyAlias + "'");
 	currentLine = resultReader.readLine();

@@ -78,7 +78,7 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     try {
       File outFile = writeStreamToFile(rawStream);
 
-      Process p = Runtime.getRuntime().exec("gpg -a -r " + alias + " --passphrase-fd 0 -e " + outFile);
+      Process p = Runtime.getRuntime().exec("gpg -a -r '" + alias + "' --passphrase-fd 0 -e " + outFile);
 
       // we probably need to write the passphrase.
 
@@ -135,7 +135,8 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     try {
       File outFile = writeStreamToFile(rawStream);
 
-      Process p = Runtime.getRuntime().exec("gpg -a -r " + alias + " --passphrase-fd 0 -b " + outFile);
+      System.err.println("running 'gpg -a -r " + alias + " --passphrase-fd 0 -b " + outFile + "'");
+      Process p = Runtime.getRuntime().exec("gpg -a -r '" + alias + "' --passphrase-fd 0 -b " + outFile);
 
       // we probably need to write the passphrase.
 
