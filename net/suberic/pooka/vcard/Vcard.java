@@ -274,9 +274,8 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
 	  String[] current = parseLine(line);
 	  if (current[0] != null && current[1] != null) {
 	    if (current[0].equalsIgnoreCase("end")) {
-	      isDone = true;
 	      if (current[1].equalsIgnoreCase("vcard")) 
-		newProps.put(current[0], current[1]);
+		isDone = true;
 	      else
 		throw new java.text.ParseException("incorrect end tag", 0);
 	    } else {
@@ -343,5 +342,6 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       out.newLine();
     }
     out.write("end:vcard");
+    out.newLine();
   }
 }

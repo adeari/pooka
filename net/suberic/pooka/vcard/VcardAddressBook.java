@@ -77,7 +77,24 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Removes the entry from the AddressBook.
    */
   public void removeAddress(AddressBookEntry removeAddress) {
-
+    if (removeAddress instanceof Vcard) {
+      Vcard removeCard = (Vcard) removeAddress;
+      Vcard[] newList = new Vcard[orderedList.length - 1];
+      int searchResult = java.util.Arrays.binarySearch(orderedList, removeCard);
+      if (searchResult >= 0) {
+	if (searchResult > 0)
+	  System.arraycopy(orderedList, 0, newList, 0, searchResult);
+	if (orderedList.length - searchResult > 1)
+	  System.arraycopy(orderedList, searchResult + 1, newList, searchResult, orderedList.length - searchResult - 1); 
+	
+	orderedList = newList;
+	try {
+	  saveAddressBook();
+	} catch (java.io.IOException ioe) {
+	  Pooka.getUIFactory().showError(Pooka.getProperty("error.savingVcard", "Error saving Address Book"), ioe);
+	}
+      }
+    }
   }
   
 
