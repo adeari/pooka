@@ -63,10 +63,13 @@ public class CryptixKeyManager implements EncryptionKeyManager {
 
     // FIXME
     try {
-      if (loadCount > 0)
+      if (loadCount <= 0) {
 	publicKeyStore.load(stream, null);
-      else
+	System.err.println("loading publickeystore.");
+      } else {
 	privateKeyStore.load(stream, null);
+	System.err.println("loading privatekeystore.");
+      }
       
       loadCount++;
     } catch (IOException ioe) {
@@ -194,17 +197,9 @@ public class CryptixKeyManager implements EncryptionKeyManager {
     
     if (bundle != null) {
 
-      Iterator iter = bundle.getPrivateKeys();
-      if (! iter.hasNext()) {
-	try {
-	  System.err.println("no next; privateKeyStore.getKey(" + alias + ", null)=" + privateKeyStore.getKey(alias, null));
-	} catch (Throwable t) {
-	  System.err.println("no next:  getKey() throws exception " + t);
-	  t.printStackTrace();
-	}
-      }
-      
-      CryptixPGPEncryptionKey key = new CryptixPGPEncryptionKey(bundle, null);
+      System.err.println("bundle for alias " + alias + " containsPrivateKey?  " + ((PGPKeyBundle)bundle).containsPrivateKey());
+
+      CryptixPGPEncryptionKey key = new CryptixPGPEncryptionKey(bundle, password);
       return key;
     }
 
