@@ -1,3 +1,8 @@
+added an icon for Pooka, and made it change icons when new messages come in.
+	BUG:    the Pooka icon doesn't look great when it's made very small,
+		and the new message icon is just perfunctory.  should get
+		new ones.
+
 improved the startup time for Multi Editor panes.
 
 added support for custom colors and components for most (if not all) 

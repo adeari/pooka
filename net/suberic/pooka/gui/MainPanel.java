@@ -22,18 +22,22 @@ import net.suberic.util.gui.*;
  */
 
 public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer, ActionContainer {
-    private ConfigurableMenuBar mainMenu;
-    private ConfigurableToolbar mainToolbar;
-    private FolderPanel folderPanel;
-    private ContentPanel contentPanel;
-    private InfoPanel infoPanel;
-    private Session session;
-    private MailQueue mailQueue;
-    private UserProfile currentUser = null;
-    private ConfigurableKeyBinding keyBindings;
-    private boolean newMessageFlag = false;
-    private String standardTitle = Pooka.getProperty("Title", "Pooka");
-    private String newMessageTitle = Pooka.getProperty("Title.withNewMessages", "* Pooka *");
+  private ConfigurableMenuBar mainMenu;
+  private ConfigurableToolbar mainToolbar;
+  private FolderPanel folderPanel;
+  private ContentPanel contentPanel;
+  private InfoPanel infoPanel;
+  private Session session;
+  private MailQueue mailQueue;
+  private UserProfile currentUser = null;
+  private ConfigurableKeyBinding keyBindings;
+
+  private boolean newMessageFlag = false;
+  private String standardTitle = Pooka.getProperty("Title", "Pooka");
+  private String newMessageTitle = Pooka.getProperty("Title.withNewMessages", "* Pooka *");
+  
+  private ImageIcon standardIcon = null;
+  private ImageIcon newMessageIcon = null;
 
     public MainPanel(JFrame frame) {
 	super(JSplitPane.HORIZONTAL_SPLIT);
@@ -79,6 +83,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       //mainToolbar.setActive(getActions());
       //keyBindings.setActive(getActions());
       
+      java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+      if (standardUrl != null) {
+	standardIcon = new ImageIcon(standardUrl);
+	setCurrentIcon(standardIcon.getImage());
+      }
+      
+      java.net.URL newMessageUrl = this.getClass().getResource(Pooka.getProperty("Pooka.newMessageIcon", "images/PookaNewMessageIcon.gif")); 
+      if (newMessageUrl != null) {
+	newMessageIcon = new ImageIcon(newMessageUrl);
+      }
+
       getParentFrame().addWindowListener(new WindowAdapter() {
 	  public void windowActivated(WindowEvent e) {
 	    setNewMessageFlag(false);
@@ -158,14 +173,24 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * or not, depending on if there are any new messages or not.
      */
     protected void resetFrameTitle() {
-	String currentTitle = getParentFrame().getTitle();
-	if (getNewMessageFlag()) {
-	    if (!currentTitle.equals(newMessageTitle))
-		getParentFrame().setTitle(newMessageTitle);
-	} else {
-	    if (!currentTitle.equals(standardTitle))
-		getParentFrame().setTitle(standardTitle);
+      String currentTitle = getParentFrame().getTitle();
+      Image currentIcon = getCurrentIcon();
+
+      if (getNewMessageFlag()) {
+	if (!currentTitle.equals(newMessageTitle))
+	  getParentFrame().setTitle(newMessageTitle);
+
+	if (currentIcon != getNewMessageIcon()) {
+	  setCurrentIcon(getNewMessageIcon());
 	}
+      } else {
+	if (!currentTitle.equals(standardTitle))
+	  getParentFrame().setTitle(standardTitle);
+
+	if (currentIcon != getStandardIcon()) {
+	  setCurrentIcon(getStandardIcon());
+	}
+      }
     }
 
     /**
@@ -344,6 +369,34 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     public JFrame getParentFrame() {
 	return (JFrame) getTopLevelAncestor();
     }
+
+  /**
+   * Get the standard icon for Pooka.
+   */
+  public Image getStandardIcon() {
+    return standardIcon.getImage();
+  }
+
+  /**
+   * Get the new message icon for Pooka.
+   */
+  public Image getNewMessageIcon() {
+    return newMessageIcon.getImage();
+  }
+
+  /**
+   * Gets the current icon for the frame.
+   */
+  public Image getCurrentIcon() {
+    return getParentFrame().getIconImage();
+  }
+
+  /**
+   * Sets the current icon for the frame.
+   */
+  public void setCurrentIcon(Image newIcon) {
+    getParentFrame().setIconImage(newIcon);
+  }
 
     //-----------actions----------------
     // Actions supported by the main Panel itself.  These should always

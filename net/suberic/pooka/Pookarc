@@ -79,6 +79,9 @@ Pooka.fetchBatchSize=50
 Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
 
+Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
+Pooka.newMessageIcon=/net/suberic/pooka/gui/images/PookaNewMessageIcon.gif
+
 MenuBar=File:Edit:Mail:Config:Window:Help
 
 MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
@@ -737,7 +740,7 @@ Preferences.SSL=Pooka.sslCertFile
 
 Pooka.sslCertFile.propertyType=File
 
-Pooka.uiConfig=messagePanel:folderPanel:messageWindow:newMessageWindow:folderTable:Button:ToggleButton:RadioButton:CheckBox:ColorChooser:ComboBox:Label:List:MenuBar:MenuItem:RadioButtonMenuItem:CheckBoxMeuItem:Menu:PopupMenu:OptionPane:Panel:ProgressBar:ScrollPane:Viewport:TabbedPane:Table:TableHeader:TextField:PasswordField:TextArea:TextPane:EditorPane:TitledBorder:ToolBar:ToolTip:Tree
+Pooka.uiConfig=messagePanel:folderPanel:messageWindow:newMessageWindow-editor:newMessageWindow-labels:folderTable:Button:ToggleButton:RadioButton:CheckBox:ColorChooser:ComboBox:Label:List:MenuBar:MenuItem:RadioButtonMenuItem:CheckBoxMeuItem:Menu:PopupMenu:OptionPane:Panel:ProgressBar:ScrollPane:Viewport:TabbedPane:Table:TableHeader:TextField:PasswordField:TextArea:TextPane:EditorPane:TitledBorder:ToolBar:ToolTip:Tree
 
 Pooka.uiConfig.propertyType=Multi
 Pooka.uiConfig._fixed=true
