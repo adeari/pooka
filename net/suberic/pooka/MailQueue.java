@@ -1,5 +1,6 @@
 package net.suberic.pooka;
 import net.suberic.pooka.gui.*;
+import net.suberic.util.thread.ActionThread;
 import javax.mail.*;
 import java.util.*;
 
@@ -13,10 +14,13 @@ import java.util.*;
 public class MailQueue {
     Hashtable transportTable;
     Session session;
-    
+
+    ActionThread thread = new ActionThread(Pooka.getProperty("thread.sendMailThread", "Send Mail Thread"));
+
     public MailQueue(Session newSession) {
 	session = newSession;
 	transportTable = new Hashtable();
+	thread.start();
     }
 
     /**
@@ -24,8 +28,10 @@ public class MailQueue {
      * transportURL.  If Message.sendImmediately is set to true, then this
      * will also go ahead and try to send all queued Messages using
      * sendQueued().
+     *
+     * Note that at the moment, only Message.sendImmediately is supported.
      */
-    public void sendMessage(Message m, URLName transportURL) throws MessagingException {
+    public void sendMessage(NewMessageInfo pNmi, URLName pTransportURL) throws MessagingException {
 	/*
 	Vector transportQueue = (Vector)transportTable.get(transportURL);
 	if (transportQueue == null) {
@@ -39,13 +45,50 @@ public class MailQueue {
 	}
 	*/
 
-	Transport sendTransport;
+	final URLName transportURL = pTransportURL;
+	final NewMessageInfo nmi = pNmi;
 
-	sendTransport = session.getTransport(transportURL); 
-	sendTransport.connect();
+	if (Pooka.getProperty("Message.sendImmediately", "false").equalsIgnoreCase("true")) {
+	    thread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		    
+                    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+			try {
+			    Transport sendTransport;
+			    
+			    sendTransport = session.getTransport(transportURL); 
+			    sendTransport.connect();
+			    
+			    Message m = nmi.getMessage();
+			    sendTransport.sendMessage(m, m.getAllRecipients());
+			    
+			    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+				    public void run() {
+					net.suberic.pooka.gui.MessageProxy proxy = nmi.getMessageProxy();
+					if (proxy != null) {
+					    net.suberic.pooka.gui.MessageUI mui = proxy.getMessageUI();
+					    if (mui != null)
+						mui.closeMessageUI();
+					}
+				    }
+				});
 
-	sendTransport.sendMessage(m, m.getAllRecipients());
-	
+			} catch (MessagingException me) {
+			    net.suberic.pooka.gui.MessageUI mui = null;
+			    net.suberic.pooka.gui.MessageProxy proxy = mui.getMessageProxy();
+			    if (proxy != null) {			    
+				mui = proxy.getMessageUI();
+			    }
+			    
+			    if (mui != null)
+				mui.showError(Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message"), me);
+			    else
+				Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message"), me);
+			}
+		    }
+		}, thread), new java.awt.event.ActionEvent(nmi, 1, "message-send"));
+	    
+	    
+	}	      
 
     }
 
@@ -102,6 +145,7 @@ public class MailQueue {
     }
 }
     
+
 
 
 

@@ -56,7 +56,7 @@ public class NewMessageInfo extends MessageInfo {
 		getMessage().setContent(messageText, messageContentType);
 	    }
 	    
-	    Pooka.getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
+	    Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName);
 	    
 	    if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
 		getMessage().setSentDate(java.util.Calendar.getInstance().getTime());

@@ -1,21 +1,20 @@
 beta 1
 ---------------
 
-caching:  pretty much the same as uid, no?  only difference is that we also have to add new messages/flag changes.  
-	   *)  bug:  new message count isn't quite correct, is it?
-
-*) add pop3/local mail spool support.
-	in progress.  todo:
-	 *)  some messages aren't parsed properly by the mbox provider
-	 *)  the mbox provider isn't safe for mailboxes that are edited by
-	     other processes.
-
-*) support for ssl?
-
 *) bug:  new message notification doesn't work for folders with both messages
 and subfolders.
 
-*) bug:  send mail seems to be on the awt event thread.
+*) add ability to switch between preview and desktop mode without restarting.
+
+*) fix key binding on tables so that enter/space (or both) will open the
+message.
+
+*) make it so you can switch a mail store from pop to imap (or vice-versa)
+   without restarting pooka.
+
+---- (?)
+
+*) support for ssl?
 
 *) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
 
@@ -49,24 +48,7 @@ ui engine
 
 general ui
 ----------
-*) revamp the UserProfile, Store, and Folder editing process.  make a full
-screen for each with all the possible information (update time, colors,
-connection information, trash/sent folders, etc.) available, and make it
-so you can edit them by right-clicking on the folder.  in other words, do
-a big ui overhaul.
-
 *) add undo/redo support
-
-*) add ability to switch between preview and desktop mode without restarting.
-
-*) fix key binding on tables so that enter/space (or both) will open the
-message.
-
-protocol support
-----------------
-*) fix the jfilechooser so it doesn't disconnect all of our folders when you
-use it--or at least so it doesn't matter if it does.  -- only on unix.  
-	doesn't happen on linux with latest glibc?
 
 searching
 ---------
@@ -99,6 +81,21 @@ new message notification.
 
 after beta 1
 ----------------
+
+*) new message count on disconnected imap folders is a bit strange.  might 
+want to get it from the cache instead of the folder itself when we haven't
+downloaded the new messages yet.  kind of weird to see '6 new messages' and
+have nothing new in your inbox because it hasn't been d/l'ed yet.
+
+*) some messages aren't parsed properly by the mbox provider.
+*) the mbox provider isn't safe for mailboxes that are edited by
+	     other processes.
+
+*) disconnected imap is way too slow.  
+
+*) fix the jfilechooser so it doesn't disconnect all of our folders when you
+use it--or at least so it doesn't matter if it does.  -- only on unix.  
+	doesn't happen on linux with latest glibc?
 
 *) fix the startup bugs:  
 	1)  windows take too long to show up
