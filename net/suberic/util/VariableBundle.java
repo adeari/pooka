@@ -152,7 +152,12 @@ public class VariableBundle extends Object {
     }
 
 
-  public void saveProperties(File saveFile) {
+    /**
+     * Saves the current properties in the VariableBundle to a file.  Note
+     * that this only saves the writableProperties of this particular
+     * VariableBundle--underlying defaults are not written.
+     */
+    public void saveProperties(File saveFile) {
 	if (writableProperties.size() > 0) { 
 	    File outputFile;
 	    String currentLine, key;
@@ -171,18 +176,24 @@ public class VariableBundle extends Object {
 		    equalsLoc = currentLine.indexOf('=');
 		    if (equalsLoc != -1) {
 			key = currentLine.substring(0, equalsLoc);
-			if (!propertyIsRemoved(key)) 
+			if (!propertyIsRemoved(key)) {
 			    if (writableProperties.getProperty(key, "").equals("")) {
 				writeSaveFile.write(currentLine);
+				writeSaveFile.newLine();
+				
 			    } else {
 				writeSaveFile.write(key + "=" + writableProperties.getProperty(key, ""));
+				writeSaveFile.newLine();
 				properties.setProperty(key, writableProperties.getProperty(key, ""));
 				writableProperties.remove(key);
 			    }
+			    removeProperty(key);
+			}
 			
-		    } else 
+		    } else {
 			writeSaveFile.write(currentLine);
-		    writeSaveFile.newLine();
+			writeSaveFile.newLine();
+		    }
 		    currentLine = readSaveFile.readLine();
 		}
 
@@ -196,6 +207,8 @@ public class VariableBundle extends Object {
 		    properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
 		    writableProperties.remove(nextKey);
 		}
+		
+		clearRemoveList();
 
 		readSaveFile.close();
 		writeSaveFile.flush();
@@ -220,11 +233,30 @@ public class VariableBundle extends Object {
 	}
     }
 
+    /**
+     * Clears the removeList.  This should generally be called after
+     * you do a writeProperties();
+     */
+    public void clearRemoveList() {
+	removeList.clear();
+    }
+
+    /**
+     * This removes the property from the currently VariableBundle.  This
+     * is different than setting the value to "" (or null) in that, if the
+     * property is removed, it is removed from the source property file.
+     */
     public void removeProperty(String remProp) {
 	if (! propertyIsRemoved(remProp))
 	    removeList.add(remProp);
     }
 
+    /**
+     * Removes a property from the removeList.  Only necessary if a property
+     * had been removed since the last save, and now has been set to a new
+     * value.  It's probably a good idea, though, to call this method any
+     * time a property has its value set.
+     */
     public void unRemoveProperty(String unRemProp) {
 	for (int i = removeList.size() -1 ; i >= 0; i--) {
 	    if (((String)removeList.elementAt(i)).equals(unRemProp))
@@ -232,6 +264,10 @@ public class VariableBundle extends Object {
 	}
     }
 
+    /**
+     * Returns true if the property is in the removeList for this
+     * VariableBundle.
+     */
     public boolean propertyIsRemoved(String prop) {
 	if (removeList.size() < 1)
 	    return false;
