@@ -156,7 +156,8 @@ MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 
 FolderPanel.2xClickAction=folder-open
 
-FolderTable=Flagged:New:Attachments:SentDate:From:Subject
+#FolderTable=Flagged:New:Attachments:SentDate:From:Subject
+FolderTable=New:SentDate:From:Subject
 FolderTable.Status.tag=SEEN
 FolderTable.Status.size=15
 FolderTable.Flagged.value=FLAG.FLAGGED
@@ -175,7 +176,7 @@ FolderTable.SentDate.size=100
 FolderTable.From.value=From
 FolderTable.From.size=200
 FolderTable.Subject.value=Subject
-FolderTable.Subject.size=205
+FolderTable.Subject.size=235
 FolderTable.2xClickAction=message-open
 FolderTable.UnreadStyle=BOLD
 
@@ -270,7 +271,7 @@ UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
 UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
 UserProfile.mailHeaders.fields.Organization.value=Organization
 
-UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Orgainization:sendMailURL:signature:sentFolder
+UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:signature:sentFolder
 UserProfile.propertyType=Multi
 
 UserProfile.default.propertyType=List
