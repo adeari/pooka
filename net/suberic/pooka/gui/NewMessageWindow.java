@@ -236,7 +236,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 		    urlName = new URLName(up.getMailProperties().getProperty("sendMailURL", "smtp://localhost/"));
 		} else {
 		    String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
-		    String value = ((JTextField)(inputTable.get(key))).getText();
+		    String value = ((JTextArea)(inputTable.get(key))).getText();
 		    mMsg.setHeader(header, value);
 		}
 	    }
