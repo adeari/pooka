@@ -869,7 +869,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
     if (! targetFolder.isAvailable()) 
-      targetFolder.loadFolder(Folder.READ_WRITE);
+      targetFolder.loadFolder();
     
     Folder target = targetFolder.getFolder();
     if (target != null) {
