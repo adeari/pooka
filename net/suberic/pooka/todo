@@ -1,7 +1,6 @@
-*) make it so we only get one connection failed message for a store.
-	- test.
-
 *) make address book editable as soon as you create it.
+	-- specifically, make it so you can hit 'apply' and then have
+	   the entry editors be enabled.
 
 *) search doesn't work properly for sent folders.
 	-- started, at least.
@@ -13,6 +12,7 @@
 *) check disconnected imap adding nested folders (foo/bar/baz/bear)
 
 *) support windows registry attachment associations.
+	-- check icemail
 
 *) check disconnection/reconnection on network removal/restoral.
 
@@ -121,6 +121,8 @@ preview:
 
 *) attachments available from message list (like actually being able to
 	click on and view/save without opening the message).
+
+*) make it so we only get one connection failed message for a store.
 
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.MessageInfo.remove(Unknown Source)

@@ -76,6 +76,7 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
     jif.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jif));
     
+    jif.pack();
     desktop.add(jif);
     jif.setVisible(true);
     try {
