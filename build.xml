@@ -43,8 +43,8 @@
         <include name="**/*"/>
       </fileset>
     </copy>
-    <copy todir="${builddir}/net/suberic/util/gui/images">
-      <fileset dir="${sourcedir}/suberic/util/gui/images">
+    <copy todir="${builddir}/net/suberic/util/gui/propedit/images">
+      <fileset dir="${sourcedir}/suberic/util/gui/propedit/images">
         <include name="**/*"/>
       </fileset>
     </copy>
