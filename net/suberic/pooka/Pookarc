@@ -13,7 +13,9 @@ Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600
 Pooka.messagePanel.vsize=570
 
-Pooka.replyPrefix=!
+Pooka.replyPrefix=>
+Pooka.forwardPrefix=>
+Pooka.forwardStyle=prefixed
 
 MenuBar=File:Edit:Mail:Window:Help
 
@@ -52,10 +54,11 @@ MenuBar.Edit.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MenuBar.Edit.Paste.Action=paste-from-clipboard
 MenuBar.Edit.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-MenuBar.Mail=NewMsg:Reply:ReplyAll:Send:Move:Delete:Expunge
+MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Reply.Action=message-reply
 MenuBar.Mail.ReplyAll.Action=message-reply-all
+MenuBar.Mail.Forward.Action=message-forward
 MenuBar.Mail.Send.Action=message-send
 MenuBar.Mail.Move=folderList
 MenuBar.Mail.Move.Action=message-move
@@ -103,13 +106,15 @@ NewMessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 NewMessageWindowToolbar.Paste.Action=paste-from-clipboard
 NewMessageWindowToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:|:Copy
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/net/suberic/pooka/gui/images/Reply.gif
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
 MessageWindowToolbar.ReplyAll.Image=/net/suberic/pooka/gui/images/ReplyAll.gif
 MessageWindowToolbar.Forward.Action=message-forward
 MessageWindowToolbar.Forward.Image=/net/suberic/pooka/gui/images/Forward.gif
+MessageWindowToolbar.Delete.Action=message-delete
+MessageWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 MessageWindowToolbar.Copy.Action=copy-to-clipboard
 MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 

@@ -177,6 +177,7 @@ public class MessageProxy {
      * the message from the mailbox.
      */
     public void deleteMessage() {
+
 	Folder trashFolder = getMessagePanel().getMainPanel().getFolderPanel().getTrashFolder();
 	if ((trashFolder != null) && (trashFolder != message.getFolder()))
 	    moveMessage(trashFolder);
@@ -214,23 +215,29 @@ public class MessageProxy {
     }
 
     /**
-     * This creates the intro to a quoted message, i.e. 'On Jan 1, 2000,
-     * allen@suberic.net wrote...'
+     * This parses a message line using the current Message as a model.
+     * The introTemplate will be of the form 'On %d, %n wrote', or 
+     * something similar.  This method uses the Pooka.parsedString
+     * characters to decide which strings to substitute for which
+     * characters.
      */
-    public String createIntro(MimeMessage m, String introTemplate) {
+    public String parseMsgString(String introTemplate) {
+	MimeMessage m = (MimeMessage)message;
 	StringBuffer intro = new StringBuffer(introTemplate);
 	int index = introTemplate.lastIndexOf('%', introTemplate.length());
 	try {
 	    while (index > -1) {
 		try {
 		    char nextChar = introTemplate.charAt(index + 1);
-		    if (nextChar == Pooka.getProperty("Pooka.replyIntro.nameChar", "n").charAt(0)) {
+		    if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
 
 			Address[] fromAddresses = m.getFrom();
 			if (fromAddresses.length > 0 && fromAddresses[0] != null)
 			    intro.replace(index, index +2, fromAddresses[0].toString());
-		    } else if (nextChar == Pooka.getProperty("Pooka.replyIntro.dateChar", "d").charAt(0)) {
+		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
 			intro.replace(index, index + 2, Pooka.getDateFormatter().format(m.getSentDate()));
+		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
+			intro.replace(index, index + 2, m.getSubject());
 		    } else if (nextChar == '%') {
 			intro.replace(index, index+1, "%");
 		    }
@@ -250,12 +257,13 @@ public class MessageProxy {
     }
     
     /**
-     * This populates a message which is a Reply to another Message.
+     * This populates a message which is a reply to the current
+     * message.
      */
     protected void populateReply(MimeMessage mMsg) 
 	throws MessagingException {
 	String textPart = MailUtilities.getTextPart(message);
-	UserProfile up = UserProfile.getDefaultProfile(this);
+	UserProfile up = getDefaultProfile();
 
 	String parsedText;
 	String replyPrefix;
@@ -264,14 +272,43 @@ public class MessageProxy {
 	if (up != null && up.getMailProperties() != null) {
 	    
 	    replyPrefix = up.getMailProperties().getProperty("replyPrefix", Pooka.getProperty("Pooka.replyPrefix", "> "));
-	    parsedIntro = createIntro((MimeMessage)getMessage(), up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")));
+	    parsedIntro = parseMsgString(up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")));
 	} else { 
 	    replyPrefix = Pooka.getProperty("Pooka.replyPrefix", "> ");
-	    parsedIntro = createIntro((MimeMessage)getMessage(), Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"));
+	    parsedIntro = parseMsgString(Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"));
 	}
 	parsedText = prefixMessage(textPart, replyPrefix, parsedIntro);
 	mMsg.setText(parsedText);
 	
+    }
+
+    /**
+     * This populates a new message which is a forwarding of the
+     * current message.
+     */
+    protected void populateForward(MimeMessage mMsg) 
+	throws MessagingException {
+	String textPart = MailUtilities.getTextPart(message);
+	UserProfile up = getDefaultProfile();
+
+	String parsedText = null;
+	String forwardPrefix;
+	String parsedIntro;
+	String forwardStyle = Pooka.getProperty("Pooka.forwardStle", "prefixed");
+
+	if (up != null && up.getMailProperties() != null) {
+	    if (forwardStyle.equals("prefixed")) {
+		forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
+		parsedIntro = parseMsgString(up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")));
+	    } else { 
+		forwardPrefix = Pooka.getProperty("Pooka.forwardPrefix", "> ");
+		parsedIntro = parseMsgString(Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"));
+	    }
+	    parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
+	}
+
+	    mMsg.setText(parsedText);
+	    mMsg.setSubject(parseMsgString(Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s")));
     }
 
     /**
@@ -367,6 +404,7 @@ public class MessageProxy {
 	new MoveAction(),
 	new ReplyAction(),
 	new ReplyAllAction(),
+	new ForwardAction(),
 	new DeleteAction()
     };
 
@@ -420,6 +458,25 @@ public class MessageProxy {
 		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)message.reply(true);
 
 		populateReply(m);
+		getMessagePanel().createNewMessage(m);
+
+	    } catch (MessagingException me) {
+		JOptionPane.showInternalMessageDialog(getMessagePanel(), Pooka.getProperty("error.MessageWindow.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+	    }
+	}
+    }
+
+    public class ForwardAction extends AbstractAction {
+
+	ForwardAction() {
+	    super("message-forward");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    try {
+		javax.mail.internet.MimeMessage m = new MimeMessage(getMessagePanel().getMainPanel().getSession());
+
+		populateForward(m);
 		getMessagePanel().createNewMessage(m);
 
 	    } catch (MessagingException me) {

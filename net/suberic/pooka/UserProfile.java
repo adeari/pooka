@@ -114,7 +114,14 @@ public class UserProfile extends Object {
 	return null;
     }
 
-    static public UserProfile getDefaultProfile(net.suberic.pooka.gui.MessageProxy msg) {
+    /**
+     * for compatibility.
+     */
+    static public UserProfile getDefaultProfile(UserProfileContainer upc) {
+	return upc.getDefaultProfile();
+    }
+
+    /*    static public UserProfile getDefaultProfile(net.suberic.pooka.gui.MessageProxy msg) {
 	if (msg.getFolderInfo() != null)
 	    return UserProfile.getDefaultProfile(msg.getFolderInfo());
 	else
@@ -128,6 +135,7 @@ public class UserProfile extends Object {
     static public UserProfile getDefaultProfile(StoreInfo store) {
 	return store.getDefaultProfile();
     }
+    */
 
     /**
      * returns the default Profile object as defined by the 
