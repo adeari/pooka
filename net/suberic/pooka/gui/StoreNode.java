@@ -289,6 +289,7 @@ public class StoreNode extends MailTreeNode {
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
 
+	    /*
 	    JInternalFrame jif = new JInternalFrame();
 	    
 	    SearchForm sf = new SearchForm(new StoreInfo[] { getStoreInfo() });
@@ -311,6 +312,7 @@ public class StoreNode extends MailTreeNode {
 
 		System.out.println("got " + matchingValues.size() + " matches.");
 	    }
+	    */
 	    /*
 	    jif.getContentPane().add(sf);
 

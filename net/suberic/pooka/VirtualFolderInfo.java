@@ -53,6 +53,7 @@ public class VirtualFolderInfo extends FolderInfo {
 
 	folderThread = new ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread "));
 
+	folderThread.start();
 	loadAllMessages();
     }
 
@@ -91,6 +92,8 @@ public class VirtualFolderInfo extends FolderInfo {
 	    }
 	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
 	    setFolderTableModel(ftm);
+
+	    resetMessageCounts();
 	}
     }
 
@@ -183,8 +186,8 @@ public class VirtualFolderInfo extends FolderInfo {
      * we can just pass this on.
      */
     protected void runMessageChanged(MessageChangedEvent mce) {
-	
 	fireMessageChangedEvent(mce);
+	resetMessageCounts();
     }
 
     /**
@@ -221,6 +224,28 @@ public class VirtualFolderInfo extends FolderInfo {
 	}
     }
 
+    
+    /**
+     * This forces an update of both the total and unread message counts.
+     */
+    public void resetMessageCounts() {
+	if (Pooka.isDebug()) {
+	    System.out.println("running resetMessageCounts.");
+	}
+	
+	int tmpUnreadCount = 0;
+	int tmpMessageCount = 0;
+	Enumeration msgs = messageToInfoTable.keys();
+	while (msgs.hasMoreElements()) {
+	    MessageInfo mi = (MessageInfo) messageToInfoTable.get(msgs.nextElement());
+	    tmpMessageCount++;
+	    if (! mi.isSeen())
+		tmpUnreadCount++;
+	}
+	unreadCount = tmpUnreadCount;
+	messageCount = tmpMessageCount;
+    }
+
     public ActionThread getFolderThread() {
 	return folderThread;
     }
@@ -229,5 +254,9 @@ public class VirtualFolderInfo extends FolderInfo {
 
 	return null;
 
+    }
+
+    public String getFolderID() {
+	return Pooka.getProperty("title.searchResults", "Search results");
     }
 }

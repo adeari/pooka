@@ -46,7 +46,12 @@ public class SearchTermIconManager {
 	    String subProperty = property + "." + (String) items.elementAt(i);
 	    Component currentIcon = loadImage(Pooka.getProperty(subProperty + ".icon", ""));
 	    if (currentIcon != null) {
-		SearchTerm currentTerm = createSearchTerm(subProperty , manager); 
+		SearchTerm currentTerm = null;
+		try {
+		    currentTerm = createSearchTerm(subProperty , manager); 
+		} catch (java.text.ParseException pe) {
+
+		}
 		if (currentTerm != null) {
 		    iconVector.add(currentIcon);
 		    termVector.add(currentTerm);
@@ -92,7 +97,7 @@ public class SearchTermIconManager {
     /**
      * Creates an appropriate SearchTerm from the given property.
      */
-    public SearchTerm createSearchTerm(String propertyName, SearchTermManager manager) {
+    public SearchTerm createSearchTerm(String propertyName, SearchTermManager manager) throws java.text.ParseException {
 	return manager.generateSearchTermFromProperty(propertyName);
     }
 

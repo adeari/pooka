@@ -89,8 +89,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private FolderTracker folderTracker = null;
 
     private boolean loading = false;
-    private int unreadCount = 0;
-    private int messageCount = 0;
+    protected int unreadCount = 0;
+    protected int messageCount = 0;
     private boolean newMessages = false;
 
     private FolderInfo parentFolder = null;
@@ -1109,6 +1109,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void fireMessageCountEvent(MessageCountEvent mce) {
 
+	if (Pooka.isDebug())
+	    System.out.println("firing MessageCountEvent on " + getFolderID());
+
 	// from the EventListenerList javadoc, including comments.
 
 	// Guaranteed to return a non-null array
@@ -1118,13 +1121,23 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	if (mce.getType() == MessageCountEvent.ADDED) {
 	    for (int i = listeners.length-2; i>=0; i-=2) {
+		if (Pooka.isDebug())
+		    System.out.println("listeners[" + i + "] is " + listeners[i] );
 		if (listeners[i]==MessageCountListener.class) {
+		    if (Pooka.isDebug())
+			System.out.println("check.  running messagesAdded on listener.");
+		    
 		    ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
 		}              
 	    }
 	} else if (mce.getType() == MessageCountEvent.REMOVED) {
 	    for (int i = listeners.length-2; i>=0; i-=2) {
+		if (Pooka.isDebug())
+		    System.out.println("listeners[" + i + "] is " + listeners[i] );
 		if (listeners[i]==MessageCountListener.class) {
+		    if (Pooka.isDebug())
+			System.out.println("check.  running messagesRemoved on listener " + listeners[i+1] );
+		    
 		    ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
 		}              
 	    }
@@ -1200,7 +1213,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 			runMessagesRemoved((MessageCountEvent)actionEvent.getSource());
 		    }
-		}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+		}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "messages-removed"));
     }
     
     /**
@@ -1208,24 +1221,35 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * overridden by subclasses.
      */
     protected void runMessagesRemoved(MessageCountEvent mce) {
+	if (Pooka.isDebug())
+	    System.out.println("running MessagesRemoved on " + getFolderID());
+
 	if (folderTableModel != null) {
 	    Message[] removedMessages = mce.getMessages();
 	    if (Pooka.isDebug())
 		System.out.println("removedMessages was of size " + removedMessages.length);
 	    MessageInfo mi;
 	    Vector removedProxies=new Vector();
+
+	    if (Pooka.isDebug()) {
+		System.out.println("message in info table:");
+		Enumeration keys = messageToInfoTable.keys();
+		while (keys.hasMoreElements())
+		    System.out.println(keys.nextElement());
+	    }
+
 	    for (int i = 0; i < removedMessages.length; i++) {
 		if (Pooka.isDebug())
-		    System.out.println("checking for existence of message.");
+		    System.out.println("checking for existence of message " + removedMessages[i]);
 		mi = getMessageInfo(removedMessages[i]);
-		if (mi.getMessageProxy() != null)
-		    mi.getMessageProxy().close();
-		
 		if (mi != null) {
+		    if (mi.getMessageProxy() != null)
+			mi.getMessageProxy().close();
+		
 		    if (Pooka.isDebug())
 			System.out.println("message exists--removing");
 		    removedProxies.add(mi.getMessageProxy());
-		    messageToInfoTable.remove(mi);
+		    messageToInfoTable.remove(removedMessages[i]);
 		}
 	    }
 	    if (getFolderDisplayUI() != null) {
@@ -1545,12 +1569,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public void resetMessageCounts() {
 	try {
-	    if (Pooka.isDebug())
-		System.out.println("running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
+	    if (Pooka.isDebug()) {
+		if (getFolder() != null)
+		    System.out.println("running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
+		else
+		    System.out.println("running resetMessageCounts.  getFolder() is null.");
+	    }
 
 	    unreadCount = getFolder().getUnreadMessageCount();
 	    messageCount = getFolder().getMessageCount();
-	    int newMessageCount = getFolder().getNewMessageCount();
 	} catch (MessagingException me) {
 	    // if we lose the connection to the folder, we'll leave the old
 	    // messageCount and set the unreadCount to zero.
