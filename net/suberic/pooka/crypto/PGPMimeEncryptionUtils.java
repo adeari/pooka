@@ -4,6 +4,7 @@ import net.suberic.pooka.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.activation.*;
 
 import java.io.*;
 
@@ -51,11 +52,19 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
    */
   public javax.mail.Message encryptMessage(Session s, javax.mail.Message msg, EncryptionKey key) 
     throws EncryptionException, MessagingException {
-    MimeMessage encryptedMessage = new MimeMessage((MimeMessage)msg);
+    MimeMessage encryptedMessage = new MimeMessage(s);
+
+    java.util.Enumeration enum = ((MimeMessage)msg).getAllHeaderLines();
+    while (enum.hasMoreElements()) {
+      encryptedMessage.addHeaderLine((String) enum.nextElement());
+    }
 
     Multipart mp = encryptPart(msg, key);
 
     encryptedMessage.setContent(mp);
+    //ContentType cType = new ContentType("multipart/encrypted");
+    //cType.setParameter("protocol", "application/pgp-encrypted");
+    //encryptedMessage.setContentType(cType.toString());
 
     return encryptedMessage;
   }
@@ -87,11 +96,13 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     throws EncryptionException, MessagingException {
 
     try {
-      MimeMultipart mm = new MimeMultipart();
-      mm.setSubType("encrypted");
+      MimeMultipart mm = new MultipartEncrypted("encrypted");
       
       MimeBodyPart idPart = new MimeBodyPart();
-      idPart.setContent("Version: 1", "application/pgp-encrypted");
+      DataSource ds = new ByteArrayDataSource(new String("Version: 1").getBytes(), "pgpapp", "application/pgp-encrypted");
+      idPart.setDataHandler(new javax.activation.DataHandler(ds));
+
+      //idPart.setContent("Version: 1", "application/pgp-encrypted");
       
       MimeBodyPart encryptedContent = new MimeBodyPart();
       byte[] encryptedBytes = encrypt(part.getInputStream(), key);

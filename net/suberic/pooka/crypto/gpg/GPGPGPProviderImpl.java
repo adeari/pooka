@@ -82,6 +82,11 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
       processWriter.flush();
       processWriter.close();
 
+      try {
+	p.waitFor();
+      } catch (InterruptedException ie) {
+      }
+
       InputStream is = new FileInputStream(new File(outFile.getAbsolutePath() + ".asc"));
       
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -99,6 +104,7 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
       return baos.toByteArray();
       
     } catch (java.io.IOException ioe) {
+      ioe.printStackTrace();
       throw new EncryptionException(ioe.getMessage());
     }
   }
