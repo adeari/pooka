@@ -445,6 +445,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new EditOutgoingServerAction(),
 	new EditConnectionAction(),
 	new EditInterfaceAction(),
+	new EditCryptoAction(),
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
 	new HelpAction(),

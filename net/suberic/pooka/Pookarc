@@ -94,10 +94,23 @@ Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
 
 
-EncryptionManager.pgp.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
-#EncryptionManager.smime.provider=net.suberic.pooka.crypto.bouncy.SMIMEEncryptionUtils
-EncryptionManager.default=pgp
+EncryptionManager.propertyType=Composite
+EncryptionManager.scoped=true
+EncryptionManager=pgp:smime:savePasswordsForSession
+EncryptionManager.pgp.propertyType=Composite
+EncryptionManager.pgp.scoped=true
+EncryptionManager.pgp=keyStore.public.filename:keyStore.private.filename:keyStore.private.password
+EncryptionManager.pgp.keyStore.public.filename.propertyType=File
+EncryptionManager.pgp.keyStore.private.filename.propertyType=File
+EncryptionManager.pgp.keyStore.private.password.propertyType=Password
+EncryptionManager.smime.propertyType=Composite
+EncryptionManager.smime.scoped=true
+EncryptionManager.smime=keyStore.public.filename:keyStore.private.filename:keyStore.private.password
+EncryptionManager.smime.keyStore.public.filename.propertyType=File
+EncryptionManager.smime.keyStore.private.filename.propertyType=File
+EncryptionManager.smime.keyStore.private.password.propertyType=Password
 EncryptionManager.savePasswordsForSession=false
+EncryptionManager.savePasswordsForSession.propertyType=Boolean
 
 Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
 Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png

@@ -99,9 +99,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	} catch (Exception e) {
 	}
       }
-	    if (!password.equals(""))
-	      password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
-	    server = Pooka.getProperty("Store." + storeID + ".server", "");
+      if (!password.equals(""))
+	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
+      server = Pooka.getProperty("Store." + storeID + ".server", "");
     }
     
     

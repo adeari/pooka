@@ -43,6 +43,8 @@ public class PookaEncryptionManager {
 
     String pgpPrivateFilename = sourceBundle.getProperty(key + ".pgp.keyStore.private.filename", "");
     String pgpPrivatePwString = sourceBundle.getProperty(key + ".pgp.keyStore.private.password", "");
+    if (!pgpPrivatePwString.equals(""))
+      pgpPrivatePwString = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(pgpPrivatePwString);
 
     try {
       EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
@@ -65,18 +67,23 @@ public class PookaEncryptionManager {
       }
     } catch (java.security.NoSuchProviderException nspe) {
       System.out.println("Error loading PGP key store:  " + nspe.getMessage());
+    } catch (Exception e) {
+      System.out.println("Error loading PGP key store:  " + e.getMessage());
     }
 
     String smimePublicFilename = sourceBundle.getProperty(key + ".smime.keyStore.public.filename", "");
 
     String smimePrivateFilename = sourceBundle.getProperty(key + ".smime.keyStore.private.filename", "");
     String smimePrivatePwString = sourceBundle.getProperty(key + ".smime.keyStore.private.password", "");
+    if (!smimePrivatePwString.equals(""))
+      smimePrivatePwString = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(smimePrivatePwString);
 
     try {
       EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
       if (smimeUtils != null) {
 	smimeKeyMgr = smimeUtils.createKeyManager();
 	try {
+	  System.err.println("loading " + smimePrivateFilename + " with password " + smimePrivatePwString);
 	  smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
 	} catch (java.security.GeneralSecurityException gse) {
 	  System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
@@ -94,6 +101,8 @@ public class PookaEncryptionManager {
       }
     } catch (java.security.NoSuchProviderException nspe) {
       System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
+    } catch (Exception e) {
+      System.out.println("Error loading S/MIME key store:  " + e.getMessage());
     }
 
 
