@@ -1,38 +1,66 @@
-after alpha 2
-----------------
+beta 1
+---------------
 
-*) enable voice control
-
+ui engine
+---------
 *)  make the windows detachable.
 
 *) add an optional preview pane.
 
-*) add a search and replace for the message editors.
-
-*) add pop3/local mail spool support.
-
-*) fix the jfilechooser so it doesn't disconnect all of our folders when you
-use it--or at least so it doesn't matter if it does.
-
-*) make a way to edit the mailcap bindings other than just the 'make default'
-option.
-
-*) add disconnected imap support.
-
-*) add something to search through all messages in the folder.
-
-*) currently, we only really support a signature file, though the ability
-is there to do all kinds of signature generators.  implement support for
-alternate signature methods.
-
+general ui
+----------
 *) revamp the UserProfile, Store, and Folder editing process.  make a full
 screen for each with all the possible information (update time, colors,
 connection information, trash/sent folders, etc.) available, and make it
 so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
 
+*) takes too long to open a window where there are a lot of new messages.
+
+*) add the ability to save messages to files.
+
+*) add ability to reply/forward with attachments, or as inline, and so forth
+
+*) add copying messages.
+
+*) add undo/redo support
+
+protocol support
+----------------
+*) add pop3/local mail spool support.
+
+*) add disconnected imap support.
+
+*) fix the jfilechooser so it doesn't disconnect all of our folders when you
+use it--or at least so it doesn't matter if it does.
+
+searching
+---------
+*) add a search and replace for the message editors.
+
+*) add something to search through all messages in the folder.
+
+*) add support for mail filters.
+
+other
+-----
 *)  fix the out of memory problems--only load a certain amount of large
 messages.  for that matter, maybe also do an optimizeit audit.
+
+*) add address book and alias support
+
+
+after beta 1
+----------------
+
+*) enable voice control
+
+*) make a way to edit the mailcap bindings other than just the 'make default'
+option.
+
+*) currently, we only really support a signature file, though the ability
+is there to do all kinds of signature generators.  implement support for
+alternate signature methods.
 
 *)  implement a way to make a custom FolderCellRenderer for a property.
 
@@ -50,8 +78,6 @@ and that all the gui updates are happening on the EventDispatcher thread.
 
 *) delete for multiple messages takes way too long.
 
-*) takes too long to open a window where there are a lot of new messages.
-
 *) make the scrolling work properly for all border cases, such as a single new
 window at -5, -5.
 
@@ -60,25 +86,13 @@ too much date info, not enough Subject.
 
 *) make printing nicer--it's pretty basic now.
 
-*) add the ability to save messages to files.
-
-*) add ability to reply/forward with attachments, or as inline, and so forth
-
-*) add copying messages.
-
-*) add undo/redo support
-
 *) select all/all messages
 
 *) add interfaces for all the rest of the features.  :)
 
-*) add support for mail filters.
-
 *) add more font support
 
 *) add 'edit message as new'
-
-*) add address book and alias support
 
 *) add ldap support
 
@@ -102,17 +116,9 @@ create and send message
 	add ability of setting return values by hand (not by UserProfile)
 	make a sent folder
 
-user profiles/information
-	can do.  todo:
-	make sure that the sendMailURL is properly updated as soon as it's
-		entered.  i think right now you have to restart, or reopen
-		folders, or something like that.
-
 Editing Profiles/Stores
 	can do.  todo:
 		make required fields.
-
-closing the window doesn't exit program.
 
 make an update Thread -- sort of done.  need to institute update time.
 
@@ -122,16 +128,6 @@ the Spice is life
 
 add Font stuff.
 
-hourglass for blocking actions--fix it. -?? may be a 1.2 bug; things work
-fine in 1.3.
-
-implement the signatures properly.  
-
 write profile changes to disk immediately on setting (?)
 
-BUGS
----------
-updates of pkamailrc aren't handled correctly--some lines aren't deleted.
-
-actions on FolderPanel are always available in the menu.
 
