@@ -33,6 +33,10 @@ the UserProfile only gets updated at startup.
 
 *) make the mailcap mappings for the attachments work properly.
 
+*) delete for multiple messages takes way too long.
+
+*) takes too long to open a window where there are a lot of new messages.
+
 -------
 
 open messages from the FolderWindow
