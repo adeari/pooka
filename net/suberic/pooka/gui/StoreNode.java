@@ -14,13 +14,11 @@ public class StoreNode extends MailTreeNode {
     
     protected StoreInfo store = null;
     protected String displayName = null;
-    protected boolean listSubscribedOnly;
     protected boolean hasLoaded = false;
 
-    public StoreNode(StoreInfo newStore, JComponent parent, boolean subscribedOnly) {
+    public StoreNode(StoreInfo newStore, JComponent parent) {
 	super(newStore, parent);
 	store = newStore;
-	listSubscribedOnly=subscribedOnly;
 	displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
 	setCommands();
     }
@@ -72,38 +70,17 @@ public class StoreNode extends MailTreeNode {
 		return;
 	    }
 	
-	if (listSubscribedOnly) {
-	    
-	    String folderName;
-	    
-	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + store.getStoreID() + ".folderList", "INBOX"), ":");
-	    
-	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-		folderName = (String)tokens.nextToken();
-		FolderNode node = new FolderNode(new FolderInfo(store, folderName ), getParentContainer(), listSubscribedOnly);
-		// we used insert here, since add() would mak
-		// another recursive call to getChildCount();
-		insert(node, i);
-	    } 
-	} else {
-	    try {
-		Folder[] folderList = store.getStore().getDefaultFolder().list();
-		
-		if (folderList != null) 
-		    for (int i = 0 ; i < folderList.length ; i++) {
-			FolderNode node = new FolderNode(new FolderInfo(store, folderList[i].getName() ),getParentContainer(), false);
-			// we used insert here, since add() would mak
-			// another recursive call to getChildCount();
-			insert(node, i);
-		    }
-	    } catch (MessagingException me) {
-		if (me instanceof FolderNotFoundException) {
-		    JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
-		} else {
-		    me.printStackTrace();
-		}
-	    }
-	}
+	String folderName;
+	
+	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + store.getStoreID() + ".folderList", "INBOX"), ":");
+	
+	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+	    folderName = (String)tokens.nextToken();
+	    FolderNode node = new FolderNode(new FolderInfo(store, folderName ), getParentContainer());
+	    // we used insert here, since add() would mak
+	    // another recursive call to getChildCount();
+	    insert(node, i);
+	} 
     }
 
     public String getStoreID() {
@@ -128,11 +105,6 @@ public class StoreNode extends MailTreeNode {
 	} else 
 	    return false;
     }
-
-    /**
-     * Subscribes to the given Folder.
-     *
-     */
 
     public Action[] defaultActions = new Action[] {
 	new OpenAction(),

@@ -18,19 +18,15 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
     
     protected FolderInfo folderInfo = null;
     protected boolean hasLoaded = false;
-    protected boolean listSubscribedOnly;
 
     /**
      * creates a tree node that points to a folder
      *
      * @param newFolder	the store for this node
      * @param newParent the parent component
-     * @param subscribedOnly whether or not the children of this node are
-     * just the subscribed folders, or all folders.
      */
-    public FolderNode(FolderInfo newFolderInfo, JComponent newParent, boolean subscribedOnly) {
+    public FolderNode(FolderInfo newFolderInfo, JComponent newParent) {
 	super(newFolderInfo, newParent);
-	listSubscribedOnly=subscribedOnly;
 	folderInfo = newFolderInfo;
 
 	folderInfo.setFolderNode(this);
@@ -46,19 +42,17 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	    }
 	}
 
-	if (listSubscribedOnly) {
-	    folderInfo.addMessageCountListener(new MessageCountAdapter() {
-		    public void messagesAdded(MessageCountEvent e) {
-			getParentContainer().repaint();
-		    }
-
-		    public void messageRemoved(MessageCountEvent e) {
-			getParentContainer().repaint();
-		    }
-		});
+	folderInfo.addMessageCountListener(new MessageCountAdapter() {
+	    public void messagesAdded(MessageCountEvent e) {
+		getParentContainer().repaint();
+	    }
 	    
-	    folderInfo.addMessageChangedListener(this);
-	}
+	    public void messageRemoved(MessageCountEvent e) {
+		getParentContainer().repaint();
+	    }
+	});
+	
+	folderInfo.addMessageChangedListener(this);
 
     }
 
@@ -129,54 +123,24 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	while (origChildren.hasMoreElements())
 	    origChildrenVector.add(origChildren.nextElement());
 
-	if (listSubscribedOnly) {
-	    Vector folderChildren = getFolderInfo().getChildren();
-
-	    if (folderChildren != null) {
-		for (int i = 0; i < folderChildren.size(); i++) {
-		    FolderNode node = popChild(((FolderInfo)folderChildren.elementAt(i)).getFolderName(), origChildrenVector);
-		    if (node == null) {
-			node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer(), true);
-			// we used insert here, since add() would mak
-			// another recursive call to getChildCount();
-			insert(node, 0);
-		    }
-		}
-		
-	    }
-
-	    removeChildren(origChildrenVector);
-
-	    hasLoaded=true;
-
-	} else {
-	    // get the default folder, and list the
-	    // subscribed folders on it
-	    
-	    Folder folder = getFolder();
-	    
-	    try {
-		Folder[] folderList = folder.list();
-		
-		for (int i = 0 ; i < folderList.length ; i++) {
-		    
-		    FolderNode node = new FolderNode(new FolderInfo(getFolderInfo(), folderList[i].getName()), getParentContainer(), false);
-		    // we used insert here, sincedd() would mak
+	Vector folderChildren = getFolderInfo().getChildren();
+	
+	if (folderChildren != null) {
+	    for (int i = 0; i < folderChildren.size(); i++) {
+		FolderNode node = popChild(((FolderInfo)folderChildren.elementAt(i)).getFolderName(), origChildrenVector);
+		if (node == null) {
+		    node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer());
+		    // we used insert here, since add() would mak
 		    // another recursive call to getChildCount();
-		    insert(node, i);
-		}
-		
-	    } catch (MessagingException me) {
-		if (me instanceof FolderNotFoundException) {
-		    JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
-		} else {
-		    me.printStackTrace();
+		    insert(node, 0);
 		}
 	    }
+	    
 	}
-
-	hasLoaded = true;
-
+	
+	removeChildren(origChildrenVector);
+	
+	hasLoaded=true;
     }
 
     /**

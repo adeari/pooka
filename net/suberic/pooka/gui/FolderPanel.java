@@ -125,7 +125,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
 
     public void addStore(String storeID, MailTreeNode root) {
 	StoreInfo store = new StoreInfo(storeID);
-	StoreNode storenode = new StoreNode(store, this, true);
+	StoreNode storenode = new StoreNode(store, this);
 	root.add(storenode);
     }
 

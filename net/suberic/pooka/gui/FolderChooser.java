@@ -38,8 +38,8 @@ public class FolderChooser {
 		public void mouseClicked(MouseEvent e) {
 		    if (e.getClickCount() == 2) {
 			MailTreeNode tmpNode = getSelectedNode();
-			if (tmpNode != null && tmpNode instanceof FolderNode)
-			    toggleSubscribed((FolderNode)tmpNode);
+			if (tmpNode != null && tmpNode instanceof ChooserFolderNode)
+			    toggleSubscribed((ChooserFolderNode)tmpNode);
 			tree.repaint();
 		    } 
 		    
@@ -75,8 +75,8 @@ public class FolderChooser {
      * creates the tree root.
      */
     private MailTreeNode createTreeRoot() {
-	StoreNode sn = new StoreNode(new net.suberic.pooka.StoreInfo(storeID), frame, false);
-	return sn;
+	ChooserStoreNode csn = new ChooserStoreNode(store, storeID, frame);
+	return csn;
     }
 
     /**
@@ -85,7 +85,7 @@ public class FolderChooser {
      *
      * Note that changes are not made until saveSubscribedList() is called.
      */
-    public void subscribeFolder(FolderNode node) {
+    public void subscribeFolder(ChooserFolderNode node) {
 	node.setSubscribed(true);
     }
 
@@ -95,15 +95,15 @@ public class FolderChooser {
      *
      * Note that changes are not made until saveSubscribedList() is called.
      */
-    public void unsubscribeFolder(FolderNode node) {
+    public void unsubscribeFolder(ChooserFolderNode node) {
 	node.setSubscribed(false);
     }
 
     /**
-     * This toggles the Subscribed field for the given FolderNode.
+     * This toggles the Subscribed field for the given ChooserFolderNode.
      */
 
-    public void toggleSubscribed(FolderNode node) {
+    public void toggleSubscribed(ChooserFolderNode node) {
 	if (node.isSubscribed())
 	    unsubscribeFolder(node);
 	else
@@ -116,7 +116,7 @@ public class FolderChooser {
      */
     public void saveSubscribedList() {
 	Properties p = new Properties();
-	FolderNode node;
+	ChooserFolderNode node;
 
 	Enumeration children = ((MailTreeNode)treeModel.getRoot()).children();
 
@@ -125,13 +125,13 @@ public class FolderChooser {
 	String prefix = "Store." + storeID;
 
 	while (children.hasMoreElements()) {
-	    node = (FolderNode)children.nextElement();
+	    node = (ChooserFolderNode)children.nextElement();
 	    if (node.isLeaf()) {
 		if (node.isSubscribed())
-		    subscribed.add(node.getFolderInfo().getFolderName());
+		    subscribed.add(node.getFolder().getName());
 	    } else {
-		if (readSubscribedTree(node, prefix + "." + node.getFolderInfo().getFolderName(), p))
-		    subscribed.add(node.getFolderInfo().getFolderName());
+		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), p))
+		    subscribed.add(node.getFolder().getName());
 	    }
 	}    
 
@@ -162,26 +162,25 @@ public class FolderChooser {
     }
 
     /**
-     * This method take a FolderNode which has children and then sets the
-     * appropriate properties.  If the FolderNode is not a leaf node and
-     * has 
+     * This method take a ChooserFolderNode which has children and then sets 
+     * the appropriate properties.
      */
-    private boolean readSubscribedTree(FolderNode parentNode, String prefix, Properties properties) {
+    private boolean readSubscribedTree(ChooserFolderNode parentNode, String prefix, Properties properties) {
 
-	FolderNode node;
+	ChooserFolderNode node;
 
 	Enumeration children = parentNode.children();
 
 	Vector subscribed = new Vector();
 
 	while (children.hasMoreElements()) {
-	    node = (FolderNode)children.nextElement();
+	    node = (ChooserFolderNode)children.nextElement();
 	    if (node.isLeaf()) {
 		if (node.isSubscribed())
-		    subscribed.add(node.getFolderInfo().getFolderName());
+		    subscribed.add(node.getFolder().getName());
 	    } else {
-		if (readSubscribedTree(node, prefix + "." + node.getFolderInfo().getFolderName(), properties))
-		    subscribed.add(node.getFolderInfo().getFolderName());
+		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), properties))
+		    subscribed.add(node.getFolder().getName());
 	    }
 	}    
 	
@@ -210,8 +209,8 @@ public class FolderChooser {
      */
 
     public void subscribeNodes(TreeModel tm) {
-	StoreNode sn = (StoreNode) tm.getRoot();
-	parseNodes(sn, "Store." + storeID);
+	ChooserStoreNode csn = (ChooserStoreNode) tm.getRoot();
+	parseNodes(csn, "Store." + storeID);
     }
 
     /**
@@ -226,7 +225,7 @@ public class FolderChooser {
 	    StringTokenizer tokens = new StringTokenizer(subscribedSubFolderList, ":");
 	    while (tokens.hasMoreTokens()) {
 		String nextName = tokens.nextToken();
-		FolderNode fn = findNode(parent, nextName);
+		ChooserFolderNode fn = findNode(parent, nextName);
 		if (fn != null) {
 		    fn.setSubscribed(true);
 		    if (! (fn.isLeaf()))
@@ -242,12 +241,12 @@ public class FolderChooser {
      * given node whose folder has the given name, it returns that
      * Node.
      */
-    private FolderNode findNode(TreeNode parent, String folderName) {
+    private ChooserFolderNode findNode(TreeNode parent, String folderName) {
 	Enumeration children = parent.children();
-	FolderNode currentFolder;
+	ChooserFolderNode currentFolder;
 	while (children.hasMoreElements()) {
-	    currentFolder = (FolderNode) children.nextElement();
-	    if (folderName.equals(currentFolder.getFolderInfo().getFolderName()))
+	    currentFolder = (ChooserFolderNode) children.nextElement();
+	    if (folderName.equals(currentFolder.getFolder().getName()))
 		return currentFolder;
 	}
 
@@ -312,3 +311,6 @@ public class FolderChooser {
     }
 
 }
+
+
+
