@@ -129,7 +129,8 @@ public class StoreInfo implements ValueChangeListener {
 	String trashFolderName = Pooka.getProperty(getStoreProperty() + ".trashFolder", "");
 	if (trashFolderName.length() > 0) {
 	    trashFolder = getChild(trashFolderName);
-	    trashFolder.setTrashFolder(true);
+	    if (trashFolder != null)
+		trashFolder.setTrashFolder(true);
 	}
     }	
     
