@@ -1,10 +1,5 @@
 top todo:
 
-*) add color and font support
-	begun.  todo:
-	*) Folder -- read messages need to honor the font and font color.
-	   -- done?  check font color.  -- read messages don't get font color.
-
 *) have Pooka itself change its icon if you get new messages, in addition to 
 changing the title bar.
 	done.  todo:  get good icons.
@@ -61,6 +56,8 @@ works when you package up a .jar file.
 doesn't change, you still resize the window.
 
 *) add pgp/gpg support.
+
+*) read messages don't get font color set properly.  works in jdk1.4.
 
 *) queuing of outgoing mails
 	todo on this:
