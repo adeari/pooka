@@ -1,16 +1,18 @@
 package net.suberic.pooka.gui.filter;
-import net.suberic.pooka.gui.FolderSelectorPane;
+import javax.swing.*;
 import java.util.Properties;
 
 /**
  * This is a class that lets you choose your filter actions.
  */
-public class MoveFilterEditor extends FilterEditor {
-    String originalFolderName;
+public class FlagFilterEditor extends FilterEditor {
+    String originalFlagName;
+    String originalFlagValue;
 
-    FolderSelectorPane fsp;
+    JComboBox flagBox;
+    JComboBox trueFalseBox;
 
-     public static String FILTER_CLASS = "net.suberic.pooka.filter.MoveFilterAction";
+    public static String FILTER_CLASS = "net.suberic.pooka.filter.FlagFilterAction";
 
     /**
      * Configures the given FilterEditor from the given VariableBundle and
@@ -20,9 +22,18 @@ public class MoveFilterEditor extends FilterEditor {
 	property = propertyName;
 	sourceBundle = bundle;
 
-	fsp = new FolderSelectorPane(propertyName + ".targetFolder", sourceBundle);
+	Vector flagNames = Pooka.getSearchManager().getFlagLabels();
+	flagBox = new JComboBox(flagNames);
 
-	this.add(fsp);
+	this.add(flagBox);
+
+	Vector trueFalse = new Vector();
+	trueFalse.add(Pooka.getProperty("label.true", "True"));
+	trueFalse.add(Pooka.getProperty("label.false", "False"));
+	
+	trueFalseBox = new JComboBox(trueFalse);
+
+	this.add(trueFalseBox);
     }
     
     /**

@@ -50,8 +50,15 @@ public class FilterEditorPane extends DefaultPropertyEditor implements java.awt.
 	// create the label
 	label = new JLabel(sourceBundle.getProperty(typeTemplate + ".label", "Action"));
 
+	// find out if we're a display filter or a backend filter
+	String filterType = sourceBundle.getProperty(typeTemplate + ".filterType", "display");
+
 	// create the combo
-	Vector filterLabels = Pooka.getSearchManager().getFilterLabels();
+	Vector filterLabels = null;
+	if (filterType.equalsIgnoreCase("display"))
+	    filterLabels = Pooka.getSearchManager().getDisplayFilterLabels();
+	else
+	    filterLabels = Pooka.getSearchManager().getBackendFilterLabels();
 	
 	typeCombo = new JComboBox(filterLabels);
 	typeCombo.addItemListener(this);

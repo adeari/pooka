@@ -36,7 +36,8 @@ public class SearchTermManager {
 
     // filter properties
 
-    Vector filterLabels;
+    Vector displayFilterLabels;
+    Vector backendFilterLabels;
     HashMap filterLabelToPropertyMap;
     HashMap filterClassToPropertyMap;
 
@@ -119,16 +120,27 @@ public class SearchTermManager {
      * Creates the filter properties.
      */
     public void createFilterMaps() {
-	filterLabels=new Vector();
+	displayFilterLabels=new Vector();
+	backendFilterLabels=new Vector();
 	filterLabelToPropertyMap = new HashMap();
 	filterClassToPropertyMap = new HashMap();
 
-	Vector filterProperties = Pooka.getResources().getPropertyAsVector("FolderFilters", "");
+	Vector filterProperties = Pooka.getResources().getPropertyAsVector("FolderFilters.display", "");
 	for (int i = 0; i < filterProperties.size(); i++) {
-	    String currentProperty = "FolderFilters." + (String) filterProperties.elementAt(i);
+	    String currentProperty = "FolderFilters.display." + (String) filterProperties.elementAt(i);
 	    String label = Pooka.getProperty(currentProperty + ".label", (String) filterProperties.elementAt(i));
 	    String className = Pooka.getProperty(currentProperty + ".class", "");
-	    filterLabels.add(label);
+	    displayFilterLabels.add(label);
+	    filterLabelToPropertyMap.put(label, currentProperty);
+	    filterClassToPropertyMap.put(className, currentProperty);
+	}
+
+	filterProperties = Pooka.getResources().getPropertyAsVector("FolderFilters.backend", "");
+	for (int i = 0; i < filterProperties.size(); i++) {
+	    String currentProperty = "FolderFilters.backend." + (String) filterProperties.elementAt(i);
+	    String label = Pooka.getProperty(currentProperty + ".label", (String) filterProperties.elementAt(i));
+	    String className = Pooka.getProperty(currentProperty + ".class", "");
+	    backendFilterLabels.add(label);
 	    filterLabelToPropertyMap.put(label, currentProperty);
 	    filterClassToPropertyMap.put(className, currentProperty);
 	}
@@ -308,10 +320,17 @@ public class SearchTermManager {
     }
 
     /**
-     * Returns the filter labels.
+     * Returns the display filter labels.
      */
-    public Vector getFilterLabels() {
-	return filterLabels;
+    public Vector getDisplayFilterLabels() {
+	return displayFilterLabels;
+    }
+
+    /**
+     * Returns the backend filter labels.
+     */
+    public Vector getBackendFilterLabels() {
+	return backendFilterLabels;
     }
 
     /**

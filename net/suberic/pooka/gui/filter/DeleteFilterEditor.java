@@ -14,7 +14,7 @@ public class DeleteFilterEditor extends FilterEditor {
      * property.
      */
     public void configureEditor(net.suberic.util.VariableBundle bundle, String propertyName) {
-
+	// there really isn't anything to do here, is there?
     }
     
     /**
