@@ -213,14 +213,14 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     pep = new CompositeEditorPane(factory, rootProp, template, false);
     
     if (original == true) {
-      originalPanels.put("default", pep);
+      originalPanels.put("___default", pep);
     }
     
-    currentPanels.put("default", pep);
+    currentPanels.put("___default", pep);
     
-    entryPanel.add("default", pep);
+    entryPanel.add("___default", pep);
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
-    entryLayout.show(entryPanel, "default");
+    entryLayout.show(entryPanel, "___default");
     
     return entryPanel;
   }
@@ -279,7 +279,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     if (selectedId != null)
       entryLayout.show(entryPanel, selectedId);
     else
-      entryLayout.show(entryPanel, "default");
+      entryLayout.show(entryPanel, "___default");
     
   }
   
