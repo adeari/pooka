@@ -7,8 +7,21 @@
 
 -----
 
-*) make it so selecting or scrolling in a messagepanel will remove the
-	new message icon.
+*) make spam button available, and give it a keybinding.  also make it so
+	hitting an unconfigured spam button gives you a choice to configure
+	it.
+
+*) printing
+	*) handle cancel better
+	*) better layout of printer frame.  center things?
+
+*) bug?? - chance when running in cached mode of having a difference in the
+	message count?  looks like the messages are correct in the count,
+	but incorrect in the display table.
+
+*) bug:  disconnected mode:  connect.  close folder.  try to re-open folder.
+
+--?
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -23,21 +36,9 @@
 	event thread, then switch over to the folder thread for the real
 	work.
 
-*) bug?? - chance when running in cached mode of having a difference in the
-	message count?  looks like the messages are correct in the count,
-	but incorrect in the display table.
-
-*) bug:  disconnected mode:  connect.  close folder.  try to re-open folder.
-
-*) make spam button available, and give it a keybinding.  also make it so
-	hitting an unconfigured spam button gives you a choice to configure
-	it.
-
-*) printing
-	*) handle cancel better
-	*) better layout of printer frame.  center things?
-
 *) fix error display with exception so that you can see the stack trace.
+
+*) disconneted:  use downloaded headers when available?
 
 ----
 

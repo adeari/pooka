@@ -33,7 +33,6 @@ public class FolderDisplayPanel extends JPanel {
     boolean enabled = true;
 
     boolean validated = false;
-    int scrollToRowOnValidate = -1;
 
     /**
      * Creates an empty FolderDisplayPanel.
@@ -80,6 +79,21 @@ public class FolderDisplayPanel extends JPanel {
 	}
       });
 
+    JScrollBar jsb = scrollPane.getVerticalScrollBar();
+    if (jsb != null) {
+      jsb.addAdjustmentListener(new AdjustmentListener() {
+	  public void adjustmentValueChanged(AdjustmentEvent e) {
+	    if (getFolderInfo() != null && getFolderInfo().hasNewMessages()) {
+	      getFolderInfo().setNewMessages(false);
+	      FolderNode fn = getFolderInfo().getFolderNode();
+	      if (fn != null)
+		fn.getParentContainer().repaint();
+	    }
+	  }
+	  
+	});
+    }
+    
     Pooka.getHelpBroker().enableHelpKey(this, "ui.folderWindow", Pooka.getHelpBroker().getHelpSet());
 
   }
@@ -449,38 +463,8 @@ public class FolderDisplayPanel extends JPanel {
   public void makeSelectionVisible(int rowNumber) {
     messageTable.scrollRectToVisible(messageTable.getCellRect(rowNumber, 1, true));
     
-    // on 1.3, the window may not be validated yet when we first want
-    // to make the selection visible.  so we have a workaround.
-    /*
-    if (!validated) {
-      String javaVersion = System.getProperty("java.version");
-      
-      if (javaVersion.compareTo("1.3") >= 0) {
-	scrollToRowOnValidate = rowNumber;
-      }
-    }
-    */
   }
   
-  /**
-   * This overrides validate() to work around the fact that we may want
-   * to scroll the JTable before we've been validated, which doesn't work
-   * under 1.3.
-   */
-  public void validate() {
-    super.validate();
-    
-    /*
-    if (! validated) {
-      validated = true;
-      if (scrollToRowOnValidate != -1) {
-	makeSelectionVisible(scrollToRowOnValidate);
-	scrollToRowOnValidate = -1;
-      }
-    }
-    */
-  }
-
   
   /**
    * This selects the next message.  If no message is selected, then

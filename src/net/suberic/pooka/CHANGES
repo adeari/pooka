@@ -1,3 +1,6 @@
+made it so selecting or scrolling in a messagepanel will remove the
+new message icon.
+
 optimized IMAP folder loading so that we initially fetch the SEEN flag,
 and then pre-fetch the messages we'll actually display (by loading around
 the getFirstUnreadMessage() value)
