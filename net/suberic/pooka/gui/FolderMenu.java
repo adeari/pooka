@@ -11,6 +11,8 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
     Vector folderList;
     FolderPanel fPanel;
 
+    Hashtable oldCommands = new Hashtable();
+
     /**
      * This creates a new FolderMenu.
      */
@@ -77,7 +79,13 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
 		    }
 		}
 		newAction.putValue("target", getTargetFolder(j));
+		Object o = oldCommands.get(mi);
+		if (o != null)
+		    mi.removeActionListener((Action)o);
+
 		mi.addActionListener(newAction);
+		oldCommands.put(mi, newAction);
+
 		mi.setEnabled(true);
 	    } else {
 		mi.setEnabled(false);

@@ -153,20 +153,13 @@ public class MessageProxy {
     public void moveMessage(FolderInfo targetFolder) {
         boolean success=false;
 	try {
-	    /*
-	      this shouldn't be necessary according to the api.
-	    if (!targetFolder.isOpen()) {
-		targetFolder.openFolder(Folder.READ_WRITE);
-	    } else if (! (targetFolder.getFolder().getMode() != Folder.READ_WRITE)) {
-		targetFolder.openFolder(Folder.READ_WRITE);
-	    }
-	    */
-
 	    folderInfo.getFolder().copyMessages(new Message[] {message}, targetFolder.getFolder());
 	    success=true;
 	} catch (MessagingException me) {
 	    if (folderInfo != null && folderInfo.getFolderWindow() != null)
 		JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n" + me.getMessage());
+	    if (Pooka.isDebug())
+		me.printStackTrace();
 	}
 
 	if (success == true) 
@@ -178,8 +171,9 @@ public class MessageProxy {
 	    } catch (MessagingException me) {
 		if (folderInfo != null && folderInfo.getFolderWindow() != null)
 		    JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n" + me.getMessage());
+		if (Pooka.isDebug())
+		    me.printStackTrace();
 	    }		
-	
     }
 
     /**

@@ -3,6 +3,12 @@ import javax.mail.*;
 import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
+import net.suberic.pooka.FolderInfo;
+import net.suberic.pooka.Pooka;
+
+/**
+ * This class represents a group of Messages all selected.
+ */
 
 public class MultiMessageProxy extends MessageProxy{
     Vector messages;
@@ -12,6 +18,12 @@ public class MultiMessageProxy extends MessageProxy{
 
     Hashtable commands;
 
+    /**
+     * This creates a new MultiMessageProxy from the MessageProxys in 
+     * the newMessages Vector.  These should be the MessageProxy objects
+     * which correspond with rows newRowNumbers on FolderWindow
+     * newFolderWindow.
+     */
     public MultiMessageProxy(int[] newRowNumbers, Vector newMessages, FolderWindow newFolderWindow) {
 	rowNumbers=newRowNumbers;
 	messages=newMessages;
@@ -29,10 +41,50 @@ public class MultiMessageProxy extends MessageProxy{
 	
     }
 
+    /**
+     * This opens up new windows for all of the selected messages.
+     */
     public void openWindow() {
 	for (int i = 0; i < messages.size(); i++) {
 	    folderWindow.getMessagePanel().openMessageWindow((MessageProxy)messages.elementAt(i));
 	}
+    }
+
+    /**
+     * Moves the Message into the target Folder.
+     */
+    public void moveMessage(FolderInfo targetFolder) {
+        boolean success=false;
+	Message[] allMessages = new Message[messages.size()];
+	for (int i = 0; i < messages.size(); i++)
+	    allMessages[i] = ((MessageProxy)messages.elementAt(i)).getMessage();
+
+	// these should all be from the same folder, shouldn't they?
+	FolderInfo fInfo = ((MessageProxy)messages.elementAt(0)).getFolderInfo();
+
+	try {
+	    fInfo.getFolder().copyMessages(allMessages, targetFolder.getFolder());
+	    success=true;
+	} catch (MessagingException me) {
+	    if (folderInfo != null && folderInfo.getFolderWindow() != null)
+		JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n");
+	    if (Pooka.isDebug())
+		me.printStackTrace();
+	}
+
+	if (success == true) 
+	    try {
+		for (int j = 0; j < allMessages.length; j++)
+		    allMessages[j].setFlag(Flags.Flag.DELETED, true);
+		
+		if ( Pooka.getProperty("Pooka.autoExpunge", "true").equals("true") )
+		    fInfo.getFolder().expunge();
+	    } catch (MessagingException me) {
+		if (folderInfo != null && folderInfo.getFolderWindow() != null)
+		    JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n" + me.getMessage());
+		if (Pooka.isDebug())
+		    me.printStackTrace();
+	    }		
     }
 
     /**
@@ -56,7 +108,8 @@ public class MultiMessageProxy extends MessageProxy{
 
     public Action[] defaultActions = {
 	new OpenAction(),
-	new DeleteAction()
+	new DeleteAction(),
+	new MoveAction()
     };
 
     public class OpenAction extends AbstractAction {
@@ -77,6 +130,17 @@ public class MultiMessageProxy extends MessageProxy{
 	public void actionPerformed(java.awt.event.ActionEvent e) {
 	    deleteMessages();
 	}
+    }
+
+    public class MoveAction extends net.suberic.util.DynamicAbstractAction {
+	MoveAction() {
+	    super("message-move");
+	}
+
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	    moveMessage((FolderInfo)getValue("target"));
+	}
+
     }
 
 }
