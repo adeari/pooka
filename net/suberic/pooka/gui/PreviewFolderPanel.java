@@ -29,6 +29,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
     private FolderStatusBar folderStatusBar = null;
 
+    ConfigurableKeyBinding keyBindings;
+
     private boolean enabled;
 
     private Action[] defaultActions;
@@ -43,6 +45,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
       this.setPreferredSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200"))));
 
       folderDisplay = new FolderDisplayPanel();
+
     }
 
     /**
@@ -63,11 +66,27 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	this.add("South", folderStatusBar);
 
 	defaultActions = new Action[] {
-	    new ActionWrapper(new ExpungeAction(), folder.getFolderThread()),
+	    new ExpungeAction(),
 	    new NextMessageAction(),
 	    new PreviousMessageAction(),
-	    new GotoMessageAction()
+	    new GotoMessageAction(),
+	    new SearchAction(),
+	    new SelectAllAction()
 		};
+
+	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
+	
+	keyBindings.setActive(getActions());
+
+	// if the PreviewFolderPanel itself gets the focus, pass it on to
+	// the folderDisplay
+	
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (folderDisplay != null)
+		folderDisplay.requestFocus();
+	    }
+	  });
     }
 
     /**
@@ -88,13 +107,26 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	this.add("South", folderStatusBar);
 
 	defaultActions = new Action[] {
-	    new ActionWrapper(new ExpungeAction(), displayedFolder.getFolderThread()),
+	    new ExpungeAction(), 
 	    new NextMessageAction(),
 	    new PreviousMessageAction(),
 	    new GotoMessageAction(),
 	    new SearchAction(),
 	    new SelectAllAction()
 		};
+	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
+	
+	keyBindings.setActive(getActions());
+
+	// if the PreviewFolderPanel itself gets the focus, pass it on to
+	// the folderDisplay
+	
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (folderDisplay != null)
+		folderDisplay.requestFocus();
+	    }
+	  });
     }
 
     /**
@@ -158,222 +190,221 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	return displayedFolder;
     }
 
-    /**
-     * Sets the FolderInfo to be displayed by this PreviewFolderPanel.
-     */
-    public void setFolderInfo(FolderInfo fi) {
-	getFolderDisplay().removeMessageTable();
-	getFolderDisplay().setFolderInfo(fi);
-	getFolderDisplay().createMessageTable();
+  /**
+   * Sets the FolderInfo to be displayed by this PreviewFolderPanel.
+   */
+  public void setFolderInfo(FolderInfo fi) {
+    getFolderDisplay().removeMessageTable();
+    getFolderDisplay().setFolderInfo(fi);
+    getFolderDisplay().createMessageTable();
+    
+    displayedFolder = fi;
 
-	displayedFolder = fi;
+  }
+  
+  /**
+   * Sets the panel enabled or disabled.
+   *
+   * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
+   */
+  public void setEnabled(boolean newValue) {
+    enabled = newValue;
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   * This skips to the given message.
+   */
+  public int selectMessage(int messageNumber) {
+    return getFolderDisplay().selectMessage(messageNumber);
+  }
+  
+  public int selectNextMessage() {
+    return getFolderDisplay().selectNextMessage();
+  }
+  
+  public int selectPreviousMessage() {
+    return getFolderDisplay().selectPreviousMessage();
+  }
+  
+  
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   * This resets the FolderTableModel in the MessageTable.
+   */
+  public void resetFolderTableModel(FolderTableModel ftm) {
+    getFolderDisplay().resetFolderTableModel(ftm);
     }
-
-    /**
-     * Sets the panel enabled or disabled.
-     *
-     * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
-     */
-    public void setEnabled(boolean newValue) {
-	enabled = newValue;
-    }
-
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * This skips to the given message.
-     */
-    public int selectMessage(int messageNumber) {
-	return getFolderDisplay().selectMessage(messageNumber);
-    }
-
-    public int selectNextMessage() {
-	return getFolderDisplay().selectNextMessage();
-    }
-
-    public int selectPreviousMessage() {
-	return getFolderDisplay().selectPreviousMessage();
-    }
-
-
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * This resets the FolderTableModel in the MessageTable.
-     */
-    public void resetFolderTableModel(FolderTableModel ftm) {
-	getFolderDisplay().resetFolderTableModel(ftm);
-    }
-
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * Not yet implemented.
-     */
-    public void showStatusMessage(String msg) {
-	Pooka.getUIFactory().showStatusMessage(getFolderInfo().getFolderID() + ":  " + msg);   
-    }
-
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * Not yet implemented.
-     */
-    public void clearStatusMessage() {
-	Pooka.getUIFactory().clearStatus();
-    }
-
-    /**
-     * Sets the busy property of the panel.
-     *
-     * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
-     */
-    public void setBusy(boolean newValue) {
-	if (newValue)
-	    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	else
-	    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-    }
-
-    /**
-     * Shows an Input dialog for this panel.
-     *
-     * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
-     */
-    public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
-    }	
-
-    /**
-     * Shows an Input Dialog with the given Input Panels and title.
-     * 
-     * As defined in interface net.suberic.pooka.gui.MessageUI.
-     */
-    public String showInputDialog(Object[] inputPanels, String title) {
-	return JOptionPane.showInputDialog(this, inputPanels, title, JOptionPane.QUESTION_MESSAGE);
-    }   
-
-    /**
-     * Shows a Confirm dialog.
-     * 
-     * As defined in interface net.suberic.pooka.gui.MessageUI.
-     */
-    public int showConfirmDialog(String message, String title, int optionType, int messageType) {
-	return JOptionPane.showConfirmDialog(this, message, title, messageType);
-    }
-
-    /**
-     * Gets the default UserProfile for this component.
-     *
-     * As defined in interface net.suberic.pooka.UserProfileContainer.
-     */
-    public UserProfile getDefaultProfile() {
-	if (getFolderInfo() != null)
-	    return getFolderInfo().getDefaultProfile();
-	else return null;
-    }
-
-    /**
-     * Shows an Error with the given parameters.
-     *
-     * As defined in interface net.suberic.pooka.gui.ErrorHandler.
-     */
-    public void showError(String errorMessage) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"));
-    }
-
-    /**
-     * Shows an Error with the given parameters.
-     *
-     * As defined in interface net.suberic.pooka.gui.ErrorHandler.
-     */
-    public void showError(String errorMessage, Exception e) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
-
-    /**
-     * Shows an Error with the given parameters.
-     *
-     * As defined in interface net.suberic.pooka.gui.ErrorHandler.
-     */
-    public void showError(String errorMessage, String title) {
-	final String errorMsg = errorMessage;
-	final String realTitle = title;
-	Runnable runMe = new Runnable() {
-		public void run() {
-
-		    JOptionPane.showMessageDialog(PreviewFolderPanel.this, errorMsg, realTitle, JOptionPane.ERROR_MESSAGE);
-		}
-	    };
-	
-	if (SwingUtilities.isEventDispatchThread()) {
-	    runMe.run();
-	} else {
-	    SwingUtilities.invokeLater(runMe);
+  
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   */
+  public void showStatusMessage(String msg) {
+    Pooka.getUIFactory().showStatusMessage(getFolderInfo().getFolderID() + ":  " + msg);   
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   */
+  public void clearStatusMessage() {
+    Pooka.getUIFactory().clearStatus();
+  }
+  
+  /**
+   * Sets the busy property of the panel.
+   *
+   * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
+   */
+  public void setBusy(boolean newValue) {
+    if (newValue)
+      this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    else
+      this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+  }
+  
+  /**
+   * Shows an Input dialog for this panel.
+   *
+   * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
+   */
+  public String showInputDialog(String inputMessage, String title) {
+    return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  }	
+  
+  /**
+   * Shows an Input Dialog with the given Input Panels and title.
+   * 
+   * As defined in interface net.suberic.pooka.gui.MessageUI.
+   */
+  public String showInputDialog(Object[] inputPanels, String title) {
+    return JOptionPane.showInputDialog(this, inputPanels, title, JOptionPane.QUESTION_MESSAGE);
+  }   
+  
+  /**
+   * Shows a Confirm dialog.
+   * 
+   * As defined in interface net.suberic.pooka.gui.MessageUI.
+   */
+  public int showConfirmDialog(String message, String title, int optionType, int messageType) {
+    return JOptionPane.showConfirmDialog(this, message, title, messageType);
+  }
+  
+  /**
+   * Gets the default UserProfile for this component.
+   *
+   * As defined in interface net.suberic.pooka.UserProfileContainer.
+   */
+  public UserProfile getDefaultProfile() {
+    if (getFolderInfo() != null)
+      return getFolderInfo().getDefaultProfile();
+    else return null;
+  }
+  
+  /**
+   * Shows an Error with the given parameters.
+   *
+   * As defined in interface net.suberic.pooka.gui.ErrorHandler.
+   */
+  public void showError(String errorMessage) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+  }
+  
+  /**
+   * Shows an Error with the given parameters.
+   *
+   * As defined in interface net.suberic.pooka.gui.ErrorHandler.
+   */
+  public void showError(String errorMessage, Exception e) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+  }
+  
+  /**
+   * Shows an Error with the given parameters.
+   *
+   * As defined in interface net.suberic.pooka.gui.ErrorHandler.
+   */
+  public void showError(String errorMessage, String title) {
+    final String errorMsg = errorMessage;
+    final String realTitle = title;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  
+	  JOptionPane.showMessageDialog(PreviewFolderPanel.this, errorMsg, realTitle, JOptionPane.ERROR_MESSAGE);
 	}
-	
-    }
-
-    /**
-     * Shows an Error with the given parameters.
-     *
-     * As defined in interface net.suberic.pooka.gui.ErrorHandler.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-	e.printStackTrace();
-    }
-
-
-    // MessageLoadedListener
+      };
     
-    /**
-     * 
-     * Defined in net.suberic.pooka.event.MessageLoadedListener.
-     */
-    public void handleMessageLoaded(net.suberic.pooka.event.MessageLoadedEvent e) {
-	if (getFolderStatusBar() != null && getFolderStatusBar().getTracker() != null)
-	    getFolderStatusBar().getTracker().handleMessageLoaded(e);
+    if (SwingUtilities.isEventDispatchThread()) {
+      runMe.run();
+    } else {
+      SwingUtilities.invokeLater(runMe);
     }
-
-    // ConnectionListener
     
-    /**
-     *
-     */
-    public void closed(ConnectionEvent e) {
+  }
 
-    }
+  /**
+   * Shows an Error with the given parameters.
+   *
+   * As defined in interface net.suberic.pooka.gui.ErrorHandler.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    showError(errorMessage + e.getMessage(), title);
+    e.printStackTrace();
+  }
+  
 
-    /**
-     *
-     */
-    public void disconnected(ConnectionEvent e) {
-
-    }
-
-    /**
-     *
-     */
-    public void opened(ConnectionEvent e) {
-
-    }
-
-    // MessageCountListener
-    /**
-     *
-     */
-    public void messagesAdded(MessageCountEvent e) {
-	getFolderStatusBar().messagesAdded(e);
-    }
-
+  // MessageLoadedListener
+  
+  /**
+   * 
+   * Defined in net.suberic.pooka.event.MessageLoadedListener.
+   */
+  public void handleMessageLoaded(net.suberic.pooka.event.MessageLoadedEvent e) {
+    if (getFolderStatusBar() != null && getFolderStatusBar().getTracker() != null)
+      getFolderStatusBar().getTracker().handleMessageLoaded(e);
+  }
+  
+  // ConnectionListener
+  
+  /**
+   *
+   */
+  public void closed(ConnectionEvent e) {
+    
+  }
+  
+  /**
+   *
+   */
+  public void disconnected(ConnectionEvent e) {
+    
+  }
+  
+  /**
+   *
+   */
+  public void opened(ConnectionEvent e) {
+    
+  }
+  
+  // MessageCountListener
+  /**
+   *
+   */
+  public void messagesAdded(MessageCountEvent e) {
+    getFolderStatusBar().messagesAdded(e);
+  }
+  
   /**
    * Called in response to a messagesRemoved event.  Should always be 
    * called on the parent FolderThread.
    */
   public void messagesRemoved(MessageCountEvent e) { 
     getFolderStatusBar().messagesRemoved(e);
-
+    
     Runnable updateAdapter = new Runnable() {
 	public void run() {
 	  Pooka.getMainPanel().refreshActiveMenus();
@@ -385,27 +416,27 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
       SwingUtilities.invokeLater(updateAdapter);
     
   }
-
-    // MessageChangedListener
-    public void messageChanged(MessageChangedEvent e) {
-      if (getFolderStatusBar() != null)
-	getFolderStatusBar().messageChanged(e);
-      if (getFolderDisplay() != null)
-	getFolderDisplay().moveSelectionOnRemoval(e);
-
-      final MessageInfo mi = getFolderInfo().getMessageInfo(e.getMessage());
-      if (mi != null) {
-	  SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		// really, all we should do here is update the individual
-		// row.
-		// getFolderDisplay().repaint();
-		getFolderDisplay().repaintMessage(mi.getMessageProxy());
-	      }
-	    });
-	}
+  
+  // MessageChangedListener
+  public void messageChanged(MessageChangedEvent e) {
+    if (getFolderStatusBar() != null)
+      getFolderStatusBar().messageChanged(e);
+    if (getFolderDisplay() != null)
+      getFolderDisplay().moveSelectionOnRemoval(e);
+    
+    final MessageInfo mi = getFolderInfo().getMessageInfo(e.getMessage());
+    if (mi != null) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    // really, all we should do here is update the individual
+	    // row.
+	    // getFolderDisplay().repaint();
+	    getFolderDisplay().repaintMessage(mi.getMessageProxy());
+	  }
+	});
     }
-
+  }
+  
   /**
    * Calls getFolderDisplay().removeRows(removedProxies).
    * This is the preferred way to remove rows from the FolderTableModel.
@@ -451,59 +482,70 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
     public class ExpungeAction extends AbstractAction {
 
-	ExpungeAction() {
-	    super("message-expunge");
-	}
+      ExpungeAction() {
+	super("message-expunge");
+      }
+      
+      public void actionPerformed(ActionEvent e) {
+	// we can't have a normal action wrapper because the underlying
+	// folder (and therefore folder thread) can change...
 	
-        public void actionPerformed(ActionEvent e) {
-	    expungeMessages();
+	if (displayedFolder != null) {
+	  displayedFolder.getFolderThread().addToQueue(new AbstractAction() {
+	      public void actionPerformed(ActionEvent e) {
+		expungeMessages();
+		
+	      }
+	    }, e);
 	}
+
+      }
     }
-
-    public class NextMessageAction extends AbstractAction {
-
-	NextMessageAction() {
-	    super("message-next");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    selectNextMessage();
-	}
+  
+  public class NextMessageAction extends AbstractAction {
+    
+    NextMessageAction() {
+      super("message-next");
     }
-
-    public class PreviousMessageAction extends AbstractAction {
-
-	PreviousMessageAction() {
-	    super("message-previous");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    selectPreviousMessage();
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      selectNextMessage();
     }
+  }
 
-    public class GotoMessageAction extends AbstractAction {
-
-	GotoMessageAction() {
-	    super("message-goto");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    getFolderStatusBar().activateGotoDialog();
-	}
+  public class PreviousMessageAction extends AbstractAction {
+    
+    PreviousMessageAction() {
+      super("message-previous");
     }
-
-    public class SearchAction extends AbstractAction {
-
-	SearchAction() {
-	    super("folder-search");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    searchFolder();
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      selectPreviousMessage();
     }
+    }
+  
+  public class GotoMessageAction extends AbstractAction {
 
+    GotoMessageAction() {
+      super("message-goto");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      getFolderStatusBar().activateGotoDialog();
+    }
+  }
+  
+  public class SearchAction extends AbstractAction {
+    
+    SearchAction() {
+      super("folder-search");
+	}
+    
+    public void actionPerformed(ActionEvent e) {
+      searchFolder();
+    }
+  }
+  
   public class SelectAllAction extends AbstractAction {
     
     SelectAllAction() {

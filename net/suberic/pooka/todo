@@ -1,4 +1,4 @@
-*) fix keybindings in preview pane mode.
+*) document keybindings
 
 *) fix the right click remove on the attachment pane.
 
@@ -8,6 +8,7 @@
 
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
+	-- make a disconnected icon.
 
 *) splashscreen?
 
@@ -20,6 +21,8 @@
 	-- maybe change the toolbars so there's only 1?
 	-- ?? make it so you can compose messages in the main window ??
 	-- make it so it doesn't automatically display the first new message.
+	  -- make that an option
+	  -- add a keybinding for 'go to next unread message'
 
 	-- search --
 

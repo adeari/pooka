@@ -7,6 +7,7 @@ import java.util.HashMap;
 import net.suberic.pooka.Pooka;
 import net.suberic.util.gui.*;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
 import javax.swing.event.ListSelectionListener;
 
 /**
@@ -66,6 +67,15 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     
     this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
     
+    // if the PreviewContentPanel itself gets the focus, pass it on to
+    // the PreviewFolderPanel (by default)
+    
+    this.addFocusListener(new java.awt.event.FocusAdapter() {
+	public void focusGained(java.awt.event.FocusEvent e) {
+	  if (current != null)
+	    current.requestFocus();
+	}
+      });
   }
   
   /**
@@ -272,6 +282,21 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   }
   
   /**
+   * Selects the current PreviewFolderPanel.
+   */
+  public void selectFolderDisplay() {
+    if (current != null)
+      current.requestFocus();
+  }
+
+  /**
+   * Selects the preview message panel.
+   */
+  public void selectMessageDisplay() {
+    messageDisplay.requestFocus();
+  }
+
+  /**
    * Returns the currently showing PreviewPanel.
    */
   public PreviewFolderPanel getCurrentPanel() {
@@ -407,13 +432,24 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
   }
   
+  public Action[] defaultActions = {
+    new NextWindowAction(),
+    new PreviousWindowAction()
+      };
+  
+  public Action[] getDefaultActions() {
+    return defaultActions;
+  }
+  
+
   /**
    * Gets the actions for the current component, if any.
    */
   public Action[] getActions() {
-    Action[] returnValue = null;
-    if (current != null)
-      returnValue = current.getActions();
+    Action[] returnValue = getDefaultActions();
+    
+    if (current != null && current.getActions() != null)
+      returnValue = javax.swing.text.TextAction.augmentList(returnValue, current.getActions());
     
     if (returnValue == null)
       return messageDisplay.getActions();
@@ -444,5 +480,28 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     public ListSelectionListener getSelectionListener() {
 	return selectionListener;
     }
+
+  
+  public class NextWindowAction extends AbstractAction {
+    NextWindowAction() {
+      super("window-next");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      selectFolderDisplay();
+    }
+  }
+  
+  public class PreviousWindowAction extends AbstractAction {
+    PreviousWindowAction() {
+      super("window-previous");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      selectMessageDisplay();
+    }
+  }
+  
+
 }
 

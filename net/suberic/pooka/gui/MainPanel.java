@@ -106,9 +106,9 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       
       // set the initial currentUser
       refreshCurrentUser();
-      
-      // if openSavedFoldersOnStartup is set to true, then open all the
-      // saved folders.
+
+      // select the content panel.
+      contentPanel.getUIComponent().requestFocus();
     }
 
     /**
@@ -589,14 +589,14 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     class SelectMessagePanelAction extends AbstractAction {
-	
-	SelectMessagePanelAction() {
-	    super("select-message-panel");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    contentPanel.getUIComponent().requestFocus();
-	}
+      
+      SelectMessagePanelAction() {
+	super("select-message-panel");
+      }
+      
+      public void actionPerformed(ActionEvent e) {
+	contentPanel.getUIComponent().requestFocus();
+      }
     }
 
     class SelectFolderPanelAction extends AbstractAction {
