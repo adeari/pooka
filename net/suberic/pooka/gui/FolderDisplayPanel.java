@@ -209,6 +209,25 @@ public class FolderDisplayPanel extends JPanel {
 		    }
 		}
 	    });
+
+	messageTable.registerKeyboardAction(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+		    if (fdui != null) {
+			fdui.selectNextMessage();
+		    }
+		}
+	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
+
+	messageTable.registerKeyboardAction(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+		    if (fdui != null) {
+			fdui.selectPreviousMessage();
+		    }
+		}
+	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
+
     }
     
     /**
@@ -277,7 +296,11 @@ public class FolderDisplayPanel extends JPanel {
      */
     public int selectPreviousMessage() {
 	int[] rowsSelected = messageTable.getSelectedRows();
-	int selectedRow = rowsSelected[0];
+	int selectedRow = 0;
+	if (rowsSelected.length > 0)
+	    selectedRow = rowsSelected[0];
+	else
+	    selectedRow = messageTable.getRowCount();
 	int newRow = selectedRow - 1;
 	boolean done = false;
 	while (! done && newRow >= 0 ) {
