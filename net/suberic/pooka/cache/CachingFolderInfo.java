@@ -314,6 +314,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
       }
     }
+
   }
 
   /**
@@ -327,7 +328,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * Refreshes the flags for the given MessageInfo.
    */
   public void refreshFlags(MessageInfo mi) throws MessagingException {
-    cacheMessage(mi, SimpleFileCache.FLAGS);
+    if (isConnected())
+      cacheMessage(mi, SimpleFileCache.FLAGS);
   }
   
   

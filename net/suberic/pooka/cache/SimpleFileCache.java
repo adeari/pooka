@@ -41,16 +41,14 @@ public class SimpleFileCache implements MessageCache {
     // the UIDValidity
     private long newUidValidity;
 
-    // the HashMaps which store the cached results.
-    //private HashMap headerCache = new HashMap();
-    //private HashMap flagCache = new HashMap();
-    //private HashMap dataHandlerCache = new HashMap();
-
     // the currently cached uid's
     private Vector cachedMessages;
 
     // the currently cached Flags.
     private HashMap cachedFlags;
+
+    // the currently cached Headers.
+    private HashMap cachedHeaders;
 
     // the place where we store changes to happen later...
     private ChangeCache changes = null;
@@ -325,7 +323,10 @@ public class SimpleFileCache implements MessageCache {
 
 	    Long l = new Long(uids[i]);
 	    if (status == MESSAGE || status == FLAGS_AND_HEADERS || status == FLAGS) {
-		cachedFlags.remove(l);
+	      cachedFlags.remove(l);
+	    }
+	    if (status == MESSAGE || status == FLAGS_AND_HEADERS || status == HEADERS) {
+	      cachedHeaders.remove(l);
 	    }
 
 	    if (status == MESSAGE) {
@@ -351,6 +352,7 @@ public class SimpleFileCache implements MessageCache {
 
 	cachedMessages = new Vector();
 	cachedFlags = new HashMap();
+	cachedHeaders = new HashMap();
 
 	getChangeAdapter().invalidate();
     }
@@ -499,15 +501,23 @@ public class SimpleFileCache implements MessageCache {
      * available in the cache.
      */
     protected InternetHeaders getHeadersFromCache(long uid) throws MessagingException {
+      InternetHeaders returnValue = (InternetHeaders) cachedHeaders.get(new Long(uid));
+      if (returnValue != null) {
+	return returnValue;
+      } else {	    
+
 	File f = new File(cacheDir, uid +DELIMETER + HEADER_EXT);
 	if (f.exists())
-	    try {
-		return new InternetHeaders(new FileInputStream(f));
-	    } catch (FileNotFoundException fnfe) {
-		throw new MessagingException(fnfe.getMessage(), fnfe);
-	    }
+	  try {
+	    returnValue = new InternetHeaders(new FileInputStream(f));
+	    cachedHeaders.put(new Long(uid), returnValue);
+	    return returnValue;
+	  } catch (FileNotFoundException fnfe) {
+	    throw new MessagingException(fnfe.getMessage(), fnfe);
+	  }
 	else
-	    return null;
+	  return null;
+      }
     }
 
     /**
@@ -515,46 +525,46 @@ public class SimpleFileCache implements MessageCache {
      * available in the cache.
      */
     protected Flags getFlagsFromCache(long uid) {
-	Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
-	if (returnValue != null) {
-	    return returnValue;
-	} else {	    
-	    File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
-	    if (f.exists()) {
-		try {
-		    Flags newFlags = new Flags();
-		    BufferedReader in = new BufferedReader(new FileReader(f));
-		    for (String currentLine = in.readLine(); currentLine != null; currentLine = in.readLine()) {
-			
-			if (currentLine.equalsIgnoreCase("Deleted"))
-			    newFlags.add(Flags.Flag.DELETED);
-			else if (currentLine.equalsIgnoreCase("Answered"))
-			    newFlags.add(Flags.Flag.ANSWERED);
-			else if (currentLine.equalsIgnoreCase("Draft"))
-			    newFlags.add(Flags.Flag.DRAFT);
-			else if (currentLine.equalsIgnoreCase("Flagged"))
-			    newFlags.add(Flags.Flag.FLAGGED);
-			else if (currentLine.equalsIgnoreCase("Recent"))
-			    newFlags.add(Flags.Flag.RECENT);
-			else if (currentLine.equalsIgnoreCase("SEEN"))
-			    newFlags.add(Flags.Flag.SEEN);
-			else 
-			    newFlags.add(new Flags(currentLine));
-		    }
-		
-		    cachedFlags.put(new Long(uid), newFlags);
-		    return newFlags;
-		} catch (FileNotFoundException fnfe) {
-		    System.out.println("caught filenotfoundexception.");
-		    return null;
-		} catch (IOException ioe) {
-		    System.out.println("caught ioexception.");
-		    return null;
-		}
+      Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
+      if (returnValue != null) {
+	return returnValue;
+      } else {	    
+	File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
+	if (f.exists()) {
+	  try {
+	    Flags newFlags = new Flags();
+	    BufferedReader in = new BufferedReader(new FileReader(f));
+	    for (String currentLine = in.readLine(); currentLine != null; currentLine = in.readLine()) {
+	      
+	      if (currentLine.equalsIgnoreCase("Deleted"))
+		newFlags.add(Flags.Flag.DELETED);
+	      else if (currentLine.equalsIgnoreCase("Answered"))
+		newFlags.add(Flags.Flag.ANSWERED);
+	      else if (currentLine.equalsIgnoreCase("Draft"))
+		newFlags.add(Flags.Flag.DRAFT);
+	      else if (currentLine.equalsIgnoreCase("Flagged"))
+		newFlags.add(Flags.Flag.FLAGGED);
+	      else if (currentLine.equalsIgnoreCase("Recent"))
+		newFlags.add(Flags.Flag.RECENT);
+	      else if (currentLine.equalsIgnoreCase("SEEN"))
+		newFlags.add(Flags.Flag.SEEN);
+	      else 
+		newFlags.add(new Flags(currentLine));
 	    }
-
+	    
+	    cachedFlags.put(new Long(uid), newFlags);
+	    return newFlags;
+	  } catch (FileNotFoundException fnfe) {
+	    System.out.println("caught filenotfoundexception.");
 	    return null;
+	  } catch (IOException ioe) {
+	    System.out.println("caught ioexception.");
+	    return null;
+	  }
 	}
+	
+	return null;
+      }
     }
 
     /**
@@ -619,36 +629,39 @@ public class SimpleFileCache implements MessageCache {
 	}
     }
 
-    /**
-     * Initializes the cache from the file system.
-     */
-    public void loadCache() {
-	cachedMessages = new Vector();
-	cachedFlags = new HashMap();
+  /**
+   * Initializes the cache from the file system.
+   */
+  public void loadCache() {
+    cachedMessages = new Vector();
+    cachedFlags = new HashMap();
+    cachedHeaders = new HashMap();
+    
+    File msgListFile = new File(cacheDir, "messageList");
+    if (msgListFile.exists()) {
+      try {
+	BufferedReader in = new BufferedReader(new FileReader(msgListFile));
+	for (String nextLine = in.readLine(); nextLine != null; nextLine = in.readLine()) {
+	  Long l = new Long(nextLine);
+	  cachedMessages.add(l);
+	  // this has the side effect of loading the cached flags
+	  // to the cachedFlags HashMap.
+	  getFlagsFromCache(l.longValue());
+	  getHeadersFromCache(l.longValue());
+	}
+      } catch (Exception e) { }
+    }
+    
+    File validityFile = new File(cacheDir, "validity");
+    if (validityFile.exists()) {
+      try {
+	BufferedReader in = new BufferedReader(new FileReader(validityFile));
+	uidValidity = Long.parseLong(in.readLine());
+      } catch (Exception e) {
+      }
+    }
 
-	File msgListFile = new File(cacheDir, "messageList");
-	if (msgListFile.exists()) {
-	    try {
-		BufferedReader in = new BufferedReader(new FileReader(msgListFile));
-		for (String nextLine = in.readLine(); nextLine != null; nextLine = in.readLine()) {
-		    Long l = new Long(nextLine);
-		    cachedMessages.add(l);
-		    // this has the side effect of loading the cached flags
-		    // to the cachedFlags HashMap.
-		    getFlagsFromCache(l.longValue());
-		}
-	    } catch (Exception e) { }
-	}
-	
-	File validityFile = new File(cacheDir, "validity");
-	if (validityFile.exists()) {
-	    try {
-		BufferedReader in = new BufferedReader(new FileReader(validityFile));
-		uidValidity = Long.parseLong(in.readLine());
-	    } catch (Exception e) {
-	    }
-	}
-    }	    
+  }	    
 
     public void writeMsgFile() {
 	try {
