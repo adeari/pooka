@@ -580,6 +580,19 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
   }
 
+  class EditCryptoAction extends AbstractAction {
+    
+    EditCryptoAction() {
+      super("cfg-crypto");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("EncryptionManager");
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.cryptoEditor", "Encryption Editor"), valuesToEdit);
+    }
+  }
+
   class EditInterfaceAction extends AbstractAction {
     
     EditInterfaceAction() {

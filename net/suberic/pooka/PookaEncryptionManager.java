@@ -48,12 +48,23 @@ public class PookaEncryptionManager {
       EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
       if (pgpUtils != null) {
 	pgpKeyMgr = pgpUtils.createKeyManager();
-	pgpKeyMgr.loadPrivateKeystore(new FileInputStream(new File(pgpPrivateFilename)), pgpPrivatePwString.toCharArray());
-	pgpKeyMgr.loadPublicKeystore(new FileInputStream(new File(pgpPublicFilename)), null);
+	try {
+	  pgpKeyMgr.loadPrivateKeystore(new FileInputStream(new File(pgpPrivateFilename)), pgpPrivatePwString.toCharArray());
+	} catch (java.io.IOException fnfe) {
+	  System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + fnfe.getMessage());
+	} catch (java.security.GeneralSecurityException gse) {
+	  System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + gse.getMessage());
+	}
+	try {
+	  pgpKeyMgr.loadPublicKeystore(new FileInputStream(new File(pgpPublicFilename)), null);
+	} catch (java.io.IOException fnfe) {
+	  System.out.println("Error loading PGP public keystore from file " + pgpPublicFilename + ":  " + fnfe.getMessage());
+	} catch (java.security.GeneralSecurityException gse) {
+	  System.out.println("Error loading PGP private keystore from file " + pgpPublicFilename + ":  " + gse.getMessage());
+	}      
       }
-    } catch (Exception e) {
-      // FIXME
-      e.printStackTrace();
+    } catch (java.security.NoSuchProviderException nspe) {
+      System.out.println("Error loading PGP key store:  " + nspe.getMessage());
     }
 
     String smimePublicFilename = sourceBundle.getProperty(key + ".smime.keyStore.public.filename", "");
@@ -65,13 +76,26 @@ public class PookaEncryptionManager {
       EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
       if (smimeUtils != null) {
 	smimeKeyMgr = smimeUtils.createKeyManager();
-	smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
-	smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), null);
+	try {
+	  smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
+	} catch (java.security.GeneralSecurityException gse) {
+	  System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
+	} catch (java.io.IOException fnfe) {
+	  System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + fnfe.getMessage());
+	}
+      
+	try {
+	  smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), null);
+	} catch (java.io.IOException fnfe) {
+	  System.out.println("Error loading S/MIME public keystore from file " + smimePublicFilename + ":  " + fnfe.getMessage());
+	} catch (java.security.GeneralSecurityException gse) {
+	  System.out.println("Error loading S/MIME private keystore from file " + smimePublicFilename + ":  " + gse.getMessage());
+	}      
       }
-    } catch (Exception e) {
-      // FIXME
-      e.printStackTrace();
+    } catch (java.security.NoSuchProviderException nspe) {
+      System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
     }
+
 
   }
 

@@ -26,14 +26,7 @@
 *) fix error in encoded stream problem.
 	-- just better error (?)  or maybe print out as far as it goes.
 
-*) still an error in connecting, disconnecting, getting a new messages/deleting
-	old messages, reconnecting.
-
 *) bounce messages
-
-*) some case(s) in which we're not generating the attachment bundle 
-	correctly?  one instance is how we're handling multipart/alternative
-	entries that don't actually have multiple parts.
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -43,6 +36,13 @@
 
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.
+
+*) some case(s) in which we're not generating the attachment bundle 
+	correctly?  one instance is how we're handling multipart/alternative
+	entries that don't actually have multiple parts.
+
+*) still an error in connecting, disconnecting, getting a new messages/deleting
+	old messages, reconnecting.
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5

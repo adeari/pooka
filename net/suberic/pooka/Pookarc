@@ -180,12 +180,13 @@ MenuBar.Encryption.CheckSignature.Action=message-check-signature
 MenuBar.Encryption.SelectPublic.Action=message-select-crypt-key
 MenuBar.Encryption.SelectPrivate.Action=message-select-sig-key
 
-MenuBar.Config=Preferences:StoreConfig:UserConfig:OutgoingConfig:ConnectionConfig:AddressBook:Theme
+MenuBar.Config=Preferences:StoreConfig:UserConfig:OutgoingConfig:ConnectionConfig:CryptoConfig:AddressBook:Theme
 MenuBar.Config.Preferences.Action=cfg-prefs
 MenuBar.Config.UserConfig.Action=cfg-users
 MenuBar.Config.StoreConfig.Action=cfg-stores
 MenuBar.Config.OutgoingConfig.Action=cfg-outgoing
 MenuBar.Config.ConnectionConfig.Action=cfg-connection
+MenuBar.Config.CryptoConfig.Action=cfg-crypto
 MenuBar.Config.AddressBook.Action=cfg-address-book
 MenuBar.Config.Theme.Action=cfg-interface-style
 
