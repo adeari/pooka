@@ -56,28 +56,30 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   protected void processComponentKeyEvent(KeyEvent e) {
     super.processComponentKeyEvent(e);
-    int keyCode = e.getKeyCode();
-    switch(keyCode) {
-    case KeyEvent.VK_TAB:
-      break;
-    case KeyEvent.VK_UP:
-      selectNextEntry();
-      break;
-    case KeyEvent.VK_DOWN:
-      selectPreviousEntry();
-      break;
-    case KeyEvent.VK_LEFT:
-      // ignore
-      break;
-    case KeyEvent.VK_RIGHT:
-      // ignore
-      break;
-    default:
-      lastKeyTime = new java.util.Date().getTime();
-      if (updateThread != null)
-	updateThread.interrupt();
-      else
-	createUpdateThread();
+    if (e.getID() == KeyEvent.KEY_PRESSED) {
+      int keyCode = e.getKeyCode();
+      switch(keyCode) {
+      case KeyEvent.VK_TAB:
+	break;
+      case KeyEvent.VK_UP:
+	selectNextEntry();
+	break;
+      case KeyEvent.VK_DOWN:
+	selectPreviousEntry();
+	break;
+      case KeyEvent.VK_LEFT:
+	// ignore
+	break;
+      case KeyEvent.VK_RIGHT:
+	// ignore
+	break;
+      default:
+	lastKeyTime = new java.util.Date().getTime();
+	if (updateThread != null)
+	  updateThread.interrupt();
+	else
+	  createUpdateThread();
+      }
     }
   }
 
@@ -169,6 +171,43 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     this.insert(newAddress.substring(length), current.beginOffset + length);
     this.setSelectionStart(current.beginOffset + length);
     this.setSelectionEnd(current.beginOffset + newAddress.length());
+  }
+
+  /**
+   * This updates the currently selected address field with the new value.
+   */
+  public void replaceAddressText(Selection current, String newAddress) {
+    int length = current.text.length();
+    // the text should always match the newAddress.  really.  :)
+    this.replaceRange(newAddress, current.beginOffset, current.endOffset);
+    this.setSelectionStart(current.beginOffset);
+    this.setSelectionEnd(current.beginOffset + newAddress.length());
+  }
+
+  /**
+   * Selects the next available address entry.
+   */
+  public void selectNextEntry() {
+    Selection currentSelection = getCurrentSelection();
+    net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+    InternetAddress newValue = matcher.getNextMatch(currentSelection.text);
+    if (newValue != null) {
+      replaceAddressText(currentSelection, newValue.toString());
+    }
+
+  }
+
+  /**
+   * Selects the previous available address entry.
+   */
+  public void selectPreviousEntry() {
+    Selection currentSelection = getCurrentSelection();
+    net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+    InternetAddress newValue = matcher.getPreviousMatch(currentSelection.text);
+    if (newValue != null) {
+      replaceAddressText(currentSelection, newValue.toString());
+    }
+
   }
 
   private class Selection {
