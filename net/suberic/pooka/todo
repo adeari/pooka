@@ -23,6 +23,11 @@ possible folders, nor just the ones that are open.
 
 *) test and fix the external editor spawning on windows.
 
+*) make sure that the file editor actually is getting used for everything
+that's set as a propertyType=file
+
+*) <sigh> save properties to a file at the end of an editor.
+
 ------------------
 
 	-- search --
