@@ -543,7 +543,7 @@ OutgoingServer._default.propertyType=List
 OutgoingServer._default.allowedValues=OutgoingServer
 
 Connection.propertyType=Multi
-Connection.editableFields=connectCommand:disconnectCommand:testAddress:testPort:valueOnStartup
+Connection.editableFields=connectCommand:disconnectCommand:valueOnStartup
 Connection.editableFields.scoped=true
 Connection.editableFields.valueOnStartup.propertyType=List
 Connection.editableFields.valueOnStartup.allowedValues=Connected:Disconnected:Unavailable

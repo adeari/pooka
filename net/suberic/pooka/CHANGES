@@ -1,3 +1,6 @@
+020429 release
+--------------
+
 fixed a NPE that could happen when switching from preview pane mode to
 desktop pane mode.
 
@@ -8,10 +11,6 @@ just about everything.
 
 fixed a bug where finding the first unread message was done on the 
 awt event thread instead of the FolderThread.
-
-added a TestAddress to the NetworkConnection object.  this way you can
-check to see whether or not the connection is up, instead of having to
-manually set it.
 
 fixed pooka so that the default image and text viewers that come with
 javamail will actually work when you double click on an attachment.

@@ -3,20 +3,13 @@
 	either multiple threads for folders, or maybe check the threading
 	and connections for javamail.
 
-*) fix the network connection test so that it doesn't hang if the
-	network is up, but the test host is unreachable.
-
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
-----------
 
 *) splashscreen?
 
 *) NPE -- is that from switching from preview to desktop?
 	-- check window menu from switching preview to desktop.
-
-*) make it so you can stop html displays from showing non-local images.
- 	-- support RFC-2557??
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
@@ -25,7 +18,24 @@
 	-- ?? make it so you can compose messages in the main window ??
 	-- make it so it doesn't automatically display the first new message.
 
----
+	-- search --
+
+*) make search give a popup window saying it's running, or at least something
+	that makes it obvious that _something's_ going on.
+
+*) make search window look different than normal window.
+
+*) disconnected from store (like if the server goes down) doesn't result in 
+icons changing?  test.
+
+--------
+
+*) make it so you can stop html displays from showing non-local images.
+ 	-- support RFC-2557??
+
+*) add icons for connecting to folder/store, for disconnected, and for
+	the root node.
+
 *) queuing of outgoing mails
 	todo on this:
 	*)  fix the local mail store so that it doesn't necessarily put
@@ -42,16 +52,6 @@
 		whether or not it's up.
 			-- started.  make sure it's enough.
 
-	-- search --
-
-*) make search give a popup window saying it's running, or at least something
-	that makes it obvious that _something's_ going on.
-
-*) make search window look different than normal window.
-
-*) add support for saved searches.
-
-------------
 
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
@@ -72,9 +72,6 @@
 
 *)  ?? if network connection goes down, pooka hangs on exit.
 
-*) disconnected from store (like if the server goes down) doesn't result in 
-icons changing?  test.
-
 +++++++
 
 *) add support for jdk1.4
@@ -83,12 +80,17 @@ icons changing?  test.
 	-- up and down arrows while composing new messages.
 	-- ssl doesn't work.
 
+*) fix the network connection test so that it doesn't hang if the
+	network is up, but the test host is unreachable.
+
 *) support java jnlp (?)
 
 *) come up with a wrapper for spawning external editors on windows.
 
 *) get some decent pooka icons.
 	
+*) add support for saved searches.
+
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
 
