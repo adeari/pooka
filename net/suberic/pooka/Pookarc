@@ -6,6 +6,10 @@ Pooka.sessionDebug=false
 
 Pooka.cacheDirectory=~/Mail/pooka
 Pooka.autoCache=true
+Pooka.autoPreview=true
+Pooka.autoPreview.propertyType=Boolean
+Pooka.autoSelectFirstUnread=true
+Pooka.autoSelectFirstUnread.propertyType=Boolean
 
 Message.sendImmediately=true
 
@@ -746,7 +750,7 @@ Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
 
-Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.checkUnsentMessages:Pooka.folderPanel.theme:Pooka.messagePanel.theme
+Preferences.UI=Pooka.guiType:Pooka.autoPreview:Pooka.autoSelectFirstUnread:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.checkUnsentMessages:Pooka.folderPanel.theme:Pooka.messagePanel.theme
 Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
 Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage

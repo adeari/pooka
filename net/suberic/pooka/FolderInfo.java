@@ -959,27 +959,27 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
 
     public FolderInfo getChild(String childName) {
-	FolderInfo childFolder = null;
-	String folderName  = null, subFolderName = null;
-
-	if (children != null) {
-	    int divider = childName.indexOf('/');
-	    if (divider > 0) {
-		folderName = childName.substring(0, divider);
-		if (divider < childName.length() - 1)
-		    subFolderName = childName.substring(divider + 1);
-	    } else 
-		folderName = childName;
-	    
-	    for (int i = 0; i < children.size(); i++)
-		if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
-		    childFolder = (FolderInfo)children.elementAt(i);
-	}
+      FolderInfo childFolder = null;
+      String folderName  = null, subFolderName = null;
+      
+      if (children != null) {
+	int divider = childName.indexOf('/');
+	if (divider > 0) {
+	  folderName = childName.substring(0, divider);
+	  if (divider < childName.length() - 1)
+	    subFolderName = childName.substring(divider + 1);
+	} else 
+	  folderName = childName;
 	
-	if (childFolder != null && subFolderName != null)
-	    return childFolder.getChild(subFolderName);
-	else
-	    return childFolder;
+	for (int i = 0; i < children.size(); i++)
+	  if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
+	    childFolder = (FolderInfo)children.elementAt(i);
+      }
+      
+      if (childFolder != null && subFolderName != null)
+	return childFolder.getChild(subFolderName);
+      else
+	return childFolder;
     }
 
     /**
@@ -1143,31 +1143,39 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       }
     }  
 
-    /**
-     * This handles the changes if the source property is modified.
-     *
-     * As defined in net.suberic.util.ValueChangeListener.
-     */
-
-    public void valueChanged(String changedValue) {
-	if (changedValue.equals(getFolderProperty() + ".folderList")) {
+  /**
+   * This handles the changes if the source property is modified.
+   *
+   * As defined in net.suberic.util.ValueChangeListener.
+   */
+  
+  public void valueChanged(String changedValue) {
+    if (changedValue.equals(getFolderProperty() + ".folderList")) {
+      getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent e) {
 	    updateChildren();
 	    if (folderNode != null) {
-		((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
+	      javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		  public void run() {
+		    ((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
+		  }
+		});
 	    }
-	} else if (changedValue.equals(getFolderProperty() + ".defaultProfile")) {
-	    if (Pooka.getProperty(changedValue, "").equals(""))
-		defaultProfile = null;
-	    else 
-		defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
-	} else if (changedValue.equals(getFolderProperty() + ".backendFilters")) { 
-	    createFilters();
-	    
-	} else if (changedValue.equals(getFolderProperty() + ".displayFilters")) {
-	    createFilters();
-	    unloadMatchingFilters();
-	}
+	  }
+	} , new java.awt.event.ActionEvent(this, 0, "open-all"));
+    } else if (changedValue.equals(getFolderProperty() + ".defaultProfile")) {
+      if (Pooka.getProperty(changedValue, "").equals(""))
+	defaultProfile = null;
+      else 
+	defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
+    } else if (changedValue.equals(getFolderProperty() + ".backendFilters")) { 
+      createFilters();
+      
+    } else if (changedValue.equals(getFolderProperty() + ".displayFilters")) {
+      createFilters();
+      unloadMatchingFilters();
     }
+  }
 
   /**
    * This subscribes to the FolderInfo indicated by the given String.
@@ -1197,7 +1205,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (childFolder != null && subFolderName != null)
       childFolder.subscribeFolder(subFolderName);	
     
-    if (childFolder.isLoaded() == false)
+    if (childFolder != null && childFolder.isLoaded() == false)
       childFolder.loadFolder();
 
     updateChildren();

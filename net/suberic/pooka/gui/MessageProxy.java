@@ -262,6 +262,7 @@ public class MessageProxy {
     
     defaultActions = new Action[] {
       new ActionWrapper(new OpenAction(), folderThread),
+      new ActionWrapper(new DefaultOpenAction(), folderThread),
       new ActionWrapper(new MoveAction(), folderThread),
       new ActionWrapper(new CopyAction(), folderThread),
       new ActionWrapper(new ReplyAction(), folderThread),
@@ -994,6 +995,23 @@ public class MessageProxy {
       if (fw != null)
 	fw.setBusy(true);;
       openWindow();
+      if (fw != null)
+	fw.setBusy(false);
+    }
+  }
+  
+  public class DefaultOpenAction extends AbstractAction {
+    DefaultOpenAction() {
+      super("file-default-open");
+    }
+    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+      openWindow();
+      getPookaUIFactory().doDefaultOpen(MessageProxy.this);
       if (fw != null)
 	fw.setBusy(false);
     }

@@ -1,18 +1,18 @@
+preview:
+	check what happens when we switch from desktop to preview and
+		autopreview is off
+	fix it so you the folder table gets keyboard focus at startup.
+
 *) disconnected:  
 	*)  make an option for caching everything.
 	*)  check sent folder with disconnected / especially not using
 		the NetworkConnection object.
+	*)  make a progress dialog for caching lots of messages, since
+		it seems to take a while.
+	*)  disconnected:  think that you're still connected.  lose connection.
+	    get new messages.  doesn't work properly.
 
 *) fix the connection order.  it's too painful right now.
-
-*) preview pane: 
-	-- make it so it doesn't automatically display the first new message.
-	  -- make that an option
-	idea:
-	  selection at startup:  
-		either scroll to and select or just scroll to
-	  action on selection:  
-		either display automatically or display on click.
 
 *) fix the launcher (specifically the html launcher, but maybe all of them)
 to use "'s correctly.

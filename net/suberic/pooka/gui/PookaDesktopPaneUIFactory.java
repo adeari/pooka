@@ -75,6 +75,19 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   }
   
   /**
+   * Opens the given MessageProxy in the default manner for this UI.
+   * Usually this will just be callen createMessageUI() and openMessageUI()
+   * on it.  However, in some cases (Preview Panel without auto display)
+   * it may be necessary to act differently.
+   *
+   * For this implementation, just calls mp.openWindow().
+   */
+  public void doDefaultOpen(MessageProxy mp) {
+    if (mp != null)
+      mp.openWindow();
+  }
+
+  /**
    * Creates an appropriate FolderDisplayUI object for the given
    * FolderInfo.
    */

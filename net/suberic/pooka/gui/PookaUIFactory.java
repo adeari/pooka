@@ -12,12 +12,19 @@ public interface PookaUIFactory extends ErrorHandler {
    */
   public MessageUI createMessageUI(MessageProxy mp) throws javax.mail.MessagingException;
 
-  
   /**
    * Creates an appropriate MessageUI object for the given MessageProxy, 
    * using the provided MessageUI as a guideline.
    */
   public MessageUI createMessageUI(MessageProxy mp, MessageUI mui) throws javax.mail.MessagingException;
+  
+  /**
+   * Opens the given MessageProxy in the default manner for this UI.
+   * Usually this will just be callen createMessageUI() and openMessageUI()
+   * on it.  However, in some cases (Preview Panel without auto display)
+   * it may be necessary to act differently.
+   */
+  public void doDefaultOpen(MessageProxy mp);
   
   /**
    * Creates an appropriate FolderDisplayUI object for the given
@@ -70,13 +77,13 @@ public interface PookaUIFactory extends ErrorHandler {
   
   /**
    * Shows a Confirm dialog with the given Object[] as the Message.
-     */
+   */
   public int showConfirmDialog(Object[] messageComponents, String title, int type);
   
   /**
    * This shows an Input window.
    */
-    public String showInputDialog(String inputMessage, String title);
+  public String showInputDialog(String inputMessage, String title);
   
   /**
    * Shows an Input window.

@@ -79,12 +79,7 @@ public class ExternalLauncher implements CommandObject, Runnable {
 	    } else {
 		parsedVerb = substituteString(verb, "%s", fileName);
 		
-		StringTokenizer tok = new StringTokenizer(parsedVerb);
-		cmdArray = new String[tok.countTokens()];
-		for (int i = 0; tok.hasMoreTokens(); i++) {
-		    String currentString = tok.nextToken();
-		    cmdArray[i]=currentString;
-		}
+		cmdArray = parseCommandString(parsedVerb);
 		
 		tmpFile.deleteOnExit();
 	    }
@@ -113,6 +108,20 @@ public class ExternalLauncher implements CommandObject, Runnable {
 	
 	return modifiedString.toString();
     }
+
+  /**
+   * This parses a command string into a command array. 
+   */
+  public String[] parseCommandString(String cmdString) {
+    StringTokenizer tok = new StringTokenizer(cmdString);
+    String[] cmdArray = new String[tok.countTokens()];
+    for (int i = 0; tok.hasMoreTokens(); i++) {
+      String currentString = tok.nextToken();
+      cmdArray[i]=currentString;
+    }
+
+    return cmdArray;
+  }
 }
 
 

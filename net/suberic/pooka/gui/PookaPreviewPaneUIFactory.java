@@ -66,77 +66,97 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     mp.setMessageUI(mui);
     return mui;
   }
+  
+  /**
+   * Opens the given MessageProxy in the default manner for this UI.
+   * Usually this will just be callen createMessageUI() and openMessageUI()
+   * on it.  However, in some cases (Preview Panel without auto display)
+   * it may be necessary to act differently.
+   *
+   */
+  public void doDefaultOpen(MessageProxy mp) {
+    if (contentPanel.getAutoPreview()) {
+      if (mp != null)
+	mp.openWindow();
+    } else {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    contentPanel.refreshCurrentMessage();
+	  }
+	});
+    }
+  }
 
-    /**
-     * Creates an appropriate FolderDisplayUI object for the given
-     * FolderInfo.
-     */
-    public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
-	// a FolderInfo can only have one FolderDisplayUI.
+  /**
+   * Creates an appropriate FolderDisplayUI object for the given
+   * FolderInfo.
+   */
+  public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
+    // a FolderInfo can only have one FolderDisplayUI.
+    
+    if (fi.getFolderDisplayUI() != null)
+      return fi.getFolderDisplayUI();
+
+    PreviewFolderPanel fw = new PreviewFolderPanel(contentPanel, fi);
+    contentPanel.addPreviewPanel(fw, fi.getFolderID());
+    return fw;
+    
+  }
+  
+  /**
+   * Creates a JPanel which will be used to show messages and folders.
+   *
+   * This implementation creates an instance of PreviewContentPanel.
+   */
+  public ContentPanel createContentPanel() {
+    contentPanel = new PreviewContentPanel();
+    contentPanel.setSize(1000,1000);
 	
-	if (fi.getFolderDisplayUI() != null)
-	    return fi.getFolderDisplayUI();
-
-	PreviewFolderPanel fw = new PreviewFolderPanel(contentPanel, fi);
-	contentPanel.addPreviewPanel(fw, fi.getFolderID());
-	return fw;
-	    
+    return contentPanel;
+  }
+  
+  /**
+   * Creates a JPanel which will be used to show messages and folders.
+   *
+   * This implementation creates an instance PreviewConentPanel from a
+   * given MessagePanel.
+   */
+  public ContentPanel createContentPanel(MessagePanel mp) {
+    contentPanel = new PreviewContentPanel(mp);
+    contentPanel.setSize(1000,1000);
+    
+    return contentPanel;
+  }
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the values in the properties Vector.  The given properties
+   * will be shown according to the values in the templates Vector.
+   * Note that there should be an entry in the templates Vector for
+   * each entry in the properties Vector.
+   */
+  public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
+    JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
+    jf.show();
     }
-
-    /**
-     * Creates a JPanel which will be used to show messages and folders.
-     *
-     * This implementation creates an instance of PreviewContentPanel.
-     */
-    public ContentPanel createContentPanel() {
-	contentPanel = new PreviewContentPanel();
-	contentPanel.setSize(1000,1000);
-	
-	return contentPanel;
-    }
-
-    /**
-     * Creates a JPanel which will be used to show messages and folders.
-     *
-     * This implementation creates an instance PreviewConentPanel from a
-     * given MessagePanel.
-     */
-    public ContentPanel createContentPanel(MessagePanel mp) {
-	contentPanel = new PreviewContentPanel(mp);
-	contentPanel.setSize(1000,1000);
-	
-	return contentPanel;
-    }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the values in the properties Vector.  The given properties
-     * will be shown according to the values in the templates Vector.
-     * Note that there should be an entry in the templates Vector for
-     * each entry in the properties Vector.
-     */
-    public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
-	JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
-	jf.show();
-    }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the values in the properties Vector.
-     */
-    public void showEditorWindow(String title, java.util.Vector properties) {
-	showEditorWindow(title, properties, properties);
-    }
-
-    /**
-     * Shows an Editor Window with the given title, which allows the user
-     * to edit the given property.
-     */
-    public void showEditorWindow(String title, String property) {
-	java.util.Vector v = new java.util.Vector();
-	v.add(property);
-	showEditorWindow(title, v, v);
-    }
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the values in the properties Vector.
+   */
+  public void showEditorWindow(String title, java.util.Vector properties) {
+    showEditorWindow(title, properties, properties);
+  }
+  
+  /**
+   * Shows an Editor Window with the given title, which allows the user
+   * to edit the given property.
+   */
+  public void showEditorWindow(String title, String property) {
+    java.util.Vector v = new java.util.Vector();
+    v.add(property);
+    showEditorWindow(title, v, v);
+  }
 
     /**
      * Shows an Editor Window with the given title, which allows the user

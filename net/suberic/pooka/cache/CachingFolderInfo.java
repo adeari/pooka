@@ -19,7 +19,7 @@ import net.suberic.pooka.gui.FolderTableModel;
  */
 
 public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
-  protected MessageCache cache = null;
+  private MessageCache cache = null;
   
   // the resource for the folder disconnected message
   protected static String disconnectedMessage = "error.CachingFolder.disconnected";
@@ -51,7 +51,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   public void loadFolder() {
     if (cache == null) {
       try {
-	cache = new SimpleFileCache(this, getCacheDirectory());
+	this.cache = new SimpleFileCache(this, getCacheDirectory());
 	type =  type | Folder.HOLDS_MESSAGES;
 	setStatus(DISCONNECTED);
       } catch (java.io.IOException ioe) {
@@ -122,7 +122,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       initializeFolderInfo();
       loading = false;
     }
-    
   }
 
   /**
@@ -938,59 +937,63 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     return getCache().isFullyCached(uid);
   }
 
-    /**
-     * This returns the MessageCache associated with this FolderInfo,
-     * if any.
-     */
-    public MessageCache getCache() {
-	return cache;
+  /**
+   * This returns the MessageCache associated with this FolderInfo,
+   * if any.
+   */
+  public MessageCache getCache() {
+    return cache;
+  }
+  
+  /**
+   * Returns whether or not we should be showing cache information in 
+   * the FolderDisplay.  Uses the FolderProperty.showCacheInfo property
+   * to determine--if this is set to true, we will show the cache info.
+   * Otherwise, if we're connected, don't show the info, and if we're
+   * not connected, do.
+   */
+  public boolean showCacheInfo() {
+    if (Pooka.getProperty(getFolderProperty() + ".showCacheInfo", "false").equalsIgnoreCase("true")) 
+      return true;
+    else {
+      if (getStatus() == CONNECTED) {
+	return false;
+      } else
+	return true;
     }
+  }
+  
+  /**
+   * Returns the cache directory for this FolderInfo.
+   */
+  public String getCacheDirectory() {
+    String localDir = Pooka.getProperty(getFolderProperty() + ".cacheDir", "");
+    if (!localDir.equals(""))
+      return localDir;
+    
+    localDir = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+    if (localDir.equals(""))
+      localDir = System.getProperty("user.home") + File.separator + ".pooka";
+    
+    localDir = localDir + File.separatorChar + "cache";
+    FolderInfo currentFolder = this;
+    StringBuffer subDir = new StringBuffer();
+    subDir.insert(0, currentFolder.getFolderName());
+    subDir.insert(0, File.separatorChar);
+    while (currentFolder.getParentFolder() != null) {
+      currentFolder = currentFolder.getParentFolder();
+      subDir.insert(0, currentFolder.getFolderName());
+      subDir.insert(0, File.separatorChar);
+    } 
+    
+    subDir.insert(0, currentFolder.getParentStore().getStoreID());
+    subDir.insert(0, File.separatorChar);
+    
+    return localDir + subDir.toString();
+  }
 
-    /**
-     * Returns whether or not we should be showing cache information in 
-     * the FolderDisplay.  Uses the FolderProperty.showCacheInfo property
-     * to determine--if this is set to true, we will show the cache info.
-     * Otherwise, if we're connected, don't show the info, and if we're
-     * not connected, do.
-     */
-    public boolean showCacheInfo() {
-	if (Pooka.getProperty(getFolderProperty() + ".showCacheInfo", "false").equalsIgnoreCase("true")) 
-	    return true;
-	else {
-	    if (getStatus() == CONNECTED) {
-		return false;
-	    } else
-		return true;
-	}
-    }
-
-    /**
-     * Returns the cache directory for this FolderInfo.
-     */
-    public String getCacheDirectory() {
-	String localDir = Pooka.getProperty(getFolderProperty() + ".cacheDir", "");
-	if (!localDir.equals(""))
-	    return localDir;
-
-	localDir = Pooka.getProperty("Pooka.defaultMailSubDir", "");
-	if (localDir.equals(""))
-	    localDir = System.getProperty("user.home") + File.separator + ".pooka";
-
-	localDir = localDir + File.separatorChar + "cache";
-	FolderInfo currentFolder = this;
-	StringBuffer subDir = new StringBuffer();
-	subDir.insert(0, currentFolder.getFolderName());
-	subDir.insert(0, File.separatorChar);
-	while (currentFolder.getParentFolder() != null) {
-	    currentFolder = currentFolder.getParentFolder();
-	    subDir.insert(0, currentFolder.getFolderName());
-	    subDir.insert(0, File.separatorChar);
-	} 
-
-	subDir.insert(0, currentFolder.getParentStore().getStoreID());
-	subDir.insert(0, File.separatorChar);
-
-	return localDir + subDir.toString();
-    }
+  public boolean isLoaded() {
+    return (getFolder() != null && cache != null);
+  }
 }
 

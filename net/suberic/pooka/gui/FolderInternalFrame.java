@@ -427,7 +427,6 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     
     public void valueChanged(javax.swing.event.ListSelectionEvent e) {
       // the main menus are handled by the FolderDisplayPanel itself.
-      System.err.println("fif:  got change event.");
       if (toolbar != null)
 	toolbar.setActive(getActions());
       if (keyBindings != null)

@@ -51,21 +51,6 @@ public class FolderDisplayPanel extends JPanel {
     setFolderInfo(newFolderInfo);
     addMessageTable();
   }
-  /*
-    if (messageTable != null) {
-      if (Pooka.getProperty("Pooka.selectFirstUnread", "true").equalsIgnoreCase("true")) {
-	if (selectedValue >= 0) {
-	  selectMessage(selectedValue);
-	} else {
-	  selectFirstUnread();
-	}
-      } else {
-	if (selectedValue >= 0) {
-	  makeSelectionVisible(selectedValue);
-	}
-      }
-    }
-  */
 
   /**
    * Initializes the window. 
@@ -282,147 +267,147 @@ public class FolderDisplayPanel extends JPanel {
 	}
     }
 
-    /**
-     * This adds all the listeners to the current FolderDisplayPanel.
-     */
-
-    public void addListeners() {
-	// add a mouse listener 
-
-	messageTable.addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent e) {
-		    if (e.getClickCount() == 2) {
-			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
-			if (rowIndex != -1) {
-			    getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
-			    MessageProxy selectedMessage = getSelectedMessage();
-			    String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
-			    if (selectedMessage != null) {
-				Action clickAction = selectedMessage.getAction(actionCommand);
-				if (clickAction != null && isEnabled()) {
-				    clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
-				    
-				}
-			    }
-			}
-		    }
-		}
-		
-		public void mousePressed(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
-			// see if anything is selected
-			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
-			if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
-			    getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
-			}
-			
-			MessageProxy selectedMessage = getSelectedMessage();
-			if (selectedMessage != null && isEnabled())
-			    selectedMessage.showPopupMenu(getMessageTable(), e);
-		    }
-		}
-
-		public void mouseReleased(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
-			// see if anything is selected
-			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
-			if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
-			    getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
-			}
-			
-			MessageProxy selectedMessage = getSelectedMessage();
-			if (selectedMessage != null && isEnabled())
-			    selectedMessage.showPopupMenu(getMessageTable(), e);
-		    }
-		}
-	    });
-
-	messageTable.getSelectionModel().addListSelectionListener(new SelectionListener());
-
-	// add sorting by header.
-
-	messageTable.getTableHeader().addMouseListener(new MouseAdapter() {
-		public void mouseClicked(MouseEvent e) {
-		    TableColumnModel columnModel = messageTable.getColumnModel();
-		    int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
-		    int column = messageTable.convertColumnIndexToModel(viewColumn); 
-		    if (e.getClickCount() == 1 && column != -1) {
-			if (Pooka.isDebug())
-			    System.out.println("Sorting ..."); 
-
-			int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
-			boolean ascending = (shiftPressed == 0); 
-			
-			MessageProxy selectedMessage = null;
-
-			int rowsSelected = messageTable.getSelectedRowCount();
-
-			if (rowsSelected == 1) 
-			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
-			else if (rowsSelected > 1)
-			    selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
-
-			((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
-
-			if (selectedMessage != null) {
-			    int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
-			    messageTable.setRowSelectionInterval(selectedIndex, selectedIndex);
-			    makeSelectionVisible(selectedIndex);
-			}
-		    }
-		}
-	    });
-
-	/*
-	messageTable.registerKeyboardAction(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
-		    if (fdui != null) {
-			fdui.selectNextMessage();
-		    }
-		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
-
-	messageTable.registerKeyboardAction(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
-		    if (fdui != null) {
-			fdui.selectPreviousMessage();
-		    }
-		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
-
-	messageTable.registerKeyboardAction(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    MessageProxy selectedMessage = getSelectedMessage();
-		    String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
-		    if (selectedMessage != null) {
-			Action clickAction = selectedMessage.getAction(actionCommand);
-			if (clickAction != null && isEnabled()) {
-			    clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
-			    
-			}
-		    }
-		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),  JComponent.WHEN_FOCUSED);
-	
-	messageTable.registerKeyboardAction(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    MessageProxy selectedMessage = getSelectedMessage();
-		    String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
-		    if (selectedMessage != null) {
-			Action clickAction = selectedMessage.getAction(actionCommand);
-			if (clickAction != null && isEnabled()) {
-			    clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
-			    
-			}
-		    }
-		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SPACE, 0),  JComponent.WHEN_FOCUSED);
-	*/
-	
-    }
+  /**
+   * This adds all the listeners to the current FolderDisplayPanel.
+   */
+  
+  public void addListeners() {
+    // add a mouse listener 
     
+    messageTable.addMouseListener(new MouseAdapter() {
+	public void mouseClicked(MouseEvent e) {
+	  if (e.getClickCount() == 2) {
+	    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+	    if (rowIndex != -1) {
+	      getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+	      MessageProxy selectedMessage = getSelectedMessage();
+	      String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
+	      if (selectedMessage != null) {
+		Action clickAction = selectedMessage.getAction(actionCommand);
+		if (clickAction != null && isEnabled()) {
+		  clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+		  
+		}
+	      }
+	    }
+	  }
+	}
+	
+	public void mousePressed(MouseEvent e) {
+	  if (e.isPopupTrigger()) {
+	    // see if anything is selected
+	    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+	    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
+	      getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+	    }
+	    
+	    MessageProxy selectedMessage = getSelectedMessage();
+	    if (selectedMessage != null && isEnabled())
+	      selectedMessage.showPopupMenu(getMessageTable(), e);
+	  }
+	}
+	
+	public void mouseReleased(MouseEvent e) {
+	  if (e.isPopupTrigger()) {
+	    // see if anything is selected
+	    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+	    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
+	      getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+	    }
+	    
+	    MessageProxy selectedMessage = getSelectedMessage();
+	    if (selectedMessage != null && isEnabled())
+	      selectedMessage.showPopupMenu(getMessageTable(), e);
+	  }
+	}
+      });
+    
+    messageTable.getSelectionModel().addListSelectionListener(new SelectionListener());
+    
+    // add sorting by header.
+    
+    messageTable.getTableHeader().addMouseListener(new MouseAdapter() {
+	public void mouseClicked(MouseEvent e) {
+	  TableColumnModel columnModel = messageTable.getColumnModel();
+	  int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
+	  int column = messageTable.convertColumnIndexToModel(viewColumn); 
+	  if (e.getClickCount() == 1 && column != -1) {
+	    if (Pooka.isDebug())
+	      System.out.println("Sorting ..."); 
+	    
+	    int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
+	    boolean ascending = (shiftPressed == 0); 
+	    
+	    MessageProxy selectedMessage = null;
+	    
+	    int rowsSelected = messageTable.getSelectedRowCount();
+	    
+	    if (rowsSelected == 1) 
+	      selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+	    else if (rowsSelected > 1)
+	      selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
+	    
+	    ((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
+	    
+	    if (selectedMessage != null) {
+	      int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
+	      messageTable.setRowSelectionInterval(selectedIndex, selectedIndex);
+	      makeSelectionVisible(selectedIndex);
+	    }
+	  }
+	}
+      });
+    
+    messageTable.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+	  if (fdui != null) {
+	    fdui.selectNextMessage();
+	  }
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
+    
+    messageTable.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+	  if (fdui != null) {
+	    fdui.selectPreviousMessage();
+	  }
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
+    
+    messageTable.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  MessageProxy selectedMessage = getSelectedMessage();
+	  if (selectedMessage != null) {
+	    Pooka.getUIFactory().doDefaultOpen(selectedMessage);
+	  }
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),  JComponent.WHEN_FOCUSED);
+    
+    messageTable.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  MessageProxy selectedMessage = getSelectedMessage();
+	  if (selectedMessage != null) {
+	    Pooka.getUIFactory().doDefaultOpen(selectedMessage);
+	  }
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SPACE, 0),  JComponent.WHEN_FOCUSED);
+    
+    messageTable.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  selectNextUnreadMessage();
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_TAB, 0),  JComponent.WHEN_FOCUSED);
+
+    messageTable.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  selectPreviousUnreadMessage();
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_TAB, java.awt.Event.SHIFT_MASK),  JComponent.WHEN_FOCUSED);
+    
+  }
+  
   /**
    * This finds the first unread message (if any) and sets that message
    * to selected, and returns that index.
@@ -550,6 +535,7 @@ public class FolderDisplayPanel extends JPanel {
     return newRow;
   }
   
+
   /**
    * This selects the previous message.  If no message is selected, then
    * the last message is selected.
@@ -562,7 +548,23 @@ public class FolderDisplayPanel extends JPanel {
     else
       selectedRow = messageTable.getRowCount();
 
-    int previousSelectable = getPreviousSelectableMessage(selectedRow, null);
+    int previousSelectable = getPreviousSelectableMessage(selectedRow, null, false);
+    return selectMessage(previousSelectable);
+  }
+
+  /**
+   * This selects the previous unread message.  If no message is selected, then
+   * the first message is selected.
+   */
+  public int selectPreviousUnreadMessage() {
+    int[] rowsSelected = messageTable.getSelectedRows();
+    int selectedRow = 0;
+    if (rowsSelected.length > 0)
+      selectedRow = rowsSelected[0];
+    else
+      selectedRow = messageTable.getRowCount();
+
+    int previousSelectable = getPreviousSelectableMessage(selectedRow, null, true);
     return selectMessage(previousSelectable);
   }
 
@@ -576,12 +578,25 @@ public class FolderDisplayPanel extends JPanel {
    * should be done on the AWTEventThread.
    */
   public int getPreviousSelectableMessage(int selectedRow, Vector removedProxies) {
+    return getPreviousSelectableMessage(selectedRow, removedProxies, false);
+  }
+
+  /**
+   * Determines which message is the previous selectable message.  If no 
+   * messages before this one are selectable (i.e. not deleted or about to
+   * be deleted), returns -1.
+   *
+   * Since we're polling flags on the Messages, this probably should be
+   * called on the FolderThread.  The change of selection itself, of course,
+   * should be done on the AWTEventThread.
+   */
+  public int getPreviousSelectableMessage(int selectedRow, Vector removedProxies, boolean unread) {
     int newRow = selectedRow - 1;
     boolean done = false;
     while (! done && newRow >= 0 ) {
       MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
       try {
-	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED) || (unread && mp.getMessageInfo().getFlags().contains(Flags.Flag.SEEN))) {
 	  newRow--;
 	} else {
 	  done = true;

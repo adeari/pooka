@@ -386,7 +386,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		      getFolderInfo().getFolderDisplayUI().openFolderDisplay();
 		    else {
 		      getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
-		      if (Pooka.getProperty("Pooka.selectFirstUnread", "true").equalsIgnoreCase("true")) {
+		      if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {
 			if (finalFirstUnread >= 0)
 			  getFolderInfo().getFolderDisplayUI().selectMessage(finalFirstUnread);
 			else

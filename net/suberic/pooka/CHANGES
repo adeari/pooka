@@ -1,3 +1,9 @@
+added an option to preview pane mode in which we don't auto-preview
+the selected message.  hitting space or enter now previews the messages.
+also added an option not to automatically select the first unread message.
+these options are useful for situations in which a person doesn't want a
+new message read automatically on folder load.
+
 added keybindings for lots of stuff, including searches, printing, selecting
 the next unread message, etc.  added a page showing the keybindings, 
 available through the help menu or by pressing Alt-K.
