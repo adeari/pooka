@@ -17,6 +17,8 @@ public class PropertyEditorFactory {
      entire field:  jtabbedpane
      ... one property with subproperties:  that's tough.  left window with
         entries, right with values?
+
+     (add password -jphekman)
     */
 
     public PropertyEditorFactory(VariableBundle bundle) {
@@ -33,9 +35,10 @@ public class PropertyEditorFactory {
 
     public DefaultPropertyEditor createEditor(String property) {
 	String test = sourceBundle.getProperty(property + ".propertyType", "");
-	
 	if (test.equals("String"))
 	    return createStringEditor(property);
+	if (test.equals("Password"))
+	    return createPasswordEditor(property);
 	else if (test.equals("List"))
 	    return createListEditor(property);
 	else if (test.equals("Boolean"))
@@ -52,6 +55,10 @@ public class PropertyEditorFactory {
 
     private DefaultPropertyEditor createStringEditor(String property) {
 	return new StringEditorPane(property, sourceBundle);
+    }
+
+    private DefaultPropertyEditor createPasswordEditor(String property) {
+	return new PasswordEditorPane(property, sourceBundle);
     }
 
     private DefaultPropertyEditor createListEditor(String property) {
