@@ -22,8 +22,9 @@ public class Pooka {
 
     static public boolean openFolders = true;
 
-    static public void main(String argv[]) {
+    static public javax.mail.Authenticator defaultAuthenticator = null;
 
+    static public void main(String argv[]) {
 	parseArgs(argv);
 
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
@@ -54,10 +55,10 @@ public class Pooka {
 	    uiFactory = new PookaDesktopPaneUIFactory();
 
 	JFrame frame = new JFrame("Pooka");
-	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
+	defaultAuthenticator = new SimpleAuthenticator(frame);
 	java.util.Properties sysProps = System.getProperties();
 	sysProps.setProperty("mail.mbox.mailspool", resources.getProperty("Pooka.spoolDir", "/var/spool/mail"));
-	defaultSession = javax.mail.Session.getDefaultInstance(sysProps, auth);
+	defaultSession = javax.mail.Session.getDefaultInstance(sysProps, defaultAuthenticator);
 	if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	    defaultSession.setDebug(true);
 

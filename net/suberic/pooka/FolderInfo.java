@@ -472,6 +472,36 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     */
 
     /**
+     * This just checks to see if we can get a NewMessageCount from the
+     * folder.  As a brute force method, it also accesses the folder
+     * at every check, catching and throwing away any Exceptions that happen.  
+     * It's nasty, but it _should_ keep the Folder open..
+     */
+    public void checkFolder() {
+	if (Pooka.isDebug())
+	    System.out.println("checking folder " + getFolderName());
+
+	// i'm taking this almost directly from ICEMail; i don't know how
+	// to keep the stores/folders open, either.  :)
+
+	if (isOpen()) {
+	    Store s = getParentStore().getStore();
+	    try {
+		Folder f = s.getFolder("nfdsaf238sa");
+		f.exists();
+	    } catch ( MessagingException me ) {
+		try {
+		    if ( ! s.isConnected() )
+			s.connect();
+		} catch ( MessagingException me2 ) {
+		}
+	    }
+	    
+	    resetMessageCounts();
+	}
+    }
+
+    /**
      * Gets the row number of the first unread message.  Returns -1 if
      * there are no unread messages, or if the FolderTableModel is not
      * set or empty.

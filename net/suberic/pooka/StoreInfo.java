@@ -31,6 +31,9 @@ public class StoreInfo implements ValueChangeListener {
     private boolean authorized = false;
     private boolean available = false;
 
+    // if this is a pop mailbox.
+    private boolean popStore = false;
+
     private UserProfile defaultProfile;
 
     // the connection information.
@@ -53,13 +56,23 @@ public class StoreInfo implements ValueChangeListener {
     public StoreInfo(String sid) {
 	setStoreID(sid);
     
-	user = Pooka.getProperty("Store." + storeID + ".user", "");
-	password = Pooka.getProperty("Store." + storeID + ".password", "");
-	if (!password.equals(""))
-	    password = net.suberic.util.gui.PasswordEditorPane.descrambleString(password);
-	server = Pooka.getProperty("Store." + storeID + ".server", "");
+
 	protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
-	
+
+	if (protocol.equalsIgnoreCase("pop3")) {
+	    user = "";
+	    password = "";
+	    server = "localhost";
+	    protocol = "mbox";
+	    popStore = true;
+	} else {
+	    user = Pooka.getProperty("Store." + storeID + ".user", "");
+	    password = Pooka.getProperty("Store." + storeID + ".password", "");
+	    if (!password.equals(""))
+		password = net.suberic.util.gui.PasswordEditorPane.descrambleString(password);
+	    server = Pooka.getProperty("Store." + storeID + ".server", "");
+	}
+
 	url = new URLName(protocol, server, -1, "", user, password);
 	
 	try {
@@ -137,7 +150,10 @@ public class StoreInfo implements ValueChangeListener {
 	    newFolderName = (String)tokens.nextToken();
 	    FolderInfo childFolder = getChild(newFolderName);
 	    if (childFolder == null) {
-		childFolder = new FolderInfo(this, newFolderName);
+		if (popStore && newFolderName.equalsIgnoreCase("INBOX")) 
+		    childFolder = new PopInboxFolderInfo(this, newFolderName);
+		else 
+		    childFolder = new FolderInfo(this, newFolderName);
 		newChildren.add(childFolder);
 	    }
 	} 
