@@ -9,6 +9,7 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.mail.Session;
 import net.suberic.pooka.MailQueue;
+import net.suberic.pooka.UserProfile;
 import net.suberic.util.gui.*;
 
 /**
@@ -19,7 +20,7 @@ import net.suberic.util.gui.*;
  */
 
 public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelectionListener {
-    private JMenuBar mainMenu;
+    private ConfigurableMenuBar mainMenu;
     private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
     private MessagePanel messagePanel;
@@ -27,6 +28,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     private Hashtable commands;
     private Session session;
     private MailQueue mailQueue;
+    private UserProfile currentUser;
     private PropertyEditorFactory editorFactory = new PropertyEditorFactory(Pooka.getResources());
 
     public MainPanel(JFrame frame) {
@@ -238,9 +240,8 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     */
 
     protected void refreshActiveMenus(JMenuBar menuBar) {
-	removeActionListeners(menuBar);
 	setActions();
-	setActiveMenus(menuBar);
+	mainMenu.setActive(commands);
 	mainToolbar.setActive(commands);
 
     }

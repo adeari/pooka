@@ -19,8 +19,10 @@ import javax.swing.border.*;
 public class MessagePanel extends JDesktopPane {
     class ExtendedDesktopManager extends DefaultDesktopManager {
 	/* ExtendedDesktopManager is just a Desktop Manager which also
-	   calls refreshActiveMenus() when the focus is changed. 
-	*/
+	 * calls refreshActiveMenus() and refreshCurrentUser()  when the 
+	 * focus is changed.  It also selects the last window selected when
+	 * the currently selected window closes.
+	 */
 	ExtendedDesktopManager() {
 	    super();
 	}
@@ -29,6 +31,7 @@ public class MessagePanel extends JDesktopPane {
 	    super.activateFrame(f);
 	    
 	    mainPanel.refreshActiveMenus(mainPanel.getMainMenu());
+	    mainPanel.refreshCurrentUser();
 	}
 	
 	public void closeFrame(JInternalFrame f) {
@@ -40,6 +43,7 @@ public class MessagePanel extends JDesktopPane {
 		} catch (java.beans.PropertyVetoException pve) {
 		}
 	    mainPanel.refreshActiveMenus(mainPanel.getMainMenu());
+	    mainPanel.refreshCurrentUser();
 	}
     }
 
