@@ -41,7 +41,11 @@ searching
 *) add something to search through all messages in the folder.
 
 *) add support for mail filters.
-
+	to be supported:
+	match:  header, subject, date, flags
+	match type:  (not) contains, is, begins with, ends with, is before,
+	 	     is after
+	actions:  move to folder, change priority, delete, mark read
 other
 -----
 *)  fix the out of memory problems--only load a certain amount of large

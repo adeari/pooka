@@ -334,3 +334,26 @@ NewAccountPooka.type=imap
 
 FolderSelectorPane.inputButton.image=images/More.gif
 
+Search.searchTerms=Answered:Deleted:Draft:Flagged:Recent:Seen:From:To:CC:ToOrCC:Body:Subject
+Search.searchTerms.Answered.class=javax.mail.search.FlagTerm
+Search.searchTerms.Answered.flag=answered
+search.searchTerms.Deleted.class=javax.mail.search.FlagTerm
+Search.searchTerms.Deleted.flag=deleted
+Search.searchTerms.Draft.class=javax.mail.search.FlagTerm
+Search.searchTerms.Draft.flag=draft
+Search.searchTerms.Flagged.class=javax.mail.search.FlagTerm
+Search.searchTerms.Flagged.flag=flagged
+Search.searchTerms.Recent.class=javax.mail.search.FlagTerm
+Search.searchTerms.Recent.flag=recent
+Search.searchTerms.Seen.class=javax.mail.search.FlagTerm
+Search.searchTerms.Seen.flag=seen
+Search.searchTerms.From.class=javax.mail.search.FromStringTerm
+Search.searchTerms.To.class=javax.mail.search.RecipientStringTerm
+Search.searchTerms.CC.class=javax.mail.search.RecipientStringTerm
+Search.searchTerms.ToOrCC.class=javax.mail.search.RecipientStringTerm
+Search.searchTerms.ToOrCC.recipientType=ToOrCC
+Search.searchTerms.Body.class=javax.mail.search.BodyTerm
+Search.searchTerms.Subject.class=javax.mail.search.SubjectTerm
+
+Search.operations=Contains:Not
+Search.operaions.Not=not

@@ -2,6 +2,8 @@ package net.suberic.pooka.gui;
 import javax.swing.*;
 import javax.mail.search.*;
 import java.util.*;
+import net.suberic.pooka.Pooka;
+import net.suberic.pooka.SearchTermManager;
 
 /**
  * This is a gui component which lets you configure a 
@@ -14,45 +16,25 @@ public class SearchEntryForm {
     private JComboBox searchFieldCombo;
     private JComboBox operationCombo;
     private JTextField textField;
-    private JToggleButton useRegexpButton;
 
-    // maps
-    private HashMap labelToPropertyMap;
-    
+    // the source SearchTermManager.
+    SearchTermManager manager;
+
     /**
-     * Constructs a new, empty SearchEntryForm.
+     * Constructs a new SearchEntryForm.
      */
-    public SearchEntryForm() {
+    public SearchEntryForm(SearchTermManager newManager) {
+	manager = newManager;
 	panel = new JPanel();
-	labelToClassMap = createLabeltoPropertyMap();
-	Vector searchFields = new Vector(labelToClassMap.keySet());
 
-	searchFieldCombo = new JComboBox(searchFields);
-	Vector operationFields = Pooka.getResources().getPropertyAsVector("SearchEntryForm.searchOperation", "");
+	searchFieldCombo = new JComboBox(manager.getTermLabels());
+	Vector operationFields = manager.getOperationLabels();
 	operationCombo = new JComboBox(operationFields);
 	textField = new JTextField();
-	useRegexpButton = new JToggleButton(Pooka.getProperty("SearchEntryForm.useRegexp.label", "Use Regexp"));
 	
 	panel.add(searchFieldCombo);
 	panel.add(operationCombo);
 	panel.add(textField);
-	panel.add(useRegexpButton);
-    }
-
-    /**
-     * Creates the labelToPropertyMap from the SearchEntryForm.searchFields 
-     * property.
-     */
-    private HashMap createLabeltoPropertyMap() {
-	Vector keys = Pooka.getPropertyAsVector("SearchEntryForm.searchFields", "");
-	if (keys != null) {
-	    HashMap returnValue = new HashMap();
-	    for (int i = 0; i < keys.length; i++) {
-		String thisValue = "SearchEntryForm.searchFields." + (String) keys.elementAt(i);
-		returnValue.put(Pooka.getProperty(thisValue + ".label", (String)keys.elementAt(i)), thisValue);
-	    }
-	} else 
-	    return null;
     }
 
     /**
@@ -67,21 +49,10 @@ public class SearchEntryForm {
      * returns that value.
      */
     public SearchTerm generateSearchTerm() {
-	SearchTerm st = null;
-	String propertyName = (String)labelToPropertyMap.get(searchFieldCombo.getSelectedItem());
-	/*
-	  Class searchClass = Class.forName(Pooka.getProperty(propertyName + ".class", ""));
-	  st = (SearchTerm) searchClass.newInstance();
-	  if (st instanceof AddressTerm) {
-	  
-	  } else if (st instanceof StringTerm) {
-	  
-	  }
-	*/
+	String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
+	String operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
+	String pattern = textField.getText();
 
-	if (Pooka.getProperty(propertyName + ".class", "").equals("javax.mail.search.BodyTerm")) {
-	    st = new BodyTerm(textField.getText(), true);
-	    return st;
-	}
+	return manager.generateSearchTerm(searchProperty, operationProperty, pattern);
     }
 }

@@ -11,6 +11,7 @@ public class Pooka {
     static public javax.activation.CommandMap mailcap;
     static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
     static public net.suberic.pooka.gui.MainPanel panel;
+    static public SearchTermManager searchManager;
 
     static public javax.mail.Session defaultSession;
     static public net.suberic.pooka.thread.FolderTracker folderTracker;
@@ -43,6 +44,7 @@ public class Pooka {
 
 	javax.activation.CommandMap.setDefaultCommandMap(mailcap);
 	javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
+	searchManager = new SearchTermManager("Search");
 
 	JFrame frame = new JFrame("Pooka");
 	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
@@ -139,6 +141,10 @@ public class Pooka {
 
     static public StoreManager getStoreManager() {
 	return storeManager;
+    }
+
+    static public SearchTermManager getSearchManager() {
+	return searchManager;
     }
 }
 
