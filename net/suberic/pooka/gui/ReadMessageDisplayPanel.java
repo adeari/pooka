@@ -111,7 +111,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     this.add(WITH_ATTACHMENTS, splitPane);
     this.add(WITHOUT_ATTACHMENTS, editorScrollPane);
     
-    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+    keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
     keyBindings.setActive(getActions());
     
     editorPane.addMouseListener(new MouseAdapter() {

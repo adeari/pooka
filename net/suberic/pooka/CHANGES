@@ -1,3 +1,5 @@
+fixed the keybindings on top-level message frames.  those should work now.
+
 selecting a NewMessageWindow now selects either the to: field, the subject:
 field, or the text body, depending on which ones are filled out.
 

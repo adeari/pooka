@@ -136,6 +136,12 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	  }
 	}
       });
+
+    keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
+    //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    
+    keyBindings.setActive(getActions());
+
   }
 
     /**

@@ -1,12 +1,7 @@
 *) document keybindings
-	-- keybindings for external message frame(s)
 	-- keybindings for address book
 	-- keybindings for saving attachments.
 	-- keybindings for opening folders.
-
-*) focus issues
-	--  when you select a new message window (using, say, alt+up), 
-		nothing gets the keyboard focus.
 
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
@@ -35,6 +30,12 @@
 
 *) disconnected from store (like if the server goes down) doesn't result in 
 icons changing?  test.
+
+*) check:  reference kept by a MessageProxy to its MessageUI after you close
+the MessageUI.  seems to happen with externals, but not with internals.
+
+*) fix the launcher (specifically the html launcher, but maybe all of them)
+to use "'s correctly.
 
 --------
 
