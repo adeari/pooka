@@ -1,8 +1,3 @@
-*) fix NPE in KeySelectorPane editing with a new user.
-
-*) fix jmaildir on windows xp
-	done.  test.
-
 *) ?? ^D message, hit return for next message, get an error?
 	tough.  could fix by having a temporary 'deleted' flag on the message
 	itself, maybe?
@@ -29,7 +24,8 @@
 
 *) fix ant.
 	see about prepackaging cryptix and bouncycastle.
-
+*) fix jmaildir on windows xp
+	done.  test.
 ----
 
 *) fix error display with exception so that you can see the stack trace.

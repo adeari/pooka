@@ -107,8 +107,14 @@ public class KeySelectorPane extends SwingPropertyEditor {
   public void setValue() {
     if (Pooka.isDebug())
       System.out.println("calling ksp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
-    if (isEnabled() && isChanged())
-      manager.setProperty(property, (String)valueDisplay.getSelectedItem());
+
+    String newValue = (String) valueDisplay.getSelectedItem();
+    if (newValue == null)
+      newValue = "";
+
+    if (isEnabled() && isChanged()) {
+      manager.setProperty(property, newValue);
+    }
   }
   
   public java.util.Properties getValue() {
