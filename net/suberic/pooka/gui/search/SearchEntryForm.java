@@ -41,6 +41,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 
 	searchFieldCombo = new JComboBox(manager.getTermLabels());
 	searchFieldCombo.setPreferredSize(searchFieldCombo.getMinimumSize());
+	searchFieldCombo.setMaximumSize(searchFieldCombo.getMinimumSize());
 
 	searchFieldCombo.addItemListener( this );
 
@@ -66,6 +67,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
 	operationCombo = new JComboBox(operationFields);
 	operationCombo.setPreferredSize(operationCombo.getMinimumSize());
+	operationCombo.setMaximumSize(operationCombo.getMinimumSize());
 	textField = new JTextField(20);
 	textField.setMaximumSize(new java.awt.Dimension(1000, textField.getPreferredSize().height));
 
@@ -77,6 +79,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
 	booleanValueCombo = new JComboBox(booleanFields);
 	booleanValueCombo.setPreferredSize(booleanValueCombo.getMinimumSize());
+	booleanValueCombo.setMaximumSize(booleanValueCombo.getMinimumSize());
 	booleanPanel.add(booleanValueCombo);
 	booleanPanel.add(Box.createGlue());
 
@@ -85,6 +88,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
 	dateComparisonCombo = new JComboBox(dateFields);
 	dateComparisonCombo.setPreferredSize(dateComparisonCombo.getMinimumSize());
+	dateComparisonCombo.setMaximumSize(dateComparisonCombo.getMinimumSize());
 	dateField = new JTextField(10);
 	dateField.setMaximumSize(new java.awt.Dimension(1000, dateField.getPreferredSize().height));
 

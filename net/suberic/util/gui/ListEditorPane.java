@@ -31,12 +31,18 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	label = new JLabel(sourceBundle.getProperty(templateType + ".label", defaultLabel));
 	inputField = createComboBox();
 
+	Box inputBox = new Box(BoxLayout.X_AXIS);
+	inputField.setPreferredSize(inputField.getMinimumSize());
+	inputField.setMaximumSize(inputField.getMinimumSize());
+	inputBox.add(inputField);
+	inputBox.add(Box.createGlue());
+	
 	this.add(label);
-	this.add(inputField);
+	this.add(inputBox);
 	this.setEnabled(isEnabled);
 
 	labelComponent = label;
-	valueComponent = inputField;
+	valueComponent = inputBox;
 	//valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
 	//valueComponent.add(inputField);
     }
