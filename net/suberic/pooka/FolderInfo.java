@@ -126,12 +126,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    if (tmpFolder != null && tmpFolder.length > 0) {
 		folder = tmpFolder[0];
 		available = true;
+		folder.addMessageChangedListener(this);
 	    } else {
 		available = false;
 		open = false;
 		folder = null;
 	    }
-	    folder.addMessageChangedListener(this);
 	    loaded = true;
 	} catch (MessagingException me) {
 	    loaded = false;
