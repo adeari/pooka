@@ -1,6 +1,8 @@
 *) "please reopen" message shouldn't come up when you've requested a
 	store/folder close. (caching, maybe normal uid?)
 
+*) make sure non-ascii characters work in email text.
+
 *) fix tableinfos so that you after a disconnect/reconnect you don't
 	have to re-fetch the headers, only the flags.
 

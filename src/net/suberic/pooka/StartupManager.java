@@ -264,7 +264,7 @@ public class StartupManager {
 	  String filename = argv[++i];
 	  if (filename == null) {
 	    System.err.println("error:  no startup file specified.");
-	    System.err.println("Usage:  java net.suberic.pooka.Pooka [-rc <filename>]");
+	    printUsage();
 	    System.exit(-1);
 	  }
 	  
@@ -281,7 +281,13 @@ public class StartupManager {
 	  }
 	  
 	  // if we have an address, try sending a mail message to it.
-	  sendMessageTo(mailAddress);
+	  if (sendMessageTo(mailAddress)) {
+	    System.err.println("send succeeded.");
+	    System.exit(0);
+	  } else {
+	    //huh
+	    System.err.println("send failed.");
+	  }
 	} else if (argv[i].equals("--help")) {
 	  printUsage();
 	  System.exit(0);
@@ -334,14 +340,17 @@ public class StartupManager {
   /**
    * Sends a message to the given mail address on startup.
    */
-  public void sendMessageTo(String pAddress) {
+  public boolean sendMessageTo(String pAddress) {
     // first see if there's already a pooka instance running.
-    /*
-    PookaConnectionManager pcm = new PookaConnectionManager();
-    if (pcm.isConnected()) {
-      pcm.sendMessage("mailto:" + pAddress);
+    net.suberic.pooka.messaging.PookaMessageSender sender = new net.suberic.pooka.messaging.PookaMessageSender();
+    try {
+      sender.openConnection();
+      sender.sendNewMessage(pAddress, null);
+    } catch (Exception e) {
+      return false;
     }
-    */
+
+    return true;
   }
 
   private long mStartTime = 0;

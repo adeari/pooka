@@ -6,10 +6,14 @@ import java.nio.channels.*;
 import java.io.*;
 
 import javax.mail.*;
+import javax.mail.internet.MimeMessage;
 
 import net.suberic.pooka.*;
+import net.suberic.pooka.gui.NewMessageProxy;
+import net.suberic.pooka.gui.NewMessageFrame;
+import net.suberic.pooka.gui.MessageUI;
 
-/**
+/** 
  * This class listens on a socket for messages from other Pooka clients.
  */
 public class PookaMessageListener extends Thread {
@@ -30,8 +34,11 @@ public class PookaMessageListener extends Thread {
    */
   public void run() {
     try {
+      System.err.println("creating socket.");
       createSocket();
+      System.err.println("socket created.");
       while (! mStopped) {
+	System.err.println("accepting connection.");
 	Socket currentSocket = mSocket.accept();
 	System.err.println("got connection.");
 	BufferedReader reader = new BufferedReader(new InputStreamReader(currentSocket.getInputStream()));
@@ -52,43 +59,48 @@ public class PookaMessageListener extends Thread {
   public void createSocket() throws Exception {
     System.err.println("creating new PookaMessageListener socket.");
     mSocket = new ServerSocket(PookaMessagingConstants.S_PORT);
-    mSocket.accept();
   }
 
   /**
    * Handles the received message.
    */
   public void handleMessage(String pMessage) {
-    System.out.println("handling message:  '" + pMessage + "'.");
-    /*
-    if (pMessage.startsWith(PookaMessagingConstants.S_NEW_MESSAGE)) {
+    System.err.println("handling message:  '" + pMessage + "'.");
+
+    if (pMessage != null && pMessage.startsWith(PookaMessagingConstants.S_NEW_MESSAGE)) {
+      System.err.println("it's a new message command.");
       // see if there's an address to send to.
       String address = null;
       if (pMessage.length() > PookaMessagingConstants.S_NEW_MESSAGE.length()) {
 	address = pMessage.substring(PookaMessagingConstants.S_NEW_MESSAGE.length() + 1);
       }
+      sendMessage(address, null);
     }
-    */
+
   }
   
   /**
    * Sends a message.
    */
   public void sendMessage(String pAddress, UserProfile pProfile) {
-          
     final String fAddress = pAddress;
     final UserProfile fProfile = pProfile;
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       public void run() {
 	try {
-	  javax.mail.internet.MimeMessage mm = new javax.mail.internet.MimeMessage(Pooka.getMainPanel().getSession());
-	  mm.setRecipients(javax.mail.Message.RecipientType.TO, fAddress);
+	  System.err.println("creating new message.");
+	  // create the template first.  this is done so the new message
+	  // opens as a top-level window.
+	  NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getMainPanel().getSession()))));
+
+	  MimeMessage mm = new MimeMessage(Pooka.getMainPanel().getSession());
+	  mm.setRecipients(Message.RecipientType.TO, fAddress);
 	  
 	  NewMessageInfo info = new NewMessageInfo(mm);
-	  net.suberic.pooka.gui.NewMessageProxy proxy = new net.suberic.pooka.gui.NewMessageProxy(info);
+	  NewMessageProxy proxy = new NewMessageProxy(info);
 	  
-	  net.suberic.pooka.gui.MessageUI nmu = Pooka.getUIFactory().createMessageUI(proxy);
+	  MessageUI nmu = Pooka.getUIFactory().createMessageUI(proxy, template);
 	  nmu.openMessageUI();
 	} catch (MessagingException me) {
 	  Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
