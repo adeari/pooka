@@ -31,7 +31,6 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     public CompositeEditorPane(PropertyEditorFactory newFactory, String 
 			       newProperty, String newTemplate) {
 	super(BoxLayout.X_AXIS);
-	System.out.println("creating a new CompositeEditorPane.");
 	configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), true);
         
     }
@@ -109,8 +108,6 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	    valueWidth = Math.max(valueWidth, ((DefaultPropertyEditor)editors.elementAt(i)).getMinimumValueSize().width);
 	    totalWidth = Math.max(totalWidth, ((DefaultPropertyEditor)editors.elementAt(i)).getMinimumTotalSize().width);
 	}
-
-	System.out.println("attempting to set all sizes to label width = " + labelWidth + ", valueWidth = " + valueWidth);
 
 	if (totalWidth > labelWidth + valueWidth) {
 	    int difference = totalWidth - labelWidth - valueWidth;

@@ -61,6 +61,7 @@ public class PropertyEditorFactory {
      */
     public DefaultPropertyEditor createEditor(String property) {
 	String test = sourceBundle.getProperty(property + ".propertyType", "");
+
 	if (test.equals("String"))
 	    return createStringEditor(property);
 	if (test.equals("Password"))
@@ -73,6 +74,8 @@ public class PropertyEditorFactory {
 	    return createMultiEditor(property);
 	else if (test.equals("Tabbed"))
 	    return createTabbedEditor(property, property);
+	else if (test.equals("Composite"))
+	    return createCompositeEditor(property, property);
 	else
 	    return createBasicEditor(property);
     }
@@ -99,6 +102,8 @@ public class PropertyEditorFactory {
 	    return createMultiEditor(property);
 	else if (test.equals("Tabbed"))
 	    return createTabbedEditor(property, typeTemplate);
+	else if (test.equals("Composite"))
+	    return createCompositeEditor(property, typeTemplate);
 	else
 	    return createBasicEditor(property);
     }
@@ -133,6 +138,10 @@ public class PropertyEditorFactory {
 
     private DefaultPropertyEditor createTabbedEditor(String property, String typeTemplate) {
 	return new TabbedEditorPane(property, typeTemplate, this);
+    }
+
+    private DefaultPropertyEditor createCompositeEditor(String property, String typeTemplate) {
+	return new CompositeEditorPane(this, property, typeTemplate);
     }
 
     public VariableBundle getBundle() {

@@ -64,7 +64,8 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
 	    this.addButtons();
     }
 
-    public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+    public void configureEditor(PropertyEditorFactory newFactory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+	
     }
 
     public void configureEditor(String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {

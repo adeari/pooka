@@ -85,10 +85,8 @@ public abstract class DefaultPropertyEditor extends JPanel implements PropertyEd
      */
     public Dimension getMinimumLabelSize() {
 	if (labelComponent != null) {
-	    System.out.println("label:  minimum size is " + labelComponent.getMinimumSize() + ", prefSize is " + labelComponent.getPreferredSize() + ", size is " + labelComponent.getSize()); 
 	    return labelComponent.getMinimumSize();
 	} else {
-	    System.out.println("label is null.");
 	    return new Dimension(0,0);
 	}
     }
@@ -98,10 +96,8 @@ public abstract class DefaultPropertyEditor extends JPanel implements PropertyEd
      */
     public Dimension getMinimumValueSize() {
 	if (valueComponent != null) {
-	    System.out.println("value:  minimum size is " + valueComponent.getMinimumSize() + ", prefSize is " + valueComponent.getPreferredSize() + ", size is " + valueComponent.getSize()); 
 	    return valueComponent.getMinimumSize();
 	} else {
-	    System.out.println("value is null.");
 	    return new Dimension(0,0);
 	}
     }
