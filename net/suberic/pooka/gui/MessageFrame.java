@@ -13,42 +13,36 @@ import javax.swing.event.*;
 import java.io.File;
 
 /**
- * An InternalFrame which can display messages.
- * 
- * This class should be used in conjunction with a MessagePanel.
+ * A top-level window for displaying a message.
  */
-public abstract class MessageInternalFrame extends JInternalFrame implements MessageUI {
-
-    protected MessagePanel parentContainer;
+public abstract class MessageFrame extends JFrame implements MessageUI {
 
     protected MessageProxy msg;
     protected MessageDisplayPanel messageDisplay;
 
     protected ConfigurableToolbar toolbar;
     protected ConfigurableKeyBinding keyBindings;
-    protected boolean addedToDesktop = false;
+    protected ConfigurableMenuBar menuBar;
 
     /**
-     * Creates a MessageInternalFrame from the given Message.
+     * Creates a MessageFrame from the given Message.
      */
 
-    public MessageInternalFrame(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
-	super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"), true, true, true, true);
+    public MessageFrame(MessageProxy newMsgProxy) {
+	super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"));
 
-	parentContainer = newParentContainer;
 	msg=newMsgProxy;
 
 	this.getContentPane().setLayout(new BorderLayout());
 
 	msg.setMessageUI(this);
 	
-	this.addInternalFrameListener(new InternalFrameAdapter() {
-		public void internalFrameClosed(InternalFrameEvent e) {
-		    if (getMessageProxy().getMessageUI() == MessageInternalFrame.this)
+	this.addWindowListener(new WindowAdapter() {
+		public void windowClosed(WindowEvent e) {
+		    if (getMessageProxy().getMessageUI() == MessageFrame.this)
 			getMessageProxy().setMessageUI(null);
 		}
 	    });
-	
     }
     
     /**
@@ -56,27 +50,21 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * duties.
      */
 
-    protected abstract void configureMessageInternalFrame();
+    protected abstract void configureMessageFrame();
 
     /**
-     * This opens the MessageInternalFrame by calling 
-     * getParentContainer().openMessageInternalFrame(getMessageProxy());
+     * This opens the MessageFrame.
      */
     public void openMessageUI() {
-	getParentContainer().openMessageWindow(getMessageProxy(), !addedToDesktop);
-	addedToDesktop = true;
+	this.show();
     }
 
     /**
-     * This closes the MessageInternalFrame.
+     * This closes the MessageFrame.
      */
     public void closeMessageUI() {
-	try {
-	    this.setClosed(true);
-	} catch (java.beans.PropertyVetoException e) {
-	}
+	this.dispose();
     }
-
 
     /**
      * This shows an Confirm Dialog window.  We include this so that
@@ -84,7 +72,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * actual implementation of the Dialog.
     */    
     public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showInternalConfirmDialog(Pooka.getMainPanel().getMessagePanel(), messageText, title, type);
+	return JOptionPane.showConfirmDialog(this, messageText, title, type);
     }
 
     /**
@@ -93,7 +81,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * actual implementation of the Dialog.
      */    
     public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-	return JOptionPane.showInternalConfirmDialog(Pooka.getMainPanel().getMessagePanel(), messageText, title, optionType, iconType);
+	return JOptionPane.showConfirmDialog(this, messageText, title, optionType, iconType);
     }
 
     /**
@@ -102,7 +90,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(Pooka.getMainPanel().getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
     }
 
     /**
@@ -130,7 +118,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * implementation of the dialog.
      */
     public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+	return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**
@@ -139,7 +127,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * implementation of the dialog.
      */
     public String showInputDialog(Object[] inputPanes, String title) {
-	return JOptionPane.showInternalInputDialog(Pooka.getMainPanel().getMessagePanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+	return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**
@@ -148,7 +136,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      */
     public void resizeByWidth() {
 	int width = (int)messageDisplay.getPreferredSize().getWidth();
-	this.setPreferredSize(new Dimension(width, width));
+	//this.setPreferredSize(new Dimension(width, width));
 	this.setSize(this.getPreferredSize());
     }
 
@@ -169,8 +157,8 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *
      * This implementation returns the DefaultProfile of the associated
-     * MessageProxy if the MessageInternalFrame is not editable.  If the 
-     * MessageInternalFrame is editable, it returns the currently selected 
+     * MessageProxy if the MessageFrame is not editable.  If the 
+     * MessageFrame is editable, it returns the currently selected 
      * UserProfile object.
      */
 
@@ -201,11 +189,6 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     public AttachmentPane getAttachmentPanel() {
 	return getMessageDisplay().getAttachmentPanel();
     }
-
-    public MessagePanel getParentContainer() {
-	return parentContainer;
-    }
-
     //------- Actions ----------//
 
     public Action[] getActions() {

@@ -12,26 +12,26 @@ import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
 
-public class ReadMessageInternalFrame extends MessageInternalFrame {
+public class ReadMessageFrame extends MessageFrame {
 
     public boolean firstShow = true;
 
     /**
-     * Creates a ReadMessageInternalFrame from the given Message.
+     * Creates a ReadMessageFrame from the given Message.
      */
 
-    public ReadMessageInternalFrame(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
-	super(newParentContainer, newMsgProxy);
+    public ReadMessageFrame(MessageProxy newMsgProxy) {
+	super(newMsgProxy);
 
-	configureMessageInternalFrame();
+	configureMessageFrame();
     }
     
-    protected void configureMessageInternalFrame() {
+    protected void configureMessageFrame() {
 	try {
 	    try {
 		this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
 	    } catch (MessagingException me) {
-		this.setTitle(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.noSubject", "<no subject>"));
+		this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
 	    }
 	    
 	    messageDisplay = new ReadMessageDisplayPanel(msg);
@@ -44,11 +44,11 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 
 	    toolbar.setActive(this.getActions());
 
-	    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+	    keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "ReadMessageWindow.keyBindings", Pooka.getResources());
 	    keyBindings.setActive(getActions());
 
 	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."));
+	    showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
 	    me.printStackTrace();
 	}
 	
@@ -82,7 +82,6 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 
     public void registerKeyboardAction(ActionListener anAction,
        	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
-	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
 
 	if (messageDisplay != null)
 	    messageDisplay.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
@@ -100,8 +99,6 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
      */
 
     public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
-	super.unregisterKeyboardAction(aKeyStroke);
-
 	if (messageDisplay != null)
 	    messageDisplay.unregisterKeyboardAction(aKeyStroke);
 	toolbar.unregisterKeyboardAction(aKeyStroke);
