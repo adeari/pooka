@@ -10,6 +10,8 @@ public class Pooka {
     static public javax.activation.CommandMap mailcap;
     static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
 
+    static public javax.mail.Session defaultSession;
+
     static public void main(String argv[]) {
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
 
@@ -24,10 +26,14 @@ public class Pooka {
 	UserProfile.createProfiles(resources);
 
 	mailcap = new FullMailcapCommandMap();
+
 	javax.activation.CommandMap.setDefaultCommandMap(mailcap);
 	javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
 
 	JFrame frame = new JFrame("Pooka");
+	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
+	defaultSession = javax.mail.Session.getDefaultInstance(System.getProperties(), auth);
+
 	frame.setBackground(Color.lightGray);
 	frame.getContentPane().setLayout(new BorderLayout());
 	MainPanel panel = new MainPanel(frame);
@@ -76,6 +82,10 @@ public class Pooka {
 
     static public javax.activation.MimetypesFileTypeMap getMimeTypesMap() {
 	return mimeTypesMap;
+    }
+
+    static public javax.mail.Session getDefaultSession() {
+	return defaultSession;
     }
 }
 

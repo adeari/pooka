@@ -14,13 +14,13 @@ public class FolderMenu extends net.suberic.util.DynamicMenu {
 	super(Pooka.getProperty(key + ".Label", key));
 
 	setActionCommand(Pooka.getProperty(key + ".Action", key));
-	fPanel = newFPanel;
 
+	fPanel = newFPanel;
 	createMenus();
     }
 
     public void createMenus() {
-	folderList = fPanel.getFolderList();
+	/*	folderList = fPanel.getFolderList();
 	
 	Folder currentFolder;
 	
@@ -30,7 +30,7 @@ public class FolderMenu extends net.suberic.util.DynamicMenu {
 	    mi.setActionCommand(getActionCommand());
 	    
 	    this.add(mi);
-	}
+	    }*/
     }
     
     public void setActiveMenus(JComponent mainPanel) {

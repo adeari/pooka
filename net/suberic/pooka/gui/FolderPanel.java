@@ -19,9 +19,8 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
     Session session;
     Folder trashFolder = null;
     
-     public FolderPanel(MainPanel newMainPanel, Session newSession) {
+     public FolderPanel(MainPanel newMainPanel) {
 	mainPanel=newMainPanel;
-	session = newSession;
 
 	setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.hsize", "200")), Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
 
@@ -125,16 +124,9 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
     }
 
     public void addStore(String storeID, MailTreeNode root) {
-	URLName urln = new URLName(Pooka.getProperty("Store." + storeID + ".protocol"), Pooka.getProperty("Store." + storeID + ".server"), -1, "", Pooka.getProperty("Store." + storeID + ".user"), Pooka.getProperty("Store." + storeID + ".password", ""));
-	
-	
-	try {
-	    Store store = session.getStore(urln);
-	    StoreNode storenode = new StoreNode(store, storeID, this, true);
-	    root.add(storenode);
-	} catch (NoSuchProviderException nspe) {
-	}
-	
+	StoreInfo store = new StoreInfo(storeID);
+	StoreNode storenode = new StoreNode(store, this, true);
+	root.add(storenode);
     }
 
     public void removeStore(String storeID, MailTreeNode root) {
@@ -157,29 +149,6 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
 
     public JTree getFolderTree() {
 	return folderTree;
-    }
-
-    public void parseFolderTree(TreeModel model, Object currentNode, Vector fList) {
-	if (model.isLeaf(currentNode)) {
-	    if (currentNode instanceof FolderNode) {
-		fList.add(((FolderNode)currentNode).getFolder());
-	    } 
-	} else {
-	    for (int i=0; i < model.getChildCount(currentNode); i++) {
-		parseFolderTree(model, model.getChild(currentNode, i), fList);
-	    }
-	}
-    }
-
-    /**
-     * Returns a vector of all the leaf folders in the tree.
-     */
-
-    public Vector getFolderList() {
-	Vector fList = new Vector();
-
-	parseFolderTree(folderTree.getModel(), folderTree.getModel().getRoot(), fList);
-	return fList;
     }
 
     /**

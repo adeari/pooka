@@ -34,14 +34,14 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
 	// set supported actions
 	// this.setLayout(new BorderLayout());
-
 	// create the menu bar.
 	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
 	session = Session.getDefaultInstance(System.getProperties(), auth);
-	mailQueue = new MailQueue(session);
 
+	mailQueue = new MailQueue(Pooka.getDefaultSession());
+	
 	messagePanel = new MessagePanel(this);
-	folderPanel = new FolderPanel(this, session);
+	folderPanel = new FolderPanel(this);
 	Pooka.getResources().addValueChangeListener(folderPanel, "Store");
 
 	this.setLeftComponent(new JScrollPane(folderPanel));

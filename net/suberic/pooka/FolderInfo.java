@@ -42,23 +42,78 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
     private FolderWindow folderWindow;
 
     private boolean open;
+    private boolean available;
 
     /**
-     * Creates a new FolderInfo from a Folder and a Folder ID (like 
-     * Store.defaultStore.folderList.folderName).
+     * Creates a new FolderInfo from a parent FolderInfo and a Folder 
+     * name.
      */
+    
+    public FolderInfo(FolderInfo parent, String fname) {
+	setFolderID(parent.getFolderID() + "." + fname);
+	folderName = fname;
+	
+	try {
+	    Folder parentFolder = parent.getFolder();
+	    Folder[] tmpFolder = parentFolder.list(fname);
+	    if (tmpFolder.length > 0) {
+		folder = tmpFolder[0];
+		available = true;
+	    } else {
+		available = false;
+		folder = null;
+	    }
+	} catch (MessagingException me) {
+	    available = false;
+	    folder = null;
+	}
+		
+	if (folder != null) {
+	    initializeFolderInfo();
+	}
+    }
 
-    public FolderInfo(Folder f, String fid) {
-	folder=f;
-	f.addMessageCountListener(this);
-	setFolderID(fid);
-	folderName = f.getName();
+
+    /**
+     * Creates a new FolderInfo from a parent StoreInfo and a Folder 
+     * name.
+     */
+    
+    public FolderInfo(StoreInfo parent, String fname) {
+	setFolderID(parent.getStoreID() + "." + fname);
+	folderName = fname;
+	
+	try {
+	    Store parentStore = parent.getStore();
+	    Folder parentFolder = parentStore.getDefaultFolder();
+	    Folder[] tmpFolder = parentFolder.list(fname);
+	    if (tmpFolder != null && tmpFolder.length > 0) {
+		folder = tmpFolder[0];
+		available = true;
+	    } else {
+		available = false;
+		folder = null;
+	    }
+	} catch (MessagingException me) {
+	    available = false;
+	    folder = null;
+	}
+		
+	if (folder != null) {
+	    initializeFolderInfo();
+	}
+    }
+
+    /**
+     * this is called by the constructors if a proper Folder object 
+     * is returned.
+     */
+    private void initializeFolderInfo() {
+	folder.addMessageCountListener(this);
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
-
-	this.updateChildren();
-
-	f.addConnectionListener(new ConnectionAdapter() { 
+	
+	folder.addConnectionListener(new ConnectionAdapter() { 
 		public void closed(ConnectionEvent e) {
 		    if (Pooka.isDebug())
 			System.out.println("Folder " + getFolderID() + " closed.");
@@ -89,8 +144,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 		    }
 		}
 	    });
-    }
 
+	updateChildren();
+
+    }
+    
 
     /**
      * Loads all Messages into a new FolderTableModel, sets this 
@@ -205,40 +263,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 
 	Vector newChildren = new Vector();
 
-	// get the default folder, and list the
-	// subscribed folders on it
-
-	Folder folder = getFolder();
-
-	Folder[] subscribed;
-	
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getFolderProperty() + ".folderList", "INBOX"), ":");
 	
 	String newFolderName;
 
 	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-	    try {
-		newFolderName = (String)tokens.nextToken();
-		FolderInfo childFolder = getChild(newFolderName);
-		if (childFolder == null) {
-		    subscribed = folder.list(newFolderName);
-		    if (subscribed.length > 0) {
-			childFolder = new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName);
-			newChildren.add(childFolder);
-		    }
-		} else {
-		    newChildren.add(childFolder);
-		}
-	    } catch (MessagingException me) {
-		if (me instanceof FolderNotFoundException) {
-		    System.out.println( Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
-		} else {
-		    me.printStackTrace();
-		}
+	    newFolderName = (String)tokens.nextToken();
+	    FolderInfo childFolder = getChild(newFolderName);
+	    if (childFolder == null) {
+		childFolder = new FolderInfo(this, newFolderName);
+		newChildren.add(childFolder);
+	    } else {
+		newChildren.add(childFolder);
 	    }
 	}
-
+	
 	children = newChildren;
+	
+	if (folderNode != null)
+	    folderNode.loadChildren();
     }
 
     /**

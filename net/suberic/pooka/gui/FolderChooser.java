@@ -17,6 +17,8 @@ public class FolderChooser {
     protected JTree tree;
     protected DefaultTreeModel treeModel;
     protected DefaultTreeModel subscribedTree;
+    //    protected Vector unsubscribed = new Vector();
+    //    protected Vector subscribed = new Vector();
 
     /**
      * Creates a new FolderChooser for the selected Store.
@@ -73,7 +75,7 @@ public class FolderChooser {
      * creates the tree root.
      */
     private MailTreeNode createTreeRoot() {
-	StoreNode sn = new StoreNode(store, storeID, frame, false);
+	StoreNode sn = new StoreNode(new net.suberic.pooka.StoreInfo(storeID), frame, false);
 	return sn;
     }
 
@@ -85,7 +87,6 @@ public class FolderChooser {
      */
     public void subscribeFolder(FolderNode node) {
 	node.setSubscribed(true);
-	
     }
 
     /**

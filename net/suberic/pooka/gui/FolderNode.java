@@ -7,9 +7,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.mail.Store;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
-import java.util.Hashtable;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
 import net.suberic.pooka.Pooka;
 import javax.mail.FolderNotFoundException;
 import javax.swing.JOptionPane;
@@ -61,6 +59,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	    
 	    folderInfo.addMessageChangedListener(this);
 	}
+
     }
 
     
@@ -69,8 +68,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
      */
     public boolean isLeaf() {
 	try {
-	    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) == 0)
+	    if (getFolder() == null || (getFolder().getType() & Folder.HOLDS_FOLDERS) == 0) {
 	    	return true;
+	    }
 	} catch (MessagingException me) { }
 	
 	// otherwise it does hold folders, and therefore not
@@ -113,28 +113,42 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	return super.children();
     }
 
-    protected void loadChildren() {
+    /**
+     * This loads (or reloads) the children of the FolderNode from
+     * the list of Children on the FolderInfo.
+     */
+    public void loadChildren() {
 	// if it is a leaf, just say we have loaded them
 	if (isLeaf()) {
 	    hasLoaded = true;
 	    return;
 	}
 
+	Enumeration origChildren = super.children();
+	Vector origChildrenVector = new Vector();
+	while (origChildren.hasMoreElements())
+	    origChildrenVector.add(origChildren.nextElement());
+
 	if (listSubscribedOnly) {
 	    Vector folderChildren = getFolderInfo().getChildren();
 
 	    if (folderChildren != null) {
-		
 		for (int i = 0; i < folderChildren.size(); i++) {
-		    
-		    FolderNode node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer(), true);
-		    // we used insert here, since add() would mak
-		    // another recursive call to getChildCount();
-		    insert(node, i);
+		    FolderNode node = popChild(((FolderInfo)folderChildren.elementAt(i)).getFolderName(), origChildrenVector);
+		    if (node == null) {
+			node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer(), true);
+			// we used insert here, since add() would mak
+			// another recursive call to getChildCount();
+			insert(node, 0);
+		    }
 		}
+		
 	    }
 
+	    removeChildren(origChildrenVector);
+
 	    hasLoaded=true;
+
 	} else {
 	    // get the default folder, and list the
 	    // subscribed folders on it
@@ -146,8 +160,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 		
 		for (int i = 0 ; i < folderList.length ; i++) {
 		    
-		    FolderNode node = new FolderNode(new FolderInfo(folderList[i], getFolderID() + "." + folderList[i].getName()), getParentContainer(), false);
-		    // we used insert here, since add() would mak
+		    FolderNode node = new FolderNode(new FolderInfo(getFolderInfo(), folderList[i].getName()), getParentContainer(), false);
+		    // we used insert here, sincedd() would mak
 		    // another recursive call to getChildCount();
 		    insert(node, i);
 		}
@@ -163,6 +177,38 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 
 	hasLoaded = true;
 
+    }
+
+    /**
+     * This goes through the Vector of FolderNodes provided and 
+     * returns the FolderNode for the given childName, if one exists.
+     * It will also remove the Found FolderNode from the childrenList
+     * Vector.
+     *
+     * If a FolderNode that corresponds with the given childName does
+     * not exist, this returns null.
+     *
+     */
+    public FolderNode popChild(String childName, Vector childrenList) {
+	if (children != null) {
+	    for (int i = 0; i < childrenList.size(); i++)
+		if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName))
+		    return (FolderNode)childrenList.elementAt(i);
+	}
+	
+	// no match.
+	return null;
+    }
+
+    /**
+     * This removes all the items in removeList from the list of this 
+     * node's children.
+     */
+    public void removeChildren(Vector removeList) {
+	for (int i = 0; i < removeList.size(); i++) {
+	    if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
+		this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
+	}
     }
 
     public void messageChanged(MessageChangedEvent mce) {

@@ -5,51 +5,24 @@ import javax.swing.JComponent;
 import javax.mail.*;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
+import net.suberic.pooka.StoreInfo;
 import java.util.StringTokenizer;
 import javax.swing.*;
 import javax.mail.event.*;
 
 public class StoreNode extends MailTreeNode {
     
-    protected Store store = null;
-    protected Folder folder = null;
-    protected String storeID = null;
+    protected StoreInfo store = null;
     protected String displayName = null;
-    private boolean connected = false;
     protected boolean listSubscribedOnly;
+    protected boolean hasLoaded = false;
 
-    public StoreNode(Store newStore, String storePrefix, JComponent parent, boolean subscribedOnly) {
+    public StoreNode(StoreInfo newStore, JComponent parent, boolean subscribedOnly) {
 	super(newStore, parent);
 	store = newStore;
-	storeID=storePrefix;
 	listSubscribedOnly=subscribedOnly;
-	displayName=Pooka.getProperty("Store." + storeID + ".displayName", storeID);
+	displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
 	setCommands();
-	if (listSubscribedOnly) {
-	    store.addConnectionListener(new ConnectionAdapter() {
-		    public void closed(ConnectionEvent e) {
-			System.out.println("Store " + displayName + " closed.");
-			if (connected == true) {
-			    try {
-				connectStore();
-			    } catch (MessagingException me) {
-				System.out.println("Store " + displayName + " closed and unable to reconnect:  " + me.getMessage());
-			    }
-			}
-		    }
-
-		    public void disconnected(ConnectionEvent e) {
-			System.out.println("Folder " + displayName + " disconnected.");
-			if (connected == true) {
-			    try {
-				connectStore();
-			    } catch (MessagingException me) {
-				System.out.println("Disconnected from store " + displayName + " and unable to reconnect:  " + me.getMessage());
-			    }
-			}
-		    }
-		});
-	}
     }
     
     /**
@@ -67,7 +40,7 @@ public class StoreNode extends MailTreeNode {
      */
 
     public int getChildCount() {
-	if (folder == null) {
+	if (hasLoaded == false) {
 	    loadChildren();
 	}
 	return super.getChildCount();
@@ -80,90 +53,45 @@ public class StoreNode extends MailTreeNode {
      */
     
     public java.util.Enumeration children() {
-	if (folder == null) {
+	if (hasLoaded == false) {
 	    loadChildren();
 	}
 	return super.children();
     }
 
-    protected void connectStore() throws MessagingException {
-	if (isConnected())
-	    return;
-
-	store.connect();
-
-	// get the default folder, too.
-
-	try {
-	    folder = store.getDefaultFolder();
-	} catch (MessagingException meFolder) {
-	    try {
-		store.close();
-	    } catch (MessagingException meClose) {
-		// we don't care here.
-	    }
-	    folder=null;
-	    throw meFolder;
-	}
-    }
-	
-
-	
-    protected void loadChildren() {
+    /**
+     * This loads or updates the top-level children of the Store.
+     */
+    public void loadChildren() {
 	// connect to the Store if we need to
 
 	if (!store.isConnected()) 
 	    try {
-		connectStore();
-
+		store.connectStore();
 	    } catch (MessagingException me) {
 		return;
 	    }
-
-	if (folder == null)
-	    try {
-		folder = store.getDefaultFolder();
-	    } catch (MessagingException meFolder) {
-		try {
-		    store.close();
-		} catch (MessagingException meClose) {
-		    // we don't care here.
-		}
-		folder=null;
-		return;
-	    }
-
-
+	
 	if (listSubscribedOnly) {
-	    Folder[] subscribed;
 	    
 	    String folderName;
 	    
-	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + storeID + ".folderList", "INBOX"), ":");
+	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + store.getStoreID() + ".folderList", "INBOX"), ":");
 	    
 	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-		try {
-		    folderName = (String)tokens.nextToken();
-		    subscribed = folder.list(folderName);
-		    FolderNode node = new FolderNode(new FolderInfo(subscribed[0], storeID + "." + folderName ),getParentContainer(), listSubscribedOnly);
-		    // we used insert here, since add() would mak
-		    // another recursive call to getChildCount();
-		    insert(node, i);
-		} catch (MessagingException me) {
-		    if (me instanceof FolderNotFoundException) {
-			JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
-		    } else {
-			me.printStackTrace();
-		    }
-		}
-	    }
+		folderName = (String)tokens.nextToken();
+		FolderNode node = new FolderNode(new FolderInfo(store, folderName ), getParentContainer(), listSubscribedOnly);
+		// we used insert here, since add() would mak
+		// another recursive call to getChildCount();
+		insert(node, i);
+	    } 
 	} else {
 	    try {
-		Folder[] folderList = folder.list();
-
+		Folder[] folderList = store.getStore().getDefaultFolder().list();
+		
 		if (folderList != null) 
 		    for (int i = 0 ; i < folderList.length ; i++) {
-			FolderNode node = new FolderNode(new FolderInfo(folderList[i], storeID + "." + folderList[i].getName() ),getParentContainer(), false);
+			FolderNode node = new FolderNode(new FolderInfo(store, folderList[i].getName() ),getParentContainer(), false);
 			// we used insert here, since add() would mak
 			// another recursive call to getChildCount();
 			insert(node, i);
@@ -177,8 +105,12 @@ public class StoreNode extends MailTreeNode {
 	    }
 	}
     }
+
     public String getStoreID() {
-	return storeID;
+	if (store != null)
+	    return store.getStoreID();
+	else
+	    return null;
     }
 
     /**
@@ -198,30 +130,10 @@ public class StoreNode extends MailTreeNode {
     }
 
     /**
-     * Here we set the connection value that we _want_ to have.  We
-     * also try to open or close the connection, as appropriate.
-     */
-    public void setConnected(boolean newValue) {
-	connected=newValue;
-	if (store != null && store.isConnected() != newValue) {
-	    if (newValue)
-		try {
-		    connectStore();
-		} catch (MessagingException me) {
-		    System.out.println("Error connecting to store:  " + me.getMessage());
-		}
-	}
-    }
-
-    /**
      * Subscribes to the given Folder.
      *
      */
 
-    public void subscribeFolder(Folder f) {
-    }
-	    
-    
     public Action[] defaultActions = new Action[] {
 	new OpenAction(),
 	new SubscribeAction()
@@ -242,9 +154,9 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    if (!isConnected())
+	    if (!store.isConnected())
 		try {
-		    connectStore();
+		    store.connectStore();
 		} catch (MessagingException me) {
 		    // I should make this easier.
 		    JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store.") + "\n" + Pooka.getProperty("error.sourceException", "The underlying exception reads:  ") + "\n" + me.getMessage());
@@ -261,7 +173,7 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    FolderChooser fc = new FolderChooser(store, getStoreID());
+	    FolderChooser fc = new FolderChooser(store.getStore(), getStoreID());
 	    ((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel().add((JInternalFrame)fc.getFrame());
 	    fc.show();
 	    try {
