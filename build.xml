@@ -18,11 +18,11 @@
   <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}"/> 
 
 <!-- libaries that will get included in the distribution -->
-  <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
   <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
   <property name="mbox_lib" value="${importdir}/mbox.jar"/>
   <property name="mail_dist_lib" value="${importdir}/mail.jar"/>
   <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
+  <property name="activation_dist_lib" value="${importdir}/activation_dist.jar"/>
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -110,7 +110,7 @@
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
     <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka_full.manifest"> 
-      <zipfileset src="${activation_cp}"/>
+      <zipfileset src="${activation_dist_lib}"/>
       <zipfileset src="${javahelp_dist_lib}"/>
       <zipfileset src="${mail_dist_lib}"/>
       <zipfileset src="${mbox_lib}"/>
