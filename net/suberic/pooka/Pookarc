@@ -316,27 +316,36 @@ UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
 UserProfile.mailHeaders.fields.Organization.value=Organization
 
 UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:signatureFile:sentFolder
+UserProfile.editableFields.scoped=true
 UserProfile.propertyType=Multi
-UserProfile.sentFolder.propertyType=Folder
-UserProfile.sentFolder.selectionRoot=allStores
+UserProfile.editableFields.sentFolder.propertyType=Folder
+UserProfile.editableFields.sentFolder.selectionRoot=allStores
 
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
 
 Store.propertyType=Multi
 Store.editableFields=server:protocol:user:password:trashFolder:defaultProfile
-Store.protocol.propertyType=List
-Store.protocol.allowedValues=imap:pop3
-Store.protocol=imap
-Store.password.propertyType=Password
-Store.defaultProfile.propertyType=List
-Store.defaultProfile.allowedValues=UserProfile
-Store.trashFolder.propertyType=Folder
-Store.trashFolder.selectionRoot=currentStore
+Store.editableFields.protocol.propertyType=List
+Store.editableFields.protocol.allowedValues=imap:pop3
+Store.editableFields.protocol=imap
+Store.editableFields.password.propertyType=Password
+Store.editableFields.defaultProfile.propertyType=List
+Store.edtiableFields.defaultProfile.allowedValues=UserProfile
+Store.editableFields.trashFolder.propertyType=Folder
+Store.editableFields.trashFolder.selectionRoot=currentStore
+
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
-Preferences=Pooka.guiType:Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit:Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage:Pooka.autoExpunge
+Preferences=UI:Reply:Startup:Signature
+Preferences.scoped=true
+Preferences.propertyType=Tabbed
+
+Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.autoExpunge
+Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
+Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
+Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v

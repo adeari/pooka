@@ -371,8 +371,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
         public void actionPerformed(ActionEvent e) {
-	    Vector valuesToEdit = Pooka.getResources().getPropertyAsVector("Preferences", "");
+	    //Vector valuesToEdit = Pooka.getResources().getPropertyAsVector("Preferences", "");
 
+	    Vector valuesToEdit = new Vector();
+	    valuesToEdit.add("Preferences");
 	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
 	}
     }
