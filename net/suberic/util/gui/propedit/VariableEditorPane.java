@@ -76,10 +76,10 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     if (selectedId == null || selectedId.equals("")) {
       enableMe = false;
       // check to see the default.
-      String possibleDefault = manager.getProperty(editorTemplate, "");
-      if (idToEditorMap.get(possibleDefault) != null) {
-	selectedId = possibleDefault;
-      }
+      //String possibleDefault = manager.getProperty(editorTemplate, "");
+      //if (idToEditorMap.get(possibleDefault) != null) {
+      //selectedId = possibleDefault;
+      //}
     }
 
     CardLayout layout = (CardLayout)valueComponent.getLayout();
@@ -87,15 +87,20 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     Object newSelected = idToEditorMap.get(selectedId);
     if (newSelected == null) {
       // we'll have to make a new window.
-      SwingPropertyEditor spe = createEditorPane(selectedId);
-      
-      // save reference to new pane in hash table
-      idToEditorMap.put(selectedId, spe);
-      editors.add(spe);
-      
-      spe.setEnabled(enableMe && enabled);
-      valueComponent.add(selectedId, spe);
-      
+      if (selectedId == null || selectedId.equals("")) {
+	JPanel jp = new JPanel();
+	valueComponent.add(selectedId, jp);
+      } else {
+
+	SwingPropertyEditor spe = createEditorPane(selectedId);
+	
+	// save reference to new pane in hash table
+	idToEditorMap.put(selectedId, spe);
+	editors.add(spe);
+	
+	spe.setEnabled(enableMe && enabled);
+	valueComponent.add(selectedId, spe);
+      }
     }
     layout.show(valueComponent, selectedId);
   }    

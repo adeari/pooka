@@ -54,8 +54,8 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   public void setEnabled(boolean newValue) {
     for (int i = 0; i < editors.size() ; i++) {
       ((PropertyEditorUI) editors.get(i)).setEnabled(newValue);
-      enabled=newValue;
     }
+    enabled=newValue;
   }
 }
     

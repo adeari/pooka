@@ -38,6 +38,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   DefaultListModel optionListModel;
   Vector templates;
   Box optionBox;
+  List buttonList;
   
   Hashtable originalPanels = new Hashtable();
   Hashtable currentPanels = new Hashtable();
@@ -195,6 +196,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Creates the box which holds the "Add" and "Remove" buttons.
    */
   private Box createButtonBox() {
+    buttonList = new ArrayList();
     Box buttonBox = new Box(BoxLayout.X_AXIS);
     
     buttonBox.add(createButton("Add", new AbstractAction() {
@@ -236,6 +238,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     thisButton.addActionListener(e);
     
+    buttonList.add(thisButton);
     return thisButton;
   }
   
@@ -513,6 +516,27 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     //CompositeEditorPane pep = new CompositeEditorPane();
     //pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
     
+  }
+  
+  /**
+   * Sets this enabled or disabled.
+   */
+  public void setEnabled(boolean newValue) {
+
+    optionList.setEnabled(newValue);
+    for (int i = 0; i < buttonList.size(); i++) {
+      ((JButton) buttonList.get(i)).setEnabled(newValue);
+    }
+
+    Object defaultEditor = originalPanels.get("___default");
+    for (int i = 0; i < editors.size() ; i++) {
+      PropertyEditorUI current = (PropertyEditorUI) editors.get(i);
+      if (current != defaultEditor) {
+	current.setEnabled(newValue);
+      }
+    }
+
+    enabled = newValue;
   }
 }
 

@@ -7,12 +7,12 @@
 	pane instead or something.
 	-- started.  todo:
 	*) general:  handle resize.
-	*) multi:  default is enabled
 	*) Variable:  default is wrong - should be disabled default.
-	*) FolderSelPane doesn't work.
+	*) FolderSelPane doesn't work. also, entryfield isn't disabled.
 	*) fix the filter editor.
 	*) add listeners:  intFilter, enabledIfOtherFilter.
-	*) enable Add Button.
+	*) enable Add Button for lists.
+	*) tabbedfield isn't disabled.
 
 *) queuing of outgoing mails
 	todo on this:
