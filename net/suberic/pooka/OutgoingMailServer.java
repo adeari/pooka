@@ -163,6 +163,10 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       // we need the thread lock for this folder.
       Object runLock = outbox.getFolderThread().getRunLock();
       synchronized(runLock) {
+	if ( ! outbox.isConnected()) {
+	  outbox.openFolder(Folder.READ_WRITE);
+	}
+
 	Message[] msgs = outbox.getFolder().getMessages();    
 	
 	try {

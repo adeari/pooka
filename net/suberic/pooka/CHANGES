@@ -1,3 +1,5 @@
+Outbox no longer throws a NPE if the Outbox is not yet open.
+
 added support for specifying SMTP port number (dan)
 
 folder menu now uses submenus to display folders instead of one huge menu (dan)
