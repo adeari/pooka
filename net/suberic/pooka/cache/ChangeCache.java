@@ -214,6 +214,7 @@ public class ChangeCache {
 	try {
 	    if (cacheFile.exists()) {
 		BufferedReader in = new BufferedReader(new FileReader(cacheFile));
+		
 		String nextLine = in.readLine();
 		while (nextLine != null) {
 		    if (nextLine.equalsIgnoreCase(EXPUNGE_MSG))
@@ -275,5 +276,165 @@ public class ChangeCache {
 	    lock = false;
 	}
     }
+
+
+    /**
+     * Writes out the given flags to be set to value value on the message with
+     * the given uid.
+     */
+    public void setFlags(String uid, Flags f, boolean value) throws IOException {
+	BufferedWriter out = null;
+	try {
+	    out = openCacheFile();
+	    
+	    out.write(uid);
+	    out.newLine();
+	    
+	    Flags.Flag[] systemFlags = f.getSystemFlags();
+	    for (int i = 0; i < systemFlags.length; i++) {
+		if (systemFlags[i] == Flags.Flag.ANSWERED) {
+		    out.write("Answered");
+		    out.newLine();
+		} else if (systemFlags[i] == Flags.Flag.DELETED) {
+		    out.write("Deleted");
+		    out.newLine();
+		} else if (systemFlags[i] == Flags.Flag.DRAFT) {
+		    out.write("Draft");
+		    out.newLine();
+		} else if (systemFlags[i] == Flags.Flag.FLAGGED) {
+		    out.write("Flagged");
+		    out.newLine();
+		} else if (systemFlags[i] == Flags.Flag.RECENT) {
+		    out.write("Recent");
+		    out.newLine();
+		} else if (systemFlags[i] == Flags.Flag.SEEN) {
+		    out.write("Seen");
+		    out.newLine();
+		}
+		
+	    }
+	    
+	    String[] userFlags = f.getUserFlags();
+	    for (int i = 0; i < userFlags.length; i++) {
+		out.write(userFlags[i]);
+		out.newLine();
+	    }
+
+	    out.write(DONE_MSG);
+	    out.newLine();
+	    
+	    if (value) 
+		out.write("true");
+	    else
+		out.write("false");
+	    
+	    out.newLine();
+
+	    out.write(DONE_MSG);
+	    out.newLine();
+	    
+	} finally {
+	    if (out != null)
+		closeCacheFile(out);
+	    else
+		lock = false;
+	}
+	
+    }
+
+    /**
+     * Writes the changes in the file back to the server.
+     */
+    public void writeChanges(com.sun.mail.pop3.POP3Folder f, Message[] msgs) throws IOException, MessagingException {
+	boolean hasLock = false;
+	while (! hasLock) {
+	    synchronized(this) {
+		if (! lock ) {
+		    lock = true;
+		    hasLock = true;
+		}
+	    }
+	    
+	    if (! hasLock )
+		try {
+		    Thread.sleep(1000);
+		} catch (Exception e ) { }
+	}
+	
+	try {
+	    if (cacheFile.exists()) {
+
+		BufferedReader in = new BufferedReader(new FileReader(cacheFile));
+		String nextLine = in.readLine();
+		while (nextLine != null) {
+		    if (nextLine.equalsIgnoreCase(EXPUNGE_MSG))
+			try {
+
+			    ((Folder) f).expunge();
+			} catch (MessagingException me) { }
+		    else if (nextLine.length() > 0) {
+			// adding flags
+
+			boolean value;
+			Flags newFlags = new Flags();
+			
+			String uid = nextLine;
+			nextLine = in.readLine();
+			while (nextLine != null && ! nextLine.equals(DONE_MSG)) {
+			    
+			    if (nextLine.equalsIgnoreCase("Deleted")) {
+				newFlags.add(Flags.Flag.DELETED);
+			    } else if (nextLine.equalsIgnoreCase("Answered"))
+				newFlags.add(Flags.Flag.ANSWERED);
+			    else if (nextLine.equalsIgnoreCase("Draft"))
+				newFlags.add(Flags.Flag.DRAFT);
+			    else if (nextLine.equalsIgnoreCase("Flagged"))
+				newFlags.add(Flags.Flag.FLAGGED);
+			    else if (nextLine.equalsIgnoreCase("Recent"))
+				newFlags.add(Flags.Flag.RECENT);
+			    else if (nextLine.equalsIgnoreCase("SEEN"))
+				newFlags.add(Flags.Flag.SEEN);
+			    else 
+				newFlags.add(new Flags(nextLine));
+			    
+			    nextLine = in.readLine();
+			}
+			
+			nextLine = in.readLine();
+			if (nextLine.equalsIgnoreCase("true")) {
+			    value = true;
+			} else
+			    value = false;
+			
+			try {
+			    Message m = getMessageByPopUID(uid, f, msgs);
+			    if (m != null) {
+				m.setFlags(newFlags, value);
+			    }
+			    // should be a done
+			    nextLine = in.readLine(); 
+			} catch (MessagingException me) { }
+		    }
+		    
+		    nextLine = in.readLine();
+		}
+		
+		in.close();
+		cacheFile.delete();
+	    }
+	} finally {
+	    lock = false;
+	}
+    }
+
+    public Message getMessageByPopUID(String uid, com.sun.mail.pop3.POP3Folder f, Message[] msgs) throws MessagingException {
+	for (int i = msgs.length; i >=0; i--) {
+	    if (f.getUID(msgs[i]).equals(uid))
+		return msgs[i];
+	}
+
+	return null;
+    }
+
 }
 

@@ -1,7 +1,10 @@
 package net.suberic.pooka;
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.mail.event.MessageCountEvent;
 import java.io.*;
+import java.util.Vector;
+import net.suberic.pooka.cache.ChangeCache;
 
 /**
  * This represents the Inbox of a Pop3 folder.  It has an mbox backend, but
@@ -11,6 +14,10 @@ public class PopInboxFolderInfo extends FolderInfo {
 
     Store popStore;
     Folder popInbox;
+    ChangeCache changeAdapter;
+    String mailHome;
+
+    public static String UID_HEADER = "X-Pooka-Pop-UID";
 
     /**
      * Creates a new FolderInfo from a parent StoreInfo and a Folder 
@@ -34,7 +41,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	
 	URLName url = new URLName(protocol, server, -1, "", user, password);
 	
-	String mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
+	mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
 	if (mailHome.equals("")) {
 	    mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
 	    if (mailHome.equals(""))
@@ -58,6 +65,8 @@ public class PopInboxFolderInfo extends FolderInfo {
 	    e.printStackTrace();
 	}
 	
+	changeAdapter = new ChangeCache(new File(mailHome));
+
 	try {
 	    // this will use a new session so we can get the corrent mbox
 	    // properties set.
@@ -85,7 +94,9 @@ public class PopInboxFolderInfo extends FolderInfo {
     }
 
     /**
-     * Checks the pop folder for new messages.
+     * Checks the pop folder for new messages.  If deleteOnServerOnLocalDelete 
+     * is set to true, this will also go through and remove any messages
+     * on the server that have been removed on the local client.
      */
     public void checkFolder() {
 	if (Pooka.isDebug())
@@ -100,41 +111,28 @@ public class PopInboxFolderInfo extends FolderInfo {
 		f = popStore.getDefaultFolder().getFolder("INBOX");
 		if (f != null) {
 		    f.open(Folder.READ_WRITE);
-		    Message[] msgs = f.getMessages();
-		    if (Pooka.isDebug()) {
-			if (f == null)
-			    System.out.println("got messages; msgs = null.");
-			else 
-			    System.out.println("got messages; msgs = " + msgs.length);
-		    }
+		    Message[] msgs = getNewMessages(f);
 		    
 		    if (msgs != null && msgs.length > 0) {
 			MimeMessage[] msgsToAppend = new MimeMessage[msgs.length];
 			for (int i = 0; i < msgs.length; i++) {
 			    msgsToAppend[i] = new MimeMessage((MimeMessage) msgs[i]);
+			    String uid = getUID(msgs[i], f);
+			    msgsToAppend[i].addHeader(UID_HEADER, uid);
 			}
 			getFolder().appendMessages(msgsToAppend);
+
 			if (! Pooka.getProperty(getFolderProperty() + ".leaveMessagesOnServer", "false").equalsIgnoreCase("true")) {
 			    for (int i = 0; i < msgs.length; i++) {
 				msgs[i].setFlag(Flags.Flag.DELETED, true);
 				if (Pooka.isDebug())
 				    System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
 			    }
-			} else if (Pooka.getProperty(getFolderProperty() + ".deleteOnServerOnLocalDelete", "false").equalsIgnoreCase("true")) {
-			    
+			} else if (isDeletingOnServer()) {
+			    removeDeletedMessages(f, msgs);
 			}
 		    }
-		    f.close(true);
-		    if (Pooka.isDebug())
-			System.out.println("closed folder.");
-		    f.open(Folder.READ_WRITE);
-		    msgs = f.getMessages();
-		    if (Pooka.isDebug()) {
-			if (f == null)
-			    System.out.println("got messages; msgs = null.");
-			else 
-			    System.out.println("got messages; msgs = " + msgs.length);		    
-		    }
+		    
 		    f.close(true);
 		    popStore.close();
 		}
@@ -156,6 +154,47 @@ public class PopInboxFolderInfo extends FolderInfo {
 	
     }
 
+    protected void runMessagesRemoved(MessageCountEvent mce) {
+	if (folderTableModel != null) {
+	    Message[] removedMessages = mce.getMessages();
+	    if (Pooka.isDebug())
+		System.out.println("removedMessages was of size " + removedMessages.length);
+	    MessageInfo mi;
+	    Vector removedProxies=new Vector();
+	    for (int i = 0; i < removedMessages.length; i++) {
+		if (Pooka.isDebug())
+		    System.out.println("checking for existence of message.");
+
+		// first, if we're removed from the pop3 folder on deletion,
+		// we need to note that this message has been removed.
+
+		if (isDeletingOnServer()) {
+		    try {
+			MimeMessage mm = (MimeMessage) removedMessages[i];
+			String uid = mm.getHeader(UID_HEADER, ":");
+			if (uid != null)
+			    getChangeAdapter().setFlags(uid, new Flags(Flags.Flag.DELETED), true);
+		    } catch (Exception e) {
+		    }
+		}
+
+		mi = getMessageInfo(removedMessages[i]);
+		if (mi.getMessageProxy() != null)
+		    mi.getMessageProxy().close();
+		
+		if (mi != null) {
+		    if (Pooka.isDebug())
+			System.out.println("message exists--removing");
+		    removedProxies.add(mi.getMessageProxy());
+		    messageToInfoTable.remove(mi);
+		}
+	    }
+	    getFolderTableModel().removeRows(removedProxies);
+	}
+	resetMessageCounts();
+	fireMessageCountEvent(mce);
+    }
+    
     /**
      * This retrieves new messages from the pop folder.
      */
@@ -206,8 +245,6 @@ public class PopInboxFolderInfo extends FolderInfo {
     }
 
     public String readLastUid() throws IOException {
-	String storeID = getParentStore().getStoreID();
-	String mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
 	File uidFile = new File(mailHome + File.separator + ".pooka-lastUid");
 	if (uidFile.exists()) {
 	    BufferedReader br = new BufferedReader(new FileReader(uidFile));
@@ -223,8 +260,6 @@ public class PopInboxFolderInfo extends FolderInfo {
     }
 
     public void writeLastUid(String lastUid) throws IOException {
-	String storeID = getParentStore().getStoreID();
-	String mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
 	File uidFile = new File(mailHome + File.separator + ".pooka-lastUid");
 	if (uidFile.exists()) {
 	    uidFile.delete();
@@ -245,4 +280,23 @@ public class PopInboxFolderInfo extends FolderInfo {
     public String getUID(Message m, Folder f) throws MessagingException {
 	return ((com.sun.mail.pop3.POP3Folder)f).getUID(m);
     }
+
+    public void removeDeletedMessages(Folder f, Message[] msgs) throws MessagingException {
+	try {
+	    getChangeAdapter().writeChanges((com.sun.mail.pop3.POP3Folder)f, msgs);
+	} catch (java.io.IOException ioe) {
+	    throw new MessagingException("Error", ioe);
+	}
+    }
+
+    public boolean isDeletingOnServer() {
+	
+	return Pooka.getProperty(getFolderProperty() + ".deleteOnServerOnLocalDelete", "false").equalsIgnoreCase("true");
+	
+    }
+
+    public ChangeCache getChangeAdapter() {
+	return changeAdapter;
+    }
+    
 }
