@@ -2,6 +2,7 @@
   *) auto signature verification.
      means checking keys for email addresses.
   *) check incorrect password for pgp.
+
   *) add crypto ui display for outgoing, also.
   *) use default key (for signing, reading - default private; for sending, 
 		   default public by email address (?) -- also overridable,

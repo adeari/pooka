@@ -165,6 +165,14 @@ public class MessageCryptoInfo {
    * is set to <code>true</code>, then checks again with the latest keys.
    */
   public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+    return checkSignature(key, recheck, true);
+  }
+
+  /**
+   * Returns whether or not the signature is valid.  If <code>recheck</code>
+   * is set to <code>true</code>, then checks again with the latest keys.
+   */
+  public boolean checkSignature(java.security.Key key, boolean recheck, boolean changeStatusOnFailure) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     if (recheck || ! hasCheckedSignature()) {
       EncryptionUtils cryptoUtils = getEncryptionUtils();
       //mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)mMsgInfo.getMessage(), key);
@@ -176,7 +184,8 @@ public class MessageCryptoInfo {
 	  mSignatureValid = ((SignedAttachment) current).checkSignature(cryptoUtils, key);
 	}
       }
-      mCheckedSignature = true;
+      if (mSignatureValid || changeStatusOnFailure)
+	mCheckedSignature = true;
     }
 
     return mSignatureValid;
@@ -288,7 +297,7 @@ public class MessageCryptoInfo {
       String senderAddress = sender.getAddress();
       Key[] matchingKeys = Pooka.getCryptoManager().getPublicKeys(senderAddress,getEncryptionType());
       for (int i = 0 ; i < matchingKeys.length; i++) {
-	if (checkSignature(matchingKeys[i], true)) {
+	if (checkSignature(matchingKeys[i], true, true)) {
 	  return true;
 	}
       }

@@ -10,6 +10,7 @@ import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.GeneralSecurityException;
 import java.util.HashSet;
+import java.util.ArrayList;
 
 import javax.mail.internet.*;
 import javax.mail.*;
@@ -33,6 +34,8 @@ public class PookaEncryptionManager {
   Map cachedPrivateKeys = new HashMap();
 
   Map cachedPublicKeys = new HashMap();
+
+  Map addressToPublicKeyMap = null;
 
   boolean savePasswordsForSession = false;
 
@@ -318,7 +321,7 @@ public class PookaEncryptionManager {
   /**
    * Returns the public key(s) for the given email address.
    */
-  public Key[] getPublicKeys(String address) {
+  public Key[] getPublicKeys(String address) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
     return getPublicKeys(address, null);
   }
 
@@ -326,8 +329,61 @@ public class PookaEncryptionManager {
    * Returns the public key(s) for the given email address that match
    * the given encryption type, or all matching keys if type == null.
    */
-  public Key[] getPublicKeys(String address, String type) {
-    return null;
+  public Key[] getPublicKeys(String address, String type) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+    if (addressToPublicKeyMap == null) {
+      sortPublicKeys();
+    }
+
+    ArrayList list = (ArrayList) addressToPublicKeyMap.get(address);
+    if (list == null)
+      return new Key[0];
+    else if (type == null) {
+      return (Key[]) list.toArray(new Key[0]);
+    } else {
+      ArrayList sortedList = new ArrayList();
+      java.util.Iterator iter = list.iterator();
+      while (iter.hasNext()) {
+	EncryptionKey current = (EncryptionKey) iter.next();
+	try {
+	  if (current.getEncryptionUtils().getType() == type) {
+	    sortedList.add(current);
+	  }
+	} catch (Exception e) {
+	}
+      }
+
+      return (Key[]) sortedList.toArray(new Key[0]);
+    }
+  }
+
+  /**
+   * Sorts all available public keys by associated address.
+   */
+  private synchronized void sortPublicKeys() throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+    if (addressToPublicKeyMap == null) {
+      addressToPublicKeyMap = new HashMap();
+      Set aliases = publicKeyAliases();
+      java.util.Iterator iter = aliases.iterator();
+      while (iter.hasNext()) {
+	Key current = getPublicKey((String) iter.next());
+
+	if (current instanceof EncryptionKey) {
+	  String[] assocAddresses = ((EncryptionKey) current).getAssociatedAddresses();
+	  for (int i = 0; assocAddresses != null && i < assocAddresses.length; i++) {
+	    String address = assocAddresses[i];
+	    ArrayList matches = (ArrayList) addressToPublicKeyMap.get(address);
+	    if (matches != null) {
+	      if (! matches.contains(current))
+	      matches.add(current);
+	    } else {
+	      matches = new ArrayList();
+	      matches.add(current);
+	      addressToPublicKeyMap.put(address, matches);
+	    }
+	  }
+	}
+      }
+    }
   }
 
   /**

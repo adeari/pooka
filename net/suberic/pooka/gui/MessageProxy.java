@@ -545,8 +545,9 @@ public class MessageProxy {
 	  if (fromAddr != null && fromAddr.length > 0) {
 	    fromString = ((javax.mail.internet.InternetAddress)fromAddr[0]).getAddress();
 	  }
-	  java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(fromString);
-	  if (keys == null || keys.length < 0) {
+	  java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(fromString, cInfo.getEncryptionType());
+
+	  if (keys == null || keys.length < 1) {
 	    java.security.Key newKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forSig", "Select key for verifying the signature on this message."), cInfo.getEncryptionType());
 	    keys = new java.security.Key[] { newKey };
 	  }
