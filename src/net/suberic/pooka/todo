@@ -1,3 +1,5 @@
+*) do startup screen (?)
+
 *) add drag and drop
    *) FIX THREADING!!! -- just try doing a big copy into a folder with a 
 	paste operation!!!
@@ -16,6 +18,8 @@
 
 -----
 *) add a real debug system.
+
+*) separate out ui interfaces from swing implementations.
 
 *) add support for running without any local files.
 	-- support for http: access?

@@ -85,14 +85,13 @@ Pooka.fastDelete.propertyType=Boolean
 Pooka.checkUnsentMessages=true
 Pooka.checkUnsentMessages.propertyType=Boolean
 
-Pooka.timeout=10000
-Pooka.connectionTimeout=10000
+Pooka.timeout=20000
+Pooka.connectionTimeout=20000
 
 Pooka.fetchBatchSize=50
 
 Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
-
 
 EncryptionManager.propertyType=Composite
 EncryptionManager.scoped=true

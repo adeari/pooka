@@ -64,8 +64,16 @@ public class PookaEncryptionManager implements ValueChangeListener {
 
     sourceBundle.addValueChangeListener(this, key + ".savePasswordsForSession");
 
-    // load the given pgp and smime stores.
-    loadStores(sourceBundle, key);
+    final VariableBundle fBundle = sourceBundle;
+    final String fKey = key;
+    Thread storeLoadingThread = new Thread(new Runnable() {
+	public void run() {
+	  // load the given pgp and smime stores.
+	  loadStores(fBundle, fKey);
+	}
+      });
+
+    storeLoadingThread.start();
   }
 
   /**
