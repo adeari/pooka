@@ -1,3 +1,6 @@
+modified Attachment handing some so that we should now handle misconfigured
+emails a little bit better.
+
 no longer have to restart for change in IMAP synch with subscribed folders
 setting.
 

@@ -237,6 +237,11 @@ public class CachingMimeMessage extends UIDMimeMessage {
       }
     }
 
+  public void writeTo(java.io.OutputStream os, String[] ignoreList)
+    throws java.io.IOException, MessagingException {
+    getCache().getMessageRepresentation(getUID(), getUIDValidity()).writeTo(os, ignoreList);
+  }
+  
 }
 
 

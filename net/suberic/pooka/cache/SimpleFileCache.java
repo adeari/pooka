@@ -104,9 +104,52 @@ public class SimpleFileCache implements MessageCache {
   /**
    * Returns the datahandler for the given message uid.
    */
-  public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException {
-    return getDataHandler(uid, uidValidity, true);
+  public DataHandler getDataHandler(long uid, long newUidValidity) throws MessagingException {
+    return getDataHandler(uid, newUidValidity, true);
+  }
+
+  /**
+   * Returns a non-mutable Message representation of the given Message.
+   */
+  public MimeMessage getMessageRepresentation(long uid, long newUidValidity) throws MessagingException {
+    return getMessageRepresentation(uid, newUidValidity, true);
+  }
+
+  /**
+   * Returns a non-mutable Message representation of the given Message.
+   */
+  public MimeMessage getMessageRepresentation(long uid, long newUidValidity, boolean saveToCache) throws MessagingException {
+    if (newUidValidity != uidValidity) {
+      throw new StaleCacheException(uidValidity, newUidValidity);
     }
+    
+    DataHandler h = getHandlerFromCache(uid);
+
+    File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
+    if (f.exists()) {
+      try {
+	FileInputStream fis = new FileInputStream(f);
+	MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
+	return mm;
+      } catch (Exception e) {
+	return null;
+      } 
+    } else {
+      if (getFolderInfo().shouldBeConnected()) {
+	MimeMessage m = getFolderInfo().getRealMessageById(uid);
+	if (m != null) {
+	  if (saveToCache)
+	    cacheMessage(m, uid, newUidValidity, MESSAGE);
+	  
+	  return m;
+	} else
+	  throw new MessageRemovedException("No such message:  " + uid);
+      } else {
+	throw new NotCachedException("Message is not cached, and folder is not available.");
+      }
+    }
+  }
+
     
   /**
    * Adds the given Flags to the message with the given uid.

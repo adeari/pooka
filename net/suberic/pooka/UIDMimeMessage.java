@@ -498,83 +498,103 @@ public class UIDMimeMessage extends MimeMessage {
 	}
     }
 
-    /**
-     * Checks whether this message is expunged. All other methods except
-     * <code>getMessageNumber()</code> are invalid on an expunged 
-     * Message object. <p>
-     *
-     * Messages that are expunged due to an explict <code>expunge()</code>
-     * request on the containing Folder are removed from the Folder 
-     * immediately. Messages that are externally expunged by another source
-     * are marked "expunged" and return true for the isExpunged() method, 
-     * but they are not removed from the Folder until an explicit 
-     * <code>expunge()</code> is done on the Folder. <p>
-     * 
-     * See the description of <code>expunge()</code> for more details on
-     * expunge handling.
-     *
-     * @see	Folder#expunge
-     */
-    public boolean isExpunged() {
+  /**
+   * Checks whether this message is expunged. All other methods except
+   * <code>getMessageNumber()</code> are invalid on an expunged 
+   * Message object. <p>
+   *
+   * Messages that are expunged due to an explict <code>expunge()</code>
+   * request on the containing Folder are removed from the Folder 
+   * immediately. Messages that are externally expunged by another source
+   * are marked "expunged" and return true for the isExpunged() method, 
+   * but they are not removed from the Folder until an explicit 
+   * <code>expunge()</code> is done on the Folder. <p>
+   * 
+   * See the description of <code>expunge()</code> for more details on
+   * expunge handling.
+   *
+   * @see	Folder#expunge
+   */
+  public boolean isExpunged() {
+    try {
+      try {
+	return (getMessage() == null);
+      } catch (FolderClosedException fce) {
+	int status = parent.getStatus();
+	if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
+	  try {
+	    parent.openFolder(Folder.READ_WRITE);
+	  } catch (MessagingException me) {
+	    throw fce;
+	  }
+	  
+	  return (getMessage() == null);
+	  
+	} else {
+	  throw fce;
+	}
+      }
+    } catch (MessagingException me) {
+      return false;
+    }
+  }
+
+  public void writeTo(java.io.OutputStream os, java.lang.String[] ignoreList) 
+    throws java.io.IOException, MessagingException {
+    try {
+      getMessage().writeTo(os, ignoreList);
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    try {
-		return (getMessage() == null);
-	    } catch (FolderClosedException fce) {
-		int status = parent.getStatus();
-		if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		    try {
-			parent.openFolder(Folder.READ_WRITE);
-		    } catch (MessagingException me) {
-			throw fce;
-		    }
-		    
-		    return (getMessage() == null);
-		    
-		} else {
-		    throw fce;
-		}
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
 	} catch (MessagingException me) {
+	  throw fce;
+	}
+	
+	getMessage().writeTo(os, ignoreList);
+      } else {
+	throw fce;
+      }
+    }
+  }
+
+  public long getUID() {
+    return uid;
+  }
+  
+  public long getUIDValidity() {
+    return parent.getUIDValidity();
+  }
+  
+  public MimeMessage getMessage() throws MessagingException {
+    return parent.getRealMessageById(uid);
+  }
+  
+  public UIDFolderInfo getParent() {
+    return parent;
+  }
+  
+  /**
+   * Overrides equals to make it so that any two MimeMessages who are
+   * from the same folder and have the same UID are considered equal.
+   */
+  public boolean equals(Object o) {
+    if (o instanceof Message) {
+      try {
+	UIDMimeMessage uidMsg = parent.getUIDMimeMessage((Message) o);
+	if (uidMsg != null)
+	  if (uidMsg.getUID() == getUID())
+	    return true;
+	  else
 	    return false;
-	}
-    }
-
-    public long getUID() {
-	return uid;
-    }
-
-    public long getUIDValidity() {
-	return parent.getUIDValidity();
-    }
-
-    public MimeMessage getMessage() throws MessagingException {
-	return parent.getRealMessageById(uid);
-    }
-
-    public UIDFolderInfo getParent() {
-	return parent;
-    }
-
-    /**
-     * Overrides equals to make it so that any two MimeMessages who are
-     * from the same folder and have the same UID are considered equal.
-     */
-    public boolean equals(Object o) {
-	if (o instanceof Message) {
-	    try {
-		UIDMimeMessage uidMsg = parent.getUIDMimeMessage((Message) o);
-		if (uidMsg != null)
-		    if (uidMsg.getUID() == getUID())
-			return true;
-		    else
-			return false;
-	    } catch (MessagingException me) {
-		return false;
-	    }
-	}
-
+      } catch (MessagingException me) {
 	return false;
+      }
     }
+    
+    return false;
+  }
 }
 
 

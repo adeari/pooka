@@ -24,6 +24,7 @@ public class CryptoAttachment extends Attachment {
 
   BodyPart decryptedBodyPart = null;
   
+  DataHandler msgDataHandler = null;
 
   /**
    * Creates a CryptoAttachment out of a MimeBodyPart.
@@ -77,18 +78,6 @@ public class CryptoAttachment extends Attachment {
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
     else {
-      /*
-      Object o = super.getDataHandler().getContent();
-      if (o instanceof Multipart) {
-	decryptedBodyPart = utils.decryptMultipart((Multipart)o, key);
-	
-	return decryptedBodyPart;
-      } else {
-	return null;
-      }
-      */
-
-      //MimeBodyPart mbp = new MimeBodyPart(super.getDataHandler().getInputStream());
       MimeBodyPart mbp = new MimeBodyPart();
       mbp.setDataHandler(super.getDataHandler());
       mbp.setHeader("Content-Type", super.getDataHandler().getContentType());

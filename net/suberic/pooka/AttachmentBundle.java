@@ -77,12 +77,9 @@ class AttachmentBundle {
    * Adds an Attachment using the given ContentType.
    */
   synchronized void addAttachment(Attachment newAttach, ContentType ct) {
-    System.err.println("ct = " + ct + "; ct.match(\"text/*\") = " + ct.match("text/*"));
     if (textPart == null && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
-      System.err.println("setting text part");
       textPart = newAttach;
     } else {
-      System.err.println("ct = " + ct + "; not adding text part.");
       allAttachments.add(newAttach);
     }
   }

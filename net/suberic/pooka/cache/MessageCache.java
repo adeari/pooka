@@ -5,43 +5,48 @@ import javax.activation.DataHandler;
 import net.suberic.pooka.MessageInfo;
 
 public interface MessageCache {
+  
+  // tag defining the content of the message
+  public static int CONTENT = 0;
+  
+  // tag defining the headers
+  public static int HEADERS = 1;
+  
+  // tag defining the flags
+  public static int FLAGS = 2;
+  
+  // tag defining the flags and headers
+  public static int FLAGS_AND_HEADERS = 3;
+  
+  // tag defining the entire message
+  public static int MESSAGE = 4;
+  
+  /**
+   * Returns the datahandler for the given message uid.
+   */
+  public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException;
+  
+  /**
+   * Returns a non-mutable Message representation of the given Message.
+   */
+  public MimeMessage getMessageRepresentation(long uid, long uidValidity) throws MessagingException;
 
-    // tag defining the content of the message
-    public static int CONTENT = 0;
-
-    // tag defining the headers
-    public static int HEADERS = 1;
-
-    // tag defining the flags
-    public static int FLAGS = 2;
-
-    // tag defining the flags and headers
-    public static int FLAGS_AND_HEADERS = 3;
-
-    // tag defining the entire message
-    public static int MESSAGE = 4;
-
-    /**
-     * Returns the datahandler for the given message uid.
-     */
-    public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException;
-
-    /**
-     * Adds the given Flags to the message with the given uid.
-     *
-     * This affects both the client cache as well as the message on the
-     * server, if the server is available.
-     */
-    public void addFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
-
-    /**
-     * Removes the given Flags from the message with the given uid.
-     *
-     * This affects both the client cache as well as the message on the
-     * server, if the server is available.
-     */
-    public void removeFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
-
+  /**
+   * Adds the given Flags to the message with the given uid.
+   *
+   * This affects both the client cache as well as the message on the
+   * server, if the server is available.
+   */
+  public void addFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
+  
+  /**
+   * Removes the given Flags from the message with the given uid.
+   *
+   * This affects both the client cache as well as the message on the
+   * server, if the server is available.
+   */
+  public void removeFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
+  
     /**
      * Returns the InternetHeaders object for the given uid.
      */
