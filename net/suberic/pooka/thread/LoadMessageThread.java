@@ -79,8 +79,9 @@ public class LoadMessageThread extends Thread {
 		
 		if (++updateCounter >= getUpdateMessagesCount()) {
 		    fireMessageLoadedEvent();
-		    updateCounter = 0;
+		    updateCounter = 0;		   
 		}
+		loadedMessageCount++;
 	    }
 	    if (updateCounter > 0)
 		fireMessageLoadedEvent();
