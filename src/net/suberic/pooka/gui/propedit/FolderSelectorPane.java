@@ -114,9 +114,23 @@ public class FolderSelectorPane extends SwingPropertyEditor {
     FileSystemView mfsv = createFileSystemView();
     
     String defaultRoot = valueDisplay.getText();
-    if (defaultRoot.equals(""))
+    if (defaultRoot.equals("")) {
       defaultRoot = "/";
-    
+      try {
+	String storeName = property.substring(property.indexOf('.') + 1, property.indexOf('.', property.indexOf('.') + 1));
+	StoreInfo si = Pooka.getStoreManager().getStoreInfo(storeName);
+	if (si != null) {
+	  defaultRoot = storeName;
+	}
+      } catch (Exception e) {
+      }
+    } else {
+
+      if (defaultRoot.lastIndexOf('/') > -1) {
+	defaultRoot = defaultRoot.substring(0, defaultRoot.lastIndexOf('/'));
+      }
+    }
+
     JFileChooser jfc =
       new JFileChooser(defaultRoot, mfsv);
     jfc.setMultiSelectionEnabled(false);

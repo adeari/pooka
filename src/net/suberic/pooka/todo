@@ -1,16 +1,5 @@
-*) make a version which builds and runs pooka from the local
-   libraries.
-
-*) update website
-
-*) sign up for doc and release-engineering tasks
-
------
-
-*) make it so a move filter for a given folder defaults to that store,
-	at least, or possibly no store at all.
-
-*) finish fixing filter editor so proper editor is selected.
+*) fix left and right arrows on read message so it doesn't scroll back up to
+	top.
 
 *) outgoing mailserver improvements:
 	*) network connections - come up with a way to autotest that doesn't
@@ -105,6 +94,9 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 -----
 
+*) add support for composing new email messages from an external source,
+say, like reacting to a mailto: link.
+
 *) encryption improvements.
    *) if no keystore named, don't try loading?  test.
 	-- we still get errors there.  fix.
@@ -152,9 +144,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 ------
 
 *) add plugin for spam checker?
-
-*) add support for composing new email messages from an external source,
-say, like reacting to a mailto: link.
 
 *) add mrpostman support(?)
 
@@ -278,10 +267,6 @@ icons changing?  test.
 	-- new focus architecture
 	-- new keybinding architecture
 	-- InputVerifier
-
-*) 1.4.1_01 bugs
-	  -- down arrow fairly consistently doesn't work when you type in a 
-	     line and then hit it.  hitting up, left, right resets it.
 
 *) add a keybinding to bring up the address book selector.
 

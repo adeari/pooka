@@ -52,7 +52,7 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
     
     // create the filterConfigPanel.
     
-    String currentClassValue = manager.getProperty(property + ".action.class", "");
+    String currentClassValue = manager.getProperty(property + ".class", "");
     String selectedLabel = null;
 
     filterConfigPanel = new JPanel();
@@ -66,7 +66,7 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
       filterConfigPanel.add(label, currentEditor);
       editorTable.put(label, currentEditor);
 
-      if (selectedLabel == null && currentClassValue == currentEditor.getFilterClassValue())
+      if (selectedLabel == null && currentClassValue != null &&  currentClassValue.equalsIgnoreCase(currentEditor.getFilterClassValue()))
 	selectedLabel = label;
     }
 
