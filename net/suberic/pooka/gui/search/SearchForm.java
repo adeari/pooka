@@ -36,7 +36,7 @@ public class SearchForm extends JPanel {
 	return folderPanel.getSelectedFolders();
     }
 
-    public javax.mail.search.SearchTerm getSearchTerm() {
+    public javax.mail.search.SearchTerm getSearchTerm() throws java.text.ParseException {
 	return entryPanel.getSearchTerm();
     }
 }

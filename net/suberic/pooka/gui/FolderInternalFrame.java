@@ -170,10 +170,30 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      */
     public void searchFolder() {
 	SearchForm sf = new SearchForm(new FolderInfo[] { getFolderInfo() });
-	int returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
+	boolean ok = false;
+	int returnValue = -1;
+	Vector tmpSelectedFolders = null;
+	javax.mail.search.SearchTerm tmpSearchTerm = null;
+
+	while (! ok ) {
+	    returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
+	    if (returnValue == JOptionPane.OK_OPTION) {
+	        tmpSelectedFolders = sf.getSelectedFolders();
+		try {
+		    tmpSearchTerm = sf.getSearchTerm();
+		    ok = true;
+		} catch (java.text.ParseException pe) {
+		    showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
+		    ok = false;
+		}
+	    } else {
+		ok = true;
+	    }
+	}
+
 	if (returnValue == JOptionPane.OK_OPTION) {
-	    final Vector selectedFolders = sf.getSelectedFolders();
-	    final javax.mail.search.SearchTerm searchTerm = sf.getSearchTerm();
+	    final javax.mail.search.SearchTerm searchTerm = tmpSearchTerm;
+	    final Vector selectedFolders = tmpSelectedFolders;
 
 	    getFolderInfo().getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 		    public void actionPerformed(ActionEvent e) {
@@ -188,12 +208,12 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 				net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
 				if (Pooka.isDebug())
 				    System.out.println("matches.length = " + matches.length);
-				for (int j = 0; j < matches.length; j++) {
-				    matchingValues.add(matches[j]);
-				    if (Pooka.isDebug())
-					System.out.println("adding " + matches[j] + " to matchingValues.");
-				}
-				
+				    for (int j = 0; j < matches.length; j++) {
+					matchingValues.add(matches[j]);
+					if (Pooka.isDebug())
+					    System.out.println("adding " + matches[j] + " to matchingValues.");
+				    }
+				    
 			    } catch (MessagingException me) {
 				System.out.println("caught exception " + me);
 			    }
@@ -206,7 +226,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 			for (int i = 0; i < selectedFolders.size(); i++) {
 			    parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
 			}
-
+			
 			MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
 			for (int i = 0; i < matchingValues.size(); i++) {
 			    if (Pooka.isDebug())

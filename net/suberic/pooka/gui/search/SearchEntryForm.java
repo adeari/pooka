@@ -80,8 +80,10 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
 	dateComparisonCombo = new JComboBox(dateFields);
 	dateField = new JTextField(30);
+	JLabel dateFormatLabel = new JLabel(Pooka.getProperty("Search.dateFormat", "mm/dd/yyyy"));
 	datePanel.add(dateComparisonCombo);
 	datePanel.add(dateField);
+	datePanel.add(dateFormatLabel);
     }
 
     /**
@@ -95,15 +97,34 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
      * This generates a SearchTerm from the information on the JPanel, and
      * returns that value.
      */
-    public SearchTerm generateSearchTerm() {
+    public SearchTerm generateSearchTerm() throws java.text.ParseException {
 	if (Pooka.isDebug())
 	    System.out.println("SearchEntryForm:  generating SearchTerm from " + searchFieldCombo.getSelectedItem() + " and " + operationCombo.getSelectedItem());
-	String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
-	String operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
-	if (Pooka.isDebug())
-	    System.out.println("using " + searchProperty + ", " + operationProperty);
-	String pattern = textField.getText();
 
+	String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
+	String selectedType = Pooka.getProperty(searchProperty + ".type", "");
+	String operationProperty = null;
+	String pattern = null;
+
+	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	    operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty);
+	    pattern = textField.getText();
+
+	} else 	if (selectedType.equalsIgnoreCase(SearchTermManager.BOOLEAN_MATCH)) {
+	    operationProperty = (String)(manager.getLabelToOperationMap().get(booleanValueCombo.getSelectedItem()));
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty);
+	    pattern = null;
+
+	} else	if (selectedType.equalsIgnoreCase(SearchTermManager.DATE_MATCH)) {
+	    operationProperty = (String)(manager.getLabelToOperationMap().get(dateComparisonCombo.getSelectedItem()));
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty);
+	    pattern = dateField.getText();
+	}
+	
 	return manager.generateSearchTerm(searchProperty, operationProperty, pattern);
     }
 

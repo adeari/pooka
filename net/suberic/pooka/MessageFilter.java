@@ -26,9 +26,15 @@ public class MessageFilter {
      *
      */
     public MessageFilter(String sourceProperty) {
-	searchTerm = Pooka.getSearchManager().generateSearchTermFromProperty(sourceProperty);
+	try {
+	    searchTerm = Pooka.getSearchManager().generateSearchTermFromProperty(sourceProperty);
 	
 	action = generateFilterAction(sourceProperty + ".action");
+	} catch (java.text.ParseException pe) {
+	    // FIXME:  we should actually handle this.
+
+	    pe.printStackTrace();
+	}
     }
 
     /**

@@ -136,7 +136,7 @@ public class SearchEntryPanel extends JPanel {
     /**
      * Returns the SearchTerm specified by this SearchEntryPanel.
      */
-    public SearchTerm getSearchTerm() {
+    public SearchTerm getSearchTerm() throws java.text.ParseException {
 	if (Pooka.isDebug())
 	    System.out.println("calling SearchEntryPanel.getSearchTerm()");
 	if (searchTerms.size() > 0) {
