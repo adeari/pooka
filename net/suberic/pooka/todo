@@ -3,19 +3,25 @@
 	done.  test.
 
 *) ?? ^D message, hit return for next message, get an error?
+	tough.  could fix by having a temporary 'deleted' flag on the message
+	itself, maybe?
 
 *) ??? still a chance to send a message twice????? !!!! ????
 
 *) encryption support:
    *) fix startup errors if no encryption configured.
+	if no keystore named, don't try loading?
    *) add documentation
    *) test autodecrypt/auto sig check.  requires keys synched to email address.
+	test
    *) test auto sign/auto encrypt.
+	test
    *) key management
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
 
 *) fix ant.
+	see about prepackaging cryptix and bouncycastle.
 
 ----
 
