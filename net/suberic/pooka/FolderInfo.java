@@ -304,7 +304,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	else
 	    tableType="FolderTable";
 
-	Vector messageInfos = new Vector();
+	Vector messageProxies = new Vector();
 
 	if (columnValues == null) {
 	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
@@ -333,25 +333,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		openFolder(Folder.READ_WRITE);
 	    }
 	    Message[] msgs = folder.getMessages();
-	    MessageInfo mp;
+	    MessageInfo mi;
 
 	    for (int i = 0; i < msgs.length; i++) {
-		mp = new MessageInfo(msgs[i], this);
+		mi = new MessageInfo(msgs[i], this);
 
-		messageInfos.add(mp);
-		messageToInfoTable.put(msgs[i], mp);
+		messageProxies.add(new MessageProxy(getColumnValues() , mi));
+		messageToInfoTable.put(msgs[i], mi);
 	    }
 
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	}
 
-	FolderTableModel ftm = new FolderTableModel(messageInfos, getColumnNames(), getColumnSizes());
+	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
 
 	setFolderTableModel(ftm);
 
 
-	loaderThread.loadMessages(messageInfos);
+	loaderThread.loadMessages(messageProxies);
 	
 	loaderThread.start();
 

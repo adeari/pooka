@@ -310,7 +310,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	int rowsSelected = messageTable.getSelectedRowCount();
 
 	if (rowsSelected == 1) 
-	    return getFolderInfo().getMessageInfo(messageTable.getSelectedRow()).getMessageProxy();
+	    return (MessageProxy)messageTable.getSelectedRow();
 	else if (rowsSelected < 1) 
 	    return null;
 	else {
@@ -462,6 +462,8 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	Action[] returnValue;
 	MessageProxy m = getSelectedMessage();
 
+	System.out.println("got selected message : " + m);
+	
 	if (m != null) 
 	    returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
 	else 

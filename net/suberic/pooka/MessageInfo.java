@@ -40,6 +40,10 @@ public class MessageInfo {
     public MessageInfo(Message newMessage, FolderInfo newFolderInfo) {
 	folderInfo = newFolderInfo;
 	message = newMessage;
+
+	try {
+	    seen = flagIsSet("FLAG.SEEN");
+	} catch (MessagingException me) { }
     }
 
     /**
