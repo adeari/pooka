@@ -46,6 +46,12 @@
 
 *) fix protocol grep timeout for imap/ssl?
 
+*) startup:
+	--make sure that the outbox gets configured correctly as an outbox
+	--see why we got two INBOX entries
+	
+*) check disconnection/reconnection on network removal/restoral.
+ 
 -------
 
 *) document keybindings

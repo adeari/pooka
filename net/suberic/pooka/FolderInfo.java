@@ -1686,7 +1686,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  if (Pooka.isDebug()) 
 	    System.out.println("init:  matchingValues.size() = " + matchingValues.size());
 
-	  ProgressDialog dialog = Pooka.getUIFactory().createProgressDialog(0,100,0,"Search","Searching");
+	  net.suberic.util.swing.ProgressDialog dialog = Pooka.getUIFactory().createProgressDialog(0,100,0,"Search","Searching");
 	  dialog.show();
 	  boolean cancelled = dialog.isCancelled();
 
