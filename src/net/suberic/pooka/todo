@@ -7,10 +7,6 @@
 
 -----
 
-*) preview:  bug:  open folder.  switch to preview mode.  switch to 
-	don't-auto-preview mode.  hit return.  both shows message in 
-	preview pane _and_ opens message window.
-
 *) bug:  html text is always black, no matter the theme or the 
 specifications in the html itself.
 
@@ -21,6 +17,11 @@ specifications in the html itself.
 	but incorrect in the display table.
 
 *) bug:  disconnected mode:  connect.  close folder.  try to re-open folder.
+
+*) still an error in connecting, disconnecting, getting a new messages/deleting
+	old messages, reconnecting.
+
+*) theme bug in folder table display between preview and desktop.
 
 --?
 
@@ -44,9 +45,6 @@ specifications in the html itself.
 ----
 
 *) fix NPE if try to send a new message without configuring client.
-
-*) still an error in connecting, disconnecting, getting a new messages/deleting
-	old messages, reconnecting.
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5

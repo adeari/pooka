@@ -710,7 +710,6 @@ public class MessageProxy {
    * this opens a MessageUI for this Message.
    */
   public void openWindow(int newDisplayMode, int newHeaderMode) {
-
     try {
       if (getMessageUI() == null) {
 	setDisplayMode(newDisplayMode);
@@ -1472,7 +1471,7 @@ public class MessageProxy {
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
 	fw.setBusy(true);;
-      openWindow();
+
       Pooka.getUIFactory().doDefaultOpen(MessageProxy.this);
       if (fw != null)
 	fw.setBusy(false);
