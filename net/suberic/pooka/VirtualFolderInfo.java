@@ -277,4 +277,20 @@ public class VirtualFolderInfo extends FolderInfo {
     public String getFolderID() {
 	return Pooka.getProperty("title.searchResults", "Search results");
     }
+
+  /**
+   * This sets the given FolderDisplayUI to be the UI for this
+   * FolderInfo.
+   * 
+   * It automatically registers that FolderDisplayUI to be a listener
+   * to MessageCount, MessageChanged, and Connection events.
+   *
+   * For a VirtualFolderInfo, if the FDUI is set to null, the FolderInfo
+   * is disposed of.
+   */
+  public void setFolderDisplayUI(FolderDisplayUI newValue) {
+    super.setFolderDisplayUI(newValue);
+    if (newValue == null)
+      this.dispose();
+  }
 }

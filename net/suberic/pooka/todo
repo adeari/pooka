@@ -2,9 +2,6 @@ next release:
 
 *) add queuing of outgoing mails (?)
 
-*) fix "got an empty/null added or deleted event" message after a search has
-	been done.
-
 *) make search give a popup window saying it's running.
 
 *) make search window look different than normal window.
@@ -46,7 +43,6 @@ error:  filterfoldercellrenderer has problems with search forms.
 *) searches don't show a busy icon, or give any other notification that
 they're running.
 
-*) fix the sorting of the subject (and from) fields.
 ---------------
 
 old

@@ -1392,12 +1392,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		}
 	    }
 	    if (getFolderDisplayUI() != null) {
+	      if (removedProxies.size() > 0) 
 		getFolderDisplayUI().removeRows(removedProxies);
-		resetMessageCounts();
-		fireMessageCountEvent(mce);
+	      resetMessageCounts();
+	      fireMessageCountEvent(mce);
 	    } else {
-		resetMessageCounts();
-		fireMessageCountEvent(mce);
+	      resetMessageCounts();
+	      fireMessageCountEvent(mce);
+	      if (removedProxies.size() > 0)
 		getFolderTableModel().removeRows(removedProxies);
 	    }
 	} else {
@@ -1730,7 +1732,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * This sets the given FolderDisplayUI to be the UI for this
      * FolderInfo.
      * 
-     * It automatically registers that FolderDipslayUI to be a listener
+     * It automatically registers that FolderDisplayUI to be a listener
      * to MessageCount, MessageChanged, and Connection events.
      */
     public void setFolderDisplayUI(FolderDisplayUI newValue) {
