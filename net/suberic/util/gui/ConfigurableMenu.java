@@ -17,7 +17,11 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
     // the latest commands list.  i'm storing this for now because i 
     // can't do a JButton.removeActionListeners().
 
-    private Hashtable commands = new Hashtable();
+    protected Hashtable commands = new Hashtable();
+
+    public ConfigurableMenu() {
+	super();
+    }
 
     /**
      * This creates a new ConfigurableMenu using the menuID as the
@@ -77,43 +81,56 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
     protected JMenuItem createMenuItem(String menuID, String menuItemID, VariableBundle vars) {
 	// TODO:  should also make these undo-able.
 	
-	/*	
-		when we become able to do custom menus again.
-		if (vars.getProperty(menuID + "." + menuItemID, "") == "") { 
-	*/
+	if (vars.getProperty(menuID + "." + menuItemID + ".class", "") == "") {
+	
+	    JMenuItem mi;
+	    try {
+		mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
+	    } catch (MissingResourceException mre) {
+		mi = new JMenuItem(menuItemID);
+	    }
+	    
+	    java.net.URL url = null;
+	    
+	    try {
+		url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
+	    } catch (MissingResourceException mre) {
+	    }
+	    
+	    if (url != null) {
+		mi.setHorizontalTextPosition(JButton.RIGHT);
+		mi.setIcon(new ImageIcon(url));
+	    }
+	    
+	    String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
+	    
+	    mi.setActionCommand(cmd);	
+	    
+	    return mi;
+	} else {
+	    // this means that we have a submenu.
+	    ConfigurableMenu m;
 
-	JMenuItem mi;
-	try {
-	    mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
-	} catch (MissingResourceException mre) {
-	    mi = new JMenuItem(menuItemID);
-	}
-	
-	java.net.URL url = null;
-	
-	try {
-	    url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
-	} catch (MissingResourceException mre) {
-	}
-
-	if (url != null) {
-	    mi.setHorizontalTextPosition(JButton.RIGHT);
-	    mi.setIcon(new ImageIcon(url));
-	}
-	
-	String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
-	
-	mi.setActionCommand(cmd);	
-	
-	return mi;
-	/*	
+	    if (vars.getProperty(menuID + "." + menuItemID + ".class", "").equals("")) {
+		m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
+	      
+	    } else {
+		// this means we're using a custom Menu.
+		
+		try {
+		    Class menuClass = Class.forName(vars.getProperty(menuID + "." + menuItemID + ".class", "net.suberic.util.gui.ConfigurableMenu"));
+		    m = (ConfigurableMenu) menuClass.newInstance();
+		    m.configureComponent(menuID + "." + menuItemID, vars);
+		} catch (Exception e) {
+		    // if we get any errors, just create a plain 
+		    // ConfigurableMenu.
+		    m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
 		}
-		if (vars.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
-		return new FolderMenu(menuID + "." + menuItemID, getFolderPanel());
-		}
-		else
-		return createMenu(menuID + "." + menuItemID );
-	*/
+	    }
+	    
+	    return m;
+	    
+	}
     }
 
     /**
@@ -139,7 +156,7 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
 	setActiveMenuItems();
     }
 
-    private void setActiveMenuItems() {
+    protected void setActiveMenuItems() {
 	for (int j = 0; j < getItemCount(); j++) {
 	    if (getItem(j) instanceof ConfigurableMenu) {
 		((ConfigurableMenu)getItem(j)).setActive(commands);
