@@ -1,5 +1,6 @@
-030611 release
+030613 release
 --------------
+fixed a bug where reopening a pop folder could result in a StackOverflowError.
 
 fixed a bug in the new acount configuration (and AddressBookManager) that 
 resulted in being unable to send mail or edit the AddressBook on the first 
@@ -7,6 +8,8 @@ startup.
 
 fixed some more cache synchronization bugs in disconnected mode.
 
+backend filters are now run on all new messages, not just messages that
+are added while connected.
 
 030530 release
 --------------

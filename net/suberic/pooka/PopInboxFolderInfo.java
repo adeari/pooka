@@ -96,9 +96,54 @@ public class PopInboxFolderInfo extends FolderInfo {
   }
   
   
+  /**
+   * This method opens the Folder, and sets the FolderInfo to know that
+   * the Folder should be open.  You should use this method instead of
+   * calling getFolder().open(), because if you use this method, then
+   * the FolderInfo will try to keep the Folder open, and will try to
+   * reopen the Folder if it gets closed before closeFolder is called.
+   *
+   * This method can also be used to reset the mode of an already 
+   * opened folder.
+   */
   public void openFolder(int mode) throws MessagingException {
-    super.openFolder(mode);
-    //checkFolder();
+    // identical to FolderInfo.openFolder() except that we don't check
+    // to make sure that the mode matches.
+
+    if (Pooka.isDebug())
+      System.out.println(this + ":  checking parent store.");
+    
+    if (!getParentStore().isConnected()) {
+      if (Pooka.isDebug())
+	System.out.println(this + ":  parent store isn't connected.  trying connection.");
+      getParentStore().connectStore();
+    }
+    
+    if (Pooka.isDebug())
+      System.out.println(this + ":  loading folder.");
+    
+    if (! isLoaded() && status != CACHE_ONLY)
+      loadFolder();
+    
+    if (Pooka.isDebug())
+      System.out.println(this + ":  folder loaded.  status is " + status);
+    
+    if (Pooka.isDebug())
+      System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
+    
+    if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
+      if (Pooka.isDebug())
+	System.out.println(this + ":  isLoaded() and isAvailable().");
+      if (getFolder().isOpen()) {
+	return;
+      } else {
+	getFolder().open(mode);
+	updateFolderOpenStatus(true);
+	resetMessageCounts();
+      }
+    } else if (status == INVALID) {
+      throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
+    }
   }
   
   /**
