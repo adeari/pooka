@@ -120,7 +120,19 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 	}
 	
 	public void mousePressed(MouseEvent e) {
-	  if (SwingUtilities.isRightMouseButton(e)) {
+	  if (e.isPopupTrigger()) {
+	    // see if anything is selected
+	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
+	    if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
+	      addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+	    }
+	    
+	    showPopupMenu(addressTable, e);
+	  }
+	}
+
+	public void mouseReleased(MouseEvent e) {
+	  if (e.isPopupTrigger()) {
 	    // see if anything is selected
 	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
 	    if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {

@@ -8,8 +8,6 @@ desktop pane.
 
 *) search results window shows all (? at least lots) messages as unread.
 
-*) fix the right click/menu click problem; test on windows.
-
 --
 
 *) queuing of outgoing mails

@@ -117,7 +117,13 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     editorPane.addMouseListener(new MouseAdapter() {
 	
 	public void mousePressed(MouseEvent e) {
-	  if (SwingUtilities.isRightMouseButton(e)) {
+	  if (e.isPopupTrigger()) {
+	    showPopupMenu(editorPane, e);
+	  }
+	}
+
+	public void mouseReleased(MouseEvent e) {
+	  if (e.isPopupTrigger()) {
 	    showPopupMenu(editorPane, e);
 	  }
 	}

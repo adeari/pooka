@@ -1,3 +1,6 @@
+switched the popup menus from checking to see if the event is a right
+click to actually checking the isPopupTrigger() method.
+
 changed the new message icon, the folder->Update title to folder->Get
 New Messages, and put a new Get New Messages icon on the FolderDisplay.
 

@@ -221,7 +221,22 @@ public class AttachmentPane extends JPanel {
 		    
 		  }
 		}
-	      } else if (SwingUtilities.isRightMouseButton(e)) {
+	      } else if (e.isPopupTrigger()) {
+		// see if anything is selected
+		int rowIndex = getTable().rowAtPoint(e.getPoint());
+		if (rowIndex != -1) {
+		  if (! getTable().isRowSelected(rowIndex)) {
+		    getTable().setRowSelectionInterval(rowIndex, rowIndex);
+		  }
+		  createPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
+		}
+		
+	      } 
+	      
+	    }
+
+	    public void mouseReleased(MouseEvent e) {
+	      if (e.isPopupTrigger()) {
 		// see if anything is selected
 		int rowIndex = getTable().rowAtPoint(e.getPoint());
 		if (rowIndex != -1) {

@@ -263,7 +263,21 @@ public class FolderDisplayPanel extends JPanel {
 		}
 		
 		public void mousePressed(MouseEvent e) {
-		    if (SwingUtilities.isRightMouseButton(e)) {
+		    if (e.isPopupTrigger()) {
+			// see if anything is selected
+			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+			if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
+			    getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+			}
+			
+			MessageProxy selectedMessage = getSelectedMessage();
+			if (selectedMessage != null && isEnabled())
+			    selectedMessage.showPopupMenu(getMessageTable(), e);
+		    }
+		}
+
+		public void mouseReleased(MouseEvent e) {
+		    if (e.isPopupTrigger()) {
 			// see if anything is selected
 			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
 			if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
