@@ -82,7 +82,8 @@ public class CachingFolderInfo extends FolderInfo {
 	
 	if (!loaderThread.isAlive())
 	    loaderThread.start();
-	
+
+	/*
 	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 		    try {
@@ -91,6 +92,7 @@ public class CachingFolderInfo extends FolderInfo {
 		    }
 		}
 	    }, getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-count-changed"));
+	*/
 	
 	return ftm;
     }
@@ -111,18 +113,23 @@ public class CachingFolderInfo extends FolderInfo {
 	StoreInfo s = null;
 	try {
 	    
-	    if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
+	    if (isOpen()) {
+                Folder current = getFolder();
+                if (current != null && current.isOpen()) {
+                    current.getNewMessageCount();
+                    current.getUnreadMessageCount();
+                }
+	    } else if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
 		s = getParentStore();
 		if (! s.isConnected())
 		    s.connectStore();
 		
 		openFolder(Folder.READ_WRITE);
-	    } else {
-		synchronizeCache();
-	    }
 
-	    if (isAvailable() && status == PASSIVE)
-		closeFolder(false);
+		if (isAvailable() && preferred_state == PASSIVE)
+		    closeFolder(false);
+	    } 
+	    
 
 	} catch ( MessagingException me ) {
 	}
@@ -132,12 +139,12 @@ public class CachingFolderInfo extends FolderInfo {
 
     protected void updateFolderOpenStatus(boolean isNowOpen) {
 	if (isNowOpen) {
+	    status = CONNECTED;
 	    try {
 		uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
 		if (getFolderTableModel() != null)
 		    synchronizeCache();
 	    } catch (Exception e) { }
-	    status = CONNECTED;
 	    
 	} else
 	    status = CLOSED;
@@ -435,10 +442,14 @@ public class CachingFolderInfo extends FolderInfo {
      * This expunges the deleted messages from the Folder.
      */
     public void expunge() throws MessagingException {
-	if (isAvailable())
+	if (isOpen())
 	    getFolder().expunge();
-	else
-	    throw new MessagingException("Error:  cannot expunge an unavailable Folder.");
+	else if (shouldBeOpen()) {
+	    openFolder(Folder.READ_WRITE);
+	    getFolder().expunge();
+	} else {
+	    getCache().expungeMessages();
+	}
     }
 
     /**

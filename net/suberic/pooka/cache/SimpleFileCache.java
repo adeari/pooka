@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.io.*;
 import javax.mail.*;
-import javax.mail.event.MessageChangedEvent;
+import javax.mail.event.*;
 import javax.activation.DataHandler;
 
 /**
@@ -115,14 +115,11 @@ public class SimpleFileCache implements MessageCache {
 	    throw new StaleCacheException(uidValidity, newUidValidity);
 	}
 	Flags f = getFlags(uid, newUidValidity);
-	System.out.println("original for " + uid + " contains deleted:  " + f.contains(Flags.Flag.DELETED));
 	if (f != null) {
 	    f.add(flag);
 	} else {
 	    f = flag;
 	}
-
-	System.out.println("new for " + uid + " contains deleted:  " + f.contains(Flags.Flag.DELETED));
 
 	if (getFolderInfo().shouldBeOpen()) {
 	    MimeMessage m = getFolderInfo().getRealMessageById(uid);
@@ -133,7 +130,6 @@ public class SimpleFileCache implements MessageCache {
 	    getFolderInfo().messageChanged(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getFolderInfo().getMessageInfoByUid(uid).getMessage()));
 	}
 	
-	System.out.println("saving new flags for " + uid);
 	saveFlags(uid, uidValidity, f);
     }
 
@@ -241,7 +237,7 @@ public class SimpleFileCache implements MessageCache {
      * count on the client.
      */  
     public boolean cacheMessage(MimeMessage m, long uid, long newUidValidity, int status) throws MessagingException {
-	System.out.println("cache message(" + uid + ")");
+
 	if (newUidValidity != uidValidity) {
 	    throw new StaleCacheException(uidValidity, newUidValidity);
 	}
@@ -379,14 +375,29 @@ public class SimpleFileCache implements MessageCache {
      * the server is available.
      */
     public void expungeMessages() throws MessagingException {
-	if (getFolderInfo().shouldBeOpen()) {
-	    getFolderInfo().expunge();
-	} else {
-	    try {
-		getChangeAdapter().expunge();
-	    } catch (IOException ioe) {
-		throw new MessagingException(ioe.getMessage(), ioe);
+	try {
+	    getChangeAdapter().expunge();
+	    Vector removedMessages = new Vector();
+	    for (int i = cachedMessages.size() -1; i >= 0; i--) {
+		long uid = ((Long) cachedMessages.elementAt(i)).longValue();
+		Flags f = getFlagsFromCache(uid);
+		if (f.contains(Flags.Flag.DELETED)) {
+		    Message m = getFolderInfo().getMessageInfoByUid(uid).getMessage();
+		    ((CachingMimeMessage)m).setExpungedValue(true);
+		    removedMessages.add(m);
+		}
 	    }
+
+	    if (removedMessages.size() > 0) {
+		Message[] rmMsg = new Message[removedMessages.size()];
+		for (int i = 0; i < removedMessages.size(); i++) 
+		    rmMsg[i] = (Message) removedMessages.elementAt(i);
+
+		MessageCountEvent mce = new MessageCountEvent(null, MessageCountEvent.REMOVED, true, rmMsg);
+		getFolderInfo().messagesRemoved(mce);
+	    }
+	} catch (IOException ioe) {
+	    throw new MessagingException(ioe.getMessage(), ioe);
 	}
     }
 
@@ -485,14 +496,14 @@ public class SimpleFileCache implements MessageCache {
     }
 
     /**
-     * Gets the Flagss from the cache.  Returns null if no flagss are
+     * Gets the Flags from the cache.  Returns null if no flagss are
      * available in the cache.
      */
     protected Flags getFlagsFromCache(long uid) {
 	Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
 	if (returnValue != null) {
 	    return returnValue;
-	} else {
+	} else {	    
 	    File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
 	    if (f.exists()) {
 		try {
@@ -519,11 +530,14 @@ public class SimpleFileCache implements MessageCache {
 		    cachedFlags.put(new Long(uid), newFlags);
 		    return newFlags;
 		} catch (FileNotFoundException fnfe) {
+		    System.out.println("caught filenotfoundexception.");
 		    return null;
 		} catch (IOException ioe) {
+		    System.out.println("caught ioexception.");
 		    return null;
 		}
 	    }
+
 	    return null;
 	}
     }
@@ -533,9 +547,7 @@ public class SimpleFileCache implements MessageCache {
      */
     protected void saveFlags(long uid, long newUidValidity, Flags f) throws MessagingException {
 	Flags oldFlags = getFlagsFromCache(uid);
-	System.out.println("caching flags for " + uid);
-	if (oldFlags != null && ! oldFlags.equals(f)) {
-	    System.out.println("new flags don't equal cached Flags.");
+	if (oldFlags == null || ! oldFlags.equals(f)) {
 	    cachedFlags.put(new Long(uid), f);
 	    try {
 		File outFile = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
@@ -565,7 +577,7 @@ public class SimpleFileCache implements MessageCache {
 		    } else if (systemFlags[i] == Flags.Flag.SEEN) {
 			bw.write("Seen");
 			bw.newLine();
-		}
+		    }
 		}
 		
 		String[] userFlags = f.getUserFlags();
@@ -583,7 +595,6 @@ public class SimpleFileCache implements MessageCache {
     }
 
     protected void writeToChangeLog(long uid, Flags flags, int status) throws MessagingException {
-	System.out.println("writing to change log.");
 	try {
 	    if (status == REMOVED)
 		getChangeAdapter().setFlags(uid, flags, false);
@@ -592,7 +603,6 @@ public class SimpleFileCache implements MessageCache {
 	} catch (IOException ioe) {
 	    throw new MessagingException (ioe.getMessage(), ioe);
 	}
-	System.out.println("done writing to change log.");
     }
 
     /**

@@ -209,6 +209,10 @@ public class CachingMimeMessage extends MimeMessage {
 	return parent.getCache();
     }
 
+    public void setExpungedValue(boolean newValue) {
+	expunged=newValue;
+    }
+
     public InternetHeaders getHeaders() throws MessagingException {
 	return getCache().getHeaders(uid, getUIDValidity());
     }

@@ -156,6 +156,7 @@ public class MessageInfo {
 		throw new MessagingException(ioe.getMessage()); 
 	    }
 	} catch (java.io.IOException ioe) {
+	    ioe.printStackTrace();
 	    throw new MessagingException(ioe.getMessage()); 
 	}
     }
@@ -281,9 +282,8 @@ public class MessageInfo {
      * Moves the Message into the target Folder.
      */
     public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
-	Message m = getRealMessage();
 	try {
-	    folderInfo.getFolder().copyMessages(new Message[] {m}, targetFolder.getFolder());
+	    folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
 	} catch (MessagingException me) {
 	    throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
 	}
@@ -357,7 +357,7 @@ public class MessageInfo {
 	Message m = getRealMessage();
 	m.setFlag(Flags.Flag.DELETED, true);
 	if ( autoExpunge )
-	    folderInfo.getFolder().expunge();
+	    folderInfo.expunge();
     }
     
     /**
