@@ -4,15 +4,12 @@
      *) fix file export for attachments
      *) test with desktop/external apps.
 
-   *) make sure that pasting cut message into new message removes the
-	cut message -- should act as copy, not move (!).  including clearing
-	the clipboard???
-	
    *) error:  fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
    *) make sure folderwindow cut/paste is enabled everywhere; add to 
 	keybindings list; give tooltips in toolbar.
    *) don't allow drag-and-drop into the same folder.
+   *) fix naming of dragged/copied file.
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.

@@ -52,7 +52,6 @@ public class NewMessageTransferHandler extends TransferHandler {
   public boolean importMessageProxy(JComponent c, Transferable t) {
     // this is exactly the same as importing a File, but with some added
     // checks and such.
-    
     try {
       NewMessageDisplayPanel nmdp = (NewMessageDisplayPanel) SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.NewMessageDisplayPanel"), c);
       if (nmdp != null) {
@@ -64,17 +63,24 @@ public class NewMessageTransferHandler extends TransferHandler {
 	    File f = (File) it.next();
 	    System.err.println("f = " + f);
 	    if (f != null) {
+	      // attach each file.
 	      nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f, "message/rfc822");
 	    
 	      nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
 	    } 
 	  }
 	  
+	  // we don't want an attachment to delete the message, so set 
+	  // cutDisallowed on the Proxy.
 	  try {
 	    MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	    System.err.println("don't allow for a removal.");
-	    mp.setImportDone(false);
-	    DndUtils.getClipboard(c).setContents(null, null);
+	    mp.setCutDisallowed(true);
+	    mp.setImportDone(true);
+	    if (mp.removeMessageOnCompletion() || mp.getActionType() == MOVE) {
+	      DndUtils.clearClipboard(c);
+	    }	    
+	    //DndUtils.getClipboard(c).setContents(null, null);
 	  } catch (Exception otherExc) {
 	    otherExc.printStackTrace();
 	    // ignore here.

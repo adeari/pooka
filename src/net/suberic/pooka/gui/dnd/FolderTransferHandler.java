@@ -31,7 +31,9 @@ public class FolderTransferHandler extends TransferHandler {
 	  if (mp != null) {
 	    mp.getMessageInfo().copyMessage(fi);
 	    mp.setImportDone(true);
-	    mp.removeMessageOnCompletion();
+	    if (mp.removeMessageOnCompletion()) {
+	      DndUtils.clearClipboard(c);
+	    }
 	    return true;
 	  }
 	} catch (Exception e) {
@@ -82,7 +84,9 @@ public class FolderTransferHandler extends TransferHandler {
 	if (mp != null) {
 	  mp.setDeleteInProgress(true);
 	  mp.setActionType(action);
-	  mp.removeMessageOnCompletion();
+	  if (mp.removeMessageOnCompletion()) {
+	    DndUtils.clearClipboard(c);
+	  }
 	}
       } catch (Exception e) {
 	e.printStackTrace();

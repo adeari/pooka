@@ -207,5 +207,14 @@ public class DndUtils {
     }
     return false;
   }
-    
+
+  /**
+   * Clears the clipboard of its current selection.
+   */
+  public static void clearClipboard(JComponent c) {
+    Clipboard cb = getClipboard(c);
+    if (cb != null) {
+      cb.setContents(new StringSelection(""),null);
+    }
+  }
 }

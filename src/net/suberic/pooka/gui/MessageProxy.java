@@ -159,9 +159,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   // whether this should be displayed as html, text, or raw RFC822.
   int displayMode = getDefaultDisplayMode();
 
-  // a flag indicating that this message is scheduled for deletion
-  boolean mDeleteInProgress = false;
-
   // the default actions for this MessageProxy.
   public Action[] defaultActions = null;
 
@@ -994,26 +991,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   }
   
   /**
-   * Sets the deleteInProgress flag.
-   */
-  public void setDeleteInProgress(boolean newValue) {
-    boolean orig = mDeleteInProgress;
-    mDeleteInProgress = newValue;
-    if (orig != mDeleteInProgress) {
-      setRefresh(true);
-      refreshMessage();
-    }
-  }
-
-  /**
-   * Returns true if this message is slated for removal, but hasn't actually
-   * been removed yet.
-   */
-  public boolean isDeleteInProgress() {
-    return mDeleteInProgress;
-  }
-
-  /**
    * Opens up a dialog to save the message to a file.
    */
   public void saveMessageToFile() {
@@ -1383,13 +1360,38 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     }
   }
 
+  // handles cut and paste behaviour
+
   int mActionType = TransferHandler.COPY;
   boolean mImportDone = false;
+  boolean mCutDisallowed = false;
+  boolean mDeleteInProgress = false;
+
+  /**
+   * Sets the deleteInProgress flag.
+   */
+  public void setDeleteInProgress(boolean newValue) {
+    boolean orig = mDeleteInProgress;
+    mDeleteInProgress = newValue;
+    if (orig != mDeleteInProgress) {
+      setRefresh(true);
+      refreshMessage();
+    }
+  }
+
+  /**
+   * Returns true if this message is slated for removal, but hasn't actually
+   * been removed yet.
+   */
+  public boolean isDeleteInProgress() {
+    return mDeleteInProgress;
+  }
 
   /**
    * Sets move or copy value.
    */
   public void setActionType(int pActionType) {
+    System.err.println("setting Action Type to " + pActionType);
     mActionType = pActionType;
   }
 
@@ -1411,16 +1413,46 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Sets whether or not the import is done.
    */
   public void setImportDone(boolean pImportDone) {
+    System.err.println("setting import done to " + pImportDone);
     mImportDone = pImportDone;
+  }
+
+  /**
+   * Sets whether or not the paste operation vetoes a cut, changing the
+   * action to a copy.  
+   */
+  public void setCutDisallowed(boolean pCutDisallowed) {
+    System.err.println("setting cutDisallowed to " + pCutDisallowed);
+    mCutDisallowed = pCutDisallowed;
+  }
+
+  /**
+   * Returns whether or not the paste operation vetoed a cut, changing the
+   * action to a copy.  
+   */
+  public boolean getCutDisallowed() {
+    return mCutDisallowed;
   }
 
   /**
    * Removes this message if the cut/past/move is complete.
    */
-  public void removeMessageOnCompletion() {
+  public boolean removeMessageOnCompletion() {
+    System.err.println("removing message on completion.");
     if (mImportDone && mActionType == javax.swing.TransferHandler.MOVE) {
-      deleteMessage();
+      if ( !mCutDisallowed) {
+	deleteMessage();
+	return true;
+      } else {
+	// if cut has been disallowed and the import has completed, then 
+	// reset things.
+	setActionType(TransferHandler.COPY);
+	setCutDisallowed(false);
+	setDeleteInProgress(false);
+      }
     }
+
+    return false;
   }
   
   /**
@@ -1428,9 +1460,14 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    */
   public void lostOwnership(java.awt.datatransfer.Clipboard clipboard,
 			    java.awt.datatransfer.Transferable contents) {
+    // reset everything
+    setActionType(TransferHandler.COPY);
+    setCutDisallowed(false);
     setDeleteInProgress(false);
   }
-  
+
+  // end cut and paste behaviour code.
+
   public Action getAction(String name) {
     if (defaultActions == null) {
       getActions();
