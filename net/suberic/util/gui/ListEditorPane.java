@@ -57,17 +57,17 @@ public class ListEditorPane extends DefaultPropertyEditor {
 			      
 	if (originalIndex == -1) {
 	    items.add(originalValue);
-	    originalIndex = items.size();
+	    originalIndex = items.size() - 1;
 	}
 
 	JComboBox jcb = new JComboBox(items);
+	jcb.setSelectedIndex(originalIndex);
 	return jcb;
     }
 
     //  as defined in net.suberic.util.gui.AkpPropertyEditor
 
     public void setValue() {
-	
 	if (isEnabled() && isChanged())
 	    sourceBundle.setProperty(property, (String)inputField.getSelectedItem());
     }
@@ -85,7 +85,7 @@ public class ListEditorPane extends DefaultPropertyEditor {
     }
 
     public boolean isChanged() {
-	return (originalIndex == inputField.getSelectedIndex());
+	return (!(originalIndex == inputField.getSelectedIndex()));
     }
 
  public void setEnabled(boolean newValue) {
