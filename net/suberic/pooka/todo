@@ -1,8 +1,29 @@
 beta 1
 ---------------
 
-*) bug:  make the FolderSelectorPanel work for all stores/folders instead of
-just for the current store/folder.
+*) fix the startup bugs:  
+	1)  windows take too long to show up
+	2)  sometimes the mailboxes are marked as broken when they shouldn't
+		be.
+
+*) add ability to reply/forward with attachments, or as inline, and so forth
+
+*) bug:  new message notification doesn't work for folders with both messages
+and subfolders.
+
+*) add disconnected imap support.  thoughts:  1)  cache headers so that we
+can make an InternetHeaders object.  2)  cache full messages so we can get
+all the information we need off the Message.  3)  effectively have a 'real'
+message which is what you make changes on.  4)  searches won't work in 
+disconnected mode.
+
+*) add pop3/local mail spool support.
+
+*) support for ssl?
+
+*) bug:  send mail seems to be on the awt event thread.
+
+*) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
 
 *) check:  see how outgoing and incoming mail handle tab characters.
 	-- a little bit of a bug, but not too much.  should probably
@@ -17,19 +38,10 @@ ones that come in while you're already connected are labelled like that.
 
 *) add address book and alias support -- jph
 
-*) fix the startup bugs:  
-	1)  windows take too long to show up
-	2)  sometimes the mailboxes are marked as broken when they shouldn't
-		be.
 
 --
 
 *) add copying messages.
-
-*) add ability to reply/forward with attachments, or as inline, and so forth
-
-*) bug:  new message notification doesn't work for folders with both messages
-and subfolders.
 
 ui engine
 ---------
@@ -60,19 +72,9 @@ a big ui overhaul.
 
 protocol support
 ----------------
-*) add disconnected imap support.  thoughts:  1)  cache headers so that we
-can make an InternetHeaders object.  2)  cache full messages so we can get
-all the information we need off the Message.  3)  effectively have a 'real'
-message which is what you make changes on.  4)  searches won't work in 
-disconnected mode.
-
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.  -- only on unix.  
 	doesn't happen on linux with latest glibc?
-
-*) add pop3/local mail spool support.
-
-*) support for ssl?
 
 searching
 ---------
@@ -89,13 +91,6 @@ searching
 
 other
 -----
-*) bug:  send mail seems to be on the awt event thread.
-
-*) fix bug with showing a new message--right now, if your imap connection is
-hanging and you try to show a new message, the entire app will hang.
-
-*) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
-
 *) loadMessageTracker?
 
 after beta 1
