@@ -73,7 +73,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public void openMessageWindow(MessageProxy m) {
-	MessageWindow newMessageWindow = new MessageWindow(this, m);
+	MessageWindow newMessageWindow = new ReadMessageWindow(this, m);
 	this.add(newMessageWindow);
 	newMessageWindow.setVisible(true);
 	try {

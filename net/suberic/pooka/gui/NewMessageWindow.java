@@ -12,12 +12,12 @@ import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
 
-public class NewMessageWindow extends MessageWindow {
+public class NewMessageWindow extends MessageWindow implements ItemListener {
 
     JTabbedPane tabbedPane = null;
     Container headerPanel = null;
     boolean modified = false;
-    Hashtable inputTable = null;
+    Hashtable inputTable;
 
     JScrollPane headerScrollPane;
 
@@ -28,11 +28,12 @@ public class NewMessageWindow extends MessageWindow {
     public NewMessageWindow(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
 	super(newParentContainer, newMsgProxy);
 
-	inputTable = new Hashtable();
-
+	configureMessageWindow();
     }
 
     protected void configureMessageWindow() {
+
+	this.createDefaultActions();
 
 	this.getContentPane().setLayout(new BorderLayout());
 	
@@ -44,9 +45,11 @@ public class NewMessageWindow extends MessageWindow {
 
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	tabbedPane = new JTabbedPane();
+
+	inputTable = new Hashtable();
 	
-	headerPanel = createHeaderPanel(msg);
-	bodyPanel = createBodyPanel(msg);
+	headerPanel = createHeaderInputPanel(msg, inputTable);
+	editorPane = createMessagePanel(msg);
 
 	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
@@ -58,7 +61,8 @@ public class NewMessageWindow extends MessageWindow {
 	    addAttachmentPane();
 	
 	splitPane.setTopComponent(tabbedPane);
-	splitPane.setBottomComponent(bodyPanel);
+	splitPane.setBottomComponent(new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+
 	this.getContentPane().add("Center", splitPane);
 	
 	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500")));
@@ -97,50 +101,15 @@ public class NewMessageWindow extends MessageWindow {
 	}
     }
 
-    public Container createHeaderPanel(MessageProxy aMsg) {
-	if (isEditable()) {
-	    return createHeaderInputPanel(aMsg, inputTable);
-	} else {
-	    return createHeaderTextField(aMsg);
-	}
-    }
-	
+    /**
+     * as defined in java.awt.event.ItemListener
+     *
+     * This implementation calls a refreshCurrentUser() on the MainPanel.
+     */
 
-    public JTextArea createHeaderTextField(MessageProxy aMsg) {
-	MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
-	
-	JTextArea headerArea = new JTextArea();
-	
-	if (showFullHeaders()) {
-	}
-	else {
-	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
-	    String hdrLabel,currentHeader = null;
-	    String[] hdrValue = null;
-	    
-	    while (tokens.hasMoreTokens()) {
-		currentHeader=tokens.nextToken();
-		hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		try {
-		    hdrValue = mMsg.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
-		} catch (MessagingException me) {
-		    hdrValue = null;
-		}
-
-		if (hdrValue != null && hdrValue.length > 0) {
-		    headerArea.append(hdrLabel + ":  ");
-		    for (int i = 0; i < hdrValue.length; i++) {
-			headerArea.append(hdrValue[i]);
-			if (i != hdrValue.length -1) 
-			    headerArea.append(", ");
-		    }
-		    headerArea.append("\n");
-		}
-	    }
-	}
-	return headerArea;
+    public void itemStateChanged(ItemEvent ie) {
+	getParentContainer().getMainPanel().refreshCurrentUser();
     }
-		    
 
     public Container createHeaderInputPanel(MessageProxy aMsg, Hashtable proptDict) {
 	
@@ -160,12 +129,7 @@ public class NewMessageWindow extends MessageWindow {
 	if (selectedProfile != null)
 	    profileCombo.setSelectedItem(selectedProfile);
 
-	/*	profileCombo.addSelectionListener(new SelectionAdapter() {
-		public void selectionChanged(SelectionEvent se) {
-		    getParentContainer().getMainPanel().refreshCurrentUser();
-		}
-	    });
-	*/
+	profileCombo.addItemListener(this);
 	
 	proptDict.put("UserProfile", profileCombo);
 
@@ -205,37 +169,19 @@ public class NewMessageWindow extends MessageWindow {
 	return inputPanel;
     }
 
-    public JComponent createBodyPanel(MessageProxy aMsg) {
-	editorPane = new JEditorPane();
+    public JEditorPane createMessagePanel(MessageProxy aMsg) {
+	JEditorPane retval = new JEditorPane();
 	
-	if (isEditable()) {
-	    
-	    // see if this message already has a text part, and if so,
-	    // include it.
-	    
-	    String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage());
-	    if (origText != null && origText.length() > 0) 
-		editorPane.setText(origText);
-	    
-	    //	    bodyInputPane.setContentType("text");
-	    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	} else {
-	    if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
-		javax.mail.internet.MimeMessage mMsg = (javax.mail.internet.MimeMessage) aMsg.getMessage();
-		String content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
-		if (content != null) {
-		    editorPane.setEditable(false);
-		    editorPane.setText(content);
-		    return new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		} else { 
-		    
-		    /* nothing found.  return a blank TextArea. */
-		    
-		    return new JScrollPane(new JTextArea(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		}
-	    } else 
-		return null;
-	}
+	// see if this message already has a text part, and if so,
+	// include it.
+	
+	String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage());
+	if (origText != null && origText.length() > 0) 
+	    retval.setText(origText);
+	
+	// bodyInputPane.setContentType("text");
+	return retval;
+
     }
 
     /**
@@ -270,7 +216,7 @@ public class NewMessageWindow extends MessageWindow {
 
     /**
      * Pops up a JFileChooser and returns the results.
-     *
+    
      * Note:  i'd like to have this working so that you can attach multiple
      * files at once, but it seems that the JFileChooser really doesn't 
      * want to return an array with anything in it for getSelectedFiles().  
@@ -348,33 +294,6 @@ public class NewMessageWindow extends MessageWindow {
     }
 
     /**
-     * This shows an Confirm Dialog window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */    
-    public int showConfirmDialog(String messageText, String title, int type) {
-	return JOptionPane.showInternalConfirmDialog(this.getDesktopPane(), messageText, title, type);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(this.getDesktopPane(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-    }
-
-    /**
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *
      * This implementation returns the DefaultProfile of the associated
@@ -400,16 +319,8 @@ public class NewMessageWindow extends MessageWindow {
 	return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
     }
 
-    public String getMessageText() {
-	return getEditorPane().getText();
-    }
-
-    public String getMessageContentType() {
-	return getEditorPane().getContentType();
-    }
-
     public boolean isEditable() {
-	return editable;
+	return true;
     }
 
     public boolean isModified() {
@@ -419,30 +330,6 @@ public class NewMessageWindow extends MessageWindow {
     public void setModified(boolean mod) {
 	if (isEditable())
 	    modified=mod;
-    }
-
-    public boolean showFullHeaders() {
-	return showFullHeaders;
-    }
-
-    public JEditorPane getEditorPane() {
-	return editorPane;
-    }
-
-    public MessageProxy getMessageProxy() {
-	return msg;
-    }
-
-    public void setMessageProxy(MessageProxy newValue) {
-	msg = newValue;
-    }
-
-    public AttachmentPane getAttachmentPanel() {
-	return attachmentPanel;
-    }
-
-    public MessagePanel getParentContainer() {
-	return parentContainer;
     }
 
     //------- Actions ----------//
@@ -495,6 +382,14 @@ public class NewMessageWindow extends MessageWindow {
 	
     }	
 
+    public Hashtable getInputTable() {
+	return inputTable;
+    }
+
+    public void setInputTable(Hashtable newInputTable) {
+	inputTable = newInputTable;
+    }
+
     public Action[] getActions() {
 	if (msg.getActions() != null) {
 	    return TextAction.augmentList(msg.getActions(), getDefaultActions());
@@ -512,16 +407,19 @@ public class NewMessageWindow extends MessageWindow {
 	return defaultActions;
     }
 
+    private void createDefaultActions() {
+	// The actions supported by the window itself.
+
+	defaultActions = new Action[] {
+	    new CloseAction(),
+	    new CutAction(),
+	    new CopyAction(),
+	    new PasteAction()
+		};
+    }
+
     //-----------actions----------------
 
-    // The actions supported by the window itself.
-
-    public Action[] defaultActions = {
-	new CloseAction(),
-	new CutAction(),
-	new CopyAction(),
-	new PasteAction()
-    };
 
     class CloseAction extends AbstractAction {
 

@@ -11,7 +11,6 @@ import java.io.*;
 
 public class NewMessageProxy extends MessageProxy {
     Hashtable commands;
-    NewMessageWindow msgWindow;
 
     public NewMessageProxy(Message newMessage) {
 	message=newMessage;
@@ -54,15 +53,15 @@ public class NewMessageProxy extends MessageProxy {
      *
      */
     public void send() {
-	if (getMessageWindow() != null) { 
+	if (getNewMessageWindow() != null) { 
 	    try {
 		URLName urlName;
 		
-		urlName = msgWindow.populateMessageHeaders(getMessage());
+		urlName = getNewMessageWindow().populateMessageHeaders(getMessage());
 		if (urlName != null) {
 		    if (attachments != null && attachments.size() > 0) {
 			MimeBodyPart mbp = new MimeBodyPart();
-			mbp.setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
+			mbp.setContent(getMessageWindow().getMessageText(), getMessageWindow().getMessageContentType());
 			MimeMultipart multipart = new MimeMultipart();
 			multipart.addBodyPart(mbp);
 			for (int i = 0; i < attachments.size(); i++) 
@@ -71,12 +70,12 @@ public class NewMessageProxy extends MessageProxy {
 			getMessage().setContent(multipart);
 			getMessage().saveChanges();
 		    } else {
-			getMessage().setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
+			getMessage().setContent(getMessageWindow().getMessageText(), getMessageWindow().getMessageContentType());
 		    }
 	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
 		}
-		((NewMessageWindow)getMessageWindow()).setModified(false);
+		getNewMessageWindow().setModified(false);
 		getMessageWindow().closeMessageWindow();
 	    } catch (MessagingException me) {
 		if (me instanceof SendFailedException) {
@@ -110,7 +109,7 @@ public class NewMessageProxy extends MessageProxy {
      * method returns null.
      */
     public File[] getFileToAttach() {
-	return ((NewMessageWindow)getMessageWindow()).getFiles(Pooka.getProperty("MessageWindow.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageWindow.attachFileDialog.buttonText", "Attach"));
+	return getNewMessageWindow().getFiles(Pooka.getProperty("MessageWindow.attachFileDialog.title", "Choose file to attach."), Pooka.getProperty("MessageWindow.attachFileDialog.buttonText", "Attach"));
     }
 
     /**
@@ -147,7 +146,7 @@ public class NewMessageProxy extends MessageProxy {
 	    
 	    attachments.add(mbp);
 	    
-	    ((NewMessageWindow)getMessageWindow()).attachmentAdded(attachments.size() -1);
+	    getNewMessageWindow().attachmentAdded(attachments.size() -1);
 	} catch (Exception e) {
 	    getMessageWindow().showError(Pooka.getProperty("error.MessageWindow.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageWindow.unableToAttachFile.title", "Unable to Attach File."), e);
 	}
@@ -164,12 +163,23 @@ public class NewMessageProxy extends MessageProxy {
 	if (attachments != null) {
 	    int index = attachments.indexOf(mbp);
 	    attachments.remove(mbp);
-	    ((NewMessageWindow)getMessageWindow()).attachmentRemoved(index);
+	    getNewMessageWindow().attachmentRemoved(index);
 	}
     }
 
     public Message getMessage() {
 	return message;
+    }
+
+    /**
+     * a convenience method which returns the current MessageWindow as
+     * a NewMessageWindow.
+     */
+    public NewMessageWindow getNewMessageWindow() {
+	if (getMessageWindow() instanceof NewMessageWindow)
+	    return (NewMessageWindow)getMessageWindow();
+	else
+	    return null;
     }
 
     public Action[] defaultActions = {
