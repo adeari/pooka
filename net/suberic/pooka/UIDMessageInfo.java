@@ -37,6 +37,7 @@ public class UIDMessageInfo extends MessageInfo {
      */
 
     public boolean flagIsSet(String flagName) throws MessagingException {
+	return super.flagIsSet(flagName);
     }
 
 }

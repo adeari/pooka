@@ -65,6 +65,10 @@ hanging and you try to show a new message, the entire app will hang.
 *) same bug can happen when getting the attachment count from the Attachment
 Panel.  we need to cache that.
 
+*) bug:  there's a problem either with line wrapping or with the size of the
+ReadMessageWindow.  They should be the same size, such that if you read a
+message that you wrote, the lines will wrap at the correct place.
+
 after beta 1
 ----------------
 
