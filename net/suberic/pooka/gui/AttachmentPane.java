@@ -255,7 +255,7 @@ public class AttachmentPane extends JPanel {
 	    Object[] messageArray = new Object[2];
 	    messageArray[0] = inputMessage;
 	    messageArray[1] = togglePanel;
-	    String cmd = message.getMessageUI().showInputDialog(messageArray, inputTitle);
+	    String cmd = Pooka.getUIFactory().showInputDialog(messageArray, inputTitle);
 	    
 	    if (cmd != null) {
 		if (cmd.indexOf("%s") == -1)

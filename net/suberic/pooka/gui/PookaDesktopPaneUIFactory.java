@@ -168,5 +168,14 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public String showInputDialog(String inputMessage, String title) {
 	return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
     }
+
+    /**
+     * This shows an Input window.  We include this so that the 
+     * MessageProxy can call the method without caring about the actual
+     * implementation of the dialog.
+     */
+    public String showInputDialog(Object[] inputPanes, String title) {
+	return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+    }
     
 }

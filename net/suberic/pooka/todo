@@ -1,7 +1,8 @@
 beta 1
 ---------------
 
-bug:  openwith doesn't work under preview.
+*) bug:  need to clear the preview panel if you unselect a message, or 
+delete the last message, and so forth.
 
 *) bug:  there's a problem either with line wrapping or with the size of the
 ReadMessageWindow.  They should be the same size, such that if you read a
@@ -20,6 +21,16 @@ you end up with foo/foo and foo/zeta).
 
 *) bug:  drop-down list, especially for defaultProfile, isn't populated
 properly when you add a new Mail Store.
+
+*) bug:  tab navigation doesn't work in the address fields on new messages
+under 1.3
+
+*) bug:  new message notification doesn't work for folders with both messages
+and subfolders.
+
+*) bug:  messages that are new for the session (i.e. showed up between the
+last time you ran the client and this time) aren't marked as recent--only
+ones that come in while you're already connected are labelled like that.
 
 ui engine
 ---------

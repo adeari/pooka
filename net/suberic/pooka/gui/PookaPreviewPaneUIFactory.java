@@ -159,6 +159,15 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * This shows an Input window.  We include this so that the 
+     * MessageProxy can call the method without caring about the actual
+     * implementation of the dialog.
+     */
+    public String showInputDialog(Object[] inputPanes, String title) {
+	return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+    }
+
+    /**
      * Returns the PropertyEditorFactory used by this component.
      */
     public PropertyEditorFactory getEditorFactory() {

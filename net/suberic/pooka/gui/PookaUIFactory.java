@@ -60,4 +60,10 @@ public interface PookaUIFactory extends ErrorHandler {
      * This shows an Input window.
      */
     public String showInputDialog(String inputMessage, String title);
+    
+    /**
+     * Shows an Input window.
+     */
+    public String showInputDialog(Object[] inputPanels, String title);
+ 
 }
