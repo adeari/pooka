@@ -1,57 +1,21 @@
-*) starting: if the info can't be connected to, you should have an option
-	to accept anyway.
-
-*) change the message loading thread so that stuff actually happens
-	on the main store thread. thought:  loadmessagethread becomes
-	a class that has a queue, and adds an action to the store thread
-	when it has stuff to do.  that action loads a number of the waiting
-	messages, then, if there are more messages, adds another action
-	to the store thread.  ????
-     *) note: when we lose a connection and reconnect, we need to 
-	refetch at least part of the messages (?)
-	
-*) open store.  close store.  first, all the folders open anyway.  second,
-	the folders opening are opening with a null action.  third, after
-	the closing, the previously-loaded messages all go to 'loading'.
-
-*) check out situation with multiple connections.  see if we can speed
-   up things that way.  possibilities:
-	*) reuse our connections so we don't have to renegotiate ssl
-	   connections each time.
-	*) use separate threads for each folder so we can do the ssl
-	   negotiation in parallel.
-
-*) fix cryptix inclusion from webstart.
-
 modifying:
 ----------
 *) add a way to tell what a store's (and folder's) current thread is up to.
 
 *) move todo list and CHANGES file to top directory.   
 
+*) fix cryptix inclusion from webstart.
+
 -------
+
 testing:
 *) jdk 1.5
    *) JOptionPane error on initial startup; hangs.
-	done?  test?
-
-*) fix TLS/SSL support for SMTP with new javamail 1.3.2.
-	*) what's up with that?  test.
-
-*) test timeouts; make sure that javamail timeout doesn't apply while
-   data is still being transferred.  or for ssl for that matter.
-
-*) fix disconnection handling really.
-   -) order of events. -- make sure the Store check is high priority.
-   -) handling of events, including timeouts and such.
-	- check order of handlings; make sure we don't end up in a 
-	  situation where we wait too long to check the connection status.
-   -) make sure auto-reconnects work.
-   -) ?:  when you close the store, should we notify all of the folders
-	that they're closing, too?
+	done?  test on windows.
 
 *) test messages, esp. encryption messages, on both desktop and preview.
    make sure they look ok.
+
 
 next release
 -----------
@@ -100,11 +64,26 @@ next release
 	mbox file (n/a).
    -- also:  pooka home, mailcap file, pookarc file
 
-*) fix problem with starting up work account and having it select first
-	message (???)
-
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
+	*) thought:  make a socket in the user's directory.  socket should
+	   be somehow associated with a process id or something like
+	   that so if pooka dies horribly then we know to delete it.
+	   when pooka is started, it checks the socket and, if said
+	   socket already exists and is valid, it either sends the info 
+	   (mailto link or whatever) to the running instance, or it 
+	   just raises the window or whatever.
+
+*) check out situation with multiple connections.  see if we can speed
+   up things that way.  possibilities:
+	*) reuse our connections so we don't have to renegotiate ssl
+	   connections each time.
+	*) use separate threads for each folder so we can do the ssl
+	   negotiation in parallel.
+
+*) open store.  close store.  first, all the folders open anyway.  second,
+	the folders opening are opening with a null action.  third, after
+	the closing, the previously-loaded messages all go to 'loading'.
 
 -----
 *) virtual folder support <sigh>

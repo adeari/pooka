@@ -57,6 +57,9 @@ fixed OutOfMemoryError when trying to subscribe to folders in jdk 1.5.
 
 fixed focus with jdk1.5 and closing internal frames bug.
 
+changed NewAccountPooka so that you can accept server values that the
+machine can't connect to at the moment.
+
 040914 release
 --------------
 

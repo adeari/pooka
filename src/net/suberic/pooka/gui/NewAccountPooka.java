@@ -94,6 +94,7 @@ public class NewAccountPooka {
     
     firstEntryWindow.pack();
     firstEntryWindow.show();
+
     firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 	
 	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
@@ -101,7 +102,7 @@ public class NewAccountPooka {
 	      public void run() {
 		handleFirstEntry();
 	      }
-	      });
+	    });
 	}
       });
     
@@ -207,7 +208,7 @@ public class NewAccountPooka {
 	continueHandling = handleInvalidEntry(e.getMessage());
       }
 
-    if (continueHandling != javax.swing.JOptionPane.NO_OPTION )
+    if (continueHandling == javax.swing.JOptionPane.YES_OPTION )
       showFirstEntryWindow();
   }
   
@@ -316,7 +317,11 @@ public class NewAccountPooka {
     
     Pooka.getUIFactory().showStatusMessage("Connecting to mailserver " + smtpServer + "...");
     
-    testConnection(smtpServer, 25);
+    try {
+      testConnection(smtpServer, 25);
+    } catch (Exception smtpException) {
+      throw new Exception("Error connection to SMTP server:\n" + smtpException.getMessage(), smtpException);
+    }
 
     String mailServerId = props.getProperty("Store");
     String protocol = props.getProperty("Store." + mailServerId + ".protocol");
@@ -336,7 +341,11 @@ public class NewAccountPooka {
 	else
 	  port = 143;
       }
-      testConnection(mailServerName, port);
+      try {
+	testConnection(mailServerName, port);
+      } catch (Exception mailServerException) {
+	throw new Exception("Error connection to mail server:\n" + mailServerException.getMessage(), mailServerException);
+      }
     } else {
       // setup maildir connection
     }
@@ -467,6 +476,8 @@ public class NewAccountPooka {
     
   }
 
+  Exception mOpenInboxException = null;
+  boolean mOpenInboxSuccessful = false;
   /**
    * Opens up your inbox.
    */
@@ -481,6 +492,10 @@ public class NewAccountPooka {
       ActionThread thread = si.getStoreThread();
       final net.suberic.pooka.StoreInfo storeInfo = si;
       
+      // set our local variables to track what's going on.
+      mOpenInboxException = null;
+      mOpenInboxSuccessful = false;
+
       javax.swing.Action connectionAction = new javax.swing.AbstractAction() {
 	  public void actionPerformed(java.awt.event.ActionEvent ae) {
 	    try {
@@ -525,13 +540,14 @@ public class NewAccountPooka {
 		    errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
 		    
 		    JTextArea jta = new JTextArea(errorMessage.toString());
-		      JLabel jl = new JLabel("test");
-		      jta.setBackground(jl.getBackground());
-		      jta.setFont(jl.getFont());
-		      
-		      int continueResponse = Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.OK_CANCEL_OPTION);
-		      if (continueResponse == javax.swing.JOptionPane.OK_OPTION)
-			showFirstEntryWindow();
+		    JLabel jl = new JLabel("test");
+		    jta.setBackground(jl.getBackground());
+		    jta.setFont(jl.getFont());
+		    jta.setEditable(false);
+
+		    int continueResponse = Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION);
+		    if (continueResponse == javax.swing.JOptionPane.YES_OPTION)
+		      showFirstEntryWindow();
 		  }
 		});
 	    }
