@@ -90,7 +90,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
       RecipientId     recId = new RecipientId();
       X509Certificate cert = bKey.getCertificate();
 
-      Key privateKey = bKey.getKeyPair().getPrivate();
+      Key privateKey = bKey.getPrivate();
 
       recId.setSerialNumber(cert.getSerialNumber());
       recId.setIssuer(cert.getIssuerX500Principal().getEncoded());
@@ -132,7 +132,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
       RecipientId     recId = new RecipientId();
       X509Certificate cert = bKey.getCertificate();
 
-      Key privateKey = bKey.getKeyPair().getPrivate();
+      Key privateKey = bKey.getPrivate();
 
       recId.setSerialNumber(cert.getSerialNumber());
       recId.setIssuer(cert.getIssuerX500Principal().getEncoded());
@@ -176,7 +176,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
       
       SMIMESignedGenerator gen = new SMIMESignedGenerator();
       
-      gen.addSigner(bKey.getKeyPair().getPrivate(), bKey.getCertificate(), SMIMESignedGenerator.DIGEST_SHA1);
+      gen.addSigner(bKey.getPrivate(), bKey.getCertificate(), SMIMESignedGenerator.DIGEST_SHA1);
       
       MimeMultipart mm = gen.generate((MimeBodyPart) p, "BC");
       
@@ -204,7 +204,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
       
       SMIMESignedGenerator gen = new SMIMESignedGenerator();
       
-      gen.addSigner(bKey.getKeyPair().getPrivate(), bKey.getCertificate(), SMIMESignedGenerator.DIGEST_SHA1);
+      gen.addSigner(bKey.getPrivate(), bKey.getCertificate(), SMIMESignedGenerator.DIGEST_SHA1);
       
       MimeMultipart mm = gen.generate(m, "BC");
       

@@ -104,7 +104,7 @@ public interface EncryptionKeyManager {
    * (e.g., the given password is wrong).
    */
   public EncryptionKey getPrivateKey(String alias, char[] password)
-    throws KeyStoreException;
+    throws KeyStoreException, EncryptionException;
   
   
   /**

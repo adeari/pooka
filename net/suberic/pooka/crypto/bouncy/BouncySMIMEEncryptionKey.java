@@ -13,23 +13,43 @@ import java.security.cert.*;
  */
 public class BouncySMIMEEncryptionKey extends EncryptionKey {
 
-  KeyPair mKeyPair;
+  PrivateKey mPrivate;
+
+  PublicKey mPublic;
 
   X509Certificate mCertificate;
 
   /**
-   * Returns the KeyPair for this key.
+   * Returns the PublicKey for this key.
    */
-  public KeyPair getKeyPair() {
-    return mKeyPair;
+  public PublicKey getPublic() {
+    return mPublic;
+  }
+  /**
+   * Returns the PrivateKey for this key.
+   */
+  public PrivateKey getPrivate() {
+    return mPrivate;
   }
   /**
    * Sets the KeyPair for this key.
    */
   public void setKeyPair(KeyPair pKeyPair) {
-    mKeyPair = pKeyPair;
+    mPublic = pKeyPair.getPublic();
+    mPrivate = pKeyPair.getPrivate();
   }
-
+  /**
+   * Sets the PublicKey for this key.
+   */
+  public void setPublic(PublicKey pPublic) {
+    mPublic = pPublic;
+  }
+  /**
+   * Sets the PublicKey for this key.
+   */
+  public void setPrivate(PrivateKey pPrivate) {
+    mPrivate = pPrivate;
+  }
 
   /**
    * Returns the certificate for this key.

@@ -6,6 +6,7 @@ import net.suberic.util.*;
 
 import java.security.cert.*;
 import java.security.Key;
+import java.security.PrivateKey;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchProviderException;
@@ -150,12 +151,18 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    * (e.g., the given password is wrong).
    */
   public EncryptionKey getPrivateKey(String alias, char[] password)
-    throws KeyStoreException {
-    if (pkcsKeyStore.isKeyEntry(alias)) {
-      BouncySMIMEEncryptionKey ek = new BouncySMIMEEncryptionKey();
-      Certificate[] chain = pkcsKeyStore.getCertificateChain(alias);
-      ek.setCertificate((X509Certificate)chain[0]);
-      return ek;
+    throws EncryptionException {
+    try {
+      if (pkcsKeyStore.isKeyEntry(alias)) {
+	BouncySMIMEEncryptionKey ek = new BouncySMIMEEncryptionKey();
+	Certificate[] chain = pkcsKeyStore.getCertificateChain(alias);
+	ek.setCertificate((X509Certificate)chain[0]);
+	PrivateKey privKey = (PrivateKey)pkcsKeyStore.getKey(alias, password);
+	ek.setPrivate(privKey);
+	return ek;
+      }
+    } catch (Exception e) {
+      throw new EncryptionException(e);
     }
 
     return null;
