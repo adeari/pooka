@@ -244,6 +244,10 @@ public class VariableBundle extends Object {
 	return false;
     }
 
+    /**
+     * This notifies all registered listeners for changedValue that its
+     * value has changed.
+     */
     public void fireValueChanged(String changedValue) {
 	Vector listeners = (Vector)VCListeners.get(changedValue);
 	if (listeners != null && listeners.size() > 0) {
@@ -252,6 +256,10 @@ public class VariableBundle extends Object {
 	}	    
     }
 
+    /**
+     * This adds the ValueChangeListener to listen for changes in the 
+     * given property.
+     */
     public void addValueChangeListener(ValueChangeListener vcl, String property) {
 	Vector listeners = (Vector)VCListeners.get(property);
 	if (listeners == null) {
@@ -264,11 +272,15 @@ public class VariableBundle extends Object {
 	}
     }
 		
+    /**
+     * This removes the given ValueChangeListener for all the values that
+     * it's listening to.
+     */
     public void removeValueChangeListener(ValueChangeListener vcl) {
 	Enumeration keys = VCListeners.keys();
 	Vector currentListenerList;
 	while (keys.hasMoreElements()) {
-	    currentListenerList = (Vector)keys.nextElement();
+	    currentListenerList = (Vector)VCListeners.get(keys.nextElement());
 	    while (currentListenerList.contains(vcl))
 		currentListenerList.remove(vcl);
 	}
