@@ -93,7 +93,6 @@ public abstract class EncryptionUtils {
   public static boolean isEncrypted(Part pPart) throws MessagingException {
     String contentType = pPart.getContentType().toLowerCase();
     
-    System.err.println("contentType = " + contentType);
     if (contentType.startsWith("multipart")) {
       ContentType ct = new ContentType(contentType);
       if (ct.getSubType().equalsIgnoreCase("encrypted")) 
@@ -101,7 +100,6 @@ public abstract class EncryptionUtils {
       else if (ct.getSubType().equalsIgnoreCase("signed")) 
 	return true;
     }
-    System.err.println("returning false.");
     return false;
   }
 }

@@ -32,6 +32,7 @@ public class CryptoAttachment extends Attachment {
     else if (ct.getSubType().equalsIgnoreCase("signed"))
       signed = true;
 
+    /*
     if (signed) {
       try {
 	System.err.println("checkSignature = " + checkSignature());
@@ -40,6 +41,7 @@ public class CryptoAttachment extends Attachment {
 	ee.printStackTrace();
       }
     }
+    */
   }
   
   /**
@@ -119,7 +121,6 @@ public class CryptoAttachment extends Attachment {
     if (encrypted) {
       try {
 	BodyPart bp = getDecryptedBodyPart();
-	System.err.println("decryptedBodyPart.getContentType() = " + bp.getContentType());
 	return new ContentType(bp.getContentType());
       } catch (Exception e) {
 	e.printStackTrace();
