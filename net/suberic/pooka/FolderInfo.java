@@ -491,47 +491,59 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void messagesAdded(MessageCountEvent e) {
 	if (Pooka.isDebug())
 	    System.out.println("Messages added.");
-	if (folderTableModel != null) {
-	    Message[] addedMessages = e.getMessages();
-	    MessageProxy mp;
-	    Vector addedProxies = new Vector();
-	    for (int i = 0; i < addedMessages.length; i++) {
-		mp = new MessageProxy(getColumnValues(), addedMessages[i], this);
-		addedProxies.add(mp);
-		messageToProxyTable.put(addedMessages[i], mp);
-	    }
-	    getFolderTableModel().addRows(addedProxies);
-	}
-	resetUnread();
-	fireMessageCountEvent(e);
-    }
 
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		MessageCountEvent mce = (MessageCountEvent)actionEvent.getSource();
+		if (folderTableModel != null) {
+		    Message[] addedMessages = mce.getMessages();
+		    MessageProxy mp;
+		    Vector addedProxies = new Vector();
+		    for (int i = 0; i < addedMessages.length; i++) {
+			mp = new MessageProxy(getColumnValues(), addedMessages[i], FolderInfo.this);
+			addedProxies.add(mp);
+			messageToProxyTable.put(addedMessages[i], mp);
+		    }
+		    getFolderTableModel().addRows(addedProxies);
+		}
+		resetUnread();
+		fireMessageCountEvent(mce);
+	    }
+	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
+    }
+    
     public void messagesRemoved(MessageCountEvent e) {
 	if (Pooka.isDebug())
 	    System.out.println("Messages Removed.");
-	if (folderTableModel != null) {
-	    Message[] removedMessages = e.getMessages();
-	    if (Pooka.isDebug())
-		System.out.println("removedMessages was of size " + removedMessages.length);
-	    MessageProxy mp;
-	    Vector removedProxies=new Vector();
-	    for (int i = 0; i < removedMessages.length; i++) {
-		if (Pooka.isDebug())
-		    System.out.println("checking for existence of message.");
-		mp = getMessageProxy(removedMessages[i]);
-		if (mp != null) {
+	
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		MessageCountEvent mce = (MessageCountEvent)actionEvent.getSource();		
+		if (folderTableModel != null) {
+		    Message[] removedMessages = mce.getMessages();
 		    if (Pooka.isDebug())
-			System.out.println("message exists--removing");
-		    removedProxies.add(mp);
-		    messageToProxyTable.remove(mp);
+			System.out.println("removedMessages was of size " + removedMessages.length);
+		    MessageProxy mp;
+		    Vector removedProxies=new Vector();
+		    for (int i = 0; i < removedMessages.length; i++) {
+			if (Pooka.isDebug())
+			    System.out.println("checking for existence of message.");
+			mp = getMessageProxy(removedMessages[i]);
+			if (mp != null) {
+			    if (Pooka.isDebug())
+				System.out.println("message exists--removing");
+			    removedProxies.add(mp);
+			    messageToProxyTable.remove(mp);
+			}
+		    }
+		    getFolderTableModel().removeRows(removedProxies);
 		}
+		resetUnread();
+		fireMessageCountEvent(mce);
 	    }
-	    getFolderTableModel().removeRows(removedProxies);
-	}
-	resetUnread();
-	fireMessageCountEvent(e);
+	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
     }
-
+    
     /**
      * This updates the TableInfo on the changed messages.
      * 
