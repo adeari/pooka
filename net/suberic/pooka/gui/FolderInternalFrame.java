@@ -212,6 +212,33 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     /**
      * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
      * 
+     * This resets the FolderTableModel in the MessageTable.
+     */
+    public void resetFolderTableModel(FolderTableModel ftm) {
+	getFolderDisplay().resetFolderTableModel(ftm);
+    }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
+     * Not yet implemented.
+     */
+    public void showStatusMessage(String msg) {
+	System.out.println(getFolderInfo().getFolderID() + ":  " + msg);
+    }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
+     * Not yet implemented.
+     */
+    public void clearStatusMessage() {
+	// no-op.
+    }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
      * This implementation sets the cursor to either Cursor.WAIT_CURSOR
      * if busy, or Cursor.DEFAULT_CURSOR if not busy.
      */

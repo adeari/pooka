@@ -124,6 +124,18 @@ other
 -----
 *) loadMessageTracker?
 
+*) add a filter ability to look for duplicate email messages.  so if you're 
+on multiple email lists, then it will filter out all but the first copy of
+the message.
+
+*) have it change its icon if you get new messages, in addition to changing
+the title bar.
+
+*) make it so you can remove the notification for certain folders if they
+get messages.  so if you have certain folders that you care about, then you'll
+get notification, and if the other folders get messages, it won't do the
+new message notification.
+
 after beta 1
 ----------------
 

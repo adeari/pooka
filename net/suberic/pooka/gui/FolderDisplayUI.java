@@ -22,11 +22,10 @@ public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, Act
 
     public int selectPreviousMessage();
 
-    /*
     public void resetFolderTableModel(FolderTableModel ftm);
 
     public void showStatusMessage(String msg);
 
     public void clearStatusMessage();
-    */
+
 }

@@ -134,6 +134,18 @@ public class FolderDisplayPanel extends JPanel {
     }
 
     /**
+     * This recreates the message table with a new FolderTableModel.
+     */
+    public void resetFolderTableModel(FolderTableModel newModel) {
+	if (messageTable != null) {
+	    FolderTableModel oldFtm = (FolderTableModel) messageTable.getModel();
+	    oldFtm.removeTableModelListener(messageTable);
+	    newModel.addTableModelListener(messageTable);
+	    messageTable.setModel(newModel);
+	}
+    }
+
+    /**
      * This adds all the listeners to the current FolderDisplayPanel.
      */
 

@@ -65,9 +65,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // This is just the simple folderName, such as "INBOX"
     private String mFolderName;
 
-    private EventListenerList messageCountListeners = new EventListenerList();
-    private EventListenerList messageChangedListeners = new EventListenerList();
-    
+    private EventListenerList eventListeners = new EventListenerList();
+
     // Information for the FolderNode
     protected FolderNode folderNode;
     protected Vector children;
@@ -255,7 +254,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			System.out.println("Folder " + getFolderID() + " closed:  " + e);
 		    }
 
-		    // if we've already 
+		    if (getFolderDisplayUI() != null)
+			getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please re-open."));
+
 		    if (status == CONNECTED) {
 			setStatus(LOST_CONNECTION);
 		    }
@@ -269,11 +270,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			Thread.dumpStack();
 		    }
 		    
+		    if (getFolderDisplayUI() != null)
+			getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please re-open."));
+
 		    if (status == CONNECTED) {
 			setStatus(LOST_CONNECTION);
 		    }
 		    fireConnectionEvent(e);
-		    
+		}
+
+		public void opened (ConnectionEvent e) {
+		    fireConnectionEvent(e);
 		}
 	    });
 
@@ -313,15 +320,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		if (folder.getMode() == mode)
 		    return;
 		else { 
-		    closeFolder(false);
+		    folder.close(false);
 		    openFolder(mode);
 		}
 	    } else {
 		folder.open(mode);
 		updateFolderOpenStatus(true);
 		resetMessageCounts();
-		if (getFolderNode() != null)
-		    getFolderNode().getParentContainer().repaint();
 	    }
 	}
 
@@ -374,14 +379,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	unloadAllMessages();
 
 	if (getFolderDisplayUI() != null)
-	    getFolderDisplayUI().setEnabled(false);
+	    getFolderDisplayUI().closeFolderDisplay();
 
 	setFolderDisplayUI(null);
 
+	/*
 	if (getFolderTracker() != null) {
 	    getFolderTracker().removeFolder(this);
 	    setFolderTracker(null);
 	}
+	*/
 
 	if (isLoaded() && isAvailable()) {
 	    setStatus(CLOSED);
@@ -415,7 +422,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	}  
 	
-	closeFolder(expunge);
+	folder.close(expunge);
 
 	if (otherException != null)
 	    throw otherException;
@@ -782,7 +789,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (Pooka.isDebug())
 	    System.out.println("firing message changed event.");
 	// Guaranteed to return a non-null array
-	Object[] listeners = messageChangedListeners.getListenerList();
+	Object[] listeners = eventListeners.getListenerList();
 	// Process the listeners last to first, notifying
 	// those that are interested in this event
 	for (int i = listeners.length-2; i>=0; i-=2) {
@@ -796,6 +803,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }  
 
+    public void addConnectionListener(ConnectionListener newListener) {
+	eventListeners.add(ConnectionListener.class, newListener);
+    }
+
+    public void removeConnectionListener(ConnectionListener oldListener) {
+	eventListeners.remove(ConnectionListener.class, oldListener);
+    }
+
+
     /**
      * This handles the distributions of any Connection events.
      *
@@ -808,7 +824,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (Pooka.isDebug())
 	    System.out.println("firing connection event.");
 	// Guaranteed to return a non-null array
-	Object[] listeners = messageChangedListeners.getListenerList();
+	Object[] listeners = eventListeners.getListenerList();
 	// Process the listeners last to first, notifying
 	// those that are interested in this event
 	for (int i = listeners.length-2; i>=0; i-=2) {
@@ -818,8 +834,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		if (Pooka.isDebug())
 		    System.out.println("check.  it's a connection listener.");
 		ConnectionListener listener = (ConnectionListener) listeners[i+1];
-		if (
-	    }              
+		if (e.getType() == ConnectionEvent.CLOSED)
+		    listener.closed(e);
+		else if (e.getType() == ConnectionEvent.DISCONNECTED)
+		    listener.disconnected(e);
+		else if (e.getType() == ConnectionEvent.OPENED)
+		    listener.opened(e);
+	    }  
 	}
     }  
 
@@ -1030,11 +1051,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public void addMessageCountListener(MessageCountListener newListener) {
-	messageCountListeners.add(MessageCountListener.class, newListener);
+	eventListeners.add(MessageCountListener.class, newListener);
     }
 	
     public void removeMessageCountListener(MessageCountListener oldListener) {
-	messageCountListeners.remove(MessageCountListener.class, oldListener);
+	eventListeners.remove(MessageCountListener.class, oldListener);
     }
 
     public void fireMessageCountEvent(MessageCountEvent mce) {
@@ -1042,7 +1063,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	// from the EventListenerList javadoc, including comments.
 
 	// Guaranteed to return a non-null array
-	Object[] listeners = messageCountListeners.getListenerList();
+	Object[] listeners = eventListeners.getListenerList();
 	// Process the listeners last to first, notifying
 	// those that are interested in this event
 
@@ -1063,11 +1084,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 	
     public void addMessageChangedListener(MessageChangedListener newListener) {
-	messageChangedListeners.add(MessageChangedListener.class, newListener);
+	eventListeners.add(MessageChangedListener.class, newListener);
     }
 
     public void removeMessageChangedListener(MessageChangedListener oldListener) {
-	messageChangedListeners.remove(MessageChangedListener.class, oldListener);
+	eventListeners.remove(MessageChangedListener.class, oldListener);
     }
 
     // as defined in javax.mail.event.MessageCountListener

@@ -1,4 +1,4 @@
-package net.suberic.pooka.cache;
+package net.suberic.pooka;
 import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.internet.MimeMessage;

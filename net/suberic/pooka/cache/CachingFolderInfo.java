@@ -14,7 +14,7 @@ import net.suberic.pooka.gui.FolderTableModel;
  * A FolderInfo which caches its messages in a MessageCache.
  */
 
-public class CachingFolderInfo extends FolderInfo {
+public class CachingFolderInfo extends UIDFolderInfo {
     protected MessageCache cache = null;
     protected HashMap uidToInfoTable = new HashMap();
     protected long uidValidity;
@@ -83,17 +83,6 @@ public class CachingFolderInfo extends FolderInfo {
 	if (!loaderThread.isAlive())
 	    loaderThread.start();
 
-	/*
-	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-		    try {
-			synchronizeCache();
-		    } catch (MessagingException me) {
-		    }
-		}
-	    }, getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-count-changed"));
-	*/
-	
 	return ftm;
     }
     
@@ -103,6 +92,8 @@ public class CachingFolderInfo extends FolderInfo {
      * at every check, catching and throwing away any Exceptions that happen.  
      * It's nasty, but it _should_ keep the Folder open..
      */
+    /*
+      // excluded--same as UIDFolderInfo.
     public void checkFolder() {
 	if (Pooka.isDebug())
 	    System.out.println("checking folder " + getFolderName());
@@ -136,7 +127,10 @@ public class CachingFolderInfo extends FolderInfo {
 	
 	resetMessageCounts();
     }
+    */
 
+    /*
+      // excluded--same as parent class.
     protected void updateFolderOpenStatus(boolean isNowOpen) {
 	if (isNowOpen) {
 	    status = CONNECTED;
@@ -149,6 +143,7 @@ public class CachingFolderInfo extends FolderInfo {
 	} else
 	    status = CLOSED;
     }
+    */
 
     /**
      * Gets the row number of the first unread message.  Returns -1 if

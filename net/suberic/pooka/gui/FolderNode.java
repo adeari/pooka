@@ -17,7 +17,7 @@ import javax.swing.JOptionPane;
 import net.suberic.pooka.FolderInfo;
 import javax.mail.event.*;
 
-public class FolderNode extends MailTreeNode implements MessageChangedListener, UserProfileContainer {
+public class FolderNode extends MailTreeNode implements MessageChangedListener, UserProfileContainer, ConnectionListener {
     
     protected FolderInfo folderInfo = null;
     protected boolean hasLoaded = false;
@@ -75,6 +75,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    });
 	
 	folderInfo.addMessageChangedListener(this);
+	folderInfo.addConnectionListener(this);
 	loadChildren();
 
     }
@@ -232,9 +233,38 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     }
 
     public void messageChanged(MessageChangedEvent mce) {
-	getParentContainer().repaint();
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    getParentContainer().repaint();
+		}
+	    });
     }
 
+    public void closed(ConnectionEvent e) {
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    getParentContainer().repaint();
+		}
+	    });
+    }
+
+    public void opened(ConnectionEvent e) {
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    getParentContainer().repaint();
+		}
+	    });
+    }
+
+    public void disconnected(ConnectionEvent e) {
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		    getParentContainer().repaint();
+		}
+	    });
+    }
+
+    
     /**
      * This opens up a dialog asking if the user wants to unsubsribe to 
      * the current Folder.  If the user chooses 'yes', then
