@@ -19,7 +19,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
     MessageProxy msg;
     JSplitPane splitPane = null;
     AttachmentPane attachmentPanel = null;
-    JEditorPane editorPane = null;
+    JTextPane editorPane = null;
     ConfigurableToolbar toolbar;
     boolean hasAttachment = false;
 
@@ -104,7 +104,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 	return getMessageProxy().getDefaultProfile();
     }
 
-    public JEditorPane getEditorPane() {
+    public JTextPane getEditorPane() {
 	return editorPane;
     }
 

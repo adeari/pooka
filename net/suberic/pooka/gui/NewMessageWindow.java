@@ -169,8 +169,8 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	return inputPanel;
     }
 
-    public JEditorPane createMessagePanel(MessageProxy aMsg) {
-	JEditorPane retval = new JEditorPane();
+    public JTextPane createMessagePanel(MessageProxy aMsg) {
+	JTextPane retval = new JTextPane();
 	
 	// see if this message already has a text part, and if so,
 	// include it.

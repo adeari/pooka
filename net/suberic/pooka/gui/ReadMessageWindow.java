@@ -19,7 +19,7 @@ public class ReadMessageWindow extends MessageWindow {
 
     int headerStyle = ReadMessageWindow.HEADERS_DEFAULT;
     boolean showFullHeaders = false;
-    JEditorPane editorPane = null;
+    JTextPane editorPane = null;
     ConfigurableToolbar toolbar;
 
     /**
@@ -71,12 +71,12 @@ public class ReadMessageWindow extends MessageWindow {
      * This method creates the component that will display the message
      * itself.
      *
-     * It returns a JEditorPane with the headers and the message body
+     * It returns a JTextPane with the headers and the message body
      * together.
      */
 
-    public JEditorPane createMessagePanel(MessageProxy aMsg) {
-	editorPane = new JEditorPane();
+    public JTextPane createMessagePanel(MessageProxy aMsg) {
+	editorPane = new JTextPane();
 	StringBuffer messageText = new StringBuffer();
 	
 	if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
@@ -128,7 +128,7 @@ public class ReadMessageWindow extends MessageWindow {
 	    return editorPane;
 
 	} else
-	    return new JEditorPane();
+	    return new JTextPane();
     }
 		    
     public boolean showFullHeaders() {
