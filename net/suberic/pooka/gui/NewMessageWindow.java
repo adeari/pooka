@@ -308,6 +308,48 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
     }
 
     /**
+     * This registers the Keyboard action not only for the FolderWindow
+     * itself, but also for pretty much all of its children, also.  This
+     * is to work around something which I think is a bug in jdk 1.2.
+     * (this is not really necessary in jdk 1.3.)
+     *
+     * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
+     *            String aCommand, KeyStroke aKeyStroke, int aCondition)
+     */
+
+    public void registerKeyboardAction(ActionListener anAction,
+       	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
+	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+
+	if (attachmentPanel != null)
+	    attachmentPanel.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	editorPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	editorScrollPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	splitPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    }
+    
+    /**
+     * This unregisters the Keyboard action not only for the FolderWindow
+     * itself, but also for pretty much all of its children, also.  This
+     * is to work around something which I think is a bug in jdk 1.2.
+     * (this is not really necessary in jdk 1.3.)
+     *
+     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+     */
+
+    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+	super.unregisterKeyboardAction(aKeyStroke);
+
+	if (attachmentPanel != null)
+	    attachmentPanel.unregisterKeyboardAction(aKeyStroke);
+	editorPane.unregisterKeyboardAction(aKeyStroke);
+	editorScrollPane.unregisterKeyboardAction(aKeyStroke);
+	toolbar.unregisterKeyboardAction(aKeyStroke);
+	splitPane.unregisterKeyboardAction(aKeyStroke);
+    }
+
+    /**
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *
      * This implementation returns the DefaultProfile of the associated

@@ -238,6 +238,42 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     }
 
     /**
+     * This registers the Keyboard action not only for the FolderWindow
+     * itself, but also for pretty much all of its children, also.  This
+     * is to work around something which I think is a bug in jdk 1.2.
+     * (this is not really necessary in jdk 1.3.)
+     *
+     * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
+     *            String aCommand, KeyStroke aKeyStroke, int aCondition)
+     */
+
+    public void registerKeyboardAction(ActionListener anAction,
+       	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
+	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+
+	messageTable.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	statusBar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    }
+    
+    /**
+     * This unregisters the Keyboard action not only for the FolderWindow
+     * itself, but also for pretty much all of its children, also.  This
+     * is to work around something which I think is a bug in jdk 1.2.
+     * (this is not really necessary in jdk 1.3.)
+     *
+     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+     */
+
+    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+	super.unregisterKeyboardAction(aKeyStroke);
+
+	messageTable.unregisterKeyboardAction(aKeyStroke);
+	statusBar.unregisterKeyboardAction(aKeyStroke);
+	toolbar.unregisterKeyboardAction(aKeyStroke);
+    }
+
+    /**
      * As specified by net.subeic.pooka.UserProfileContainer
      */
 
