@@ -30,7 +30,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
      */     
     public CompositeEditorPane(PropertyEditorFactory newFactory, String 
 			       newProperty, String newTemplate) {
-	super(BoxLayout.Y_AXIS);
+	super(BoxLayout.X_AXIS);
 	System.out.println("creating a new CompositeEditorPane.");
 	configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), true);
         
@@ -67,14 +67,32 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 
 	editors = new Vector();
 
+	GridBagConstraints constraints = new GridBagConstraints();
+	GridBagLayout layout = (GridBagLayout) getLayout();
+	constraints.weightx = 1.0;
+	constraints.fill = GridBagConstraints.BOTH;
+
 	for (int i = 0; i < properties.size(); i++) {
 	    currentEditor =
               factory.createEditor((String)properties.elementAt(i), (String) templates.elementAt(i));
 	    editors.add(currentEditor);
-	    this.add(currentEditor);
+	    
+	    if (currentEditor.labelComponent != null) {
+		layout.setConstraints(currentEditor.labelComponent, constraints);
+		this.add(currentEditor.labelComponent);
+	    }
+
+	    if (currentEditor.valueComponent != null) {
+		constraints.gridwidth=GridBagConstraints.REMAINDER;
+		layout.setConstraints(currentEditor.valueComponent, constraints);
+		this.add(currentEditor.valueComponent);
+	    }
+
+	    constraints.weightx = 0.0;
+	    constraints.gridwidth = 1;
+	    
 	}
 
-	System.out.println("aligning editor sizes.");
 	alignEditorSizes();
     }
 

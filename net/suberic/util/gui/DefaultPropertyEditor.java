@@ -6,7 +6,7 @@ import java.awt.Dimension;
 /**
  * A Swing implementation of the PropertyEditorUI.
  */
-public abstract class DefaultPropertyEditor extends Box implements PropertyEditorUI {
+public abstract class DefaultPropertyEditor extends JPanel implements PropertyEditorUI {
     // shows whether or not this component is enabled.
     boolean enabled;
 
@@ -23,14 +23,16 @@ public abstract class DefaultPropertyEditor extends Box implements PropertyEdito
      * X_AXIS layout.
      */
     public DefaultPropertyEditor() {
-	super(BoxLayout.X_AXIS);
+	super();
+	this.setLayout(new java.awt.GridBagLayout());
     }
 
     /**
      * Creates a new DefaultPropertyEditor, with the axis as given.
      */
     public DefaultPropertyEditor(int axis) {
-	super(axis);
+	super();
+	this.setLayout(new java.awt.GridBagLayout());
     }
 
     /**
