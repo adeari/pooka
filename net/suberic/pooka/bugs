@@ -1,0 +1,22 @@
+getting an IllegalStateException when opening a folder.  that folder also 
+seems not to be getting updates (notifications of new messages) at the
+time:
+
+java.lang.IllegalStateException: This operation is not allowed on an open folder        at java.lang.Throwable.fillInStackTrace(Native Method)
+        at java.lang.Throwable.fillInStackTrace(Compiled Code)
+        at java.lang.Throwable.<init>(Compiled Code)
+        at java.lang.Exception.<init>(Compiled Code)
+        at java.lang.RuntimeException.<init>(Compiled Code)
+        at java.lang.IllegalStateException.<init>(IllegalStateException.java:45)        at com.sun.mail.imap.IMAPFolder.checkClosed(Compiled Code)
+        at com.sun.mail.imap.IMAPFolder.open(Compiled Code)
+        at net.suberic.pooka.FolderInfo.openFolder(Compiled Code)
+        at net.suberic.pooka.FolderInfo$1.closed(FolderInfo.java:160)
+        at javax.mail.event.ConnectionEvent.dispatch(Compiled Code)
+        at javax.mail.EventQueue.run(Compiled Code)
+        at java.lang.Thread.run(Thread.java:479)
+
+could be the the folders are closing again without our knowledge.
+
+--------------
+
+
