@@ -29,36 +29,56 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
 
     proxy = nmp;
 
-    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+    this.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+    Box contentBox = Box.createVerticalBox();
 
     Box cryptoBox = new Box(BoxLayout.Y_AXIS);
     Box cryptoLabelBox = new Box(BoxLayout.X_AXIS);
 
     cryptoLabelBox.add(new JLabel(Pooka.getProperty("NewMessageCryptoPanel.encryptionKey.label", "Encryption Key")));
     
+    cryptoLabelBox.add(Box.createHorizontalStrut(5));
     JButton clearEncryptionButton = createClearEncryptionButton();
+
     cryptoLabelBox.add(clearEncryptionButton);
     
+    cryptoLabelBox.add(Box.createHorizontalGlue());
+
     createEncryptionButton();
     
     cryptoBox.add(cryptoLabelBox);
-    cryptoBox.add(mEncryptionKeyButton);
+
+    Box cryptoButtonBox = Box.createHorizontalBox();
+    cryptoButtonBox.add(mEncryptionKeyButton);
+    cryptoButtonBox.add(Box.createHorizontalGlue());
+    cryptoBox.add(cryptoButtonBox);
     
     Box signatureBox = new Box(BoxLayout.Y_AXIS);
     Box signatureLabelBox = new Box(BoxLayout.X_AXIS);
 
     signatureLabelBox.add(new JLabel(Pooka.getProperty("NewMessageCryptoPanel.signatureKey.label", "Signature Key")));
     
+    signatureLabelBox.add(Box.createHorizontalStrut(5));
+
     JButton clearSignatureButton = createClearSignatureButton();
     signatureLabelBox.add(clearSignatureButton);
+
+    signatureLabelBox.add(Box.createHorizontalGlue());
     
     createSignatureButton();
     
     signatureBox.add(signatureLabelBox);
-    signatureBox.add(mSignatureKeyButton);
     
-    this.add(cryptoBox);
-    this.add(signatureBox);
+    Box signatureButtonBox = Box.createHorizontalBox();
+    signatureButtonBox.add(mSignatureKeyButton);
+    signatureButtonBox.add(Box.createHorizontalGlue());
+    signatureBox.add(signatureButtonBox);
+    
+    contentBox.add(cryptoBox);
+    contentBox.add(signatureBox);
+    
+    this.add(contentBox);
   }
 
   /**

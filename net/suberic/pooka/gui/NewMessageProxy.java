@@ -448,13 +448,17 @@ public class NewMessageProxy extends MessageProxy {
 	((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
       }
       */
-      getNewMessageInfo().setEncryptMessage(NewMessageInfo.CRYPTO_NO);
+      //getNewMessageInfo().setEncryptMessage(NewMessageInfo.CRYPTO_NO);
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
+      }
     }
   }
 
   class ClearSignAction extends AbstractAction {
     ClearSignAction() {
-      super("message-clear-sign");
+      super("message-clear-signature");
     }
     
     public void actionPerformed(ActionEvent e) {
@@ -465,6 +469,10 @@ public class NewMessageProxy extends MessageProxy {
       }
       */
       getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_NO);
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setSignatureKey(null);
+      }
     }
   }
 
