@@ -1,10 +1,12 @@
 package net.suberic.pooka.gui.search;
 import javax.swing.*;
 import net.suberic.pooka.*;
+import java.util.Vector;
 
-public class SearchForm extends JPanel {
+public class SearchForm extends JDialog {
     SearchEntryPanel entryPanel;
     SearchFolderPanel folderPanel;
+    int returnValue = JOptionPane.OK_OPTION;
     
     public SearchForm() {
 	this.populatePanel();
@@ -15,20 +17,20 @@ public class SearchForm extends JPanel {
     }
 
     public SearchForm(StoreInfo[] selectedStores, boolean editable) {
-
+	folderPanel = new SearchFolderPanel(selectedStores, editable);
+	populatePanel();
     }
 
     /**
      * Populates the SearchForm.
      */
     public void populatePanel() {
-	this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+	this.getContentPane().setLayout(new BoxLayout(this.getContentPane(), BoxLayout.Y_AXIS));
 
-	this.add(new JLabel("No folder selected."));
-	folderPanel = new SearchFolderPanel();
+	this.getContentPane().add(folderPanel);
 	entryPanel = new SearchEntryPanel(Pooka.getSearchManager());
-	this.add(entryPanel);
-	this.add(createButtonPanel());
+	this.getContentPane().add(entryPanel);
+	this.getContentPane().add(createButtonPanel());
     }
 
     /**
@@ -38,13 +40,32 @@ public class SearchForm extends JPanel {
 	JPanel buttonPanel = new JPanel();
 	JButton okButton = new JButton(Pooka.getProperty("button.ok", "Ok"));
 	JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
-	okButton.addActionListener(new Action() {
+	okButton.addActionListener(new AbstractAction() {
 		public void actionPerformed (java.awt.event.ActionEvent e) {
-		    
+		    returnValue = JOptionPane.OK_OPTION;
+		    dispose();
+		}
+	    });
+	cancelButton.addActionListener(new AbstractAction() {
+		public void actionPerformed (java.awt.event.ActionEvent e) {
+		    returnValue = JOptionPane.CANCEL_OPTION;
+		    dispose();
 		}
 	    });
 	buttonPanel.add(okButton);
 	buttonPanel.add(cancelButton);
 	return buttonPanel;
+    }
+
+    public int getReturnValue() {
+	return returnValue;
+    }
+
+    public Vector getSelectedFolders() {
+	return folderPanel.getSelectedFolders();
+    }
+
+    public javax.mail.search.SearchTerm getSearchTerm() {
+	return entryPanel.getSearchTerm();
     }
 }

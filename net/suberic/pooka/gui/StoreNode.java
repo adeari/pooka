@@ -291,8 +291,9 @@ public class StoreNode extends MailTreeNode {
 
 	    JInternalFrame jif = new JInternalFrame();
 	    
-	    SearchForm sf = new SearchForm();Pooka.getSearchManager());
-		    
+	    SearchForm sf = new SearchForm(new StoreInfo[] { getStoreInfo() }, false);
+	    sf.show();
+	    /*
 	    jif.getContentPane().add(sf);
 
 	    MessagePanel mp = (MessagePanel)((FolderPanel)getParentContainer()).getMainPanel().getContentPanel();
@@ -302,7 +303,11 @@ public class StoreNode extends MailTreeNode {
 	    try {
 		jif.setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) { }
+	    */
+
+	    
 	}
+	
     }
 
     class DisconnectAction extends AbstractAction {
