@@ -4,6 +4,8 @@ beta 1
 *) bug:  message editor isn't the right size, assumingly because we aren't
 allowing for the vertical scroll bar (?)
 
+*) check:  see how outgoing and incoming mail handle tab characters.
+
 --
 
 *) add address book and alias support
