@@ -45,6 +45,8 @@ the UserProfile only gets updated at startup.
 
 *) takes too long to open a window where there are a lot of new messages.
 
+*) make the MessageWindow honor the inline tag for inlined attachments.
+
 -------
 
 open messages from the FolderWindow
