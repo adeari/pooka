@@ -25,6 +25,7 @@ public class SearchEntryPanel extends JPanel {
     JPanel conditionPanel;
     JPanel entryPanel;
     JScrollPane entryScrollPane;
+    JButton buttonOne, buttonTwo;
     Vector searchTerms = new Vector();
     SearchTermManager manager;
 
@@ -62,6 +63,7 @@ public class SearchEntryPanel extends JPanel {
 	public JComboBox getCombo() {
 	    return list;
 	}
+
     }
 
     /**
@@ -121,14 +123,14 @@ public class SearchEntryPanel extends JPanel {
 	JPanel jp = new JPanel();
 	jp.setLayout(new FlowLayout());
 	
-	JButton buttonOne = new JButton(Pooka.getProperty("Search.button.and.label", "And"));
+	buttonOne = new JButton(Pooka.getProperty("Search.button.and.label", "And"));
 	buttonOne.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    addSearchEntryForm(AND);
 		}
 	    });
 
-	JButton buttonTwo = new JButton(Pooka.getProperty("Search.button.or.label", "Or"));
+	buttonTwo = new JButton(Pooka.getProperty("Search.button.or.label", "Or"));
 	buttonTwo.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    addSearchEntryForm(OR);
@@ -314,5 +316,19 @@ public class SearchEntryPanel extends JPanel {
 		props.setProperty(rootProperty + ".operation", "or");
 	    }
 	}
+    }
+
+    /**
+     * Sets whether or not this panel is enabled.
+     */
+    public void setEnabled(boolean newValue) {
+	for (int i = 0; i < searchTerms.size(); i++) {
+	    SearchEntryPair currentPair = (SearchEntryPair) searchTerms.elementAt(i);
+	    currentPair.form.setEnabled(newValue);
+	    currentPair.connector.getCombo().setEnabled(newValue);
+	}
+	buttonOne.setEnabled(newValue);
+	buttonTwo.setEnabled(newValue);
+
     }
 }

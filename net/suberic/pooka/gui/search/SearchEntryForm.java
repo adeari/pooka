@@ -183,7 +183,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	}
 	
 	Properties returnValue = new java.util.Properties();
-	returnValue.setProperty(rootProperty, searchProperty);
+	returnValue.setProperty(rootProperty + ".searchTerm", searchProperty);
 	returnValue.setProperty(rootProperty + ".operation", operationProperty);
 	returnValue.setProperty(rootProperty + ".pattern", pattern);
 	returnValue.setProperty(rootProperty + ".type", "single");

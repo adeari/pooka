@@ -340,11 +340,14 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	}
     }
 
+    /**
+     * This produces a string for the given JList.
+     */
     public String getStringFromList(JList list) {
 
 	String retVal;
 	if (optionListModel.getSize() < 1)
-	    return null;
+	    return "";
 	else 
 	    retVal = new String((String)optionListModel.getElementAt(0));
 	
@@ -355,6 +358,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	return retVal;
     }
 
+    /**
+     * Sets the value for this MultiEditorPane.
+     */
     public void setValue() {
 	if (isEnabled()) {
 	    for (int i = 0; i < removeValues.size() ; i++) 
@@ -367,8 +373,10 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 		((CompositeEditorPane)components[i]).setValue();
 	    }
 	    
-	    if (isChanged())
+	    if (isChanged()) {
+		//System.out.println("setting property.  property is " + property + "; getStringFromList is " + getStringFromList(getOptionList()));
 		sourceBundle.setProperty(property, getStringFromList(getOptionList()));
+	    }
 	}
     }
     

@@ -599,11 +599,11 @@ FolderFilters.ColorFilter.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderFilters.ColorFilter.editorClass=net.suberic.pooka.gui.filter.ColorFilterEditor
 
 FolderInfo.defaultDisplayFilters=Unread
-FolderInfo.defaultDisplayFilters.Unread.searchTerm=Search.searchTerms.Seen
-FolderInfo.defaultDisplayFilters.Unread.operationProperty=Search.operations.False
+FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen
+FolderInfo.defaultDisplayFilters.Unread.searchTerm.operationProperty=Search.operations.False
 FolderInfo.defaultDisplayFilters.Unread.action.class=net.suberic.pooka.gui.filter.FontDisplayFilter
 FolderInfo.defaultDisplayFilters.Unread.action.style=bold
-FolderInfo.defaultDisplayFilters.Uncached.searchTerm=Search.searchTerms.Cached
+FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTerms.Cached
 FolderInfo.defaultDisplayFilters.Uncached.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderInfo.defaultDisplayFilters.Uncached.action.rgb=28101
 
