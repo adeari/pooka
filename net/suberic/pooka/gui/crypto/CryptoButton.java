@@ -265,8 +265,6 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
     currentCryptStatus = newEncryptionStatus;
     currentSigStatus = newSignatureStatus;
 
-    System.err.println("cryptStatus = " + currentCryptStatus + ", sigStaus = " + currentSigStatus);
-
     if (currentCryptStatus == NOT_ENCRYPTED || currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
       if (currentSigStatus == NOT_SIGNED) {
 	if (currentCryptStatus == NOT_ENCRYPTED)
