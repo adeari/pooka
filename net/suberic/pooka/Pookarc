@@ -398,7 +398,7 @@ UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
 UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
 UserProfile.mailHeaders.fields.Organization.value=Organization
 
-UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:signatureFile:sentFolder
+UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:sendPrecommand:signatureFile:sentFolder
 UserProfile.editableFields.scoped=true
 UserProfile.propertyType=Multi
 UserProfile.editableFields.sentFolder.propertyType=Folder
@@ -499,7 +499,7 @@ Store.editableFields.propertyType=Composite
 #Store.editableFields.trashFolder.propertyType=Folder
 #Store.editableFields.trashFolder.selectionRoot=currentStore
 
-Store.editableFields=protocol:storeConfig:trashFolder:defaultProfile:mailCheckTime
+Store.editableFields=protocol:storeConfig:trashFolder:defaultProfile:mailCheckTime:precommand
 Store.editableFields.protocol.propertyType=List
 Store.editableFields.protocol.allowedValues=imap:pop3:mbox
 Store.editableFields.protocol=imap
@@ -512,6 +512,7 @@ Store.editableFields.trashFolder.selectionRoot=currentStore
 Store.editableFields.defaultProfile.propertyType=List
 Store.editableFields.defaultProfile.allowedValues=UserProfile
 Store.editableFields.mailCheckTime=5
+Store.editableFields.precommand=""
 
 Store.editableFields.storeConfig.removeString=.storeConfig
 Store.editableFields.storeConfig.allowedValues.imap=Store.editableFields.storeConfig.imap

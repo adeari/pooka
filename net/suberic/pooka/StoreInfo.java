@@ -457,7 +457,19 @@ public class StoreInfo implements ValueChangeListener, Item {
 	return;
       } else { 
 	try {
-	  store.connect();
+            // Execute the precommand if there is one
+            String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
+            if (preCommand.length() > 0) {
+                try {
+                    Process p = Runtime.getRuntime().exec(preCommand);
+                    p.waitFor();
+                } catch (Exception ex)
+                {
+                    System.out.println("Could not run precommand:");
+                    ex.printStackTrace();
+                }
+            }
+            store.connect();
 	} catch (MessagingException me) {
 	  Exception e = me.getNextException();
 	  if (e != null && e instanceof java.io.InterruptedIOException) 

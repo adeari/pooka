@@ -9,7 +9,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   Properties mailProperties;
   String name;
   URLName sendMailURL;
-  
+  String sendPrecommand;
   String sentFolderName;
   FolderInfo sentFolder;
   public boolean autoAddSignature = true;
@@ -60,6 +60,7 @@ public class UserProfile extends Object implements ValueChangeListener {
       sentFolderName=mainProperties.getProperty("UserProfile." + name + ".sentFolder", "");
       
       sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
+      sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
       sigGenerator=createSignatureGenerator();
       
       String fromAddr = (String)mailProperties.get("From");
@@ -347,6 +348,10 @@ public class UserProfile extends Object implements ValueChangeListener {
 
   public URLName getSendMailURL() {
     return sendMailURL;
+  }
+  
+  public String getSendPrecommand() {
+    return sendPrecommand;
   }
   
   public FolderInfo getSentFolder() {

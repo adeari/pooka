@@ -26,10 +26,12 @@ public class NewMessageInfo extends MessageInfo {
     MimeMessage mMsg = (MimeMessage) message;
     
     URLName urlName = null;
+    String sendPrecommand = null;
     
     if (profile != null) {
       profile.populateMessage(mMsg);
       urlName = profile.getSendMailURL();
+      sendPrecommand = profile.getSendPrecommand();
     }
     
     Enumeration individualHeaders = headers.getAllHeaders();
@@ -56,7 +58,7 @@ public class NewMessageInfo extends MessageInfo {
 	getMessage().setContent(messageText, messageContentType);
       }
       
-      Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName);
+      Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
   
       /*
       if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {

@@ -25,13 +25,14 @@ public class MailQueue {
   
   /**
    * This adds the Message to the queue associated with the given 
-   * transportURL.  If Message.sendImmediately is set to true, then this
+   * transportURL.  If sendPrecommand != "", then sendPrecommand will be executed before 
+   * attempting to send each message. If Message.sendImmediately is set to true, then this
    * will also go ahead and try to send all queued Messages using
    * sendQueued().
    *
    * Note that at the moment, only Message.sendImmediately is supported.
    */
-  public void sendMessage(NewMessageInfo pNmi, URLName pTransportURL) throws MessagingException {
+  public void sendMessage(NewMessageInfo pNmi, URLName pTransportURL, String sendPrecommand) throws MessagingException {
     /*
       Vector transportQueue = (Vector)transportTable.get(transportURL);
       if (transportQueue == null) {
@@ -47,6 +48,7 @@ public class MailQueue {
     
     final URLName transportURL = pTransportURL;
     final NewMessageInfo nmi = pNmi;
+    final String precommand = sendPrecommand;
     
     if (Pooka.getProperty("Message.sendImmediately", "false").equalsIgnoreCase("true")) {
       thread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
@@ -54,7 +56,17 @@ public class MailQueue {
 	  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 	    try {
 	      Transport sendTransport;
-	      
+	      if (precommand.length() > 0) {
+                try {
+                    Process p = Runtime.getRuntime().exec(precommand);
+                    p.waitFor();
+                } catch (Exception ex)
+                {
+                    System.out.println("Could not run SMTP precommand:");
+                    ex.printStackTrace();
+                }
+              }
+              
 	      sendTransport = session.getTransport(transportURL); 
 	      sendTransport.connect();
 	      
