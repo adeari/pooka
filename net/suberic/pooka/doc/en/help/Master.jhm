@@ -15,6 +15,7 @@
 	<mapID target="protocol.pop" url="pooka/store/protocol.html#pop" />
 	<mapID target="store.intro" url="pooka/store/intro.html" />
 	<mapID target="addressBook.intro" url="pooka/addressbook/intro.html" />
+	<mapID target="encryption.intro" url="pooka/encryption/intro.html" />
 	<mapID target="ui.folderPanel" url="pooka/ui/folderpanel.html" />
 	<mapID target="ui.messagePanel" url="pooka/ui/messagepanel.html" />
 	<mapID target="ui.folderWindow" url="pooka/ui/folderwindow.html" />

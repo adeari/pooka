@@ -12,6 +12,7 @@
     <tocitem text="Composing New Mail" target="composing.intro"/>
     <tocitem text="Searches" target="search.intro"/>
     <tocitem text="Address Books" target="addressBook.intro"/>
+    <tocitem text="Encryption" target="encryption.intro"/>
     <tocitem text="Configuration Options" target="options">
       <tocitem text="Preferences" target="options.preferences">
         <tocitem text="UI" target="options.preferences.ui"/>
