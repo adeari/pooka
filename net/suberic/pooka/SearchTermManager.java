@@ -167,6 +167,7 @@ public class SearchTermManager {
      * property.operation (should be 'or' or 'and')
      */
     public SearchTerm generateSearchTermFromProperty(String property) throws java.text.ParseException {
+	//System.out.println("generating search term for " + property);
 	String type = Pooka.getProperty(property + ".type", "single");
 	if (type.equalsIgnoreCase("single")) {
 	    String searchProperty = Pooka.getProperty(property + ".searchTerm", "");

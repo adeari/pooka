@@ -241,9 +241,9 @@ public class SearchEntryPanel extends JPanel {
 	    for (int i = 0; i < subProps.size(); i++) {
 		String nextTerm = (String) subProps.elementAt(i);
 		if (i == 0)
-		    addSearchTermProperty(rootProperty + "." + nextTerm, bundle, type);
+		    addSearchTermProperty(nextTerm, bundle, type);
 		else
-		    addSearchTermProperty(rootProperty + "." + nextTerm, bundle, subType);
+		    addSearchTermProperty(nextTerm, bundle, subType);
 	    }
 	} else {
 	    addSingleSearchTerm(rootProperty, bundle, type);
@@ -309,7 +309,7 @@ public class SearchEntryPanel extends JPanel {
 	    int type = ((SearchEntryPair) pairList.elementAt(0)).connector.getType();
 	    addToProperties(pairList, rootProperty + ".term2", props);
 	    props.setProperty(rootProperty + ".type", "compound");
-	    props.setProperty(rootProperty + ".subTerms", "term1:term2");
+	    props.setProperty(rootProperty + ".subTerms", rootProperty + ".term1:" + rootProperty + ".term2");
 	    if (type == AND) {
 		props.setProperty(rootProperty + ".operation", "and");
 	    } else {
