@@ -651,6 +651,16 @@ public class MessageInfo {
   }
   
   /**
+   * Runs folder filters on this MessageInfo.
+   */
+  public void runBackendFilters() {
+    FolderInfo fi = getFolderInfo();
+    java.util.LinkedList list = new java.util.LinkedList();
+    list.add(getMessageProxy());
+    fi.applyFilters(list);
+  }
+
+  /**
    *  Caches the current messages.
    */
   public void cacheMessage() throws MessagingException {

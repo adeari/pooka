@@ -2022,9 +2022,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   /**
    * This applies each MessageFilter in filters array on the given 
-   * MessageInfo objects.
+   * MessageProxy objects.
    *
-   * @return a Vector containing the removed MessageInfo objects.
+   * @return a Vector containing the removed MessageProxy objects.
    */
   public Vector applyFilters(List messages) {
     Vector notRemovedYet = new Vector(messages);

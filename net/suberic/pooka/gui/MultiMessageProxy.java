@@ -43,7 +43,8 @@ public class MultiMessageProxy extends MessageProxy {
 		new ActionWrapper(new MoveAction(), storeThread),
 		new ActionWrapper(new CopyAction(), storeThread),
 		new ActionWrapper(new PrintAction(), storeThread),
-		new ActionWrapper(new CacheMessageAction(), storeThread)
+		new ActionWrapper(new CacheMessageAction(), storeThread),
+		new ActionWrapper(new FilterAction(), storeThread)
 		    };
 	} else {
 	    defaultActions = new Action[] {
@@ -51,7 +52,8 @@ public class MultiMessageProxy extends MessageProxy {
 		new DeleteAction(),
 		new MoveAction(),
 		new CopyAction(),
-		new PrintAction()
+		new PrintAction(),
+		new FilterAction()
 		    };
 	}	    
 

@@ -128,6 +128,26 @@ public class MultiMessageInfo extends MessageInfo {
   }
   
   /**
+   * Runs folder filters on this MessageInfo.
+   */
+  public void runBackendFilters() {
+    if (folderInfo != null) {
+      java.util.List list = new java.util.LinkedList();
+      for (int i = 0; i < messages.length; i++) {
+	list.add(messages[i].getMessageProxy());
+      }
+      folderInfo.applyFilters(list);
+    } else {
+      for (int i = 0; i < messages.length; i++) {
+	java.util.LinkedList list = new java.util.LinkedList();
+	list.add(messages[i]);
+	FolderInfo fi = messages[i].getFolderInfo();
+	fi.applyFilters(list);
+      }
+    }
+  }
+
+  /**
    *  Caches the current messages.
    */
   public void cacheMessage() throws MessagingException {

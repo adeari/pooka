@@ -462,6 +462,15 @@ public class MessageProxy {
   }
   
   /**
+   * Runs server filters on this Message.
+   */
+  public void runBackendFilters() {
+    MessageInfo info = getMessageInfo();
+    if (info != null)
+      info.runBackendFilters();
+  }
+
+  /**
    * This loads the Attachment information into the attachments vector.
    */
   
@@ -1063,7 +1072,8 @@ public class MessageProxy {
 	new ActionWrapper(new SaveMessageAction(), folderThread),
 	new ActionWrapper(new CacheMessageAction(), folderThread),
 	new ActionWrapper(new SaveAddressAction(), folderThread),
-	new ActionWrapper(new OpenAsNewAction(), folderThread)
+	new ActionWrapper(new OpenAsNewAction(), folderThread),
+	new ActionWrapper(new FilterAction(), folderThread)
       };
 
       commands = new Hashtable();
@@ -1467,6 +1477,27 @@ public class MessageProxy {
 	fw.setBusy(true);;
 	
       openWindowAsNew(true);
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class FilterAction extends AbstractAction {
+    FilterAction() {
+      super("message-filter");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      runBackendFilters();
       
       if (fw != null)
 	fw.setBusy(false);
