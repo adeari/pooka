@@ -6,6 +6,7 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 import java.util.*;
+import java.security.Key;
 
 /**
  * This stores the encyrption information about a particular MessageInfo. 
@@ -192,6 +193,64 @@ public class MessageCryptoInfo {
     }
 
     return mDecryptSuccessful;
+  }
+
+  /**
+   * Tries to decrypt the Message using all available cached keys.
+   */
+  public boolean autoDecrypt(UserProfile defaultProfile) {
+    try {
+      String cryptType = getEncryptionType();
+      
+      /*
+	Key defaultKey = defaultProfile.getPrivateKey(cryptType);
+	if (defaultKey != null) {
+	try {
+	if (decryptMessage(defaultKey, true))
+	return true;
+	} catch (Exception e) {
+	// ignore for now.
+	}
+	}
+      */
+      
+      // why not just try all of the private keys?  at least, all the
+      // ones we have available.
+      //java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys(cryptType);
+      java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys();
+      if (privateKeys != null) {
+	for (int i = 0 ; i < privateKeys.length; i++) {
+	  try {
+	    if (decryptMessage(privateKeys[i], true))
+	      return true;
+	  } catch (Exception e) {
+	    // ignore for now.
+	  }
+	}
+	
+      }
+    } catch (Exception e) {
+
+    }
+    return false;
+  }  
+
+  /**
+   * Checks the signature of the given message as compared to the 
+   * given from address.
+   */
+  public boolean autoCheckSignature(InternetAddress sender) {
+    try {
+      String senderAddress = sender.getAddress();
+      Key[] matchingKeys = Pooka.getCryptoManager().getPublicKeys(senderAddress,getEncryptionType());
+      for (int i = 0 ; i < matchingKeys.length; i++) {
+	if (checkSignature(matchingKeys[i], true)) {
+	  return true;
+	}
+      }
+    } catch (Exception e) {
+    }
+    return false;
   }
 
   /**

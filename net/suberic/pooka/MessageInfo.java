@@ -62,26 +62,14 @@ public class MessageInfo {
       attachments = MailUtilities.parseAttachments(getMessage());
       attachmentsLoaded = true;
       if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && cryptoInfo.isEncrypted()) {
-	try {
-	  java.security.Key key = getDefaultProfile().getEncryptionKey();
-	  if (key != null)
-	    getCryptoInfo().decryptMessage(key, false);
-	} catch (Exception e) {
-	  // if we catch an exception here, that's fine; we can try 
-	  // again later.
+	if (cryptoInfo.autoDecrypt(getDefaultProfile())) {
+	  attachments = MailUtilities.parseAttachments(getMessage());
 	}
       }
-
+      
       if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") && cryptoInfo.isSigned()) {
-	try {
-	  // FIXME
-	  String fromAddress = ((javax.mail.internet.InternetAddress[])getMessage().getFrom())[0].getAddress();
-	  java.security.Key[] key = Pooka.getCryptoManager().getPublicKeys(fromAddress);
-	  if (key != null)
-	    cryptoInfo.checkSignature(key[0], false);
-	} catch (Exception e) {
-	  // if we catch an exception here, that's fine; we can try 
-	  // again later.
+	if (cryptoInfo.autoCheckSignature((javax.mail.internet.InternetAddress) getMessage().getFrom()[0])) {
+	  attachments = MailUtilities.parseAttachments(getMessage());
 	}
       }
 

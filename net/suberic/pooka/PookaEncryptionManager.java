@@ -29,11 +29,11 @@ public class PookaEncryptionManager {
 
   char[] keyMgrPasswd = null;
 
-  Map addressToPrivateKeyMap = null;
-  
-  Map addressToPublicKeyMap = null;
-
   Map aliasPasswordMap = new HashMap();
+
+  Map cachedPrivateKeys = new HashMap();
+
+  Map cachedPublicKeys = new HashMap();
 
   boolean savePasswordsForSession = false;
 
@@ -118,39 +118,24 @@ public class PookaEncryptionManager {
    * Returns the private key(s) for the given email address.
    */
   public Key[] getPrivateKeys(String address) {
+    return getPrivateKeys(address, null);
+  }
+
+  /**
+   * Returns the private key(s) for the given email address and 
+   * the given encryption type, or all matching keys if type == null.
+   */
+  public Key[] getPrivateKeys(String address, String type) {
     return null;
   }
 
   /**
-   * Returns all available private keys.
+   * Returns all private keys that have been cached.
    */
-  /*
-  public Key[] getPrivateKeys() {
-    Key[] returnValue = new Key[0];
-    if (pgpKeyMgr != null) {
-      Key[] pgpKeys = pgpKeyMgr.getPrivateKeys();
-      if (pgpKeys != null && pgpKeys.length > 0)
-	returnValue = pgpKeys;
-    }
-
-    if (smimeKeyMgr != null) {
-      Key[] smimeKeys = smimeKeyMgr.getPrivateKeys();
-      if (smimeKeys != null && smimeKeys.length > 0) {
-	if (returnValue.length > 0) {
-	  Key[] newReturnValue = new Key[returnValue.length + smimeKeys.length];
-	  System.arraycopy(returnValue, 0, newReturnValue, 0, returnValue.length);
-	  System.arraycopy(smimeKeys, 0, newReturnValue, returnValue.length, smimeKeys.length);
-	  returnValue = newReturnValue;
-	} else {
-	  returnValue = smimeKeys;
-	}
-      }
-    }
-    
-    return returnValue;
+  public Key[] getCachedPrivateKeys() {
+    return (Key[]) cachedPrivateKeys.entrySet().toArray(new Key[0]);
   }
-  */
-
+  
   /**
    * Returns all available private key aliases.
    */
@@ -198,14 +183,22 @@ public class PookaEncryptionManager {
    * Returns the Private key for the given alias.
    */
   public Key getPrivateKey(String alias) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+    // first check to see if this is in the cache.
+    Key cachedKey = (Key) cachedPrivateKeys.get(alias);
+    if (cachedKey != null)
+      return cachedKey;
+
     if (pgpKeyMgr != null || smimeKeyMgr != null) {
       char[] password = getPasswordForAlias(alias, false);
 
       // check to see if this exists anywhere.
       if (pgpKeyMgr != null) {
 	try {
-	  if (pgpKeyMgr.containsPrivateKeyAlias(alias))
-	    return pgpKeyMgr.getPrivateKey(alias,password);
+	  if (pgpKeyMgr.containsPrivateKeyAlias(alias)) {
+	    Key returnValue = pgpKeyMgr.getPrivateKey(alias,password);
+	    cachedPrivateKeys.put(alias, returnValue);
+	    return returnValue;
+	  }
 	} catch (KeyStoreException kse) {
 	  // FIXME ignore for now?
 	}
@@ -214,8 +207,11 @@ public class PookaEncryptionManager {
       
       if (smimeKeyMgr!= null) {
 	try {
-	  if (smimeKeyMgr.containsPrivateKeyAlias(alias))
-	    return smimeKeyMgr.getPrivateKey(alias, password);
+	  if (smimeKeyMgr.containsPrivateKeyAlias(alias)) {
+	    Key returnValue = smimeKeyMgr.getPrivateKey(alias, password);
+	    cachedPrivateKeys.put(alias, returnValue);
+	    return returnValue;
+	  }
 	} catch (KeyStoreException kse) {
 	  // FIXME ignore for now?
 	}
@@ -230,6 +226,11 @@ public class PookaEncryptionManager {
    * Returns the Private key for the given alias.
    */
   public Key getPrivateKey(String alias, char[] password) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+
+    // first check to see if this is in the cache.
+    Key cachedKey = (Key) cachedPrivateKeys.get(alias);
+    if (cachedKey != null)
+      return cachedKey;
 
     Key returnValue = null;
     if (pgpKeyMgr != null) {
@@ -246,6 +247,10 @@ public class PookaEncryptionManager {
       } catch (KeyStoreException kse) {
 	// FIXME ignore for now?
       }
+    }
+
+    if (returnValue != null) {
+      cachedPrivateKeys.put(alias, returnValue);
     }
 
     return returnValue;
@@ -296,6 +301,14 @@ public class PookaEncryptionManager {
    * Returns the public key(s) for the given email address.
    */
   public Key[] getPublicKeys(String address) {
+    return getPublicKeys(address, null);
+  }
+
+  /**
+   * Returns the public key(s) for the given email address that match
+   * the given encryption type, or all matching keys if type == null.
+   */
+  public Key[] getPublicKeys(String address, String type) {
     return null;
   }
 
