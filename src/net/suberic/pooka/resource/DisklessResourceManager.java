@@ -40,7 +40,11 @@ public class DisklessResourceManager extends ResourceManager {
    */
   public static void exportResources(File pOutputFile, boolean pIncludePasswords) throws IOException {
     VariableBundle sourceBundle = Pooka.getResources();
-    Properties newWritableProperties = new Properties(sourceBundle.getWritableProperties());
+    System.err.println("testing save..");
+    sourceBundle.saveProperties(new File("/home/allen/testOut"));
+
+    //Properties newWritableProperties = new Properties(sourceBundle.getWritableProperties());
+    Properties newWritableProperties = new Properties(sourceBundle.getProperties());
     
     // first go through and edit out the inappropriate stores.
     
@@ -60,9 +64,15 @@ public class DisklessResourceManager extends ResourceManager {
       }
     }
 
-    Enumeration names = newWritableProperties.propertyNames();
+    //Enumeration names = newWritableProperties.propertyNames();
+    //Enumeration names = sourceBundle.getWritableProperties().propertyNames();
+    Enumeration names = sourceBundle.getProperties().propertyNames();
+
     while (names.hasMoreElements()) {
       String current = (String) names.nextElement();
+      
+      System.err.println("current=" + current);
+
       boolean keep = true;
       if (current.startsWith("Store")) {
 	if ((! pIncludePasswords) && current.endsWith("password")) {
@@ -78,6 +88,7 @@ public class DisklessResourceManager extends ResourceManager {
 
       if (keep) {
 	newWritableProperties.setProperty(current, sourceBundle.getProperty(current));
+      System.err.println("setting current=" + current + ", value="+ sourceBundle.getProperty(current));
       }
 
     }

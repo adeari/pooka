@@ -897,6 +897,25 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
   }
 
+  /**
+   * Shows the current status for this store and its thread.
+   */
+  public void showStatus() {
+    System.out.println("Status for store " + getStoreID());
+    System.out.println("Connected:  " + isConnected());
+    if (store != null) {
+      System.out.println("store.isConnected():  " + store.isConnected());
+    } else {
+      System.out.println("No store object.");
+    }
+    if (storeThread != null) {
+      System.out.println("Current Action:  " + storeThread.getCurrentActionName());
+      System.out.println("Action Queue Size:  " + storeThread.getQueueSize());
+    } else {
+      System.out.println("No Action Thread.");
+    }
+  }
+
   // Accessor methods.
   
   public Store getStore() {

@@ -11,10 +11,6 @@ import java.util.Vector;
  */
 public class ActionThread extends Thread {
 
-  boolean stopMe = false;
-
-  Object runLock = new Object();
-
   // indicates high priority
   public static int PRIORITY_HIGH = 10;
 
@@ -23,6 +19,12 @@ public class ActionThread extends Thread {
 
   // indicates low priority
   public static int PRIORITY_LOW = 0;
+
+  boolean stopMe = false;
+
+  Object runLock = new Object();
+
+  String mCurrentActionName = "";
 
   /**
    * Creates an ActionThread with the given threadName.
@@ -69,6 +71,7 @@ public class ActionThread extends Thread {
       while (pair != null) {
 	try {
 	  synchronized(runLock) {
+	    
 	    pair.action.actionPerformed(pair.event);
 	  }
 	} catch (Exception e) {

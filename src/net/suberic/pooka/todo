@@ -19,6 +19,8 @@
 	*) usage
 	   - need some plan for http access such that we can write a
 	     proper usage file.  something like 'export for http use'?
+	       started.  need to change it to use a VariableBundle, so that
+	       we save the right file.
 	
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
@@ -33,6 +35,8 @@ say, like reacting to a mailto: link.
 
 *) support jdk 1.5
    *) add support for ocean theme 
+
+*) add a way to tell what a store's current thread is up to.
 
 -----
 

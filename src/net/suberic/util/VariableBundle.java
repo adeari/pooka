@@ -232,7 +232,7 @@ public class VariableBundle extends Object {
    * that this only saves the writableProperties of this particular
    * VariableBundle--underlying defaults are not written.
    */
-  public void saveProperties(File saveFile) {
+  public void saveProperties(File pSaveFile) {
     if (writableProperties.size() > 0) { 
       File outputFile;
       String currentLine, key;

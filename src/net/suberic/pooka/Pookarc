@@ -129,7 +129,7 @@ Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png
 
 MenuBar=File:Edit:Mail:Encryption:Config:Window:Help
 
-MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
+MenuBar.File=NewFolder:NewMail:Open:Close:Export:SaveAs:Print:EmptyTrash:Exit
 
 MenuBar.File.NewFolder.Action=folder-new
 #MenuBar.File.NewFolder.Image=/org/javalobby/icons/20x20png/NewFolder.png
@@ -138,6 +138,7 @@ MenuBar.File.Open.Action=file-open
 #MenuBar.File.Open.Image=/org/javalobby/icons/20x20png/OpenArrow.png
 MenuBar.File.Close.Action=file-close
 #MenuBar.File.Close.Image=/org/javalobby/icons/20x20png/Delete.png
+MenuBar.File.Export.Action=cfg-export
 MenuBar.File.SaveAs.Action=file-save-as
 #MenuBar.File.SaveAs.Image=/org/javalobby/icons/20x20png/Save.png
 MenuBar.File.Print.Action=file-print
