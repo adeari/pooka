@@ -29,6 +29,7 @@ error:  filterfoldercellrenderer has problems with search forms.
 *) searches don't show a busy icon, or give any other notification that
 they're running.
 
+*) fix the sorting of the subject (and from) fields.
 ---------------
 
 old
