@@ -55,9 +55,18 @@ public class NewAccountPooka {
 	propertyVector.add("NewAccountPooka.type");
 
 	JInternalFrame firstEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.entryWindowMessage.title", "Enter Email Account Information"), false, false, false, false);
-	firstEntryWindow.getContentPane().setLayout(new BoxLayout(firstEntryWindow.getContentPane(), BoxLayout.Y_AXIS));
-	firstEntryWindow.getContentPane().add(new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client.")));
-	firstEntryWindow.getContentPane().add(new PropertyEditorPane(factory, propertyVector, firstEntryWindow));
+        JComponent contentPane = 
+          (JComponent) firstEntryWindow.getContentPane();
+        contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
+        // is there a way to make this wrap automatically, without adding
+        // explicit newlines?
+	contentPane.add(new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client.")));
+
+	contentPane.add(new PropertyEditorPane(factory,
+                                               propertyVector,
+                                               firstEntryWindow));
+
 	firstEntryWindow.pack();
 	firstEntryWindow.show();
 	firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -90,6 +99,10 @@ public class NewAccountPooka {
 	    String labelValue = Pooka.getProperty(property+".label", "");
 	    if (!(labelValue.equals("")))
 		vb.setProperty(property + ".label", labelValue);
+	    String propertyTypeValue =
+              Pooka.getProperty(property + ".propertyType", "");
+	    if (!(propertyTypeValue.equals("")))
+		vb.setProperty(property + ".propertyType", propertyTypeValue);
 	}
 	return vb;
     }
