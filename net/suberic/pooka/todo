@@ -3,9 +3,6 @@
 *) make there a build option for help only, so i can switch it in 
 	WebStart.
 
-*) make sure that if we lose the server connection while loading/caching the
-message, that we don't actually cache the partially-loaded message.
-
 *) regexp? (add search/replace to editor)
   -- started.  todo:
 	*) add feature to NewMessage

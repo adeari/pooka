@@ -686,9 +686,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mi);
 	    try {
 	      if (autoCache) {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.CONTENT);
+		getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.MESSAGE, false);
 	      } else {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+		getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
 	      }
 	    } catch (MessagingException me) {
 	      System.out.println("caught exception:  " + me);
@@ -717,9 +717,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    uidToInfoTable.put(new Long(uid), mi);
 	    try {
 	      if (autoCache) {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.CONTENT);
+		getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.MESSAGE, false);
 	      } else {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+		getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
 	      }
 	    } catch (MessagingException me) {
 	      System.out.println("caught exception:  " + me);
@@ -728,6 +728,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  }
 	}
       }
+
+      getCache().writeMsgFile();
+
       addedProxies.removeAll(applyFilters(addedProxies));
       if (addedProxies.size() > 0) {
 	if (getFolderTableModel() != null) 
@@ -925,65 +928,65 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
     }
 
-    /**
-     * This attempts to cache the message represented by this MessageInfo.
-     */
-    public void cacheMessage (MessageInfo info, int cacheStatus) throws MessagingException {
-	if (status == CONNECTED) {
-	    Message m = info.getMessage();
-	    if (m instanceof CachingMimeMessage) {
-		long uid = ((CachingMimeMessage)m).getUID();
-		MimeMessage realMessage = getRealMessageById(uid);
-		getCache().cacheMessage(realMessage, uid, uidValidity, cacheStatus);
-	    } else if (m instanceof MimeMessage) {
-		long uid = getUID(m);
-		getCache().cacheMessage((MimeMessage)m, uid, uidValidity, cacheStatus);
-	    } else {
-		throw new MessagingException(Pooka.getProperty("error.CachingFolderInfo.unknownMessageType", "Error:  unknownMessageType."));
-	    }
-	} else { 
-	    throw new MessagingException(Pooka.getProperty("error.CachingFolderInfo.cacheWhileDisconnected", "Error:  You cannot cache messages unless you\nare connected to the folder."));
-	}
+  /**
+   * This attempts to cache the message represented by this MessageInfo.
+   */
+  public void cacheMessage (MessageInfo info, int cacheStatus) throws MessagingException {
+    if (status == CONNECTED) {
+      Message m = info.getMessage();
+      if (m instanceof CachingMimeMessage) {
+	long uid = ((CachingMimeMessage)m).getUID();
+	MimeMessage realMessage = getRealMessageById(uid);
+	getCache().cacheMessage(realMessage, uid, uidValidity, cacheStatus);
+      } else if (m instanceof MimeMessage) {
+	long uid = getUID(m);
+	getCache().cacheMessage((MimeMessage)m, uid, uidValidity, cacheStatus);
+      } else {
+	throw new MessagingException(Pooka.getProperty("error.CachingFolderInfo.unknownMessageType", "Error:  unknownMessageType."));
+      }
+    } else { 
+      throw new MessagingException(Pooka.getProperty("error.CachingFolderInfo.cacheWhileDisconnected", "Error:  You cannot cache messages unless you\nare connected to the folder."));
     }
-
-
-    /**
-     * This updates the children of the current folder.  Generally called
-     * when the folderList property is changed.
-     */
+  }
+  
+  
+  /**
+   * This updates the children of the current folder.  Generally called
+   * when the folderList property is changed.
+   */
+  
+  public void updateChildren() {
+    Vector newChildren = new Vector();
     
-    public void updateChildren() {
-	Vector newChildren = new Vector();
-
-	String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
-	if (childList != "") {
-	    StringTokenizer tokens = new StringTokenizer(childList, ":");
-	    
-	    String newFolderName;
-	
-	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-		newFolderName = (String)tokens.nextToken();
-		FolderInfo childFolder = getChild(newFolderName);
-		if (childFolder == null) {
-		    if (! Pooka.getProperty(getFolderProperty() + "." + newFolderName + ".cacheMessages", "true").equalsIgnoreCase("false"))
-			childFolder = new CachingFolderInfo(this, newFolderName);
-		    else if (Pooka.getProperty(getParentStore().getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
-			childFolder = new UIDFolderInfo(this, newFolderName);
-		    } else
-			childFolder = new FolderInfo(this, newFolderName);
-		    
-		    newChildren.add(childFolder);
-		} else {
-		    newChildren.add(childFolder);
-		}
-	    }
-       
-	    children = newChildren;
-	    
-	    if (folderNode != null) 
-		folderNode.loadChildren();
+    String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
+    if (childList != "") {
+      StringTokenizer tokens = new StringTokenizer(childList, ":");
+      
+      String newFolderName;
+      
+      for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+	newFolderName = (String)tokens.nextToken();
+	FolderInfo childFolder = getChild(newFolderName);
+	if (childFolder == null) {
+	  if (! Pooka.getProperty(getFolderProperty() + "." + newFolderName + ".cacheMessages", "true").equalsIgnoreCase("false"))
+	    childFolder = new CachingFolderInfo(this, newFolderName);
+	  else if (Pooka.getProperty(getParentStore().getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
+	    childFolder = new UIDFolderInfo(this, newFolderName);
+	  } else
+	    childFolder = new FolderInfo(this, newFolderName);
+	  
+	  newChildren.add(childFolder);
+	} else {
+	  newChildren.add(childFolder);
 	}
+      }
+      
+      children = newChildren;
+      
+      if (folderNode != null) 
+	folderNode.loadChildren();
     }
+  }
     
   /**
    * This method closes the Folder.  If you open the Folder using 

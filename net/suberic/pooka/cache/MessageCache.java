@@ -63,6 +63,16 @@ public interface MessageCache {
     public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status) throws MessagingException;
 
     /**
+     * Adds a message to the cache.  Note that status is only used to
+     * determine whether or not the entire message is cached, or just
+     * the headers and flags.
+     *
+     * This does not affect the server, nor does it affect message
+     * count on the client.
+     */
+    public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status, boolean writeMsgFile) throws MessagingException;
+
+    /**
      * Removes a message from the cache only.  This has no effect on the
      * server.
      */
@@ -153,11 +163,15 @@ public interface MessageCache {
      */
     public boolean isFullyCached(long uid);
 
-    /**
-     * Searches all of the cached messages and returns those which match
-     * the given SearchTerm.
-     */
-    public MessageInfo[] search(javax.mail.search.SearchTerm term) throws
+  /**
+   * Searches all of the cached messages and returns those which match
+   * the given SearchTerm.
+   */
+  public MessageInfo[] search(javax.mail.search.SearchTerm term) throws
     javax.mail.MessagingException;
 
+  /**
+   * Writes the list of cached messages.
+   */
+  public void writeMsgFile();
 }

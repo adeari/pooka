@@ -1042,7 +1042,7 @@ FolderFilters.display.FontFilter.editorClass=net.suberic.pooka.gui.filter.FontFi
 CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
 CachingFolderInfo.sentFolderDefaultDisplayFilters=Uncached
 FolderInfo.defaultDisplayFilters=Unread
-FolderInfo.sentFolderDefaultDisplayFilters=Unread
+FolderInfo.sentFolderDefaultDisplayFilters=
 
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.operation=Search.operations.False

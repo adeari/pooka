@@ -1,3 +1,8 @@
+optimized the caching system somewhat so that we're not writing files over
+and over agian to the filesystem.  this may also fix a problem where a
+message could be cached as blank if the connection to the store broke at
+just the right time.
+
 attachment file choosers now remember your last directory, instead of always
 starting in your home directory.
 
