@@ -16,9 +16,7 @@ public class PookaTrustManager implements X509TrustManager {
    * Creates a new TrustManager that wraps the given manager.
    */
   public PookaTrustManager(TrustManager[] newWrappedManagers) {
-    System.err.println("nwm.length = " + newWrappedManagers.length);
     for (int i = 0; i < newWrappedManagers.length; i++) {
-      System.out.println("nwm[" + i + "] = " + newWrappedManagers[i]);
       if (newWrappedManagers[i] instanceof X509TrustManager)
 	wrappedManager = (X509TrustManager) newWrappedManagers[i];
     }
@@ -71,7 +69,6 @@ public class PookaTrustManager implements X509TrustManager {
    * (default untrusted) certificate.
    */
   public boolean askIsTrusted(X509Certificate[] cert) {
-    System.err.println("asking if we're trusted.");
     return true;
   }
 }
