@@ -155,7 +155,6 @@ public class StoreInfo implements ValueChangeListener {
 		else if (Pooka.getProperty(getStoreProperty() + "." + newFolderName + ".cacheMessages", "false").equalsIgnoreCase("true"))
 		    childFolder = new net.suberic.pooka.cache.CachingFolderInfo(this, newFolderName);
 		else if (Pooka.getProperty(getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
-		    System.out.println("making a new UIDFolder.");
 		    childFolder = new UIDFolderInfo(this, newFolderName);
 		} else
 		    childFolder = new FolderInfo(this, newFolderName);
