@@ -50,14 +50,14 @@ public class MessagePrinter implements Printable {
     java.awt.Dimension minSize = jtp.getMinimumSize();
 
     double newWidth = Math.max(minSize.getWidth(), pageWidth);
-    
+
     java.awt.Dimension newSize = new java.awt.Dimension();
     newSize.setSize(newWidth, jtp.getSize().getHeight());
     jtp.setSize(newSize);
-    
-    if (jtp.getSize().getHeight() < jtp.getMinimumSize().getHeight()) {
+
+    if (jtp.getSize().getHeight() < jtp.getPreferredSize().getHeight()) {
       java.awt.Dimension finalSize = new java.awt.Dimension();
-      finalSize.setSize(jtp.getSize().getWidth(), jtp.getMinimumSize().getHeight());
+      finalSize.setSize(jtp.getSize().getWidth(), jtp.getPreferredSize().getHeight());
       jtp.setSize(finalSize);
     }
 
@@ -69,9 +69,9 @@ public class MessagePrinter implements Printable {
     jtp.setVisible(true);
 
     // don't scale below 1.
-    //mScale = Math.min(1,pageWidth/panelWidth);
+    mScale = Math.min(1,pageWidth/panelWidth);
 
-    mScale = 1;
+    //mScale = 1;
     
     int counter = 0;
 
@@ -100,6 +100,8 @@ public class MessagePrinter implements Printable {
     double scaledPageHeight = pageHeight/mScale;
 
     jtp.validate();
+    jtp.addNotify();
+
     View view = jtp.getUI().getRootView(jtp);
 
     double pageWidth = jtp.getSize().getWidth();
@@ -113,10 +115,6 @@ public class MessagePrinter implements Printable {
       Rectangle currentPage = new Rectangle();
       currentPage.setRect(0d, pageStart, pageWidth, scaledPageHeight);
 
-      System.err.println("page = " + breakList.size());
-      System.err.println("allocation = " + allocation);
-      System.err.println("currentPage = " + currentPage);
-      System.err.println("view.getAllocation().getBounds() = " + view.getChildAllocation(0, allocation).getBounds());
       pageExists = calculatePageBreak(view, allocation, currentPage);
 
       if (pageExists) {
@@ -156,22 +154,12 @@ public class MessagePrinter implements Printable {
 	    (allocation.intersects(currentPage))) {
         } else {
           if (allocation.getBounds().getY() >= currentPage.getY() && allocation.getBounds().getY() < pageEnd) {
-	    /*
-	    System.err.println("pageEnd = " + pageEnd + "; allocation.getBounds() = " + allocation.getBounds() + ", allocation.getMaxY() = " + allocation.getBounds().getMaxY() + ", allocation.getMaxX() = " + allocation.getBounds().getMaxX());
-	    if (view instanceof GlyphView) {
-	      GlyphView glView = (GlyphView) view;
-	      int begin = glView.viewToModel((float) (allocation.getBounds().getX()), (float) (allocation.getBounds().getY()), allocation.getBounds());
-	      int end = glView.viewToModel((float) (allocation.getBounds().getX() + allocation.getBounds().getWidth()), (float) (allocation.getBounds().getY() + allocation.getBounds().getHeight()), allocation.getBounds());
-	      System.err.println("view.getText(" + begin + ", " + end + ") = " + glView.getText(begin, end).toString());
-	    }
-	    */
 
             if (allocation.getBounds().getMaxY() <= pageEnd) {
 	      // don't bother--we're fine.
             } else {
               if (allocation.getBounds().getY() < pageEnd) {
                 pageEnd = allocation.getBounds().getY();
-		//System.err.println("changing pageEnd from " + pageEnd + " to " + allocation.getBounds().getY());
               }
             }
           }	  
