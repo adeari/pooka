@@ -329,9 +329,9 @@ public class FolderFileWrapper extends File {
 
 	    if (children != null)
 		return children;
-	}
+	} 
 
-	return null;
+	return new FolderFileWrapper[0];
     }
 
     public File[] listFiles(FileFilter filter) {

@@ -193,8 +193,14 @@ public class MailFileSystemView
 
 		File f = ((FolderFileWrapper)getDefaultRoot()).getFileByName(dir.getAbsolutePath());
 		
-		if (f == null) return null; // FIXME: error?
-		
+		if (f == null) {
+		    if (Pooka.isDebug())
+			System.out.println("getFiles:  tried returning the root, but got null.  returning the root itself instead.");
+		    return new FolderFileWrapper[0];
+		}
+
+		if (Pooka.isDebug())
+		    System.out.println("getFiles:  returning " + f + ".listFiles() for getFiles()");
 		return f.listFiles();
 	}
     }
