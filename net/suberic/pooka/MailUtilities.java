@@ -145,87 +145,101 @@ public class MailUtilities {
     for (int i = 0; i < mp.getCount(); i++) {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
       
-      String encryptionType = EncryptionManager.checkEncryptionType(mbp);
-      EncryptionUtils utils = null;
-      if (encryptionType != null) {
-	try {
-	  utils = EncryptionManager.getEncryptionUtils(encryptionType);
-	} catch (java.security.NoSuchProviderException nspe) {
-	}
-      }
-      
-      if (utils != null) {
-      
-	int encryptionStatus = utils.getEncryptionStatus(mbp);
-	if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
-	  Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
-	
-	  bundle.addAttachment(newAttach);
-	} else if (encryptionStatus == EncryptionUtils.SIGNED) {
-	  // in the case of signed attachments, we should get the wrapped body.
-	  
-	  Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
-	  MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
-	  
-	  if (signedMbp != null) {
-	    String signedContentType = signedMbp.getContentType().toLowerCase();
-	    if (signedContentType.startsWith("multipart")) {
-	      bundle.addAll(parseAttachments((Multipart)signedMbp.getContent()));
-	    } else if (signedContentType.startsWith("message")) {
-	      bundle.addAttachment(new Attachment(signedMbp));
-	      Object msgContent;
-	      msgContent = signedMbp.getContent();
-	    
-	      if (msgContent instanceof Message)
-		bundle.addAll(parseAttachments((Message)msgContent));
-	      else if (msgContent instanceof java.io.InputStream)
-		bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
-	      else
-		System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
-	      
-	    } else {
-	      bundle.addAttachment(new Attachment(signedMbp));
-	    }
-	  }
-
-	  bundle.addAttachment(newAttach);
-
-	} else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
-	  bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mbp));
-	} else {
-	  // FIXME
-	  bundle.addAttachment(new Attachment(mbp));
-	}
-      
-      } else {
-	ContentType ct = new ContentType(mbp.getContentType());
-	if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-	  if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	    parseAlternativeAttachment(bundle, mbp);
-	  } else if (mbp.getContent() instanceof Multipart) {
-	    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
-	  } else {
-	    Attachment attachment = new Attachment(mbp);
-	    bundle.addAttachment(attachment);
-	  }
-	} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-	  bundle.addAttachment(new Attachment(mbp));
-	  Object msgContent;
-	  msgContent = mbp.getContent();
-	  
-	  if (msgContent instanceof Message)
-	    bundle.addAll(parseAttachments((Message)msgContent));
-	  else if (msgContent instanceof java.io.InputStream)
-	    bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
-	  else
-	    System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
-	  
-	} else {
-	  bundle.addAttachment(new Attachment(mbp), ct);
-	}
-      }
+      handleBodyPart(mbp, bundle);
     }
     return bundle;
+  }
+
+  /**
+   * Handles a MimeBodyPart.
+   */
+  static void handleBodyPart(MimeBodyPart mbp, AttachmentBundle bundle) {
+    
+    System.err.println("mbp.getContentType() = " + mbp.getContentType());
+    
+    String encryptionType = EncryptionManager.checkEncryptionType(mbp);
+    System.err.println("encryptionType = " + encryptionType);
+    
+    EncryptionUtils utils = null;
+    if (encryptionType != null) {
+      try {
+	utils = EncryptionManager.getEncryptionUtils(encryptionType);
+      } catch (java.security.NoSuchProviderException nspe) {
+      }
+    }
+    
+    if (utils != null) {
+      
+      int encryptionStatus = utils.getEncryptionStatus(mbp);
+      System.err.println("encryptionStatus = " + encryptionStatus);
+      if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
+	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
+	
+	bundle.addAttachment(newAttach);
+      } else if (encryptionStatus == EncryptionUtils.SIGNED) {
+	// in the case of signed attachments, we should get the wrapped body.
+	
+	System.err.println("creating new signed attachment from mbp.");
+	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
+	MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
+	
+	if (signedMbp != null) {
+	  String signedContentType = signedMbp.getContentType().toLowerCase();
+	  if (signedContentType.startsWith("multipart")) {
+	    bundle.addAll(parseAttachments((Multipart)signedMbp.getContent()));
+	  } else if (signedContentType.startsWith("message")) {
+	    bundle.addAttachment(new Attachment(signedMbp));
+	    Object msgContent;
+	    msgContent = signedMbp.getContent();
+	    
+	    if (msgContent instanceof Message)
+	      bundle.addAll(parseAttachments((Message)msgContent));
+	    else if (msgContent instanceof java.io.InputStream)
+	      bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
+	    else
+	      System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+	    
+	  } else {
+	    bundle.addAttachment(new Attachment(signedMbp));
+	  }
+	}
+	
+	bundle.addAttachment(newAttach);
+	
+      } else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
+	bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mbp));
+      } else {
+	// FIXME
+	bundle.addAttachment(new Attachment(mbp));
+      }
+      
+    } else {
+      ContentType ct = new ContentType(mbp.getContentType());
+      if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
+	if (ct.getSubType().equalsIgnoreCase("alternative")) {
+	  parseAlternativeAttachment(bundle, mbp);
+	} else if (mbp.getContent() instanceof Multipart) {
+	  bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
+	} else {
+	  Attachment attachment = new Attachment(mbp);
+	  bundle.addAttachment(attachment);
+	}
+      } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+	bundle.addAttachment(new Attachment(mbp));
+	Object msgContent;
+	msgContent = mbp.getContent();
+	
+	if (msgContent instanceof Message)
+	  bundle.addAll(parseAttachments((Message)msgContent));
+	else if (msgContent instanceof java.io.InputStream)
+	  bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
+	else
+	  System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+	
+      } else {
+	bundle.addAttachment(new Attachment(mbp), ct);
+      }
+    }
   }
 
   /**
@@ -349,47 +363,47 @@ public class MailUtilities {
     return -1;
   }
 
-    /**
-     * A convenience method which wraps the given string using the
-     * length specified by Pooka.lineLength.
-     */
-    public static String wrapText(String originalText) {
-	int wrapLength;
-	int tabSize;
-	try {
-	    String wrapLengthString = Pooka.getProperty("Pooka.lineLength");
-	    wrapLength = Integer.parseInt(wrapLengthString);
-	} catch (Exception e) {
-	    wrapLength = 72;
-	}
-
-	try {
-	    String tabSizeString = Pooka.getProperty("Pooka.tabSize", "8");
-	    tabSize = Integer.parseInt(tabSizeString);
-	} catch (Exception e) {
-	    tabSize = 8;
-	}
-	return wrapText(originalText, wrapLength, '\n', tabSize);
+  /**
+   * A convenience method which wraps the given string using the
+   * length specified by Pooka.lineLength.
+   */
+  public static String wrapText(String originalText) {
+    int wrapLength;
+    int tabSize;
+    try {
+      String wrapLengthString = Pooka.getProperty("Pooka.lineLength");
+      wrapLength = Integer.parseInt(wrapLengthString);
+    } catch (Exception e) {
+      wrapLength = 72;
     }
-
-    /**
-     * Escapes html special characters.
-     */
-    public static String escapeHtml(String input) {
-	char[] characters = input.toCharArray();
-	StringBuffer retVal = new StringBuffer();
-	for (int i = 0; i < characters.length; i++) {
-	    if (characters[i] == '&')
-		retVal.append("&amp;");
-	    else if (characters[i] == '<')
-		retVal.append("&lt;");
-	    else if (characters[i] == '>')
-		retVal.append("&gt;");
-	    else
-		retVal.append(characters[i]);
-	}
-	return retVal.toString();
+    
+    try {
+      String tabSizeString = Pooka.getProperty("Pooka.tabSize", "8");
+      tabSize = Integer.parseInt(tabSizeString);
+    } catch (Exception e) {
+      tabSize = 8;
     }
+    return wrapText(originalText, wrapLength, '\n', tabSize);
+  }
+  
+  /**
+   * Escapes html special characters.
+   */
+  public static String escapeHtml(String input) {
+    char[] characters = input.toCharArray();
+    StringBuffer retVal = new StringBuffer();
+    for (int i = 0; i < characters.length; i++) {
+      if (characters[i] == '&')
+	retVal.append("&amp;");
+      else if (characters[i] == '<')
+	retVal.append("&lt;");
+      else if (characters[i] == '>')
+	retVal.append("&gt;");
+      else
+	retVal.append(characters[i]);
+    }
+    return retVal.toString();
+  }
 }
 
 

@@ -23,17 +23,9 @@ public class SignedAttachment extends Attachment {
    */
   public SignedAttachment(MimeBodyPart mbp) throws MessagingException {
     super(mbp);
+    System.err.println("signed attachment created.");
   }
   
-  /**
-   * Returns if the signature matches.
-   */
-  public boolean checkSignature() 
-    throws MessagingException, java.io.IOException {
-
-    return false;
-  }
-
   /**
    * Creates a SignedAttachment out of a MimeMessage.  This is typically
    * used when the content of a Message is too large to display, and
@@ -42,6 +34,21 @@ public class SignedAttachment extends Attachment {
    */
   public SignedAttachment(MimeMessage msg) throws MessagingException {
     super(msg);
+    System.err.println("signed attachment created.");
+  }
+
+  /**
+   * Returns if the signature matches.
+   */
+  public boolean checkSignature(EncryptionUtils utils, Key key) 
+    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+
+    Object content = getDataHandler().getContent();
+    if (content instanceof MimeMultipart) {
+      return utils.checkSignature((MimeMultipart) content, key);
+    } else {
+      return false;
+    }
   }
 
   /**

@@ -15,6 +15,7 @@
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
   *) fix threading on encryption actions.
+     *) !!! we're parsing each message on load now. !!!
   *) add keybindings for encryption/decryption.
   *) fix smime signature test (???)
 

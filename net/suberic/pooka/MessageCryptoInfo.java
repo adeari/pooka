@@ -86,22 +86,42 @@ public class MessageCryptoInfo {
    * Returns whether or not this message is signed.
    */
   public boolean isSigned() throws MessagingException {
+    /*
     EncryptionUtils utils = getEncryptionUtils();
     if (utils != null) {
       return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.SIGNED);
     } else
       return false;
+    */
+    List attachments = mMsgInfo.getAttachments();
+    for (int i = 0 ; i < attachments.size(); i++) {
+      if (attachments.get(i) instanceof SignedAttachment) {
+	System.err.println("message is signed.");
+	return true;
+      }
+    }
+
+    return false;
   }
 
   /**
    * Returns whether or not this message is encrypted.
    */
   public boolean isEncrypted() throws MessagingException {
+    /*
     EncryptionUtils utils = getEncryptionUtils();
     if (utils != null) {
       return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
     } else
       return false;
+    */
+    List attachments = mMsgInfo.getAttachments();
+    for (int i = 0 ; i < attachments.size(); i++) {
+      if (attachments.get(i) instanceof CryptoAttachment) {
+	return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -144,7 +164,15 @@ public class MessageCryptoInfo {
   public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     if (recheck || ! hasCheckedSignature()) {
       EncryptionUtils cryptoUtils = getEncryptionUtils();
-      mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)mMsgInfo.getMessage(), key);
+      //mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)mMsgInfo.getMessage(), key);
+      List attachments = mMsgInfo.getAttachments();
+      boolean returnValue = false;
+      for (int i = 0; i < attachments.size(); i++) {
+	Attachment current = (Attachment) attachments.get(i);
+	if (current instanceof SignedAttachment) {
+	  mSignatureValid = ((SignedAttachment) current).checkSignature(cryptoUtils, key);
+	}
+      }
       mCheckedSignature = true;
     }
 
