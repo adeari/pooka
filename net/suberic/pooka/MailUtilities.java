@@ -81,7 +81,14 @@ public class MailUtilities {
 		} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
 		    bundle.nonTextAttachments.add(mbp);
 		    bundle.allAttachments.add(mbp);
-		    bundle.addAll(parseAttachments((Message)mbp.getContent(), showFullHeaders, true));
+		    Object msgContent = mbp.getContent();
+		    if (msgContent instanceof Message)
+			bundle.addAll(parseAttachments((Message)msgContent, showFullHeaders, true));
+		    else if (msgContent instanceof java.io.InputStream)
+			bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent), showFullHeaders, true));
+		    else
+			System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+
 		} else {
 		    bundle.nonTextAttachments.add(mbp);
 		    bundle.allAttachments.add(mbp);
