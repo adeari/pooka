@@ -74,10 +74,9 @@ Pooka.defaultSigGenerator=net.suberic.pooka.FileSignatureGenerator
 Pooka.autoExpunge=true
 Pooka.autoExpunge.propertyType=Boolean
 
-MenuBar=File:Edit:Mail:Window:Help
+MenuBar=File:Edit:Mail:Config:Window:Help
 
 MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
-#MenuBar.File=NewMail:OpenFolder:OpenMessage:Close:Exit
 
 MenuBar.File.NewFolder.Action=folder-new
 MenuBar.File.NewFolder.Image=/net/suberic/pooka/gui/images/New.gif
@@ -94,13 +93,8 @@ MenuBar.File.EmptyTrash.Action=folder-empty
 MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif
 
-#MenuBar.Edit=UserConfig:StoreConfig:Folders:Undo:Select All:Cut:Copy:Paste
-MenuBar.Edit=UserConfig:StoreConfig:AddressBook:Preferences:Cut:Copy:Paste
-MenuBar.Edit.UserConfig.Action=cfg-users
-MenuBar.Edit.StoreConfig.Action=cfg-stores
-MenuBar.Edit.Folders.Action=folder-subscribe
-MenuBar.Edit.AddressBook.Action=cfg-address-book
-MenuBar.Edit.Preferences.Action=cfg-prefs
+#MenuBar.Edit=UserConfig:StoreConfig:OutgoingConfig:ConnectionConfig:Folders:Undo:Select All:Cut:Copy:Paste
+MenuBar.Edit=Cut:Copy:Paste
 MenuBar.Edit.Undo.Action=undo-action
 MenuBar.Edit.Undo.Image=/net/suberic/pooka/gui/images/Undo.gif
 MenuBar.Edit.Select All.Action=select-all
@@ -136,6 +130,15 @@ MenuBar.Mail.Expunge.Action=message-expunge
 MenuBar.Mail.AddSignature.Action=message-add-signature
 MenuBar.Mail.SearchFolder.Action=folder-search
 MenuBar.Mail.Subscribe.Action=folder-subscribe
+
+MenuBar.Config=Preferences:StoreConfig:UserConfig:OutgoingConfig:ConnectionConfig:AddressBook:Folders
+MenuBar.Config.Preferences.Action=cfg-prefs
+MenuBar.Config.UserConfig.Action=cfg-users
+MenuBar.Config.StoreConfig.Action=cfg-stores
+MenuBar.Config.OutgoingConfig.Action=cfg-outgoing
+MenuBar.Config.ConnectionConfig.Action=cfg-connection
+MenuBar.Config.Folders.Action=folder-subscribe
+MenuBar.Config.AddressBook.Action=cfg-address-book
 
 MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
@@ -348,6 +351,11 @@ AddressBookEditor.popupMenu.Edit.Action=address-edit
 AddressBookEditor.popupMenu.Delete.Action=address-delete
 AddressBookEditor.popupMenu.Add.Action=address-add
 
+ConnectionMonitor.popupMenu=Connect:Disconnect:Unavailable
+ConnectionMonitor.popupMenu.Connect.Action=connection-connect
+ConnectionMonitor.popupMenu.Disconnect.Action=connection-disconnect
+ConnectionMonitor.popupMenu.Unavailable.Action=connection-unavailable
+
 AttachmentPane=ContentType
 AttachmentPane.ContentType=Content-Type
 AttachmentPane.Actions=Open:OpenWith:SaveAs
@@ -398,14 +406,38 @@ UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
 UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
 UserProfile.mailHeaders.fields.Organization.value=Organization
 
-UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:sendPrecommand:signatureFile:sentFolder
+UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:signatureFile:sentFolder:mailServer
 UserProfile.editableFields.scoped=true
 UserProfile.propertyType=Multi
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
+UserProfile.editableFields.mailServer.propertyType=List
+UserProfile.editableFields.mailServer.allowedValues=OutgoingServer
 
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
+
+OutgoingServer.editableFields=server:authenticated:user:password:connection:outbox
+OutgoingServer.editableFields.scoped=true
+OutgoingServer.propertyType=Multi
+OutgoingServer.editableFields.connection.propertyType=List
+OutgoingServer.editableFields.connection.allowedValues=Connection
+OutgoingServer.editableFields.authenticated.propertyType=Boolean
+OutgoingServer.editableFields.authenticated=false
+OutgoingServer.editableFields.password.propertyType=Password
+OutgoingServer.editableFields.outbox.propertyType=Folder
+
+OutgoingServer._default.propertyType=List
+OutgoingServer._default.allowedValues=OutgoingServer
+
+Connection.propertyType=Multi
+Connection.editableFields=connectCommand:disconnectCommand:connectOnStartup
+Connection.editableFields.scoped=true
+Connection.editableFields.connectOnStartup.propertyType=Boolean
+Connection.editableFields.connectOnStartup=true
+
+Connection._default.propertyType=List
+Connection._default.allowedValues=Connection
 
 AddressBook._default.propertyType=List
 AddressBook._default.allowedValues=AddressBook
@@ -492,17 +524,8 @@ Folder.editableFields.notifyNewMessagesNode.propertyType=Boolean
 Store.propertyType=Multi
 Store.editableFields.scoped=true
 Store.editableFields.propertyType=Composite
-#Store.editableFields=server:protocol:user:password:trashFolder:defaultProfile
-#Store.editableFields.protocol.propertyType=List
-#Store.editableFields.protocol.allowedValues=imap:pop3:mbox
-#Store.editableFields.protocol=imap
-#Store.editableFields.password.propertyType=Password
-#Store.editableFields.defaultProfile.propertyType=List
-#Store.editableFields.defaultProfile.allowedValues=UserProfile
-#Store.editableFields.trashFolder.propertyType=Folder
-#Store.editableFields.trashFolder.selectionRoot=currentStore
 
-Store.editableFields=protocol:storeConfig:trashFolder:defaultProfile:mailCheckTime:precommand
+Store.editableFields=protocol:storeConfig:trashFolder:defaultProfile:mailCheckTime:connection
 Store.editableFields.protocol.propertyType=List
 Store.editableFields.protocol.allowedValues=imap:pop3:mbox
 Store.editableFields.protocol=imap
@@ -515,7 +538,8 @@ Store.editableFields.trashFolder.selectionRoot=currentStore
 Store.editableFields.defaultProfile.propertyType=List
 Store.editableFields.defaultProfile.allowedValues=UserProfile
 Store.editableFields.mailCheckTime=5
-Store.editableFields.precommand=""
+Store.editableFields.connection.propertyType=List
+Store.editableFields.connection.allowedValues=Connection
 
 Store.editableFields.storeConfig.removeString=.storeConfig
 Store.editableFields.storeConfig.allowedValues.imap=Store.editableFields.storeConfig.imap

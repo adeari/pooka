@@ -372,7 +372,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   }
 
   public OutgoingMailServer getMailServer() {
-    if (mailServerName == null)
+    if (mailServer == null)
       loadMailServer();
     
     return mailServer;
@@ -401,9 +401,13 @@ public class UserProfile extends Object implements ValueChangeListener {
    * property.
    */
   public void loadMailServer() {
+    System.err.println("mailServerName is " + mailServerName);
     mailServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(mailServerName);
-    if (mailServer == null)
+    System.err.println("mailServer is " + mailServer);
+    if (mailServer == null) {
       mailServer = Pooka.getOutgoingMailManager().getDefaultOutgoingMailServer();
+      System.err.println("mailServer was null.  using default, which is " + mailServer);
+    }
   }
 
   

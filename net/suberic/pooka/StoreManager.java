@@ -100,7 +100,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
    * The folderName should be in the form "/storename/folder/subfolder".
    */
   public FolderInfo getFolder(String folderName) {
-    if (folderName.length() >= 1) {
+    if (folderName != null && folderName.length() >= 1) {
       int divider = folderName.indexOf('/', 1);
       while (divider == 0) {
 	folderName = folderName.substring(1);
