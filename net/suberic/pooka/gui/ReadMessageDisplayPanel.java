@@ -107,10 +107,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     
-    attachmentScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    attachmentDisplayPanel = new JPanel();
     
     splitPane.setTopComponent(otherScrollPane);
-    splitPane.setBottomComponent(attachmentScrollPane);
+    splitPane.setBottomComponent(attachmentDisplayPanel);
     
     this.add(WITH_ATTACHMENTS, splitPane);
     this.add(WITHOUT_ATTACHMENTS, editorScrollPane);
@@ -269,7 +269,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    
 	    if (hasAttachments) {
 	      attachmentPanel = new AttachmentPane(getMessageProxy());
-	      attachmentScrollPane.setViewportView(attachmentPanel);
+	      attachmentDisplayPanel.add(attachmentPanel);
 	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITH_ATTACHMENTS);
 	      editorStatus = WITH_ATTACHMENTS;
 	      

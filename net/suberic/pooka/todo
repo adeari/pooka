@@ -1,3 +1,5 @@
+*) attachment panel is broken for preview pane mode.
+
 *) add pgp/gpg support.
 features:
   mozilla:  key, click on it and it gives you status.  good idea!
@@ -59,6 +61,8 @@ bugs:
 *) fix error in encoded stream problem.
 	-- just better error (?)  or maybe print out as far as it goes.
 	-- see pooka_problems from plc
+
+*) arrow keys on read messages should scroll the window.
 
 *) bounce messages
 

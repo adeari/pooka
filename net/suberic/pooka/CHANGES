@@ -1,3 +1,6 @@
+modified the resizing code for message tables so that we now just resize
+the next column.
+
 changed the display for some error message so that there's acutally a 
 space between the message and the error code.
 

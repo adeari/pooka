@@ -106,7 +106,7 @@ public class AttachmentPane extends JPanel {
       else
 	return null;
     }
-  }
+  } // AttachmentTableModel
   
   class SaveAttachmentThread extends Thread {
     
@@ -185,7 +185,7 @@ public class AttachmentPane extends JPanel {
       } catch (Exception e) {}
       dialog.dispose();
     }
-  }
+  } // SaveAttachmentThread
 
   // i'm hardcoding these, but i doubt that will be too much of a problem.
 
@@ -197,6 +197,7 @@ public class AttachmentPane extends JPanel {
   JTable table;
   AttachmentTableModel tableModel;
   MessageProxy message;
+  JPanel displayPanel;
   Action[] defaultActions;
 
   public AttachmentPane (MessageProxy msg) {
@@ -252,16 +253,24 @@ public class AttachmentPane extends JPanel {
 	  
 	}
       });
-    
-    this.add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+
+    JScrollPane jsp = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    jsp.getViewport().add(table);
+    table.addNotify();
+    this.add(jsp);
     
     // the width will be resized; the only important part here is 
     // the height.
     
     Dimension prefSize = this.getPreferredSize();
     int defaultHeight = Integer.parseInt(Pooka.getProperty("Pooka.attachmentPanel.vsize", "100"));
-    if (prefSize.getHeight() > defaultHeight)
+    if (prefSize.getHeight() > defaultHeight) {
       this.setPreferredSize(new Dimension((int)prefSize.getWidth(), defaultHeight));
+    }
+    Dimension jspPrefSize = jsp.getPreferredSize();
+    if (jspPrefSize.getHeight() > defaultHeight - 15) {
+      jsp.setPreferredSize(new Dimension((int)prefSize.getWidth(), defaultHeight - 15));
+    }
     
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
@@ -277,6 +286,13 @@ public class AttachmentPane extends JPanel {
     createKeyBindings();
   }
   
+  /**
+   * Returns the display panel for the AttachmentPane.  This will normally
+   * contain just the AttachmentTable.
+   */
+  public JPanel getDisplayPanel() {
+    return displayPanel;
+  }
   
   /**
    * getSelectedAttachment() will return the selected Attachment.

@@ -217,7 +217,7 @@ public class NewMessageInfo extends MessageInfo {
    * Adds an attachment to this message.
    */
   public void addAttachment(Attachment attachment) {
-    attachments.getAttachments().add(attachment);
+    attachments.addAttachment(attachment);
   }
   
   /**
@@ -226,7 +226,7 @@ public class NewMessageInfo extends MessageInfo {
   public int removeAttachment(Attachment part) {
     if (attachments != null) {
       int index = attachments.getAttachments().indexOf(part);	
-      attachments.getAttachments().remove(index);
+      attachments.removeAttachment(part);
       return index;
     }
     

@@ -399,17 +399,19 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      *
      */
     public void addAttachmentPane() {
-	attachmentPanel = new AttachmentPane(getMessageProxy());
-	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	NewMessageUI nmui = getNewMessageUI();
-	if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
-	  try {
-	    Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentScrollPane, true);
-	  } catch (Exception e) {
-	    System.err.println("error setting theme:  " + e);
-	  }
+      attachmentPanel = new AttachmentPane(getMessageProxy());
+      attachmentDisplayPanel = new JPanel();
+      attachmentDisplayPanel.add(attachmentPanel);
+      
+      NewMessageUI nmui = getNewMessageUI();
+      if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+	try {
+	  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentDisplayPanel, true);
+	} catch (Exception e) {
+	  System.err.println("error setting theme:  " + e);
 	}
-	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentScrollPane);
+      }
+      tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentDisplayPanel);
     }
 
     /**
@@ -417,12 +419,12 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      */
 
     public void removeAttachmentPane() {
-	if (attachmentPanel != null) {
-	    tabbedPane.setSelectedComponent(headerScrollPane);
-	    tabbedPane.remove(attachmentScrollPane);
-	}
-	attachmentPanel = null;
-	attachmentScrollPane=null;
+      if (attachmentPanel != null) {
+	tabbedPane.setSelectedComponent(headerScrollPane);
+	tabbedPane.remove(attachmentDisplayPanel);
+      }
+      attachmentPanel = null;
+      attachmentDisplayPanel = null;
     }
 
     /**
@@ -735,7 +737,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     
     public void actionPerformed(ActionEvent e) {
       if (attachmentPanel != null) {
-	tabbedPane.setSelectedComponent(attachmentScrollPane);
+	tabbedPane.setSelectedComponent(attachmentDisplayPanel);
 	attachmentPanel.requestFocus();
       }
     }

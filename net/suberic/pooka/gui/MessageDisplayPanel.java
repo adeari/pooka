@@ -30,8 +30,7 @@ public abstract class MessageDisplayPanel extends JPanel {
   
   protected Matcher currentMatcher = null;
 
-  //<sigh>
-  JScrollPane attachmentScrollPane;
+  JPanel attachmentDisplayPanel;
   
   /**
    * Creates an empty MessageDisplayPanel.
