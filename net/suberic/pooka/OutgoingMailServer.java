@@ -195,7 +195,26 @@ public class OutgoingMailServer implements net.suberic.util.Item {
       throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Mail Server:  ") + getItemID());
     }
     
-    Transport sendTransport = Pooka.getDefaultSession().getTransport(sendMailURL); 
+    Session session = Pooka.getDefaultSession();
+
+
+    boolean useAuth = Pooka.getProperty(getItemProperty() + ".authenticated", "false").equalsIgnoreCase("true");
+    if (useAuth) {
+      java.util.Properties sysProps = new java.util.Properties(System.getProperties());
+      sysProps.setProperty("mail.mbox.mailspool", Pooka.getProperty("Pooka.spoolDir", "/var/spool/mail"));
+      sysProps.setProperty("mail.smtp.auth", "true");
+      String userName = Pooka.getProperty(getItemProperty() + ".user", "");
+      if (! userName.equals(""))
+	sysProps.setProperty("mail.smtp.user", userName);
+      String password = Pooka.getProperty(getItemProperty() + ".password", "");
+      if (! password.equals(""))
+	sysProps.setProperty("mail.smtp.password", password);
+
+      session = javax.mail.Session.getInstance(sysProps, Pooka.defaultAuthenticator);
+      if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
+	session.setDebug(true);
+    }
+    Transport sendTransport = session.getTransport(sendMailURL); 
     return sendTransport;
   }
 

@@ -12,9 +12,6 @@ next release:
 		in an INBOX for everything.
 	*)  fix the UIDFolderInfo so that you can add new messages directly
 		to it.
-	*)  make sure everything works properly if there is no outbox
-		configured.  throw an exception if there's no outbox and
-		the connection is down.
 	*)  fix the threading.  sending messages is on the awt thread right	
 		now.
 
@@ -24,6 +21,7 @@ next release:
 *) make search window look different than normal window.
 
 *) add support for authenticated smtp.
+	*) done?  need to test it.
 
 *) add support for external editors, such as emacs.
 

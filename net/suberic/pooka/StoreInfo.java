@@ -16,7 +16,7 @@ import net.suberic.util.Item;
  * and the properties of the Store.
  */
 
-public class StoreInfo implements ValueChangeListener, Item {
+public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionListener {
   
   private Store store;
   
@@ -37,6 +37,8 @@ public class StoreInfo implements ValueChangeListener, Item {
   
   private UserProfile defaultProfile;
   
+  private NetworkConnection connection;
+
   // the connection information.
   private String user;
   private String password;
@@ -128,7 +130,7 @@ public class StoreInfo implements ValueChangeListener, Item {
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".password");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".server");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".port");
-    
+    Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".connection");
     
     if (available) {
       store.addConnectionListener(new ConnectionAdapter() { 
@@ -165,6 +167,15 @@ public class StoreInfo implements ValueChangeListener, Item {
     
     defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
     
+    connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
+    if (connection == null) {
+      connection = Pooka.getConnectionManager().getDefaultConnection();
+    }
+
+    if (connection != null) {
+      connection.addConnectionListener(this);
+    }
+
     updateChildren();
     
     String trashFolderName = Pooka.getProperty(getStoreProperty() + ".trashFolder", "");
@@ -312,46 +323,62 @@ public class StoreInfo implements ValueChangeListener, Item {
   public void remove() {
 
   }
-    /**
-     * This handles the changes if the source property is modified.
-     *
-     * As defined in net.suberic.util.ValueChangeListener.
-     */
-
-    public void valueChanged(String changedValue) {
-	if (changedValue.equals(getStoreProperty() + ".folderList")) {
-	    updateChildren();
-	} else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
-	    defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
-	} else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
-
-	    if (storeNode != null) {
-		Enumeration enum = storeNode.children();
-		Vector v = new Vector();
-		while (enum.hasMoreElements())
-		    v.add(enum.nextElement());
-		
-		storeNode.removeChildren(v);
-	    }
-
-	    children = null;
-
-	    /*
-	    String realChildren = Pooka.getProperty(getStoreProperty() + ".folderList", "");
-	    Pooka.setProperty(getStoreProperty() + ".folderList", "");
-	    Pooka.setProperty(getStoreProperty() + ".folderList", realChildren);
-	    */
-
-	    try {
-		disconnectStore();
-	    } catch (Exception e) { }
-	    if (Pooka.isDebug())
-		System.out.println("calling configureStore()");
-
-	    configureStore();
-	}
+  /**
+   * This handles the changes if the source property is modified.
+   *
+   * As defined in net.suberic.util.ValueChangeListener.
+   */
+  
+  public void valueChanged(String changedValue) {
+    if (changedValue.equals(getStoreProperty() + ".folderList")) {
+      updateChildren();
+    } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
+      defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
+    } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
+      
+      if (storeNode != null) {
+	Enumeration enum = storeNode.children();
+	Vector v = new Vector();
+	while (enum.hasMoreElements())
+	  v.add(enum.nextElement());
+	
+	storeNode.removeChildren(v);
+      }
+      
+      children = null;
+      
+      /*
+	String realChildren = Pooka.getProperty(getStoreProperty() + ".folderList", "");
+	Pooka.setProperty(getStoreProperty() + ".folderList", "");
+	Pooka.setProperty(getStoreProperty() + ".folderList", realChildren);
+      */
+      
+      try {
+	disconnectStore();
+      } catch (Exception e) { }
+      if (Pooka.isDebug())
+	System.out.println("calling configureStore()");
+      
+      configureStore();
     }
+  }
+  
 
+  /**
+   * Called when the status of the NetworkConnection changes.
+   */
+  public void connectionStatusChanged(NetworkConnection connection, int newStatus) {
+    if (newStatus == NetworkConnection.CONNECTED) {
+      // we've connected.
+      
+    } else if (newStatus == NetworkConnection.DISCONNECTED) {
+      // we're being disconnected.  close all the connections.
+	
+    } else {
+      // we've been cut off.  note it.
+
+    }
+  }
     /**
      * Remove the given String from the folderList property.  
      *
@@ -651,6 +678,10 @@ public class StoreInfo implements ValueChangeListener, Item {
     public UserProfile getDefaultProfile() {
 	return defaultProfile;
     }
+
+  public NetworkConnection getConnection() {
+    return connection;
+  }
 
     public ActionThread getStoreThread() {
 	return storeThread;
