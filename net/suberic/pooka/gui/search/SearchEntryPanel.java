@@ -126,8 +126,14 @@ public class SearchEntryPanel extends JPanel {
 	    SearchEntryForm sef = new SearchEntryForm(manager);
 	    SearchEntryPair pair = new SearchEntryPair(sef, AND);
 	    searchTerms.add(pair);
-	    entryPanel.add(pair.connector);
-	    entryPanel.add(sef.getPanel());
+
+	    JPanel newSearchPanel = new JPanel();
+	    newSearchPanel.add(pair.connector);
+	    newSearchPanel.add(sef.getPanel());
+	    entryPanel.add(newSearchPanel);
+	    //entryPanel.add(pair.connector);
+	    //entryPanel.add(sef.getPanel());
+
 	    entryPanel.revalidate();
 	    //entryPanel.repaint();
 	}

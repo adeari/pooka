@@ -1,7 +1,7 @@
 beta 1
 ---------------
 
-search:  fix date handling
+search: 
 add support for nested searches.
 add support for incoming message filter
 add support for message display filter

@@ -63,7 +63,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	stringMatchPanel = new JPanel();
 	Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
 	operationCombo = new JComboBox(operationFields);
-	textField = new JTextField(30);
+	textField = new JTextField(20);
 	
 	stringMatchPanel.add(operationCombo);
 	stringMatchPanel.add(textField);
@@ -79,7 +79,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 
 	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
 	dateComparisonCombo = new JComboBox(dateFields);
-	dateField = new JTextField(30);
+	dateField = new JTextField(20);
 	JLabel dateFormatLabel = new JLabel(Pooka.getProperty("Search.dateFormat", "mm/dd/yyyy"));
 	datePanel.add(dateComparisonCombo);
 	datePanel.add(dateField);
