@@ -25,7 +25,6 @@
   <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
   <property name="activation_dist_lib" value="${importdir}/activation_dist.jar"/>
   <property name="crypto_lib" value="${importdir}/javamail-crypto.jar"/>
-  <property name="crypto_combined_lib" value="${importdir}/cryptoproviders.jar"/>
   <property name="cryptix_message_api_lib" value="${importdir}/cryptix-message-api.jar"/>
   <property name="cryptix_pki_api_lib" value="${importdir}/cryptix-pki-api.jar"/>
 
