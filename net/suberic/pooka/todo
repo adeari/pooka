@@ -6,7 +6,8 @@ preview:
 *) disconnected:  
 	*)  make an option for caching everything.
 	*)  check sent folder with disconnected / especially not using
-		the NetworkConnection object.
+		the NetworkConnection object. -- note:  ok with the
+		NetworkConnection.
 	*)  make a progress dialog for caching lots of messages, since
 		it seems to take a while.
 	*)  disconnected:  think that you're still connected.  lose connection.
@@ -14,25 +15,7 @@ preview:
 
 *) fix the connection order.  it's too painful right now.
 
-*) fix the launcher (specifically the html launcher, but maybe all of them)
-to use "'s correctly.
-
 *) fix reverse sorting.
-
-error:  subscribe to folder in disconnected mode, then open it.  got
-	the following error:
-
- java.lang.NullPointerException
-	at net.suberic.pooka.cache.CachingFolderInfo.fetch(CachingFolderInfo.java:327)
-	at net.suberic.pooka.FolderInfo.loadMessageTableInfos(FolderInfo.java:755)
-	at net.suberic.pooka.cache.CachingFolderInfo.loadAllMessages(CachingFolderInfo.java:284)
-	at net.suberic.pooka.gui.FolderNode$OpenAction.actionPerformed(FolderNode.java:364)
-	at net.suberic.util.thread.ActionThread.run(ActionThread.java(Compiled Code))
-java.lang.NullPointerException
-	at net.suberic.pooka.cache.CachingFolderInfo.synchronizeCache(CachingFolderInfo.java:485)
-	at net.suberic.pooka.cache.CachingFolderInfo.loadAllMessages(CachingFolderInfo.java:238)
-	at net.suberic.pooka.gui.FolderNode$OpenAction.actionPerformed(FolderNode.java:364)
-	at net.suberic.util.thread.ActionThread.run(ActionThread.java(Compiled Code))
 
 --------
 
@@ -196,6 +179,10 @@ doesn't change, you still resize the window.
 	3)  make it add an extension to incomplete and unmatched addresses
 	    (i.e. change allen to allen@atg.com)
 
+
+*) fix the launcher (specifically the html launcher, but maybe all of them)
+to use "'s correctly.  works for now with opera, which should be good 
+enough...
 
 error:  filterfoldercellrenderer has problems with search forms.
 
