@@ -1,60 +1,22 @@
 *) add pgp/gpg support.
-features:
-  mozilla:  key, click on it and it gives you status.  good idea!
-
-  add crypto ui display for outgoing, also?
-
-  pgp&smime encrypt, decrypt, sign, check sig, sign&encrypt
-    check signature with default key(s)
-    check signature with selected key(s)
-    recheck signature -- choose key(s)
-  add keys from incoming emails
-  use default key (for signing, reading - default private; for sending, 
+  *) fix signed and encrypted.
+	-- need to fix the signature check.  should use signedAttachment.
+	instead of just reading the message itself.  same for decrypting;
+	should use Attachments instaed of Message.
+  *) add crypto ui display for outgoing, also.
+  *) use default key (for signing, reading - default private; for sending, 
 		   default public by email address (?) -- also overridable,
 		   though.)
-  auto check sig
-  auto decrypt
-  auto encrypt
-ui:
-  fix dialogs
-    outgoing encrypted message should have visual clue saying it's going
-      to get encrypted.
-    
-    Read an encrypted message:  
-    encrypted message should have some sort of 'this is an encrypted message' 
+  *) encrypted message should have some sort of 'this is an encrypted message' 
       text instead of the blank text it currently has.
-  save passphrases.
-  auto check sig
-  auto decrypt
-  auto encrypt/sign
-  show only appropriate keys (s/mime for s/mime signed/encrypted, etc.)
-  when selecting a key, have options for encryption (always use this key,
+  *) when selecting a key, have options for encryption (always use this key,
 	etc.)
-bugs:
-  -- started.  todo on api:
-       	- key management
-	- including importing keys from emails.
-	- sign and encrypt
-	- more checks, proper exceptions
-	- fix signature
-	- check signed vs. encrypted.
--- todo on pooka
-	- no crypto status display in preview pane mode.
-	- check keys--they seem to not all work.  make sure that all 
-	  available keys work, and that only keys that work are available?
-	- key management
-	  - inc. default key for user, addressbookentry 
+  *) key management
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
-	- way to show encryption information (ui)
-	  -- thought:  show decrypted or encrypted.  which by default
-		       is configurable.  when decryption is attempted,
-		       there's a ui, though it will probably try the
-		       default for the user, first.
-		       - sigs auto-verified?
-	  -- need a way to show current encryption status, plus a way
-		to decrypt/check signature
-	  -- ?? button at bottom that shows status?
+  *) fix threading on encryption actions.
+  *) add keybindings for encryption/decryption.
+  *) fix smime signature test (???)
 
 *) fix error in encoded stream problem.
 	-- just better error (?)  or maybe print out as far as it goes.

@@ -1269,7 +1269,9 @@ public class MessageProxy {
 	new ActionWrapper(new FilterAction(), folderThread),
 	new ActionWrapper(new DecryptAction(), folderThread),
 	new ActionWrapper(new CheckSignatureAction(), folderThread),
-	new ActionWrapper(new ImportKeysAction(), folderThread)
+	new ActionWrapper(new ImportKeysAction(), folderThread),
+	new ActionWrapper(new SignatureStatusAction(), folderThread),
+	new ActionWrapper(new EncryptionStatusAction(), folderThread)
       };
 
       commands = new Hashtable();
@@ -1758,6 +1760,54 @@ public class MessageProxy {
 	
       importKeys();
       
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class EncryptionStatusAction extends AbstractAction {
+    EncryptionStatusAction() {
+      super("message-encryption-status");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+
+      if (getMessageUI() != null)
+	getMessageUI().showMessageDialog("(Encryption Status)", "Encryption Status");
+      else
+	Pooka.getUIFactory().showMessage("(Encryption Status)", "Encryption Status");
+
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class SignatureStatusAction extends AbstractAction {
+    SignatureStatusAction() {
+      super("message-signature-status");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      if (getMessageUI() != null)
+	getMessageUI().showMessageDialog("(Signature Status)", "Signature Status");
+      else
+	Pooka.getUIFactory().showMessage("(Signature Status)", "Signature Status");
+
       if (fw != null)
 	fw.setBusy(false);
       if (getMessageUI() != null)

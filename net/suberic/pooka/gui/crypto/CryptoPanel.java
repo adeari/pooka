@@ -2,6 +2,7 @@ package net.suberic.pooka.gui.crypto;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 import net.suberic.util.VariableBundle;
 import net.suberic.pooka.Pooka;
@@ -10,6 +11,7 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
   
   JButton encryptionButton;
   JButton signatureButton;
+  JButton importKeysButton;
 
   // the various icons
   static ImageIcon notEncryptedIcon;
@@ -21,6 +23,8 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
   static ImageIcon signatureVerifiedIcon;
   static ImageIcon signatureBadIcon;
   static ImageIcon signatureFailedVerificationIcon;
+
+  static ImageIcon importKeysIcon;
 
   // the various tooltips
   static String notEncryptedTooltip;
@@ -41,6 +45,7 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
   static Color failedColor = Color.RED;
 
   static boolean iconsLoaded = false;
+  static boolean tooltipsLoaded = false;
 
   // the current status
   int currentCryptStatus = NOT_ENCRYPTED;
@@ -57,6 +62,10 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
 	if (! iconsLoaded) {
 	  loadIcons("CryptoPanel", thisClass, Pooka.getResources());
 	  iconsLoaded = true;
+	}
+	if (! tooltipsLoaded) {
+	  loadTooltips("CryptoPanel", Pooka.getResources());
+	  tooltipsLoaded = true;
 	}
       }
     }
@@ -95,7 +104,32 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
     returnValue.setSize(25,25);
     return returnValue;
   }
+
+  /**
+   * Creates an Import Keys Button.
+   */
+  public JButton createImportKeysButton() {
+    JButton returnValue = new JButton();
+    if (importKeysIcon != null)
+      returnValue.setIcon(importKeysIcon);
+    returnValue.setPreferredSize(new java.awt.Dimension(25,25));
+    returnValue.setMaximumSize(new java.awt.Dimension(25,25));
+    returnValue.setSize(25,25);
+    return returnValue;
+  }
   
+  /**
+   * Updates the action on the given button.
+   */
+  public void updateAction(JButton button, Action a) {
+    ActionListener[] listeners = button.getActionListeners();
+    for (int i = 0; i < listeners.length; i++) {
+      button.removeActionListener(listeners[i]);
+    }
+    
+    button.addActionListener(a);
+  }
+
   /**
    * Updates the encryption information.
    */
@@ -113,20 +147,38 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       if (currentSigStatus == NOT_SIGNED) {
 	signatureButton.setIcon(notSignedIcon);
 	signatureButton.setToolTipText(notSignedTooltip);
+	if (proxy != null) {
+	  Action checkSigAction = proxy.getAction("message-signature-status");
+	  if (checkSigAction != null)
+	    updateAction(signatureButton, checkSigAction);
+	}
+
       } else if (currentSigStatus == UNCHECKED_SIGNED) {
-	signatureButton.setIcon(uncheckedSignedIcon);
-	signatureButton.setToolTipText(uncheckedSignedTooltip);
 	if (proxy != null) {
 	  Action checkSigAction = proxy.getAction("message-check-signature");
 	  if (checkSigAction != null)
-	    signatureButton.setAction(checkSigAction);
+	    updateAction(signatureButton, checkSigAction);
 	}
+	signatureButton.setIcon(uncheckedSignedIcon);
+	signatureButton.setToolTipText(uncheckedSignedTooltip);
       } else if (currentSigStatus == SIGNATURE_VERIFIED) {
 	signatureButton.setIcon(signatureVerifiedIcon);
 	signatureButton.setToolTipText(signatureVerifiedTooltip);
+	System.err.println("proxy = " + proxy);
+	if (proxy != null) {
+	  Action checkSigAction = proxy.getAction("message-signature-status");
+	  System.err.println(" got action for message-signature-status:  " + checkSigAction);
+	  if (checkSigAction != null)
+	    updateAction(signatureButton, checkSigAction);
+	}
       } else if (currentSigStatus == SIGNATURE_BAD) {
 	signatureButton.setIcon(signatureBadIcon);
 	signatureButton.setToolTipText(signatureBadTooltip);
+	if (proxy != null) {
+	  Action checkSigAction = proxy.getAction("message-signature-status");
+	  if (checkSigAction != null)
+	    updateAction(signatureButton, checkSigAction);
+	}
       }
     }
 
@@ -139,17 +191,33 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
 	if (proxy != null) {
 	  Action decryptAction = proxy.getAction("message-decrypt");
 	  if (decryptAction != null)
-	    encryptionButton.setAction(decryptAction);
+	    updateAction(encryptionButton, decryptAction);
 	}
       } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
 	encryptionButton.setIcon(decryptedSuccessfullyIcon);
 	encryptionButton.setToolTipText(decryptedSuccessfullyTooltip);
+	if (proxy != null) {
+	  Action decryptAction = proxy.getAction("message-encryption-status");
+	  if (decryptAction != null)
+	    updateAction(encryptionButton, decryptAction);
+	}
       } else if (currentCryptStatus == DECRYPTED_UNSUCCESSFULLY) {
 	encryptionButton.setIcon(decryptedUnsuccessfullyIcon);
 	encryptionButton.setToolTipText(decryptedUnsuccessfullyTooltip);
+	if (proxy != null) {
+	  Action decryptAction = proxy.getAction("message-encryption-status");
+	  if (decryptAction != null)
+	    updateAction(encryptionButton, decryptAction);
+	}
       } else {
 	encryptionButton.setIcon(notEncryptedIcon);
 	encryptionButton.setToolTipText(notEncryptedTooltip);
+	System.err.println("notEncryptedTooltip=" + notEncryptedTooltip);
+	if (proxy != null) {
+	  Action decryptAction = proxy.getAction("message-encryption-status");
+	  if (decryptAction != null)
+	    updateAction(encryptionButton, decryptAction);
+	}
       }    
       repaint();
     }
