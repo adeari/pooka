@@ -292,20 +292,20 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException {
     // if we're connected, go ahead and fetch these.  why the hell not?
 
+    int cacheStatus = -1;
+    boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);
+    boolean doHeaders = (profile.contains(FetchProfile.Item.ENVELOPE) || profile.contains(FetchProfile.Item.CONTENT_INFO));
+    
+    if (doFlags && doHeaders) {
+      cacheStatus = SimpleFileCache.FLAGS_AND_HEADERS;
+    } else if (doFlags) {
+      cacheStatus = SimpleFileCache.FLAGS;
+    } else if (doHeaders) {
+      cacheStatus = SimpleFileCache.HEADERS;
+    }
+    
     if (isConnected()) {
       super.fetch(messages, profile);
-
-      int cacheStatus = -1;
-      boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);
-      boolean doHeaders = (profile.contains(FetchProfile.Item.ENVELOPE) || profile.contains(FetchProfile.Item.CONTENT_INFO));
-      
-      if (doFlags && doHeaders) {
-	cacheStatus = SimpleFileCache.FLAGS_AND_HEADERS;
-      } else if (doFlags) {
-	cacheStatus = SimpleFileCache.FLAGS;
-      } else if (doHeaders) {
-	cacheStatus = SimpleFileCache.HEADERS;
-      }
       
       if (cacheStatus != -1) {
 	for (int i = 0; i < messages.length; i++) {
@@ -314,10 +314,26 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  getCache().cacheMessage((MimeMessage)m, uid, cache.getUIDValidity(), cacheStatus);	
 	}
       }
+    } else {
+      // if we're not connected, then go ahead and preload the cache for
+      // these.
+      for (int i = 0; i < messages.length; i++) {
+	Message current = messages[i].getMessage();
+	if (current != null && current instanceof UIDMimeMessage) {
+	  long uid = ((UIDMimeMessage) current).getUID();
+	  if (cacheStatus == SimpleFileCache.FLAGS_AND_HEADERS || cacheStatus == SimpleFileCache.FLAGS) {
+	    getCache().getFlags(uid, cache.getUIDValidity());
+	  }
+	  
+	  if (cacheStatus == SimpleFileCache.FLAGS_AND_HEADERS || cacheStatus == SimpleFileCache.HEADERS) {
+	    getCache().getHeaders(uid, cache.getUIDValidity());
+	  }
+	}
+      }
     }
 
   }
-
+  
   /**
    * Refreshes the headers for the given MessageInfo.
    */

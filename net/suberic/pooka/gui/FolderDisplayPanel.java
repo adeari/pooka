@@ -422,8 +422,8 @@ public class FolderDisplayPanel extends JPanel {
 	  SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {
 	      int useFirstUnread = firstUnread;
-	      if (useFirstUnread < 0) {
-		useFirstUnread = messageTable.getRowCount();
+	      if (useFirstUnread < 0 || useFirstUnread > messageTable.getRowCount()) {
+		useFirstUnread = messageTable.getRowCount() - 1;
 	      } else {
 		messageTable.setRowSelectionInterval(useFirstUnread, useFirstUnread);
 	      }

@@ -1,3 +1,8 @@
+made it so exiting pooka before all the messages are loaded doesn't result
+in a bunch of exceptions.
+
+improved the startup time, so that open folders show up more quickly.
+
 fixed the popup menu on the attachment pane so that it shows up in the
 right place (and isn't selected by default when you right click and 
 release).

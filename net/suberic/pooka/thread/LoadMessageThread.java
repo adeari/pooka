@@ -33,7 +33,9 @@ public class LoadMessageThread extends Thread {
   private int updateMessagesCount = 10;
   private int loadedMessageCount = 0;
   private boolean sleeping = false;
-  
+
+  private boolean stopped = false;
+
   /**
    * This creates a new LoadMessageThread from a FolderInfo object.
    */
@@ -46,7 +48,7 @@ public class LoadMessageThread extends Thread {
   
   public void run() {
     int uptime = 0;
-    while (true) {
+    while (! stopped) {
       try {
 	loadWaitingMessages();
       } catch (Exception e) {
@@ -77,67 +79,77 @@ public class LoadMessageThread extends Thread {
     
     int updateCounter = 0;
     
-    if (numMessages > 0) {
+    if (! stopped && numMessages > 0) {
       MessageLoadedListener display = getFolderInfo().getFolderDisplayUI();
       if (display != null)
 	this.addMessageLoadedListener(display);
       
       fireMessageLoadedEvent(MessageLoadedEvent.LOADING_STARTING, getLoadedMessageCount(), messages.size());
-
+      
       int fetchBatchSize = 50;
+      int loadBatchSize = 25;
       try {
 	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
       } catch (NumberFormatException nfe) {
       }
-
-      FetchProfile fetchProfile = getFolderInfo().getFetchProfile();
-
-      for(int i=numMessages-1; i >= 0; i--) {
-	synchronized(folderInfo.getFolderThread().getRunLock()) {
-	  mp=(MessageProxy)messages.elementAt(i);
-	  
-	  if (! mp.getMessageInfo().hasBeenFetched()) {
-	    try {
-	      int fetchCount = 0;
-	      Vector fetchVector = new Vector();
-	      for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
-		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
-		if (! fetchInfo.hasBeenFetched()) {
-		  fetchVector.add(fetchInfo);
-		  fetchInfo.setFetched(true);
-		}
-	      }
-	      
-	      MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
-	      toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
-	      getFolderInfo().fetch(toFetch, fetchProfile);
-	    } catch(MessagingException me) {
-	      System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
-	      me.printStackTrace();
-	    }
-	  
-	  }
-
-	  try {
-	    if (! mp.isLoaded())
-	      mp.loadTableInfo();
-	    if (mp.needsRefresh())
-	      mp.refreshMessage();
-	    else if (! mp.matchedFilters()) {
-	      mp.matchFilters();
-	    }
-	  } catch (Exception e) {
-	    e.printStackTrace();
-	  }
-	}
-
-	if (++updateCounter >= getUpdateMessagesCount()) {
-	  fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
-	  updateCounter = 0;		   
-	}
-	loadedMessageCount++;
+      
+      try {
+	loadBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.loadBatchSize", "25"));
+      } catch (NumberFormatException nfe) {
       }
       
+      FetchProfile fetchProfile = getFolderInfo().getFetchProfile();
+
+      int i = numMessages - 1;
+      while ( ! stopped &&  i >= 0 ) {
+	synchronized(folderInfo.getFolderThread().getRunLock()) {
+	  for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
+	    mp=(MessageProxy)messages.elementAt(i);
+	    
+	    if (! mp.getMessageInfo().hasBeenFetched()) {
+	      try {
+		int fetchCount = 0;
+		Vector fetchVector = new Vector();
+		for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+		  MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+		  if (! fetchInfo.hasBeenFetched()) {
+		    fetchVector.add(fetchInfo);
+		    fetchInfo.setFetched(true);
+		  }
+		}
+		
+		MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
+		toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
+		getFolderInfo().fetch(toFetch, fetchProfile);
+	      } catch(MessagingException me) {
+		System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+		me.printStackTrace();
+	      }
+	      
+	    }
+	    
+	    try {
+	      if (! mp.isLoaded())
+		mp.loadTableInfo();
+	      if (mp.needsRefresh())
+		mp.refreshMessage();
+	      else if (! mp.matchedFilters()) {
+		mp.matchFilters();
+	      }
+	    } catch (Exception e) {
+	      e.printStackTrace();
+	    }
+	    
+	    if (++updateCounter >= getUpdateMessagesCount()) {
+	      fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
+	      updateCounter = 0;		   
+	    }
+	    loadedMessageCount++;
+	    i--;
+	  }
+	}
+      }
+
       if (updateCounter > 0)
 	fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
       
@@ -249,6 +261,13 @@ public class LoadMessageThread extends Thread {
   
   public boolean isSleeping() {
     return sleeping;
+  }
+
+  /**
+   * Stops the thread.
+   */
+  public void stopThread() {
+    stopped = true;
   }
 }
 

@@ -1,9 +1,5 @@
 *) document keybindings
 
-*) make it so starting up is quicker (?).  -- check with threading, maybe?
-	either multiple threads for folders, or maybe check the threading
-	and connections for javamail.
-
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
 	-- make a disconnected icon.

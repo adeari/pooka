@@ -495,36 +495,36 @@ public class SimpleFileCache implements MessageCache {
 	} else
 	    return null;
     }
-
-    /**
-     * Gets the InternetHeaders from the cache.  Returns null if no headers are
-     * available in the cache.
-     */
-    protected InternetHeaders getHeadersFromCache(long uid) throws MessagingException {
-      InternetHeaders returnValue = (InternetHeaders) cachedHeaders.get(new Long(uid));
-      if (returnValue != null) {
+  
+  /**
+   * Gets the InternetHeaders from the cache.  Returns null if no headers are
+   * available in the cache.
+   */
+  InternetHeaders getHeadersFromCache(long uid) throws MessagingException {
+    InternetHeaders returnValue = (InternetHeaders) cachedHeaders.get(new Long(uid));
+    if (returnValue != null) {
 	return returnValue;
-      } else {	    
-
-	File f = new File(cacheDir, uid +DELIMETER + HEADER_EXT);
-	if (f.exists())
-	  try {
-	    returnValue = new InternetHeaders(new FileInputStream(f));
-	    cachedHeaders.put(new Long(uid), returnValue);
-	    return returnValue;
-	  } catch (FileNotFoundException fnfe) {
-	    throw new MessagingException(fnfe.getMessage(), fnfe);
-	  }
-	else
-	  return null;
-      }
+    } else {	    
+      
+      File f = new File(cacheDir, uid +DELIMETER + HEADER_EXT);
+      if (f.exists())
+	try {
+	  returnValue = new InternetHeaders(new FileInputStream(f));
+	  cachedHeaders.put(new Long(uid), returnValue);
+	  return returnValue;
+	} catch (FileNotFoundException fnfe) {
+	  throw new MessagingException(fnfe.getMessage(), fnfe);
+	}
+      else
+	return null;
     }
-
+  }
+  
     /**
      * Gets the Flags from the cache.  Returns null if no flagss are
      * available in the cache.
      */
-    protected Flags getFlagsFromCache(long uid) {
+    Flags getFlagsFromCache(long uid) {
       Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
       if (returnValue != null) {
 	return returnValue;
@@ -646,8 +646,8 @@ public class SimpleFileCache implements MessageCache {
 	  cachedMessages.add(l);
 	  // this has the side effect of loading the cached flags
 	  // to the cachedFlags HashMap.
-	  getFlagsFromCache(l.longValue());
-	  getHeadersFromCache(l.longValue());
+	  //getFlagsFromCache(l.longValue());
+	  //getHeadersFromCache(l.longValue());
 	}
       } catch (Exception e) { }
     }

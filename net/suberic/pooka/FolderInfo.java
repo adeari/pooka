@@ -354,57 +354,62 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * opened folder.
      */
     public void openFolder(int mode) throws MessagingException {
-	
-	if (Pooka.isDebug())
-	    System.out.println(this + ":  loading folder.");
 
-	if (! isLoaded() && status != CACHE_ONLY)
-	    loadFolder();
-	
+      if (Pooka.isDebug())
+	System.out.println(this + ":  checking parent store.");
+      
+      
+      if (!getParentStore().isConnected()) {
 	if (Pooka.isDebug())
-	    System.out.println(this + ":  folder loaded.  making sure parent store is connected.  status is " + status);
-
-	//if (status != CONNECTED) {
-	if (!getParentStore().isConnected())
-	  getParentStore().connectStore();
-	//}
-	
+	  System.out.println(this + ":  parent store isn't connected.  trying connection.");
+	getParentStore().connectStore();
+      }
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  loading folder.");
+      
+      if (! isLoaded() && status != CACHE_ONLY)
+	loadFolder();
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  folder loaded.  status is " + status);
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
+      
+      if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
 	if (Pooka.isDebug())
-	    System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
-	
-	if (status == CLOSED || status == LOST_CONNECTION) {
-	  if (Pooka.isDebug())
-	    System.out.println(this + ":  isLoaded() and isAvailable().");
-	  if (folder.isOpen()) {
-	    if (folder.getMode() == mode)
-	      return;
-	    else { 
-	      folder.close(false);
-	      openFolder(mode);
+	  System.out.println(this + ":  isLoaded() and isAvailable().");
+	if (folder.isOpen()) {
+	  if (folder.getMode() == mode)
+	    return;
+	  else { 
+	    folder.close(false);
+	    openFolder(mode);
 	    }
-	  } else {
-	    folder.open(mode);
-	    updateFolderOpenStatus(true);
-	    resetMessageCounts();
-	  }
-	} else if (status == INVALID) {
-	  throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
-	}
-	
-    }
-
-    /**
-     * Actually records that the folde has been opened or closed.  
-     * This is separated out so that subclasses can override it more
-     * easily.
-     */
-    protected void updateFolderOpenStatus(boolean isNowOpen) {
-	if (isNowOpen) {
-	    setStatus(CONNECTED);
 	} else {
-	    setStatus(CLOSED);
+	  folder.open(mode);
+	  updateFolderOpenStatus(true);
+	  resetMessageCounts();
 	}
+      } else if (status == INVALID) {
+	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
+	}
+      
     }
+  
+  /**
+   * Actually records that the folde has been opened or closed.  
+   * This is separated out so that subclasses can override it more
+   * easily.
+   */
+  protected void updateFolderOpenStatus(boolean isNowOpen) {
+    if (isNowOpen) {
+      setStatus(CONNECTED);
+    } else {
+      setStatus(CLOSED);
+    }
+  }
 
     /**
      * This method calls openFolder() on this FolderInfo, and then, if
@@ -416,20 +421,29 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
 
     public void openAllFolders(int mode) {
-	try {
-	    openFolder(mode);
-	} catch (MessagingException me) {
+      try {
+	openFolder(mode);
+      } catch (MessagingException me) {
+      }
+      
+      if (children != null) {
+	for (int i = 0; i < children.size(); i++) {
+	  doOpenFolders((FolderInfo) children.elementAt(i), mode);
 	}
-
-	if (children != null)
-	    for (int i = 0; i < children.size(); i++) 
-		try {
-		    ((FolderInfo)children.elementAt(i)).openFolder(mode);
-		} catch (MessagingException me) {
-		}
+      }
     }
-    
-    /**
+  
+  private void doOpenFolders(FolderInfo fi, int mode) {
+    final FolderInfo current = fi;
+    final int finalMode = mode;
+    getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	  current.openAllFolders(finalMode);
+	}
+      }, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
+  }
+  
+  /**
      * This method closes the Folder.  If you open the Folder using 
      * openFolder (which you should), then you should use this method
      * instead of calling getFolder.close().  If you don't, then the
@@ -468,33 +482,39 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	closeFolder(expunge, true);
     }
-
-    /**
-     * This closes the curernt Folder as well as all subfolders.
-     */
-    public void closeAllFolders(boolean expunge) throws MessagingException {
-	MessagingException otherException = null;
-	Vector folders = getChildren();
-	if (folders != null) {
-	    for (int i = 0; i < folders.size(); i++) {
-		try {
-		    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
-		} catch (MessagingException me) {
-		    if (otherException == null)
-			otherException = me;
-		} catch (Exception e) {
-		    MessagingException newMe = new MessagingException (e.getMessage(), e);
-		    if (otherException == null)
-			otherException = newMe;
-		}
-	    }
-	}  
-	
-	closeFolder(expunge, false);
-
-	if (otherException != null)
-	    throw otherException;
+  
+  /**
+   * This closes the current Folder as well as all subfolders.
+   */
+  public void closeAllFolders(boolean expunge, boolean shuttingDown) throws MessagingException {
+    if (shuttingDown && loaderThread != null) {
+      loaderThread.stopThread();
     }
+
+    synchronized(getFolderThread().getRunLock()) {
+      MessagingException otherException = null;
+      Vector folders = getChildren();
+      if (folders != null) {
+	for (int i = 0; i < folders.size(); i++) {
+	  try {
+	    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge, shuttingDown);
+	  } catch (MessagingException me) {
+	    if (otherException == null)
+	      otherException = me;
+	  } catch (Exception e) {
+	    MessagingException newMe = new MessagingException (e.getMessage(), e);
+	    if (otherException == null)
+	      otherException = newMe;
+	  }
+	}
+      }  
+      
+      closeFolder(expunge, false);
+      
+      if (otherException != null)
+	throw otherException;
+    }
+  }
 
     /**
      * Gets all of the children folders of this FolderInfo which are
@@ -702,41 +722,42 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
 
-    /**
-     * Unloads all of the tableInfos of the MessageInfo objects.  This
-     * should be used either when the message information is stale, or when
-     * the display rules have changed.
-     */
-    public void unloadTableInfos() {
-      if (folderTableModel != null) {
-	Vector allProxies = folderTableModel.getAllProxies();
-	for (int i = 0; i < allProxies.size(); i++) {
-	  MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
-	  mp.unloadTableInfo();
-	}
-	
-	if (loaderThread != null)
-	  loaderThread.loadMessages(allProxies);
+  /**
+   * Unloads all of the tableInfos of the MessageInfo objects.  This
+   * should be used either when the message information is stale, or when
+   * the display rules have changed.
+   */
+  public void unloadTableInfos() {
+    if (folderTableModel != null) {
+      Vector allProxies = folderTableModel.getAllProxies();
+      for (int i = 0; i < allProxies.size(); i++) {
+	MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+	mp.unloadTableInfo();
       }
+      
+      if (loaderThread != null)
+	loaderThread.loadMessages(allProxies);
+      
     }
-
+  }
+  
     /**
      * Unloads the matching filters.
      */
-    public void unloadMatchingFilters() {
-	if (folderTableModel != null) {
-	    Vector allProxies = folderTableModel.getAllProxies();
-	    for (int i = 0; i < allProxies.size(); i++) {
-		MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
-		mp.clearMatchedFilters();
-	    }
-
-	    if (loaderThread != null)
-		loaderThread.loadMessages(allProxies);
-
-	}
-     }
-
+  public void unloadMatchingFilters() {
+    if (folderTableModel != null) {
+      Vector allProxies = folderTableModel.getAllProxies();
+      for (int i = 0; i < allProxies.size(); i++) {
+	MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+	mp.clearMatchedFilters();
+      }
+      
+      if (loaderThread != null)
+	loaderThread.loadMessages(allProxies);
+      
+    }
+  }
+  
   /**
    * Refreshes the headers for the given MessageInfo.
    */

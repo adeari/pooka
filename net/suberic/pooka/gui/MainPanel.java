@@ -250,7 +250,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	// to be deleted, and ask the user if they want to expunge the
 	// deleted messages.
 	try {
-	  ((StoreInfo)v.elementAt(i)).closeAllFolders(false);
+	  ((StoreInfo)v.elementAt(i)).closeAllFolders(false, true);
 	} catch (Exception e) {
 	  // we really don't care.
 	}

@@ -515,7 +515,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * the Store, if the children vector has not been loaded yet.
    */
   public void connectStore() throws MessagingException {
+    if (Pooka.isDebug())
+      System.out.println("trying to connect store " + getStoreID());
+
     if (store.isConnected()) {
+      if (Pooka.isDebug())
+	System.out.println("store " + getStoreID() + " is already connected.");
+
       connected=true;
       return;
     } else { 
@@ -523,12 +529,23 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	// don't test for connections for mbox providers.
 	if (!protocol.equalsIgnoreCase("mbox")) {
 	  NetworkConnection currentConnection = getConnection();
+	  if (Pooka.isDebug())
+	    System.out.println("connect store " + getStoreID() + ":  checking connection.");
+
 	  if (currentConnection != null) {
-	    if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED)
+	    if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
+	      if (Pooka.isDebug())
+		System.out.println("connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
+
 	      currentConnection.connect(true, true);
+	    }
 	    
 	    if (connection.getStatus() != NetworkConnection.CONNECTED) {
 	      throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
+	    } else {
+	      if (Pooka.isDebug())
+		System.out.println("connect store " + getStoreID() + ":  successfully opened connection.");
+	      
 	    }
 	  }
 	}
@@ -536,6 +553,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	// Execute the precommand if there is one
 	String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
 	if (preCommand.length() > 0) {
+	  if (Pooka.isDebug())
+	    System.out.println("connect store " + getStoreID() + ":  executing precommand.");
+
 	  try {
 	    Process p = Runtime.getRuntime().exec(preCommand);
 	    p.waitFor();
@@ -544,6 +564,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	    ex.printStackTrace();
 	  }
 	}
+
+	if (Pooka.isDebug())
+	  System.out.println("connect store " + getStoreID() + ":  doing store.connect()");
 	store.connect();
       } catch (MessagingException me) {
 	Exception e = me.getNextException();
@@ -552,64 +575,80 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	else
 	  throw me;
       }
+
+      if (Pooka.isDebug())
+	System.out.println("connect store " + getStoreID() + ":  connection succeeded; connected = true.");
       connected=true;
       
       if (useSubscribed && protocol.equalsIgnoreCase("imap")) {
 	synchSubscribed();
       }
       
-      if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
-	for (int i = 0; i < children.size(); i++)
-	  ((FolderInfo)children.elementAt(i)).openAllFolders(Folder.READ_WRITE);
+      if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true")) {
+	for (int i = 0; i < children.size(); i++) {
+	  doOpenFolders((FolderInfo) children.elementAt(i));
+	}
+      }
     }
-    
   }
-    
-    /**
-     * This method disconnects the Store.  If you connect to the Store using 
-     * connectStore() (which you should), then you should use this method
-     * instead of calling getStore.disconnect().  If you don't, then the
-     * StoreInfo will try to reconnect the store.
-     */
-    public void disconnectStore() throws MessagingException {
-	MessagingException storeException = null;
-	if (!(store.isConnected())) {
-	    connected=false;
-	    return;
-	} else {
-	    try {
-		store.close();
-	    } catch (MessagingException me) {
-		storeException = me;
-	    } finally {
-		connected=false;
-		try {
-		    closeAllFolders(false);
-		} catch (MessagingException folderMe) {
-		    if (storeException != null)
-			throw folderMe;
-		    else {
-			storeException.setNextException(folderMe);
-			throw storeException;
-		    }
-		}
-	    }
-	}
-    }
 
-    /**
-     * Closes all of the Store's children.
-     */
-    public void closeAllFolders(boolean expunge) throws MessagingException {
-	if (Pooka.isDebug())
-	    System.out.println("closing all folders of store " + getStoreID());
-	Vector folders = getChildren();
-	if (folders != null) {
-	    for (int i = 0; i < folders.size(); i++) {
-		((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
-	    }
+  private void doOpenFolders(FolderInfo fi) {
+    final FolderInfo current = fi;
+    getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	  current.openAllFolders(Folder.READ_WRITE);
 	}
+      }, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
+  }
+
+    
+  /**
+   * This method disconnects the Store.  If you connect to the Store using 
+   * connectStore() (which you should), then you should use this method
+   * instead of calling getStore.disconnect().  If you don't, then the
+   * StoreInfo will try to reconnect the store.
+   */
+  public void disconnectStore() throws MessagingException {
+    MessagingException storeException = null;
+    if (!(store.isConnected())) {
+      connected=false;
+      return;
+    } else {
+      try {
+	store.close();
+      } catch (MessagingException me) {
+	storeException = me;
+      } finally {
+	connected=false;
+	try {
+	  closeAllFolders(false, false);
+	} catch (MessagingException folderMe) {
+	  if (storeException != null)
+	    throw folderMe;
+	  else {
+	    storeException.setNextException(folderMe);
+	    throw storeException;
+	  }
+	}
+      }
     }
+  }
+
+  /**
+   * Closes all of the Store's children.
+   */
+  public void closeAllFolders(boolean expunge, boolean shuttingDown) throws MessagingException {
+    synchronized(getStoreThread().getRunLock()) {
+      if (Pooka.isDebug())
+	System.out.println("closing all folders of store " + getStoreID());
+      Vector folders = getChildren();
+      if (folders != null) {
+	for (int i = 0; i < folders.size(); i++) {
+	  ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge, shuttingDown);
+	}
+      }
+    }
+  }
 
     /**
      * Gets all of the children folders of this StoreInfo which are both
