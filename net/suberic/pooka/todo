@@ -1,7 +1,5 @@
 *) document keybindings
 
-*) fix the right click remove on the attachment pane.
-
 *) make it so starting up is quicker (?).  -- check with threading, maybe?
 	either multiple threads for folders, or maybe check the threading
 	and connections for javamail.

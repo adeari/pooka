@@ -1,3 +1,7 @@
+fixed the popup menu on the attachment pane so that it shows up in the
+right place (and isn't selected by default when you right click and 
+release).
+
 fixed the keybindings in preview pane mode.
 
 020429 release

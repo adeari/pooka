@@ -234,7 +234,7 @@ public class AttachmentPane extends JPanel {
 	      if (! getTable().isRowSelected(rowIndex)) {
 		getTable().setRowSelectionInterval(rowIndex, rowIndex);
 	      }
-	      createPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
+	      createPopupMenu().show(getTable(), e.getX(), e.getY());
 	    }
 	    
 	  } 
@@ -249,7 +249,7 @@ public class AttachmentPane extends JPanel {
 	      if (! getTable().isRowSelected(rowIndex)) {
 		getTable().setRowSelectionInterval(rowIndex, rowIndex);
 	      }
-	      createPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
+	      createPopupMenu().show(getTable(), e.getX(), e.getY());
 	    }
 	    
 	  } 
