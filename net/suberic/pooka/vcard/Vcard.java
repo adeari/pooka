@@ -31,8 +31,8 @@ public class Vcard implements Comparable {
    */
   protected Vcard(Properties newProps) {
     properties = newProps;
-    System.out.println("***** new vcard:");
-    properties.list(System.out);
+    System.err.println("***** new vcard:");
+    properties.list(System.err);
   }
   
   /**
@@ -47,9 +47,10 @@ public class Vcard implements Comparable {
    */
   public InternetAddress getAddress() {
     try {
-      if (address == null)
-	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("n"));
-      System.out.println("made new internet address from " + properties.getProperty("email;internet") + ", " + properties.getProperty("n"));
+      if (address == null) {
+	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
+	System.err.println("made new internet address from " + properties.getProperty("email;internet") + ", " + properties.getProperty("fn"));
+      }
       return address;
     } catch (java.io.UnsupportedEncodingException uee) {
       return null;
@@ -61,8 +62,10 @@ public class Vcard implements Comparable {
    */
   public String getPersonalName() {
     try {
-      if (address == null)
-	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("n"));
+      if (address == null) {
+	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
+	System.err.println("made new internet address from " + properties.getProperty("email;internet") + ", " + properties.getProperty("fn"));
+      }
       return address.getPersonal();
     } catch (java.io.UnsupportedEncodingException uee) {
       return null;
@@ -169,8 +172,10 @@ public class Vcard implements Comparable {
 	  if (! (current[0].equalsIgnoreCase("begin") && current[1].equalsIgnoreCase("vcard")))
 	    throw new java.text.ParseException("No beginning", 0);
 	}
-	else 
+	else {
 	  newProps.put(current[0], current[1]);
+	  System.err.println("adding " + current[0] + ", " + current[1] + " to newProps.");
+	}
       } else {
 	return null;
       }
@@ -182,10 +187,12 @@ public class Vcard implements Comparable {
 	  if (current[0] != null && current[1] != null) {
 	    if (current[0].equalsIgnoreCase("end")) {
 	      isDone = true;
-	      if (current[1].equalsIgnoreCase("vcard"))
+	      if (current[1].equalsIgnoreCase("vcard")) 
 		newProps.put(current[0], current[1]);
 	      else
 		throw new java.text.ParseException("incorrect end tag", 0);
+	    } else {
+	      newProps.put(current[0], current[1]);
 	    }
 	  }
 	} else {

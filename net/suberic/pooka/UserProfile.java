@@ -15,7 +15,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   public boolean autoAddSignature = true;
   public boolean signatureFirst = true;
   private SignatureGenerator sigGenerator;
-  private AddressBook addressBook = new FakeAddressBook();
+  private AddressBook addressBook = net.suberic.pooka.Pooka.addressBook;
   
   private Vector excludeAddresses;
   
