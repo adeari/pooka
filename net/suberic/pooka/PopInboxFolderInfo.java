@@ -114,8 +114,8 @@ public class PopInboxFolderInfo extends FolderInfo {
 			}
 			getFolder().appendMessages(msgsToAppend);
 			for (int i = 0; i < msgs.length; i++) {
-			    msgsToAppend[i].setFlag(Flags.Flag.DELETED, true);
-			    System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgsToAppend[i].isSet(Flags.Flag.DELETED));
+			    msgs[i].setFlag(Flags.Flag.DELETED, true);
+			    System.out.println("marked message " + i + " to be deleted.  isDelted = " + msgs[i].isSet(Flags.Flag.DELETED));
 			}
 		    }
 		    f.close(true);

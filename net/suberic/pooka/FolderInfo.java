@@ -1164,6 +1164,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		} catch (MessagingException me) {
 		    if (otherException == null)
 			otherException = me;
+		} catch (Exception e) {
+		    MessagingException newMe = new MessagingException (e.getMessage(), e);
+		    if (otherException == null)
+			otherException = newMe;
 		}
 	    }
 	}  
