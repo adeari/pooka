@@ -11,7 +11,7 @@ public class ItemManager implements ValueChangeListener {
   
   private List itemList;
   private HashMap itemIdMap = new HashMap();
-  private List valueChangeListenerList = new LinkedList();
+  private List listenerList = new LinkedList();
 
   private String resourceString;
   private VariableBundle sourceBundle;
@@ -154,7 +154,7 @@ public class ItemManager implements ValueChangeListener {
     
     if (! newItemList.equals(itemList)) {
       itemList = newItemList;
-      fireItemListChangeEvent();
+      //fireItemListChangeEvent();
     }
   }
 
@@ -163,7 +163,7 @@ public class ItemManager implements ValueChangeListener {
    * in the allItems Vector; otherwise, returns null.
    */
   public Item getItem(String itemID) {
-    Vector allItems = getItemList();
+    Vector allItems = getItems();
     for (int i = 0; i < allItems.size(); i++) {
       Item si = (Item)(allItems.elementAt(i));
       
@@ -197,7 +197,7 @@ public class ItemManager implements ValueChangeListener {
    * This removes a ItemListChangeListener from the local listener list.
    */
   public void removeItemListChangeListener(ItemListChangeListener ilcl) {
-    listenerList.removeAll(ilcl);
+    listenerList.remove(ilcl);
   }
   
   /**
@@ -205,7 +205,7 @@ public class ItemManager implements ValueChangeListener {
    */
   public void fireItemListChangeEvent(ItemListChangeEvent e) {
     for (int i = 0; i < listenerList.size(); i++)
-      ((ItemListChangeListener)listenerList.elementAt(i)).itemListChange(e);
+      ((ItemListChangeListener)listenerList.get(i)).itemListChanged(e);
   }
   
 
@@ -226,7 +226,7 @@ public class ItemManager implements ValueChangeListener {
       itemID=(String)tokens.nextToken();
       Item newItem = itemCreator.createItem(sourceBundle, resourceString, itemID);
       itemList.add(newItem);
-      itemIdList.add(itemID, newItem);
+      itemIdMap.put(itemID, newItem);
     }
     
   }

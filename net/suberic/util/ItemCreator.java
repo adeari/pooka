@@ -10,5 +10,5 @@ public interface ItemCreator {
   /**
    * Creates an item from the given sourceBundle, resourceString, and itemID.
    */
-  public Item createItem(VariableBundle sourceBundle, String resourceString, Item itemID);
+  public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID);
 }
