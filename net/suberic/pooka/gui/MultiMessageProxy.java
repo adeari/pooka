@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.awt.event.MouseEvent;
+import java.awt.print.*;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.Pooka;
 import net.suberic.util.gui.ConfigurablePopupMenu;
@@ -40,7 +41,8 @@ public class MultiMessageProxy extends MessageProxy{
 	defaultActions = new Action[] {
 	    new ActionWrapper(new OpenAction(), storeThread),
 	    new ActionWrapper(new DeleteAction(), storeThread),
-	    new ActionWrapper(new MoveAction(), storeThread)
+	    new ActionWrapper(new MoveAction(), storeThread),
+	    new ActionWrapper(new PrintAction(), storeThread)
 		};
 
 	commands = new Hashtable();
@@ -126,6 +128,37 @@ public class MultiMessageProxy extends MessageProxy{
 	    }
     }
 
+        /**
+     * This sends the message to the printer, first creating an appropriate
+     * print dialog, etc.
+     */
+
+    public void printMessage() {
+	PrinterJob job = PrinterJob.getPrinterJob ();
+	Book book = new Book ();
+	PageFormat pf = job.pageDialog (job.defaultPage ());
+	for (int i = 0; i < messages.size(); i++) {
+	    MessagePrinter printer = new MessagePrinter((MessageProxy)messages.elementAt(i), book.getNumberOfPages());
+	    book.append (printer, pf);
+	}
+	job.setPageable (book);
+	final PrinterJob externalJob = job;
+	if (job.printDialog ()) {
+	    Thread printThread = new Thread(new net.suberic.util.swing.RunnableAdapter() {
+		public void run() {
+		    try {
+			externalJob.print ();
+		    }
+		    catch (PrinterException ex) {
+			ex.printStackTrace ();
+		    }
+		}
+	    });
+	    printThread.start();
+	    
+	}
+    }
+
     public Message getMessage() { return null; }
 
     public Action getAction(String name) {
@@ -167,4 +200,16 @@ public class MultiMessageProxy extends MessageProxy{
 
     }
 
+    public class PrintAction extends AbstractAction {
+	PrintAction() {
+	    super("file-print");
+	}
+	
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	    folderWindow.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    printMessage();
+	    folderWindow.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	}
+    }
 }
+

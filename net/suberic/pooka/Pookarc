@@ -87,7 +87,7 @@ MenuBar.Help.About.Action=help-about
 MenuBar.Help.License.Action=help-license
 
 #MainToolbar = FolderNew:FolderOpen:FolderClose:|:MessageNew:MessageOpen:MessageSave:MessageClose:|:Cut:Copy:Paste
-MainToolbar = FolderOpen:MessageNew:MessageOpen:MessageClose:|:Cut:Copy:Paste
+MainToolbar = FolderOpen:MessageNew:MessageOpen:MessageClose:|:Cut:Copy:Paste:Print
 MainToolbar.FolderNew.Action=folder-new
 MainToolbar.FolderNew.Image=/net/suberic/pooka/gui/images/New.gif
 MainToolbar.FolderOpen.Action=folder-open
@@ -108,18 +108,26 @@ MainToolbar.Copy.Action=copy-to-clipboard
 MainToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MainToolbar.Paste.Action=paste-from-clipboard
 MainToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
+MainToolbar.Print.Action=file-print
+MainToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 
-FolderWindowToolbar=Down:Up:Open:Delete
+FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Print
 FolderWindowToolbar.Down.Action=folder-down
 FolderWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
 FolderWindowToolbar.Up.Action=folder-up
 FolderWindowToolbar.Up.Image=/net/suberic/pooka/gui/images/Up.gif
 FolderWindowToolbar.Open.Action=message-open
 FolderWindowToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
+FolderWindowToolbar.Reply.Action=message-reply
+FolderWindowToolbar.Reply.Image=/net/suberic/pooka/gui/images/Reply.gif
+FolderWindowToolbar.ReplyAll.Action=message-reply-all
+FolderWindowToolbar.ReplyAll.Image=/net/suberic/pooka/gui/images/ReplyAll.gif
 FolderWindowToolbar.Delete.Action=message-delete
 FolderWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
+FolderWindowToolbar.Print.Action=file-print
+FolderWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 
-NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste
+NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste:Print
 NewMessageWindowToolbar.Send.Action=message-send
 NewMessageWindowToolbar.Send.Image=/net/suberic/pooka/gui/images/Envelope.gif
 NewMessageWindowToolbar.AttachFile.Action=message-attach-file
@@ -130,6 +138,9 @@ NewMessageWindowToolbar.Copy.Action=copy-to-clipboard
 NewMessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 NewMessageWindowToolbar.Paste.Action=paste-from-clipboard
 NewMessageWindowToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
+NewMessageWindowToolbar.Print.Action=file-print
+NewMessageWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
+
 
 MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy
 MessageWindowToolbar.Reply.Action=message-reply

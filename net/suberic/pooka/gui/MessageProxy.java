@@ -357,13 +357,20 @@ public class MessageProxy {
 	int count = printer.getPageCount(pf);
 	book.append (printer, pf, count);
 	job.setPageable (book);
+	final PrinterJob externalJob = job;
 	if (job.printDialog ()) {
-	    try {
-		job.print ();
-	    }
-	    catch (PrinterException ex) {
-		ex.printStackTrace ();
-	    }
+	    Thread printThread = new Thread(new net.suberic.util.swing.RunnableAdapter() {
+		    public void run() {
+			try {
+			    externalJob.print ();
+			}
+			catch (PrinterException ex) {
+			    ex.printStackTrace ();
+			}
+		    }
+	    });
+	    printThread.start();
+	    
 	}
     }
 

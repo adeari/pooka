@@ -13,12 +13,18 @@ public class MessagePrinter implements Printable {
     private PageFormat pf;
     private ArrayList pages;
     private Font font= new Font ("TimesRoman", Font.PLAIN, 12);
+    private int offset;
     
     /**
      * This creates a new MessagePrinter for the given MessageProxy.
      */
-    public MessagePrinter(MessageProxy mp) {
+    public MessagePrinter(MessageProxy mp, int newOffset) {
 	message = mp;
+	offset = newOffset;
+    }
+
+    public MessagePrinter(MessageProxy mp) {
+	this(mp, 0);
     }
 
     /**
@@ -90,11 +96,11 @@ public class MessagePrinter implements Printable {
 	    pages = calculatePages();
 	}
 
-	if (pageIndex >= pages.size ()) {
+	if (pageIndex - offset >= pages.size ()) {
 	    return Printable.NO_SUCH_PAGE;
 	}
 
-	renderPage (graphics, pf, pageIndex);
+	renderPage (graphics, pf, pageIndex - offset);
 	return Printable.PAGE_EXISTS;
     }
 }
