@@ -66,7 +66,7 @@ public class SimpleFileCache implements MessageCache {
 	    return h;
 	} else {
 	    if (getFolderInfo().isAvailable()) {
-		MimeMessage m = getFolderInfo().getMessageById(uid);
+		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null) {
 		    h = m.getDataHandler();
 		    if (saveToCache)
@@ -101,7 +101,7 @@ public class SimpleFileCache implements MessageCache {
 	    f = flag;
 	}
 	if (getFolderInfo().isAvailable()) {
-	    MimeMessage m = getFolderInfo().getMessageById(uid);
+	    MimeMessage m = getFolderInfo().getRealMessageById(uid);
 	    if (m != null)
 		m.setFlags(flag, true);
 	} else {
@@ -123,7 +123,7 @@ public class SimpleFileCache implements MessageCache {
 	    f.remove(flag);
 
 	    if (getFolderInfo().isAvailable()) {
-		MimeMessage m = getFolderInfo().getMessageById(uid);
+		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null)
 		    m.setFlags(flag, false);
 	    } else {
@@ -143,7 +143,7 @@ public class SimpleFileCache implements MessageCache {
 	    return h;
 	} else {
 	    if (getFolderInfo().isAvailable()) {
-		MimeMessage m = getFolderInfo().getMessageById(uid);
+		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null) {
 		    java.util.Enumeration enum = m.getAllHeaderLines();
 		    h = new InternetHeaders();
@@ -174,7 +174,7 @@ public class SimpleFileCache implements MessageCache {
 	    return f;
 	} else {
 	    if (getFolderInfo().isAvailable()) {
-		MimeMessage m = getFolderInfo().getMessageById(uid);
+		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (f != null) {
 		    f = m.getFlags();
 		    if (saveToCache)
