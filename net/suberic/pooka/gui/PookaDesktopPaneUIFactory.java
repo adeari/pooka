@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
-import net.suberic.util.gui.PropertyEditorFactory;
+import net.suberic.util.gui.propedit.PropertyEditorFactory;
+import net.suberic.util.gui.propedit.DesktopPropertyEditorFactory;
 import net.suberic.util.swing.ThemeManager;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
@@ -27,7 +28,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public PookaDesktopPaneUIFactory() {
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
  
-      editorFactory = new PookaDesktopPropertyEditorFactory(Pooka.getResources());
+      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources());
     }
 
   /**
@@ -165,7 +166,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
     messagePanel.setUIComponent(messageScrollPane);
     
-    ((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+    ((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
     return messagePanel;
   }
   
@@ -181,7 +182,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
     messagePanel.setUIComponent(messageScrollPane);
     
-    ((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+    ((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
     return messagePanel;
   }
   

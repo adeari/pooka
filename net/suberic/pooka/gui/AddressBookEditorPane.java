@@ -1,6 +1,8 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
+import net.suberic.util.gui.propedit.*;
+import net.suberic.pooka.gui.propedit.*;
 import net.suberic.util.gui.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -10,9 +12,8 @@ import javax.swing.Action;
 /**
  * A property editor which edits an AddressBook.
  */
-public class AddressBookEditorPane extends DefaultPropertyEditor {
+public class AddressBookEditorPane extends SwingPropertyEditor {
   
-  String property;
   AddressBook book;
   JPanel editPanel;
   JPanel searchEntryPanel;
@@ -21,8 +22,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   JButton editButton, addButton, deleteButton, searchButton;
   boolean enabled = true;
 
-  VariableBundle sourceBundle = null;
-  PropertyEditorFactory factory = null;
+  PropertyEditorManager manager;
 
   Action[] defaultActions = new Action[] {
     new AddAction(),
@@ -32,19 +32,20 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 
   ConfigurablePopupMenu popupMenu;
 
-  public AddressBookEditorPane(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
-    configureEditor(newFactory, newProperty, newTemplateType, bundle, isEnabled);
-  }
+  /**
+   * @param propertyName The property to be edited.  
+   * @param template The property that will define the layout of the 
+   *                 editor.
+   * @param manager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default. 
+   */
+  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+    property=propertyName;
+    manager=newManager;
+    editorTemplate = template;
+    originalValue = manager.getProperty(property, "");
 
-  public AddressBookEditorPane(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle) {
-    configureEditor(newFactory, newProperty, newTemplateType, bundle, true);
-  }
-  
-  public void configureEditor(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
-    sourceBundle = bundle;
-    factory = newFactory;
-
-    property=newProperty;
     // we're going to have "AddressBook." at the beginning, and 
     // ".addressListEditor" at the end...
     String bookName = property.substring(12, property.length() - 18);
@@ -63,7 +64,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     //this.add(new JScrollPane(addressTable));
     JScrollPane addressPane = new JScrollPane(addressTable);
     try {
-      addressPane.setPreferredSize(new java.awt.Dimension(Integer.parseInt(sourceBundle.getProperty("Pooka.addressBookEditor.hsize", "300")), Integer.parseInt(sourceBundle.getProperty("Pooka.addressBookEditor.vsize", "100"))));
+      addressPane.setPreferredSize(new java.awt.Dimension(Integer.parseInt(manager.getProperty("Pooka.addressBookEditor.hsize", "300")), Integer.parseInt(manager.getProperty("Pooka.addressBookEditor.vsize", "100"))));
     } catch (Exception e) {
       addressPane.setPreferredSize(new java.awt.Dimension(300, 100));
     }
@@ -71,7 +72,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     this.add(editPanel);
 
     popupMenu = new ConfigurablePopupMenu();
-    popupMenu.configureComponent("AddressBookEditor.popupMenu", bundle);
+    popupMenu.configureComponent("AddressBookEditor.popupMenu", manager.getFactory().getSourceBundle());
     popupMenu.setActive(getActions());
 
     this.setEnabled(isEnabled);
@@ -83,14 +84,14 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    */
   public void createSearchEntryPanel() {
     searchEntryPanel = new JPanel();
-    searchEntryPanel.add(new JLabel(sourceBundle.getProperty("AddressBookEditor.matchString", "Match String: ")));
+    searchEntryPanel.add(new JLabel(manager.getProperty("AddressBookEditor.matchString", "Match String: ")));
 
     searchEntryField = new JTextField(30);
     searchEntryPanel.add(searchEntryField);
 
     Action a = new SearchAction();
 
-    searchButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Search", "Search"));
+    searchButton = new JButton(manager.getProperty("AddressBookEditor.title.Search", "Search"));
     searchButton.addActionListener(a);
     searchEntryPanel.add(searchButton);
     
@@ -156,17 +157,17 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     editPanel = new JPanel();
 
     Action a = new AddAction();
-    addButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Add", "Add"));
+    addButton = new JButton(manager.getProperty("AddressBookEditor.title.Add", "Add"));
     addButton.addActionListener(a);
     editPanel.add(addButton);
 
     a = new EditAction();
-    editButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Edit", "Edit"));
+    editButton = new JButton(manager.getProperty("AddressBookEditor.title.Edit", "Edit"));
     editButton.addActionListener(a);
     editPanel.add(editButton);
 
     a = new DeleteAction();
-    deleteButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Delete", "Delete"));
+    deleteButton = new JButton(manager.getProperty("AddressBookEditor.title.Delete", "Delete"));
     deleteButton.addActionListener(a);
     editPanel.add(deleteButton);
     
@@ -231,8 +232,8 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    * Brings up an editor for the current entry.
    */
   public void editEntry(AddressBookEntry entry) {
-    AddressEntryEditor editor = new AddressEntryEditor(factory, entry, sourceBundle);
-    factory.showNewEditorWindow(sourceBundle.getProperty("AddressEntryEditor.title", "Address Entry"), editor);
+    AddressEntryEditor editor = new AddressEntryEditor(manager, entry);
+    manager.getFactory().showNewEditorWindow(manager.getProperty("AddressEntryEditor.title", "Address Entry"), editor);
   }
 
   /**

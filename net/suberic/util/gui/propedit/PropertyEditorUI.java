@@ -84,6 +84,11 @@ public interface PropertyEditorUI {
   public boolean isEnabled();
 
   /**
+   * Returns the PropertyEditorManager for this PropertyEditorUI.
+   */
+  public PropertyEditorManager getManager();
+
+  /**
    * Adds a PropertyEditorListener to the ListenerList.
    */
   public void addPropertyEditorListener(PropertyEditorListener pel);

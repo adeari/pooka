@@ -204,6 +204,13 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
+   * Gets the PropertyEditorManager
+   */
+  public PropertyEditorManager getManager() {
+    return manager;
+  }
+
+  /**
    * Adds a PropertyEditorListener to the ListenerList.
    */
   public void addPropertyEditorListener(PropertyEditorListener pel) {

@@ -41,7 +41,7 @@ public class PopInboxFolderInfo extends FolderInfo {
     String user = Pooka.getProperty("Store." + storeID + ".user", "");
     String password = Pooka.getProperty("Store." + storeID + ".password", "");
     if (!password.equals(""))
-      password = net.suberic.util.gui.PasswordEditorPane.descrambleString(password);
+      password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
     String server = Pooka.getProperty("Store." + storeID + ".server", "");
     String protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
     

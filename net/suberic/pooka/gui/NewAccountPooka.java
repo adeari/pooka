@@ -3,7 +3,7 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.Pooka;
 import net.suberic.util.*;
 import net.suberic.util.thread.*;
-import net.suberic.util.gui.*;
+import net.suberic.util.gui.propedit.*;
 import javax.swing.*;
 import java.util.*;
 
@@ -74,7 +74,9 @@ public class NewAccountPooka {
     jta.setFont(jl.getFont());
     contentPane.add(jta);
     
-    contentPane.add(new PropertyEditorPane(factory,
+
+    PropertyEditorManager mgr = new PropertyEditorManager(getProperties(), factory);
+    contentPane.add(new PropertyEditorPane(mgr,
 					   propertyVector,
 					   propertyVector,
 					   firstEntryWindow));
@@ -263,12 +265,13 @@ public class NewAccountPooka {
     JInternalFrame secondEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.secondWindowMessage.title", "Outgoing Email Server"), false, false, false, false);
     secondEntryWindow.getContentPane().setLayout(new BoxLayout(secondEntryWindow.getContentPane(), BoxLayout.Y_AXIS));
     secondEntryWindow.getContentPane().add(new JTextArea(Pooka.getProperty("NewAccountPooka.secondWindowMessage", "Please enter the URL for your outgoing email.")));
-    secondEntryWindow.getContentPane().add(new PropertyEditorPane(factory, propertyVector, secondEntryWindow));
+    PropertyEditorManager mgr = new PropertyEditorManager(getProperties(), factory);
+    secondEntryWindow.getContentPane().add(new PropertyEditorPane(mgr, propertyVector, secondEntryWindow));
     secondEntryWindow.pack();
     secondEntryWindow.show();
     secondEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-	  SwingUtilities.invokeLater( new Runnable() {
+	  SwingUtilities.invokeLater(new Runnable() {
 	      public void run() {
 		handleSecondEntry();
 	      }

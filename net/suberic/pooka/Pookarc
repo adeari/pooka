@@ -922,3 +922,22 @@ CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
 
 # colors
 Pooka.background=0
+
+# PropertyEditors
+PropertyEditor=String:Boolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList
+PropertyEditor.String.class=net.suberic.util.gui.propedit.StringEditorPane
+PropertyEditor.Boolean.class=net.suberic.util.gui.propedit.BooleanEditorPane
+PropertyEditor.List.class=net.suberic.util.gui.propedit.ListEditorPane
+PropertyEditor.Variable.class=net.suberic.util.gui.propedit.VariableEditorPane
+PropertyEditor.Composite.class=net.suberic.util.gui.propedit.CompositeEditorPane
+PropertyEditor.Color.class=net.suberic.util.gui.propedit.ColorSelectorPane
+PropertyEditor.Font.class=net.suberic.util.gui.propedit.FontSelectorPane
+PropertyEditor.File.class=net.suberic.util.gui.propedit.FileSelectorPane
+PropertyEditor.Multi.class=net.suberic.util.gui.propedit.MultiEditorPane
+PropertyEditor.Password.class=net.suberic.util.gui.propedit.PasswordEditorPane
+PropertyEditor.Directory.class=net.suberic.util.gui.propedit.FileSelectorPane
+PropertyEditor.Tabbed.class=net.suberic.util.gui.propedit.TabbedEditorPane
+PropertyEditor.Folder.class=net.suberic.util.gui.propedit.StringEditorPane
+PropertyEditor.Filter.class=net.suberic.util.gui.propedit.StringEditorPane
+PropertyEditor.SearchTerm.class=net.suberic.util.gui.propedit.StringEditorPane
+PropertyEditor.AddressList.class=net.suberic.util.gui.propedit.StringEditorPane

@@ -1,5 +1,5 @@
 package net.suberic.pooka.gui;
-import net.suberic.util.gui.PropertyEditorFactory;
+import net.suberic.util.gui.propedit.PropertyEditorFactory;
 import net.suberic.util.swing.ThemeManager;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
@@ -28,7 +28,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
      * Constructor.
      */
     public PookaPreviewPaneUIFactory() {
-      editorFactory = new PookaExternalPropertyEditorFactory(Pooka.getResources());
+      editorFactory = new PropertyEditorFactory(Pooka.getResources());
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
     }
 

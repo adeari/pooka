@@ -68,7 +68,7 @@ public interface PookaUIFactory extends ErrorHandler {
   /**
    * Returns the PropertyEditorFactory used by this component.
    */
-  public net.suberic.util.gui.PropertyEditorFactory getEditorFactory();
+  public net.suberic.util.gui.propedit.PropertyEditorFactory getEditorFactory();
   
   /**
    * Shows a Confirm dialog.

@@ -7,7 +7,7 @@ import java.util.List;
  * This will make an editor for a list of properties.
  */
 public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
-  List editors;
+  protected List editors;
   
   /**
    * This writes the currently configured values in the PropertyEditorUI

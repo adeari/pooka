@@ -145,11 +145,11 @@ public class PropertyEditorPane extends Box {
     JButton thisButton;
     
     thisButton = new JButton(manager.getProperty("label." + label, label));
-    try {
-      thisButton.setMnemonic(manager.getProperty("label." + label + ".mnemonic", "").charAt(0));
-    } catch (java.util.MissingResourceException mre) {
+    String mnemonic = manager.getProperty("label." + label + ".mnemonic", "");
+    if (mnemonic.length() > 0) {
+      thisButton.setMnemonic(mnemonic.charAt(0));
     }
-    
+
     thisButton.setSelected(isDefault);
     
     thisButton.addActionListener(e);

@@ -73,7 +73,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     // these values might be 'allen', 'deborah', 'marc', 'jessica', etc.
     
     Vector optionVector = createEditedList(originalValue);
-    
+
     optionListModel = new DefaultListModel();
     
     for (int i = 0; i < optionVector.size(); i++) {
@@ -89,6 +89,13 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     template = editorTemplate + ".editableFields";
     
+    Vector templateNames  = createEditedList(manager.getProperty(template, ""));
+    
+    templates = new Vector();
+    for (int i = 0; i < templateNames.size(); i++) {
+      template.add(new String(template + "." + (String)templateNames.get(i)));
+    }
+
     // create entryPanels (the panels which show the subproperties
     // of each item in the optionList) for each option.
     
@@ -163,7 +170,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     rootProp = new String(property + ".default");
     
-    SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate);
+    SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate + ".editableFields");
     pep.setEnabled(false);
     
     if (original == true) {
