@@ -128,10 +128,21 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     // of each item in the optionList) for each option.
     
     entryPanel = createEntryPanel(optionVector, true);
-    this.add(entryPanel);
+
+    if (sourceBundle.getProperty(template + "._useScrollPane", "false").equalsIgnoreCase("true")) {
+      JScrollPane jsp = new JScrollPane(entryPanel);
+      java.awt.Dimension size = jsp.getPreferredSize();
+      size.height = Math.min(size.height, 300);
+      size.width = Math.min(size.width, 400);
+      jsp.setPreferredSize(size);
+      this.add(jsp);
+      valueComponent = jsp;
+    } else {
+      this.add(entryPanel);
+      valueComponent = entryPanel;
+    }
     
     labelComponent = optionBox;
-    valueComponent = entryPanel;
     
     this.setEnabled(isEnabled);
   }

@@ -132,7 +132,12 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     
     GridBagConstraints constraints = new GridBagConstraints();
     constraints.insets = new Insets(1,3,0,3);
-    GridBagLayout layout = (GridBagLayout) getLayout();
+    
+    //GridBagLayout layout = (GridBagLayout) getLayout();
+    GridBagLayout layout = new GridBagLayout();
+    JPanel contentPanel = new JPanel();
+    contentPanel.setLayout(layout);
+
     constraints.weightx = 1.0;
     constraints.fill = GridBagConstraints.BOTH;
     
@@ -145,13 +150,15 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
       
       if (currentEditor.labelComponent != null) {
 	layout.setConstraints(currentEditor.labelComponent, constraints);
-	this.add(currentEditor.labelComponent);
+	//this.add(currentEditor.labelComponent);
+	contentPanel.add(currentEditor.labelComponent);
       }
       
       if (currentEditor.valueComponent != null) {
 	constraints.gridwidth=GridBagConstraints.REMAINDER;
 	layout.setConstraints(currentEditor.valueComponent, constraints);
-	this.add(currentEditor.valueComponent);
+	//this.add(currentEditor.valueComponent);
+	contentPanel.add(currentEditor.valueComponent);
       }
       
       constraints.weightx = 0.0;
@@ -159,6 +166,8 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
       
     }
     
+    //JScrollPane jsp = new JScrollPane(contentPanel);
+    this.add(contentPanel);
     alignEditorSizes();
   }
   
@@ -184,6 +193,8 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     for (int i = 0; i < editors.size(); i++) {
       ((DefaultPropertyEditor) editors.elementAt(i)).setWidths(labelWidth, valueWidth);
     }
+    
+
     
   }
   
@@ -256,6 +267,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
       }
     }
   }
+
 }
     
 
