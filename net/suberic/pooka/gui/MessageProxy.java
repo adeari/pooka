@@ -190,6 +190,9 @@ public class MessageProxy {
 		    JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n" + me.getMessage());
 	    }   
 	}
+	
+	if (getMessageWindow() != null)
+	    getMessageWindow().closeMessageWindow();
     }
 
     /**
