@@ -1,3 +1,6 @@
+caching messages when using disconnected imap no longer marks the messages
+as read.
+
 made some implementation changes to the way that disconnected imap folders
 are loaded.  this should result in a fairly substantial performace increase
 for large folders.

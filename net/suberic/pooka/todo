@@ -1,35 +1,30 @@
-	-- disconnect imap --
-
-*) disconnected imap is way too slow.  
-
-*) caching messages marks them as read.
+	-- disconnected imap --
 
 *) no way to cache messages as they come in.
 
-*) new messages seem to be loaded last.
+*) fully cached filter doesn't work anymore.
+
+*) get rid of the 'comparing new messages...' status message after you're
+	done!
 
 *) in general, make reconnecting/resynching (with disconnected imap or
 	with the uid system) use the LoadMessageThread.  also make the
 	LoadMessageThread use the main FolderThread synchronization.
 
-*) new message count on disconnected imap folders is a bit strange.  might 
-want to get it from the cache instead of the folder itself when we haven't
-downloaded the new messages yet.  kind of weird to see '6 new messages' and
-have nothing new in your inbox because it hasn't been d/l'ed yet.
-
-*) incorrect number of messages/unread messages when in disconnected mode.
+*) each loading of the FolderTableInfo rechecks the unread message
+	count, which sucks for performance.  improvements with new
+	caching system???
 
 *) check reading uncached messages; it should happen that if you try to
 read an uncached message twice in a row, you should get the same error
-message.
-
-*) get rid of the 'comparing new messages...' status message after you're
-	done!
+message, instead of having a random empty 
 
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
 
-*) add a POOKA_HOME option.
+*) add a POOKA_HOME option. -- done sort of, but need to find the right
+	place for it, and to enable a directory file chooser.  oh, and
+	set it up in the new account setup.
 
 ---
 

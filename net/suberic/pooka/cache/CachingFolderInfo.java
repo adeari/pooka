@@ -280,7 +280,29 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
     
   }
+
+  public boolean hasUnread() {
+    return (getUnreadCount() > 0);
+  }
+  
+  public int getUnreadCount() {
+    try {
+      unreadCount = getCache().getUnreadMessageCount();
+    } catch (MessagingException me) {
+
+    }
+    return unreadCount;
+  }
+  
+  public int getMessageCount() {
+    try {
+      messageCount = getCache().getMessageCount();
+    } catch (MessagingException me) {
+    }
     
+    return messageCount;
+  }
+  
   /**
    * This synchronizes the cache with the new information from the 
    * Folder.

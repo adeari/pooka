@@ -242,22 +242,31 @@ public class SimpleFileCache implements MessageCache {
 	    throw new StaleCacheException(uidValidity, newUidValidity);
 	}
 	try {
-	    if (status == CONTENT || status == MESSAGE) {
-		File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
-		if (outFile.exists())
-		    outFile.delete();
-		
-		FileOutputStream fos = new FileOutputStream(outFile);
-		m.writeTo(fos);
-		
-		fos.flush();
-		fos.close();
-	    }
+	  if (status == CONTENT || status == MESSAGE) {
+	    // we have to reset the seen flag if it's not set, since getting
+	    // the message from the server sets the flag.
+	    Flags flags = m.getFlags();
+	    boolean resetSeen = (! flags.contains(Flags.Flag.SEEN));
+	      
+	    File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
+	    if (outFile.exists())
+	      outFile.delete();
 	    
-	    if (status == MESSAGE || status == FLAGS || status == FLAGS_AND_HEADERS) {
-		Flags flags = m.getFlags();
-		saveFlags(uid, uidValidity, flags);
+	    FileOutputStream fos = new FileOutputStream(outFile);
+	    m.writeTo(fos);
+	    
+	    fos.flush();
+	    fos.close();
+
+	    if (resetSeen) {
+	      m.setFlag(Flags.Flag.SEEN, false);
 	    }
+	  }
+	  
+	  if (status == MESSAGE || status == FLAGS || status == FLAGS_AND_HEADERS) {
+	    Flags flags = m.getFlags();
+	    saveFlags(uid, uidValidity, flags);
+	  }
 
 
 	    if (status == MESSAGE || status == HEADERS || status == FLAGS_AND_HEADERS) {
