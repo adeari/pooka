@@ -16,6 +16,8 @@ disconnected mode.
 	       we reconnect to the server.
 	   *)  loading the initial cache takes too long--we should have a 
 	       note on screen saying that we're caching things.
+	   *)  cached folders currently come up with the first message showing
+	       instead of the last.
 	   *)  add a ui for configuring caching.
 	   *)  add a ui for seeing the caching mode for each message, and for
 	       explicitly caching the messages themselves.
