@@ -47,19 +47,25 @@ public class OutgoingMailServer implements net.suberic.util.Item {
   /**
    * Sends all available messages.
    */
-  /*
   public void sendAll() throws javax.mail.MessagingException {
 
     NetworkConnection connection = getConnection();
+    
+    if (connection.getStatus() == NetworkConnection.DISCONNECTED) {
+      connection.connect();
+    }
 
-    if (connection.getStatus() == NetworkConnection.DOWN) 
-      FIXME
+    if (connection.getStatus() != NetworkConnection.CONNECTED) {
+      throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Mail Server:  ") + getItemID());
+    }
 
     Transport sendTransport = Pooka.getDefaultSession().getTransport(sendMailURL); 
     try {
       sendTransport.connect();
       
-      Message[] msgs = getFolder().getMessages();    
+      FolderInfo outbox = getOutbox();
+
+      Message[] msgs = outbox.getFolder().getMessages();    
       
       try {
 	for (int i = 0; i < msgs.length; i++) {
@@ -70,13 +76,12 @@ public class OutgoingMailServer implements net.suberic.util.Item {
 	  }
 	}
       } finally {
-	getFolder().expunge();
+	outbox.getFolder().expunge();
       }
     } finally {
       sendTransport.close();
     }
   }
-  */
 
   /**
    * Virtually sends a message.  If the current status is connected, then
@@ -84,47 +89,42 @@ public class OutgoingMailServer implements net.suberic.util.Item {
    * Message.sendImmediately setting is true, then we'll attempt to send
    * the message anyway.  
    */
-  /*
   public void sendMessage(NewMessageInfo nmi, boolean connect) throws javax.mail.MessagingException {
-    this.appendMessages(new MessageInfo[] { nmi });
-    if (online)
+    FolderInfo outbox = getOutbox();
+    NetworkConnection connection = getConnection();
+
+    outbox.appendMessages(new MessageInfo[] { nmi });
+    if (connection.getStatus() == NetworkConnection.CONNECTED)
       sendAll();
     else if (connect || Pooka.getProperty("Message.sendImmediately", "false").equalsIgnoreCase("true")) {
       try {
-	connect();
-	if (online)
-	  sendAll();
+	connection.connect();
+	sendAll();
       } catch (MessagingException me) {
 	System.err.println("me is a " + me);
-	online = false;
+	me.printStackTrace();
       }
     }
   }
-  */
   
   /**
    * Virtually sends a message.  If the current status is connected, then
    * the message will actually be sent now.  
    */
-  /*
   public void sendMessage(NewMessageInfo nmi) throws javax.mail.MessagingException {
     sendMessage(nmi, false);
   }
-  */
 
   /**
    * <p>The NetworkConnection that this OutgoingMailServer depends on.
    */
   public NetworkConnection getConnection() {
-    /*
     NetworkConnectionManager connectionManager = Pooka.getConnectionManager();
     NetworkConnection returnValue = connectionManager.getConnection(connectionID);
     if (returnValue != null)
       return returnValue;
     else
       return connectionManager.getDefaultConnection();
-    */
-    return null;
   }
 
   /**

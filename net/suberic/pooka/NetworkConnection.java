@@ -98,6 +98,15 @@ public class NetworkConnection implements net.suberic.util.Item {
   }
 
   /**
+   * <p>Connect to this network service.</p>
+   * 
+   * @return the new status of the server.
+   */
+  public int connect() {
+    return connect(true);
+  }
+
+  /**
    * <p>Disconnect from this network service.</p>
    * 
    * @param runDisonnectCommand whether or not we should run the
@@ -122,6 +131,15 @@ public class NetworkConnection implements net.suberic.util.Item {
     }
     
     return status;
+  }
+
+  /**
+   * <p>Disconnect from this network service.</p>
+   * 
+   * @return the new status of the server.
+   */
+  public int disconnect() {
+    return disconnect(true);
   }
 
   /**

@@ -318,6 +318,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new EditStoreConfigAction(),
 	new EditPreferencesAction(),
 	new EditAddressBookAction(),
+	new EditOutgoingServerAction(),
+	new EditConnectionAction(),
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
 	new SelectMessagePanelAction(),
@@ -420,6 +422,34 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       valuesToEdit.add("AddressBook");
       valuesToEdit.add("AddressBook._default");
       Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.addressBook", "Address Book Editor"), valuesToEdit);
+    }
+  }
+
+  class EditOutgoingServerAction extends AbstractAction {
+    
+    EditOutgoingServerAction() {
+      super("cfg-outgoing");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("OutgoingServer");
+      valuesToEdit.add("OutgoingServer._default");
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.outgoingServer", "Outgoing Mail Editor"), valuesToEdit);
+    }
+  }
+
+  class EditConnectionAction extends AbstractAction {
+    
+    EditConnectionAction() {
+      super("cfg-connection");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("Connection");
+      valuesToEdit.add("Connection._default");
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.connectionEditor", "Connection Editor"), valuesToEdit);
     }
   }
 

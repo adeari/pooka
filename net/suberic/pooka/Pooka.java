@@ -12,7 +12,8 @@ public class Pooka {
     static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
   static public net.suberic.pooka.gui.MainPanel panel;
   static public SearchTermManager searchManager;
-  
+  static public NetworkConnectionManager connectionManager;
+
   static public javax.mail.Session defaultSession;
   static public net.suberic.pooka.thread.FolderTracker folderTracker;
   
@@ -44,17 +45,9 @@ public class Pooka {
 	UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
     } catch (Exception e) { System.out.println("Cannot set look and feel..."); }
 
-    /*
-    try {
-    addressBook = new net.suberic.pooka.vcard.VcardAddressBook("/home/allen/working/vcard.db");
-
-    } catch (Exception e) {
-      System.out.println("caught exception :  " + e);
-      e.printStackTrace();
-    }
-    */
-    
     addressBookManager = new AddressBookManager();
+
+    connectionManager = new NetworkConnectionManager();
 
     dateFormatter = new DateFormatter();
 
@@ -212,6 +205,10 @@ public class Pooka {
 
   static public AddressBookManager getAddressBookManager() {
     return addressBookManager;
+  }
+
+  static public NetworkConnectionManager getConnectionManager() {
+    return connectionManager;
   }
 }
 

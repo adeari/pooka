@@ -94,6 +94,14 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
   }
 
   /**
+   * This returns the NetwordConnection with the given connectionName if it 
+   * exists; otherwise, returns null.
+   */
+  public NetworkConnection getDefaultConnection() {
+    return (NetworkConnection) manager.getItem("_default");
+  }
+
+  /**
    * This adds a ItemListChangeListener to the local listener list.
    */
   public void addItemListChangeListener(ItemListChangeListener ilcl) {
