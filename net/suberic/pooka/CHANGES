@@ -1,3 +1,9 @@
+fixed a bug in UIDFolderInfo which made it so you couldn't append 
+non-UIDMimeMessages.
+
+modified the fetch() functionality of the FolderInfos so that we only 
+fetch Pooka.fetchBatchSize messages at a time.  this should reduce the amout
+of time it takes to display large folders at startup.
 
 changed the SMTP server support so that we now have a separate SMTP server
 object, instead of having the servers configured in the UserProfile.

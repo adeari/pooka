@@ -512,7 +512,11 @@ public class UIDFolderInfo extends FolderInfo {
      * gets the 'real' message for the given MessageInfo.
      */
     public Message getRealMessage(MessageInfo mi) throws MessagingException {
-	return ((UIDMimeMessage)mi.getMessage()).getMessage();
+      Message wrappingMessage = mi.getMessage();
+      if (wrappingMessage instanceof UIDMimeMessage)
+	return ((UIDMimeMessage)wrappingMessage).getMessage();
+      else
+	return wrappingMessage;
     }
 
     /**

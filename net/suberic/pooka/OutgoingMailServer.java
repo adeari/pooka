@@ -107,9 +107,21 @@ public class OutgoingMailServer implements net.suberic.util.Item {
 	  System.out.println("me is a " + me);
 	  me.printStackTrace();
 	}
+
+	((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
+      
+      } else {
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
+	((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
       }
     } else {
-      Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
+      // if there is no outbox set, just try sending the message directly.
+
+      Transport sendTransport = Pooka.getDefaultSession().getTransport(sendMailURL); 
+      sendTransport.connect();
+      Message m = nmi.getMessage();
+      sendTransport.sendMessage(m, m.getAllRecipients());
+      ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
     }
   }
   

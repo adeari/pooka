@@ -74,6 +74,7 @@ public class NewMessageProxy extends MessageProxy {
 	}
 	
       } catch (MessagingException me) {
+	getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
       }
     }
   }
