@@ -1,13 +1,5 @@
 	-- disconnected imap --
 
-*) things are still too slow.  :)  i had something happen where the old
-messages appeared, but the ones that had been read since were sitll marked
-as unread.  a bit later, they were marked as read.
-	-- make it so on first load, we do both a load and refresh.
-	-- done?
-
-*) fully cached filter doesn't work anymore.
-
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
 
@@ -17,6 +9,10 @@ as unread.  a bit later, they were marked as read.
 *) each loading of the FolderTableInfo rechecks the unread message
 	count, which sucks for performance.  improvements with new
 	caching system???
+
+*) each loading we also recache the flags no matter what.  this is probably
+not very efficient.
+
 ---
 
 *) make it so the connection objects actually have a clue as to whether

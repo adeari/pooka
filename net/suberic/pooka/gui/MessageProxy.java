@@ -327,7 +327,7 @@ public class MessageProxy {
    * Refreshes the MessageProxy by reloading the information for the
    * MessageInfo, and then updating the FolderTableInfo if necessary.
    */
-  public void refreshMessage() {
+  public synchronized void refreshMessage() {
     if (needsRefresh()) {
       try {
 	

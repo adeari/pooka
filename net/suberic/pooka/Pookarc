@@ -905,7 +905,7 @@ FolderInfo.defaultDisplayFilters.Unread.action.style=bold
 FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTerms.Cached
 FolderInfo.defaultDisplayFilters.Uncached.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Uncached.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
-FolderInfo.defaultDisplayFilters.Uncached.action.rgb=28101
+FolderInfo.defaultDisplayFilters.Uncached.action.rgb=-8648439
 
 CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
 

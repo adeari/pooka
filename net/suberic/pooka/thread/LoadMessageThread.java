@@ -125,7 +125,7 @@ public class LoadMessageThread extends Thread {
 	  try {
 	    if (! mp.isLoaded())
 	      mp.loadTableInfo();
-	    else if (mp.needsRefresh())
+	    if (mp.needsRefresh())
 	      mp.refreshMessage();
 	    else if (! mp.matchedFilters()) {
 	      mp.matchFilters();
