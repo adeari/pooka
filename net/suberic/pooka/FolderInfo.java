@@ -684,8 +684,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * Fetches the information for the given messages using the given
    * FetchProfile.
    */
-  public void fetch(Message[] messages, FetchProfile profile) throws MessagingException  {
-    getFolder().fetch(messages, profile);
+  public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException  {
+    Message[] realMsgs = new Message[messages.length];
+    for (int i = 0; i < realMsgs.length; i++) {
+      realMsgs[i] = messages[i].getMessage();
+    }
+    getFolder().fetch(realMsgs, profile);
   }
 
     /**
@@ -1909,26 +1913,26 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return displayFilters;
     }
 
-    /**
-     * This forces an update of both the total and unread message counts.
-     */
-    public void resetMessageCounts() {
-	try {
-	    if (Pooka.isDebug()) {
-		if (getFolder() != null)
-		    System.out.println("running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
-		else
-		    System.out.println("running resetMessageCounts.  getFolder() is null.");
-	    }
-
-	    unreadCount = getFolder().getUnreadMessageCount();
-	    messageCount = getFolder().getMessageCount();
-	} catch (MessagingException me) {
-	    // if we lose the connection to the folder, we'll leave the old
-	    // messageCount and set the unreadCount to zero.
-	    unreadCount = 0;
-	}
+  /**
+   * This forces an update of both the total and unread message counts.
+   */
+  public void resetMessageCounts() {
+    try {
+      if (Pooka.isDebug()) {
+	if (getFolder() != null)
+	  System.out.println("running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
+	else
+	  System.out.println("running resetMessageCounts.  getFolder() is null.");
+      }
+      
+      unreadCount = getFolder().getUnreadMessageCount();
+      messageCount = getFolder().getMessageCount();
+    } catch (MessagingException me) {
+      // if we lose the connection to the folder, we'll leave the old
+      // messageCount and set the unreadCount to zero.
+      unreadCount = 0;
     }
+  }
 
     /**
      * This returns the parentFolder.  If this FolderInfo is a direct

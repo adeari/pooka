@@ -525,7 +525,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	  NetworkConnection currentConnection = getConnection();
 	  if (currentConnection != null) {
 	    if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED)
-	      currentConnection.connect();
+	      currentConnection.connect(true, true);
 	    
 	    if (connection.getStatus() != NetworkConnection.CONNECTED) {
 	      throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());

@@ -103,18 +103,13 @@ public class LoadMessageThread extends Thread {
 	      for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
 		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
 		if (! fetchInfo.hasBeenFetched()) {
-		  Message currentMsg = fetchInfo.getRealMessage();
-		  if (currentMsg instanceof UIDMimeMessage)
-		    currentMsg = ((UIDMimeMessage)currentMsg).getMessage();
-		
-		  fetchVector.add(currentMsg);
-		  
+		  fetchVector.add(fetchInfo);
 		  fetchInfo.setFetched(true);
 		}
 	      }
 	      
-	      Message[] toFetch = new Message[fetchVector.size()];
-	      toFetch = (Message[]) fetchVector.toArray(toFetch);
+	      MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
+	      toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
 	      getFolderInfo().fetch(toFetch, fetchProfile);
 	    } catch(MessagingException me) {
 	      System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);

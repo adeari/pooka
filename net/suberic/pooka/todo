@@ -1,5 +1,3 @@
-*) make it so the connection objects actually have a clue as to whether
-or not they're actually connected, instead of relying on the user.
 
 *) bug:  in preview mode, select multiple messages, including the last
 	one.  delete.  get error.
@@ -47,6 +45,8 @@ or not they're actually connected, instead of relying on the user.
 	that makes it obvious that _something's_ going on.
 
 *) make search window look different than normal window.
+
+*) add support for saved searches.
 
 ------------
 

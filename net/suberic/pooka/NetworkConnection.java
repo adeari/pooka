@@ -111,6 +111,19 @@ public class NetworkConnection implements net.suberic.util.Item {
    * @return the new status of the server.
    */
   public int connect(boolean runConnectCommand) {
+    return connect(runConnectCommand, false);
+  }
+
+  /**
+   * <p>Connect to this network service.</p>
+   * 
+   * @param runConnectCommand whether or not we should run the
+   *        <code>connectCommand</code>, if there is one.
+   * @param isInteractive whether or not we should prompt the user if
+   *        the connection test fails after the connection.
+   * @return the new status of the server.
+   */
+  public int connect(boolean runConnectCommand, boolean isInteractive) {
     
     try {
       if (runConnectCommand) {
@@ -122,7 +135,17 @@ public class NetworkConnection implements net.suberic.util.Item {
       }
 
       if (status != CONNECTED) {
-	if (checkConnection()) {
+	boolean connectionSucceeded = checkConnection();
+	if (! connectionSucceeded && isInteractive) {
+	  // check to see if we want to mark this as connected anyway.
+	  int response = Pooka.getUIFactory().showConfirmDialog("Connection to test port " + testAddress.getHostAddress() + ":" + testPort + " failed.  Mark this connection as unavailable?", "Test of " + getItemID() + " failed.", javax.swing.JOptionPane.YES_NO_OPTION);
+	  if (response == javax.swing.JOptionPane.NO_OPTION)
+	    connectionSucceeded = true;
+	  else
+	    status = UNAVAILABLE;
+	}
+
+	if (connectionSucceeded) {
 	  status = CONNECTED;
 	  fireConnectionEvent();
 	}
@@ -207,12 +230,10 @@ public class NetworkConnection implements net.suberic.util.Item {
   public boolean checkConnection() {
     if (testAddress != null && testPort > -1) {
       try {
-	System.err.println("testing address " + testAddress + ", port " + testPort);
 	Socket testSocket = new Socket(testAddress, testPort);
 	testSocket.close();
 	return true;
       } catch (Exception e) {
-	System.err.println("caught exception " + e);
 	return false;
       }
     }

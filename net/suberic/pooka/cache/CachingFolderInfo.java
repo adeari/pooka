@@ -289,15 +289,16 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * Fetches the information for the given messages using the given
    * FetchProfile.
    */
-  public void fetch(Message[] messages, FetchProfile profile) throws MessagingException {
+  public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException {
     // if we're connected, go ahead and fetch these.  why the hell not?
 
     if (isConnected()) {
       super.fetch(messages, profile);
+
       int cacheStatus = -1;
       boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);
       boolean doHeaders = (profile.contains(FetchProfile.Item.ENVELOPE) || profile.contains(FetchProfile.Item.CONTENT_INFO));
-
+      
       if (doFlags && doHeaders) {
 	cacheStatus = SimpleFileCache.FLAGS_AND_HEADERS;
       } else if (doFlags) {
@@ -308,7 +309,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       
       if (cacheStatus != -1) {
 	for (int i = 0; i < messages.length; i++) {
-	  Message m = messages[i];
+	  Message m = messages[i].getRealMessage();
 	  long uid = ((UIDFolder)getFolder()).getUID(m);
 	  getCache().cacheMessage((MimeMessage)m, uid, cache.getUIDValidity(), cacheStatus);	
 	}
@@ -385,27 +386,56 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   public boolean hasUnread() {
     return (getUnreadCount() > 0);
   }
-  
-  public int getUnreadCount() {
-    try {
-      if (getCache() != null) 
-	unreadCount = getCache().getUnreadMessageCount();
-    } catch (MessagingException me) {
 
-    }
-    return unreadCount;
+  /*
+  public int getUnreadCount() {
+  try {
+  if (getCache() != null) 
+  unreadCount = getCache().getUnreadMessageCount();
+  } catch (MessagingException me) {
+  
+  }
+  return unreadCount;
   }
   
   public int getMessageCount() {
-    try {
-      if (getCache() != null) 
-	messageCount = getCache().getMessageCount();
-    } catch (MessagingException me) {
-    }
-    
-    return messageCount;
+  try {
+  if (getCache() != null) 
+  messageCount = getCache().getMessageCount();
+  } catch (MessagingException me) {
   }
-  
+  return messageCount;
+  }
+  */
+
+  /**
+   * This forces an update of both the total and unread message counts.
+   */
+  public void resetMessageCounts() {
+    try {
+      if (Pooka.isDebug()) {
+	if (getFolder() != null)
+	  System.out.println("running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
+	else
+	  System.out.println("running resetMessageCounts.  getFolder() is null.");
+      }
+
+      if (isConnected()) {
+	unreadCount = getFolder().getUnreadMessageCount();
+	messageCount = getFolder().getMessageCount();
+      } else if (getCache() != null) { 
+	messageCount = getCache().getMessageCount();
+	unreadCount = getCache().getUnreadMessageCount();
+      } else {
+	// if there's no cache and no connection, don't do anything.
+      }
+    } catch (MessagingException me) {
+      // if we lose the connection to the folder, we'll leave the old
+      // messageCount and set the unreadCount to zero.
+      unreadCount = 0;
+    }
+  }
+
   /**
    * This synchronizes the cache with the new information from the 
    * Folder.

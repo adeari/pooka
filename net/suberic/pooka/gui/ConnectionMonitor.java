@@ -232,7 +232,7 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
     public void actionPerformed(ActionEvent e) {
       NetworkConnection connection = getSelectedConnection();
       if (connection != null && connection.getStatus() != NetworkConnection.CONNECTED) {
-	connection.connect();
+	connection.connect(true, true);
       }
     }
   }
