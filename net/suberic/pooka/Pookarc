@@ -19,6 +19,7 @@ Pooka.forwardStyle=prefixed
 
 Pooka.lineWrap=true
 Pooka.lineLength=72
+Pooka.displayTextAttachments=true
 
 MenuBar=File:Edit:Mail:Window:Help
 

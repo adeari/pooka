@@ -118,7 +118,12 @@ public class ReadMessageWindow extends MessageWindow {
 	    }
 
 	    // then do the content
-	    String content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
+	    String content = null;
+	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true"))
+		content = net.suberic.pooka.MailUtilities.getTextAndTextInlines(mMsg, Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"));
+	    else
+		content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
+
 	    if (content != null) {
 		messageText.append(content);
 		editorPane.setEditable(false);

@@ -36,6 +36,45 @@ public class MailUtilities {
     }
 
     /**
+     * This method returns all of the attachments marked as 'inline' which
+     * are also of text or message/rfc822 types.
+     */
+    public static Vector getInlineTextAttachments(Message m) {
+	try {
+	    Object content = m.getContent();
+	    
+	    if (content instanceof Multipart) {
+		Multipart mp = (Multipart)content;
+		boolean textFound = false;
+		Vector attachments = new Vector();
+		for (int i = 0; i < mp.getCount(); i++) {
+		    MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
+		    String type = mbp.getContentType();
+		    if (textFound == false) {
+			if (type.regionMatches(true, 0, "text", 0, 4)) {
+			    textFound = true;
+			} else {
+			    if (type.regionMatches(true, 0, "message/rfc822",0,14) && mbp.getDisposition().regionMatches(true, 0, "inline", 0, 6))
+				attachments.add(mbp);
+			}
+		    } else
+			if ((type.regionMatches(true, 0, "message/rfc822", 0, 14) ||type.regionMatches(true, 0, "text", 0, 4)) && mbp.getDisposition().regionMatches(true, 0, "inline", 0, 6))
+			    attachments.add(mbp);
+		}
+
+		return attachments;
+	    }
+	} catch (Exception e) {
+	    // with any excpetion, we just return null.  i think that's
+	    // safe for now.
+	}
+	
+	return null;
+	
+    }
+
+
+    /**
      * This returns the Attachments (basically, all the Parts in a Multipart
      * except for the main body of the message).
      */
@@ -69,6 +108,32 @@ public class MailUtilities {
 	return null;
 	
     }
+
+    /**
+     * This method returns the Message Text plus the text inline attachments.
+     * The attachments are separated by the separator flag.
+     */
+
+    public static String getTextAndTextInlines(Message m, String separator) {
+
+	StringBuffer returnValue = new StringBuffer(MailUtilities.getTextPart(m));
+	Vector attachments = MailUtilities.getInlineTextAttachments(m);
+	if (attachments != null && attachments.size() > 1) {
+	    for (int i = 0; i < attachments.size(); i++) {
+		try {
+		    Object content = ((MimeBodyPart)attachments.elementAt(i)).getContent();
+		    returnValue.append(separator);
+		    returnValue.append(content);
+		} catch (Exception e) {
+		    // if we get an exception getting the content, just
+		    // ignore the attachment.
+		}
+	    }
+	}
+
+	return returnValue.toString();
+    }
+
 
     /**
      * This takes a String and words wraps it at length wrapLength, 
