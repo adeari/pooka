@@ -25,8 +25,22 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
     /**
      * This creates a new FolderSelectorPane.
      */
+    public FolderSelectorPane(String newProperty, String typeTemplate, VariableBundle bundle, boolean isEnabled) {
+	configureEditor(null, newProperty, typeTemplate, bundle, isEnabled);
+    }
+
+    /**
+     * This creates a new FolderSelectorPane.
+     */
+    public FolderSelectorPane(String newProperty, String typeTemplate, VariableBundle bundle) {
+	this(newProperty, typeTemplate, bundle, true);
+    }
+
+    /**
+     * This creates a new FolderSelectorPane.
+     */
     public FolderSelectorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {
-	configureEditor(null, newProperty, newProperty, bundle, isEnabled);
+	this(newProperty, newProperty, bundle, isEnabled);
     }
 
     /**
@@ -76,6 +90,7 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
 		ImageIcon icon = new ImageIcon(url);
 	    
 		JButton newButton = new JButton(icon);
+		newButton.setPreferredSize(new java.awt.Dimension(icon.getIconHeight(), icon.getIconWidth()));
 		newButton.addActionListener(new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 			    selectNewFolder();
@@ -139,9 +154,9 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
 	    int suffixSize = sourceBundle.getProperty(propertyTemplate + ".nameSuffix", "trashFolder").length();
 	    String currentStoreName = property.substring(prefixSize, property.length() - suffixSize);
 	    net.suberic.pooka.StoreInfo currentStore = Pooka.getStoreManager().getStoreInfo(currentStoreName);
-	    if (currentStore != null)
+	    if (currentStore != null) {
 		returnValue = new MailFileSystemView(currentStore.getStore());
-	    
+	    }
 	}
 
 	return returnValue;
