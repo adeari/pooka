@@ -40,7 +40,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
     username = Pooka.getProperty("AddressBook." + addressBookID + ".username", "");
     password = Pooka.getProperty("AddressBook." + addressBookID + ".password", "");
     if (!password.equals(""))
-      password = net.suberic.util.gui.PasswordEditorPane.descrambleString(password);
+      password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
 
     // make the connection.
 

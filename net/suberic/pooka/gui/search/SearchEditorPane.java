@@ -1,46 +1,42 @@
 package net.suberic.pooka.gui.search;
 import net.suberic.util.VariableBundle;
-import net.suberic.util.gui.*;
+import net.suberic.util.gui.propedit.*;
 import javax.swing.*;
 import java.util.*;
 
 /**
  * This is a class which lets you choose SearchTerms as properties.
  */
-public class SearchEditorPane extends DefaultPropertyEditor {
-    String property;
-    String originalValue;
-    VariableBundle sourceBundle;
-
+public class SearchEditorPane extends SwingPropertyEditor {
+    
     Properties originalProperties;
-
+    
     SearchEntryPanel searchEntryPanel;
-
+    
     /**
-     * This creates a new SearchEditorPane.
+     * @param propertyName The property to be edited.  
+     * @param template The property that will define the layout of the 
+     *                 editor.
+     * @param manager The PropertyEditorManager that will manage the
+     *                   changes.
+     * @param isEnabled Whether or not this editor is enabled by default. 
      */
-    public SearchEditorPane(String newProp, String newTemplate, VariableBundle newBundle) {
-	configureEditor(null, newProp, newTemplate, newBundle, true);
+    public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+	property=propertyName;
+	manager=newManager;
+	editorTemplate = template;
+	originalValue = manager.getProperty(property, "");
+	
+	searchEntryPanel = new SearchEntryPanel(net.suberic.pooka.Pooka.getSearchManager(), property, manager.getFactory().getSourceBundle());
+	originalProperties = searchEntryPanel.generateSearchTermProperties(property);
+	
+	//this.add(searchEntryPanel);
+	labelComponent = new JLabel(manager.getProperty("title.search.where", "Where"));
+	valueComponent = searchEntryPanel;
+	
+	this.setEnabled(isEnabled);
     }
-
-    /**
-     * This configures an editor for the given property.
-     */
-   public void configureEditor(PropertyEditorFactory factory, String newProperty, String typeTemplate, VariableBundle bundle, boolean isEnabled) {
-       property=newProperty;
-       sourceBundle=bundle;
-       originalValue = sourceBundle.getProperty(property, "");
-       
-       searchEntryPanel = new SearchEntryPanel(net.suberic.pooka.Pooka.getSearchManager(), property, sourceBundle);
-       originalProperties = searchEntryPanel.generateSearchTermProperties(property);
-
-       this.add(searchEntryPanel);
-       labelComponent = new JLabel(sourceBundle.getProperty("title.search.where", "Where"));
-       valueComponent = searchEntryPanel;
-
-       this.setEnabled(isEnabled);
-   }
-
+    
     /**
      * Sets the value for this PropertyEditor.
      */
@@ -60,15 +56,15 @@ public class SearchEditorPane extends DefaultPropertyEditor {
 		String originalValue = originalProperties.getProperty((String) currentKey);
 		String newValue = newValues.getProperty((String) currentKey);
 		if (originalValue == null ||  ! originalValue.equals(newValue))
-		    sourceBundle.setProperty((String) currentKey, newValue);
+		    manager.setProperty((String) currentKey, newValue);
 	    } else {
-		sourceBundle.setProperty((String) currentKey, newValues.getProperty((String) currentKey));
+		manager.setProperty((String) currentKey, newValues.getProperty((String) currentKey));
 	    }
 	}
 	
 	Iterator iter = originalKeys.iterator();
 	while (iter.hasNext()) {
-	    sourceBundle.removeProperty((String) iter.next());
+	    manager.removeProperty((String) iter.next());
 	}
     }
 
@@ -83,7 +79,7 @@ public class SearchEditorPane extends DefaultPropertyEditor {
      * Resets the current Editor to its original value.
      */
     public void resetDefaultValue() {
-	searchEntryPanel.setSearchTerm(property, sourceBundle);
+	searchEntryPanel.setSearchTerm(property, manager.getFactory().getSourceBundle());
     }
 
     /**
