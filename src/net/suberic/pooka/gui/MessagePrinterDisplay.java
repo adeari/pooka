@@ -18,7 +18,7 @@ public class MessagePrinterDisplay implements PrintJobListener {
 
   int mCurrentPage = 0;
 
-  int mTotalPage = 0;
+  int mPageCount = 0;
 
   String mCurrentDoc = "";
 
@@ -31,15 +31,18 @@ public class MessagePrinterDisplay implements PrintJobListener {
   boolean mInternal = false;
 
   JDialog mDialog = null;
-  JInternalFrame mInternalFrame = null;
+  JInternalFrame mDialogFrame = null;
+
+  Object mSource;
 
   /**
    * Creates a new MessagePrinterDisplay using the given MessagePrinter
    * and the given DocPrintJob.
    */
-  public MessagePrinterDisplay(MessagePrinter pPrinter, DocPrintJob pJob) {
+  public MessagePrinterDisplay(MessagePrinter pPrinter, DocPrintJob pJob, Object pSource) {
     mPrinter = pPrinter;
     mJob = pJob;
+    mSource = pSource;
     mInternal = checkInternal();
     mPrinter.setDisplay(this);
   }
@@ -55,7 +58,7 @@ public class MessagePrinterDisplay implements PrintJobListener {
     displayMessage.append("Page ");
     displayMessage.append(mCurrentPage);
     displayMessage.append(" of ");
-    displayMessage.append(mTotalPage);
+    displayMessage.append(mPageCount);
     displayMessage.append("\r\n");
 
     final String msg = displayMessage.toString();
@@ -81,10 +84,28 @@ public class MessagePrinterDisplay implements PrintJobListener {
   }
   
   /**
+   * Sets the page count.
+   */
+  public void setPageCount(int pPageCount) {
+    mPageCount = pPageCount;
+    updateDisplayPane();
+  }
+  
+  /**
    * Checks to see if this is an internal dialog or not.
    */
   private boolean checkInternal() {
+    if (mSource instanceof JComponent) {
+      PookaUIFactory uiFactory = Pooka.getUIFactory();
+      if (uiFactory instanceof PookaDesktopPaneUIFactory) {
+	JComponent sourceComponent = (JComponent) mSource;
+	if (((PookaDesktopPaneUIFactory) uiFactory).isInMainFrame(sourceComponent))
+	  return true;
+      }
+    }
+
     return false;
+    
   }
 
   /**
@@ -92,17 +113,40 @@ public class MessagePrinterDisplay implements PrintJobListener {
    */
   public void show() {
     mDisplayPane = new JTextPane();
+    mDisplayPane.setBorder(BorderFactory.createEtchedBorder());
+    JLabel jl = new JLabel();
+    mDisplayPane.setBackground(jl.getBackground());
+    mDisplayPane.setFont(jl.getFont());
 
     if (mInternal) {
+      mDialogFrame = new JInternalFrame("Printing", true, false, false, true);
+      mDialogFrame.getContentPane().setLayout(new BoxLayout(mDialogFrame.getContentPane(), BoxLayout.Y_AXIS));
+      
+      mDialogFrame.getContentPane().add(mDisplayPane);
+      if (mJob instanceof CancelablePrintJob) {
+	Box buttonBox = createButtonBox();
+	mDialogFrame.getContentPane().add(buttonBox);
+      }
+      updateDisplayPane();
+      mDialogFrame.pack();
 
+      MessagePanel mp = ((PookaDesktopPaneUIFactory)Pooka.getUIFactory()).getMessagePanel();
+      mp.add(mDialogFrame);
+      mDialogFrame.setLocation(mp.getNewWindowLocation(mDialogFrame, true));
+      mDialogFrame.setVisible(true);
+      
     } else {
-      mDialog = new JDialog();
+      if (mSource instanceof JComponent && SwingUtilities.getWindowAncestor((JComponent) mSource) instanceof java.awt.Frame) {
+	mDialog = new JDialog((java.awt.Frame) SwingUtilities.getWindowAncestor((JComponent) mSource));
+      } else {
+	mDialog = new JDialog();
+      }
       mDialog.getContentPane().setLayout(new BoxLayout(mDialog.getContentPane(), BoxLayout.Y_AXIS));
       
       mDialog.getContentPane().add(mDisplayPane);
 
-      Box buttonBox = createButtonBox();
       if (mJob instanceof CancelablePrintJob) {
+	Box buttonBox = createButtonBox();
 	mDialog.getContentPane().add(buttonBox);
       }
       updateDisplayPane();
@@ -131,7 +175,9 @@ public class MessagePrinterDisplay implements PrintJobListener {
   Box createButtonBox() {
     Box returnValue = new Box(BoxLayout.X_AXIS);
     JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
+    returnValue.add(Box.createHorizontalGlue());
     returnValue.add(cancelButton);
+    returnValue.add(Box.createHorizontalGlue());
     cancelButton.addActionListener(new ActionListener() {
 	public void actionPerformed(ActionEvent e) {
 	  cancel();
@@ -148,7 +194,10 @@ public class MessagePrinterDisplay implements PrintJobListener {
   public void dispose() {
     if (SwingUtilities.isEventDispatchThread()) {
       if (mInternal) {
-
+	try {
+	  mDialogFrame.setClosed(true);
+	} catch (java.beans.PropertyVetoException e) {
+	}
       } else {
 	mDialog.dispose();
       }
@@ -156,7 +205,10 @@ public class MessagePrinterDisplay implements PrintJobListener {
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    if (mInternal) {
-
+	      try {
+		mDialogFrame.setClosed(true);
+	      } catch (java.beans.PropertyVetoException e) {
+	      }
 	    } else {
 	      mDialog.dispose();
 	    }

@@ -17,8 +17,11 @@ public class MessagePrinter implements Printable {
   private int offset;
   private MessagePrinterDisplay mDisplay = null;
   
+  JTextPane jtp = null;
+
   int mPageCount = 0;
-  int[] mPageBreaks = null;
+  double[] mPageBreaks = null;
+  double mScale = 1;
 
   /**
    * This creates a new MessagePrinter for the given MessageInfo.
@@ -40,7 +43,58 @@ public class MessagePrinter implements Printable {
     return mPageCount;
   }
 
-  JTextPane jtp = null;
+  /**
+   * Calculates the page breaks for this component.
+   */
+  public void doPageCalculation(PageFormat pageFormat) {
+    double pageHeight = pageFormat.getImageableHeight();
+    double pageWidth = pageFormat.getImageableWidth(); 
+
+    boolean needsResize = false;
+
+    java.awt.Dimension minSize = jtp.getMinimumSize();
+
+    double newWidth = Math.max(minSize.getWidth(), pageWidth);
+    
+    java.awt.Dimension newSize = new java.awt.Dimension();
+    newSize.setSize(newWidth, jtp.getSize().getHeight());
+    jtp.setSize(newSize);
+    
+    if (jtp.getSize().getHeight() < jtp.getMinimumSize().getHeight()) {
+      java.awt.Dimension finalSize = new java.awt.Dimension();
+      finalSize.setSize(jtp.getSize().getWidth(), jtp.getMinimumSize().getHeight());
+      jtp.setSize(finalSize);
+    }
+
+    java.awt.Dimension d = jtp.getSize();
+
+    double panelWidth = d.getWidth(); 
+    double panelHeight = d.getHeight(); 
+    
+    jtp.setVisible(true);
+
+    // don't scale below 1.
+    mScale = Math.min(1,pageWidth/panelWidth);
+
+    //mScale = 1;
+    
+    mPageCount = (int)Math.ceil(mScale * panelHeight / pageHeight);
+    
+    java.util.List breakList = new java.util.ArrayList();
+    
+    int counter = 0;
+
+    mPageBreaks = new double[mPageCount];
+
+    for (int i = 0 ; i < mPageCount; i++) {
+      mPageBreaks[i] = i*pageHeight;
+    }
+
+    if (mDisplay != null) {
+      mDisplay.setPageCount(mPageCount);
+    }
+
+  }
 
   /**
    * This actually prints the given page.
@@ -51,40 +105,30 @@ public class MessagePrinter implements Printable {
 	createTextPane();
       }
 
-      if (mDisplay != null) {
-	mDisplay.setCurrentPage(pageIndex);
+      if (mPageBreaks == null) {
+	doPageCalculation(pageFormat);
       }
-      
-      System.err.println("printing page " + pageIndex);
-      
-      Graphics2D g2 = (Graphics2D)graphics;
-      
-      Dimension d = jtp.getSize(); //get size of document
-      double panelWidth = d.width; //width in pixels
-      double panelHeight = d.height; //height in pixels
-      
-      double pageHeight = pageFormat.getImageableHeight(); //height of printer page
-      double pageWidth = pageFormat.getImageableWidth(); //width of printer page
-      
-      double scale = pageWidth/panelWidth;
-      
-      //double scale = 1;
-      
-      int totalNumPages = (int)Math.ceil(scale * panelHeight / pageHeight);
-      
+
       //make sure not print empty pages
-      if(pageIndex >= totalNumPages) { 
+      if(pageIndex >= mPageCount) { 
 	return Printable.NO_SUCH_PAGE;
       }
+      
+      if (mDisplay != null) {
+	mDisplay.setCurrentPage(pageIndex + 1);
+      }
+      
+      Graphics2D g2 = (Graphics2D)graphics;
       
       //shift Graphic to line up with beginning of print-imageable region
       g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
       
       //shift Graphic to line up with beginning of next page to print
-      g2.translate(0f, -pageIndex*pageHeight);
+      //g2.translate(0f, -pageIndex*pageHeight);
+      g2.translate(0f, -mPageBreaks[pageIndex]);
       
       //scale the page so the width fits...
-      g2.scale(scale, scale);
+      g2.scale(mScale, mScale);
       
       jtp.paint(g2); //repaint the page for printing
       
@@ -164,10 +208,11 @@ public class MessagePrinter implements Printable {
     jtp.setContentType(contentType);
     jtp.setText(messageText.toString());
 
-    jtp.addNotify();
+    //jtp.addNotify();
     jtp.setSize(jtp.getPreferredSize());
-    jtp.setVisible(true);
 
+    //jtp.setVisible(true);
+    
   }
 
   /**
@@ -175,5 +220,12 @@ public class MessagePrinter implements Printable {
    */
   public void setDisplay(MessagePrinterDisplay pDisplay) {
     mDisplay = pDisplay;
+  }
+
+  /**
+   * Returns the JTextPane for this Printer.
+   */
+  public JTextPane getTextPane() {
+    return jtp;
   }
 }

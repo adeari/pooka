@@ -375,4 +375,12 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     showing=newValue;
   }
 
+  /**
+   * Checks to see if the given component is in the main Pooka frame.
+   */
+  public boolean isInMainFrame(java.awt.Component c) {
+    java.awt.Window mainWindow = SwingUtilities.getWindowAncestor(messagePanel);
+    java.awt.Window componentWindow = SwingUtilities.getWindowAncestor(c);
+    return (mainWindow == componentWindow);
+  }
 }

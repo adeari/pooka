@@ -298,7 +298,7 @@ NewMessageWindowToolbar.Sign.Image=/org/javalobby/icons/20x20png/Draw.png
 NewMessageWindowToolbar.Encrypt.Action=message-encrypt
 NewMessageWindowToolbar.Encrypt.Image=/org/javalobby/icons/20x20png/Lock.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Print:Find:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -313,6 +313,8 @@ MessageWindowToolbar.SaveAddress.Action=message-save-address
 MessageWindowToolbar.SaveAddress.Image=/org/javalobby/icons/20x20png/EditBook.png
 MessageWindowToolbar.Detach.Action=window-detach
 MessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
+MessageWindowToolbar.Print.Action=file-print
+MessageWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 MessageWindowToolbar.Find.Action=message-find
 MessageWindowToolbar.Find.Image=/org/javalobby/icons/20x20png/Binocular.png
 MessageWindowToolbar.DisplayStyle.class=net.suberic.pooka.gui.DisplayStyleComboBox

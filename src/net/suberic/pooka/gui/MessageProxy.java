@@ -1049,7 +1049,7 @@ public class MessageProxy {
    * This sends the message to the printer, first creating an appropriate
    * print dialog, etc.
    */
-  public void printMessage() {
+  public void printMessage(Object source) {
     // starts on FolderThread.
 
     // Load up the message into the MessagePrinter, just to be safe.
@@ -1061,6 +1061,8 @@ public class MessageProxy {
       // now switch over to the AWTEventThread.
       
       final MessagePrinter messagePrinter = mp;
+      
+      final Object final_source = source;
       
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
@@ -1085,7 +1087,7 @@ public class MessageProxy {
 	      
 	      final DocPrintJob final_job = service.createPrintJob();
 	      
-	      final MessagePrinterDisplay mpd = new MessagePrinterDisplay(messagePrinter, final_job);
+	      final MessagePrinterDisplay mpd = new MessagePrinterDisplay(messagePrinter, final_job, final_source);
 	      
 	      final_job.addPrintJobListener(mpd);
 
@@ -1664,7 +1666,8 @@ public class MessageProxy {
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
 	fw.setBusy(true);;
-      printMessage();
+
+      printMessage(e.getSource());
       
       if (fw != null)
 	fw.setBusy(false);
