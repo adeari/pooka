@@ -187,7 +187,8 @@ FolderPanel.2xClickAction=file-open
 
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 #FolderTable=New:SentDate:From:Subject
-FolderTable=Status:SentDate:From:Subject
+FolderTable=MsgNumber:Status:SentDate:From:Subject
+FolderTable.MsgNumber.type=RowCounter
 FolderTable.Status.type=Multi
 FolderTable.Status.size=15
 FolderTable.Status.value=Deleted:New:Answered

@@ -175,9 +175,6 @@ public class MessageProxy {
     }
 
     /**
-     * Returns whether or not the underlying Messa
-
-    /**
      * This gets a Flag property from the Message.
      */
 

@@ -360,6 +360,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 				fp.add(profileDef);
 			}
 		    }
+		} else if (type.equalsIgnoreCase("RowCounter")) {
+		    colvals.addElement(RowCounter.getInstance());
 		} else {
 		    String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
 		    colvals.addElement(value);
