@@ -339,6 +339,7 @@ public class SimpleFileCache implements MessageCache {
 	cachedMessages = new Vector();
 	cachedFlags = new HashMap();
 
+	getChangeAdapter().invalidate();
     }
 
 
@@ -393,7 +394,7 @@ public class SimpleFileCache implements MessageCache {
 		for (int i = 0; i < removedMessages.size(); i++) 
 		    rmMsg[i] = (Message) removedMessages.elementAt(i);
 
-		MessageCountEvent mce = new MessageCountEvent(null, MessageCountEvent.REMOVED, true, rmMsg);
+		MessageCountEvent mce = new MessageCountEvent(getFolderInfo().getFolder(), MessageCountEvent.REMOVED, true, rmMsg);
 		getFolderInfo().messagesRemoved(mce);
 	    }
 	} catch (IOException ioe) {
@@ -470,7 +471,8 @@ public class SimpleFileCache implements MessageCache {
 		FileInputStream fis = new FileInputStream(f);
 		MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
 		javax.activation.DataSource source = new MimePartDataSource (mm);
-		return new DataHandler(source);
+		DataHandler dh = new DataHandler(source);
+		return dh;
 	    } catch (Exception e) {
 		return null;
 	    } 
@@ -652,7 +654,18 @@ public class SimpleFileCache implements MessageCache {
 	} catch (Exception e) {
 	}
     }
-    
+
+    /**
+     * Writes any offline changes made back to the server.
+     */
+    public void writeChangesToServer(Folder f) throws MessagingException {
+	try {
+	    getChangeAdapter().writeChanges((UIDFolder) f);
+	} catch (IOException ioe) {
+	    throw new MessagingException(net.suberic.pooka.Pooka.getProperty("error.couldNotGetChanges", "Error:  could not get cached changes."), ioe);
+	}
+    }
+
     public CachingFolderInfo getFolderInfo() {
 	return folderInfo;
     }

@@ -197,7 +197,6 @@ public class CachingFolderInfo extends FolderInfo {
      * Folder.
      */
     public void synchronizeCache() throws MessagingException {
-	System.out.println("sync cache.");
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
@@ -207,6 +206,9 @@ public class CachingFolderInfo extends FolderInfo {
 	    getCache().invalidateCache();
 	    getCache().setUIDValidity(uidValidity);
 	}
+
+	// first write all the changes that we made back to the server.
+	getCache().writeChangesToServer(getFolder());
 
 	FetchProfile fp = new FetchProfile();
 	fp.add(FetchProfile.Item.ENVELOPE);
@@ -253,7 +255,6 @@ public class CachingFolderInfo extends FolderInfo {
     }
 
     protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
-	System.out.println("updating cache.");
 	for (int i = 0; i < messages.length; i++) {
 	    getCache().cacheMessage((MimeMessage)messages[i], uids[i], uidValidity, SimpleFileCache.FLAGS);
 	}
@@ -346,10 +347,11 @@ public class CachingFolderInfo extends FolderInfo {
 		}
 		
 		mi = getMessageInfoByUid(uid);
-		if (mi.getMessageProxy() != null)
-		    mi.getMessageProxy().close();
-		
 		if (mi != null) {
+
+		    if (mi.getMessageProxy() != null)
+			mi.getMessageProxy().close();
+		    
 		    if (Pooka.isDebug())
 			System.out.println("message exists--removing");
 		    

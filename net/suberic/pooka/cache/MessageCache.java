@@ -132,4 +132,9 @@ public interface MessageCache {
      * be used after a call to invalidateCache().
      */
     public void setUIDValidity(long newValidity);
+
+    /**
+     * Writes any offline changes made back to the server.
+     */
+    public void writeChangesToServer(Folder f) throws MessagingException;
 }
