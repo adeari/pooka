@@ -85,7 +85,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	//props.setProperty("mail.pop3s.socketFactory.port", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.port", "995"));
       }
       
-      Session session = javax.mail.Session.getInstance(props, Pooka.defaultAuthenticator);
+      Session session = javax.mail.Session.getInstance(props, Pooka.getDefaultAuthenticator());
       
       if (Pooka.isDebug()) {
 	System.out.println("session.getProperty(mail.mbox.inbox) = " + session.getProperty("mail.mbox.inbox"));

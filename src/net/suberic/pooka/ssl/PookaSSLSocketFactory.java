@@ -58,7 +58,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
 	    TrustManager[] trustManagers = tmFactory.getTrustManagers();
 	    
 	    String fileName = Pooka.getProperty("Pooka.sslCertFile", "");
-	    ptm = Pooka.resourceManager.createPookaTrustManager(trustManagers, fileName);
+	    ptm = Pooka.getResourceManager().createPookaTrustManager(trustManagers, fileName);
 	    Pooka.setTrustManager(ptm);
 	  }
 	}

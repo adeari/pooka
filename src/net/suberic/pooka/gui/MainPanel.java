@@ -124,7 +124,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   }
 
   /**
-   * This gets all the actinos associated with this panel.  Useful for
+   * This gets all the actions associated with this panel.  Useful for
    * populating the MenuBar and Toolbar.
    *
    * The method actually returns the Panel's defaultActions plus the

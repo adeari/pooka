@@ -125,7 +125,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
     
     try {
-      mSession = Session.getInstance(p, Pooka.defaultAuthenticator);
+      mSession = Session.getInstance(p, Pooka.getDefaultAuthenticator());
       
       updateSessionDebug();
       

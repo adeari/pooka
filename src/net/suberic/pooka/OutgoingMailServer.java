@@ -351,7 +351,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
       sysProps.setProperty("mail.smtp.starttls.enable", "true");
 
-      session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password, (net.suberic.pooka.gui.SimpleAuthenticator) Pooka.defaultAuthenticator));
+      session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password, (net.suberic.pooka.gui.SimpleAuthenticator) Pooka.getDefaultAuthenticator()));
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	session.setDebug(true);
     }

@@ -53,7 +53,7 @@ public class LoadHttpConfigPooka {
       URL configUrl = new URL(urlString);
       InputStream is = configUrl.openStream();
       VariableBundle newBundle = new VariableBundle(is, Pooka.getResources());
-      Pooka.resources = newBundle;
+      Pooka.setResources(newBundle);
     } catch (MalformedURLException mue) {
       JOptionPane.showMessageDialog(mFrame, "Malformed URL.");
       showChoices();
