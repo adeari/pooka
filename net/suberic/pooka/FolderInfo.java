@@ -673,7 +673,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return unread;
     }
 
-    private void resetUnread() {
+    /**
+     * This forces an update of the unread status.
+     */
+    public void resetUnread() {
 	try {
 	    if (Pooka.isDebug())
 		System.out.println("running resetUnread.  unread message count is " + getFolder().getUnreadMessageCount());
