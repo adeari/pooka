@@ -1,3 +1,18 @@
+next release:
+
+*) add queuing of outgoing mails (?)
+
+*) make vcard address book at least come close to working for simple cases.
+
+*) fix "got an empty/null added or deleted event" message after a search has
+	been done.
+
+*) make search give a popup window saying it's running.
+
+*) make search window look different than normal window.
+
+*) add connecting to subscribed folders.
+
 beta 1
 ---------------
 
