@@ -354,19 +354,28 @@ public class UIDFolderInfo extends FolderInfo {
     }
 
     
+    /**
+     * Returns the UIDMimeMessage that represents the given Message.  If
+     * this cannot be done (say, if the given Message does not exist in 
+     * the current Folder), returns null.
+     */
 
     public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
 	if (m instanceof UIDMimeMessage)
 	    return (UIDMimeMessage) m;
 
 	// it's not a UIDMimeMessage, so it must be a 'real' message.
-	long uid = ((UIDFolder)getFolder()).getUID(m);
-	MessageInfo mi = getMessageInfoByUid(uid);
-	if (mi != null)
-	    return (UIDMimeMessage) mi.getMessage();
-	
-	// doesn't already exist.  just create a new one.
-	return new UIDMimeMessage(this, uid);
+	try {
+	    long uid = ((UIDFolder)getFolder()).getUID(m);
+	    MessageInfo mi = getMessageInfoByUid(uid);
+	    if (mi != null)
+		return (UIDMimeMessage) mi.getMessage();
+	    
+	    // doesn't already exist.  just create a new one.
+	    return new UIDMimeMessage(this, uid);
+	} catch (java.util.NoSuchElementException nsee) {
+	    return null;
+	}
     }
 
     /**
@@ -467,6 +476,11 @@ public class UIDFolderInfo extends FolderInfo {
 	}
 	fireConnectionEvent(e);
     }
+
+    /**
+     * gets the UID for a given MimeMessage
+     */
+    
 
     /**
      * gets the 'real' message for the given MessageInfo.

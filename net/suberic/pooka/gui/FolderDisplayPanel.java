@@ -95,7 +95,7 @@ public class FolderDisplayPanel extends JPanel {
      */
     public void createMessageTable() {
 	messageTable=new JTable(getFolderInfo().getFolderTableModel());
-	getFolderInfo().getFolderTableModel().addTableModelListener(messageTable);
+	//getFolderInfo().getFolderTableModel().addTableModelListener(messageTable);
 
 	if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
 	    messageTable.setShowVerticalLines(false);
@@ -136,7 +136,7 @@ public class FolderDisplayPanel extends JPanel {
 	if (messageTable != null) {
 	    FolderTableModel oldFtm = (FolderTableModel) messageTable.getModel();
 	    oldFtm.removeTableModelListener(messageTable);
-	    newModel.addTableModelListener(messageTable);
+	    //newModel.addTableModelListener(messageTable);
 	    messageTable.setModel(newModel);
 	}
     }
@@ -147,7 +147,7 @@ public class FolderDisplayPanel extends JPanel {
 
     public void addListeners() {
 	// add a mouse listener 
-	
+
 	messageTable.addMouseListener(new MouseAdapter() {
 		public void mouseClicked(MouseEvent e) {
 		    if (e.getClickCount() == 2) {

@@ -371,7 +371,11 @@ public class UIDMimeMessage extends MimeMessage {
      */
     public synchronized Flags getFlags() throws MessagingException {
 	try {
-	    return getMessage().getFlags();
+	    Message m = getMessage();
+	    if (m != null)
+		return m.getFlags();
+	    else
+		throw new MessageRemovedException();
 	} catch (FolderClosedException fce) {
 	    int status = parent.getStatus();
 	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
@@ -470,6 +474,31 @@ public class UIDMimeMessage extends MimeMessage {
 
     public MimeMessage getMessage() throws MessagingException {
 	return parent.getRealMessageById(uid);
+    }
+
+    public UIDFolderInfo getParent() {
+	return parent;
+    }
+
+    /**
+     * Overrides equals to make it so that any two MimeMessages who are
+     * from the same folder and have the same UID are considered equal.
+     */
+    public boolean equals(Object o) {
+	if (o instanceof Message) {
+	    try {
+		UIDMimeMessage uidMsg = parent.getUIDMimeMessage((Message) o);
+		if (uidMsg != null)
+		    if (uidMsg.getUID() == getUID())
+			return true;
+		    else
+			return false;
+	    } catch (MessagingException me) {
+		return false;
+	    }
+	}
+
+	return false;
     }
 }
 

@@ -572,7 +572,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	try {
 	    if (e.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED && e.getMessage().getFlags().contains(Flags.Flag.DELETED)) {
 		MessageProxy selectedProxy = getSelectedMessage();
-		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage() == e.getMessage()) {
+		if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage().equals(e.getMessage())) {
 		    SwingUtilities.invokeLater(new Runnable() {
 			    public void run() {
 				selectNextMessage();
@@ -580,8 +580,28 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 			});
 		}
 	    }
-	} catch (MessagingException me) {
+	} catch (MessageRemovedException me) {
+	    // -- sigh.  if the message has been removed, then we need to
+	    // handle it differently.
 	    
+	    try {
+		MessageProxy selectedProxy = getSelectedMessage();
+		if ( selectedProxy != null && (selectedProxy.getMessageInfo().getMessage() == null || selectedProxy.getMessageInfo().getMessage().isExpunged() || selectedProxy.getMessageInfo().getMessage().getFlags().contains(Flags.Flag.DELETED))) {
+		    SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+				selectNextMessage();
+			    }
+			});
+		}
+	    } catch (MessageRemovedException mre) {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    selectNextMessage();
+			}
+		    });
+	    } catch (MessagingException me2) {
+	    }
+	} catch (MessagingException me) {
 	}
 	
 	SwingUtilities.invokeLater(new Runnable() {
