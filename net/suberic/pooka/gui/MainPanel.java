@@ -28,7 +28,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     private Session session;
     private MailQueue mailQueue;
     private UserProfile currentUser = null;
-    private PropertyEditorFactory editorFactory = new PropertyEditorFactory(Pooka.getResources());
+    private PropertyEditorFactory editorFactory = new PookaPropertyEditorFactory(Pooka.getResources());
     private ConfigurableKeyBinding keyBindings;
     private boolean newMessageFlag = false;
     private String standardTitle = Pooka.getProperty("Title", "Pooka");
