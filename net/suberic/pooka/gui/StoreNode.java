@@ -180,6 +180,7 @@ public class StoreNode extends MailTreeNode {
 	    JFileChooser jfc =
 		new JFileChooser("/", new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo().getStore()));
 	    jfc.setMultiSelectionEnabled(true);
+	    jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 	    int returnValue =
 		jfc.showDialog(getParentContainer(),
 			       Pooka.getProperty("FolderEditorPane.Select",
