@@ -969,32 +969,61 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
     }
     
-    /**
-     * This method closes the Folder.  If you open the Folder using 
-     * openFolder (which you should), then you should use this method
-     * instead of calling getFolder.close().  If you don't, then the
-     * FolderInfo will try to reopen the folder.
-     */
+  /**
+   * This method closes the Folder.  If you open the Folder using 
+   * openFolder (which you should), then you should use this method
+   * instead of calling getFolder.close().  If you don't, then the
+   * FolderInfo will try to reopen the folder.
+   */
   public void closeFolder(boolean expunge) throws MessagingException {
     closeFolder(expunge, false);
-    }
+  }
 
-    /**
-     * Searches for messages in this folder which match the given
-     * SearchTerm.
-     *
-     * Basically wraps the call to Folder.search(), and then wraps the
-     * returned Message objects as MessageInfos.
-     */
-    public MessageInfo[] search(javax.mail.search.SearchTerm term) 
-    throws MessagingException {
-	if (isConnected()) {
-	    return super.search(term);
-	} else {
-	    return getCache().search(term);
+  /**
+   * This method closes the Folder.  If you open the Folder using 
+   * openFolder (which you should), then you should use this method
+   * instead of calling getFolder.close().  If you don't, then the
+   * FolderInfo will try to reopen the folder.
+   */
+  public void closeFolder(boolean expunge, boolean closeDisplay) throws MessagingException {
+    
+    if (closeDisplay && getFolderDisplayUI() != null)
+      getFolderDisplayUI().closeFolderDisplay();
+    
+    if (isLoaded() && isAvailable()) {
+      if (isConnected()) {
+	try {
+	  getFolder().close(expunge);
+	} catch (java.lang.IllegalStateException ise) {
+	  throw new MessagingException(ise.getMessage(), ise);
 	}
-    }
+      }
 
+      if (getCache() != null) {
+	setStatus(DISCONNECTED);
+      } else {
+	setStatus(CLOSED);
+      }
+    }
+    
+  }
+  
+  /**
+   * Searches for messages in this folder which match the given
+   * SearchTerm.
+   *
+   * Basically wraps the call to Folder.search(), and then wraps the
+   * returned Message objects as MessageInfos.
+   */
+  public MessageInfo[] search(javax.mail.search.SearchTerm term) 
+    throws MessagingException {
+    if (isConnected()) {
+      return super.search(term);
+    } else {
+      return getCache().search(term);
+    }
+  }
+  
   /**
    * The resource for the default display filters.
    */

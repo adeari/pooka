@@ -16,7 +16,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
   
   Icon connectedIcon;
   Icon disconnectedIcon;
-  Icon closedIcon;
+  Icon closedFolderIcon;
   Icon unavailableIcon;
   Icon connectedStoreIcon;
   Icon disconnectedStoreIcon;
@@ -57,7 +57,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       } else if (expanded) {
 	setDisabledIcon(getOpenIcon());
       } else {
-	setDisabledIcon(getClosedIcon());
+	setDisabledIcon(getClosedFolderIcon());
       }
     }
     else {
@@ -67,7 +67,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       } else if (expanded) {
 	setIcon(getOpenIcon());
       } else {
-	setIcon(getClosedIcon());
+	setIcon(getClosedFolderIcon());
       }
     }
     
@@ -83,7 +83,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	FolderNode node = (FolderNode)lastPath;
 	
 	FolderInfo fi = node.getFolderInfo();
-	
+
 	if (isSpecial(node)) {
 	  setFontToSpecial();
 	} else {
@@ -93,7 +93,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	FolderInfo folderInfo = ((FolderNode)node).getFolderInfo();
 	
 	if (folderInfo == null){
-	  setIconToClosed();
+	  setIconToClosedFolder();
 	} else {
 	  if (!((FolderNode)node).isLeaf()) {
 	    //System.out.println("folderInfo is " + folderInfo.getFolderID() + "; hasNewMessages is " + folderInfo.hasNewMessages());
@@ -102,6 +102,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    else 
 	      setIconToSubfolder();
 	  } else if (folderInfo.isConnected()) {
+	    
 	    if (folderInfo.notifyNewMessagesNode() && folderInfo.hasNewMessages()) {
 	      setIconToOpenWithNew();
 	    } else
@@ -114,7 +115,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	  } else if (!folderInfo.isValid()) {
 	    setIconToUnavailable();
 	  } else {
-	    setIconToClosed();
+	    setIconToClosedFolder();
 	  }
 	}
       } else if (lastPath instanceof StoreNode) {
@@ -210,15 +211,15 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     }
   }
   
-  public void setIconToClosed() {
-    if (getClosedIcon() != null)
-      setIcon(getClosedIcon());
+  public void setIconToClosedFolder() {
+    if (getClosedFolderIcon() != null)
+      setIcon(getClosedFolderIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.closedIcon", "images/Minus.gif"));
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.closedFolderIcon", "images/Minus.gif"));
       if (url != null) {
-	setClosedIcon(new ImageIcon(url));
-	setIcon(getClosedIcon());
+	setClosedFolderIcon(new ImageIcon(url));
+	setIcon(getClosedFolderIcon());
       }
     }
   }
@@ -314,12 +315,12 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     disconnectedWithNewIcon = newIcon;
   }
   
-  public Icon getClosedIcon() {
-    return closedIcon;
+  public Icon getClosedFolderIcon() {
+    return closedFolderIcon;
   }
   
-  public void setClosedIcon(Icon newIcon) {
-    closedIcon = newIcon;
+  public void setClosedFolderIcon(Icon newIcon) {
+    closedFolderIcon = newIcon;
   }
   
   public Icon getUnavailableIcon() {
