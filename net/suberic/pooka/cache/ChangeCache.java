@@ -250,8 +250,10 @@ public class ChangeCache {
 	    // get the UID's we want to append.
 	    nextLine = in.readLine();
 	    ArrayList messageList = new ArrayList();
+	    ArrayList uidList = new ArrayList();
 	    while (! nextLine.equalsIgnoreCase("DONE_MSG")) {
 	      long uid = Long.parseLong(nextLine);
+	      uidList.add(new Long(uid));
 	      net.suberic.pooka.MessageInfo m = cfi.getMessageInfoByUid(uid);
 	      if (m != null)
 		messageList.add(m.getMessage());
@@ -263,7 +265,12 @@ public class ChangeCache {
 	    }
 	    
 	    ((javax.mail.Folder)f).appendMessages(messages);
-	    cfi.getCache().invalidateCache(
+	    
+	    long[] invalidatedUids = new long[uidList.size()];;
+	    for (int i = 0; i < uidList.size(); i++) {
+	      invalidatedUids[i] = ((Long) uidList.get(i)).longValue();
+	    }
+	    cfi.getCache().invalidateCache(invalidatedUids, MessageCache.MESSAGE);
 	    
 	    nextLine = in.readLine();
 	  } else if (nextLine.equalsIgnoreCase(EXPUNGE_MSG))
