@@ -4,11 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.security.Key;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import net.suberic.util.VariableBundle;
 import net.suberic.pooka.Pooka;
 import net.suberic.crypto.EncryptionKey;
 import net.suberic.pooka.gui.NewMessageProxy;
+import net.suberic.pooka.gui.NewMessageCryptoInfo;
 
 
 /**
@@ -18,6 +21,10 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
   
   JButton mSignatureKeyButton = null;
   JButton mEncryptionKeyButton = null;
+
+  JToggleButton mSignatureEnabledButton = null;
+  JToggleButton mEncryptionEnabledButton = null;
+
   JList mAttachKeysList = null;
 
   NewMessageProxy proxy = null;
@@ -31,7 +38,7 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
     proxy = nmp;
 
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-
+    /*
     Box cryptoBox = new Box(BoxLayout.Y_AXIS);
     Box cryptoLabelBox = new Box(BoxLayout.X_AXIS);
 
@@ -73,6 +80,39 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
     signatureButtonBox.add(mSignatureKeyButton);
     signatureButtonBox.add(Box.createHorizontalGlue());
     signatureBox.add(signatureButtonBox);
+    */
+
+    Box cryptoBox = new Box(BoxLayout.X_AXIS);
+
+    cryptoBox.add(new JLabel(Pooka.getProperty("NewMessageCryptoPanel.encryptionKey.label", "Encryption Key")));
+    
+    cryptoBox.add(Box.createHorizontalStrut(5));
+
+    mEncryptionEnabledButton = createEncryptionEnabledButton();
+
+    createEncryptionButton();
+
+    cryptoBox.add(mEncryptionKeyButton);
+
+    cryptoBox.add(Box.createHorizontalGlue());
+
+    cryptoBox.add(mEncryptionEnabledButton);
+    
+    Box signatureBox = new Box(BoxLayout.X_AXIS);
+
+    signatureBox.add(new JLabel(Pooka.getProperty("NewMessageCryptoPanel.signatureKey.label", "Signature Key")));
+    
+    signatureBox.add(Box.createHorizontalStrut(5));
+
+    mSignatureEnabledButton = createSignatureEnabledButton();
+
+    createSignatureButton();
+
+    signatureBox.add(mSignatureKeyButton);
+
+    signatureBox.add(Box.createHorizontalGlue());
+
+    signatureBox.add(mSignatureEnabledButton);
     
     this.add(cryptoBox);
     this.add(signatureBox);
@@ -109,6 +149,43 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
   }
 
   /**
+   * Creates a ToggleButton for enabling/disabling encryption.
+   */
+  public JToggleButton createEncryptionEnabledButton() {
+    java.net.URL keyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/Key.png"));
+
+    java.net.URL noKeyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/NoKey.png"));
+
+    if (keyUrl != null) {
+      ImageIcon keyIcon = new ImageIcon(keyUrl);
+      ImageIcon noKeyIcon = new ImageIcon(noKeyUrl);
+      
+      JToggleButton returnValue = new JToggleButton(noKeyIcon, proxy.getCryptoInfo().getEncryptMessage() != NewMessageCryptoInfo.CRYPTO_NO);
+
+      returnValue.setSelectedIcon(keyIcon);
+      
+      returnValue.addActionListener(new ActionListener() {
+	  public void actionPerformed(ActionEvent e) {
+	    boolean nowSelected = mEncryptionEnabledButton.isSelected();
+	    System.err.println("changing encryption value to " + nowSelected);
+
+	    mEncryptionKeyButton.setEnabled(nowSelected);
+	    if (nowSelected)
+	      proxy.getCryptoInfo().setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
+	    else
+	      proxy.getCryptoInfo().setEncryptMessage(NewMessageCryptoInfo.CRYPTO_NO);
+	  }
+	});
+
+      returnValue.setSize(keyIcon.getIconHeight(), keyIcon.getIconWidth());
+      returnValue.setPreferredSize(new java.awt.Dimension(keyIcon.getIconHeight(), keyIcon.getIconWidth()));
+      return returnValue;
+    }
+
+    return null;
+  }
+
+  /**
    * Creates a button which clears the encryption key.
    */
   public JButton createClearEncryptionButton() {
@@ -141,6 +218,42 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
     updateSignatureButton();
   }
   
+  /**
+   * Creates a ToggleButton for enabling/disabling the signature.
+   */
+  public JToggleButton createSignatureEnabledButton() {
+    java.net.URL keyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/Key.png"));
+
+    java.net.URL noKeyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/NoKey.png"));
+
+    if (keyUrl != null) {
+      ImageIcon keyIcon = new ImageIcon(keyUrl);
+      ImageIcon noKeyIcon = new ImageIcon(noKeyUrl);
+
+      JToggleButton returnValue = new JToggleButton(noKeyIcon, proxy.getCryptoInfo().getSignMessage() != NewMessageCryptoInfo.CRYPTO_NO);
+      
+      returnValue.setSelectedIcon(keyIcon);
+
+      returnValue.addActionListener(new ActionListener() {
+	  public void actionPerformed(ActionEvent e) {
+	    boolean nowSelected = mSignatureEnabledButton.isSelected();
+	    System.err.println("changing signature value to " + nowSelected);
+	    mSignatureKeyButton.setEnabled(nowSelected);
+	    if (nowSelected)
+	      proxy.getCryptoInfo().setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
+	    else
+	      proxy.getCryptoInfo().setSignMessage(NewMessageCryptoInfo.CRYPTO_NO);
+	  }
+	});
+      returnValue.setSize(new java.awt.Dimension(keyIcon.getIconHeight(), keyIcon.getIconWidth()));
+      returnValue.setPreferredSize(new java.awt.Dimension(keyIcon.getIconHeight(), keyIcon.getIconWidth()));
+
+      return returnValue;
+    }
+
+    return null;
+  }
+
   /**
    * Updates the enryption button.
    */
