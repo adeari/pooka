@@ -38,11 +38,10 @@ public class LoadMessageThread extends Thread {
     
     public LoadMessageThread(FolderInfo newFolderInfo) {
 	folderInfo = newFolderInfo;
-	this.setDaemon(true);
-	this.setPriority(this.getPriority() -1);
     }
 
     public void run() {
+	this.setPriority(1);
 	while (true) {
 	    loadWaitingMessages();
 	    
