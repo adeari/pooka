@@ -12,7 +12,7 @@ import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
 
-public class MessageWindow extends JInternalFrame implements UserProfileContainer {
+public class MessageWindow extends JInternalFrame implements UserProfileContainer, ItemListener {
 
     public static int HEADERS_DEFAULT = 0;
     public static int HEADERS_FULL = 1;
@@ -185,11 +185,7 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	if (selectedProfile != null)
 	    profileCombo.setSelectedItem(selectedProfile);
 
-	profileCombo.addSelectionListener(new SelectionAdapter() {
-		public void selectionChanged(SelectionEvent se) {
-		    getParentContainer().getMainPanel().refreshCurrentUser();
-		}
-	    });
+	profileCombo.addItemListener(this);
 	
 	proptDict.put("UserProfile", profileCombo);
 
@@ -227,6 +223,16 @@ public class MessageWindow extends JInternalFrame implements UserProfileContaine
 	}
 
 	return inputPanel;
+    }
+
+    /**
+     * as defined in java.awt.event.ItemListener
+     *
+     * This implementation calls a refreshCurrentUser() on the MainPanel.
+     */
+
+    public void itemStateChanged(ItemEvent ie) {
+	getParentContainer().getMainPanel().refreshCurrentUser();
     }
 
     public JComponent createBodyPanel(MessageProxy aMsg) {
