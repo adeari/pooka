@@ -134,7 +134,6 @@ public class NewAccountPooka {
 
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("e is " + e + "; e.getMessage() is " + e.getMessage());
       handleInvalidEntry(e.getMessage());
     }
 
@@ -436,7 +435,6 @@ public class NewAccountPooka {
   }
   
   public void handleInvalidEntry(String message) {
-    System.out.println("error:  " + message);
     StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
     if (message != null && message.length() > 0) {
       errorMessage.append("\n");

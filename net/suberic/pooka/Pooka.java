@@ -71,7 +71,13 @@ public class Pooka {
 	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
       }
       java.io.InputStream is = url.openStream();
-      resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka"));
+      try {
+	resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka"));
+      } catch (java.io.IOException ioe) {
+
+	resources = new net.suberic.util.VariableBundle(url.openStream(), "net.suberic.pooka.Pooka");
+	//resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
+      }
     } catch (Exception e) {
       System.err.println("caught exception:  " + e);
       e.printStackTrace();

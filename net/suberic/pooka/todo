@@ -1,5 +1,6 @@
 *) startup:
 	--make sure that the outbox gets configured correctly as an outbox
+	--same for sent folder.
 
 *) default domain for outgoing addresses.
 	- test outbox failure.
