@@ -112,7 +112,7 @@ MenuBar.Edit.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MenuBar.Edit.Paste.Action=paste-from-clipboard
 MenuBar.Edit.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-MenuBar.Mail=NewMsg:Reply:ReplyAll:ReplyMulti:Forward:ForwardMulti:Send:Move:Copy:Delete:Expunge:AddSignature:SearchFolder
+MenuBar.Mail=NewMsg:Reply:ReplyAll:ReplyMulti:Forward:ForwardMulti:Send:Move:Copy:Delete:Expunge:AddSignature:SearchFolder:Subscribe
 
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Reply.Action=message-reply
@@ -135,6 +135,7 @@ MenuBar.Mail.Delete.Action=message-delete
 MenuBar.Mail.Expunge.Action=message-expunge
 MenuBar.Mail.AddSignature.Action=message-add-signature
 MenuBar.Mail.SearchFolder.Action=folder-search
+MenuBar.Mail.Subscribe.Action=folder-subscribe
 
 MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
