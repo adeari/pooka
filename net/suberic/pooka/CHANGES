@@ -1,3 +1,6 @@
+added a button for actually using the address list to pull in addresses
+to the to:, cc:, and bcc: fields.
+
 changed the message display code so that searches work a bit better with
 items in a sent folder.
 

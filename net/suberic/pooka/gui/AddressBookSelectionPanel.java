@@ -1,5 +1,7 @@
 package net.suberic.pooka.gui;
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.net.URL;
 
@@ -14,10 +16,10 @@ import net.suberic.pooka.*;
 public class AddressBookSelectionPanel extends JPanel {
 
   // the list of addresses available
-  JList addressList;
+  JTable addressTable;
   
   // the list of addresses selected
-  JList confirmedList;
+  JTable confirmedTable;
 
   // the filter entry
   JTextField filterField;
@@ -25,13 +27,16 @@ public class AddressBookSelectionPanel extends JPanel {
   // the AddressEntryTextArea that we're using.
   AddressEntryTextArea entryArea;
 
+  // the parent frame.
+  Component parentFrame;
+
   /**
    * Creates a new AddressBookSelectionPanel using the given 
    * AddressEntryTextArea.
    */
-  public AddressBookSelectionPanel(AddressEntryTextArea entryTextArea) {
+  public AddressBookSelectionPanel(AddressEntryTextArea entryTextArea, Component newParentFrame) {
     entryArea = entryTextArea;
-
+    parentFrame = newParentFrame;
     configurePanel();
   }
 
@@ -44,16 +49,17 @@ public class AddressBookSelectionPanel extends JPanel {
 
     Box choiceBox = new Box(BoxLayout.Y_AXIS);
     JPanel filterPanel = createFilterPanel();
-    createAddressList();
+    createAddressTable();
     choiceBox.add(filterPanel);
-    choiceBox.add(new JScrollPane(addressList));
+    choiceBox.add(new JScrollPane(addressTable));
     addressBox.add(choiceBox);
 
     JPanel selectionPanel = createSelectionPanel();
     addressBox.add(selectionPanel);
 
-    confirmedList = new JList();
-    addressBox.add(new JScrollPane(confirmedList));
+    createConfirmedTable();
+
+    addressBox.add(new JScrollPane(confirmedTable));
 
     this.add(addressBox);
 
@@ -81,11 +87,24 @@ public class AddressBookSelectionPanel extends JPanel {
   }
 
   /**
-   * Creates the address list.
+   * Creates the address table.
    */
-  void createAddressList() {
-    addressList = new JList();
+  void createAddressTable() {
+    AddressBookTableModel addressModel = new AddressBookTableModel();
+    addressTable = new JTable(addressModel);
+    addressTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+    addressTable.getColumnModel().getColumn(1).setPreferredWidth(50);
     doFilter("");
+  }
+
+  /**
+   * Creates the confirmed table.
+   */
+  void createConfirmedTable() {
+    AddressBookTableModel confirmedModel = new AddressBookTableModel();
+    confirmedTable = new JTable(confirmedModel);
+    confirmedTable.getColumnModel().getColumn(0).setPreferredWidth(50);
+    confirmedTable.getColumnModel().getColumn(1).setPreferredWidth(50);
   }
 
   /**
@@ -150,31 +169,30 @@ public class AddressBookSelectionPanel extends JPanel {
   }
 
   /**
-   * Updates the addressList using the results of the filter from the
+   * Updates the addressTable using the results of the filter from the
    * filterField.
    */
   public void doFilter(String filterValue) {
     AddressBookEntry[] matchingValues = getAddressMatcher().match(filterValue);
-    addressList.setListData(matchingValues);
+    AddressBookTableModel model = (AddressBookTableModel) addressTable.getModel();
+    model.setEntries(matchingValues);
   }
 
   /**
-   * Gets the currently selected addresses in the addressList.
+   * Gets the currently selected addresses in the addressTable.
    */
   public AddressBookEntry[] getSelectedAddresses() {
-    if (addressList != null) {
-      Object[] selectedValues = addressList.getSelectedValues();
-      if (selectedValues != null) {
-	AddressBookEntry[] returnValue = new AddressBookEntry[selectedValues.length];
-	for (int i = 0; i < selectedValues.length; i++) {
-	  returnValue[i] = (AddressBookEntry)selectedValues[i];
-	  return returnValue;
+    if (addressTable != null) {
+      AddressBookTableModel model = (AddressBookTableModel) addressTable.getModel();
+      int[] selectedRows = addressTable.getSelectedRows();
+      if (selectedRows != null) {
+	AddressBookEntry[] returnValue = new AddressBookEntry[selectedRows.length];
+	for (int i = 0; i < selectedRows.length; i++) {
+	  returnValue[i] = model.getEntryAt(selectedRows[i]);
 	}
+	return returnValue;
       }
     }
-
-    // else...
-
     return new AddressBookEntry[0];
   }
 
@@ -182,64 +200,180 @@ public class AddressBookSelectionPanel extends JPanel {
    * Gets all of the confirmed list of addresses.
    */
   public AddressBookEntry[] getConfirmedAddresses() {
-    if (confirmedList != null) {
-      ListModel confirmedValues = confirmedList.getModel();
-      AddressBookEntry[] returnValue = new AddressBookEntry[confirmedValues.getSize()];
-      for (int i = 0; i < confirmedValues.getSize(); i++) {
-	returnValue[i] = (AddressBookEntry)confirmedValues.getElementAt(i);
-	return returnValue;
+    if (confirmedTable != null) {
+      AddressBookTableModel model = (AddressBookTableModel) confirmedTable.getModel();
+      AddressBookEntry[] returnValue = new AddressBookEntry[model.getRowCount()];
+      for (int i = 0; i < returnValue.length; i++) {
+	returnValue[i] = model.getEntryAt(i);
       }
+      return returnValue;
     }
-
-    // else...
 
     return new AddressBookEntry[0];
   }
 
   /**
-   * Adds the currently selected address(es) in the addressList to the
-   * confirmedList.
+   * Adds the currently selected address(es) in the addressTable to the
+   * confirmedTable.
    */
   public void confirmSelectedAddresses() {
     AddressBookEntry[] selectedValues = getSelectedAddresses();
-    ListModel lm = confirmedList.getModel();
-    if (lm instanceof DefaultListModel) {
-      DefaultListModel dlm = (DefaultListModel) lm;
-      for (int i = 0; selectedValues.length; i++) {
-	dlm.addElement(selectedValues[i]);
-      }
-    } else {
-      // we have to rebuild it from scratch.
-      
-    }
+    AddressBookTableModel model = (AddressBookTableModel) confirmedTable.getModel();
+    model.addEntries(selectedValues);
   }
 
   /**
-   * Removed the currently selected address(es) in the confirmedList from the
-   * confirmedList.
+   * Removed the currently selected address(es) in the confirmedTable from the
+   * confirmedTable.
    */
   public void removeSelectedAddresses() {
-
+    AddressBookTableModel model = (AddressBookTableModel) confirmedTable.getModel();
+    int[] selectedRows = confirmedTable.getSelectedRows();
+    AddressBookEntry[] removedEntries = new AddressBookEntry[selectedRows.length];
+    for (int i = 0; i < selectedRows.length; i++) {
+      removedEntries[i] = model.getEntryAt(selectedRows[i]);
+    }
+    model.removeEntries(removedEntries);
   }
 
   /**
    * Copies the entries from the selection list to the AddressEntryTextArea.
    */
   public void copySelectionsToEntry() {
-
+    AddressBookEntry[] confirmedEntries = getConfirmedAddresses();
+    entryArea.addAddresses(confirmedEntries);
   }
 
   /**
    * Closes this panel.
    */
   public void closePanel() {
-
+    if (parentFrame instanceof JInternalFrame) {
+      try {
+	((JInternalFrame) parentFrame).setClosed(true);
+      } catch (java.beans.PropertyVetoException e) {
+      }
+    } else {
+      ((JFrame) parentFrame).dispose();
+    }
   }
   
   /**
    * Gets the appropriate AddressMatcher.
    */
   public AddressMatcher getAddressMatcher() {
-    return null;
+    return entryArea.getNewMessageUI().getSelectedProfile().getAddressMatcher();
+  }
+
+  /**
+   * A TableModel for Address Books.
+   */
+  class AddressBookTableModel extends AbstractTableModel {
+    
+    List addressList = new ArrayList();
+
+    /**
+     * Creates an AddressBookTableModel.
+     */
+    public AddressBookTableModel() {
+      
+    }
+
+    /**
+     * Returns the row count.
+     */
+    public int getRowCount() {
+      return addressList.size();
+    }
+
+    /**
+     * Returns the column count.
+     */
+    public int getColumnCount() {
+      return 2;
+    }
+
+    
+    /**
+     * Returns the value at the given row and column.
+     */
+    public Object getValueAt(int row, int column) {
+      if (row < 0 || row >= getRowCount() || column < 0 || column >= 2)
+	return null;
+
+      AddressBookEntry entry = getEntryAt(row);
+      if (column == 0) {
+	return entry.getID();
+      } 
+
+      if (column == 1) {
+	return entry.getAddressString();
+      }
+
+      return null;
+    }
+
+    /**
+     * Returns the AddressBookEntry for the given row.
+     */
+    public AddressBookEntry getEntryAt(int row) {
+      return (AddressBookEntry) addressList.get(row);
+    }
+
+    /**
+     * Adds the given AddressBookEntries to the table.
+     */
+    public void addEntries(AddressBookEntry[] newEntries) {
+      // make sure that each entry is unique.
+      if (newEntries != null && newEntries.length > 0) {
+	int firstNew = addressList.size();
+	for (int i = 0 ; i < newEntries.length; i++) {
+	  if ( ! addressList.contains(newEntries[i])) {
+	    addressList.add(newEntries[i]);
+	  }
+	}
+	
+	if (firstNew != addressList.size()) 
+	  fireTableRowsInserted(firstNew, addressList.size() -1);
+      }
+    }
+
+    /**
+     * Removes the given AddressBookEntries from the table.
+     */
+    public void removeEntries(AddressBookEntry[] removedEntries) {
+      for (int i = 0; i < removedEntries.length; i++) {
+	int index = addressList.indexOf(removedEntries[i]);
+	if (index >=0) {
+	  addressList.remove(index);
+	  fireTableRowsDeleted(index, index);
+	}
+      }
+    }
+
+    /**
+     * Sets the given AddressBookEntries as the values for the table.
+     */
+    public void setEntries(AddressBookEntry[] newEntries) {
+      ArrayList newList = new ArrayList();
+      for (int i = 0; i < newEntries.length; i++) {
+	newList.add(newEntries[i]);
+      }
+      addressList=newList;
+      fireTableDataChanged();
+    }
+
+    /**
+     * Returns the name for the given column.
+     */
+    public String getColumnName(int col) {
+      if (col == 0)
+	return "Name";
+      
+      if (col == 2)
+	return "Address";
+
+      return "";
+    } 
   }
 }

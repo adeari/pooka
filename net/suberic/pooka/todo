@@ -3,9 +3,11 @@
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
 	address field.
-	-- make it a two pane search/display and 'selected' display(?)
 	-- check to make sure that we get the correct ui factory for
 	each message window.
+	-- fix the size of the window.
+	-- make it so you can add to the address book from the selection
+		panel.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath

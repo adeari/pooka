@@ -451,6 +451,40 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   }
 
   /**
+   * Adds the given AddressBookEntries to the address field.
+   */
+  public void addAddresses(AddressBookEntry[] newEntries) {
+    // first see if we're actually adding anything
+    if (newEntries == null || newEntries.length < 1)
+      return;
+
+    // next see if we need to add a comma.
+    String currentValue = getText();
+    boolean addComma = false;
+    boolean found = false;
+    for (int i = currentValue.length() - 1; !found && i >=0; i--) {
+      char currentChar = currentValue.charAt(i);
+      if (! Character.isWhitespace(currentChar)) {
+	found = true;
+	if (currentChar != ',')
+	  addComma = true;
+      }
+    }
+
+    StringBuffer newValue = new StringBuffer(currentValue);
+    if (addComma)
+      newValue.append(", ");
+
+    for (int i = 0; i < newEntries.length; i++) {
+      newValue.append(newEntries[i].getID());
+      if (i < newEntries.length -1)
+	newValue.append(", ");
+    }
+    
+    setText(newValue.toString());
+  }
+
+  /**
    * Creates a button that pulls up an editor dialog for addresses.
    */
   public JButton createAddressButton() {
@@ -464,7 +498,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   /**
    * Returns the parent MessageUI.
    */
-  public MessageUI getMessageUI() {
+  public NewMessageUI getNewMessageUI() {
     return messageUI;
   }
 
