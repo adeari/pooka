@@ -699,7 +699,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   }
 
   private void doOpenFolders(FolderInfo fi) {
-    if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
+    if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
 
       final FolderInfo current = fi;
       getStoreThread().addToQueue(new javax.swing.AbstractAction() {
