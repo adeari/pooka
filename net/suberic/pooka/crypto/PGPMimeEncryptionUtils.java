@@ -216,39 +216,9 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     ct.setParameter("micalg", "pgp-sha1");
     MimeMultipart mpart = new MultipartEncrypted(ct);
 
-    /*
-      System.out.println("part 1 is " );
-      p.writeTo(System.out);
-      System.out.println("done part 1" );
-    */
-
-    /*
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      p.writeTo(baos);
-      
-      InputStream is = new ByteArrayInputStream(baos.toByteArray());
-    */
-
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    /*
-    OutputStreamWriter osw = new OutputStreamWriter(baos);
-    BufferedWriter bw = new BufferedWriter(osw);
 
-    java.util.Enumeration hdrLines = ((MimeBodyPart)p).getAllHeaderLines();
-    
-    while (hdrLines.hasMoreElements()) {
-      bw.write((String)hdrLines.nextElement());
-      bw.newLine();
-    }
-
-    bw.newLine();
-    bw.flush();
-
-    p.getDataHandler().writeTo(baos);
-
-    */
-
-    com.sun.mail.util.LineOutputStream los = new com.sun.mail.util.LineOutputStream(baos);
+    com.sun.mail.util.CRLFOutputStream los = new com.sun.mail.util.CRLFOutputStream(baos);
     OutputStreamWriter osw = new OutputStreamWriter(los);
 
     BufferedWriter bw = new BufferedWriter(osw);
@@ -285,10 +255,14 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   }
 
   /**
-   * Checks the signature on a Part.
+   * Checks the signature on a MimeMessage.
    */
-  public boolean checkSignature(Part p, EncryptionKey key) 
+  public boolean checkSignature(MimeMessage mm, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException {
+    Object o = mm.getContent();
+    if (o instanceof MimeMultipart) {
+      return checkSignature((MimeMultipart) o, key);
+    }
     return false;
   }
 
@@ -327,10 +301,34 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   }
 
   /**
-   * Checks the signature on a Message.
+   * Checks the signature on a BodyPart.
    */
-  public boolean checkSignature(MimeMessage msg, EncryptionKey key) {
-    return false;
+  public boolean checkSignature(Part part, EncryptionKey key) 
+    throws EncryptionException, MessagingException, IOException {
+    // check the type; should be multipart/signed
+
+    String contentType = part.getContentType();
+    ContentType ct = new ContentType(contentType);
+    if (contentType == null || ! ct.getBaseType().equalsIgnoreCase("multipart/signed")) {
+      throw new EncryptionException ("error in content type:  expected 'multipart/signeded', got '" + contentType + "'");
+    }
+
+    Object content = part.getContent();
+
+    MimeMultipart mpart = (MimeMultipart) content;
+    return checkSignature(mpart, key);
+    
   }
 
+  /**
+   * Checks the signature on a BodyPart.
+   */
+  public boolean checkSignature(MimeMultipart mMulti, EncryptionKey key) 
+    throws EncryptionException, MessagingException, IOException {
+    //
+    MimeBodyPart contentPart = (MimeBodyPart)mMulti.getBodyPart(0);
+    MimeBodyPart signaturePart = (MimeBodyPart)mMulti.getBodyPart(1);
+
+    return false;
+  }
 }

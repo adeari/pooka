@@ -34,9 +34,13 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) ?? ^D message, hit return for next message, get an error?
 
+*) new message count in icon
+
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together
 	(@ sourceforge).  -- use rfc3156.
+
+-----
 
 *) add drag and drop
 	*) include message
@@ -46,8 +50,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
-
-*) new message count in icon
 
 *) add a dependent button/menu item.  so that that way instead of having
 	a separate Caching popup menu, you can just say "if caching,

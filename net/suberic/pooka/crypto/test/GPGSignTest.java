@@ -22,8 +22,8 @@ public class GPGSignTest {
       MimeMessage rawMessage = new MimeMessage(s);
       rawMessage.setText("This is a signed message.  Really!  I am writing this message here.\n\nBeware of the leopard.\n\nIsn't it fun?\n\n\n-allen\n");
       rawMessage.setSubject("Test again (pgp signed)");
-      rawMessage.setFrom(new InternetAddress("avatar@localhost"));
-      rawMessage.setRecipient(Message.RecipientType.TO, new InternetAddress("avatar@localhost"));
+      rawMessage.setFrom(new InternetAddress("allen@localhost"));
+      rawMessage.setRecipient(Message.RecipientType.TO, new InternetAddress("allen@localhost"));
 
       PGPMimeEncryptionUtils cryptoUtils = new PGPMimeEncryptionUtils();
       
@@ -37,7 +37,7 @@ public class GPGSignTest {
       signedMessage.setSentDate(new java.util.Date(System.currentTimeMillis()));
       Transport t = s.getTransport(new URLName("smtp://localhost"));
       t.connect();
-      t.sendMessage(signedMessage, new InternetAddress[] { new InternetAddress("avatar@localhost")});
+      t.sendMessage(signedMessage, new InternetAddress[] { new InternetAddress("allen@localhost")});
 
       System.out.println("message sent!");
       
