@@ -105,6 +105,27 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
     }
 
     /**
+     * Creates a new MessagePanel from an already created 
+     * PreviewContentPanel.
+     */
+    public MessagePanel(MainPanel newMainPanel, PreviewContentPanel pcp) {
+	this (newMainPanel);
+
+	// go through each folder on the PreviewContentPanel.
+
+	java.util.HashMap cardTable = pcp.getCardTable();
+	Set keys = cardTable.keySet();
+	Interator keyIt = keys.iterator();
+	while (keyIt.hasNext()) {
+	    String folderID = (String) keyIt.next();
+	    PreviewFolderPanel pfp = (PreviewFolderPanel) cardTable.get(folderID);
+	    FolderInternalFrame fif = new FolderInternalFrame(pfp, this);
+	    pfp.getFolderInfo().setFolderDisplayUI(fif);
+	    openFolderWindow(pfp.getFolderInfo());
+	}
+    }
+
+    /**
      * This opens a new FolderWindow for the given FolderInfo, and sets
      * it as the selected window.
      */
