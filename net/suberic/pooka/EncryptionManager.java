@@ -83,10 +83,13 @@ public class EncryptionManager {
     }
 
     String defaultString = sourceBundle.getProperty(key + ".default", "pgp");
-    if (defaultString.equalsIgnoreCase("pgp"))
+    System.err.println("defaultString = " + defaultString); 
+    if (defaultString.equalsIgnoreCase("pgp")) {
       defaultUtils = pgpUtils;
-    else
+      System.err.println("defaultString = " + defaultString); 
+    } else {
       defaultUtils = smimeUtils;
+    }
 
     if (defaultUtils != null) {
       keyMgrFilename = sourceBundle.getProperty(key + ".keyStore.filename", "");
@@ -97,13 +100,11 @@ public class EncryptionManager {
       }
       keyMgrPasswd = pwArray;
 
-      /*
       try {
 	keyMgr = defaultUtils.createKeyManager(new FileInputStream(new File(keyMgrFilename)), keyMgrPasswd);
       } catch (Exception e) {
 	e.printStackTrace();
       }
-      */
     }
   }
 
@@ -115,6 +116,7 @@ public class EncryptionManager {
       synchronized(this) {
 	if (defaultUtils == null) {
 
+	  System.err.println("creating new defaultUtils.");
 	  PGPMimeEncryptionUtils cryptoUtils = new PGPMimeEncryptionUtils();
 	  
 	  cryptoUtils.setPGPProviderImpl(new net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl());

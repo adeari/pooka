@@ -1,3 +1,5 @@
+*) fix error in encoded stream problem.
+
 *) still an error in connecting, disconnecting, getting a new messages/deleting
 	old messages, reconnecting.
 

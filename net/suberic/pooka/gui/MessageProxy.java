@@ -607,6 +607,16 @@ public class MessageProxy {
   }
 
   /**
+   * Imports the keys on this message.
+   */
+  public void importKeys() {
+    MessageInfo info = getMessageInfo();
+    if (info != null) {
+      
+    }
+  }
+
+  /**
    * Returns the CryptoStatusDisplay for this MessageProxy, if any.
    */
   public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
@@ -1232,7 +1242,8 @@ public class MessageProxy {
 	new ActionWrapper(new OpenAsNewAction(), folderThread),
 	new ActionWrapper(new FilterAction(), folderThread),
 	new ActionWrapper(new DecryptAction(), folderThread),
-	new ActionWrapper(new CheckSignatureAction(), folderThread)
+	new ActionWrapper(new CheckSignatureAction(), folderThread),
+	new ActionWrapper(new ImportKeysAction(), folderThread)
       };
 
       commands = new Hashtable();
@@ -1699,6 +1710,27 @@ public class MessageProxy {
 	fw.setBusy(true);;
 	
       checkSignature();
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class ImportKeysAction extends AbstractAction {
+    ImportKeysAction() {
+      super("message-import-keys");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      importKeys();
       
       if (fw != null)
 	fw.setBusy(false);
