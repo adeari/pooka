@@ -4,6 +4,7 @@
   <property name="distdir" value="Dist"/>
   <property name="docdir" value="Docs"/>
   <property name="importdir" value="Imported"/>
+  <property name="iconsdir" value="org"/>
 
 <!-- Define classpath for building.  Note this isn't used for running pooka,
      So dynamicaly loaded classes aren't listed here. -->
@@ -15,9 +16,9 @@
   <property name="javahelp_cp" value="${importdir}/jh.jar"/>
   <property name="javahelp_dist_cp" value="${importdir}/jh_dist.jar"/>
   <property name="mbox_cp" value="${importdir}/mbox.jar"/>
-  <property name="kunststofff_cp" value="${importdir}/kunststoff.jar"/>
+  <property name="kunststoff_cp" value="${importdir}/kunststoff.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${javahelp_cp}:${mbox_cp}:${kunstsoff_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${javahelp_cp}:${mbox_cp}:${kunststoff_cp}"/> 
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -47,6 +48,11 @@
     </copy>
     <copy todir="${builddir}/net/suberic/util/gui/propedit/images">
       <fileset dir="${sourcedir}/suberic/util/gui/propedit/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/org/javalobby/icons/20x20png">
+      <fileset dir="${iconsdir}/javalobby/icons/20x20png">
         <include name="**/*"/>
       </fileset>
     </copy>
@@ -85,6 +91,7 @@
       <zipfileset src="${javahelp_dist_cp}"/>
       <zipfileset src="${mail_cp}"/>
       <zipfileset src="${mbox_cp}"/>
+      <zipfileset src="${kunststoff_cp}"/>
     </jar>
   </target>
 

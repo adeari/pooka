@@ -1,3 +1,7 @@
+fixed the build information so that we now include the kunststoff files.
+
+modified the toolbars and the images some.
+
 added an easier interface for adding new folders.
 
 fixed a bug where multipart/alternative messages with additional attachments
