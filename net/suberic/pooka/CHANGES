@@ -1,3 +1,6 @@
+020322 release
+--------------
+
 made it so replying to or forwarding messages with only html content results
 in the inclusion of the html code.  best i can do for now.
 

@@ -113,7 +113,7 @@ public class LoadMessageThread extends Thread {
 
 	      fetchInfo.setFetched(true);
 	    }
-	    getFolderInfo().getFolder().fetch(toFetch, fetchProfile);
+	    getFolderInfo().fetch(toFetch, fetchProfile);
 	  } catch(MessagingException me) {
 	    System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
 	    me.printStackTrace();

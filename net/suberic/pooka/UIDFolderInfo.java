@@ -146,117 +146,117 @@ public class UIDFolderInfo extends FolderInfo {
   }
   
   protected void updateFolderOpenStatus(boolean isNowOpen) {
-	if (isNowOpen) {
-	    status = CONNECTED;
-	    try {
-		uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
-		if (getFolderTableModel() != null)
-		    synchronizeCache();
-	    } catch (Exception e) { }
-	    
-	} else
-	    status = CLOSED;
-    }
-
-    /**
-     * This synchronizes the cache with the new information from the 
-     * Folder.
-     */
-    public void synchronizeCache() throws MessagingException {
-	if (Pooka.isDebug())
-	    System.out.println("synchronizing cache.");
-
-	if (getFolderDisplayUI() != null)
-	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
-
-	long newValidity = ((UIDFolder)getFolder()).getUIDValidity();
-	if (uidValidity != newValidity) {
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
-	    
-	    unloadAllMessages();
-	    loadAllMessages();
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().resetFolderTableModel(folderTableModel);
-
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().clearStatusMessage();
-
-	} else {
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
-	    FetchProfile fp = new FetchProfile();
-	    fp.add(FetchProfile.Item.ENVELOPE);
-	    fp.add(FetchProfile.Item.FLAGS);
-	    fp.add(UIDFolder.FetchProfileItem.UID);
-	    Message[] messages = getFolder().getMessages();
-	    getFolder().fetch(messages, fp);
-	    
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
-
-	    long[] uids = new long[messages.length];
-	    
-	    for (int i = 0; i < messages.length; i++) {
-		uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
-	    }
-	    
-	    if (Pooka.isDebug())
-		System.out.println("synchronizing--uids.length = " + uids.length);
-	    
-	    long[] addedUids = getAddedMessages(uids, uidValidity);
-	    if (Pooka.isDebug())
-		System.out.println("synchronizing--addedUids.length = " + addedUids.length);
-	    
-	    if (addedUids.length > 0) {
-		Message[] addedMsgs = ((UIDFolder)getFolder()).getMessagesByUID(addedUids);
-		MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.ADDED, false, addedMsgs);
-		messagesAdded(mce);
-	    }    
-	    
-	    long[] removedUids = getRemovedMessages(uids, uidValidity);
-	    if (Pooka.isDebug())
-		System.out.println("synchronizing--removedUids.length = " + removedUids.length);
-	    
-	    if (removedUids.length > 0) {
-		Message[] removedMsgs = new Message[removedUids.length];
-		for (int i = 0 ; i < removedUids.length; i++) {
-		    removedMsgs[i] = getMessageInfoByUid(removedUids[i]).getRealMessage();
-		}
-		MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.REMOVED, false, removedMsgs);
-		messagesRemoved(mce);
-		
-	    }
-	    
-	    updateFlags(uids, messages, uidValidity);
-
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().clearStatusMessage();
+    if (isNowOpen) {
+      status = CONNECTED;
+      try {
+	uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
+	if (getFolderTableModel() != null)
+	  synchronizeCache();
+      } catch (Exception e) { }
+      
+    } else
+      status = CLOSED;
+  }
+  
+  /**
+   * This synchronizes the cache with the new information from the 
+   * Folder.
+   */
+  public void synchronizeCache() throws MessagingException {
+    if (Pooka.isDebug())
+      System.out.println("synchronizing cache.");
+    
+    if (getFolderDisplayUI() != null)
+      getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
+    
+    long newValidity = ((UIDFolder)getFolder()).getUIDValidity();
+    if (uidValidity != newValidity) {
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
+      
+      unloadAllMessages();
+      loadAllMessages();
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().resetFolderTableModel(folderTableModel);
+      
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().clearStatusMessage();
+      
+    } else {
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
+      FetchProfile fp = new FetchProfile();
+      fp.add(FetchProfile.Item.ENVELOPE);
+      fp.add(FetchProfile.Item.FLAGS);
+      fp.add(UIDFolder.FetchProfileItem.UID);
+      Message[] messages = getFolder().getMessages();
+      getFolder().fetch(messages, fp);
+      
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
+      
+      long[] uids = new long[messages.length];
+      
+      for (int i = 0; i < messages.length; i++) {
+	uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
+      }
+      
+      if (Pooka.isDebug())
+	System.out.println("synchronizing--uids.length = " + uids.length);
+      
+      long[] addedUids = getAddedMessages(uids, uidValidity);
+      if (Pooka.isDebug())
+	System.out.println("synchronizing--addedUids.length = " + addedUids.length);
+      
+      if (addedUids.length > 0) {
+	Message[] addedMsgs = ((UIDFolder)getFolder()).getMessagesByUID(addedUids);
+	MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.ADDED, false, addedMsgs);
+	messagesAdded(mce);
+      }    
+      
+      long[] removedUids = getRemovedMessages(uids, uidValidity);
+      if (Pooka.isDebug())
+	System.out.println("synchronizing--removedUids.length = " + removedUids.length);
+      
+      if (removedUids.length > 0) {
+	Message[] removedMsgs = new Message[removedUids.length];
+	for (int i = 0 ; i < removedUids.length; i++) {
+	  removedMsgs[i] = getMessageInfoByUid(removedUids[i]).getRealMessage();
 	}
-    }
-
-    /**
-     * Gets the added UIDs.
-     */
-    protected long[] getAddedMessages(long[] newUids, long uidValidity) {
-	long[] added = new long[newUids.length];
-	int addedCount = 0;
-	Set currentUids = uidToInfoTable.keySet();
-
-	for (int i = 0; i < newUids.length; i++) {
-	    if (! currentUids.contains(new Long(newUids[i]))) {
-		added[addedCount++]=newUids[i];
-	    }
-	}
-
-	long[] returnValue = new long[addedCount];
-	if (addedCount > 0) 
-	    System.arraycopy(added, 0, returnValue, 0, addedCount);
+	MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.REMOVED, false, removedMsgs);
+	messagesRemoved(mce);
 	
-	return returnValue;
-
+      }
+      
+      updateFlags(uids, messages, uidValidity);
+      
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().clearStatusMessage();
     }
-
+  }
+  
+  /**
+   * Gets the added UIDs.
+   */
+  protected long[] getAddedMessages(long[] newUids, long uidValidity) {
+    long[] added = new long[newUids.length];
+    int addedCount = 0;
+    Set currentUids = uidToInfoTable.keySet();
+    
+    for (int i = 0; i < newUids.length; i++) {
+      if (! currentUids.contains(new Long(newUids[i]))) {
+	added[addedCount++]=newUids[i];
+      }
+    }
+    
+    long[] returnValue = new long[addedCount];
+    if (addedCount > 0) 
+      System.arraycopy(added, 0, returnValue, 0, addedCount);
+    
+    return returnValue;
+    
+  }
+  
     /**
      * Gets the removed UIDs.
      */

@@ -680,6 +680,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
   
+  /**
+   * Fetches the information for the given messages using the given
+   * FetchProfile.
+   */
+  public void fetch(Message[] messages, FetchProfile profile) throws MessagingException  {
+    getFolder().fetch(messages, profile);
+  }
+
     /**
      * Unloads all messages.  This should be run if ever the current message
      * information becomes out of date, as can happen when the connection
