@@ -52,7 +52,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	editorPane = createMessagePanel(msg);
 
 	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	tabbedPane.add(Pooka.getProperty("MessageDisplayPanel.HeaderTab", "Headers"), headerScrollPane);
+	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
 
 	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
 	    addAttachmentPane();
@@ -126,7 +126,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	
 	// Create Address panel
 
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageDisplayPanel.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
+	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
 	String currentHeader = null;
 	JLabel hdrLabel = null;
 	EntryTextArea inputField = null;
@@ -134,12 +134,12 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	while (tokens.hasMoreTokens()) {
 	    inputRow = new Box(BoxLayout.X_AXIS);
 	    currentHeader=tokens.nextToken();
-	    hdrLabel = new JLabel(Pooka.getProperty("MessageDisplayPanel.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
+	    hdrLabel = new JLabel(Pooka.getProperty("MessageWindow.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
 	    hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
 	    inputRow.add(hdrLabel);
 
 	    try {
-		inputField = new net.suberic.util.swing.EntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageDisplayPanel.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+		inputField = new net.suberic.util.swing.EntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 	    } catch (MessagingException me) {
 		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	    }
@@ -152,7 +152,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    
 	    inputPanel.add(inputRow);
 
-	    proptDict.put(Pooka.getProperty("MessageDisplayPanel.Input." + currentHeader + ".value", currentHeader), inputField);
+	    proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
 	}
 
 	return inputPanel;
@@ -219,7 +219,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    key = (String)(keys.nextElement());
 	    
 	    if (! key.equals("UserProfile")) {
-		String header = new String(Pooka.getProperty("MessageDisplayPanel.Header." + key + ".MIMEHeader", key));
+		String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
 		String value = ((EntryTextArea)(inputTable.get(key))).getText();
 		returnValue.setHeader(header, value);
 	    }
@@ -273,7 +273,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     public void addAttachmentPane() {
 	attachmentPanel = new AttachmentPane(getMessageProxy());
 	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	tabbedPane.add(Pooka.getProperty("MessageDisplayPanel.AttachmentTab", "Attachments"), attachmentScrollPane);
+	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentScrollPane);
     }
 
     /**
@@ -375,7 +375,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
     public void addNotify() {
         super.addNotify();
-        splitPane.setDividerLocation(Math.min(tabbedPane.getPreferredSize().height + 1, Integer.parseInt(Pooka.getProperty("MessageDisplayPanel.headerPanel.vsize", "500"))));
+        splitPane.setDividerLocation(Math.min(tabbedPane.getPreferredSize().height + 1, Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "500"))));
     }
 
     public boolean isEditable() {
