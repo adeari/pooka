@@ -485,7 +485,17 @@ public class UserProfile extends Object implements ValueChangeListener {
     return null;
   }
 
+  /**
+   * Returns whether or not we want to sign messages as default for this
+   * UserProfile.
+   */
+  public boolean getSignAsDefault() {
+    return false;
+  }
 
+  /**
+   * Returns the default AddressMatcher for this UserProfile.
+   */
   public AddressMatcher getAddressMatcher() {
     if (addressBook != null)
       return addressBook.getAddressMatcher();

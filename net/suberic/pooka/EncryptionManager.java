@@ -2,6 +2,7 @@ package net.suberic.pooka;
 
 import net.suberic.pooka.crypto.*;
 import javax.mail.internet.MimeMessage;
+import javax.mail.MessagingException;
 
 /**
  * The EncryptionManager manages Pooka's encryption facilities.
@@ -42,17 +43,41 @@ public class EncryptionManager {
   }
 
   /**
-   * Encrypts the given message if we think we should.
+   * Encrypts to given message.  Actually checks all of the recipients
+   * configured to see if we have a key for each one.
    */
   public MimeMessage encryptMessage(MimeMessage mMsg) {
-    return mMsg;
+    return null;
   }
 
   /**
-   * Signs the given message if we think we should.
+   * Encrypts the given message.  If there's no key, return null.
    */
-  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile) {
-    return mMsg;
+  public MimeMessage encryptMessage(MimeMessage mMsg, EncryptionKey key)
+    throws EncryptionException, MessagingException  {
+    if (key != null) {
+      return getDefaultEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+    } else
+      return mMsg;
+  }
+
+  /**
+   * Signs the given message.
+   */
+  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, EncryptionKey key) 
+    throws EncryptionException, MessagingException, java.io.IOException  {
+    if (key == null) {
+      key = profile.getEncryptionKey();
+    }
+
+    if (key == null) {
+      // get user input.
+    }
+    
+    if (key != null)
+      return getDefaultEncryptionUtils().signMessage(Pooka.getDefaultSession(), mMsg, key);
+    else
+      return mMsg;
   }
 
 }

@@ -11,6 +11,29 @@ import javax.mail.internet.*;
  */
 public class NewMessageInfo extends MessageInfo {
 
+  // ok, i could have just used sets of booleans, but...
+  static int CRYPTO_YES = 0;
+  static int CRYPTO_DEFAULT = 5;
+  static int CRYPTO_NO = 10;
+
+  // whether or not we want to encrypt this message.
+  int mEncryptMessage = CRYPTO_DEFAULT;
+  
+  // whether or not we want to sign this message
+  int mSignMessage = CRYPTO_DEFAULT;
+
+  // the EncryptionKey to use to sign this.  if null, then use the default
+  // key for the UserProfile.
+  net.suberic.pooka.crypto.EncryptionKey mSignatureKey = null;
+
+  // the EncryptionKey to use to encrypt this.  if null, then use the default
+  // key for the recipient(s).
+  net.suberic.pooka.crypto.EncryptionKey mEncryptionKey = null;
+
+
+  /**
+   * Creates a NewMessageInfo to wrap the given Message.
+   */
   public NewMessageInfo(Message newMessage) {
     message = newMessage;
     attachments = new AttachmentBundle();
@@ -62,9 +85,22 @@ public class NewMessageInfo extends MessageInfo {
     
     getMessage().setSentDate(new java.util.Date(System.currentTimeMillis()));
 
-    message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+    // do encryption stuff, if necessary.
 
-    message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile);
+    try {
+      if (mSignMessage == CRYPTO_YES || (mSignMessage == CRYPTO_DEFAULT && profile != null && profile.getSignAsDefault())) {
+	message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile, mSignatureKey);
+      }
+      
+      if (mEncryptMessage == CRYPTO_YES) {
+	// if we're forcing an encryption, then we aren't going to 
+	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+      } else if (mEncryptMessage == CRYPTO_DEFAULT) {
+	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     boolean sent = false;
     if (profile != null) {
