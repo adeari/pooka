@@ -10,6 +10,8 @@ Pooka.hsize = 800
 Pooka.vsize = 600
 
 Pooka.guiType=Desktop
+Pooka.guiType.propertyType=List
+Pooka.guiType.allowedValues=Desktop:Preview
 
 Pooka.folderPanel.hsize=180
 Pooka.folderPanel.vsize=570
@@ -23,19 +25,35 @@ Pooka.attachmentPanel.vsize=100
 Pooka.replyPrefix=>
 Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
+Pooka.forwardStyle.propertyType=List
+Pooka.forwardStyle.allowedValues=prefixed:not prefixed
 
 Pooka.lineWrap=true
+Pooka.lineWrap.propertyType=Boolean
 Pooka.lineLength=78
 Pooka.displayTextAttachments=true
+Pooka.displayTextAttachments.propertyType=Boolean
 
 Pooka.openFoldersOnConnect=true
+Pooka.openFoldersOnConnect.propertyType=Boolean
+
 Pooka.openSavedFoldersOnStartup=true
+Pooka.openSavedFoldersOnStartup.propertyType=Boolean
+
 Pooka.saveOpenFoldersOnExit=true
+Pooka.saveOpenFoldersOnExit.propertyType=Boolean
+
 Pooka.saveFolderWindowLocationsOnExit=true
+Pooka.saveFolderWindowLocationsOnExit.propertyType=Boolean
 
 Pooka.newMessage.autoAddSignature=true
+Pooka.newMessage.autoAddSignature.propertyType=Boolean
 Pooka.newMessage.signatureBeforeCopiedMessage=false
+Pooka.newMessage.signatureBeforeCopiedMessage.propertyType=Boolean
 Pooka.defaultSigGenerator=net.suberic.pooka.FileSignatureGenerator
+
+Pooka.autoExpunge=true
+Pooka.autoExpunge.propertyType=Boolean
 
 MenuBar=File:Edit:Mail:Window:Help
 
@@ -318,7 +336,7 @@ Store.trashFolder.selectionRoot=currentStore
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
-Preferences=Pooka.guiType:Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocations:Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
+Preferences=Pooka.guiType:Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit:Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage:Pooka.autoExpunge
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v

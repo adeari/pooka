@@ -43,6 +43,8 @@ public class BooleanEditorPane extends DefaultPropertyEditor {
 	
 	inputField = new JCheckBox(sourceBundle.getProperty(property + ".label", defaultLabel));
 	
+	inputField.setSelected(originalValue);
+
 	this.add(inputField);
 	this.setEnabled(isEnabled);
     }
