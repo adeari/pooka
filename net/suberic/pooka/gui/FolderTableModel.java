@@ -78,7 +78,6 @@ public class FolderTableModel extends AbstractTableModel {
 		
 		data.addAll(changedMsg);
 		fireTableRowsInserted(firstRow, lastRow);
-		System.out.println("inserted rows " + firstRow + " to " + lastRow + ".");
 	    } else if (addOrRem == FolderTableModel.REMOVE_MESSAGES) {
 		for (int i = 0; i < changedMsg.size() ; i++) {
 		    int rowNumber = data.indexOf(changedMsg.elementAt(i));
