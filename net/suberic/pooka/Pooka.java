@@ -40,6 +40,10 @@ public class Pooka {
     }
     java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 
+    try {
+	UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
+    } catch (Exception e) { System.out.println("Cannot set look and feel..."); }
+
     /*
     try {
     addressBook = new net.suberic.pooka.vcard.VcardAddressBook("/home/allen/working/vcard.db");

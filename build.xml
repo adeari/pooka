@@ -1,0 +1,61 @@
+<project name="Pooka" default="compile" basedir=".">
+  <property name="builddir" value="Build"/>
+  <property name="sourcedir" value="net"/>
+  <property name="distdir" value="Dist"/>
+  <property name="docdir" value="Docs"/>
+  <property name="importdir" value="Imported"/>
+
+<!-- Define classpath for building.  Note this isn't used for running pooka,
+     So dynamicaly loaded classes aren't listed here. -->
+  <property name="activation_cp" value="${importdir}/activation.jar"/>
+  <property name="mail_cp" value="${importdir}/mail.jar"/>
+  <property name="jsse_cp" value="${importdir}/jsse.jar"/>
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}"/> 
+  
+  <target name="clean">
+    <delete dir="${distdir}"/>
+    <delete dir="${builddir}"/>
+    <delete dir="${docdir}"/>
+  </target>
+
+  <target name="init">
+    <tstamp/>
+    <mkdir dir="${builddir}"/>
+    <mkdir dir="${distdir}"/>
+    <mkdir dir="${docdir}"/>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}"/>
+    <copy todir="${builddir}/net/suberic/pooka">
+      <fileset dir="${sourcedir}/suberic/pooka">
+        <include name="Pookarc"/>
+        <include name="*.properties"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/net/suberic/pooka/gui/images">
+      <fileset dir="${sourcedir}/suberic/pooka/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="docs" depends="init">
+    <javadoc sourcepath="." 
+             destdir="${docdir}" 
+             windowtitle="Pooka Documentation"
+             classpath="${full_cp}"
+ 	     packagenames="net.suberic.*"/>
+  </target>
+
+  <target name="dist" depends="compile">
+    <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"/> 
+    <copy todir="${distdir}">
+      <fileset dir="${importdir}">
+        <include name="**/*.jar"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="all" depends="compile,dist,docs"/>
+</project>
