@@ -71,7 +71,7 @@ MenuBar.Mail.Reply.Action=message-reply
 MenuBar.Mail.ReplyAll.Action=message-reply-all
 MenuBar.Mail.Forward.Action=message-forward
 MenuBar.Mail.Send.Action=message-send
-MenuBar.Mail.Move=folderList
+MenuBar.Mail.Move.class=net.suberic.pooka.gui.FolderMenu
 MenuBar.Mail.Move.Action=message-move
 MenuBar.Mail.Delete.Action=message-delete
 MenuBar.Mail.Expunge.Action=message-expunge
@@ -79,6 +79,7 @@ MenuBar.Mail.Expunge.Action=message-expunge
 MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
 MenuBar.Window.Cascade.Action=window-cascase
+MenuBar.Window.class=net.suberic.pooka.gui.WindowMenu
 
 MenuBar.Help=About:License
 MenuBar.Help.About.Action=help-about
