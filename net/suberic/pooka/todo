@@ -23,6 +23,10 @@ startup (i.e. not just on messagesAdded).
 
 ------
 
+*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
+	message.  read it.  disconnect there.  get a few new messages.
+	reconnect from original pooka.
+
 *) MoveFilter on closed imap folder:
 java.lang.ArrayIndexOutOfBoundsException: 0
         at net.suberic.pooka.gui.filechooser.MailFileSystemView.getDefaultRoot(MailFileSystemView.java:461)
