@@ -13,10 +13,6 @@ as unread.  a bit later, they were marked as read.
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
 
-*) add a POOKA_HOME option. -- done sort of, but need to find the right
-	place for it, and to enable a directory file chooser.  oh, and
-	set it up in the new account setup.
-
 ---
 
 *) make it so the connection objects actually have a clue as to whether
@@ -63,6 +59,7 @@ or not they're actually connected, instead of relying on the user.
 
 *) make the NewAccountPooka make a more fully-featured account; i.e. allow
 	for laptop configurations, sent folder configuration, etc.
+	include the .pooka directory configuration.
 
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.

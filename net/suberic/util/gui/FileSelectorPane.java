@@ -19,6 +19,8 @@ public class FileSelectorPane extends DefaultPropertyEditor {
   JTextField valueDisplay;
   JButton inputButton;
   VariableBundle sourceBundle;
+
+  int fileSelection;
   
   /**
    * This creates a new FileSelectorPane.
@@ -72,6 +74,13 @@ public class FileSelectorPane extends DefaultPropertyEditor {
     inputButton = createInputButton();
     
     valueDisplay.setPreferredSize(new java.awt.Dimension(150 - inputButton.getPreferredSize().width, valueDisplay.getMinimumSize().height));
+    
+    String selectionType = sourceBundle.getProperty(propertyTemplate + ".propertyType", "File");
+    if (selectionType.equalsIgnoreCase("Directory")) {
+      fileSelection = JFileChooser.DIRECTORIES_ONLY;
+    } else {
+      fileSelection = JFileChooser.FILES_ONLY;
+    }
     
     this.add(label);
     labelComponent = label;
@@ -129,8 +138,9 @@ public class FileSelectorPane extends DefaultPropertyEditor {
     JFileChooser jfc =
       new JFileChooser((String)valueDisplay.getText());
     jfc.setMultiSelectionEnabled(false);
-    jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    
+    jfc.setFileSelectionMode(fileSelection);
+    jfc.setFileHidingEnabled(false);
+
     int returnValue =
       jfc.showDialog(this,
 		     sourceBundle.getProperty("FolderEditorPane.Select",
