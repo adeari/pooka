@@ -96,7 +96,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 			else 
 			    setIconToSubfolder();
 		    } else if (folderInfo.isSortaOpen()) {
-			if (folderInfo.notifyNewMessages() && folderInfo.hasNewMessages()) {
+			if (folderInfo.notifyNewMessagesNode() && folderInfo.hasNewMessages()) {
 			    setIconToOpenWithNew();
 			} else
 			    setIconToOpen();
