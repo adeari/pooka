@@ -1,3 +1,10 @@
+added a default domain setting, so that if you enter in an email address 
+without a domain, then the default domain is appended.  if no default domain
+is set, then the domain of the user is appended.
+
+fixed an error where incomplete matches to address book entries would return
+as if they were complete matches.
+
 fixed an error with subscribing to deeply nested subfolders.
 
 made it so the address entry windows actually show up in desktop mode.

@@ -1,5 +1,4 @@
 *) default domain for outgoing addresses.
-	- test address matching. ('allen' shouldn't match 'allen@dback')
 	- test outbox failure.
 
 *) make address book editable as soon as you create it.

@@ -184,6 +184,15 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
     }
 
     if (orderedList[value].compareTo(matchString) == 0) {
+      if (exactly) {
+	// FIXME assume for now only one match.
+	String valueExact = orderedList[value].getPersonalName();
+	if (valueExact.equalsIgnoreCase(matchString)) {
+	  return new AddressBookEntry[] { orderedList[value] };
+	} else
+	  return new AddressBookEntry[0];
+      }
+
       // get all the matches.
       int minimum = value;
       while (minimum > 0 && (orderedList[minimum - 1].compareTo(matchString) == 0))
