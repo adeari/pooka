@@ -23,6 +23,8 @@ a big ui overhaul.
 
 *) add copying messages.
 
+*) add delete/expunge support, or at least enable it.  
+
 *) add undo/redo support
 
 protocol support
