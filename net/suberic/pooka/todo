@@ -3,6 +3,12 @@ next release:
 *) add queuing of outgoing mails (?)
 
 *) make vcard address book at least come close to working for simple cases.
+	editor:
+		right click menu
+		add
+		delete
+		disable
+	should work for groups.
 
 *) fix "got an empty/null added or deleted event" message after a search has
 	been done.
@@ -11,7 +17,9 @@ next release:
 
 *) make search window look different than normal window.
 
-*) add connecting to subscribed folders.
+*) add support for authenticated smtp.
+
+*) test new system with pop3/mbox to make sure it still works.
 
 beta 1
 ---------------

@@ -13,6 +13,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   
   String property;
   AddressBook book;
+  JPanel editPanel;
   JPanel searchEntryPanel;
   JTextField searchEntryField;
   JTable addressTable;
@@ -42,12 +43,14 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     this.setBorder(BorderFactory.createEtchedBorder());
 
     createSearchEntryPanel();
+    createEditPanel();
     createAddressTable();
 
     labelComponent = this;
     
     this.add(searchEntryPanel);
     this.add(addressTable);
+    this.add(editPanel);
   }
 
   /**
@@ -110,12 +113,68 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
   
   /**
+   * Creates the panel which has the editor fields, such as add/delete/edit
+   * buttons.
+   */
+  public void createEditPanel() {
+    editPanel = new JPanel();
+
+    Action a = new AddAction();
+    JButton button = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Add", "Add"));
+    button.addActionListener(a);
+    editPanel.add(button);
+
+    a = new EditAction();
+    button = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Edit", "Edit"));
+    button.addActionListener(a);
+    editPanel.add(button);
+
+    a = new DeleteAction();
+    button = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Delete", "Delete"));
+    button.addActionListener(a);
+    editPanel.add(button);
+    
+  }
+
+  /**
    * Performs a search using the string value in the searchEntryField.  Updates
    * the addressTable with the results.
    */
   public void performSearch() {
     AddressBookEntry[] matchingEntries = book.getAddressMatcher().match(searchEntryField.getText());
     updateTableModel(matchingEntries);
+  }
+
+  /**
+   * Adds a new entry.
+   */
+  public void performAdd() {
+    AddressBookEntry newEntry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
+    editEntry(newEntry);
+    if (newEntry.getAddress() != null) {
+      book.addAddress(newEntry);
+      ((AddressBookTableModel)addressTable.getModel()).addEntry(newEntry);
+    }
+  }
+
+  /**
+   * Edits the current entry.
+   */
+  public void performEdit() {
+    AddressBookEntry e = getSelectedEntry();
+    if (e != null)
+      editEntry(e);
+  }
+
+  /**
+   * Deletes the current entry.
+   */
+  public void performDelete() {
+    AddressBookEntry e = getSelectedEntry();
+    if (e != null) {
+      book.removeAddress(e);
+      ((AddressBookTableModel)addressTable.getModel()).removeEntry(e);
+    }
   }
 
   /**
@@ -247,6 +306,48 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     public AddressBookEntry getEntryAt(int index) {
       return entries[index];
     }
+    
+    /**
+     * Adds the given AddressBookEntry to the end of the table.
+     */
+    public void addEntry(AddressBookEntry e) {
+      AddressBookEntry[] newEntries;
+      int length; 
+
+      if (entries != null) {
+	length = entries.length;
+	newEntries = new AddressBookEntry[length + 1];
+	System.arraycopy(entries, 0, newEntries, 0, length);
+      } else {
+	length = 0;
+	newEntries = new AddressBookEntry[1];
+      }
+      newEntries[length] = e;
+
+      fireTableRowsInserted(length, length);
+    }
+
+    /**
+     * Removes the given AddressBookEntry from the table, if present.
+     */
+    public void removeEntry(AddressBookEntry e) {
+      boolean found = false;
+
+      for (int i = 0; !found && i < entries.length; i++) {
+	if (e == entries[i]) {
+	  found = true;
+	  int removedRow = i;
+	  AddressBookEntry[] newEntries = new AddressBookEntry[entries.length - 1];
+	  if (removedRow != 0)
+	    System.arraycopy(entries, 0, newEntries, 0, removedRow);
+
+	  if (removedRow != entries.length -1) 
+	    System.arraycopy(entries, removedRow + 1, newEntries, removedRow, entries.length - removedRow - 1);
+
+	  fireTableRowsDeleted(removedRow, removedRow);
+	}
+      }
+    }
   }
 
   public class SearchAction extends AbstractAction {
@@ -257,6 +358,42 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     public void actionPerformed(ActionEvent e) {
       setBusy(true);
       performSearch();
+      setBusy(false);
+    }
+  }
+
+  public class AddAction extends AbstractAction {
+    public AddAction() {
+      super("address-add");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      setBusy(true);
+      performAdd();
+      setBusy(false);
+    }
+  }
+
+  public class EditAction extends AbstractAction {
+    public EditAction() {
+      super("address-edit");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      setBusy(true);
+      performEdit();
+      setBusy(false);
+    }
+  }
+
+  public class DeleteAction extends AbstractAction {
+    public DeleteAction() {
+      super("address-delete");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      setBusy(true);
+      performDelete();
       setBusy(false);
     }
   }
