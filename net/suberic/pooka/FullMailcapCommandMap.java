@@ -51,6 +51,30 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
   */
   
   /**
+   * Return the DataContentHandler for the specified MIME type.
+   */
+  public DataContentHandler createDataContentHandler(java.lang.String mimeType) {
+    CommandInfo[] allCmds = getAllCommands(mimeType);
+    if (allCmds != null) {
+      for (int i = 0; i < allCmds.length; i++) {
+	CommandInfo current = allCmds[i];
+	if (current != null) {
+	  String name = current.getCommandName();
+	  if (name != null && name.equalsIgnoreCase("content-handler")) {
+	    try {
+	      String className = current.getCommandClass();
+	      return (DataContentHandler) Class.forName(className).newInstance();
+	    } catch (Exception e) {
+	    }
+	  }
+	}
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * this adds the following files/resources, in order:
    *
    * The file localMailcap.
@@ -397,8 +421,9 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	    }
 
 	    i = sb.length();
-	    if (sb.charAt(i-1) == ' ' || sb.charAt(i-1) == '\t') {
-		while (sb.charAt(i-1) == ' ' || sb.charAt(i-1) == '\t')
+	    //System.err.println("i = " + i + ", sb = '" + sb + "'");
+	    if (i > 0 && (sb.charAt(i-1) == ' ' || sb.charAt(i-1) == '\t')) {
+		while (i > 0 && sb.charAt(i-1) == ' ' || sb.charAt(i-1) == '\t')
 		    i--;
 		sb.delete(i, sb.length());
 	    }

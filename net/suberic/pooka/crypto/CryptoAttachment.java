@@ -61,6 +61,9 @@ public class CryptoAttachment extends Attachment {
       encrypted = true;
     else if (ct.getSubType().equalsIgnoreCase("signed"))
       signed = true;
+    else if (ct.getPrimaryType().equalsIgnoreCase("application") && ct.getSubType().equalsIgnoreCase("pkcs7-mime")) {
+      encrypted = true;
+    }
   }
 
   /**
@@ -72,7 +75,8 @@ public class CryptoAttachment extends Attachment {
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
     else {
-      // we should always be wrapping a Multipart object here.
+      
+      /*
       Object o = super.getDataHandler().getContent();
       if (o instanceof Multipart) {
 	decryptedBodyPart = utils.decryptMultipart((Multipart)o, key);
@@ -81,6 +85,11 @@ public class CryptoAttachment extends Attachment {
       } else {
 	return null;
       }
+      */
+      MimeBodyPart mbp = new MimeBodyPart(super.getDataHandler().getInputStream());
+      decryptedBodyPart = utils.decryptBodyPart(mbp, key);
+
+      return decryptedBodyPart;
     }
     
   }

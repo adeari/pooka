@@ -129,6 +129,10 @@ public class MessageCryptoInfo {
 		bundle.textPart = ca;
 		bundle.allAttachments.remove(ca);
 	      }
+	    } else {
+	      System.err.println("ca.getMimeType() = " + ca.getMimeType());
+	      System.err.println("bp.getMimeType() = " + ((MimeBodyPart) bp).getContentType());
+	      System.err.println("bp.getContent() = " + bp.getContent());
 	    }
 	  }
 	}

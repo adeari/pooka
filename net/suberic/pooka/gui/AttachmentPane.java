@@ -129,7 +129,7 @@ public class AttachmentPane extends JPanel {
       try {
 	decodedIS = attachment.getInputStream();
 	attachmentSize = attachment.getSize();
-	if (attachment.getEncoding().equalsIgnoreCase("base64"))
+	if (attachment.getEncoding() != null && attachment.getEncoding().equalsIgnoreCase("base64"))
 	  attachmentSize = (int) (attachmentSize * .73);
 	
 	dialog = createDialog(attachmentSize);

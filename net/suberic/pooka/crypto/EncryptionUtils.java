@@ -92,6 +92,10 @@ public abstract class EncryptionUtils {
       ContentType ct = new ContentType(contentType);
       if (ct.getSubType().equalsIgnoreCase("encrypted")) 
 	return true;
+    } else if (contentType.startsWith("application")) {
+      ContentType ct = new ContentType(contentType);
+      if (ct.getSubType().equalsIgnoreCase("pkcs7-mime")) 
+	return true;
     }
     return false;
   }

@@ -105,8 +105,6 @@ public class Pooka {
 
     StoreManager.setupSSL();
 
-    cryptoManager = new EncryptionManager(resources, "EncryptionManager");
-
     try {
       UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
     } catch (Exception e) { System.out.println("Cannot set look and feel...");
@@ -145,6 +143,10 @@ public class Pooka {
     
     javax.activation.CommandMap.setDefaultCommandMap(mailcap);
     javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
+
+
+    cryptoManager = new EncryptionManager(resources, "EncryptionManager");
+
     searchManager = new SearchTermManager("Search");
     
     if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))

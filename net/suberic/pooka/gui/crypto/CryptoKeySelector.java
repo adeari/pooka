@@ -55,7 +55,7 @@ public class CryptoKeySelector {
   public static String showKeySet(Set keys, String title) {
     Vector keyList = new Vector(keys);
     JList displayList = new JList(keyList);
-    int value = JOptionPane.showConfirmDialog(Pooka.getMainPanel(), displayList, title, JOptionPane.YES_NO_OPTION);
+    int value = JOptionPane.showConfirmDialog(Pooka.getMainPanel(), new JScrollPane(displayList), title, JOptionPane.YES_NO_OPTION);
     if (value != JOptionPane.NO_OPTION && value != JOptionPane.CANCEL_OPTION) {
       String selectAlias = (String)displayList.getSelectedValue();
       return selectAlias;

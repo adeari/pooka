@@ -1,4 +1,10 @@
-modified the laoding of table display infos so that we now don't fail 
+fixed the FullMailcapCommandMap so that we support custom DataContentHandlers
+now.
+
+fixed a bug in the Attachment handling where an incorrectly-formed encoding
+would lead to a NullPointerException.
+
+modified the loading of table display infos so that we now don't fail 
 totally if a particular field gets an exception.
 
 added a search/filter for arbitrary message headers.

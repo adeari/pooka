@@ -10,6 +10,7 @@ import java.util.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
+import javax.activation.*;
 
 import org.bouncycastle.mail.smime.*;
 import org.bouncycastle.cms.*;
@@ -18,6 +19,21 @@ import org.bouncycastle.cms.*;
  * Utilities for encrypting/decrypting messages.
  */
 public class SMIMEEncryptionUtils extends EncryptionUtils {
+
+  public SMIMEEncryptionUtils() {
+
+    MailcapCommandMap _mailcap =
+      (MailcapCommandMap)CommandMap.getDefaultCommandMap();
+    
+    _mailcap.addMailcap("application/pkcs7-signature;;x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_signature");
+    _mailcap.addMailcap("application/pkcs7-mime;;x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_mime");
+    _mailcap.addMailcap("application/x-pkcs7-signature;;x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_signature");
+    _mailcap.addMailcap("application/x-pkcs7-mime;;x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_mime");
+    _mailcap.addMailcap("multipart/signed;;x-java-content-handler=org.bouncycastle.mail.smime.handlers.multipart_signed");
+    
+    CommandMap.setDefaultCommandMap(_mailcap);
+
+  }
 
   /**
    * Encrypts a Message.
@@ -127,6 +143,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
   public  BodyPart decryptBodyPart(BodyPart part, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException {
     try {
+      System.err.println("decrypting body part");
       BouncySMIMEEncryptionKey bKey = (BouncySMIMEEncryptionKey) key;
 
       RecipientId     recId = new RecipientId();
@@ -143,6 +160,8 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
 
       MimeBodyPart mbp = SMIMEUtil.toMimeBodyPart(recipient.getContent(privateKey, "BC"));
 
+      System.err.println("returning " + mbp);
+      System.err.println("particularly, " + mbp.getContent());
       return mbp;
     } catch (CMSException cmse) {
       throw new EncryptionException(cmse);

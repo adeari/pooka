@@ -51,8 +51,6 @@ public class CryptixPGPProviderImpl implements PGPProviderImpl {
       e.printStackTrace();
       throw new EncryptionException(e.getMessage());
     }
-    
-    
   }
   
   /**
@@ -60,7 +58,44 @@ public class CryptixPGPProviderImpl implements PGPProviderImpl {
    */
   public byte[] encrypt(java.io.InputStream rawStream, EncryptionKey key)
     throws EncryptionException {
-    return null;
+    
+    try {
+      CryptixPGPEncryptionKey pgpKey = (CryptixPGPEncryptionKey) key;
+      KeyBundle bundle = pgpKey.getKeyBundle();
+
+      LiteralMessageBuilder lmb = 
+	LiteralMessageBuilder.getInstance("OpenPGP");
+
+      byte[] msg;
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      
+      byte[] bytesRead = new byte[256];
+      int numRead = rawStream.read(bytesRead);
+      
+      while (numRead > -1) {
+	baos.write(bytesRead, 0, numRead);
+	numRead = rawStream.read(bytesRead);
+      }
+      msg = baos.toByteArray();
+
+      lmb.init(msg);
+      
+      LiteralMessage litmsg = (LiteralMessage)lmb.build();
+      
+      EncryptedMessageBuilder emb = 
+	EncryptedMessageBuilder.getInstance("OpenPGP");
+      emb.init(litmsg);
+      emb.addRecipient(bundle);
+      Message encryptedMessage = emb.build();
+
+      PGPArmouredMessage armoured = new PGPArmouredMessage(encryptedMessage);
+
+      return armoured.getEncoded();
+      
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }
   }
 
    /**

@@ -90,13 +90,16 @@ public class NewMessageInfo extends MessageInfo {
     // do encryption stuff, if necessary.
 
     try {
+      System.err.println("checking on crypto stuff.");
       if (mSignMessage == CRYPTO_YES || (mSignMessage == CRYPTO_DEFAULT && profile != null && profile.getSignAsDefault())) {
 	message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile, mSignatureKey);
       }
       
       if (mEncryptMessage == CRYPTO_YES) {
+	System.err.println("encrypting with " + getEncryptionKey());
 	if (getEncryptionKey() != null) {
 	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getEncryptionKey());
+	  message.writeTo(System.out);
 	} else {
 	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
 	}

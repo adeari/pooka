@@ -123,7 +123,7 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public EncryptionKey getPublicKey(String alias)
     throws KeyStoreException {
-    if (pkcsKeyStore.isKeyEntry(alias)) {
+    if (pkcsKeyStore.isCertificateEntry(alias) || pkcsKeyStore.isKeyEntry(alias)) {
       BouncySMIMEEncryptionKey ek = new BouncySMIMEEncryptionKey();
       Certificate[] chain = pkcsKeyStore.getCertificateChain(alias);
       ek.setCertificate((X509Certificate)chain[0]);
@@ -264,8 +264,8 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
     HashSet returnValue = new HashSet();
     while (enum.hasMoreElements()) {
       String alias = (String) enum.nextElement();
-      if (pkcsKeyStore.isCertificateEntry(alias))
-	returnValue.add(alias);
+      //if (pkcsKeyStore.isCertificateEntry(alias))
+      returnValue.add(alias);
     }
     return returnValue;
   }
