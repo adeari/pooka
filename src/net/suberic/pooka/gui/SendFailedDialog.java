@@ -95,6 +95,7 @@ public class SendFailedDialog extends JPanel {
 
     this.add(messagePanel);
     this.add(choicePanel);
+    this.add(new net.suberic.util.swing.ExceptionDisplayPanel(Pooka.getProperty("error.showStackTrace", "Stack Trace"), mException));
 
     reactivatePanels();
   }
