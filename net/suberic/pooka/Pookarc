@@ -314,6 +314,7 @@ ExternalLauncher.cmdWrapper./=sh -c %v
 FolderTree.readStyle=PLAIN
 FolderTree.unreadStyle=BOLD
 FolderTree.connectedIcon=images/Plus.gif
+FolderTree.connectedWithNewIcon=images/PlusNew.gif
 FolderTree.disconnectedIcon=images/Minus.gif
 FolderTree.unavailableIcon=images/Delete.gif
 FolderTree.connectedStoreIcon=images/mailbox.gif
