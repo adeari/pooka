@@ -126,11 +126,45 @@
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
       <zipfileset src="${crypto_lib}"/>
-      <zipfileset src="${crypto_combined_lib}"/>
-      <zipfileset src="${cryptix_message_api_lib}"/>
-      <zipfileset src="${cryptix_pki_api_lib}"/>
     </jar>
     <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
+  </target>
+
+
+  <target name="dist-crypto" depends="compile">
+    <mkdir dir="${distdir}/cryptodist"/>
+    <mkdir dir="${distdir}/cryptodist/pooka"/>
+    <mkdir dir="${distdir}/cryptodist/pooka/lib"/>
+
+    <tstamp>
+      <format property="today" pattern="yyMMdd" locale="en"/>
+    </tstamp>
+    <jar jarfile="${distdir}/cryptodist/pooka/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka_crypto.manifest"> 
+      <zipfileset src="${activation_dist_lib}"/>
+      <zipfileset src="${javahelp_dist_lib}"/>
+      <zipfileset src="${mail_dist_lib}"/>
+      <zipfileset src="${localproviders_lib}"/>
+      <zipfileset src="${kunststoff_lib}"/>
+      <zipfileset src="${icejni_cp}"/>
+      <zipfileset src="${crypto_lib}"/>
+    </jar>
+    <signjar jar="${distdir}/cryptodist/pooka/pooka.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
+
+    <copy todir="${distdir}/cryptodist/pooka/lib">
+      <fileset dir="${importdir}">
+        <include name="bcmail-jdk14-121.jar"/>
+        <include name="bcprov-jdk14-121.jar"/>
+        <include name="cryptix-jce-provider.jar"/>
+        <include name="cryptix-openpgp-provider.jar"/>
+        <include name="cryptix-message-api.jar"/>
+        <include name="cryptix-pki-api.jar"/>
+        <include name="javamail-crypto-bouncycastle-smime.jar"/>
+        <include name="javamail-crypto-cryptix-openpgp.jar"/>
+      </fileset>
+    </copy>
+    
+    <zip zipfile="${distdir}/pooka_11_crypto_${today}.zip" basedir="${distdir}/cryptodist"/>
+         
   </target>
 
   <target name="dist-jnlp-noFile" depends="compile-jnlp">

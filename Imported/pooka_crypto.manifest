@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: net.suberic.pooka.Pooka
+Class-Path: lib/bcmail-jdk14-121.jar lib/bcprov-jdk14-121.jar lib/cryptix-jce-provider.jar lib/cryptix-openpgp-provider.jar lib/cryptix-message-api.jar lib/cryptix-pki-api.jar lib/javamail-crypto-bouncycastle-smime.jar lib/javamail-crypto-cryptix-openpgp.jar
