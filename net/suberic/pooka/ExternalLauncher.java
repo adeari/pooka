@@ -79,11 +79,11 @@ public class ExternalLauncher implements CommandObject, Runnable {
 	    } else {
 		parsedVerb = substituteString(verb, "%s", fileName);
 		
-		StringTokenizer tok = new StringTokenizer(wrapper);
+		StringTokenizer tok = new StringTokenizer(parsedVerb);
 		cmdArray = new String[tok.countTokens()];
 		for (int i = 0; tok.hasMoreTokens(); i++) {
 		    String currentString = tok.nextToken();
-		    cmdArray[i]=tok.nextToken();
+		    cmdArray[i]=currentString;
 		}
 		
 		tmpFile.deleteOnExit();
