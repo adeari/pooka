@@ -1,5 +1,3 @@
-*) attachment panel is broken for preview pane mode.
-
 *) add pgp/gpg support.
 features:
   mozilla:  key, click on it and it gives you status.  good idea!
@@ -76,6 +74,9 @@ bugs:
 
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.
+
+*) add ability for ui components to be enabled/disabled programmatically.
+	- both for adding to menus/tables and enabling/disabling options.
 
 *) some case(s) in which we're not generating the attachment bundle 
 	correctly?  one instance is how we're handling multipart/alternative

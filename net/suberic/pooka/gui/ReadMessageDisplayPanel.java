@@ -18,6 +18,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   private JTextPane otherEditorPane = null;
   private JScrollPane otherScrollPane = null;
   
+  private Box attachmentSlot = null;
+  private Box cryptoSlot = null;
+
   public boolean firstShow = true;
   
   private static String WITH_ATTACHMENTS = "with";
@@ -108,7 +111,13 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     
     attachmentDisplayPanel = new JPanel();
+    attachmentDisplayPanel.setLayout(new BoxLayout(attachmentDisplayPanel, BoxLayout.X_AXIS));
+    attachmentSlot = new Box(BoxLayout.Y_AXIS);
+    cryptoSlot = new Box(BoxLayout.Y_AXIS);
     
+    attachmentDisplayPanel.add(attachmentSlot);
+    attachmentDisplayPanel.add(cryptoSlot);
+
     splitPane.setTopComponent(otherScrollPane);
     splitPane.setBottomComponent(attachmentDisplayPanel);
     
@@ -221,6 +230,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       final String finalMessageText = messageText.toString();
       final String finalContentType = contentType;
       final boolean hasAttachments = getMessageProxy().hasAttachments();
+      final boolean hasEncryption = (getMessageProxy().getMessageInfo() == null) ? false : getMessageProxy().getMessageInfo().hasEncryption();
       final boolean contentIsNull = (content == null);
 
       SwingUtilities.invokeLater(new Runnable() {
@@ -269,7 +279,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    
 	    if (hasAttachments) {
 	      attachmentPanel = new AttachmentPane(getMessageProxy());
-	      attachmentDisplayPanel.add(attachmentPanel);
+	      fillAttachmentSlot(attachmentPanel);
+
 	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITH_ATTACHMENTS);
 	      editorStatus = WITH_ATTACHMENTS;
 	      
@@ -285,6 +296,18 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    } else {
 	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITHOUT_ATTACHMENTS);
 	      editorStatus = WITHOUT_ATTACHMENTS;
+	    }
+	    
+	    if (hasEncryption) {
+	      net.suberic.pooka.gui.crypto.CryptoStatusDisplay csd = new net.suberic.pooka.gui.crypto.CryptoButton();
+	      setCryptoStatusDisplay(csd);
+	      MessageCryptoInfo cryptoInfo = getMessageProxy().getMessageInfo().getCryptoInfo();
+	      if (cryptoInfo != null)
+		csd.cryptoUpdated(cryptoInfo);
+
+	      fillCryptoSlot((JComponent) csd);
+	    } else {
+	      fillCryptoSlot(null);
 	    }
 	  }
 	});
@@ -327,6 +350,38 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       return false;
   }
   
+  /**
+   * Shows the given Component in the Attachment slot.
+   */
+  public void fillAttachmentSlot(JComponent component) {
+    if (attachmentSlot != null) {
+      Component[] children = attachmentSlot.getComponents();
+      for (int i = 0; children != null && i < children.length; i++) {
+	attachmentSlot.remove(children[i]);
+      }
+
+      if (component != null)
+	attachmentSlot.add(component);
+    }
+
+  }
+
+  /**
+   * Shows the given Component in the Crypto slot.
+   */
+  public void fillCryptoSlot(JComponent component) {
+    if (cryptoSlot != null) {
+      Component[] children = cryptoSlot.getComponents();
+      for (int i = 0; children != null && i < children.length; i++) {
+	cryptoSlot.remove(children[i]);
+      }
+
+      if (component != null)
+	cryptoSlot.add(component);
+    }
+
+  }
+
   /**
    * This registers the Keyboard action not only for the FolderWindow
    * itself, but also for pretty much all of its children, also.  This
