@@ -322,10 +322,17 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	try {
 	    getFolderInfo().getFolder().expunge();
 	} catch (MessagingException me) {
-	    JOptionPane.showInternalMessageDialog(getDesktopPane(), Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
+	    showError(Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
 	}   
     }
 
+    /**
+     * This shows an error message.
+     */
+    public void showError(String message) {
+	JOptionPane.showInternalMessageDialog(getDesktopPane(), message);
+    }
+    
     // Accessor methods.
 
     public MessagePanel getMessagePanel() {

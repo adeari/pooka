@@ -18,7 +18,7 @@ public class MailTreeNode extends DefaultMutableTreeNode {
     // this is only used for the FolderChooser
     private boolean subscribed = false;
 
-    ConfigurablePopupMenu popupMenu;
+    public ConfigurablePopupMenu popupMenu;
 
     MailTreeNode(Object userObj, JComponent parent) {
 	super(userObj);

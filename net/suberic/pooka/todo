@@ -8,10 +8,7 @@ a menu option and from the 'open with' dialog.
 	need to deal with disconnection issues and return value issues.
 
 *) create a Trash folder.  done.  
-	add a ui.  -- not done.  jfc above, plus 'empty trash' option, 
-		entry on store panel for trash folder, icon, fewer other
-		opens (unsubscribe, especially).
-	icon.  also, make it so it doesn't get new message notification.
+	make it so it doesn't get new message notification.
 
 *) create a Sent folder.  done.
 	need to add ui as above

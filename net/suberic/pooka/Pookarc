@@ -31,7 +31,7 @@ Pooka.saveFolderWindowLocationsOnExit=true
 
 MenuBar=File:Edit:Mail:Window:Help
 
-MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:Exit
+MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit
 #MenuBar.File=NewMail:OpenFolder:OpenMessage:Close:Exit
 
 MenuBar.File.NewFolder.Action=folder-new
@@ -45,6 +45,7 @@ MenuBar.File.SaveAs.Action=file-saveAs
 MenuBar.File.SaveAs.Image=/net/suberic/pooka/gui/images/Save.gif
 MenuBar.File.Print.Action=file-print
 MenuBar.File.Print.Image=/net/suberic/pooka/gui/images/Print.gif
+MenuBar.File.EmptyTrash.Action=folder-empty
 MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif
 
@@ -188,13 +189,18 @@ FolderTable.Subject.value=Subject
 FolderTable.Subject.size=260
 
 # -- Popup menus.
-FolderNode.popupMenu=Open:Update:Close:New:Edit:Unsubscribe
+FolderNode.popupMenu=Open:Update:Close:Edit:Unsubscribe
 FolderNode.popupMenu.Open.Action=file-open
 FolderNode.popupMenu.Update.Action=folder-update
 FolderNode.popupMenu.Close.Action=folder-close
-FolderNode.popupMenu.New.Action=file-new
 FolderNode.popupMenu.Edit.Action=file-edit
 FolderNode.popupMenu.Unsubscribe.Action=folder-unsubscribe
+
+TrashFolderNode.popupMenu=Open:Empty:Close:Edit
+TrashFolderNode.popupMenu.Open.Action=file-open
+TrashFolderNode.popupMenu.Close.Action=folder-close
+TrashFolderNode.popupMenu.Edit.Action=file-edit
+TrashFolderNode.popupMenu.Empty.Action=folder-empty
 
 StoreNode.popupMenu=Open:Subscribe:Close:Edit
 StoreNode.popupMenu.Open.Action=file-open

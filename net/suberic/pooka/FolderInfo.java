@@ -80,9 +80,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	updateChildren();
 
-	defaultActions = new Action[] {
-	    new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread())
-		};
+	resetDefaultActions();
+    }
+
+    /**
+     * This resets the defaultActions.  Useful when this goes to and from
+     * being a trashFolder, since only trash folders have emptyTrash
+     * actions.
+     */
+    public void resetDefaultActions() {
+	if (isTrashFolder())
+	    defaultActions = new Action[] {
+		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+		new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread())
+		    
+		    };
+	else
+	    defaultActions = new Action[] {
+		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread())
+		    };
     }
 
 
@@ -580,6 +596,26 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
+     * This removes all the messages in the folder, if the folder is a
+     * TrashFolder.
+     */
+    public void emptyTrash() {
+	if (isTrashFolder()) {
+	    try {
+		Message[] allMessages = getFolder().getMessages();
+		getFolder().setFlags(allMessages, new Flags(Flags.Flag.DELETED), true);
+		getFolder().expunge();
+	    } catch (MessagingException me) {
+		String m = Pooka.getProperty("error.trashFolder.EmptyTrashError", "Error emptying Trash:") +"\n" + me.getMessage();
+		if (getFolderWindow() != null) 
+		    getFolderWindow().showError(m);
+		else
+		    System.out.println(m);
+	    }
+	}
+    }
+
+    /**
      * Remove the given String from the folderList property.  
      *
      * Note that because this is also a ValueChangeListener to the
@@ -977,8 +1013,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return trashFolder;
     }
 
+    /**
+     * This sets the trashFolder value.  it also resets the defaultAction
+     * list and erases the FolderNode's popupMenu, if there is one.
+     */
     public void setTrashFolder(boolean newValue) {
 	trashFolder = newValue;
+	resetDefaultActions();
+	if (getFolderNode() != null)
+	    getFolderNode().popupMenu = null;
     }
 
     public boolean isSentFolder() {
@@ -1057,6 +1100,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
         public void actionPerformed(ActionEvent e) {
 	    resetMessageCounts();
+	}
+    }
+
+    class EmptyTrashAction extends AbstractAction {
+	
+	EmptyTrashAction() {
+	    super("folder-empty");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    emptyTrash();
 	}
     }
 

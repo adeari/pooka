@@ -103,6 +103,10 @@ public class MultiMessageProxy extends MessageProxy{
 	    }		
     }
 
+    /**
+     * Shows the popupMenu for the MultiMessageProxy.  The definition of this
+     * menu comes from the MessageProxy.popupMenu property.
+     */
     public void showPopupMenu(JComponent component, MouseEvent e) {
 	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
 	popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
@@ -128,7 +132,7 @@ public class MultiMessageProxy extends MessageProxy{
 	    }
     }
 
-        /**
+    /**
      * This sends the message to the printer, first creating an appropriate
      * print dialog, etc.
      */
