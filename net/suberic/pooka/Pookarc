@@ -732,6 +732,7 @@ Store.editableFields.storeConfig.mbox.mbox.scoped=true
 Store.editableFields.storeConfig.mbox.mbox.scopeRoot=Store.editableFields
 
 Store.editableFields.password.propertyType=Password
+Store.editableFields.port._listeners=PropertyEditor.filter.portFilter
 Store.editableFields.SSL.propertyType=Boolean
 Store.editableFields.cachingEnabled.propertyType=Boolean
 Store.editableFields.cachingEnabled=false
@@ -750,8 +751,8 @@ Store.editableFields.inboxLocation.propertyType=File
 Store.editableFields.mailDirectory.propertyType=Directory
 Store.editableFields.mailDirectory=Pooka.cacheDirectory
 
-Store.trashFolder.namePrefix=Store.
-Store.trashFolder.nameSuffix=.trashFolder
+Store.editableFields.trashFolder.namePrefix=Store.
+Store.editableFields.trashFolder.nameSuffix=.trashFolder
 
 Preferences=UI:Reply:Startup:Signature:HTML:Files
 Preferences.propertyScoped=false
@@ -951,3 +952,7 @@ PropertyEditor.Folder.class=net.suberic.pooka.gui.propedit.FolderSelectorPane
 PropertyEditor.Filter.class=net.suberic.util.gui.propedit.StringEditorPane
 PropertyEditor.SearchTerm.class=net.suberic.util.gui.propedit.StringEditorPane
 PropertyEditor.AddressList.class=net.suberic.pooka.gui.propedit.AddressEntryEditor
+
+PropertyEditor.filter.portFilter.class=net.suberic.util.gui.propedit.NumberFilter
+PropertyEditor.filter.portFilter.min=0
+PropertyEditor.filter.portFilter.max=32000

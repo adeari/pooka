@@ -241,7 +241,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public void firePropertyChangingEvent(String newValue) throws PropertyValueVetoException {
     for (int i = 0; i < listenerList.size(); i++) {
       PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
-      current.propertyChanging(newValue);
+      current.propertyChanging(this, property, newValue);
     }
   }
 
@@ -251,7 +251,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public void firePropertyChangedEvent(String newValue) {
     for (int i = 0; i < listenerList.size(); i++) {
       PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
-      current.propertyChanged(newValue);
+      current.propertyChanged(this, property, newValue);
     }
   }
 

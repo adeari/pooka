@@ -54,7 +54,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     }
 
     manager.addPropertyEditorListener(keyProperty, new PropertyEditorAdapter() {
-	public void propertyChanged(String newValue) {
+	public void propertyChanged(PropertyEditorUI ui, String prop, String newValue) {
 	  showPanel(newValue);
 	}
       });

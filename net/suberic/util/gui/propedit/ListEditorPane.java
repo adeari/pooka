@@ -259,7 +259,7 @@ public class ListEditorPane extends SwingPropertyEditor {
     /**
      * Called after a property changes.
      */
-    public void propertyChanged(String newValue) {
+    public void propertyChanged(PropertyEditorUI ui, String property, String newValue) {
       updateComboBox(newValue);
     }
     

@@ -44,8 +44,9 @@ public class StringEditorPane extends SwingPropertyEditor {
 	      currentValue = inputField.getText();
 	      firePropertyChangedEvent(currentValue);
 	    } catch (PropertyValueVetoException pvve) {
-	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + inputField.getText() + ":  " + pvve.getReason());
 	      inputField.setText(currentValue);
+	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+	      inputField.requestFocus();
 	    }
 	  }
 	}
@@ -58,6 +59,7 @@ public class StringEditorPane extends SwingPropertyEditor {
     valueComponent = inputField;
 
     manager.registerPropertyEditor(property, this);
+    addDefaultListeners();
   }
   
   /**

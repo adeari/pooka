@@ -17,7 +17,6 @@ public class FolderSelectorPane extends SwingPropertyEditor {
   JLabel label;
   JTextField valueDisplay;
   JButton inputButton;
-  //boolean enabled;
   
   /**
    * @param propertyName The property to be edited.  
@@ -145,6 +144,7 @@ public class FolderSelectorPane extends SwingPropertyEditor {
     
     FileSystemView returnValue = null;
     boolean justSubscribed = manager.getProperty(editorTemplate + ".onlySubscribed", "false").equalsIgnoreCase("true");
+
     if (manager.getProperty(editorTemplate + ".selectionRoot", "allStores").equals("allStores")) {
       if (justSubscribed) 
 	returnValue = new PookaFileSystemView();
@@ -152,7 +152,7 @@ public class FolderSelectorPane extends SwingPropertyEditor {
 	returnValue = new MailFileSystemView();
     } else {
       int prefixSize = manager.getProperty(editorTemplate + ".namePrefix", "Store.").length();
-      int suffixSize = manager.getProperty(editorTemplate + ".nameSuffix", "trashFolder").length();
+      int suffixSize = manager.getProperty(editorTemplate + ".nameSuffix", ".trashFolder").length();
       String currentStoreName = property.substring(prefixSize, property.length() - suffixSize);
       net.suberic.pooka.StoreInfo currentStore = Pooka.getStoreManager().getStoreInfo(currentStoreName);
       if (currentStore != null) {

@@ -6,7 +6,6 @@
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.
 	-- started.  todo:
-	*) FolderSelPane doesn't work. 
 	*) address book editor doesn't work.
 	*) add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
 
