@@ -125,8 +125,10 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
 	public void updateDesktopSize() {
 	    MessagePanel mp = getMainPanel().getMessagePanel();
-	    if (mp.getSize().getWidth() < 1000)
-		mp.setSize(1000, 1000);
+	    /*
+	      if (mp.getSize().getWidth() < 1000)
+	      mp.setSize(1000, 1000);
+	    */
 
 	    JScrollPane scrollPane = getMainPanel().getMessageScrollPane();
 
@@ -136,7 +138,15 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    // calculate the min and max locations for all the frames.
 	    JInternalFrame[] allFrames = mp.getAllFrames();
 	    int min_x = 0, min_y = 0, max_x = 0, max_y = 0;
-	    Rectangle bounds = null;
+	    // add to this the current viewable area.
+
+	    Rectangle bounds = scrollPane.getViewport().getViewRect();
+	    min_x = bounds.x;
+	    min_y = bounds.y;
+	    max_x = bounds.width + bounds.x;
+	    max_y = bounds.height + bounds.y;
+
+	    bounds = null;
 	    for (int i = 0; i < allFrames.length; i++) {
 		bounds = allFrames[i].getBounds(bounds);
 		min_x = Math.min(min_x, bounds.x);
@@ -145,19 +155,12 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 		max_y = Math.max(max_y, bounds.height + bounds.y);
 	    }
 	    
-	    // add to this the current viewable area.
-	    bounds = scrollPane.getViewport().getBounds(bounds);
-	    min_x = Math.min(min_x, bounds.x + hsb.getValue());
-	    min_y = Math.min(min_y, bounds.y + vsb.getValue());
-	    max_x = Math.max(max_x, bounds.width + bounds.x + hsb.getValue());
-	    max_y = Math.max(max_y, bounds.height + bounds.y + vsb.getValue());
-
 	    bounds = mp.getBounds(bounds);
 	    int xdiff = 0;
 	    int ydiff = 0;
 	    if (min_x != bounds.x || min_y != bounds.y) {
-		xdiff = bounds.x - min_x;
-		ydiff = bounds.y - min_y;
+		xdiff = bounds.x + hsb.getValue() - min_x;
+		ydiff = bounds.y + vsb.getValue() - min_y;
 
 		hsb = scrollPane.getHorizontalScrollBar();
 		vsb = scrollPane.getVerticalScrollBar();
@@ -179,6 +182,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    int vval = vsb.getValue();
 
 	    mp.setSize(max_x - min_x, max_y - min_y);
+	    mp.setPreferredSize(mp.getSize());
+	    scrollPane.validate();
 
 	    hsb = scrollPane.getHorizontalScrollBar();
 	    vsb = scrollPane.getVerticalScrollBar();
@@ -192,21 +197,6 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    vsb.setValue(vval + ydiff);
 	}
 
-	public void printstats(String message) {
-	    System.out.println("\n" + message);
-	    MessagePanel mp = getMainPanel().getMessagePanel();
-	    JScrollPane scrollPane = getMainPanel().getMessageScrollPane();
-	    JViewport viewport = scrollPane.getViewport();
-	    JInternalFrame[] allFrames = mp.getAllFrames();
-	    
-	    System.out.println("getBounds() of MessagePanel is " + mp.getBounds());
-	    System.out.println("getBounds() of JViewport is " + viewport.getBounds());
-	    System.out.println("getViewRect() is JViewport is " + viewport.getViewRect());
-	    System.out.println("HSB.getValue() is " + scrollPane.getHorizontalScrollBar().getValue());
-	    System.out.println("VSB.getValue() is " + scrollPane.getVerticalScrollBar().getValue());
-	    for (int i = 0; i < allFrames.length; i++)
-		System.out.println("allFrames[i] = " + allFrames[i].getLocation());
-	}
     }
 
     // end internal class ExtendedDesktopManager

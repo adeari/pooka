@@ -24,6 +24,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
     private MessagePanel messagePanel;
+    private JScrollPane messageScrollPane;
     private Session session;
     private MailQueue mailQueue;
     private UserProfile currentUser = null;
@@ -52,11 +53,13 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	// create the menu bar.
 
 	messagePanel = new MessagePanel(this);
+	messagePanel.setSize(1000,1000);
+	messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	folderPanel = new FolderPanel(this);
 	Pooka.getResources().addValueChangeListener(folderPanel, "Store");
 
 	this.setLeftComponent(folderPanel);
-	this.setRightComponent(messagePanel);
+	this.setRightComponent(messageScrollPane);
 
 	mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
 	mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
@@ -234,6 +237,10 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
     public MessagePanel getMessagePanel() {
 	return messagePanel;
+    }
+
+    public JScrollPane getMessageScrollPane() {
+	return messageScrollPane;
     }
 
     public FolderPanel getFolderPanel() {
