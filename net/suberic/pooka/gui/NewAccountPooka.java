@@ -104,6 +104,10 @@ public class NewAccountPooka {
               Pooka.getProperty(property + ".propertyType", "");
 	    if (!(propertyTypeValue.equals("")))
 		vb.setProperty(property + ".propertyType", propertyTypeValue);
+	    String allowedValuesValue =
+              Pooka.getProperty(property + ".allowedValues", "");
+	    if (!(allowedValuesValue.equals("")))
+		vb.setProperty(property + ".allowedValues", allowedValuesValue);
 	}
 	return vb;
     }
