@@ -34,7 +34,7 @@ public class MultiMessageProxy extends MessageProxy{
 	rowNumbers=newRowNumbers;
 	messages=newMessages;
 	folderWindow=newFolderWindow;
-
+	folderInfo = newFolderWindow.getFolderInfo();
 	
 	ActionThread storeThread = folderWindow.getFolderInfo().getParentStore().getStoreThread();
 
