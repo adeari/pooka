@@ -665,25 +665,28 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     MessagingException storeException = null;
     if (!(store.isConnected())) {
       connected=false;
+      closeAllFolders(false, false);
       return;
     } else {
       try {
-	store.close();
-      } catch (MessagingException me) {
-	storeException = me;
-      } finally {
-	connected=false;
 	try {
 	  closeAllFolders(false, false);
 	} catch (MessagingException folderMe) {
-	  if (storeException != null)
-	    throw folderMe;
-	  else {
-	    storeException.setNextException(folderMe);
-	    throw storeException;
-	  }
+	  storeException = folderMe;
 	}
+	store.close();
+      } catch (MessagingException me) {
+	if (storeException != null) {
+	  me.setNextException(storeException);
+	}
+	storeException = me;
+	throw storeException;
+      } finally {
+	connected=false;
       }
+
+      if (storeException != null)
+	throw storeException;
     }
   }
 

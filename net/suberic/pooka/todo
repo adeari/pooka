@@ -1,12 +1,6 @@
 *) fix the problem with things like MissingStartBoundary by getting the
 raw input stream.
 
-*) connect server.  disconnect.  read message.  unread message count doesn't
-change.
-
-*) Preview mode:  open a folder.  unsubscribe to it.  try opening another
-folder.  get a NPE.
-
 *) make it so folder windows save their settings (window size, column width,
 sort order)
 

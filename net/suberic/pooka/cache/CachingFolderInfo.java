@@ -534,7 +534,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	messageCount = getFolder().getMessageCount();
       } else if (getCache() != null) { 
 	messageCount = getCache().getMessageCount();
-	if (! tracksUnreadMessages()) 
+	if (tracksUnreadMessages()) 
 	  unreadCount = getCache().getUnreadMessageCount();
       } else {
 	// if there's no cache and no connection, don't do anything.
