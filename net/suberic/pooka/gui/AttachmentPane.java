@@ -111,6 +111,96 @@ public class AttachmentPane extends JPanel {
 	}
     }
 
+    class SaveAttachmentThread extends Thread {
+	
+	MimeBodyPart mbp;
+	File saveFile;
+	JDialog jd;
+	JProgressBar progressBar;
+	boolean running = true;
+
+	SaveAttachmentThread(MimeBodyPart part, File newSaveFile) {
+	    mbp = part;
+	    saveFile = newSaveFile;
+	}
+
+	public void run() {
+	    InputStream decodedIS = null;
+	    BufferedOutputStream outStream = null;
+	    
+	    int attachmentSize = 0;
+	    
+	    try {
+		decodedIS = mbp.getInputStream();
+		attachmentSize = mbp.getSize();
+		if (mbp.getEncoding().equalsIgnoreCase("base64"))
+		    attachmentSize = (int) (attachmentSize * .73);
+		
+		createDialog(attachmentSize);
+		jd.show();
+		
+		outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
+		int b=0;
+		byte[] buf = new byte[32768];
+		
+		b = decodedIS.read(buf);
+		while (b != -1 && running) {
+		    outStream.write(buf, 0, b);
+		    progressBar.setValue(progressBar.getValue() + b);
+		    b = decodedIS.read(buf);
+		    
+		}
+		
+		jd.dispose();
+		
+	    } catch (IOException ioe) {
+		Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
+		cancelSave();
+	    } catch (MessagingException ioe) {
+		Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
+		cancelSave();
+	    } finally {
+		if (outStream != null) {
+		    try {
+			outStream.flush();
+			outStream.close();
+		    } catch (IOException ioe) {}
+		}
+	    }
+	}
+
+	public void createDialog(int attachmentSize) {
+	    progressBar = new JProgressBar(0, attachmentSize);
+	    progressBar.setBorderPainted(true);
+	    progressBar.setStringPainted(true);
+
+	    jd = new JDialog();
+	    jd.getContentPane().setLayout(new BoxLayout(jd.getContentPane(), BoxLayout.Y_AXIS));
+	    JLabel nameLabel = new JLabel(saveFile.getName());
+	    JPanel buttonPanel = new JPanel();
+	    JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
+	    cancelButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+			cancelSave();
+		    }
+		});
+	    buttonPanel.add(cancelButton);
+
+	    jd.getContentPane().add(nameLabel);
+	    jd.getContentPane().add(progressBar);
+	    jd.getContentPane().add(buttonPanel);
+
+	    jd.pack();
+	}
+
+	public void cancelSave() {
+	    try {
+		saveFile.delete();
+	    } catch (Exception e) {}
+	    jd.dispose();
+	}
+    }
+
     JTable table;
     AttachmentTableModel tableModel;
     JPopupMenu popupMenu;
@@ -286,7 +376,7 @@ public class AttachmentPane extends JPanel {
     /**
      * This opens up a JFileChooser to let the user choose under what
      * name and where the selected Attachment should be saved.  It then
-     * calls saveAttachmentAs() to save the file.
+     * calls saveFileAs() to save the file.
      */
     public void saveAttachment() {
 	MimeBodyPart mbp = getSelectedPart();
@@ -314,29 +404,9 @@ public class AttachmentPane extends JPanel {
      * This actually saves the MimeBodyPart as the File saveFile.
      */
     public void saveFileAs(MimeBodyPart mbp, File saveFile) throws IOException {
-	InputStream decodedIS;
-	BufferedOutputStream outStream;
+	SaveAttachmentThread thread = new SaveAttachmentThread(mbp, saveFile);
+	thread.start();
 
-	try {
-	    decodedIS = mbp.getInputStream();
-	} catch (MessagingException me) {
-	    throw new IOException(me.getMessage());
-	}
-	outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
-	try {
-	    int b=0;
-	    byte[] buf = new byte[32768];
-	    
-	    b = decodedIS.read(buf);
-	    while (b != -1) {
-		outStream.write(buf, 0, b);
-		b = decodedIS.read(buf);
-	    }
-
-	} finally {
-	    outStream.flush();
-	    outStream.close();
-	}
     }
 
     /**

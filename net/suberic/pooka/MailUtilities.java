@@ -189,7 +189,7 @@ public class MailUtilities {
      * The attachments are separated by the separator flag.
      */
 
-    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
+    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders, boolean withHeaders, int maxLength) throws MessagingException {
 	StringBuffer returnValue = null;
 	String retString = MailUtilities.getTextPart(m, showFullHeaders, withHeaders);
 	if (retString != null && retString.length() > 0)
@@ -202,24 +202,27 @@ public class MailUtilities {
 	    for (int i = 0; i < attachments.size(); i++) {
 		Object content = null;
 		try {
-		    content = ((MimeBodyPart)attachments.elementAt(i)).getContent();
+		    int size = ((MimeBodyPart)attachments.elementAt(i)).getSize();
+		    System.out.println("size of attachment is " + size);
+		    if (size <= maxLength) {
+			content = ((MimeBodyPart)attachments.elementAt(i)).getContent();
+			returnValue.append(separator);
+			if (content instanceof MimeMessage)
+			    returnValue.append(getTextAndTextInlines((MimeMessage)content, separator, showFullHeaders, maxLength));
+			else
+			    returnValue.append(content);
+		    }
 		} catch (IOException ioe) {
 		    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
 		}
-
-		returnValue.append(separator);
-		if (content instanceof MimeMessage)
-		    returnValue.append(getTextAndTextInlines((MimeMessage)content, separator, showFullHeaders));
-		else
-		    returnValue.append(content);
 	    }
 	}
 	
 	return returnValue.toString();
     }
     
-    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders) throws MessagingException {
-	return getTextAndTextInlines(m, separator, showFullHeaders, false);
+    public static String getTextAndTextInlines(Message m, String separator, boolean showFullHeaders, int maxLength) throws MessagingException {
+	return getTextAndTextInlines(m, separator, showFullHeaders, false, maxLength);
     }
 
     /**

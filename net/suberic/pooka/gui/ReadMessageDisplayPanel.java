@@ -106,7 +106,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    
 	    String content = null;
 	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-		content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
+		int displayLength = 100000;
+		try {
+		    displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
+		} catch (NumberFormatException nfe) {
+		}
+		content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true, displayLength);
 	    } else {
 		content = getMessageProxy().getMessageInfo().getTextPart( showFullHeaders(), true);
 	    }

@@ -137,12 +137,12 @@ public class MessageInfo {
     /**
      * Gets the Content and inline text content for the Message.
      */
-    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
+    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders, int maxLength) throws MessagingException {
 	try {
-	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders);
+	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders, maxLength);
 	} catch (FolderClosedException fce) {
 	    getFolderInfo().openFolder(Folder.READ_WRITE);
-	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders);
+	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders, maxLength);
 	}
     }
 

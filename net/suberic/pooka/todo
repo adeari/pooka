@@ -1,8 +1,6 @@
 beta 1
 ---------------
 
-*) bug:  no dialog is shown when you do a save-as for an attachment.
-
 *) bug:  drop-down list, especially for defaultProfile, isn't populated
 properly when you add a new Mail Store.
 
@@ -26,7 +24,7 @@ messages.  for that matter, maybe also do an optimizeit audit.
 last time you ran the client and this time) aren't marked as recent--only
 ones that come in while you're already connected are labelled like that.
 
-*) bug:  make the FolderSelectorPanel work for all stores/foldes instead of
+*) bug:  make the FolderSelectorPanel work for all stores/folders instead of
 just for the current store/folder.
 
 --
@@ -46,7 +44,10 @@ ui engine
 	   intenral frame change.
 	-- 2)  make it not get included for preview pane ui windows.
 	-- 3)  make it available for folder windows?
-
+	-- 4)  the windows are being resized, meaning that if you make the
+	       window larger and then detach it, or if you move the split
+		pane divider, then it reverts to its original state when you
+		detach/attach the window.
 
 *) fix all of the thread issues that i've introduced.  :)
 
