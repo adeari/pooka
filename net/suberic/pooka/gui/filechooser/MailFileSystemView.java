@@ -112,7 +112,7 @@ public class MailFileSystemView
 		
 		newFolder.create(Folder.HOLDS_FOLDERS);
 		
-		return new FolderFileWrapper(newFolder, (FolderFileWrapper)containingDir, store);
+		return new FolderFileWrapper(newFolder, (FolderFileWrapper)containingDir);
 	    } else {
 		return null;
 
@@ -189,7 +189,7 @@ public class MailFileSystemView
 	    Folder f = store.getDefaultFolder();
 	    if (Pooka.isDebug())
 		System.out.println("done setting f.");
-	    root = new FolderFileWrapper(f, null, "/", store);
+	    root = new FolderFileWrapper(f, null, "/");
 	    return new File[] { root };
 	} catch (MessagingException me) {
 	    return null; // FIXME: throw this on
