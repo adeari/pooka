@@ -1,6 +1,6 @@
 *) threading of attachment actions.
 
-*) switch attached progress dialog to use a ProgressDialog.
+*) switch attachment progress dialog to use a ProgressDialog.
 
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
@@ -17,6 +17,7 @@
 *) make search window look different than normal window.
 
 *) search doesn't work properly for sent folders.
+	-- started, at least.
 
 *) fix the display of the FolderTree -- right now, unopened stores are
 	squashed.
@@ -51,8 +52,12 @@ preview:
 	    get new messages.  doesn't work properly.
 	*)  reading a message in disconnected mode doesn't actually mark
 	     it read. -- ?? test.  seems to work.
+
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store. -- get testcase?
+	-- make it so there's a way to close the store that actually resets
+	the connection totally, so that if your network is screwed up 
+	pooka can recover without restarting.
 
 *)  add documentation and online help.
 
