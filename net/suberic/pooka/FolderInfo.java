@@ -76,10 +76,6 @@ public class FolderInfo {
 		messageProxies.add(mp);
 	    }
 
-	    //loaderThread.loadMessages(messageProxies);
-
-	    //	    loaderThread.start();
-
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	}
@@ -88,9 +84,55 @@ public class FolderInfo {
 
 	setFolderTableModel(ftm);
 
+
+	loaderThread.loadMessages(messageProxies);
+	
+	loaderThread.start();
+
 	return ftm;
     }
     
+    /**
+     * Gets the row number of the first unread message.  Returns -1 if
+     * there are no unread messages, or if the FolderTableModel is not
+     * set or empty.
+     */
+    
+    public int getFirstUnreadMessage() {
+
+	// one part brute, one part force, one part ignorance.
+
+	if (Pooka.isDebug())
+	    System.out.println("getting first unread message");
+
+	if (getFolderTableModel() == null)
+	    return -1;
+
+	try {
+	    int numUnread = getFolder().getUnreadMessageCount();
+	    int countUnread = 0;
+	    int i;
+	    if (numUnread > 0) {
+		Message[] messages = getFolder().getMessages();
+		for (i = messages.length - 1; ( i >= 0 && countUnread < numUnread) ; i--) {
+		    if (!(messages[i].isSet(Flags.Flag.SEEN))) 
+		    countUnread++;
+		}
+		if (Pooka.isDebug())
+		    System.out.println("Returning " + i);
+		return i + 1;
+	    } else { 
+		if (Pooka.isDebug())
+		    System.out.println("Returning -1");
+		return -1;
+	    }
+	} catch (MessagingException me) {
+	    if (Pooka.isDebug())
+		System.out.println("Messaging Exception.  Returning -1");
+	    return -1;
+	}
+    }
+
     /**
      * Creates the column values from the FolderTable property.
      */
