@@ -12,8 +12,13 @@ public class MailQueue {
 	transportTable = new Hashtable();
     }
 
-    public void sendMessage(Message m, URLName transportURL) {
-	System.out.println("MailQueue sending message at url " + transportURL);
+    /**
+     * This adds the Message to the queue associated with the given 
+     * transportURL.  If Message.sendImmediately is set to true, then this
+     * will also go ahead and try to send all queued Messages using
+     * sendQueued().
+     */
+    public void sendMessage(Message m, URLName transportURL) throws MessagingException {
 	Vector transportQueue = (Vector)transportTable.get(transportURL);
 	if (transportQueue == null) {
 	    transportQueue = new Vector();
@@ -27,7 +32,16 @@ public class MailQueue {
 
     }
 
-    public void sendQueued() {
+    /**
+     * This will try to send all the Messages currently in the queue.  If 
+     * it encounters any major errors (i.e being unable to connect to the
+     * mailserver), it will more or less exit out, throwing a 
+     * MessagingException saying why it failed.  If it manages to send some
+     * Messages but not others, it will send the ones that it can, and return
+     * a MessagingException with all the individual sub-exceptions tacked
+     * on to it using MessagingException.setNextException().
+     */
+    public void sendQueued() throws MessagingException {
 	Enumeration keys = transportTable.keys();
 	URLName transportURL;
 	Transport sendTransport;
@@ -37,33 +51,34 @@ public class MailQueue {
 	
 	while (keys.hasMoreElements()) {
 	    transportURL = (URLName)keys.nextElement();
-	    try {
-		sendQueue = (Vector)transportTable.get(transportURL);
+	    sendQueue = (Vector)transportTable.get(transportURL);
+	    
+	    if (!(sendQueue.isEmpty())) {
+		MessagingException returnException = null;
+		sendTransport = session.getTransport(transportURL); 
+		sendTransport.connect();
 		
-		if (!(sendQueue.isEmpty())) {
-		    sendTransport = session.getTransport(transportURL); 
-		    sendTransport.connect();
-		    
-		    for (int i=sendQueue.size()-1 ; i >= 0; i--) {
-			msg = (Message)sendQueue.elementAt(i);
-			try {
-			    sendTransport.sendMessage(msg, msg.getAllRecipients());
-			    sendQueue.removeElementAt(i);
-			} catch (SendFailedException sfe) {
-			    
-			    System.out.println(sfe.getMessage());
-			    error = true;
-			} catch (MessagingException me) {
-			    error = true;
-			}
+		for (int i=sendQueue.size()-1 ; i >= 0; i--) {
+		    msg = (Message)sendQueue.elementAt(i);
+		    try {
+			sendTransport.sendMessage(msg, msg.getAllRecipients());
+			sendQueue.removeElementAt(i);
+		    } catch (SendFailedException sfe) {
+			if (returnException == null) 
+			    returnException = sfe;
+			else
+			    returnException.setNextException(sfe);
+		    } catch (MessagingException me) {
+			if (returnException == null)  
+			    returnException = me;
+			else
+			    returnException.setNextException(me);
 		    }
 		}
-	    } catch (NoSuchProviderException nspe) {
-	    } catch (MessagingException  me ) {
+		if (returnException != null)
+		    throw returnException;
 	    }
 	}
-	if (error) 
-	    System.out.println("Error!\n");
     }
 }
     

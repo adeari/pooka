@@ -31,6 +31,9 @@ public class MessageProxy {
     // commands for the GUI
     Hashtable commands;
 
+    // The Window associated with this MessageProxy.
+    MessageWindow msgWindow;
+
     protected MessageProxy() {
     }
 
@@ -300,6 +303,14 @@ public class MessageProxy {
 
     public boolean isLoaded() {
 	return loaded;
+    }
+
+    public MessageWindow getMessageWindow() {
+	return msgWindow;
+    }
+
+    public void setMessageWindow(MessageWindow newValue) {
+	msgWindow = newValue;
     }
 
     public Action getAction(String name) {

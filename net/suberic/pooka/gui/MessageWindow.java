@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.UserProfile;
+import net.suberic.util.gui.ConfigurableToolbar;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -9,6 +10,7 @@ import javax.swing.*;
 import javax.swing.text.TextAction;
 import java.util.*;
 import javax.swing.text.JTextComponent;
+import javax.swing.event.*;
 
 public class MessageWindow extends JInternalFrame {
 
@@ -25,6 +27,7 @@ public class MessageWindow extends JInternalFrame {
     boolean modified = false;
     Hashtable inputTable = null;
     JEditorPane editorPane = null;
+    ConfigurableToolbar toolbar;
 
     /**
      * Creates a MessageWindow from the given Message.
@@ -37,24 +40,41 @@ public class MessageWindow extends JInternalFrame {
 	if (isEditable()) 
 	    inputTable = new Hashtable();
 
+	this.getContentPane().setLayout(new BorderLayout());
+
 	msg=newMsgProxy;
 	if (editable) {
 	    this.setModified(true);
 	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
-	} else 
+	    toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
+	} else {
 	    try {
 		this.setTitle(msg.getMessage().getSubject());
 	    } catch (MessagingException me) {
 		this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.noSubject", "<no subject>"));
 	    }
+	    toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
+	}
 	
+	toolbar.setActive(this.getActions());
+	this.getContentPane().add("North", toolbar);
+
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	
 	splitPane.setTopComponent(createHeaderPanel(msg));
 	splitPane.setBottomComponent(createBodyPanel(msg));
-	this.getContentPane().add(splitPane);
+	this.getContentPane().add("Center", splitPane);
 	
 	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "200")));
+	
+	newMsgProxy.setMessageWindow(this);
+
+	this.addInternalFrameListener(new InternalFrameAdapter() {
+		public void internalFrameClosed(InternalFrameEvent e) {
+		    if (getMessageProxy().getMessageWindow() == MessageWindow.this)
+			getMessageProxy().setMessageWindow(null);
+		}
+	    });
 	
     }
 
@@ -273,12 +293,17 @@ public class MessageWindow extends JInternalFrame {
 	}
     }
 
-    public void send() throws MessagingException {
-	if (msg.getMessage() instanceof MimeMessage) {
-	    MimeMessage mMsg = (MimeMessage)msg.getMessage();
-	    String key;
-	    URLName urlName = new URLName("smtp://localhost");
+    /**
+     * This will populate a Message with the values entered in the 
+     * MessageWindow.
+     */
 
+    public URLName populateMessageHeaders(Message m) throws MessagingException {
+	if (m instanceof MimeMessage) {
+	    MimeMessage mMsg = (MimeMessage)m;
+	    String key;
+	    URLName urlName = null;
+	    
 	    Enumeration keys = inputTable.keys();
 	    while (keys.hasMoreElements()) {
 		key = (String)(keys.nextElement());
@@ -293,13 +318,17 @@ public class MessageWindow extends JInternalFrame {
 		    mMsg.setHeader(header, value);
 		}
 	    }
-	
-	    mMsg.setContent(getEditorPane().getText(), getEditorPane().getContentType());
-	
-	    ((MessagePanel)getDesktopPane()).getMainPanel().getMailQueue().sendMessage(mMsg, urlName);
-	    this.setModified(false);
-	    this.closeMessageWindow();
+	    return urlName;
 	}
+	return null;
+    }
+
+    public String getMessageText() {
+	return getEditorPane().getText();
+    }
+
+    public String getMessageContentType() {
+	return getEditorPane().getContentType();
     }
 
     public boolean isEditable() {
@@ -321,6 +350,14 @@ public class MessageWindow extends JInternalFrame {
 
     public JEditorPane getEditorPane() {
 	return editorPane;
+    }
+
+    public MessageProxy getMessageProxy() {
+	return msg;
+    }
+
+    public void setMessageProxy(MessageProxy newValue) {
+	msg = newValue;
     }
 
     //------- Actions ----------//
@@ -396,7 +433,6 @@ public class MessageWindow extends JInternalFrame {
 
     public Action[] defaultActions = {
 	new CloseAction(),
-	new SendAction(),
 	new CutAction(),
 	new CopyAction(),
 	new PasteAction()
@@ -410,21 +446,6 @@ public class MessageWindow extends JInternalFrame {
 	
         public void actionPerformed(ActionEvent e) {
 	    closeMessageWindow();
-	}
-    }
-
-    class SendAction extends AbstractAction {
-
-	SendAction() {
-	    super("message-send");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    try {
-		send();
-	    } catch (MessagingException me) {
-		JOptionPane.showInternalMessageDialog(getDesktopPane(), Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
-	    }
 	}
     }
 
