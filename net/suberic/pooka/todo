@@ -1,7 +1,4 @@
 
-*) default domain for outgoing addresses.
-	- test outbox failure.
-
 *) make address book editable as soon as you create it.
 	-- specifically, make it so you can hit 'apply' and then have
 	   the entry editors be enabled.
