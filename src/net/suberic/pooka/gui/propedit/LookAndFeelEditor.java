@@ -16,11 +16,15 @@ public class LookAndFeelEditor extends ListEditorPane {
    * Creates the JComboBox with the appropriate options.
    */
   protected JComboBox createComboBox() {
-    String originalValue = manager.getProperty(property, "");
+    originalValue = manager.getProperty(property, "");
 
     Vector items = loadLnF();
 
     JComboBox jcb = new JComboBox(items);
+
+    if (debug)
+      System.out.println("setting to original index " + originalIndex);
+
     jcb.setSelectedIndex(originalIndex);
 
     jcb.addItemListener(new ItemListener() {
@@ -65,17 +69,27 @@ public class LookAndFeelEditor extends ListEditorPane {
 
 	LookAndFeel currentLnf = (LookAndFeel) Class.forName(itemValue).newInstance();
 	if (currentLnf.isSupportedLookAndFeel()) {
+	  if (debug)
+	    System.out.println("instantiated " + itemValue + "; adding " + itemLabel);
+
 	  if (itemValue.equals(originalValue)) {
-	    originalIndex=i;
-	    currentIndex=i;
+	    if (debug)
+	      System.out.println("matching " + itemValue + "; settingin originalIndex to " + i);
+	    originalIndex=items.size();
+	    currentIndex=items.size();
 	  }
 	  items.add(itemLabel);
 	  labelToValueMap.put(itemLabel, itemValue);
 	  
 	  foundLnfs.put(itemValue, null);
+	} else {
+	  if (debug)
+	    System.out.println("not adding " + itemLabel + "; not supported look and feel.");
 	}
       } catch (Exception e) {
 	// assume it couldn't be instantiated.
+	if (debug)
+	  System.out.println("error instantiating " + itemLabel + "; not adding.");
       }
     }
     
@@ -90,7 +104,7 @@ public class LookAndFeelEditor extends ListEditorPane {
       tokens = new StringTokenizer(manager.getProperty(editorTemplate + ".allowedValues", ""), ":");
     }
     
-    for (int i=0; tokens.hasMoreTokens(); i++) {
+    while (tokens.hasMoreTokens()) {
       String currentItem = tokens.nextToken();
       
       String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
@@ -104,18 +118,27 @@ public class LookAndFeelEditor extends ListEditorPane {
       if (! foundLnfs.containsKey(itemValue)) {
 	// try instantiating this.
 	try {
-
 	  LookAndFeel currentLnf = (LookAndFeel) Class.forName(itemValue).newInstance();
 	  if (currentLnf.isSupportedLookAndFeel()) {
+	    if (debug)
+	      System.out.println("instantiated; adding " + itemLabel);
 	    if (itemValue.equals(originalValue)) {
-	      originalIndex=i;
-	      currentIndex=i;
+	      if (debug)
+		System.out.println("setting originalIndex to " + items.size());
+	      originalIndex=items.size();
+	      currentIndex=items.size();
 	    }
 	    items.add(itemLabel);
 	    labelToValueMap.put(itemLabel, itemValue);
+	  } else {
+	    if (debug)
+	      System.out.println("not adding " + itemLabel + "; not supported look and feel.");
 	  }
 	} catch (Exception e) {
 	  // assume it didn't work.
+	  if (debug)
+	    System.out.println("error instantiating " + itemLabel + "; not adding.");
+
 	}
       }
     }
