@@ -61,6 +61,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
 	this.setLeftComponent(folderPanel);
 	this.setRightComponent(messageScrollPane);
+	this.setDividerLocation(folderPanel.getPreferredSize().width);
 
 	mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
 	mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
