@@ -54,10 +54,21 @@ public class FolderTracker extends Thread {
     public void checkFolder() {
 	if (Pooka.isDebug())
 	    System.out.println("checking folder " + getFolderInfo().getFolderName());
+
+	// i'm taking this almost directly from ICEMail; i don't know how
+	// to keep the stores/folders open, either.  :)
+
 	if (getFolderInfo().isOpen()) {
+	    Store s = getFolderInfo().getParentStore().getStore();
 	    try {
-		getFolderInfo().getFolder().list("nfdsaf238sa");
-	    } catch (Exception e) {
+		Folder f = s.getFolder("nfdsaf238sa");
+		f.exists();
+	    } catch ( MessagingException me ) {
+		try {
+		    if ( ! s.isConnected() )
+			s.connect();
+		} catch ( MessagingException me2 ) {
+		}
 	    }
 	    
 	    getFolderInfo().resetUnread();
