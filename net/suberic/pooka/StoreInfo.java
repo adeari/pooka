@@ -16,7 +16,7 @@ import net.suberic.util.VariableBundle;
  */
 
 public class StoreInfo implements ValueChangeListener {
-    public static Vector allStores = null;
+    //public static Vector allStores = null;
 
     private Store store;
 
@@ -138,7 +138,7 @@ public class StoreInfo implements ValueChangeListener {
     
     /**
      * This goes through the list of children of this store and
-     * returns the StoreInfo for the given childName, if one exists.
+     * returns the FolderInfo for the given childName, if one exists.
      * If none exists, or if the children Vector has not been loaded
      * yet, or if this is a leaf node, then this method returns null.
      */
@@ -164,6 +164,28 @@ public class StoreInfo implements ValueChangeListener {
 	    return childFolder.getChild(subFolderName);
 	else
 	    return childFolder;
+    }
+
+
+    /**
+     * This goes through the list of children of this store and
+     * returns the FolderInfo that matches this folderID.
+     * If none exists, or if the children Vector has not been loaded
+     * yet, or if this is a leaf node, then this method returns null.
+     */
+    public FolderInfo getFolderById(String folderID) {
+	FolderInfo childFolder = null;
+
+	if (children != null) {
+	    for (int i = 0; i < children.size(); i++) {
+		FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
+		if (possibleMatch != null) {
+		    return possibleMatch;
+		}
+	    }
+	}
+
+	return null;
     }
 
     /**
@@ -226,6 +248,7 @@ public class StoreInfo implements ValueChangeListener {
      * This loads and creates all the Stores from the Store property of
      * the VariableBundle.
      */
+    /*
     public static Vector loadAllStores(VariableBundle resources) {
 	allStores = new Vector();
 	String storeID = null;
@@ -239,29 +262,35 @@ public class StoreInfo implements ValueChangeListener {
 
 	return allStores;
     }
+    */
 
     /**
      * This adds the store with the given storeName to the allStores list.
      */
+    /*
     public static void addStore(String storeName) {
 	if (getStoreInfo(storeName) == null) {
 	    StoreInfo store = new StoreInfo(storeName);
 	    allStores.add(store);
 	}
     }
+    */
 
     /**
      * This adds the StoreInfo to the allStores list.
      */
+    /*
     public static void addStore(StoreInfo storeInfo) {
 	if (!allStores.contains(storeInfo))
 	    allStores.add(storeInfo);
     }
+    */
 
     /**
      * This removes the StoreInfo with the given storeName from the allStores
      * list.
      */
+    /*
     public static void removeStore (String storeName) {
 	boolean removed = false;
 
@@ -274,22 +303,25 @@ public class StoreInfo implements ValueChangeListener {
 	    }
 	}	
     }
+    */
     
     /**
      * This removes the StoreInfo from the allStores list.
      */
-
+    /*
     public static void removeStore (StoreInfo storeInfo) {
 	allStores.remove(storeInfo);
     }
+    */
 
     /**
      * This returns the StoreInfo with the given storeName if it exists
      * in the allStores Vector; otherwise, returns null.
      */
     static public StoreInfo getStoreInfo(String storeName) {
+	Vector allStores = getAllStores();
 	for (int i = 0; i < allStores.size(); i++) {
-	    StoreInfo si = (StoreInfo)(allStores.elementAt(i));
+	    StoreInfo si = (StoreInfo)(getAllStores().elementAt(i));
 
 	    if (si.getStoreID().equals(storeName)) {
 		return si;
@@ -372,5 +404,9 @@ public class StoreInfo implements ValueChangeListener {
 
     public void setTrashFolder(FolderInfo newValue) {
 	trashFolder = newValue;
+    }
+
+    public static Vector getAllStores() {
+	return Pooka.getAllStoreInfos();
     }
 }
