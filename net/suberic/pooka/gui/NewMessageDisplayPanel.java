@@ -138,21 +138,19 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
 	    inputRow.add(hdrLabel);
 
-	    /*
-	    if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC")) {
+	    if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") && Pooka.getProperty("Pooka.useAddressCompletion", "false").equalsIgnoreCase("true")) {
 	      try {
-		inputField = new AddressEntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+		inputField = new AddressEntryTextArea(((NewMessageProxy)msg).getNewMessageUI(), ((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 	      } catch (MessagingException me) {
-		inputField = new net.suberic.util.swing.AddressTextArea(1, 30);
+		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	      }
 	    } else {
-	    */
 	      try {
 		inputField = new net.suberic.util.swing.EntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 	      } catch (MessagingException me) {
 		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	      }
-	      //}
+	    }
 
 
 	    inputField.setLineWrap(true);

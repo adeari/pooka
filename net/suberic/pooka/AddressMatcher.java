@@ -10,6 +10,7 @@ public interface AddressMatcher {
   /**
    * Returns all of the InternetAddresses which match the given String.
    */
+  public InternetAddress[] match(String matchString);
 
   /**
    * Returns all of the InternetAddresses whose FirstName matches the given 
