@@ -227,10 +227,10 @@ public class AttachmentPane extends JPanel {
 
 	String newCmd = message.getMessageWindow().showInputDialog(inputMessage, inputTitle);
 
-	if (newCmd.indexOf("%s") == -1)
-	    newCmd = newCmd.concat(" %s");
-
 	if (newCmd != null) {
+	    if (newCmd.indexOf("%s") == -1)
+		newCmd = newCmd.concat(" %s");
+	    
 	    MimeBodyPart mbp = getSelectedPart();
 	    if (mbp != null) {
 		DataHandler dh = null;
