@@ -6,12 +6,19 @@ alpha 2
 *) fix the attachment pop up on windows.
 
 *)  fix the occasional NullPointerException in the FolderInfo (?) -- might
-    be done already.
+    be done already. -- note:  this is probably happening because of the
+    fact that swing components aren't thread safe (!).  i should make
+    the other threads, especially things that happen from the mail event
+    update thread, use SwingUtilities.invokeLater().
 
 *) finish fixing the threading problems--specifically, see if we can get
 the FolderWindow to refresh properly, the ReadMessageWindow to come up with
 an AttachmentPane, and the new message windows to look a bit better when
 they appear (i.e. actually appear in front).
+	*) note: folderWindow would do deletes better if we batched them
+	   up; SwingUtilities.invokeLater() will probably help, too.
+	*) new windows will appear at front and selected if we set the
+	   layer properly when we create the windows.
 
 *)  fix the response window size when there are lots of people in the 
 address fields--right now it makes the entire window huge.
@@ -19,6 +26,7 @@ address fields--right now it makes the entire window huge.
 *)  add 1.3 compatibility.  current issues:
 	*)  FolderWindow comes up showing first message rather than last
 	*)  NewMessageWindow splitPane not in the right location.
+	*)  (sort of) folderPanel isn't being sized properly now.
 
 *)  fix the actions update when a message is unselected/deleted.
 
@@ -29,7 +37,7 @@ a menu option and from the 'open with' dialog.
 
 *) create a Trash folder.
 
-*) make the DesktopPane scroll/resize properly.
+*) make the DesktopPane scroll/resize properly. -- almost done.
 
 after alpha 2
 ----------------
