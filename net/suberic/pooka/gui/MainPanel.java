@@ -318,6 +318,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new EditUserConfigAction(),
 	new EditStoreConfigAction(),
 	new EditPreferencesAction(),
+	new EditAddressBookAction(),
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
 	new SelectMessagePanelAction(),
@@ -406,6 +407,21 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
 	}
     }
+
+  class EditAddressBookAction extends AbstractAction {
+    
+    EditAddressBookAction() {
+      super("cfg-address-book");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      //Vector valuesToEdit = Pooka.getResources().getPropertyAsVector("Preferences", "");
+      
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("AddressBook");
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.addressBook", "Address Book Editor"), valuesToEdit);
+    }
+  }
 
     class HelpAboutAction extends AbstractAction {
 	

@@ -62,6 +62,12 @@ public class VariableBundle extends Object {
 	this(propertiesFile, null, newParentProperties);
     }
 
+  public VariableBundle(Properties editableProperties, VariableBundle newParentProperties) {
+    writableProperties = editableProperties;
+    parentProperties = newParentProperties;
+    properties = new Properties();
+    resources = null;
+  }
     public String getProperty(String key, String defaultValue) {
 	String returnValue;
 

@@ -645,7 +645,6 @@ public class MessageInfo {
    * Adds the sender of the message to the current AddressBook, if any.
    */
   public void addAddress(AddressBook book, boolean useVcard) throws MessagingException {
-    System.err.println("adding address.  really.");
     boolean found = false;
     if (useVcard) {
       Attachment vcard = null;
@@ -661,7 +660,6 @@ public class MessageInfo {
 	}
 
 	if (vcard != null) {
-	  System.err.println("found a vcard.");
 	  try {
 	    String vcardText = (String) vcard.getContent();
 	    BufferedReader reader = new BufferedReader(new StringReader(vcardText));
@@ -679,7 +677,6 @@ public class MessageInfo {
     }
 
     if (!found) {
-      System.err.println("no vcard.");
       Address[] fromAddresses = getMessage().getFrom();
       javax.mail.internet.InternetAddress addr = (javax.mail.internet.InternetAddress) fromAddresses[0];
 

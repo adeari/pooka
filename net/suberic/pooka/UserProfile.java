@@ -413,7 +413,10 @@ public class UserProfile extends Object implements ValueChangeListener {
   }
   
   public AddressMatcher getAddressMatcher() {
-    return addressBook.getAddressMatcher();
+    if (addressBook != null)
+      return addressBook.getAddressMatcher();
+    else
+      return null;
   }
 
   public AddressBook getAddressBook() {
