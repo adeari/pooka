@@ -31,6 +31,8 @@ public class Vcard implements Comparable {
    */
   protected Vcard(Properties newProps) {
     properties = newProps;
+    System.out.println("***** new vcard:");
+    properties.list(System.out);
   }
   
   /**
@@ -44,14 +46,27 @@ public class Vcard implements Comparable {
    * Gets the InternetAddress associated with this Vcard.
    */
   public InternetAddress getAddress() {
-    return address;
+    try {
+      if (address == null)
+	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("n"));
+      System.out.println("made new internet address from " + properties.getProperty("email;internet") + ", " + properties.getProperty("n"));
+      return address;
+    } catch (java.io.UnsupportedEncodingException uee) {
+      return null;
+    }
   }
   
   /**
    * Gets the PersonalName property associated with this Vcard.
    */
   public String getPersonalName() {
-    return address.getPersonal();
+    try {
+      if (address == null)
+	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("n"));
+      return address.getPersonal();
+    } catch (java.io.UnsupportedEncodingException uee) {
+      return null;
+    }
   }
   
   /**
@@ -156,6 +171,8 @@ public class Vcard implements Comparable {
 	}
 	else 
 	  newProps.put(current[0], current[1]);
+      } else {
+	return null;
       }
       
       while (!isDone) {
@@ -171,6 +188,8 @@ public class Vcard implements Comparable {
 		throw new java.text.ParseException("incorrect end tag", 0);
 	    }
 	  }
+	} else {
+	  isDone = true;
 	}
       }
       return new Vcard(newProps);
@@ -183,23 +202,27 @@ public class Vcard implements Comparable {
    * Parses a name/value pair from an rfc2425 stream.
    */
   private static String getNextLine(BufferedReader reader) throws IOException {
+    //System.err.println("calling getNextLine()");
+    System.err.println("reader is ready.");
     String firstLine = reader.readLine();
+    System.err.println("got line " + firstLine);
     boolean isDone = false;
-    while (! isDone) {
-      reader.mark(256);
-      String nextLine = reader.readLine();
-      if (nextLine != null) {
-	if (! Character.isWhitespace(nextLine.charAt(0))) {
-	  isDone = true;
-	  reader.reset();
+    if (firstLine != null) {
+      while (! isDone) {
+	reader.mark(256);
+	String nextLine = reader.readLine();
+	if (nextLine != null) {
+	  if (! Character.isWhitespace(nextLine.charAt(0))) {
+	    isDone = true;
+	    reader.reset();
+	  } else {
+	    firstLine = firstLine + nextLine.substring(1);
+	  }
 	} else {
-	  firstLine = firstLine + nextLine.substring(1);
+	  isDone = true;
 	}
-      } else {
-	isDone = true;
       }
-    }
-    
+    } 
     return firstLine;
   }
   
