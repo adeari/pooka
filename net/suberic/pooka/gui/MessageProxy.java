@@ -489,15 +489,15 @@ public class MessageProxy {
 
 	java.security.Key key = getDefaultProfile().getEncryptionKey();
 
+	MessageCryptoInfo cInfo = info.getCryptoInfo();
 	try {
 	  if (key == null) {
-	    key = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPrivateKey();
+	    key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());
 	  }
 	} catch (Exception e) {
 	  showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
 	}
 	  
-	MessageCryptoInfo cInfo = info.getCryptoInfo();
 	int sigStatus = 0;
 	int encryptStatus = 0;
 	
@@ -573,7 +573,7 @@ public class MessageProxy {
 	  }
 	  java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(fromString);
 	  if (keys == null || keys.length < 0) {
-	    java.security.Key newKey = CryptoKeySelector.selectPublicKey();
+	    java.security.Key newKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forSig", "Select key for verifying the signature on this message."), cInfo.getEncryptionType());
 	    keys = new java.security.Key[] { newKey };
 	  }
 	  
@@ -611,15 +611,15 @@ public class MessageProxy {
   /**
    * Opens up a dialog to select a public key.
    */
-  public void selectPublicKey() {
-    
+  public java.security.Key selectPublicKey(String flavorText, String type) throws java.security.GeneralSecurityException {
+    return CryptoKeySelector.selectPublicKey(flavorText, type);
   }
 
   /**
    * Opens up a dialog to select a private key.
    */
-  public void selectPrivateKey() {
-    
+  public java.security.Key selectPrivateKey(String flavorText, String type) throws java.security.GeneralSecurityException {
+    return CryptoKeySelector.selectPrivateKey(flavorText, type);
   }
 
   /**

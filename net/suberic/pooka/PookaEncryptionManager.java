@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyStoreException;
+import java.util.HashSet;
 
 import javax.mail.internet.*;
 import javax.mail.*;
@@ -154,23 +155,43 @@ public class PookaEncryptionManager {
    * Returns all available private key aliases.
    */
   public Set privateKeyAliases() throws java.security.KeyStoreException {
-    Set returnValue = new java.util.HashSet();
-    if (pgpKeyMgr != null) {
-      try {
-	returnValue.addAll(pgpKeyMgr.privateKeyAliases());
-      } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+    return privateKeyAliases(null);
+  }
+
+  /**
+   * Returns all available private key aliases for the give EncryptionType,
+   * or all available aliases if type is null.
+   */
+  public Set privateKeyAliases(String encryptionType) throws java.security.KeyStoreException {
+    if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.PGP)) {
+      if (pgpKeyMgr != null)
+	return new HashSet(pgpKeyMgr.privateKeyAliases());
+    } else if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.SMIME)) {
+      if (smimeKeyMgr != null) {
+	return new HashSet(smimeKeyMgr.privateKeyAliases());
       }
-    }
-    if (smimeKeyMgr != null) {
-      try {
-	returnValue.addAll(smimeKeyMgr.privateKeyAliases());
-      } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+    } else {
+      // return both.
+      Set returnValue = new java.util.HashSet();
+      if (pgpKeyMgr != null) {
+	try {
+	  returnValue.addAll(pgpKeyMgr.privateKeyAliases());
+	} catch (KeyStoreException kse) {
+	  // FIXME ignore for now?
+	}
       }
+      if (smimeKeyMgr != null) {
+	try {
+	  returnValue.addAll(smimeKeyMgr.privateKeyAliases());
+	} catch (KeyStoreException kse) {
+	  // FIXME ignore for now?
+	}
+      }
+
+      return returnValue;
     }
 
-    return returnValue;
+    return new HashSet();
   }
 
   /**
@@ -236,7 +257,7 @@ public class PookaEncryptionManager {
   protected char[] getPasswordForAlias(String alias, boolean check) {
     char[] returnValue = (char[]) aliasPasswordMap.get(alias);
     if (returnValue == null || check) {
-      returnValue = net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog();
+      returnValue = net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog(alias);
       if (returnValue != null) {
 	if (savePasswordsForSession) {
 	  aliasPasswordMap.put(alias, returnValue);
@@ -282,23 +303,45 @@ public class PookaEncryptionManager {
    * Returns all available public key aliases.
    */
   public Set publicKeyAliases() throws java.security.KeyStoreException {
-    Set returnValue = new java.util.HashSet();
-    if (pgpKeyMgr != null) {
-      try {
-	returnValue.addAll(pgpKeyMgr.publicKeyAliases());
-      } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+    return publicKeyAliases(null);
+  }
+
+  /**
+   * Returns available public key aliases for the given encryption type, or
+   * all available aliases if null.
+   */
+  public Set publicKeyAliases(String encryptionType) throws java.security.KeyStoreException {
+
+    if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.PGP)) {
+      if (pgpKeyMgr != null)
+	return new HashSet(pgpKeyMgr.publicKeyAliases());
+    } else if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.SMIME)) {
+      if (smimeKeyMgr != null) {
+	return new HashSet(smimeKeyMgr.publicKeyAliases());
       }
-    }
-    if (smimeKeyMgr != null) {
-      try {
-	returnValue.addAll(smimeKeyMgr.publicKeyAliases());
-      } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+    } else {
+      // return both.
+      Set returnValue = new java.util.HashSet();
+      if (pgpKeyMgr != null) {
+	try {
+	  returnValue.addAll(pgpKeyMgr.publicKeyAliases());
+	} catch (KeyStoreException kse) {
+	  // FIXME ignore for now?
+	}
       }
+      if (smimeKeyMgr != null) {
+	try {
+	  returnValue.addAll(smimeKeyMgr.publicKeyAliases());
+	} catch (KeyStoreException kse) {
+	  // FIXME ignore for now?
+	}
+      }
+      
+      return returnValue;
     }
 
-    return returnValue;
+    return new HashSet();
+
   }
 
   /**

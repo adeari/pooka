@@ -3,6 +3,9 @@ features:
   show status:  encrypted/unchecked, unencrypted, not encrypted
 	        signed/unchecked, signed/failed, signed/checked, encrypted
   pgp&smime encrypt, decrypt, sign, check sig, sign&encrypt
+    check signature with default key(s)
+    check signature with selected key(s)
+    recheck signature -- choose key(s)
   add keys from incoming emails
   use default key (for signing, reading - default private; for sending, 
 		   default public by email address (?) -- also overridable,
@@ -10,6 +13,19 @@ features:
   auto check sig
   auto decrypt
   auto encrypt
+ui:
+  fix dialogs
+    outgoing encrypted message should have visual clue saying it's going
+      to get encrypted.
+    
+    Read an encrypted message:  
+    encrypted message should have some sort of 'this is an encrypted message' 
+      text instead of the blank text it currently has.
+  save passphrases.
+  auto check sig
+  auto decrypt
+  auto encrypt/sign
+  show only appropriate keys (s/mime for s/mime signed/encrypted, etc.)
 bugs:
   -- started.  todo on api:
        	- key management

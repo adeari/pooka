@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
 import net.suberic.crypto.EncryptionManager;
+import net.suberic.crypto.EncryptionUtils;
 
 public class MailUtilities {
   public MailUtilities() {
@@ -61,52 +62,26 @@ public class MailUtilities {
   public static AttachmentBundle parseAttachments(Message m) throws MessagingException, java.io.IOException {
     AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
 
-    if (EncryptionManager.checkEncryptionType((MimeMessage) m) != null) {
-      Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
-      
-      bundle.getAttachments().add(newAttach);
-      
-      /*
-      ContentType ct2 = newAttach.getMimeType();
+    String encryptionType = EncryptionManager.checkEncryptionType((MimeMessage)m);
+    EncryptionUtils utils = null;
+    if (encryptionType != null) {
+      try {
+	utils = EncryptionManager.getEncryptionUtils(encryptionType);
+      } catch (java.security.NoSuchProviderException nspe) {
+      }
+    }
 
-      if (ct2.match("text/*") && bundle.textPart == null) {
-	bundle.textPart = newAttach;
-      } else if (ct2.match("multipart/alternative")) {
-
-	Multipart mp = (Multipart) newAttach.getContent();
-	MimeBodyPart textPart = null;
-	MimeBodyPart htmlPart = null;
-	  
-	for (int i = 0; i < mp.getCount(); i++) {
-	  MimeBodyPart current = (MimeBodyPart)mp.getBodyPart(i);
-	  ContentType ct3 = new ContentType(current.getContentType());
-	  if (ct3.match("text/plain"))
-	    textPart = current;
-	  else if (ct3.match("text/html"))
-	    htmlPart = current;
-	}
-	  
-	if (htmlPart != null && textPart != null) {
-	  Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
-	  bundle.textPart = attachment;
-	} else {
-	  // hurm
-	  if (textPart != null) {
-	    Attachment attachment = new Attachment(textPart);
-	    bundle.textPart = attachment;
-	  } else if (htmlPart != null) {
-	    Attachment attachment = new Attachment(htmlPart);
-	    bundle.textPart = attachment;
-	  } else {
-	    bundle.addAll(parseAttachments(mp));
-	  }
-	}
-      } else if (ct2.match("multipart/*")) {
-	Multipart mp = (Multipart) newAttach.getContent();
-	bundle.addAll(parseAttachments(mp));
-      } else 
+    if (utils != null) {
+      int encryptionStatus = utils.getEncryptionStatus((MimeMessage) m);
+      if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
+	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
+	
 	bundle.getAttachments().add(newAttach);
-      */
+      } else if (encryptionStatus == EncryptionUtils.SIGNED) {
+	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment((MimeMessage)m);
+	
+	bundle.getAttachments().add(newAttach);
+      }
 
     } else {
       String contentType = ((MimeMessage) m).getContentType().toLowerCase();
@@ -170,17 +145,28 @@ public class MailUtilities {
     for (int i = 0; i < mp.getCount(); i++) {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
       
-      if (EncryptionManager.checkEncryptionType(mbp) != null) {
-	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
-	bundle.getAttachments().add(newAttach);
-	/*
-	ContentType ct = newAttach.getMimeType();
-	if (ct.match("text/*") && bundle.textPart == null) {
-	  bundle.textPart = newAttach;
-	} else {
+      String encryptionType = EncryptionManager.checkEncryptionType(mbp);
+      EncryptionUtils utils = null;
+      if (encryptionType != null) {
+	try {
+	  utils = EncryptionManager.getEncryptionUtils(encryptionType);
+	} catch (java.security.NoSuchProviderException nspe) {
+	}
+      }
+      
+      if (utils != null) {
+      
+	int encryptionStatus = utils.getEncryptionStatus(mbp);
+	if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
+	  Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
+	
+	  bundle.getAttachments().add(newAttach);
+	} else if (encryptionStatus == EncryptionUtils.SIGNED) {
+	  Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
+	
 	  bundle.getAttachments().add(newAttach);
 	}
-	*/
+      
       } else {
 	ContentType ct = new ContentType(mbp.getContentType());
 	if (ct.getPrimaryType().equalsIgnoreCase("text")) {

@@ -44,9 +44,8 @@ public class MessageCryptoInfo {
    * Returns the EncryptionUtils to use with this MessageCryptoInfo.
    */
   public EncryptionUtils getEncryptionUtils() throws MessagingException {
-    if (! mCheckedEncryption) {
-      mEncryptionType = net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) mMsgInfo.getMessage());
-    }
+
+    checkEncryptionType();
 
     if (mEncryptionType != null) {
       try {
@@ -58,7 +57,30 @@ public class MessageCryptoInfo {
       return null;
     }
   }
+  
+  /**
+   * Checks the encryption of this message.
+   */
+  void checkEncryptionType() throws MessagingException {
+    synchronized(this) {
+      if (! mCheckedEncryption) {
+	mEncryptionType = net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) mMsgInfo.getMessage());
+	mCheckedEncryption = true;
+      }
+    }
+    
+  }
 
+  /**
+   * Returns the encryption type of this message.
+   */
+  public String getEncryptionType() throws MessagingException {
+    checkEncryptionType();
+
+    return mEncryptionType;
+  }
+
+   
   /**
    * Returns whether or not this message is signed.
    */
