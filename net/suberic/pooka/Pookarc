@@ -483,7 +483,7 @@ OutgoingServer.editableFields.editor.propertyType=Tabbed
 OutgoingServer.editableFields.editor.propertyScoped=true
 OutgoingServer.editableFields.editor.addSubProperty=false
 
-OutgoingServer.editableFields.editor.smtp=server:authenticated:user:password
+OutgoingServer.editableFields.editor.smtp=server:port:authenticated:user:password
 OutgoingServer.editableFields.editor.smtp.scoped=true
 OutgoingServer.editableFields.editor.smtp.scopeRoot=OutgoingServer.editableFields
 OutgoingServer.editableFields.editor.smtp.propertyType=Composite

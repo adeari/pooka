@@ -33,79 +33,96 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
 	fPanel = Pooka.getMainPanel().getFolderPanel();
 
 	MailTreeNode root =  (MailTreeNode)fPanel.getFolderTree().getModel().getRoot();
-	folderList = getAllChildren(root);
-	
-	FolderNode currentFolder;
+        buildMenu(root, this);
+    }
 
-	for (int i = 0; i < folderList.size(); i++) {
-	    if (folderList.elementAt(i) instanceof FolderNode) {
-		currentFolder=(FolderNode)folderList.elementAt(i);
-		JMenuItem mi = new JMenuItem(currentFolder.getFolderID());
-		mi.setActionCommand(getActionCommand());
-	    
-		this.add(mi);
-	    }
+    /**
+     * This recursively builds the menu
+     */
+    protected void buildMenu(MailTreeNode mtn, JMenu currentMenu)
+    {
+	Enumeration children = mtn.children();
+	while(children.hasMoreElements())
+	    {
+		MailTreeNode curNode = (MailTreeNode)children.nextElement();
+		if(curNode.isLeaf())
+		    {
+			JMenuItem mi = new FolderMenuItem(curNode.toString(), ((FolderNode)curNode).getFolderInfo());
+			mi.setActionCommand(getActionCommand());
+			currentMenu.add(mi);
+		    }
+		else // Create a submenu
+		    {
+			JMenu newMenu = new JMenu(curNode.toString());
+			currentMenu.add(newMenu);
+			buildMenu(curNode, newMenu);
+		    }
+	    }	
+    }
+
+
+    /**
+     * Recursively sets the child menu items to enabled or disabled as appropriate.
+     * Also sets up their command handlers for the right folder.
+     */
+    protected void setActiveSubMenuItems(JMenu curMenu) {
+
+	for (int j = 0; j < curMenu.getItemCount(); j++) {
+            if(curMenu.getItem(j) instanceof FolderMenuItem)
+		{
+		    JMenuItem mi = curMenu.getItem(j);
+		    Action a = getAction(getActionCommand());
+		    if (a != null) {
+			Action newAction = a;
+			if (a instanceof net.suberic.util.DynamicAbstractAction) {
+			    try {
+				newAction = (Action)((net.suberic.util.DynamicAbstractAction)a).cloneDynamicAction();
+			    } catch (CloneNotSupportedException cnse) {
+				// sigh.  this is a really bad idea.  
+
+				System.out.println("cnse hit.");
+			    }
+			} else {
+			    System.out.println("action is not a DynamicAbstractAction.");
+			}
+			newAction.putValue("target", ((FolderMenuItem)mi).getFolderInfo());
+			Object o = oldCommands.get(mi);
+			if (o != null)
+			    mi.removeActionListener((Action)o);
+
+			mi.addActionListener(newAction);
+			oldCommands.put(mi, newAction);
+
+			mi.setEnabled(true);
+		    } else {
+			mi.setEnabled(false);
+		    } 
+		}
+	    else
+		setActiveSubMenuItems((JMenu)curMenu.getItem(j));
 	}
     }
     
+    public void setActiveMenuItems()
+    {
+	setActiveSubMenuItems(this);
+    }
+
     /**
-     * This recursively goes through the tree of MailTreeNodes and returns
-     * only the leaf values.
+     * Your basic menu item plus room to hang a FolderInfo class.
      */
-    public Vector getAllChildren(MailTreeNode mtn) {
-	Vector current = new Vector();
-	if (mtn.isLeaf()) {
-	    current.addElement(mtn);
-	} else {
-	    Enumeration children = mtn.children();
-	    while (children.hasMoreElements()) {
-		current.addAll(getAllChildren((MailTreeNode)children.nextElement()));
-	    }
-	}
-	return current;
+    class FolderMenuItem extends JMenuItem
+    {
+        public FolderMenuItem(String text, FolderInfo fi)
+	{
+	    super(text);
+	    folderInfo = fi;
+       	}
+
+        public FolderInfo getFolderInfo() { return folderInfo; }
+
+        private FolderInfo folderInfo;
     }
-
-    public void setActiveMenuItems() {
-	for (int j = 0; j < getItemCount(); j++) {
-	    JMenuItem mi = getItem(j);
-	    Action a = getAction(getActionCommand());
-	    if (a != null) {
-		Action newAction = a;
-		if (a instanceof net.suberic.util.DynamicAbstractAction) {
-		    try {
-			newAction = (Action)((net.suberic.util.DynamicAbstractAction)a).cloneDynamicAction();
-		    } catch (CloneNotSupportedException cnse) {
-			// sigh.  this is a really bad idea.  
-
-			System.out.println("cnse hit.");
-		    }
-		} else {
-		    System.out.println("action is not a DynamicAbstractAction.");
-		}
-		newAction.putValue("target", getTargetFolder(j));
-		Object o = oldCommands.get(mi);
-		if (o != null)
-		    mi.removeActionListener((Action)o);
-
-		mi.addActionListener(newAction);
-		oldCommands.put(mi, newAction);
-
-		mi.setEnabled(true);
-	    } else {
-		mi.setEnabled(false);
-	    } 
-	}
-    }
-
-	protected FolderInfo getTargetFolder(int folderNumber) {
-		/*
-			System.out.println("calling getTargetFolder(" + folderNumber + ")");
-			for (int i = 0; i < folderList.size(); i++) {
-			System.out.println("folderList " + i + " = " + folderList.elementAt(i));
-			}
-		*/
-		return (FolderInfo)((FolderNode)folderList.elementAt(folderNumber)).getFolderInfo();
-	}
 }
 
 

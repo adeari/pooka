@@ -53,7 +53,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     if (currentConnection != null)
       currentConnection.addConnectionListener(this);
 
-    sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + "/");
+    sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
 
     outboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
 
@@ -84,7 +84,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	  currentConnection.addConnectionListener(this);
 	
       } else if (changedValue.equals(getItemProperty() + ".server")) {
-	sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + "/");
+	sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
       } else if (changedValue.equals(getItemProperty() + ".outbox")) {
 	String newOutboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
 	if (newOutboxID != outboxID) {

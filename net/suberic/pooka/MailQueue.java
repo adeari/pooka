@@ -58,6 +58,7 @@ public class MailQueue {
 	      Transport sendTransport;
 	      if (precommand.length() > 0) {
                 try {
+		    System.out.println("MailQueue: Running precommand: " + precommand);
                     Process p = Runtime.getRuntime().exec(precommand);
                     p.waitFor();
                 } catch (Exception ex)
@@ -66,7 +67,7 @@ public class MailQueue {
                     ex.printStackTrace();
                 }
               }
-              
+              System.out.println("MailQueue: Trying to connect.."); 
 	      sendTransport = session.getTransport(transportURL); 
 	      sendTransport.connect();
 	      
