@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui.search;
 import javax.swing.*;
+import javax.swing.event.*;
 import javax.mail.search.*;
 import java.util.*;
 import net.suberic.pooka.Pooka;
@@ -10,7 +11,7 @@ import net.suberic.pooka.SearchTermManager;
  * javax.mail.search.SearchTerm.  It can be used either to configure mail
  * filters, or to search folders.
  */
-public class SearchEntryForm {
+public class SearchEntryForm implements java.awt.event.ItemListener {
     // ui objects
     private JPanel panel;
     private JComboBox searchFieldCombo;
@@ -26,6 +27,7 @@ public class SearchEntryForm {
     private JPanel datePanel;
     private JComboBox dateComparisonCombo;
     private JTextField dateField;
+    private java.awt.CardLayout layout;
 
     // the source SearchTermManager.
     SearchTermManager manager;
@@ -33,16 +35,19 @@ public class SearchEntryForm {
     /**
      * Constructs a new SearchEntryForm.
      */
-    public SearchEntryForm(SearchTermManager newManager) {
+    public SearchEntryForm(SearchTermManager newManager) { 
 	manager = newManager;
 	panel = new JPanel();
 
 	searchFieldCombo = new JComboBox(manager.getTermLabels());
 
+	searchFieldCombo.addItemListener( this );
+
 	createPanels();
 
 	selectionPanel = new JPanel();
-	selectionPanel.setLayout(new java.awt.CardLayout());
+	layout = new java.awt.CardLayout();
+	selectionPanel.setLayout(layout);
 	selectionPanel.add(stringMatchPanel, SearchTermManager.STRING_MATCH);
 	selectionPanel.add(booleanPanel, SearchTermManager.BOOLEAN_MATCH);
 	selectionPanel.add(datePanel, SearchTermManager.DATE_MATCH);
@@ -64,11 +69,14 @@ public class SearchEntryForm {
 	stringMatchPanel.add(textField);
 
 	booleanPanel = new JPanel();
+	booleanPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 	Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
 	booleanValueCombo = new JComboBox(booleanFields);
 	booleanPanel.add(booleanValueCombo);
 
 	datePanel = new JPanel();
+	datePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+
 	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
 	dateComparisonCombo = new JComboBox(dateFields);
 	dateField = new JTextField(30);
@@ -98,4 +106,15 @@ public class SearchEntryForm {
 
 	return manager.generateSearchTerm(searchProperty, operationProperty, pattern);
     }
+
+    public void itemStateChanged(java.awt.event.ItemEvent e) {
+	String selectedString = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
+	
+	String selectedType = Pooka.getProperty(selectedString + ".type", "");
+	layout.show(selectionPanel, selectedType);
+    }
 }
+
+
+
+

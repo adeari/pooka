@@ -546,13 +546,15 @@ Search.searchTerms.Received.type=Date
 Search.searchTerms.Sent.class=javax.mail.search.SentDateTerm
 Search.searchTerms.Sent.type=Date
 
-Search.operations=Contains:NotContains:Equals:NotEquals:Before:After
+Search.operations=Contains:NotContains:True:False:Equals:NotEquals:Before:After
 Search.operationTypes=String:Boolean:Date
 Search.operationTypes.String=Contains:NotContains
-Search.operationTypes.Boolean=Equals:NotEquals
+Search.operationTypes.Boolean=True:False
 Search.operationTypes.Date=Equals:NotEquals:Before:After
 Search.operations.Not=not
 Search.operations.NotEquals=notEquals
 Search.operations.Before=before
 Search.operations.After=after
 Search.operations.Equals=equals
+Search.operations.True=equals
+Search.operations.False=notEquals

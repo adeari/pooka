@@ -39,6 +39,7 @@ public class SearchTermManager {
 	} catch (Exception e) { }
 	createTermMaps(propertyName + ".searchTerms");
 	createOperationMaps(propertyName + ".operations");
+	createOperationTypeMaps(propertyName);
     }
 
     /**
@@ -75,6 +76,22 @@ public class SearchTermManager {
 		operationLabels.add(thisLabel);
 	    }
 	} 
+    }
+
+    private void createOperationTypeMaps(String propName) {
+	typeToLabelMap = new HashMap();
+	Vector types = Pooka.getResources().getPropertyAsVector(propName + ".operationTypes", "");
+	for (int i = 0; i < types.size(); i++) {
+	    String currentType = (String) types.elementAt(i);
+	    Vector currentList = Pooka.getResources().getPropertyAsVector(propName + ".operationTypes." + currentType, "");
+	    Vector labelList = new Vector();
+
+	    for (int j = 0; j < currentList.size(); j++) {
+		labelList.add(Pooka.getProperty(propName + ".operations." + (String) currentList.elementAt(j) + ".label"));
+	    }
+
+	    typeToLabelMap.put(currentType, labelList);
+	}
     }
 
     /**
@@ -266,6 +283,10 @@ public class SearchTermManager {
 
     public Vector getOperationLabels() {
 	return operationLabels;
+    }
+
+    public Vector getOperationLabels(String operationType) {
+	return (Vector) typeToLabelMap.get(operationType);
     }
 }
 
