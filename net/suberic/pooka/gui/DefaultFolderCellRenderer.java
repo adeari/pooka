@@ -26,15 +26,13 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 
 	Component returnValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
-	if (value instanceof BooleanIcon) {
-	    BooleanIcon bIcon = (BooleanIcon)value;
-	    if (bIcon.bool == true) {
-		Component icon = bIcon.getIcon();
-		if (icon != null) {
-		    icon.setBackground(returnValue.getBackground());
-		}
-		return icon;
+	if (value instanceof TableCellIcon) {
+	    TableCellIcon tcIcon = (TableCellIcon)value;
+	    Component icon = tcIcon.getIcon();
+	    if (icon != null) {
+		icon.setBackground(returnValue.getBackground());
 	    }
+	    return icon;
 	} 
 
 	if (value instanceof Date) {

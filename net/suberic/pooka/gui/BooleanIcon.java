@@ -7,12 +7,13 @@ import java.awt.Component;
 public class BooleanIcon implements TableCellIcon {
     public boolean bool;
     public String iconFile;
-    private static HashMap labelTable = new HashMap();
-    private static Component blankImage = new JLabel();
+    public static HashMap labelTable = new HashMap();
+    protected static Component blankImage = new JLabel();
 
     public BooleanIcon(boolean boolValue, String newIconFile) {
 	bool=boolValue;
 	iconFile = newIconFile;
+	((JLabel)blankImage).setOpaque(true);
     }
 
     /**
@@ -22,14 +23,24 @@ public class BooleanIcon implements TableCellIcon {
      */
     public Component getIcon() {
 	if (bool) {
-	    
-	    if (labelTable.containsKey(iconFile))
-		return (Component)labelTable.get(iconFile);
-	    
+	    return getIcon(iconFile);
+	} else
+	    return blankImage;
+    }
+
+    public Component getIcon(String imageFile) {
+	
+	if (labelTable.containsKey(imageFile))
+	    return (Component)labelTable.get(imageFile);
+	else
+	    return loadImage(imageFile);
+    }
+
+    public Component loadImage(String imageFile) {
 	    Component returnValue = null;
 	    
 	    try {
-		java.net.URL url = this.getClass().getResource(iconFile);
+		java.net.URL url = this.getClass().getResource(imageFile);
 		if (url != null) {
 		    returnValue = new JLabel(new ImageIcon(url));
 		    ((JLabel)returnValue).setOpaque(true);
@@ -37,13 +48,11 @@ public class BooleanIcon implements TableCellIcon {
 		} else
 		    returnValue = null;
 	    } catch (MissingResourceException mre) {
-		returnValue = null;
+		returnValue = blankImage;
 	    }
 	
-	    labelTable.put(iconFile, returnValue);
+	    labelTable.put(imageFile, returnValue);
 	    return returnValue;
-	} else
-	    return blankImage;
     }
 
     public int compareTo(Object o) {
@@ -62,4 +71,5 @@ public class BooleanIcon implements TableCellIcon {
     public String toString() {
 	return "";
     }
+
 }
