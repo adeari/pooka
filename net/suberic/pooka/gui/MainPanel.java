@@ -124,18 +124,11 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
      * returns a UserProfile, then the default UserProfile is returned.
      */
     protected void refreshCurrentUser() {
-	System.out.println("refreshCurrentUser().");
 	UserProfile selectedProfile = getDefaultProfile();
 	if (selectedProfile != null) {
-	    System.out.println("currentUser getting set to dynamic value:  " + selectedProfile.getName());
 	    currentUser = selectedProfile;
 	} else {
-	    System.out.println("setting currentUser to the default Profile.");
 	    currentUser = UserProfile.getDefaultProfile();
-	    if (currentUser != null)
-		System.out.println("currentUser is now " + currentUser.getName());
-	    else
-		System.out.println("currentUser is now null.");
 	}
     }
 
@@ -285,6 +278,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
 	    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), valuesToEdit);
 	    msgPanel.add(jif);
+	    jif.setVisible(true);
 	    try {
 		jif.setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) {
@@ -307,6 +301,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
 	    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
 	    msgPanel.add(jif);
+	    jif.setVisible(true);
 	    try {
 		jif.setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) {

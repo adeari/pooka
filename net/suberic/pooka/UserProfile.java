@@ -89,7 +89,6 @@ public class UserProfile extends Object {
 
 	    // don't add it if it's empty.
 	    if (currentProfileName.length() > 0) {
-		System.out.println("adding profile " + currentProfileName);
 		userProperties = new Properties();
 
 		for (int i = 0; i < profileMap.size(); i++) {
@@ -135,17 +134,9 @@ public class UserProfile extends Object {
 
 	try {
 	    defaultProfile = UserProfile.getProfile(Pooka.getProperty("UserProfile.default"));
-	    System.out.println("returning value from getProfile(getProperty('UserProfile.default'");
 	    return defaultProfile;
 	} catch (Exception e) {
-	    System.out.println("returning profileList.firstElement");
-	    UserProfile retValue = (UserProfile)(profileList.firstElement());
-	    if (retValue != null)
-		System.out.println("profile returned is " + retValue.getName());
-	    else
-		System.out.println("returned value is null.");
-	    return retValue;
-	    //	    return (UserProfile)(profileList.firstElement());
+	    return (UserProfile)(profileList.firstElement());
 	}
     }
 

@@ -79,7 +79,7 @@ public class StoreInfo implements ValueChangeListener {
 		}
 	    });
 	
-	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreID() + ".defaultProfile", ""));
+	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
     }	
     
     /**
@@ -132,9 +132,9 @@ public class StoreInfo implements ValueChangeListener {
      */
 
     public void valueChanged(String changedValue) {
-	if (changedValue.equals(getStoreID() + ".folderList")) {
+	if (changedValue.equals(getStoreProperty() + ".folderList")) {
 	    updateChildren();
-	} else if (changedValue.equals(getStoreID() + ".defaultProfile")) {
+	} else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
 	    defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
 	}
     }

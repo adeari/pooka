@@ -69,9 +69,7 @@ public class NewMessageProxy extends MessageProxy {
 			multipart.setSubType("mixed");
 			getMessage().setContent(multipart);
 			getMessage().saveChanges();
-			System.out.println("message set.  content should be " + multipart.toString() );
 		    } else {
-			System.out.println("no attachment.");
 			getMessage().setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
 		    }
 	       
@@ -97,14 +95,11 @@ public class NewMessageProxy extends MessageProxy {
      * calls getFileToAttach(), and then sends that to attachFile().
      */
     public void attach() {
-	System.out.println("calling NewMessageProxy.attach()");
 	File[] f = getFileToAttach();
 	if (f != null) {
-	    System.out.println("file was returned.  length is " + f.length);
 	    for (int i = 0; i < f.length; i++)
 		attachFile(f[i]);
-	}
-	else
+	} else
 	    System.out.println("attached file was null.");
     }
 

@@ -227,10 +227,12 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
      */
 
     public UserProfile getDefaultProfile() {
-	if (getFolderInfo() != null)
+	if (getFolderInfo() != null) {
 	    return getFolderInfo().getDefaultProfile();
-	else
+	}
+	else {
 	    return null;
+	}
     }
 
     public Action[] getActions() {

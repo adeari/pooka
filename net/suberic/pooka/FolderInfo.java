@@ -90,8 +90,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	folderName = fname;
 	
 	try {
-	    Store parentStore = parent.getStore();
-	    Folder parentFolder = parentStore.getDefaultFolder();
+	    Store store = parent.getStore();
+	    Folder parentFolder = store.getDefaultFolder();
 	    Folder[] tmpFolder = parentFolder.list(fname);
 	    if (tmpFolder != null && tmpFolder.length > 0) {
 		folder = tmpFolder[0];
@@ -598,13 +598,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public UserProfile getDefaultProfile() {
-	if (defaultProfile != null)
+	if (defaultProfile != null) {
 	    return defaultProfile;
-	else if (parentFolder != null)
+	}
+	else if (parentFolder != null) {
 	    return parentFolder.getDefaultProfile();
-	else if (parentStore != null)
+	}
+	else if (parentStore != null) {
 	    return parentStore.getDefaultProfile();
-	else
+	}
+	else {
 	    return null;
+	}
     }
 }

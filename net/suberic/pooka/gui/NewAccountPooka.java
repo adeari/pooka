@@ -77,6 +77,7 @@ public class NewAccountPooka {
 	    });
 
 	getMessagePanel().add(firstEntryWindow);
+	firstEntryWindow.setVisible(true);
 	try {
 	    firstEntryWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException pve) {
@@ -165,6 +166,7 @@ public class NewAccountPooka {
 	    });		
 
 	getMessagePanel().add(secondEntryWindow);
+	secondEntryWindow.setVisible(true);
 	try {
 	    secondEntryWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException pve) {
