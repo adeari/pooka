@@ -117,6 +117,7 @@
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
     </jar>
+    <!-- <signjar jar="${distdir}/pooka_${today}.jar" alias="pooka" storepass=""/> -->
   </target>
 
   <target name="dist-jnlp" depends="compile-jnlp">
@@ -180,10 +181,10 @@
 
   <!--
   <target name="sign" depends="jnlp">
-    <signjar jar="${basedir}/pooka.jar" alias="pooka" storepass=""/>
-    <signjar jar="${basedir}/pooka_help.jar" alias="pooka" storepass=""/>
-    <signjar jar="${basedir}/pooka_images.jar" alias="pooka" storepass=""/>
-    <signjar jar="${basedir}/icejnidde.jar" alias="pooka" storepass=""/>
+    <signjar jar="${distdir}/pooka.jar" alias="pooka" storepass=""/>
+    <signjar jar="${distdir}/pooka_help.jar" alias="pooka" storepass=""/>
+    <signjar jar="${distdir}/pooka_images.jar" alias="pooka" storepass=""/>
+    <signjar jar="${distdir}/icejnidde.jar" alias="pooka" storepass=""/>
   </target>
   -->
 </project>
