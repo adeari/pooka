@@ -263,6 +263,14 @@ public class MessageProxy {
 	    }
 	}
 
+	matchFilters();
+
+    }	
+
+    /**
+     * This matches the FolderInfo's display filters.
+     */
+    public void matchFilters() {
 	if (! filtersMatched ) {
 	    // match the given filters for the FolderInfo.
 	    
@@ -283,7 +291,8 @@ public class MessageProxy {
 	    
 	    filtersMatched=true;
 	}
-    }	
+	
+    }
 
     /**
      * This loads the Attachment information into the attachments vector.
@@ -608,9 +617,20 @@ public class MessageProxy {
      * This sets the loaded value for the MessageProxy to false.   This 
      * should be called only if the TableInfo of the Message has been 
      * changed and needs to be reloaded.
+     *
+     * Note that this also sets the filtersMatched property to false.
      */
     public void unloadTableInfo() {
 	loaded=false;
+	filtersMatched=false;
+    }
+
+    /**
+     * This flags the message that we should check again to see which 
+     * filters it matches.
+     */
+    public void clearMatchedFilters() {
+	filtersMatched = false;
     }
 
     public MessageUI getMessageUI() {
@@ -655,7 +675,12 @@ public class MessageProxy {
      * Returns the matching filters for this MessageProxy.
      */
     public net.suberic.pooka.gui.filter.DisplayFilter[] getMatchingFilters() {
-	return matchingFilters;
+	if (filtersMatched)
+	    return matchingFilters;
+	else {
+	    matchFilters();
+	    return matchingFilters;
+	}
     }
 
     public Action getAction(String name) {

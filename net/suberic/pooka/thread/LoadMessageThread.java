@@ -32,6 +32,7 @@ public class LoadMessageThread extends Thread {
     private int updateCheckMilliseconds = 60000;
     private int updateMessagesCount = 10;
     private int loadedMessageCount = 0;
+    private boolean sleeping = false;
     
     /**
      * This creates a new LoadMessageThread from a FolderInfo object.
@@ -49,13 +50,16 @@ public class LoadMessageThread extends Thread {
 	    loadWaitingMessages();
 	    
 	    try {
+		sleeping = true;
 		if (updateCheckMilliseconds < 1) {
 		    while (updateCheckMilliseconds < 1)
 			sleep(60000);
 		} else { 
 		    sleep(updateCheckMilliseconds);
 		}
+		sleeping = false;
 	    } catch (InterruptedException ie) {
+		sleeping = false;
 	    }
 	}
     }
@@ -129,6 +133,10 @@ public class LoadMessageThread extends Thread {
      */
     public synchronized void loadMessages(MessageProxy mp) {
 	loadQueue.add(mp);
+
+	if (this.isSleeping())
+	    this.interrupt();
+	
     }
 
     /**
@@ -139,6 +147,9 @@ public class LoadMessageThread extends Thread {
 	    for (int i = 0; i < mp.length; i++) 
 		loadQueue.add(mp[i]);
 	}
+
+	if (this.isSleeping())
+	    this.interrupt();
     }
 
     /**
@@ -148,6 +159,9 @@ public class LoadMessageThread extends Thread {
 	if (mp != null && mp.size() > 0) 
 	    for (int i = 0; i < mp.size(); i++)
 		loadQueue.add(mp.elementAt(i));
+
+	if (this.isSleeping())
+	    this.interrupt();
     }
 
     /**
@@ -182,6 +196,10 @@ public class LoadMessageThread extends Thread {
 
     public int getLoadedMessageCount() {
 	return loadedMessageCount;
+    }
+
+    public boolean isSleeping() {
+	return sleeping;
     }
 }
 

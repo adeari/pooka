@@ -159,7 +159,7 @@ public class SearchTermManager {
      * 
      * for 'single' types:
      * property.searchTerm
-     * property.operationProperty (optional)
+     * property.operation (optional)
      * property.pattern (optional)
      *
      * for 'compound' types:
@@ -171,7 +171,7 @@ public class SearchTermManager {
 	String type = Pooka.getProperty(property + ".type", "single");
 	if (type.equalsIgnoreCase("single")) {
 	    String searchProperty = Pooka.getProperty(property + ".searchTerm", "");
-	    String operationProperty = Pooka.getProperty(property + ".operationProperty", "");
+	    String operationProperty = Pooka.getProperty(property + ".operation", "");
 	    String pattern = Pooka.getProperty(property + ".pattern", "");
 	    return generateSearchTerm(searchProperty, operationProperty, pattern);
 	} else if (type.equalsIgnoreCase("compound")) {

@@ -595,15 +595,34 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * the display rules have changed.
      */
     public void unloadTableInfos() {
-	
+	if (folderTableModel != null) {
+	    Vector allProxies = folderTableModel.getAllProxies();
+	    for (int i = 0; i < allProxies.size(); i++) {
+		MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+		mp.unloadTableInfo();
+	    }
+
+	    if (loaderThread != null)
+		loaderThread.loadMessages(allProxies);
+	}
     }
 
     /**
      * Unloads the matching filters.
      */
     public void unloadMatchingFilters() {
-	
-    }
+	if (folderTableModel != null) {
+	    Vector allProxies = folderTableModel.getAllProxies();
+	    for (int i = 0; i < allProxies.size(); i++) {
+		MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+		mp.clearMatchedFilters();
+	    }
+
+	    if (loaderThread != null)
+		loaderThread.loadMessages(allProxies);
+
+	}
+     }
 
     /**
      * Refreshes all the MessageInfo objects by the UID, if any.
@@ -930,8 +949,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		defaultProfile = null;
 	    else 
 		defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
-	} else if (changedValue.equals(getFolderProperty() + ".backendFilters") || changedValue.equals(getFolderProperty() + ".displayFilters")) {
+	} else if (changedValue.equals(getFolderProperty() + ".backendFilters")) { 
 	    createFilters();
+	    
+	} else if (changedValue.equals(getFolderProperty() + ".displayFilters")) {
+	    createFilters();
+	    unloadMatchingFilters();
 	}
     }
 

@@ -224,7 +224,7 @@ FolderTable.Status.New.subTerms=FolderTable.Status.New.notSeenTerm:FolderTable.S
 FolderTable.Status.New.operation=and
 FolderTable.Status.New.icon=/net/suberic/pooka/gui/images/SmallGreenCircle.gif
 FolderTable.Status.New.notSeenTerm.searchTerm=Search.searchTerms.Seen
-FolderTable.Status.New.notSeenTerm.operationProperty=Search.operations.Not
+FolderTable.Status.New.notSeenTerm.operation=Search.operations.Not
 FolderTable.Status.New.recentTerm.searchTerm=Search.searchTerms.Recent
 FolderTable.Status.Answered.searchTerm=Search.searchTerms.Answered
 FolderTable.Status.Answered.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
@@ -593,6 +593,7 @@ Search.operations.After=after
 Search.operations.Equals=equals
 Search.operations.True=equals
 Search.operations.False=notEquals
+Search.operations.NotContains=not
 
 FolderFilters=ColorFilter:FontFilter
 FolderFilters.ColorFilter.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
@@ -602,7 +603,7 @@ FolderFilters.FontFilter.editorClass=net.suberic.pooka.gui.filter.FontFilterEdit
 
 FolderInfo.defaultDisplayFilters=Unread
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen
-FolderInfo.defaultDisplayFilters.Unread.searchTerm.operationProperty=Search.operations.False
+FolderInfo.defaultDisplayFilters.Unread.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Unread.action.class=net.suberic.pooka.gui.filter.FontDisplayFilter
 FolderInfo.defaultDisplayFilters.Unread.action.style=bold
 FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTerms.Cached
