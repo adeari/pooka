@@ -7,15 +7,13 @@ the password on the screen' part.
 
 *)  add context-sensitive menus (right-click menus)
 
-*)  add send buttons and other appropriate commands to MessageWindow.
-
 *)  make the GUI Authenticator (which should come up when you don't enter
 your password in the Store Configuration) work--right now it doesn't.  note:
 it actually works ok (just ok) when you start it up from scratch--but when
 you make a new Store without a password, it shows up lots and lots of times
 and basically just fails all over the place.
 
-*)  enable cut & paste
+*)  make cut & paste work from the Toolbar.
 
 *)  make the windows detachable.
 
@@ -26,16 +24,14 @@ entered through a propertyEditor.
 
 *)  currently can't delete multiple messages at once.
 
-*)  make window selection work after windows are closed--currently, if you
-close your selected window, no window is selected.  it should be that the
-next window in the stack (?) gets selected automatically.
-
-*)  all MessagingExceptions should be handled correctly, not (as in 
-MessageWindow) ignored.
+*)  all MessagingExceptions should be handled correctly, not ignored.
 
 *)  the piece of code that keeps the Stores open only starts up if you open
 a FolderWindow.  so if you just start up the program and don't open any windows
 for a while, your connection to your Store can go down.
+
+*) add a ValueChangeListener for the UserProfile properties.  right now
+the UserProfile only gets updated at startup.
 
 open messages from the FolderWindow
 	can do.  todo on this:
