@@ -38,7 +38,17 @@ import java.util.Hashtable;
 
 public class CryptoButton extends JButton implements ConfigurableUI {
 
+  public static int NOT_ENCRYPTED = 0;
+  public static int UNCHECKED_ENCRYPTED = 1;
+  public static int DECRYPTED_SUCCESSFULLY = 5;
+  public static int DECRYPTED_UNSUCCESSFULLY = 10;
+  public static int UNCHECKED_SIGNED = 15;
+  public static int SIGNATURE_VERIFIED = 20;
+  public static int SIGNATURE_BAD = 25;
+  public static int SIGNATURE_FAILED_VERIFICATION = 30;
+
   // the various icons
+  ImageIcon notEncryptedIcon;
   ImageIcon uncheckedEncryptedIcon;
   ImageIcon decryptedSuccessfullyIcon;
   ImageIcon decryptedUnsuccessfullyIcon;
@@ -46,6 +56,11 @@ public class CryptoButton extends JButton implements ConfigurableUI {
   ImageIcon signatureVerifiedIcon;
   ImageIcon signatureBadIcon;
   ImageIcon signatureFailedVerificationIcon;
+
+  // the current status
+  int currentStatus = NOT_ENCRYPTED;
+
+  Action currentAction = null;
 
   public CryptoButton () {
     super();
@@ -71,6 +86,25 @@ public class CryptoButton extends JButton implements ConfigurableUI {
    */ 
   public void configureComponent(String key, VariableBundle vars) {
 
+    loadIcons(key, vars);
+
+    try {
+      this.setToolTipText(vars.getProperty(key+ ".ToolTip"));
+    } catch (java.util.MissingResourceException mre) {
+    }
+    
+    String cmd = vars.getProperty(key + ".Action", key);
+    
+    setActionCommand(cmd);
+    
+    cryptoUpdated(NOT_ENCRYPTED);
+  }
+
+  /**
+   * This loads all of the icons for this button.
+   */
+  public void loadIcons(String key, VariableBundle vars) {
+
     /*
      * this is going to have several images:
      * Unchecked Encrypted
@@ -83,32 +117,15 @@ public class CryptoButton extends JButton implements ConfigurableUI {
      * ...and maybe more.
      */
 
-    loadIcons();
+    try {
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".notEncrypted.Image"));
+      if (url != null)
+	notEncryptedIcon = new ImageIcon(url);
+    } catch (java.util.MissingResourceException mre) {
+      return;
+    }
 
     try {
-      this.setToolTipText(vars.getProperty(key+ ".ToolTip"));
-    } catch (java.util.MissingResourceException mre) {
-    }
-    
-    String cmd = vars.getProperty(key + ".Action", key);
-    
-    setActionCommand(cmd);
-    
-  }
-
-  /**
-   * This loads all of the icons for this button.
-   */
-  public void loadIcons() {
-    ImageIcon uncheckedEncryptedIcon;
-    ImageIcon decryptedSuccessfullyIcon;
-    ImageIcon decryptedUnsuccessfullyIcon;
-    ImageIcon uncheckedSignedIcon;
-    ImageIcon signatureVerifiedIcon;
-    ImageIcon signatureBadIcon;
-    ImageIcon signatureFailedVerificationIcon;
-    
-    try {
       java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
       if (url != null)
 	uncheckedEncryptedIcon = new ImageIcon(url);
@@ -117,49 +134,49 @@ public class CryptoButton extends JButton implements ConfigurableUI {
     }
     
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".decryptedSuccessfully.Image"));
       if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
+	decryptedSuccessfullyIcon = new ImageIcon(url);
     } catch (java.util.MissingResourceException mre) {
       return;
     }
     
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".decryptedUnsuccessfully.Image"));
       if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
+	decryptedUnsuccessfullyIcon = new ImageIcon(url);
     } catch (java.util.MissingResourceException mre) {
       return;
     }
     
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedSigned.Image"));
       if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
+	uncheckedSignedIcon = new ImageIcon(url);
     } catch (java.util.MissingResourceException mre) {
       return;
     }
     
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".signatureVerified.Image"));
       if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
+	signatureVerifiedIcon = new ImageIcon(url);
     } catch (java.util.MissingResourceException mre) {
       return;
     }
     
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".signatureBad.Image"));
       if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
+	signatureBadIcon = new ImageIcon(url);
     } catch (java.util.MissingResourceException mre) {
       return;
     }
     
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
+      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".signatureFailedVerification.Image"));
       if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
+	signatureFailedVerificationIcon = new ImageIcon(url);
     } catch (java.util.MissingResourceException mre) {
       return;
     }
@@ -173,22 +190,66 @@ public class CryptoButton extends JButton implements ConfigurableUI {
    * names as keys, and the Actions themselves as values.
    */
   public void setActive(Hashtable commands) {
-   
+    if (currentAction != null) {
+      removeActionListener(currentAction);
+    }
+
+    try {
+      currentAction = (Action)commands.get(getActionCommand());
+    } catch (ClassCastException cce) {
+      currentAction = null;
+    }
+    
+    if (currentAction != null) {
+      addActionListener(currentAction);
+      setEnabled(true);
+    } else {
+      setEnabled(false);
+    }
   }
   
+
   /**
    * This updates the Actions on the UI Component.
    *
    */
   public void setActive(Action[] newActions) {
-
+    Hashtable tmpHash = new Hashtable();
+    if (newActions != null && newActions.length > 0) {
+      for (int i = 0; i < newActions.length; i++) {
+	String cmdName = (String)newActions[i].getValue(Action.NAME);
+	tmpHash.put(cmdName, newActions[i]);
+      }
+    }
+    
+    setActive(tmpHash);
   }
-
+  
   /**
    * Updates the encryption information.
    */
   public void cryptoUpdated(int newStatus) {
-    
+    currentStatus = newStatus;
+
+    if (currentStatus == NOT_ENCRYPTED) {
+      setIcon(notEncryptedIcon);
+    } else if (currentStatus == UNCHECKED_ENCRYPTED) {
+      setIcon(uncheckedEncryptedIcon);
+    } else if (currentStatus == DECRYPTED_SUCCESSFULLY) {
+      setIcon(decryptedSuccessfullyIcon);
+    } else if (currentStatus == DECRYPTED_UNSUCCESSFULLY) {
+      setIcon(decryptedUnsuccessfullyIcon);
+    } else if (currentStatus == UNCHECKED_SIGNED) {
+      setIcon(uncheckedSignedIcon);
+    } else if (currentStatus == SIGNATURE_VERIFIED) {
+      setIcon(signatureVerifiedIcon);
+    } else if (currentStatus == SIGNATURE_BAD) {
+      setIcon(signatureBadIcon);
+    } else if (currentStatus == SIGNATURE_FAILED_VERIFICATION) {
+      setIcon(signatureFailedVerificationIcon);
+    } else {
+      setIcon(notEncryptedIcon);
+    }
   }
 }
     

@@ -108,7 +108,9 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
     commands=newCommands;
     for (int i = 0; i < this.getComponentCount(); i++) {
       Object component = this.getComponentAtIndex(i);
-      if (component instanceof JButton) {
+      if (component instanceof ConfigurableUI) {
+	((ConfigurableUI) component).setActive(newCommands);
+      } else if (component instanceof JButton) {
 	JButton bi = (JButton)(component);
 	
 	Action a = getAction(bi.getActionCommand());
@@ -118,9 +120,7 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
 	} else {
 	  bi.setEnabled(false);
 	}
-      } else if (component instanceof ConfigurableUI) {
-	((ConfigurableUI) component).setActive(newCommands);
-      }
+      } 
     }
   }
   

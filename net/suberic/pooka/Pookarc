@@ -258,7 +258,7 @@ NewMessageWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:Crypto:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -290,6 +290,16 @@ MessageWindowToolbar.HeaderStyle.Default.Action=file-open-defaultdisplay
 MessageWindowToolbar.HeaderStyle.Default.Image=/org/javalobby/icons/20x20png/Check.png
 MessageWindowToolbar.HeaderStyle.Full.Action=file-open-fulldisplay
 MessageWindowToolbar.HeaderStyle.Full.Image=/org/javalobby/icons/20x20png/CheckAll.png
+MessageWindowToolbar.Crypto.Action=message-decrypt
+MessageWindowToolbar.Crypto.class=net.suberic.pooka.gui.crypto.CryptoButton
+MessageWindowToolbar.Crypto.notEncrypted.Image=/org/javalobby/icons/20x20png/Book.png
+MessageWindowToolbar.Crypto.uncheckedEncrypted.Image=/org/javalobby/icons/20x20png/Lock.png
+MessageWindowToolbar.Crypto.decryptedSuccessfully.Image=/org/javalobby/icons/20x20png/UnLock.png
+MessageWindowToolbar.Crypto.decryptedUnsuccessfully.Image=/org/javalobby/icons/20x20png/Lock.png
+MessageWindowToolbar.Crypto.uncheckedSigned.Image=/org/javalobby/icons/20x20png/CheckAll.png
+MessageWindowToolbar.Crypto.signatureVerified.Image=/org/javalobby/icons/20x20png/Lock.png
+MessageWindowToolbar.Crypto.signatureBad.Image=/org/javalobby/icons/20x20png/UnLock.png
+MessageWindowToolbar.Crypto.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/UnLock.png
 
 FolderPanel.2xClickAction=file-open
 
