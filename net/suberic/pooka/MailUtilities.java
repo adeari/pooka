@@ -19,16 +19,31 @@ public class MailUtilities {
 	    Object content = m.getContent();
 
 	    if (content instanceof Multipart) {
-		bundle.addAll(parseAttachments((Multipart)content, showFullHeaders));
+		ContentType ct = new ContentType(((Multipart)content).getContentType());
+
+		if (ct.getSubType().equalsIgnoreCase("alternative")) {
+		    Multipart mp = (Multipart)content;
+		    for (int i = 0; i < mp.getCount(); i++) {
+			MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
+			ContentType ct2 = new ContentType(mbp.getContentType());
+			if (ct2.getPrimaryType().equalsIgnoreCase("text") && ct2.getSubType().equalsIgnoreCase("plain")) {
+			    bundle.textPart = new StringBuffer((String)mbp.getContent());
+			    bundle.allText.append((String)mbp.getContent());
+			    break;
+			}
+		    }
+		} else {
+		    bundle.addAll(parseAttachments((Multipart)content, showFullHeaders));
+		}
 	    } else if (content instanceof String) {
-		bundle.textPart = new StringBuffer((String)content);
-		bundle.allText.append(content);
+		    bundle.textPart = new StringBuffer((String)content);
+		    bundle.allText.append(content);
 	    }
 	} catch (Exception e) {
 	}
-
+	
 	// add the headers for the message to the main textPart.
-
+	
 	if (withHeaders) {
 	    if (bundle.textPart != null) {
 		bundle.textPart = getHeaderInformation((MimeMessage)m, showFullHeaders).append(bundle.textPart); 
