@@ -461,6 +461,13 @@ public class UIDFolderInfo extends FolderInfo {
    * FetchProfile.
    */
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException  {
+    if (Pooka.isDebug()) {
+      if (messages == null)
+	System.out.println("UIDFolderInfo:  fetching with null messages.");
+      else
+	System.out.println("UIDFolderInfo:  fetching " + messages.length + " messages.");
+    }
+
     // check the messages first; make sure we're just fetching 'real'
     // messages.
     java.util.ArrayList realMsgList = new java.util.ArrayList();
@@ -475,8 +482,16 @@ public class UIDFolderInfo extends FolderInfo {
 
     Message[] realMsgs = (Message[]) realMsgList.toArray(new Message[0]);
     
-    getFolder().fetch(realMsgs, profile);
+    if (Pooka.isDebug()) {
+      if (realMsgs == null)
+	System.out.println("UIDFolderInfo:  running fetch with null real messages.");
+      else
+	System.out.println("UIDFolderInfo:  fetching " + realMsgs.length + " messages.");
+      
+    }
 
+    getFolder().fetch(realMsgs, profile);
+    
     for (int i = 0 ; i < messages.length; i++) {
       messages[i].setFetched(true);
     }

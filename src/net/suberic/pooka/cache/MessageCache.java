@@ -6,20 +6,12 @@ import net.suberic.pooka.MessageInfo;
 
 public interface MessageCache {
   
-  // tag defining the content of the message
-  public static int CONTENT = 0;
-  
-  // tag defining the headers
-  public static int HEADERS = 1;
-  
-  // tag defining the flags
-  public static int FLAGS = 2;
-  
-  // tag defining the flags and headers
-  public static int FLAGS_AND_HEADERS = 3;
-  
-  // tag defining the entire message
-  public static int MESSAGE = 4;
+  public static int NOT_CACHED = -1;
+  public static int FLAGS = 1;
+  public static int HEADERS = 5;
+  public static int FLAGS_AND_HEADERS = 10;
+  public static int CONTENT = 20;
+  public static int MESSAGE = 30;
   
   /**
    * Returns the datahandler for the given message uid.

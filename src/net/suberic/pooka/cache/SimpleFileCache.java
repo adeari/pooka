@@ -17,12 +17,6 @@ public class SimpleFileCache implements MessageCache {
 
   // FIXME:  why isn't anything synchronized?
   
-  public static int NOT_CACHED = -1;
-  public static int CONTENT = 0;
-  public static int HEADERS = 1;
-  public static int FLAGS = 2;
-  public static int FLAGS_AND_HEADERS = 3;
-  
   public static int ADDED = 10;
   public static int REMOVED = 11;
   
