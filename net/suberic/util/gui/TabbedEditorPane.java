@@ -64,7 +64,6 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
      * Creates an editor pane for a group of values.
      */
     private DefaultPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-	System.out.println("creating compositeEditorPane for " + subProperty + ", template " + subTemplate);
 	return new CompositeEditorPane(factory, subProperty, subTemplate);
     }
 
