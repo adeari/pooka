@@ -1,3 +1,6 @@
+020703 release
+--------------
+
 fixed a bug which prevented you from deleting a message from a 
 disconnected folder.
 
