@@ -102,31 +102,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	return actions;
     }
 
-    /*
-    private void setWindowsMenu(JMenuBar menuBar) {
-	// TODO:  fix this.  Currently we just recreate the Windows menu
-	// every time.  It works, and doesn't seem all that slow, but still....
-
-	JMenu clearWindowMenu = createMenu("MenuBar.Window");
-	int origCount = clearWindowMenu.getMenuComponentCount();
-
-	for (int i = menuBar.getMenuCount() - 1; i >= 0; i--) {
-	    if (menuBar.getMenu(i).getText().equals("Window")) {
-		JMenu windowMenu = menuBar.getMenu(i);
-		for (int k = windowMenu.getMenuComponentCount(); k > origCount; k--)
-		    windowMenu.remove(k-1);
-		
-		JInternalFrame[] allFrames = messagePanel.getAllFrames();
-		for(int j = 0; j < allFrames.length; j++) {
-		    JMenuItem mi = new JMenuItem(allFrames[j].getTitle());
-		    mi.addActionListener(new ActivateWindowAction());
-		    mi.setActionCommand(String.valueOf(messagePanel.getIndexOf(allFrames[j])));
-		    windowMenu.add(mi);
-		}
-	    }
+    /**
+     * This selects the menu with the key accelerator that matches the
+     * character 'key'.
+     */
+    public void selectMenu(char key) {
+	for (int i = 0; i < mainMenu.getMenuCount(); i++) {
+	    JMenu m = mainMenu.getMenu(i);
+	    if (m != null && m.getMnemonic() == (int)key)
+		m.setSelected(true);
 	}
     }
-    */
 
     /**
      * This method shows a help screen.  At the moment, it just takes the
@@ -293,7 +279,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new HelpLicenseAction(),
 	new SelectMessagePanelAction(),
 	new SelectFolderPanelAction(),
-	new NewMessageAction()
+	new NewMessageAction(),
+	new SelectMenuAction("select-menu-F"),
+	new SelectMenuAction("select-menu-E"),
+	new SelectMenuAction("select-menu-M"),
+	new SelectMenuAction("select-menu-W"),
+	new SelectMenuAction("select-menu-H")
     };
 
 
@@ -431,6 +422,21 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
 	public void actionPerformed(ActionEvent e) {
 	    messagePanel.createNewMessage();
+	}
+
+    }
+
+    public class SelectMenuAction extends AbstractAction {
+	SelectMenuAction() {
+	    super("menu-select");
+	}
+
+	SelectMenuAction(String cmd) {
+	    super(cmd);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    selectMenu(e.getActionCommand().charAt(e.getActionCommand().length() -1));
 	}
 
     }
