@@ -22,7 +22,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     boolean changed = false;
     Vector removeValues = new Vector();
     DefaultListModel optionListModel;
-    Vector subProperties;
     Vector templateTypes;
 
     String template;
@@ -80,18 +79,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	template = property + ".editableFields";
 
-	/*
-	subProperties = new Vector();
-	templateTypes = new Vector();
-	StringTokenizer subPropertiesTok  = new StringTokenizer(sourceBundle.getProperty(property + ".editableFields", ""), ":");
-
-	while (subPropertiesTok.hasMoreElements()) {
-	    String current = subPropertiesTok.nextToken();
-	    subProperties.add(current);
-	    templateTypes.add(property + "." + current);
-	}
-	*/
-	
 	// create entryPanels (the panels which show the subproperties
 	// of each item in the optionList) for each option.
 
@@ -144,8 +131,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	
 	for (int i = 0; i < itemList.size(); i++) {
 	    rootProp = new String(property + "." + (String)(itemList.elementAt(i)));
-	    //propList = createPropertiesList(rootProp, subProperties);
-	    
 	    pep = new CompositeEditorPane(factory, rootProp, template);;
 	    
 	    if (original == true) {
@@ -167,9 +152,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 
 	rootProp = new String(property + ".default");
 	    
-	//propList = createPropertiesList(rootProp, subProperties);
-
-	pep = new CompositeEditorPane(factory, rootProp, template);;
+	pep = new CompositeEditorPane(factory, rootProp, template, false);
 	    
 	if (original == true) {
 	    originalPanels.put("default", pep);
@@ -223,15 +206,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     }
 
 
-    private Vector createPropertiesList(String rootProperty, Vector subProps) {
-	Vector editedProperties = new Vector();
-
-	for (int i = 0; i < subProps.size(); i++) 
-	    editedProperties.add(rootProperty + "." + (String)subProps.elementAt(i));
-
-	return editedProperties;
-    }
-
     public void valueChanged(ListSelectionEvent e) {
 	CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
 
@@ -247,7 +221,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	    return;
 	
 	String rootProp =new String(property.concat("." + newValueName));
-	//Vector propList = createPropertiesList(rootProp, subProperties);
 	
 	CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
 	optionListModel.addElement(newValueName);
@@ -264,14 +237,22 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	if (selValue == null)
 	    return;
 
+	String rootProp = new String(property.concat("." + selValue));
+	PropertyEditorUI removedUI = (PropertyEditorUI) currentPanels.get(selValue);
+	if (removedUI != null) {
+	    java.util.Properties removedProperties = removedUI.getValue();
+	    java.util.Enumeration keys = removedProperties.keys();
+	    while (keys.hasMoreElements()) {
+		String currentKey = (String) keys.nextElement();
+		removeValues.add(currentKey);
+	    }
+	    currentPanels.remove(selValue);
+	}
+	
 	ListModel lm = getOptionList().getModel();
 
 	if (lm instanceof DefaultListModel)
 	    ((DefaultListModel)lm).removeElement(selValue);
-	
-	String rootProp = new String(property.concat("." + selValue));
-	
-	removeValues.addAll(createPropertiesList(rootProp, subProperties));
 	
 	this.setChanged(true);
     }
@@ -312,7 +293,6 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	    CompositeEditorPane oldPane = (CompositeEditorPane)currentPanels.get(oldName);
 	    if (oldPane != null) {
 		String rootProp =new String(property.concat("." + newName));
-		//Vector propList = createPropertiesList(rootProp, subProperties);
 		
 		CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
 		java.util.Properties oldProps = oldPane.getValue();

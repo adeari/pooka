@@ -136,6 +136,29 @@ public class VariableEditorPane extends DefaultPropertyEditor {
     public java.util.Properties getValue() {
 	java.util.Properties currentRetValue = new java.util.Properties();
 	
+	PropertyEditorUI parent = getParentPropertyEditor();
+	if (parent instanceof CompositeEditorPane) {
+	    String currentValue = sourceBundle.getProperty(keyProperty, "");
+	    if (parent != null) {
+		String test = ((CompositeEditorPane)parent).getOtherValues(this).getProperty(keyProperty);
+		if (test != null)
+		    currentValue = test;
+	    }
+	    
+	    String editValue = currentValue;
+	    
+	    if (scoped)
+		editValue = template + "." + editValue;
+	    
+	    PropertyEditorUI ui = 	factory.createEditor(property, editValue);
+	    
+	    java.util.Properties props = ui.getValue();
+	    java.util.Enumeration keys = props.keys();
+	    while (keys.hasMoreElements()) {
+		String currentProperty = (String) keys.nextElement();
+		currentRetValue.setProperty(currentProperty, props.getProperty(currentProperty));
+	    }
+	}
 	return currentRetValue;
     }
 

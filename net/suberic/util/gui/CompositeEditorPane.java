@@ -36,6 +36,18 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     }
 
     /**
+     * This contructor creates a PropertyEditor for the list of 
+     * properties represented by the given property.
+     */     
+    public CompositeEditorPane(PropertyEditorFactory newFactory, String 
+			       newProperty, String newTemplate, 
+			       boolean isEnabled) {
+	super(BoxLayout.X_AXIS);
+	configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), isEnabled);
+        
+    }
+
+    /**
      * This configures an editor for the given propertyName in the 
      * VariableBundle bundle.
      *
@@ -78,6 +90,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	for (int i = 0; i < properties.size(); i++) {
 	    currentEditor =
               factory.createEditor((String)properties.elementAt(i), (String) templates.elementAt(i));
+	    currentEditor.setEnabled(enabled);
 	    editors.add(currentEditor);
 	    
 	    if (currentEditor.labelComponent != null) {
@@ -152,6 +165,27 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	    while (keys.hasMoreElements()) {
 		String currentKey = (String) keys.nextElement();
 		currentRetValue.setProperty(currentKey, newValue.getProperty(currentKey));
+	    }
+	}
+
+	return currentRetValue;
+    }
+
+    /**
+     * Returns all of the values of this editorPane except for the ones
+     * that belong to the given propertyEditor.
+     */
+    public java.util.Properties getOtherValues(PropertyEditorUI current) {
+	java.util.Properties currentRetValue = new java.util.Properties();
+	for (int i = 0; i < editors.size(); i++) {
+	    DefaultPropertyEditor currentEditor = (DefaultPropertyEditor)(editors.elementAt(i));
+	    if (currentEditor != current) {
+		java.util.Properties newValue = ((DefaultPropertyEditor)(editors.elementAt(i))).getValue();
+		java.util.Enumeration keys = newValue.propertyNames();
+		while (keys.hasMoreElements()) {
+		    String currentKey = (String) keys.nextElement();
+		    currentRetValue.setProperty(currentKey, newValue.getProperty(currentKey));
+		}
 	    }
 	}
 
