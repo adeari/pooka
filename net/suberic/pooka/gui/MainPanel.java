@@ -9,7 +9,7 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.mail.Session;
 import net.suberic.pooka.MailQueue;
-import net.suberic.util.gui.PropertyEditorFactory;
+import net.suberic.util.gui.*;
 
 /**
  * The main panel for PookaMail
@@ -20,7 +20,7 @@ import net.suberic.util.gui.PropertyEditorFactory;
 
 public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelectionListener {
     private JMenuBar mainMenu;
-    private JToolBar mainToolbar;
+    private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
     private MessagePanel messagePanel;
     private Action[] actions;
@@ -50,59 +50,11 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	setActions();
 
 	mainMenu = createMenubar();
-	mainToolbar = createToolbar();
+	mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
 
 	setActiveMenus(mainMenu);
-	setActiveToolbarItems();
+	mainToolbar.setActive(commands);
 
-    }
-    
-
-    /**
-     * Create the menuBar.  This reads the values from the resources
-     * ResourceBundle and creates menus appropriately.
-     */
-    
-    protected JToolBar createToolbar() {
-	JToolBar tBar = new JToolBar();
-	if (Pooka.getProperty("MainToolbar", "") == "") {
-	    return null;
-	}
-	
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MainToolbar", ""), ":");
-	while (tokens.hasMoreTokens()) {
-	  JButton b = createToolButton(tokens.nextToken());
-	  if (b != null) {
-	    tBar.add(b);
-	  }
-	}
-	return tBar;
-    }
-
-    /**
-     * This creates the toolbar buttons themselves--called by createToolbar()
-     */
-
-    protected JButton createToolButton(String key) {
-	JButton bi;
-	try {
-	    java.net.URL url =this.getClass().getResource(Pooka.getProperty("MainToolbar." + key + ".Image"));
-	    bi = new JButton(new ImageIcon(url));
-
-	} catch (MissingResourceException mre) {
-	    return null;
-	}
-	
-	try {
-	    bi.setToolTipText(Pooka.getProperty("MainToolbar." +key+ ".ToolTip"));
-	} catch (MissingResourceException mre) {
-	}
-	
-	String cmd = Pooka.getProperty("MainToolbar." + key + ".Action", key);
-	
-	bi.setActionCommand(cmd);
-	    
-	return bi;
     }
     
     // creates the Menubar.
@@ -247,19 +199,6 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	}
     }	    
 
-    private void setActiveToolbarItems() {
-	for (int i = 0; i < mainToolbar.getComponentCount(); i++) {
-	    JButton bi = (JButton)(mainToolbar.getComponentAtIndex(i));
-
-	    Action a = getAction(bi.getActionCommand());
-	    if (a != null) {
-		bi.addActionListener(a);
-		bi.setEnabled(true);
-	    } else {
-		bi.setEnabled(false);
-	    }
-	}
-    }
     private void setActiveMenus(JMenuBar menuBar) {
 	for (int i = 0; i < menuBar.getMenuCount(); i++) {
 	    setActiveMenuItems(menuBar.getMenu(i));
@@ -315,21 +254,6 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	}
     }
 
-    private void removeActionListeners(JToolBar toolBar) {
-	for (int i = 0; i < toolBar.getComponentCount(); i++) {
-	    if ((toolBar.getComponentAtIndex(i)) instanceof JButton) {
-		JButton button = (JButton)(toolBar.getComponentAtIndex(i));
-		Action a = getAction(button.getActionCommand());
-		if (a != null) {
-		    //                    mi.removeActionListener(a);
-		    button.removeActionListener(a);
-		} else {
-		    button.setEnabled(false);
-		}
-	    }
-	    
-	}   
-    }
 
     /* Called by ExtendedDesktopManager every time the focus on the windows
        changes.  Resets the Actions associated with the menu items and toolbar
@@ -340,10 +264,9 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 
     protected void refreshActiveMenus(JMenuBar menuBar) {
 	removeActionListeners(menuBar);
-	removeActionListeners(mainToolbar);
 	setActions();
 	setActiveMenus(menuBar);
-	setActiveToolbarItems();
+	mainToolbar.setActive(commands);
 
     }
 
@@ -376,11 +299,11 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	mainMenu=newMainMenu;
     }
 
-    public JToolBar getMainToolbar() {
+    public ConfigurableToolbar getMainToolbar() {
 	return mainToolbar;
     }
 
-    public void setMainToolbar(JToolBar newMainToolbar) {
+    public void setMainToolbar(ConfigurableToolbar newMainToolbar) {
         mainToolbar = newMainToolbar;
     }
 
