@@ -50,7 +50,7 @@ public class SimpleFileCache implements MessageCache {
     }
 
     public DataHandler getDataHandler(long uid, boolean saveToCache) throws MessagingException {
-	DataHandler h = (DataHandler) getFromCache(uid, CONTENT);
+	DataHandler h = getHandlerFromCache(uid);
 	if (h != null) {
 	    return h;
 	} else {
@@ -59,7 +59,7 @@ public class SimpleFileCache implements MessageCache {
 		if (m != null) {
 		    h = m.getDataHandler();
 		    if (saveToCache)
-			addMessage(m, uid, CACHE_ALL);
+			cacheMessage(m, uid, CACHE_ALL);
 		    return h;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -69,20 +69,38 @@ public class SimpleFileCache implements MessageCache {
 	}
     }
 
+    /**
+     * Returns the datahandler for the given message uid.
+     */
     public DataHandler getDataHandler(long uid) throws MessagingException {
 	return getDataHandler(uid, true);
     }
-
+    
+    /**
+     * Adds the given Flags to the message with the given uid.
+     *
+     * This affects both the client cache as well as the message on the
+     * server, if the server is available.
+     */
     public void addFlag(long uid, Flags flag) throws MessagingException {
-	
+
     }
 
+    /**
+     * Removes the given Flags from the message with the given uid.
+     *
+     * This affects both the client cache as well as the message on the
+     * server, if the server is available.
+     */
     public void removeFlag(long uid, Flags flag) throws MessagingException {
 
     }
 
+    /**
+     * Returns the InternetHeaders object for the given uid.
+     */    
     public InternetHeaders getHeaders(long uid, boolean saveToCache) throws MessagingException {
-	InternetHeaders h = (InternetHeaders) getFromCache(uid, HEADERS);
+	InternetHeaders h = getHeadersFromCache(uid);
 	if (h != null) {
 	    return h;
 	} else {
@@ -95,7 +113,7 @@ public class SimpleFileCache implements MessageCache {
 			h.addHeaderLine((String) enum.nextElement());
 		    }
 		    if (saveToCache)
-			addMessage(m, uid, CACHE_HEADERS_AND_FLAGS);
+			cacheMessage(m, uid, CACHE_HEADERS_AND_FLAGS);
 		    return h;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -109,8 +127,11 @@ public class SimpleFileCache implements MessageCache {
 	return getHeaders(uid, true);
     }
 
+    /**
+     * Returns the Flags object for the given uid.
+     */
     public Flags getFlags(long uid, boolean saveToCache) throws MessagingException {
-	Flags f = (Flags) getFromCache(uid, FLAGS);
+	Flags f = getFlagsFromCache(uid);
 	if (f != null) {
 	    return f;
 	} else {
@@ -119,7 +140,7 @@ public class SimpleFileCache implements MessageCache {
 		if (f != null) {
 		    f = m.getFlags();
 		    if (saveToCache)
-			addMessage(m, uid, CACHE_HEADERS_AND_FLAGS);
+			cacheMessage(m, uid, CACHE_HEADERS_AND_FLAGS);
 		    return f;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -130,11 +151,22 @@ public class SimpleFileCache implements MessageCache {
 
     }
 
+    /**
+     * Returns the Flags object for the given uid.
+     */
     public Flags getFlags(long uid) throws MessagingException {
 	return getFlags(uid, true);
     }
 
-    public boolean addMessage(MimeMessage m, long uid) throws MessagingException {
+    /**
+     * Adds a message to the cache.  Note that status is only used to
+     * determine whether or not the entire message is cached, or just
+     * the headers and flags.
+     *
+     * This does not affect the server, nor does it affect message
+     * count on the client.
+     */  
+    public boolean cacheMessage(MimeMessage m, long uid, int status) throws MessagingException {
 	File outFile = new File(cacheDir, uid + "_msg.gz");
 	if (outFile.exists())
 	    outFile.delete();
@@ -150,24 +182,20 @@ public class SimpleFileCache implements MessageCache {
 	    
     }
 
-    public boolean removeMessage(long uid) {
+    /**
+     * Removes a message from the cache only.  This has no effect on the
+     * server.
+     */
+    public boolean invalidateCache(long uid) {
 	invalidateCache(new long[] { uid });
 	cachedMessages.remove(uid);
 
 	return true;
     }
-
-    public boolean invalidateCache(long[] uids) {
-	if (uids != null) {
-
-	    for (int i = 0 ; i < uids.length; i++)
-		invalidateCache(uids[i]);
-
-	    return true;
-	} else
-	    return false;
-    }
-
+    
+    /**
+     * Invalidates all of the messages in the uids array in the cache.
+     */
     public boolean invalidateCache(long[] uids) {
 	FilenameFilter filter = new FilenameFilter() {
 		public boolean accept(File dir, String name) {
@@ -182,13 +210,115 @@ public class SimpleFileCache implements MessageCache {
 	for (int i = 0; i < matchingFiles.length; i++)
 	    matchingFiles[i].delete();
     }
+    
+    /**
+     * Adds the messages to the given folder.  Returns the uids for the 
+     * message.  Uses the status to determine how much of the message
+     * is cached.
+     *
+     * Note that if any message fails to be appended, then the ones that
+     * have succeeded should be returned in the long[].  
+     *
+     * This method changes both the client cache as well as the server, if
+     * the server is available.
+     */
+    public long[] appendMessages(MimeMessage[] msgs, int status) {
+    }
+    
+    /**
+     * Removes all messages marked as 'DELETED'  from the given folder.  
+     * Returns the uids of all the removed messages.
+     *
+     * Note that if any message fails to be removed, then the ones
+     * that have succeeded should be returned in the long[].
+     *
+     * This method changes both the client cache as well as the server, if
+     * the server is available.
+     */
+    public long[] expungeMessages() {
+    }
 
+    /**
+     * This returns the uid's of the message which exist in updatedUids, but
+     * not in the current list of messsages.
+     */ 
     public long[] getAddedMessages(long[] uids) {
+	
+    }
+
+    /**
+     * This returns the uid's of the message which exist in the current
+     * list of messages, but no longer exist in the updatedUids.
+     */
+    public long[] getRemovedMessages(long[] uids) {
 
     }
 
-    public long[] getRemovedMessages(long[] uids) {
+    /**
+     * This returns the message id's of all the currently cached messages.
+     * Note that only the headers and flags of the message need to be
+     * cached for a message to be considered in the cache.
+     */
+    public long[] getMessageUids() {
 
+    }
+
+    /**
+     * Gets a DataHandler from the cache.  Returns null if no handler is
+     * available in the cache.
+     */
+    protected DataHandler getHandlerFromCache(long uid) {
+	File f = new File(cacheDir, uid + "_handler");
+	if (f.exists())
+	    return new DataHandler(new FileDataSource(f));
+	else
+	    return null;
+    }
+
+    /**
+     * Gets the InternetHeaders from the cache.  Returns null if no headers are
+     * available in the cache.
+     */
+    protected InternetHeader getHeadersFromCache(long uid) {
+	File f = new File(cacheDir, uid + "_headers");
+	if (f.exists())
+	    return new InternetHeaders(new FileInputStream(f));
+	else
+	    return null;
+    }
+
+    /**
+     * Gets the Flagss from the cache.  Returns null if no flagss are
+     * available in the cache.
+     */
+    protected Flags getFlagsFromCache(long uid) {
+	File f = new File(cacheDir, uid + "_flags");
+	if (f.exists()) {
+	    Flags newFlags = new Flags();
+	    BufferedReader in = new BufferedReader(new FileReader(f));
+	    for (String currentLine = in.readLine(); currentLine != null; currentLine = in.readLine()) {
+
+		if (currentLine.equalsIgnoreCase("Deleted"))
+		    newFlags.add(Flags.Flag.DELETED);
+		else if (currentLine.equalsIgnoreCase("Answered"))
+		    newFlags.add(Flags.Flag.ANSWERED);
+		else if (currentLine.equalsIgnoreCase("Draft"))
+		    newFlags.add(Flags.Flag.DRAFT);
+		else if (currentLine.equalsIgnoreCase("Flagged"))
+		    newFlags.add(Flags.Flag.FLAGGED);
+		else if (currentLine.equalsIgnoreCase("Recent"))
+		    newFlags.add(Flags.Flag.RECENT);
+		else if (currentLine.equalsIgnoreCase("SEEN"))
+		    newFlags.add(Flags.Flag.SEEN);
+		else 
+		    newFlags.add(new Flags(currentLine));
+	    }
+
+	    return newFlags;
+	}
+	    
+	else
+	    return null;
     }
 
     /**

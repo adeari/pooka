@@ -62,7 +62,7 @@ public interface MessageCache {
     public boolean invalidateCache(long uid);
 
     /**
-     * Calls uncacheMessage on each uid.
+     *  Invalidates all of the messages in the uids array in the cache.
      */
     public boolean invalidateCache(long[] uids);
 
@@ -103,4 +103,10 @@ public interface MessageCache {
      */
     public long[] getRemovedMessages(long[] updatedUids);
 
+    /**
+     * This returns the message id's of all the currently cached messages.
+     * Note that only the headers and flags of the message need to be
+     * cached for a message to be considered in the cache.
+     */
+    public long[] getMessageUids();
 }
