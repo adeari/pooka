@@ -188,6 +188,7 @@ FolderPanel.2xClickAction=file-open
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 #FolderTable=New:SentDate:From:Subject
 FolderTable=MsgNumber:Status:SentDate:From:Subject
+FolderTable.MsgNumber.size=30
 FolderTable.MsgNumber.type=RowCounter
 FolderTable.Status.type=Multi
 FolderTable.Status.size=15

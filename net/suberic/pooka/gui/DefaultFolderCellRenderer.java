@@ -33,9 +33,17 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 		icon.setBackground(returnValue.getBackground());
 	    }
 	    return icon;
-	} 
-
-	if (value instanceof Date) {
+	} else if (value instanceof RowCounter) {
+	    if (returnValue instanceof JLabel)
+		((JLabel)returnValue).setText(Integer.toString(row));
+	    else {
+		JLabel label = new JLabel(Integer.toString(row));
+		label.setBackground(returnValue.getBackground());
+		label.setForeground(returnValue.getForeground());
+		label.setFont(returnValue.getFont());
+		returnValue = label;
+	    }
+	} else if (value instanceof Date) {
 	    Date displayDate = (Date)value; 
 	    String dateText = null;
 	    Calendar current = Calendar.getInstance();

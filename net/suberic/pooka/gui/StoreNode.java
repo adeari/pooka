@@ -30,7 +30,7 @@ public class StoreNode extends MailTreeNode {
 	loadChildren();
 	defaultActions = new Action[] {
 	    new ActionWrapper(new OpenAction(), getStoreInfo().getStoreThread()),
-	    new ActionWrapper(new SubscribeAction(), getStoreInfo().getStoreThread()),
+	    new SubscribeAction(),
 	    new TestAction(),
 	    new ActionWrapper(new DisconnectAction(), getStoreInfo().getStoreThread()),
 	    new EditAction()
