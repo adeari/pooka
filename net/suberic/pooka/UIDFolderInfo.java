@@ -36,7 +36,7 @@ public class UIDFolderInfo extends FolderInfo {
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public synchronized void loadAllMessages() {
+    public synchronized void loadAllMessages() throws MessagingException {
 	if (folderTableModel == null) {
 	    Vector messageProxies = new Vector();
 	    
@@ -47,7 +47,7 @@ public class UIDFolderInfo extends FolderInfo {
 		loaderThread = createLoaderThread();
 	    
 	    try {
-		if (!(getFolder().isOpen())) {
+		if (!isConnected()) {
 		    openFolder(Folder.READ_WRITE);
 		}
 		
@@ -96,7 +96,7 @@ public class UIDFolderInfo extends FolderInfo {
 	StoreInfo s = null;
 	try {
 	    
-	    if (isOpen()) {
+	    if (isConnected()) {
                 Folder current = getFolder();
                 if (current != null && current.isOpen()) {
                     current.getNewMessageCount();

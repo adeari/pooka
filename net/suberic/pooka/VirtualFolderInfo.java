@@ -47,7 +47,7 @@ public class VirtualFolderInfo extends FolderInfo {
      * Initialized the FolderInfo.  Basically adds itself as a listener
      * to all the parent FolderInfos.
      */
-    private void initializeFolderInfo() {
+    protected void initializeFolderInfo() {
 	for (int i = 0; i < parents.length; i++) {
 	    parents[i].addMessageCountListener(this);
 	    parents[i].addMessageChangedListener(this);

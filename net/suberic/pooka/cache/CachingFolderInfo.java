@@ -21,24 +21,98 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
 	
-	try {
-	    cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
-	} catch (java.io.IOException ioe) {
-	    System.out.println("Error creating cache!");
-	    ioe.printStackTrace();
-	}
     }
 
     public CachingFolderInfo(FolderInfo parent, String fname) {
 	super(parent, fname);
+    }
+
+    /**
+     * This actually loads up the Folder object itself.  This is used so 
+     * that we can have a FolderInfo even if we're not connected to the
+     * parent Store.
+     *
+     * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
+     * Once the parent store is connected, we can try to load the folder.  
+     * If the load is successful, we go to a CLOSED state.  If it isn't,
+     * then we can either return to NOT_LOADED, or INVALID.
+     */
+    public void loadFolder() {
+	if (cache == null) {
+	    try {
+		cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
+		setStatus(DISCONNECTED);
+	    } catch (java.io.IOException ioe) {
+		System.out.println("Error creating cache!");
+		ioe.printStackTrace();
+		return;
+	    }
+	}
+
+	if (isLoaded() || (loading && children == null)) 
+	    return;
+
+	Folder[] tmpFolder;
+	Folder tmpParentFolder;
 	
 	try {
-	    cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
-	} catch (java.io.IOException ioe) {
-	    System.out.println("Error creating cache!");
-	    ioe.printStackTrace();
+	    loading = true;
+	    if (getParentStore().isConnected()) {
+		if (getParentFolder() == null) {
+		    try {
+			if (Pooka.isDebug())
+			    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
+			
+			Store store = getParentStore().getStore();
+			tmpParentFolder = store.getDefaultFolder();
+			tmpFolder = tmpParentFolder.list(getFolderName());
+		    } catch (MessagingException me) {
+			if (Pooka.isDebug()) {
+			    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
+			    me.printStackTrace();
+		    }
+			tmpFolder =null;
+		    }
+		} else {
+		    if (!getParentFolder().isLoaded())
+			getParentFolder().loadFolder();
+		    if (!getParentFolder().isLoaded()) {
+			tmpFolder = null;
+		    } else {
+			tmpParentFolder = getParentFolder().getFolder();
+			if (tmpParentFolder != null) {
+			    tmpFolder = tmpParentFolder.list(getFolderName());
+			} else {
+			    tmpFolder = null;
+			}
+		    }
+		}
+		if (tmpFolder != null && tmpFolder.length > 0) {
+		    setFolder(tmpFolder[0]);
+		    setStatus(CLOSED);
+		    getFolder().addMessageChangedListener(this);
+		} else {
+		    if (cache != null)
+			setStatus(CACHE_ONLY);
+		    else
+			setStatus(INVALID);
+		    setFolder(null);
+		}
+	    } 
+	} catch (MessagingException me) {
+	    if (Pooka.isDebug()) {
+		System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
+		me.printStackTrace();
+	    }
+	    setStatus(NOT_LOADED);
+	    setFolder(null);
+	} finally {
+	    initializeFolderInfo();
+	    loading = false;
 	}
+	
     }
+
 
     /**
      * Loads all Messages into a new FolderTableModel, sets this 
@@ -46,41 +120,40 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public synchronized void loadAllMessages() {
+    public synchronized void loadAllMessages() throws MessagingException {
 	if (folderTableModel == null) {
+	    if (getFolderDisplayUI() != null) {
+		getFolderDisplayUI().setBusy(true);
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.starting", "Loading messages from cache."));
+	    }
+	    
+	    if (!isLoaded())
+		loadFolder();
+
+	    Vector messageProxies = new Vector();
+	    
+	    FetchProfile fp = createColumnInformation();
+	    if (loaderThread == null) 
+		loaderThread = createLoaderThread();
+	    
 	    try {
-		if (getFolderDisplayUI() != null) {
-		    getFolderDisplayUI().setBusy(true);
-		    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.starting", "Loading messages from cache."));
+		
+		if (preferredStatus < DISCONNECTED && !(isConnected())) {
+		    openFolder(Folder.READ_WRITE);
+		} else {
+		    uidValidity = cache.getUIDValidity();
 		}
 		
-		Vector messageProxies = new Vector();
+		long[] uids = cache.getMessageUids();
+		MessageInfo mi;
 		
-		FetchProfile fp = createColumnInformation();
-		if (loaderThread == null) 
-		    loaderThread = createLoaderThread();
-		
-		try {
-
-		    if (status < DISCONNECTED && !(getFolder().isOpen())) {
-			openFolder(Folder.READ_WRITE);
-		    } else {
-			uidValidity = cache.getUIDValidity();
-		    }
+		for (int i = 0; i < uids.length; i++) {
+		    Message m = new CachingMimeMessage(this, uids[i]);
+		    mi = new MessageInfo(m, this);
 		    
-		    long[] uids = cache.getMessageUids();
-		    MessageInfo mi;
-		    
-		    for (int i = 0; i < uids.length; i++) {
-			Message m = new CachingMimeMessage(this, uids[i]);
-			mi = new MessageInfo(m, this);
-			
-			messageProxies.add(new MessageProxy(getColumnValues() , mi));
-			messageToInfoTable.put(m, mi);
-			uidToInfoTable.put(new Long(uids[i]), mi);
-		    }
-		} catch (MessagingException me) {
-		    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
+		    messageProxies.add(new MessageProxy(getColumnValues() , mi));
+		    messageToInfoTable.put(m, mi);
+		    uidToInfoTable.put(new Long(uids[i]), mi);
 		}
 		
 		FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
@@ -111,7 +184,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		    getFolderDisplayUI().setBusy(false);
 		    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.finished", "Done loading messages."));
 		}
-
+		
 	    }
 	}
     }
@@ -462,9 +535,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
      * This expunges the deleted messages from the Folder.
      */
     public void expunge() throws MessagingException {
-	if (isOpen())
+	if (isConnected())
 	    getFolder().expunge();
-	else if (shouldBeOpen()) {
+	else if (shouldBeConnected()) {
 	    openFolder(Folder.READ_WRITE);
 	    getFolder().expunge();
 	} else {
@@ -532,20 +605,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
     }
     
-    /**
-     * This actually loads up the Folder object itself.  This is used so 
-     * that we can have a FolderInfo even if we're not connected to the
-     * parent Store.
-     *
-     * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
-     * Once the parent store is connected, we can try to load the folder.  
-     * If the load is successful, we go to a CLOSED state.  If it isn't,
-     * then we can either return to NOT_LOADED, or INVALID.
-     */
-    public void loadFolder() {
-	setStatus(DISCONNECTED);
-    }
-
     /**
      * This method closes the Folder.  If you open the Folder using 
      * openFolder (which you should), then you should use this method

@@ -83,6 +83,9 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 
 		FolderInfo folderInfo = ((FolderNode)node).getFolderInfo();
 		
+		// FIXME now that we support more connection levels, we should
+		// have more icons.
+
 		if (folderInfo == null){
 		    setIconToDisconnected();
 		} else {
@@ -92,12 +95,12 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 			    setIconToSubfolderWithNew();
 			else 
 			    setIconToSubfolder();
-		    } else if (folderInfo.isOpen()) {
+		    } else if (folderInfo.isSortaOpen()) {
 			if ((! folderInfo.isTrashFolder()) && (! folderInfo.isSentFolder()) && folderInfo.hasNewMessages()) {
 			    setIconToOpenWithNew();
 			} else
 			    setIconToOpen();
-		    } else if (!folderInfo.isAvailable()) {
+		    } else if (!folderInfo.isValid()) {
 			setIconToUnavailable();
 		    } else {
 			setIconToDisconnected();

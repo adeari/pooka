@@ -337,42 +337,35 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 
 	    try {
 
-		// check the status of the FolderInfo.
-		if (!getFolderInfo().isAvailable())
-		    getFolderInfo().openFolder(Folder.READ_WRITE);
+		getFolderInfo().loadAllMessages();
+		
+		final int folderType = getFolderInfo().getType();
 
-		if (getFolderInfo().isAvailable()) {
-		    if (getFolderInfo().getFolderTableModel() == null)
-			getFolderInfo().loadAllMessages();
-
-		    int tmpType;
-
-		    if (getFolder() != null)
-			tmpType = getFolder().getType();
-		    else
-			tmpType = Folder.HOLDS_MESSAGES;
-
-		    final int folderType = tmpType;
-		    SwingUtilities.invokeLater(new Runnable() {
-			    public void run() {
-
-		    if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
-			if (getFolderInfo().getFolderDisplayUI() != null)
-			    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-			else {
-			    getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
-			    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-			}
-			
-		    }
-		    if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
-			javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-			folderTree.expandPath(folderTree.getSelectionPath());
-		    }
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    
+			    if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
+				if (getFolderInfo().getFolderDisplayUI() != null)
+				    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+				else {
+				    getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
+				    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+				}
+				
 			    }
-			});
-		}
-	    } catch (MessagingException me) {
+			    if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
+				javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+				folderTree.expandPath(folderTree.getSelectionPath());
+			    }
+			}
+		    });
+	    }  catch (MessagingException me) {
+		final MessagingException newMe = me;
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + "\n", newMe);
+			}
+		    });
 	    }
 	    
 	    SwingUtilities.invokeLater(new Runnable() {

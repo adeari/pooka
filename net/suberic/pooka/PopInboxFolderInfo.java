@@ -92,7 +92,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	//checkFolder();
     }
 
-    public synchronized void loadAllMessages() {
+    public synchronized void loadAllMessages() throws MessagingException {
 	if (folderTableModel == null) {
 	    super.loadAllMessages();
 	    checkFolder();
@@ -110,7 +110,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	
 	Folder f = null;
 	try {
-	    if (isOpen() && popStore != null) {
+	    if (isConnected() && popStore != null) {
 		if (Pooka.isDebug())
 		    System.out.println("checking folder " + getFolderName() + ":  opening pop store.");
 		popStore.connect();

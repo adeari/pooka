@@ -151,7 +151,7 @@ public class MessageInfo {
 	    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		if (getFolderInfo().shouldBeOpen()) {
+		if (getFolderInfo().shouldBeConnected()) {
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 		    loadAttachmentInfo();
 		    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
@@ -191,7 +191,7 @@ public class MessageInfo {
 	    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		if (getFolderInfo().shouldBeOpen()) {
+		if (getFolderInfo().shouldBeConnected()) {
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 		    loadAttachmentInfo();
 		    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
@@ -223,7 +223,7 @@ public class MessageInfo {
 	    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		if (getFolderInfo().shouldBeOpen()) {
+		if (getFolderInfo().shouldBeConnected()) {
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 		    loadAttachmentInfo();
 		    return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
@@ -255,7 +255,7 @@ public class MessageInfo {
 	    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
 	    try {
-		if (getFolderInfo().shouldBeOpen()) {
+		if (getFolderInfo().shouldBeConnected()) {
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 		    loadAttachmentInfo();
 		    return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);

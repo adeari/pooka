@@ -52,6 +52,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // shows the current status of the FolderInfo.
     protected int status = NOT_LOADED;
 
+    // shows the type of this folder.
+    protected int type = 0;
+
     // shows the preferred state of the FolderInfo.  should be CONNECTED,
     // PASSIVE, DISCONNECTED, or CLOSED.
     protected int preferredStatus = CONNECTED;
@@ -89,7 +92,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     protected LoadMessageThread loaderThread;
     private FolderTracker folderTracker = null;
 
-    private boolean loading = false;
+    protected boolean loading = false;
     protected int unreadCount = 0;
     protected int messageCount = 0;
     private boolean newMessages = false;
@@ -126,7 +129,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	resetDefaultActions();
 	
-	
     }
 
 
@@ -161,15 +163,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * then we can either return to NOT_LOADED, or INVALID.
      */
     public void loadFolder() {
-	
-	if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread() + "loading folder " + getFolderID());
+	boolean parentIsConnected = false;
 
 	if (isLoaded() || (loading && children == null)) 
 	    return;
-
-	if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread() + "past first check--folder " + getFolderID() + " isn't loaded yet.");
 
 	Folder[] tmpFolder;
 	Folder tmpParentFolder;
@@ -197,36 +194,27 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    tmpFolder =null;
 		}
 	    } else {
-		if (Pooka.isDebug())
-		    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent folder connection.");
-
 		if (!parentFolder.isLoaded())
 		    parentFolder.loadFolder();
 		if (!parentFolder.isLoaded()) {
-		    if (Pooka.isDebug())
-			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  parentFolder is still not loaded after calling loadFolder().");
-
 		    tmpFolder = null;
 		} else {
 		    tmpParentFolder = parentFolder.getFolder();
-		    if (tmpParentFolder != null)
+		    if (tmpParentFolder != null) {
+			parentIsConnected = true;
 			tmpFolder = tmpParentFolder.list(mFolderName);
-		    else {
-			if (Pooka.isDebug())
-			    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  parentFolder loaded, but couldn't find folder " + mFolderName);
-			
+		    } else {
 			tmpFolder = null;
 		    }
 		}
 	    }
 	    if (tmpFolder != null && tmpFolder.length > 0) {
 		setFolder(tmpFolder[0]);
+		type = getFolder().getType();
 		setStatus(CLOSED);
-		folder.addMessageChangedListener(this);
 	    } else {
-		if (Pooka.isDebug())
-		    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  setting available to false.");
-		setStatus(INVALID);
+		if (parentIsConnected)
+		    setStatus(INVALID);
 		setFolder(null);
 	    }
 	} catch (MessagingException me) {
@@ -240,25 +228,34 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    loading = false;
 	}
 	
-	if (folder != null) {
-	    initializeFolderInfo();
-	}
+	initializeFolderInfo();
 
+    }
+
+    /**
+     * This adds a listener to the Folder.
+     */
+    protected void addFolderListeners() {
+	if (folder != null) {
+	    folder.addMessageChangedListener(this);
+	    folder.addMessageCountListener(this);
+	    folder.addConnectionListener(this);
+	}
     }
 
     /**
      * this is called by loadFolders if a proper Folder object 
      * is returned.
      */
-    private void initializeFolderInfo() {
-	folder.addMessageCountListener(this);
+    protected void initializeFolderInfo() {
+	addFolderListeners();
+
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".displayFilters");
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".backendFilters");
 
-	folder.addConnectionListener(this);
 	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
 	if (!defProfile.equals(""))
 	    defaultProfile = UserProfile.getProfile(defProfile);
@@ -272,6 +269,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
+    /**
+     * Invoked when a Store/Folder/Transport is closed.
+     * 
+     * As specified in javax.mail.event.ConnectionListener.
+     */
     public void closed(ConnectionEvent e) {
 	if (Pooka.isDebug()) {
 	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
@@ -289,6 +291,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	fireConnectionEvent(e);
     }
     
+    /**
+     * Invoked when a Store/Folder/Transport is disconnected.
+     * 
+     * As specified in javax.mail.event.ConnectionListener.
+     */
     public void disconnected(ConnectionEvent e) {
 	if (Pooka.isDebug()) {
 	    System.out.println("Folder " + getFolderID() + " disconnected.");
@@ -306,6 +313,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	fireConnectionEvent(e);
     }
     
+    /**
+     * Invoked when a Store/Folder/Transport is opened.
+     * 
+     * As specified in javax.mail.event.ConnectionListener.
+     */
     public void opened (ConnectionEvent e) {
 	fireConnectionEvent(e);
     }
@@ -325,16 +337,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (Pooka.isDebug())
 	    System.out.println(this + ":  loading folder.");
 
-	if (! isLoaded())
+	if (! isLoaded() && status != CACHE_ONLY)
 	    loadFolder();
 	
 	if (Pooka.isDebug())
 	    System.out.println(this + ":  folder loaded.  making sure parent store is connected.  status is " + status);
 
-	if (status < PASSIVE) {
+	//if (status != CONNECTED) {
 	    if (!getParentStore().isConnected())
 		getParentStore().connectStore();
-	}
+	    //}
 
 	if (Pooka.isDebug())
 	    System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
@@ -473,11 +485,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		returnValue.addAll(((FolderInfo) children.elementAt(i)).getAllFolders());
 	}
 	
-	try {
-	    if (isOpen() && ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0))
-		returnValue.add(this);
-	} catch (MessagingException me) {
-	}
+	if (isSortaOpen() && (getType() & Folder.HOLDS_MESSAGES) != 0)
+	    returnValue.add(this);
 
 	return returnValue;
     }
@@ -550,7 +559,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public synchronized void loadAllMessages() {
+    public synchronized void loadAllMessages() throws MessagingException {
 	if (folderTableModel == null) {
 	    Vector messageProxies = new Vector();
 	    
@@ -558,26 +567,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    if (loaderThread == null) 
 		loaderThread = createLoaderThread();
 	    
-	    try {
-		if (!(getFolder().isOpen())) {
-		    openFolder(Folder.READ_WRITE);
-		}
-		
-		
-		Message[] msgs = folder.getMessages();
-		folder.fetch(msgs, fp);
-		MessageInfo mi;
-		
-		for (int i = 0; i < msgs.length; i++) {
-		    mi = new MessageInfo(msgs[i], this);
-		    
-		    messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		    messageToInfoTable.put(msgs[i], mi);
-		}
-	    } catch (MessagingException me) {
-		System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
+	    if (! isLoaded())
+		loadFolder();
+
+	    if (! isConnected() ) {
+		openFolder(Folder.READ_WRITE);
 	    }
 	    
+	    
+	    Message[] msgs = folder.getMessages();
+	    folder.fetch(msgs, fp);
+	    MessageInfo mi;
+	    
+	    for (int i = 0; i < msgs.length; i++) {
+		mi = new MessageInfo(msgs[i], this);
+		
+		messageProxies.add(new MessageProxy(getColumnValues() , mi));
+		messageToInfoTable.put(msgs[i], mi);
+	    }
+
 	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
 	    
 	    setFolderTableModel(ftm);
@@ -666,7 +674,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	// i'm taking this almost directly from ICEMail; i don't know how
 	// to keep the stores/folders open, either.  :)
 
-	if (isOpen()) {
+	if (isConnected()) {
 	    Store s = getParentStore().getStore();
 	    try {
 		//Folder f = s.getFolder("nfdsaf238sa");
@@ -1539,7 +1547,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return folder;
     }
 
-    private void setFolder(Folder newValue) {
+    protected void setFolder(Folder newValue) {
 	folder=newValue;
     }
 
@@ -1657,24 +1665,32 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	addToListeners(folderDisplayUI);
     }
 
-    public boolean isOpen() {
+    public int getType() {
+	return type;
+    }
+
+    public boolean isConnected() {
 	return (status == CONNECTED);
     }
 
-    public boolean shouldBeOpen() {
+    public boolean shouldBeConnected() {
 	return (status < PASSIVE);
     }
 
-    public boolean isAvailable() {
+    public boolean isSortaOpen() {
 	return (status < CLOSED);
+    }
+
+    public boolean isAvailable() {
+	return (status < NOT_LOADED);
+    }
+
+    public boolean isLoaded() {
+	return (folder != null);
     }
 
     public boolean isValid() {
 	return (status != INVALID);
-    }
-
-    public boolean isLoaded() {
-	return (status < NOT_LOADED);
     }
 
     public boolean hasUnread() {
