@@ -28,8 +28,8 @@ Pooka.openFoldersOnConnect=true
 
 MenuBar=File:Edit:Mail:Window:Help
 
-#MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit
-MenuBar.File=NewMail:OpenFolder:OpenMessage:Close:Exit
+MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit
+#MenuBar.File=NewMail:OpenFolder:OpenMessage:Close:Exit
 
 MenuBar.File.NewFolder.Action=folder-new
 MenuBar.File.NewFolder.Image=/net/suberic/pooka/gui/images/New.gif
@@ -41,7 +41,7 @@ MenuBar.File.Close.Action=file-close
 MenuBar.File.Close.Image=/net/suberic/pooka/gui/images/Delete.gif
 MenuBar.File.SaveAs.Action=file-saveAs
 MenuBar.File.SaveAs.Image=/net/suberic/pooka/gui/images/Save.gif
-MenuBar.File.Print.Action=message-print
+MenuBar.File.Print.Action=file-print
 MenuBar.File.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 MenuBar.File.Exit.Action=file-exit
 MenuBar.File.Exit.Image=/net/suberic/pooka/gui/images/Exit.gif

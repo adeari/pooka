@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.awt.event.*;
+import java.awt.print.*;
 
 public class MessageProxy {
     // the underlying message
@@ -66,7 +67,8 @@ public class MessageProxy {
 	    new ActionWrapper(new ReplyAction(), storeThread),
 	    new ActionWrapper(new ReplyAllAction(), storeThread),
 	    new ActionWrapper(new ForwardAction(), storeThread),
-	    new ActionWrapper(new DeleteAction(), storeThread)
+	    new ActionWrapper(new DeleteAction(), storeThread),
+	    new ActionWrapper(new PrintAction(), storeThread)
 		};
 	
         Action[] actions = getActions();
@@ -343,6 +345,29 @@ public class MessageProxy {
     }
 
     /**
+     * This sends the message to the printer, first creating an appropriate
+     * print dialog, etc.
+     */
+
+    public void printMessage() {
+	PrinterJob job = PrinterJob.getPrinterJob ();
+	Book book = new Book ();
+	MessagePrinter printer = new MessagePrinter(this);
+	PageFormat pf = job.pageDialog (job.defaultPage ());
+	int count = printer.getPageCount(pf);
+	book.append (printer, pf, count);
+	job.setPageable (book);
+	if (job.printDialog ()) {
+	    try {
+		job.print ();
+	    }
+	    catch (PrinterException ex) {
+		ex.printStackTrace ();
+	    }
+	}
+    }
+
+    /**
      * This creates and shows a PopupMenu for this component.  
      */
     public void showPopupMenu(JComponent component, MouseEvent e) {
@@ -554,6 +579,20 @@ public class MessageProxy {
 		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    deleteMessage();
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	}
+    }
+
+    public class PrintAction extends AbstractAction {
+	PrintAction() {
+	    super("file-print");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+	    printMessage();
 	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
