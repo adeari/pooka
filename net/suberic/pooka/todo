@@ -5,22 +5,27 @@ possible folders, nor just the ones that are open.
 *) fix it so the file (and font and so forth?) editor actually includes
 	the '...' icon.
 
-*) make an option where message windows size to the viewport of the
-desktop pane.
-
-*) add support for jdk1.4
-	-- tabbing between the address components for New Messages
-	-- the MailFileSystemView doesn't seem to work at all (!)
-	-- up and down arrows while composing new messages.
-
-*) support java jnlp (?)
-
 *) a nested message which is of type text/html doesn't get shown on the
 	display.
 
 *) need a way for forward/include html-only messages.
 
-*) come up with a wrapper for spawning external editors on windows.
+*) make an option where message windows size to the viewport of the
+desktop pane.
+
+*) queuing of outgoing mails
+	todo on this:
+	*)  fix the local mail store so that it doesn't necessarily put
+		in an INBOX for everything.  this is so we can set up a
+		local mail store for IMAP users without having to fake
+		out the INBOX for it.
+	*)  add some sort of an administrative api to the NetworkConnection
+		so that the application and the admin tools (the bottom right
+		config) don't have the same restrictions (or lack thereof).
+	*)  change the new user setup so that it configures an outbox
+		automatically.
+	*) make it so there is some way for the NetworkConnection to detect
+		whether or not it's up.
 
 	-- search --
 
@@ -55,6 +60,51 @@ have nothing new in your inbox because it hasn't been d/l'ed yet.
 
 ------------
 
+*) address book:  make it so you can bring up your address book while 
+	addressing messages, and pull choices from there into your
+	address field.
+
+*) attachments available from message list (by default)
+
+*) make the NewAccountPooka make a more fully-featured account; i.e. allow
+	for laptop configurations, sent folder configuration, etc.
+
++++++++
+
+*) add support for jdk1.4
+	-- tabbing between the address components for New Messages
+	-- the MailFileSystemView doesn't seem to work at all (!)
+	-- up and down arrows while composing new messages.
+	-- ssl doesn't work.
+
+*) support java jnlp (?)
+
+*) come up with a wrapper for spawning external editors on windows.
+
+*) get some decent pooka icons.
+	
+*) add support for composing new email messages from an external source,
+say, like reacting to a mailto: link.
+
+*) add a search and replace for the message editors.
+
+*)  check all of my actions and make sure that they are threading 
+properly--both that the email work is being done on the proper thread,
+and that all the gui updates are happening on the EventDispatcher thread.
+
+*) bug:  make sure all of the showError, etc. methods are on the AWTEventThread
+rather than the calling thread.
+
+*)  all MessagingExceptions should be handled correctly, not ignored.  there
+should only be a few of these left.
+
+*) add ability of setting return values by hand (not by UserProfile) on 
+	new messages.
+
+++++++++++++++++++++++++++++++++++++++++++++++++
+
+*)  add documentation and online help.
+
 *)  when you change users for a new message, then, even if the theme 
 doesn't change, you still resize the window.
 
@@ -62,20 +112,6 @@ doesn't change, you still resize the window.
 
 *) read messages don't get font color set properly.  works in jdk1.4.
 
-*) queuing of outgoing mails
-	todo on this:
-	*)  fix the local mail store so that it doesn't necessarily put
-		in an INBOX for everything.  this is so we can set up a
-		local mail store for IMAP users without having to fake
-		out the INBOX for it.
-	*)  add some sort of an administrative api to the NetworkConnection
-		so that the application and the admin tools (the bottom right
-		config) don't have the same restrictions (or lack thereof).
-	*)  change the new user setup so that it configures an outbox
-		automatically.
-
-*) get some decent pooka icons.
-	
 *) add support for external editors, such as emacs.
 
 *) address book/ldap support.
@@ -106,8 +142,6 @@ error:  filterfoldercellrenderer has problems with search forms.
 		pane divider, then it reverts to its original state when you
 		detach/attach the window.
 
-*) add a search and replace for the message editors.
-
 *) expand an unopened store in the folder tree that has folders and
 	subfolders.  connect to the store.  the subfolders close back up.
 
@@ -131,9 +165,6 @@ or stores configured is a big problem.
 use it--or at least so it doesn't matter if it does.  -- only on unix.  
 	doesn't happen on linux with latest glibc?
 
-*) fix the startup bugs:  
-	1)  windows take too long to show up
-
 *) enable voice control
 
 *) make a way to edit the mailcap bindings other than just the 'make default'
@@ -147,16 +178,6 @@ alternate signature methods.
 
 *)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
-
-*)  check all of my actions and make sure that they are threading 
-properly--both that the email work is being done on the proper thread,
-and that all the gui updates are happening on the EventDispatcher thread.
-
-*) bug:  make sure all of the showError, etc. methods are on the AWTEventThread
-rather than the calling thread.
-
-*)  all MessagingExceptions should be handled correctly, not ignored.  there
-should only be a few of these left.
 
 *) make the scrolling work properly for all border cases, such as a single new
 window at -5, -5.
@@ -176,9 +197,6 @@ attachments that you don't want to keep (?)
 
 *) customize settings on folder window--headers, window size.
 
-*) add ability of setting return values by hand (not by UserProfile) on 
-	new messages.
-
 *) make required fields for the gui properties.
 
 *) check it to see if we can still get the same kind of 
@@ -187,7 +205,6 @@ attachments that you don't want to keep (?)
 
 make an update Thread -- sort of done.  need to institute update time.
 
-attachments available from message list.
 
 the Spice is life
 
