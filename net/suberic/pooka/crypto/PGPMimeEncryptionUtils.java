@@ -216,12 +216,54 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     ct.setParameter("micalg", "pgp-sha1");
     MimeMultipart mpart = new MultipartEncrypted(ct);
 
-    System.out.println("part 1 is " );
-    p.writeTo(System.out);
-    System.out.println("done part 1" );
+    /*
+      System.out.println("part 1 is " );
+      p.writeTo(System.out);
+      System.out.println("done part 1" );
+    */
+
+    /*
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      p.writeTo(baos);
+      
+      InputStream is = new ByteArrayInputStream(baos.toByteArray());
+    */
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-    p.writeTo(baos);
+    /*
+    OutputStreamWriter osw = new OutputStreamWriter(baos);
+    BufferedWriter bw = new BufferedWriter(osw);
+
+    java.util.Enumeration hdrLines = ((MimeBodyPart)p).getAllHeaderLines();
+    
+    while (hdrLines.hasMoreElements()) {
+      bw.write((String)hdrLines.nextElement());
+      bw.newLine();
+    }
+
+    bw.newLine();
+    bw.flush();
+
+    p.getDataHandler().writeTo(baos);
+
+    */
+
+    com.sun.mail.util.LineOutputStream los = new com.sun.mail.util.LineOutputStream(baos);
+    OutputStreamWriter osw = new OutputStreamWriter(los);
+
+    BufferedWriter bw = new BufferedWriter(osw);
+
+    java.util.Enumeration hdrLines = ((MimeBodyPart)p).getAllHeaderLines();
+    
+    while (hdrLines.hasMoreElements()) {
+      bw.write((String)hdrLines.nextElement());
+      bw.newLine();
+    }
+
+    bw.newLine();
+    bw.flush();
+
+    p.getDataHandler().writeTo(los);
 
     InputStream is = new ByteArrayInputStream(baos.toByteArray());
     
