@@ -1,5 +1,8 @@
 *) add support for running without any local files.
 	-- support for http: access?
+	    -- fix variable bundle to make sure that we close the stream
+	    -- better error messages
+	    -- test .htaccess connection.
 
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.
@@ -14,6 +17,10 @@
 	(@ sourceforge).
 
 *) add drag and drop
+	*) include message
+	*) move message
+	*) attach file
+	*) save attachment?
 
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
@@ -24,6 +31,8 @@
 	a separate Caching popup menu, you can just say "if caching,
 	add this menu item; if not, don't."
 
+*) make VariableBundle support #include, or something like it.
+
 *) add "view pookarc"
 
 *) add console?
@@ -31,6 +40,8 @@
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
 	message.  read it.  disconnect there.  get a few new messages.
 	reconnect from original pooka.
+
+*) filter for random headers
 
 ------
 

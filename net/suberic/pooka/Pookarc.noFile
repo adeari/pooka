@@ -6,6 +6,7 @@ Pooka.sessionDebug=false
 
 #Pooka.useLocalFiles=true
 Pooka.useLocalFiles=false
+Pooka.httpConfig=true
 
 Pooka.cacheDirectory=~/Mail/pooka
 Pooka.autoCache=true

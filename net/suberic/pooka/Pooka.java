@@ -98,6 +98,11 @@ public class Pooka {
       System.exit(-1);
     }
     
+    if (resources.getProperty("Pooka.httpConfig", "false").equalsIgnoreCase("true")) {
+      net.suberic.pooka.gui.LoadHttpConfigPooka configPooka = new net.suberic.pooka.gui.LoadHttpConfigPooka();
+      configPooka.start();
+    }
+
     StoreManager.setupSSL();
 
     try {
