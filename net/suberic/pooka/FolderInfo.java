@@ -152,6 +152,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 		}
 	    });
 
+	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
+	if (!defProfile.equals(""))
+	    defaultProfile = UserProfile.getProfile(defProfile);
+
 	updateChildren();
 
     }
