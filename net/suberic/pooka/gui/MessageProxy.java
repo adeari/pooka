@@ -155,7 +155,7 @@ public class MessageProxy {
   int displayMode = getDefaultDisplayMode();
 
   // the default actions for this MessageProxy.
-  public Action[] defaultActions;
+  public Action[] defaultActions = null;
   
   /**
    * This class should make it easy for us to sort subjects correctly.
@@ -278,45 +278,6 @@ public class MessageProxy {
     messageInfo.setMessageProxy(this);
     
     columnHeaders = newColumnHeaders;
-    
-    commands = new Hashtable();
-    
-    ActionThread folderThread = messageInfo.getFolderInfo().getFolderThread();
-    
-    defaultActions = new Action[] {
-      new ActionWrapper(new OpenAction(), folderThread),
-      new ActionWrapper(new OpenDefaultDisplayAction(), folderThread),
-      new ActionWrapper(new OpenFullDisplayAction(), folderThread),
-      new ActionWrapper(new OpenRawDisplayAction(), folderThread),
-      new ActionWrapper(new OpenTextDisplayAction(), folderThread),
-      new ActionWrapper(new OpenHtmlDisplayAction(), folderThread),
-      new ActionWrapper(new DefaultOpenAction(), folderThread),
-      new ActionWrapper(new MoveAction(), folderThread),
-      new ActionWrapper(new CopyAction(), folderThread),
-      new ActionWrapper(new ReplyAction(), folderThread),
-      new ActionWrapper(new ReplyAllAction(), folderThread),
-      new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
-      new ActionWrapper(new ReplyAllWithAttachmentsAction(), folderThread),
-      new ActionWrapper(new ForwardAction(), folderThread),
-      new ActionWrapper(new ForwardWithAttachmentsAction(), folderThread),
-      new ActionWrapper(new ForwardAsInlineAction(), folderThread),
-      new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
-      new ActionWrapper(new ForwardQuotedAction(), folderThread),
-      new ActionWrapper(new DeleteAction(), folderThread),
-      new ActionWrapper(new PrintAction(), folderThread),
-      new ActionWrapper(new SaveMessageAction(), folderThread),
-      new ActionWrapper(new CacheMessageAction(), folderThread),
-      new ActionWrapper(new SaveAddressAction(), folderThread),
-      new ActionWrapper(new OpenAsNewAction(), folderThread)
-	};
-    
-    Action[] actions = getActions();
-    if (actions != null) {
-      for (int i = 0; i < actions.length; i++) {
-	Action a = actions[i];
-	commands.put(a.getValue(Action.NAME), a);
-      }
-    }
     
   }
   
@@ -1068,10 +1029,51 @@ public class MessageProxy {
   }
   
   public Action getAction(String name) {
+    if (defaultActions == null) {
+      getActions();
+    }
     return (Action)commands.get(name);
   }
   
-  public Action[] getActions() {
+  public Action[] getActions() { 
+    if (defaultActions == null) {
+      ActionThread folderThread = messageInfo.getFolderInfo().getFolderThread();
+    
+      defaultActions = new Action[] {
+	new ActionWrapper(new OpenAction(), folderThread),
+	new ActionWrapper(new OpenDefaultDisplayAction(), folderThread),
+	new ActionWrapper(new OpenFullDisplayAction(), folderThread),
+	new ActionWrapper(new OpenRawDisplayAction(), folderThread),
+	new ActionWrapper(new OpenTextDisplayAction(), folderThread),
+	new ActionWrapper(new OpenHtmlDisplayAction(), folderThread),
+	new ActionWrapper(new DefaultOpenAction(), folderThread),
+	new ActionWrapper(new MoveAction(), folderThread),
+	new ActionWrapper(new CopyAction(), folderThread),
+	new ActionWrapper(new ReplyAction(), folderThread),
+	new ActionWrapper(new ReplyAllAction(), folderThread),
+	new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
+	new ActionWrapper(new ReplyAllWithAttachmentsAction(), folderThread),
+	new ActionWrapper(new ForwardAction(), folderThread),
+	new ActionWrapper(new ForwardWithAttachmentsAction(), folderThread),
+	new ActionWrapper(new ForwardAsInlineAction(), folderThread),
+	new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
+	new ActionWrapper(new ForwardQuotedAction(), folderThread),
+	new ActionWrapper(new DeleteAction(), folderThread),
+	new ActionWrapper(new PrintAction(), folderThread),
+	new ActionWrapper(new SaveMessageAction(), folderThread),
+	new ActionWrapper(new CacheMessageAction(), folderThread),
+	new ActionWrapper(new SaveAddressAction(), folderThread),
+	new ActionWrapper(new OpenAsNewAction(), folderThread)
+      };
+
+      commands = new Hashtable();
+      
+      for (int i = 0; i < defaultActions.length; i++) {
+	Action a = defaultActions[i];
+	commands.put(a.getValue(Action.NAME), a);
+      }
+      
+    }
     return defaultActions;
   }
   

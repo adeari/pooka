@@ -1,27 +1,34 @@
+*) change over from mbox to maildir or something like it.
+	-- make sure default for new is maildir, not mbox.
+	-- make sure old mbox setups still work
+	-- add configs for both.
+	-- fix list()
+	-- fix updatemsgs
+	-- tag new messages as recent.
+	-- see why sent folder won't open.
+	-- fix id for mfn -- right now, you can get duplicates.
+
 *) make it faster to start up; make a way to open and load all of your open
 folders before opening the other folders.
 
-*) change over from mbox to maildir or something like it.
-
-*) add plugin for spam checker?
-
-*) check moving internal windows code in 1.4
-
-*) add mrpostman support(?)
-
 --
 
+*) check unsubscribe w/subdir.
+
 *) add "view pookarc"
+
+*) add console?
 
 *) fix the problem with things like MissingStartBoundary by getting the
 raw input stream.
 
 *) check why the bcc field sometimes doesn't show the address book icon.
 
-*) check unsubscribe w/subdir.
+------
 
-*) memory leak???
-   -- theme listener!!!
+*) add plugin for spam checker?
+
+*) add mrpostman support(?)
 
 ------
 

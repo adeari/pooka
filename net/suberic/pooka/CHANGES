@@ -1,3 +1,12 @@
+removed the old code that messed with the scroll move during internal pane
+moves.  should be all ok under jdk 1.4.  (?)
+
+fixed a bug where unsubscribing to the last subfolder of a folder doesn't
+work.
+
+modified the MessageProxy class so that we don't create lots and lots of
+unnecessary actions.
+
 fixed a couple of memory leaks
 
 the outbox folder now gets the correct toolbar in preview pane mode.
