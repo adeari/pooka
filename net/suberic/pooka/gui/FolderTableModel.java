@@ -51,9 +51,18 @@ public class FolderTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     try {
-      return ((MessageProxy)data.elementAt(row)).getTableInfo().elementAt(col);
+      MessageProxy mp = (MessageProxy) data.elementAt(row);
+      if (mp == null)
+	return "null";
+      else {
+	if (! mp.isLoaded()) {
+	  return ("loading...");
+	} else {
+	  return ((MessageProxy)data.elementAt(row)).getTableInfo().elementAt(col);
+	}
+      }
     } catch (ArrayIndexOutOfBoundsException ae) {
-      return new Object();
+      return "exception";
     }
   }
   

@@ -312,6 +312,15 @@ public class MessageProxy {
 	getMessageInfo().isSeen();
 	
 	loaded=true;
+	// notify the JTable that this proxy has loaded.
+	/*
+	fireTableInfoLoadedEvent();
+	FolderInfo fi = getFolderInfo();
+	if (fi != null) {
+	  fi.notifyTableInfoLoaded(this);
+	}
+	*/
+
       } catch (MessagingException me) {
       }
     }
@@ -319,7 +328,7 @@ public class MessageProxy {
     matchFilters();
     
   }	
-  
+
   /**
    * This matches the FolderInfo's display filters.
    */
@@ -775,8 +784,12 @@ public class MessageProxy {
     if (filtersMatched)
       return matchingFilters;
     else {
-      matchFilters();
-      return matchingFilters;
+      if (isLoaded()) {
+	matchFilters();
+	return matchingFilters;
+      } else {
+	return new DisplayFilter[0];
+      }
     }
   }
   
