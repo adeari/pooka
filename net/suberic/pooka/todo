@@ -1,9 +1,6 @@
 beta 1
 ---------------
 
-*) bug:  new message notification doesn't work for folders with both messages
-and subfolders.
-
 *) add disconnected imap support.  thoughts:  1)  cache headers so that we
 can make an InternetHeaders object.  2)  cache full messages so we can get
 all the information we need off the Message.  3)  effectively have a 'real'
@@ -11,8 +8,21 @@ message which is what you make changes on.  4)  searches won't work in
 disconnected mode.
 
 *) add pop3/local mail spool support.
+	in progress.  todo:
+	 *)  some messages aren't parsed properly by the mbox provider
+	 *)  the mbox provider isn't safe for mailboxes that are edited by
+	     other processes.
+	 *)  need to add support for keeping the messages in the mailbox
+	     while you have them on disk.
+	 *)  bug:  messages currently aren't being deleted off the pop
+	     server.
+	 *)  update the ui so that you can properly configure pop/mbox/imap
+	     store separately.
 
 *) support for ssl?
+
+*) bug:  new message notification doesn't work for folders with both messages
+and subfolders.
 
 *) bug:  send mail seems to be on the awt event thread.
 
@@ -22,15 +32,11 @@ disconnected mode.
 	-- a little bit of a bug, but not too much.  should probably
 	check the actual message source to see how tabs are sent.
 
-*) there's a bug with the email address removal.  fix it.
-	-- test.  there might not actually be one.
-
 *) bug:  messages that are new for the session (i.e. showed up between the
 last time you ran the client and this time) aren't marked as recent--only
 ones that come in while you're already connected are labelled like that.
 
 *) add address book and alias support -- jph
-
 
 --
 
@@ -58,8 +64,6 @@ screen for each with all the possible information (update time, colors,
 connection information, trash/sent folders, etc.) available, and make it
 so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
-
-*) add the ability to save messages to files.
 
 *) add undo/redo support
 
@@ -111,13 +115,14 @@ entered through a propertyEditor.
 *)  check on file->exit to make sure that there are no unsent messages,
 and give an option on what you want to do with each one if there are any.
 
+*)  make it so file->exit gives you the option for expunging deleted messages
+    from your mailboxes.
+
 *)  check all of my actions and make sure that they are threading 
 properly--both that the email work is being done on the proper thread,
 and that all the gui updates are happening on the EventDispatcher thread.
 
 *)  all MessagingExceptions should be handled correctly, not ignored.
-
-*) delete for multiple messages takes way too long.
 
 *) make the scrolling work properly for all border cases, such as a single new
 window at -5, -5.
@@ -143,7 +148,7 @@ attachments that you don't want to keep (?)
 
 *) name all of your threads.
 
-*)  add color support
+*) add color support
 
 *) customize settings on folder window--headers, window size.
 
@@ -160,4 +165,5 @@ the Spice is life
 
 write profile changes to disk immediately on setting (?)
 
+add support for using an external editor, like emacs.
 
