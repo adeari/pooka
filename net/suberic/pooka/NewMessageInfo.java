@@ -8,6 +8,7 @@ import javax.mail.internet.*;
 
 import net.suberic.pooka.crypto.*;
 import net.suberic.crypto.*;
+import net.suberic.pooka.gui.NewMessageCryptoInfo;
 
 import java.security.Key;
 

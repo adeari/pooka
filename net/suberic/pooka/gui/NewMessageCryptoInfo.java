@@ -1,14 +1,16 @@
-package net.suberic.pooka;
+package net.suberic.pooka.gui;
 
 import java.security.Key;
-
 import java.util.*;
 
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.internet.InternetHeaders;
+import javax.mail.internet.InternetAddress;
 
+import net.suberic.pooka.*;
 import net.suberic.crypto.*;
 
 /**
@@ -40,20 +42,72 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     super(nmi);
   }
 
-  // sign message.
- 
+  // keys
+
+  // the signature key.
+  Key mSignatureKey = null;
+  
+  // the encryption key
+  Key mEncryptionKey = null;
+
   /**
-   * Returns whether we're planning on encrypting this message or not.
+   * The Signature Key for this set of recipients.
+   */
+  public Key getSignatureKey() {
+    return mSignatureKey;
+  }
+  
+  /**
+   * Sets the encryption key for encrypting this message.
+   */
+  public void setSignatureKey(Key pSignatureKey) {
+    mSignatureKey = pSignatureKey;
+  }
+  
+  /**
+   * Sets the encryption key for encrypting this message.
+   */
+  public void setEncryptionKey(Key pEncryptionKey) {
+    mEncryptionKey = pEncryptionKey;
+  }
+  
+  /**
+   * Gets the encryption key we're using for this message.
+   */
+  public Key getEncryptionKey() {
+    return mEncryptionKey;
+  }
+  
+  // sign message.
+  
+  /**
+   * Returns whether we're planning on signing this message or not.
    */
   public int getSignMessage() {
     return mSignMessage;
   }
 
   /**
-   * Sets whether or not we want to encrypt this message.
+   * Sets whether or not we want to sign this message.
    */
   public void setSignMessage(int pSignMessage) {
     mSignMessage = pSignMessage;
+  }
+  
+  // encrypt message.
+  
+  /**
+   * Returns whether we're planning on encrypting this message or not.
+   */
+  public int getEncryptMessage() {
+    return mEncryptMessage;
+  }
+
+  /**
+   * Sets whether or not we want to encrypt this message.
+   */
+  public void setEncryptMessage(int pEncryptMessage) {
+    mEncryptMessage = pEncryptMessage;
   }
   
   // attach keys.
@@ -129,6 +183,29 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     return mRecipientInfos;
   }
 
+  /**
+   * Updates the CryptoRecipientInfos with information from the 
+   * MessageUI.
+   */
+  public boolean updateRecipientInfos(UserProfile profile, InternetHeaders headers) throws javax.mail.internet.AddressException {
+    // just use the defaults for now.
+
+    InternetAddress[] toAddresses = InternetAddress.parse(headers.getHeader("To", ","), false);
+    InternetAddress[] ccAddresses = InternetAddress.parse(headers.getHeader("CC", ","), false);
+    InternetAddress[] bccAddresses = InternetAddress.parse(headers.getHeader("BCC", ","), false);
+
+    Key cryptKey = getEncryptionKey();
+    Key sigKey = getSignatureKey();
+
+    
+    CryptoRecipientInfo info = new CryptoRecipientInfo(sigKey, cryptKey, toAddresses, ccAddresses, bccAddresses);
+    
+    mRecipientInfos = new LinkedList();
+    mRecipientInfos.add(info);
+
+    return true;
+  }
+
   // Recipient/encryption key matches.
 
   /**
@@ -148,6 +225,28 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     Address[] toList = null;
     Address[] ccList = null;
     Address[] bccList = null;
+
+    /**
+     * Creteas a new CryptoRecipieintInfo.
+     */
+    public CryptoRecipientInfo() {
+
+    }
+
+    /**
+     * Creteas a new CryptoRecipieintInfo with the given signatureKey,
+     * encryptionKey, toList, ccList, and bccList.
+     */
+    public CryptoRecipientInfo(Key pSignatureKey, Key pEncryptionKey, Address[] pToList, Address[] pCcList, Address[] pBccList) {
+
+      setEncryptionKey(pEncryptionKey);
+      setSignatureKey(pSignatureKey);
+
+      setRecipients(pToList, Message.RecipientType.TO);
+      setRecipients(pCcList, Message.RecipientType.CC);
+      setRecipients(pBccList, Message.RecipientType.BCC);
+    }
+
 
     /**
      * The recipients for this crypto configuration.

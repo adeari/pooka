@@ -121,14 +121,14 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
    * Returns the current encryption key.
    */
   public Key getEncryptionKey() {
-    return proxy.getNewMessageInfo().getEncryptionKey();
+    return proxy.getCryptoInfo().getEncryptionKey();
   }
 
   /**
    * Sets the current encryption key.
    */
   public void setEncryptionKey(Key pEncryptionKey) {
-    proxy.getNewMessageInfo().setEncryptionKey(pEncryptionKey);
+    proxy.getCryptoInfo().setEncryptionKey(pEncryptionKey);
     updateEncryptionButton();
   }
 
@@ -173,14 +173,14 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
    * Returns the current encryption key.
    */
   public Key getSignatureKey() {
-    return proxy.getNewMessageInfo().getSignatureKey();
+    return proxy.getCryptoInfo().getSignatureKey();
   }
 
   /**
    * Sets the current encryption key.
    */
   public void setSignatureKey(Key pSignatureKey) {
-    proxy.getNewMessageInfo().setSignatureKey(pSignatureKey);
+    proxy.getCryptoInfo().setSignatureKey(pSignatureKey);
     updateSignatureButton();
   }
 
@@ -188,28 +188,28 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
    * Sets whether we're going to encrypt or not.
    */
   public void setEncryptMessage(int encryptValue) {
-    proxy.getNewMessageInfo().setEncryptMessage(encryptValue);
+    proxy.getCryptoInfo().setEncryptMessage(encryptValue);
   }
 
   /**
    * Sets whether we're going to sign or not.
    */
   public void setSignMessage(int signValue) {
-    proxy.getNewMessageInfo().setSignMessage(signValue);
+    proxy.getCryptoInfo().setSignMessage(signValue);
   }
 
   /**
    * Attaches an encryption key.
    */
   public void attachEncryptionKey(Key cryptKey) {
-    proxy.getNewMessageInfo().attachEncryptionKey(cryptKey);
+    proxy.getCryptoInfo().attachEncryptionKey(cryptKey);
   }
 
   /**
    * Removes an encryption key.
    */
   public void removeEncryptionKey(Key cryptKey) {
-    proxy.getNewMessageInfo().removeEncryptionKey(cryptKey);
+    proxy.getCryptoInfo().removeEncryptionKey(cryptKey);
   }
 
   /**

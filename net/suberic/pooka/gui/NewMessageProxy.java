@@ -18,11 +18,17 @@ import net.suberic.pooka.gui.crypto.*;
 public class NewMessageProxy extends MessageProxy {
   Hashtable commands;
 
+  NewMessageCryptoInfo mCryptoInfo = null;
+
   private static Vector allUnsentProxies = new Vector();
+
+  boolean sendLock = false;
   
   public NewMessageProxy(NewMessageInfo newMessage) {
     messageInfo = newMessage;
     messageInfo.setMessageProxy(this);
+
+    mCryptoInfo = new NewMessageCryptoInfo(newMessage);
 
     commands = new Hashtable();
     
@@ -64,21 +70,34 @@ public class NewMessageProxy extends MessageProxy {
    *
    */
   public void send() {
-    if (getNewMessageUI() != null) { 
-      getNewMessageUI().setBusy(true);
-      try {
+    // thread:  AwtEvent
+
+    synchronized(this) {
+      if (sendLock)
+	return;
+      else
+	sendLock = true;
+    }
+    
+    try {
+      if (getNewMessageUI() != null) { 
+	getNewMessageUI().setBusy(true);
 	UserProfile profile = getNewMessageUI().getSelectedProfile();
 	InternetHeaders headers = getNewMessageUI().getMessageHeaders();
 	
 	String messageText = getNewMessageUI().getMessageText();
 	
 	String messageContentType = getNewMessageUI().getMessageContentType();
-	getNewMessageInfo().sendMessage(profile, headers, messageText, messageContentType);
-	getNewMessageInfo().saveToSentFolder(profile);
 	
-      } catch (MessagingException me) {
-	getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+	if (getCryptoInfo().updateRecipientInfos(profile, headers)) {
+	  getNewMessageInfo().sendMessage(profile, headers, getCryptoInfo(), messageText, messageContentType);
+	  getNewMessageInfo().saveToSentFolder(profile);
+	}
       }
+    } catch (MessagingException me) {
+      getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+    } finally {
+      sendLock = false;
     }
   }
 
@@ -282,6 +301,13 @@ public class NewMessageProxy extends MessageProxy {
   }
 
   /**
+   * Returns the CryptoInfo for this proxy.
+   */
+  public NewMessageCryptoInfo getCryptoInfo() {
+    return mCryptoInfo;
+  }
+
+  /**
    * Returns whether or not we should prompt the user to see if they really
    * want to close the window for this message.
    */
@@ -367,10 +393,10 @@ public class NewMessageProxy extends MessageProxy {
     public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageInfo.CRYPTO_YES);
+	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
       
-      if (getNewMessageInfo().getEncryptionKey() == null && getNewMessageUI().getSelectedProfile().getEncryptionKey() == null) {
+      if (getCryptoInfo().getEncryptionKey() == null && getNewMessageUI().getSelectedProfile().getEncryptionKey() == null) {
 	try {
 	  java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
 	  if (cryptKey != null) {
@@ -393,10 +419,10 @@ public class NewMessageProxy extends MessageProxy {
     public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageInfo.CRYPTO_YES);
+	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
       
-      if (getNewMessageInfo().getSignatureKey() == null && (getDefaultProfile() == null || getDefaultProfile().getEncryptionKey() == null)) {
+      if (getCryptoInfo().getSignatureKey() == null && (getDefaultProfile() == null || getDefaultProfile().getEncryptionKey() == null)) {
 	try {
 	  java.security.Key signKey = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."), Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"));
 	  if (csd instanceof NewMessageCryptoDisplay) {
@@ -418,7 +444,7 @@ public class NewMessageProxy extends MessageProxy {
     public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageInfo.CRYPTO_YES);
+	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
       
       try {
@@ -442,7 +468,7 @@ public class NewMessageProxy extends MessageProxy {
     public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageInfo.CRYPTO_YES);
+	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
       
       try {
@@ -466,7 +492,7 @@ public class NewMessageProxy extends MessageProxy {
     public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageInfo.CRYPTO_NO);	((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
+	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_NO);	((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
       }
     }
   }
@@ -480,7 +506,7 @@ public class NewMessageProxy extends MessageProxy {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageInfo.CRYPTO_NO);
+	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_NO);
 	((NewMessageCryptoDisplay) csd).setSignatureKey(null);
       }
     }

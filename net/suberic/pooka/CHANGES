@@ -1,3 +1,5 @@
+put in another check to try to avoid sending multiple copies of one message.
+
 modified the resizing code for message tables so that we now just resize
 the next column.
 

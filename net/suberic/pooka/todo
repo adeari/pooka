@@ -1,3 +1,7 @@
+*) fix getDefaultProfile for MessageProxy.
+
+*) fix jmaildir on windows xp
+
 *) add pgp/gpg support.
   *) auto signature verification.
      means checking keys for email addresses.
