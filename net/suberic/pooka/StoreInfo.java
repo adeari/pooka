@@ -77,22 +77,24 @@ public class StoreInfo implements ValueChangeListener {
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty());
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".folderList");
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".defaultProfile");
-	
-	store.addConnectionListener(new ConnectionAdapter() { 
-		
-		public void disconnected(ConnectionEvent e) {
-		    if (Pooka.isDebug())
-			System.out.println("Store " + getStoreID() + " disconnected.");
-		    if (connected == true) {
-			try {
-			    if (!(store.isConnected()))
-				store.connect();
-			} catch (MessagingException me) {
-			    System.out.println("Store " + getStoreID() + " disconnected and unable to reconnect:  " + me.getMessage());
+
+	if (available) {
+	    store.addConnectionListener(new ConnectionAdapter() { 
+		    
+		    public void disconnected(ConnectionEvent e) {
+			if (Pooka.isDebug())
+			    System.out.println("Store " + getStoreID() + " disconnected.");
+			if (connected == true) {
+			    try {
+				if (!(store.isConnected()))
+				    store.connect();
+			    } catch (MessagingException me) {
+				System.out.println("Store " + getStoreID() + " disconnected and unable to reconnect:  " + me.getMessage());
+			    }
 			}
 		    }
-		}
-	    });
+		});
+	}
 
 	storeThread = new ActionThread(this.getStoreID() + " - ActionThread");
 	storeThread.start();
