@@ -119,8 +119,8 @@ public class SearchTermManager {
 
 		// default case for StringTerms
 
-		    java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Class.forName("java.lang.String"), Boolean.TYPE });
-		    term = (SearchTerm) termConst.newInstance(new Object[] { pattern, new Boolean(ignoreCase) });
+		    java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Class.forName("java.lang.String")});
+		    term = (SearchTerm) termConst.newInstance(new Object[] { pattern});
 
 		    if (Pooka.getProperty(operationProperty, "").equalsIgnoreCase("not")) 
 			term = new NotTerm(term);
@@ -141,6 +141,8 @@ public class SearchTermManager {
 				    
 	    }
 	} catch (Exception e) {
+	    System.out.println("caught Exception generating SearchTerm: " + e);
+	    e.printStackTrace();
 	    return null;
 	}
 	

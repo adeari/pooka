@@ -48,6 +48,8 @@ public class MessageFilter {
 	    newAction.initializeFilter(actionProperty);
 	    return newAction;
 	} catch (Exception e) {
+	    System.out.println("caught exception initializing filter " + e);
+	    e.printStackTrace();
 	}
 	return null;
     }

@@ -4,9 +4,10 @@ import java.util.Vector;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.Pooka;
 
-public class MoveFilterAction {
+public class MoveFilterAction implements FilterAction {
 
-    private FolderInfo targetFolder;
+    private FolderInfo targetFolder = null;
+    private String folderName = null;
 
     public MoveFilterAction() {
     }
@@ -26,7 +27,7 @@ public class MoveFilterAction {
 	for (int i = 0; i < filteredMessages.size(); i++) {
 	    //try {
 	    MessageProxy current = (MessageProxy) filteredMessages.elementAt(i);
-	    current.moveMessage(targetFolder);
+	    current.moveMessage(getTargetFolder());
 	    moved.add(current);
 	    // catch (MessagingException me) {
 	    // failedMove.add(filteredMessage[i];
@@ -40,11 +41,23 @@ public class MoveFilterAction {
      * Initializes the FilterAction from the sourceProperty given.
      * 
      * This takes the .targetFolder subproperty of the given sourceProperty
-     * and initializes the targetFolder from it.
+     * and assigns its value as the folderName String.
      */
     
     public void initializeFilter(String sourceProperty) {
-	String folderID = Pooka.getProperty(sourceProperty + ".targetFolder", "");
-	targetFolder = Pooka.getStoreManager().getFolder(folderID);
+	folderName = Pooka.getProperty(sourceProperty + ".targetFolder", "");
     }
+
+    /**
+     * Returns the targetFolder.  If the targetFolder has not yet been 
+     * loaded. calls Pooka.getStoreManager.getFolder(folderName) to 
+     * cache the targetFolder.
+     */
+    public FolderInfo getTargetFolder() {
+	if (targetFolder == null)
+	    targetFolder = Pooka.getStoreManager().getFolder(folderName);
+
+	return targetFolder;
+    }
+
 }
