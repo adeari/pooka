@@ -20,6 +20,10 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   String disconnectCommand = null;
 
+  boolean disconnectRequested = false;
+
+  boolean disconnectCommandRequested = false;
+
   int status = DISCONNECTED;
 
   public static int CONNECTED = 0;
@@ -29,6 +33,8 @@ public class NetworkConnection implements net.suberic.util.Item {
   public static int UNAVAILABLE = 10;
 
   private java.util.LinkedList listenerList = new java.util.LinkedList();
+
+  private java.util.LinkedList lockList = new java.util.LinkedList();
 
   /**
    * <p>Creates a new NetworkConnection from the given property.</p>
@@ -125,16 +131,31 @@ public class NetworkConnection implements net.suberic.util.Item {
    * @return the new status of the server.
    */
   public int disconnect(boolean runDisconnectCommand) {
-    try {
-      if (runDisconnectCommand) {
-	String postCommand = getDisconnectCommand();
-	if (postCommand != null && postCommand.length() > 0) {
-	  Process p = Runtime.getRuntime().exec(postCommand);
-	  p.waitFor();
-	}
+    synchronized(this) {
+      if (lockList.isEmpty()) {
+	return doDisconnect(runDisconnectCommand);
+      } else {
+	disconnectRequested = true;
+	if (runDisconnectCommand)
+	  disconnectCommandRequested = true;
+
+	return status;
       }
       
+    }
+  }
+
+  private int doDisconnect(boolean runDisconnectCommand) {
+    try {
       if (status != DISCONNECTED) {
+	if (runDisconnectCommand) {
+	  String postCommand = getDisconnectCommand();
+	  if (postCommand != null && postCommand.length() > 0) {
+	    Process p = Runtime.getRuntime().exec(postCommand);
+	    p.waitFor();
+	  }
+	}
+	
 	status = DISCONNECTED;
 	fireConnectionEvent();
       } else {
@@ -143,7 +164,7 @@ public class NetworkConnection implements net.suberic.util.Item {
       System.out.println("Could not run disconnect command:");
       ex.printStackTrace();
     }
-    
+
     return status;
   }
 
@@ -175,6 +196,30 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public int getStatus() {
     return status;
+  }
+
+  /**
+   * <p>Gets an ConnectionLock for this NetworkConnection.
+   */
+  public synchronized ConnectionLock getConnectionLock() {
+    if (getStatus() == CONNECTED) {
+      ConnectionLock cl = new ConnectionLock();
+      lockList.add(cl);
+      return cl;
+    } else
+      return null;
+  }
+
+  /**
+   * <p>Releases the given ConnectionLock.
+   */
+  public synchronized void releaseLock(ConnectionLock cl) {
+    lockList.remove(cl);
+    if (lockList.isEmpty() && disconnectRequested) {
+      doDisconnect(disconnectCommandRequested);
+      disconnectRequested = false;
+      disconnectRequested = false;
+    }
   }
 
   /**
@@ -223,5 +268,22 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public String toString() {
     return getItemID();
+  }
+
+  /**
+   * an object that represents a lock on this connection.  useful if you
+   * have several threads depending on having this connection stay open.
+   */
+  public class ConnectionLock {
+    public ConnectionLock() {
+      
+    }
+
+    /**
+     * Releases this lock.
+     */
+    public void release() {
+      releaseLock(this);
+    }
   }
 }

@@ -2,8 +2,6 @@ next release:
 
 *) add queuing of outgoing mails (?)
 	todo on this:
-	*)  make it so the mail queue automatically flushes when you 
-		connect--if you want it to.
 	*)  make it fault tolerant so that if you still have the old
 		sendMailURL, things still work.
 	*)  fix the local mail store so that it doesn't necessarily put
@@ -11,6 +9,11 @@ next release:
 		local mail store for IMAP users.
 	*)  fix the threading.  sending messages is on the awt thread right
 		now.
+	*)  fix the NewAccountPooka to set up the new system instead of
+		the old system.
+	*)  add some sort of an administrative api to the NetworkConnection
+		so that the application and the admin tools (the bottom right
+		config) don't have the same restrictions (or lack thereof).
 
 *) make search give a popup window saying it's running, or at least something
 	that makes it obvious that _something's_ going on.
@@ -25,6 +28,9 @@ next release:
 *) add support for random SSL certificates.
 	done.  make it so we actually have a local keystore so that 
 	we don't have to ask each time.
+
+*) fix the multiple copies of new messages that sometimes happens when
+we lose and regain our imap connections.
 
 beta 1
 ---------------

@@ -363,7 +363,19 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	System.out.println("calling configureStore()");
       
       configureStore();
+    } else if (changedValue.equals(getStoreProperty() + ".connection")) {
+      connection.removeConnectionListener(this);
+
+      connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
+      if (connection == null) {
+	connection = Pooka.getConnectionManager().getDefaultConnection();
+      }
+      
+      if (connection != null) {
+	connection.addConnectionListener(this);
+      }
     }
+
   }
   
 
@@ -371,32 +383,35 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Called when the status of the NetworkConnection changes.
    */
   public void connectionStatusChanged(NetworkConnection connection, int newStatus) {
-    if (newStatus == NetworkConnection.CONNECTED) {
-      // we've connected.
-      // we probably don't care.
-
-    } else if (newStatus == NetworkConnection.DISCONNECTED) {
-      // we're being disconnected.  close all the connections.
-      try {
-	disconnectStore();
-      } catch (MessagingException me) {
-	if (Pooka.isDebug()) {
-	  System.out.println("Caught exception disconnecting Store " + getStoreID() + ":  " + me);
-	  me.printStackTrace();
+    // mbox folders still don't care.
+    if (!protocol.equalsIgnoreCase("mbox")) {
+      if (newStatus == NetworkConnection.CONNECTED) {
+	// we've connected.
+	// we probably don't care.
+	
+      } else if (newStatus == NetworkConnection.DISCONNECTED) {
+	// we're being disconnected.  close all the connections.
+	try {
+	  disconnectStore();
+	} catch (MessagingException me) {
+	  if (Pooka.isDebug()) {
+	    System.out.println("Caught exception disconnecting Store " + getStoreID() + ":  " + me);
+	    me.printStackTrace();
+	  }
+	  // else ignore
 	}
-	// else ignore
-      }
-
-    } else {
-      // we've been cut off.  note it.
-      try {
-	disconnectStore();
-      } catch (MessagingException me) {
-	if (Pooka.isDebug()) {
-	  System.out.println("Caught exception disconnecting Store " + getStoreID() + ":  " + me);
-	  me.printStackTrace();
+	
+      } else {
+	// we've been cut off.  note it.
+	try {
+	  disconnectStore();
+	} catch (MessagingException me) {
+	  if (Pooka.isDebug()) {
+	    System.out.println("Caught exception disconnecting Store " + getStoreID() + ":  " + me);
+	    me.printStackTrace();
+	  }
+	  // else ignore
 	}
-	// else ignore
       }
     }
   }

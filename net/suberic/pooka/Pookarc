@@ -472,7 +472,7 @@ OutgoingServer.editableFields.editor.smtp.scoped=true
 OutgoingServer.editableFields.editor.smtp.scopeRoot=OutgoingServer.editableFields
 OutgoingServer.editableFields.editor.smtp.propertyType=Composite
 
-OutgoingServer.editableFields.editor.connection=connection:precommand:outbox
+OutgoingServer.editableFields.editor.connection=connection:precommand:sendOnConnect:outbox
 OutgoingServer.editableFields.editor.connection.scoped=true
 OutgoingServer.editableFields.editor.connection.scopeRoot=OutgoingServer.editableFields
 OutgoingServer.editableFields.editor.connection.propertyType=Composite
@@ -482,6 +482,8 @@ OutgoingServer.editableFields.connection.allowedValues=Connection
 OutgoingServer.editableFields.authenticated.propertyType=Boolean
 OutgoingServer.editableFields.authenticated=false
 OutgoingServer.editableFields.password.propertyType=Password
+OutgoingServer.editableFields.sendOnConnect.propertyType=Boolean
+OutgoingServer.editableFields.sendOnConnect=false
 OutgoingServer.editableFields.outbox.propertyType=Folder
 
 OutgoingServer._default.propertyType=List
