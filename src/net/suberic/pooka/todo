@@ -38,6 +38,9 @@ say, like reacting to a mailto: link.
 
 *) add a way to tell what a store's current thread is up to.
 
+*) fix AttachmentPane.openAction from showing dialog on store thread instead
+	of AWTEventThread.
+
 -----
 
 *) test w/gnu javamail -- ???
