@@ -10,6 +10,7 @@ public class UserProfile extends Object {
     String name;
     URLName sendMailURL;
 
+    String sentFolderName;
     FolderInfo sentFolder;
 
     static Vector profileList = new Vector();
@@ -37,7 +38,8 @@ public class UserProfile extends Object {
 		mailProperties.put(profileKey, mainProperties.getProperty("UserProfile." + name + ".mailHeaders." + profileKey, ""));
 	    }
 	    
-	    sentFolder=Pooka.getFolder(mainProperties.getProperty("UserProfile." + name + ".sentFolder", ""));
+	    sentFolderName=mainProperties.getProperty("UserProfile." + name + ".sentFolder", "");
+
 	    sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
 	    profileList.addElement(this);
 	}
@@ -237,11 +239,14 @@ public class UserProfile extends Object {
     }
 
     public FolderInfo getSentFolder() {
-	return sentFolder;
+	if (!sentFolderName.equals(""))
+	    return Pooka.getFolder(sentFolderName);
+	else
+	    return null;
     }
 
-    public void setSentFolder(FolderInfo newValue) {
-	sentFolder = newValue;
+    public void setSentFolderName(String newValue) {
+	sentFolderName = newValue;
     }
 
     public String getSignature() {

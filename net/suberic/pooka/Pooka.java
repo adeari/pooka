@@ -26,6 +26,7 @@ public class Pooka {
 	dateFormatter = new DateFormatter();
 
 	UserProfile.createProfiles(resources);
+
 	resources.addValueChangeListener(UserProfile.vcl, "UserProfile");
 
 	mailcap = new FullMailcapCommandMap();
@@ -53,6 +54,7 @@ public class Pooka {
 	    NewAccountPooka nap = new NewAccountPooka(panel.getMessagePanel());
 	    nap.start();
 	}
+	//UserProfile.loadAllSentFolders();
     }
 
     static public String getProperty(String propName, String defVal) {
@@ -106,11 +108,7 @@ public class Pooka {
      * This returns the StoreInfo which corresponds with the storeName.
      */
     static public StoreInfo getStore(String storeName) {
-	MainPanel mp = getMainPanel();
-	if (mp != null && mp.getFolderPanel() != null)
-	    return mp.getFolderPanel().getStore(storeName);
-
-	return null;
+	return StoreInfo.getStoreInfo(storeName);
     }
 
     /**
@@ -118,15 +116,21 @@ public class Pooka {
      * The folderName should be in the form "/storename/folder/subfolder".
      */
     static public FolderInfo getFolder(String folderName) {
+	System.out.println("getting Folder " + folderName);
 	if (folderName.length() < 1) {
 	    int divider = folderName.indexOf('/', 1);
 	    if (divider > 0) {
 		String storeName = folderName.substring(1, divider);
 		StoreInfo store = getStore(storeName);
-		if (store != null)
+		if (store != null) {
+		    System.out.println("store != null; getting child " + folderName.substring(divider + 1) + " on store " + storeName);
 		    return store.getChild(folderName.substring(divider +1));
+		} else
+		    System.out.println("getStore on " + storeName + " returned null.");
 	    }
 	}
+
+	System.out.println("returning null.");
 	return null;
     }
 }
