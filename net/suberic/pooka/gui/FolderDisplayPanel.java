@@ -313,6 +313,10 @@ public class FolderDisplayPanel extends JPanel {
 
 	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
 	    Pooka.getMainPanel().refreshActiveMenus();
+	    getFolderInfo().setNewMessages(false);
+	    FolderNode fn = getFolderInfo().getFolderNode();
+	    if (fn != null)
+		fn.getParentContainer().repaint();
 	}
     }
 

@@ -7,11 +7,9 @@ immediate todo:
 	both desktop and prevew settings.)
 	 -- done for 1.2.2; don't have 1.3 on here.
 
-	2)  add the delete ui and make it actually controllable by a checkbox.
+	2)  add a way to move directly to a message.
 
-	3)  add a way to move directly to a message.
-
-	4)  work out a test case for the JFileChooser bug.
+	3)  work out a test case for the JFileChooser bug.
 
 	bug:  openwith doesn't work under preview.
 
@@ -39,8 +37,6 @@ a big ui overhaul.
 *) add ability to reply/forward with attachments, or as inline, and so forth
 
 *) add copying messages.
-
-*) add delete/expunge support, or at least enable it.  
 
 *) add undo/redo support
 

@@ -31,6 +31,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
     private boolean enabled;
 
+    private Action[] defaultActions;
+
     /**
      * Creates an empty PreviewFolderPanel.
      */
@@ -58,6 +60,10 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
 	this.add("Center", folderDisplay);
 	this.add("South", folderStatusBar);
+
+	defaultActions = new Action[] {
+	    new ActionWrapper(new ExpungeAction(), folder.getFolderThread())
+		};
     }
 
     /**
@@ -68,6 +74,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     public void openFolderDisplay() {
 	if (displayedFolder != null) 
 	    contentPanel.showFolder(displayedFolder.getFolderID());
+	setEnabled(true);
     }
 
     /**
@@ -81,6 +88,17 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    displayedFolder.setFolderDisplayUI(null);
 	displayedFolder = null;
 	setEnabled(false);
+    }
+
+    /**
+     * This expunges all the messages marked as deleted in the folder.
+     */
+    public void expungeMessages() {
+	try {
+	    getFolderInfo().getFolder().expunge();
+	} catch (MessagingException me) {
+	    showError(Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
+	}   
     }
 
     /**
@@ -267,19 +285,36 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      */
     public Action[] getActions() {
 	if (enabled) {
-	    Action[] returnValue = null;
+	    Action[] returnValue = defaultActions;
 
-	    if (getFolderDisplay() != null)
-		returnValue = getFolderDisplay().getActions();
-	    
+	    if (getFolderDisplay() != null) {
+		if (returnValue == null) {
+		    returnValue = getFolderDisplay().getActions();
+		} else {
+		    returnValue = TextAction.augmentList(returnValue, getFolderDisplay().getActions());
+		}
+	    } 
+
 	    return returnValue;
 
-	} else
+	} else {
 	    return null;
+	}
     }
 
     public FolderDisplayPanel getFolderDisplay() {
 	return folderDisplay;
+    }
+
+    public class ExpungeAction extends AbstractAction {
+
+	ExpungeAction() {
+	    super("message-expunge");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    expungeMessages();
+	}
     }
 }
 
