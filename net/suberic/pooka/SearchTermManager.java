@@ -1,3 +1,4 @@
+
 package net.suberic.pooka;
 import javax.mail.search.*;
 import javax.mail.*;
@@ -13,9 +14,11 @@ public class SearchTermManager {
     Vector termLabels;
     HashMap labelToOperationMap;
     Vector operationLabels;
+    HashMap typeToLabelMap;
 
     Class stringTermClass;
     Class flagTermClass;
+    Class dateTermClass;
     
     String sourceProperty;
 
@@ -32,6 +35,7 @@ public class SearchTermManager {
 	try {
 	    flagTermClass = Class.forName("javax.mail.search.FlagTerm");
 	    stringTermClass = Class.forName("javax.mail.search.StringTerm");
+	    dateTermClass = Class.forName("javax.mail.search.DateTerm");
 	} catch (Exception e) { }
 	createTermMaps(propertyName + ".searchTerms");
 	createOperationMaps(propertyName + ".operations");
@@ -144,13 +148,15 @@ public class SearchTermManager {
 	try {
 	    String className = Pooka.getProperty(searchProperty + ".class", "");
 	    Class stClass = Class.forName(className);
+
+	    // ****** Create a StringTerm.
+
 	    if (stringTermClass.isAssignableFrom(stClass)) {
 
 		boolean ignoreCase = Pooka.getProperty(searchProperty + ".ignoreCase", "false").equals("true");
 		
 		// check for the special cases.
 		if (className.equals("javax.mail.search.RecipientStringTerm")) {
-
 		    String recipientType = Pooka.getProperty(searchProperty + ".recipientType", "to");
 		    if (recipientType.equalsIgnoreCase("to"))
 			term = new RecipientStringTerm(javax.mail.Message.RecipientType.TO, pattern);
@@ -158,43 +164,66 @@ public class SearchTermManager {
 			term = new RecipientStringTerm(javax.mail.Message.RecipientType.CC, pattern);
 		    else if (recipientType.equalsIgnoreCase("toorcc"))
 			term = new OrTerm(new RecipientStringTerm(javax.mail.Message.RecipientType.CC, pattern), new RecipientStringTerm(javax.mail.Message.RecipientType.TO, pattern));
-
-
-		    if (Pooka.getProperty(operationProperty, "").equalsIgnoreCase("not")) 
-			term = new NotTerm(term);
-			
+		    
+		    
 		} else if (className.equals("javax.mail.search.HeaderTerm")) {
 
 		    term = new HeaderTerm(Pooka.getProperty(searchProperty + ".header", ""), pattern);
-		    if (Pooka.getProperty(operationProperty, "").equalsIgnoreCase("not")) 
-			term = new NotTerm(term);
-
 
 		} else {
-
 		// default case for StringTerms
 
 		    java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Class.forName("java.lang.String")});
 		    term = (SearchTerm) termConst.newInstance(new Object[] { pattern});
+		    
+		}
+	    } 
+	    
+	    // ********** Create a FlagTerm
 
-		    if (Pooka.getProperty(operationProperty, "").equalsIgnoreCase("not")) 
-			term = new NotTerm(term);
+	    else if (flagTermClass.isAssignableFrom(stClass)) {
+		term = new FlagTerm(getFlags(Pooka.getProperty(searchProperty + ".flag", "")), Pooka.getProperty(searchProperty + ".value", "true").equalsIgnoreCase("true"));
+	    } 
+
+	    // ********** Create a DateTerm
+
+	    else if (dateTermClass.isAssignableFrom(stClass)) {
+
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat();
+		java.util.Date compareDate = null;
+		try {
+		    compareDate = sdf.parse(pattern);
+		} catch (java.text.ParseException pe) {
 
 		}
-	    } else if (flagTermClass.isAssignableFrom(stClass)) {
-		
-		term = new FlagTerm(getFlags(Pooka.getProperty(searchProperty + ".flag", "")), Pooka.getProperty(searchProperty + ".value", "true").equalsIgnoreCase("true"));
-		if (Pooka.getProperty(operationProperty, "").equalsIgnoreCase("not")) 
-		    term = new NotTerm(term);
-		
-	    } else {
-		
+
+		int comparison = 0;
+
+		String operationPropertyType = Pooka.getProperty(operationProperty, "");
+		if (operationPropertyType.equalsIgnoreCase("equals") || operationPropertyType.equalsIgnoreCase("notEquals"))
+		    comparison = DateTerm.EQ;
+		else if (operationPropertyType.equalsIgnoreCase("is before"))
+		    comparison = DateTerm.LT;
+		else if (operationPropertyType.equalsIgnoreCase("is after"))
+		    comparison = DateTerm.GT;
+		    
+		java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Integer.TYPE , Class.forName("java.util.Date")});
+		term = (SearchTerm) termConst.newInstance(new Object[] { new Integer(comparison), compareDate });
+	    } 
+
+	    // ********** Default Case, no term known.
+
+	    else {
 		// default case for any term.
 		term = (SearchTerm) stClass.newInstance();
-		if (Pooka.getProperty(operationProperty, "").equalsIgnoreCase("not")) 
-		    term = new NotTerm(term);
-				    
 	    }
+	    
+	    // *********** Handles not cases.
+
+	    String operationPropertyValue = Pooka.getProperty(operationProperty, "");
+	    if (operationPropertyValue.equalsIgnoreCase("not") || operationPropertyValue.equalsIgnoreCase("notEquals"))
+		term = new NotTerm(term);
+	    
 	} catch (Exception e) {
 	    System.out.println("caught Exception generating SearchTerm: " + e);
 	    e.printStackTrace();
