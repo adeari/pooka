@@ -30,7 +30,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // folder is available, but only should be accessed during the checkFolder
     // phase.
-
     public static int PASSIVE = 10;
 
     // folder is running in disconnected mode; only act on the cached 
@@ -119,8 +118,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	createFilters();
 
 	resetDefaultActions();
-	
-	
     }
 
 
@@ -1197,6 +1194,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	if (preferred_state < CLOSED)
 	    openFolder(Folder.READ_WRITE);
+
     }
 
     /**
@@ -1225,9 +1223,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * Pooka.openFoldersOnConnect is set to true.
      */
 
-    public void openAllFolders(int mode) {
+    public void openAllFolders() {
 	try {
-	    openFolder(mode);
+	    openToPreferredState();
 	} catch (MessagingException me) {
 	}
 
@@ -1369,10 +1367,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public FolderTableModel getFolderTableModel() {
-	if (folderTableModel == null) 
-	    return loadAllMessages();
-	else 
-	    return folderTableModel;
+	return folderTableModel;
     }
 
     public void setFolderTableModel(FolderTableModel newValue) {
