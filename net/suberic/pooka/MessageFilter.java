@@ -2,6 +2,7 @@ package net.suberic.pooka;
 import javax.mail.*;
 import javax.mail.search.SearchTerm;
 import net.suberic.pooka.gui.MessageProxy;
+import net.suberic.pooka.filter.FilterAction;
 
 /**
  * This represents a MessageFilter.  It contains a SearchTerm and an Action
