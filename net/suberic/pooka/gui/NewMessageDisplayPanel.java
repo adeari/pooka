@@ -138,11 +138,22 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
 	    inputRow.add(hdrLabel);
 
-	    try {
+	    /*
+	    if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC")) {
+	      try {
+		inputField = new AddressEntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+	      } catch (MessagingException me) {
+		inputField = new net.suberic.util.swing.AddressTextArea(1, 30);
+	      }
+	    } else {
+	    */
+	      try {
 		inputField = new net.suberic.util.swing.EntryTextArea(((NewMessageProxy)msg).getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
-	    } catch (MessagingException me) {
+	      } catch (MessagingException me) {
 		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
-	    }
+	      }
+	      //}
+
 
 	    inputField.setLineWrap(true);
 	    inputField.setWrapStyleWord(true);

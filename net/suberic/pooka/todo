@@ -1,9 +1,7 @@
 beta 1
 ---------------
 
-*) pop3 folder doesn't come up properly. (done)
-
-*) add support for proxy server (done)
+*) add address book/ldap support.
 
 *) add queuing of outgoing emails.
 
