@@ -28,6 +28,8 @@ public abstract class MessageDisplayPanel extends JPanel {
   protected boolean hasAttachment = false;
   protected ConfigurableKeyBinding keyBindings;
   
+  protected Matcher currentMatcher = null;
+
   //<sigh>
   JScrollPane attachmentScrollPane;
   
@@ -58,20 +60,53 @@ public abstract class MessageDisplayPanel extends JPanel {
   /**
    * This finds the given regular expression in the displayed page.
    */
-  public int findRegexp(String regString) {
+  public void findRegexp(String regString) {
+    boolean matchSucceeded = doFindRegexp(regString);
+    System.out.println("matchSucceeded = " + matchSucceeded);
+    if (matchSucceeded) {
+      int start = currentMatcher.start();
+      int end = currentMatcher.end();
+      editorPane.setCaretPosition(start);
+      editorPane.moveCaretPosition(end);
+    }
+  }
+
+  /**
+   * Does the work of finding the next match.
+   */
+  protected boolean doFindRegexp(String regString) {
+    if (currentMatcher != null) {
+      String origString = currentMatcher.pattern().pattern();
+      if (origString.equals(regString)) {
+	return doFindNext();
+      }
+    }
+
+    // otherwise make a new pattern/matcher.
+
     Pattern p = Pattern.compile(regString);
     javax.swing.text.Document currentDoc = editorPane.getDocument();
+
     try {
-      Matcher m = p.matcher(currentDoc.getText(0, currentDoc.getLength()));
-      if (m.find()) {
-	return m.start();
-      }
+      currentMatcher = p.matcher(currentDoc.getText(0, currentDoc.getLength()));
+      return currentMatcher.find();
     } catch (Exception e) {
 
     }
+    
+    return false;
 
-    return -1;
+  }
 
+  /**
+   * Matches the next value.
+   */
+  protected boolean doFindNext() {
+    if (currentMatcher != null) {
+      return currentMatcher.find();
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -121,88 +156,88 @@ public abstract class MessageDisplayPanel extends JPanel {
     return retval;
   }
 
-    /**
-     * This sets the default font for the editorPane to a font determined
-     * by the MessageWindow.editorPane.font (.name and .size) properties.
-     * 
-     * I believe that if the font cannot be found or instantiated, 
-     * nothing should happen, but i'm not sure.  :)
-     */
-    public void setDefaultFont(JEditorPane jep) {
-      Font f = null;
-      try {
-	net.suberic.util.swing.ThemeSupporter ts = (net.suberic.util.swing.ThemeSupporter)getMessageUI();
-	net.suberic.util.swing.ConfigurableMetalTheme cmt = (net.suberic.util.swing.ConfigurableMetalTheme) ts.getTheme(Pooka.getUIFactory().getPookaThemeManager());
-	if (cmt != null) {
-	  f = cmt.getMonospacedFont();
-	}
-      } catch (Exception e) {
-	// if we get an exception, just ignore it and use the default.
+  /**
+   * This sets the default font for the editorPane to a font determined
+   * by the MessageWindow.editorPane.font (.name and .size) properties.
+   * 
+   * I believe that if the font cannot be found or instantiated, 
+   * nothing should happen, but i'm not sure.  :)
+   */
+  public void setDefaultFont(JEditorPane jep) {
+    Font f = null;
+    try {
+      net.suberic.util.swing.ThemeSupporter ts = (net.suberic.util.swing.ThemeSupporter)getMessageUI();
+      net.suberic.util.swing.ConfigurableMetalTheme cmt = (net.suberic.util.swing.ConfigurableMetalTheme) ts.getTheme(Pooka.getUIFactory().getPookaThemeManager());
+      if (cmt != null) {
+	f = cmt.getMonospacedFont();
       }
-
-      if (f == null) {
-	String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
-	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
-	
-	f = new Font(fontName, Font.PLAIN, fontSize);
-      }
-
-      if (f != null)
-	jep.setFont(f);
+    } catch (Exception e) {
+      // if we get an exception, just ignore it and use the default.
+    }
+    
+    if (f == null) {
+      String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
+      int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
       
+      f = new Font(fontName, Font.PLAIN, fontSize);
     }
-
-    /**
-     * This sets the size of the MessageDisplayPanel to a reasonable
-     * default value.
-     *
-     * This method should be implemented by subclasses.
-     */
-    public abstract void sizeToDefault();
-
-    public UserProfile getDefaultProfile() {
-	if (getMessageProxy() != null)
-	    return getMessageProxy().getDefaultProfile();
-	else
-	    return null;
-    }
-
-    public JTextPane getEditorPane() {
-	return editorPane;
-    }
-
-    public MessageProxy getMessageProxy() {
-      if (msgUI != null)
-	return msgUI.getMessageProxy();
-      else
-	return null;
-    }
-
-    public MessageUI getMessageUI() {
-	return msgUI;
-    }
-
-    public void setMessageUI(MessageUI newValue) {
-	msgUI = newValue;
-    }
-
-    public String getMessageText() {
-	return getEditorPane().getText();
-    }
-
-    public String getMessageContentType() {
-	return getEditorPane().getContentType();
-    }
-
-    public AttachmentPane getAttachmentPanel() {
-	return attachmentPanel;
-    }
-
-    public Action[] getActions() {
-	return null;
-    }
-
-    public JSplitPane getSplitPane() {
-	return splitPane;
-    }
+    
+    if (f != null)
+      jep.setFont(f);
+    
+  }
+  
+  /**
+   * This sets the size of the MessageDisplayPanel to a reasonable
+   * default value.
+   *
+   * This method should be implemented by subclasses.
+   */
+  public abstract void sizeToDefault();
+  
+  public UserProfile getDefaultProfile() {
+    if (getMessageProxy() != null)
+      return getMessageProxy().getDefaultProfile();
+    else
+      return null;
+  }
+  
+  public JTextPane getEditorPane() {
+    return editorPane;
+  }
+  
+  public MessageProxy getMessageProxy() {
+    if (msgUI != null)
+      return msgUI.getMessageProxy();
+    else
+      return null;
+  }
+  
+  public MessageUI getMessageUI() {
+    return msgUI;
+  }
+  
+  public void setMessageUI(MessageUI newValue) {
+    msgUI = newValue;
+  }
+  
+  public String getMessageText() {
+    return getEditorPane().getText();
+  }
+  
+  public String getMessageContentType() {
+    return getEditorPane().getContentType();
+  }
+  
+  public AttachmentPane getAttachmentPanel() {
+    return attachmentPanel;
+  }
+  
+  public Action[] getActions() {
+    return null;
+  }
+  
+  public JSplitPane getSplitPane() {
+    return splitPane;
+  }
 }

@@ -29,7 +29,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   private DisplayStyleComboBox headerCombo = null;
 
   Action[] defaultActions = new Action[] {
-    new AttachmentPanelAction()
+    new AttachmentPanelAction(),
+    new TestAction()
   };
 
   /**
@@ -478,6 +479,20 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       if (attachmentPanel != null) {
 	attachmentPanel.requestFocus();
       }
+    }
+  }
+
+  /**
+   * Selects the Attachment panel.
+   */
+  public class TestAction extends AbstractAction {
+    TestAction() {
+      super("file-test");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.out.println("finding regexp.");
+      findRegexp("a");
     }
   }
 
