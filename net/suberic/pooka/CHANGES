@@ -1,3 +1,6 @@
+made it so doing an open action on the folder node actually makes sure
+that the Folder is in an OPEN state.
+
 changed the display of newly received messages.  now if you try to display
 messages before they're loaded, instead of loading the messages on the
 AWT thread, you just show 'loading' for each frame.  when the table info
