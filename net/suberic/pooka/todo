@@ -4,14 +4,20 @@ alpha 2
 *)  add a way to edit the mailcap file.  this should be doable both from
 a menu option and from the 'open with' dialog.
 
-*) create a Trash folder.  add a ui.  you should be able to:  create a new
-folder; assign a folder to be a trash folder for a store; see an icon that
-says [trash with stuff | empty trash folder]; empty the trash.
+*)  get JFileChooser to work with the mail stores.  sort of done; still
+	need to deal with disconnection issues and return value issues.
 
-*) create a Sent folder.  should be able to assign one just as with the
-trash folder, except maybe the sent folder should be by user profile rather
-than by store.  sent folder needs to have a different display--both a 
-different icon and different folder information (to: instead of from:).
+*) create a Trash folder.  done.  
+	add a ui.  -- not done.  jfc above, plus 'empty trash' option, 
+		entry on store panel for trash folder, icon, fewer other
+		opens (unsubscribe, especially).
+	icon.  also, make it so it doesn't get new message notification.
+
+*) create a Sent folder.  done.
+	need to add ui as above
+	need to fix display (sent date is too big.)
+	need to fix sent date--right now, it isn't being set.
+	need to check to see when messages are actually received there.
 
 *) fix the signature
 
@@ -20,17 +26,40 @@ up for top-level folders?).
 
 *) fix marc's ClassCastException.
 
-*) add a way to notify users of 'new' messages.
+*) add a way to notify users of 'new' messages. -- sort of done.  need to make
+	it nicer, maybe listing new messages on the title, and use italics
+	or something other than * * in the folderPanel.
+	-- also, as above, make sure these things don't show for the sent and
+	trash folders.
+	-- also, check the update times for the selections of windows; i think
+	that the FolderNodes aren't being redrawn on time.
 
 *) add keyboard control for everything, including switching between internal
 frames and the folderPanel.  oh, and making it so you can get at the menus.
+	-- most of that's done.  need to check on alt+f under jdk 1.2.2, and
+	...  probably just do another run through for all the options before
+	we finish.
 
 *) fix the addNotify problems--i'm honestly not sure exactly how they need
-to be fixed, but they certainly do.
+to be fixed, but they certainly do.  -- done for the FolderWindow; need to
+	do it for the MessageWindow/NewMessageWindow (sizing).
 
 *) add the ability to keep track of which folders are to be opened on 
 startup.  also add a flag to the startup to override this, so that nothing
-gets opened on start for that session.
+gets opened on start for that session.  -- done; need to add flag.  also need
+to explore why, if the folderList is set to empty, you can't override it 
+without removing the entry from the file itself.
+
+*) bug:  fix what happens if you try sending out a bad email.  also, while
+	we're at it, make sure that the from: and smtp: information get 
+	updated live.
+
+*) bug:  check the listener on the closing of the main window--it doesn't
+	seem to be working properly.
+
+*) bug:  check the internal frame / window focus issue--make sure that 
+	the selected frame always has keyboard focus, and that the keyboard
+	focus defaults to a reasonable place.
 
 ?????? alpha 2 or not ??????
 ----------------------------
@@ -60,12 +89,6 @@ a big ui overhaul.
 
 *)  fix the out of memory problems--only load a certain amount of large
 messages.  for that matter, maybe also do an optimizeit audit.
-
-*)  make the FolderChooser less clunky.  add the ability to create and
-remove Folders.
-
-*)  make the subscribe/unsubscribe folder functionality more easilty
-available.
 
 *)  implement a way to make a custom FolderCellRenderer for a property.
 
