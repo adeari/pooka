@@ -10,6 +10,9 @@ import net.suberic.pooka.UserProfile;
 import java.awt.event.ActionEvent;
 import java.io.*;
 
+/**
+ * This class represents a new message that is being written.
+ */
 public class NewMessageProxy extends MessageProxy {
     Hashtable commands;
 
@@ -87,8 +90,10 @@ public class NewMessageProxy extends MessageProxy {
 	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
 		    try {
-			if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null)
+			if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
+			    getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
 			    profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
+			}
 		    } catch (MessagingException me) {
 			getMessageWindow().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 		    }
