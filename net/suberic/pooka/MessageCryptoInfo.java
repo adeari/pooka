@@ -143,7 +143,7 @@ public class MessageCryptoInfo {
    */
   public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     if (recheck || ! hasCheckedSignature()) {
-      EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils((MimeMessage) mMsgInfo.getMessage());
+      EncryptionUtils cryptoUtils = getEncryptionUtils();
       mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)mMsgInfo.getMessage(), key);
       mCheckedSignature = true;
     }
@@ -251,6 +251,25 @@ public class MessageCryptoInfo {
     } catch (Exception e) {
     }
     return false;
+  }
+
+  /**
+   * Extracts the (public) keys from the message.
+   */
+  public Key[] extractKeys() throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+    synchronized(this) {
+      AttachmentBundle bundle = mMsgInfo.getAttachmentBundle();
+      List attachmentList = bundle.getAttachmentsAndTextPart();
+      for (int i = 0; i < attachmentList.size(); i++) {
+	Object o = attachmentList.get(i);
+	if (o instanceof KeyAttachment) {
+	  EncryptionUtils utils = getEncryptionUtils();
+	  return ((KeyAttachment) o).extractKeys(utils);
+	}
+      }
+    }
+
+    return null;
   }
 
   /**

@@ -604,7 +604,42 @@ public class MessageProxy {
   public void importKeys() {
     MessageInfo info = getMessageInfo();
     if (info != null) {
-      
+      MessageCryptoInfo cInfo = info.getCryptoInfo();
+      if (cInfo != null) {
+	try {
+	  java.security.Key[] newKeys = cInfo.extractKeys();
+	  if (newKeys != null && newKeys.length > 0) {
+	    // check to see if these match our current keys.
+	    String changedMessage = Pooka.getProperty("Pooka.crypto.importKeysMessage", "Import the following keys:") + "\n";
+	    
+	    for (int i = 0; i < newKeys.length; i++) {
+	      // FIXME check to see if changed.
+	      changedMessage = changedMessage + newKeys[i].toString() + "\n";
+	    }
+	    
+	    int doImport = JOptionPane.NO_OPTION;
+
+	    if (getMessageUI() != null)
+	      doImport = getMessageUI().showConfirmDialog(changedMessage, Pooka.getProperty("Pooka.crypto.importKeysTitle", "Import keys"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+	    else
+	      doImport = Pooka.getUIFactory().showConfirmDialog(changedMessage, Pooka.getProperty("Pooka.crypto.importKeysTitle", "Import keys"), JOptionPane.YES_NO_OPTION);
+
+	    if (doImport == JOptionPane.YES_OPTION) {
+	      for (int i = 0; i < newKeys.length; i++) {
+		System.err.println("importing key " + newKeys[i]);
+	      }
+	    }
+	    
+	  } else {
+	    if (getMessageUI() != null)
+	      getMessageUI().showMessageDialog("No keys found.", "No keys found");
+	    else
+	      Pooka.getUIFactory().showMessage("No keys found.", "No keys found");
+	  }
+	} catch (Exception e) {
+	  showError(Pooka.getProperty("Error.encryption.keyExtractionFailed", "Failed to extract keys."), e);
+	}
+      }
     }
   }
 

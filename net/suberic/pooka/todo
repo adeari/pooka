@@ -62,6 +62,8 @@ bugs:
 
 *) bounce messages
 
+*) filtering multiple message should show a status.
+
 *) add support for running without any local files.
 	-- support for http: access?
 	    -- fix variable bundle to make sure that we close the stream
@@ -74,7 +76,7 @@ bugs:
 *) some case(s) in which we're not generating the attachment bundle 
 	correctly?  one instance is how we're handling multipart/alternative
 	entries that don't actually have multiple parts.
-	soo pooka_problems blob
+	see pooka_problems blob
 
 *) still an error in connecting, disconnecting, getting a new messages/deleting
 	old messages, reconnecting.
