@@ -5,7 +5,7 @@ import java.awt.print.*;
 import java.awt.*;
 import javax.mail.internet.MimeMessage;
 import javax.swing.*;
-import javax.swing.text.View;
+import javax.swing.text.*;
 import javax.mail.MessagingException;
 
 public class MessagePrinter implements Printable {
@@ -69,9 +69,9 @@ public class MessagePrinter implements Printable {
     jtp.setVisible(true);
 
     // don't scale below 1.
-    mScale = Math.min(1,pageWidth/panelWidth);
+    //mScale = Math.min(1,pageWidth/panelWidth);
 
-    //mScale = 1;
+    mScale = 1;
     
     int counter = 0;
 
@@ -113,9 +113,14 @@ public class MessagePrinter implements Printable {
       Rectangle currentPage = new Rectangle();
       currentPage.setRect(0d, pageStart, pageWidth, scaledPageHeight);
 
+      System.err.println("page = " + breakList.size());
+      System.err.println("allocation = " + allocation);
+      System.err.println("currentPage = " + currentPage);
+      System.err.println("view.getAllocation().getBounds() = " + view.getChildAllocation(0, allocation).getBounds());
       pageExists = calculatePageBreak(view, allocation, currentPage);
 
       if (pageExists) {
+	//pageEnd = pageEnd + 3;
 	breakList.add(new Double(pageStart * mScale));
       }
     }
@@ -150,14 +155,26 @@ public class MessagePrinter implements Printable {
         if ((allocation.getBounds().getHeight() > currentPage.getHeight()) &&
 	    (allocation.intersects(currentPage))) {
         } else {
-          if (allocation.getBounds().getY() >= currentPage.getY()) {
-            if (allocation.getBounds().getMaxY() <= currentPage.getMaxY()) {
+          if (allocation.getBounds().getY() >= currentPage.getY() && allocation.getBounds().getY() < pageEnd) {
+	    /*
+	    System.err.println("pageEnd = " + pageEnd + "; allocation.getBounds() = " + allocation.getBounds() + ", allocation.getMaxY() = " + allocation.getBounds().getMaxY() + ", allocation.getMaxX() = " + allocation.getBounds().getMaxX());
+	    if (view instanceof GlyphView) {
+	      GlyphView glView = (GlyphView) view;
+	      int begin = glView.viewToModel((float) (allocation.getBounds().getX()), (float) (allocation.getBounds().getY()), allocation.getBounds());
+	      int end = glView.viewToModel((float) (allocation.getBounds().getX() + allocation.getBounds().getWidth()), (float) (allocation.getBounds().getY() + allocation.getBounds().getHeight()), allocation.getBounds());
+	      System.err.println("view.getText(" + begin + ", " + end + ") = " + glView.getText(begin, end).toString());
+	    }
+	    */
+
+            if (allocation.getBounds().getMaxY() <= pageEnd) {
+	      // don't bother--we're fine.
             } else {
               if (allocation.getBounds().getY() < pageEnd) {
                 pageEnd = allocation.getBounds().getY();
+		//System.err.println("changing pageEnd from " + pageEnd + " to " + allocation.getBounds().getY());
               }
             }
-          }
+          }	  
         }
       }
     }
@@ -230,6 +247,9 @@ public class MessagePrinter implements Printable {
   public void createTextPane() throws MessagingException {
     jtp = new JTextPane();
 
+    java.awt.Insets newMargin = new java.awt.Insets(0,0,0,0);
+    jtp.setMargin(newMargin);
+
     StringBuffer messageText = new StringBuffer();
 
     String content = null;
@@ -289,6 +309,15 @@ public class MessagePrinter implements Printable {
     if (content != null)
       messageText.append(content);
 
+    // pull in the correct font.
+    String fontName = Pooka.getProperty("MessageWindow.editorPane.printing.font.name", "monospaced");
+    int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.printint.font.size", "10"));
+      
+    Font f = new Font(fontName, Font.PLAIN, fontSize);
+    
+    if (f != null)
+      jtp.setFont(f);
+    
     jtp.setContentType(contentType);
     jtp.setText(messageText.toString());
 
