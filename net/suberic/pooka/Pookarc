@@ -93,7 +93,10 @@ Pooka.fetchBatchSize=50
 Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
 
-EncryptionManager.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
+
+EncryptionManager.pgp.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
+EncryptionManager.smime.provider=net.suberic.pooka.crypto.bouncy.SMIMEEncryptionUtils
+EncryptionManager.default=pgp
 EncryptionManager.savePasswordsForSession=false
 
 Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif

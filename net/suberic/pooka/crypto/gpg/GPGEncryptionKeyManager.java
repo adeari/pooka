@@ -231,9 +231,21 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
 
     String newAlias = gpgKey.getAlias();
 
-    System.err.println("returning new key with alias " + newAlias + ", passphrase " + new String(passphrase));
-    GPGEncryptionKey newKey = new GPGEncryptionKey(newAlias, new String(passphrase));
-    return newKey;
+    if (passphrase == null) {
+      System.err.println("returning new key with alias " + newAlias + ", passphrase null.");
+
+    } else {
+      System.err.println("returning new key with alias " + newAlias + ", passphrase " + new String(passphrase));
+    }
+    if (passphrase == null) {
+
+      GPGEncryptionKey newKey = new GPGEncryptionKey(newAlias, null);
+      return newKey;
+
+    } else {
+      GPGEncryptionKey newKey = new GPGEncryptionKey(newAlias, new String(passphrase));
+      return newKey;
+    }
   }
   
   

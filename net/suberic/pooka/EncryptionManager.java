@@ -42,18 +42,35 @@ public class EncryptionManager {
    * key property.
    */
   public EncryptionManager(VariableBundle sourceBundle, String key) {
-    String utilsClassName = sourceBundle.getProperty(key + ".provider", "");
-    if (utilsClassName != null) {
+    String pgpUtilsClassName = sourceBundle.getProperty(key + ".pgp.provider", "");
+    if (pgpUtilsClassName != null) {
       try {
-	Class utilsClass = Class.forName(utilsClassName);
+	Class utilsClass = Class.forName(pgpUtilsClassName);
 	PGPProviderImpl providerImpl = (PGPProviderImpl) utilsClass.newInstance();
 	PGPMimeEncryptionUtils cryptoUtils  = new PGPMimeEncryptionUtils();
 	cryptoUtils.setPGPProviderImpl(providerImpl);
-	defaultUtils = cryptoUtils;
+	pgpUtils = cryptoUtils;
       } catch (Exception e) {
 	e.printStackTrace();
       }
     }
+
+    String smimeUtilsClassName = sourceBundle.getProperty(key + ".smime.provider", "");
+    if (smimeUtilsClassName != null) {
+      try {
+	Class utilsClass = Class.forName(smimeUtilsClassName);
+	EncryptionUtils newUtils = (EncryptionUtils) utilsClass.newInstance();
+	smimeUtils = newUtils;
+      } catch (Exception e) {
+	e.printStackTrace();
+      }
+    }
+
+    String defaultString = sourceBundle.getProperty(key + ".default", "pgp");
+    if (defaultString.equalsIgnoreCase("pgp"))
+      defaultUtils = pgpUtils;
+    else
+      defaultUtils = smimeUtils;
 
     if (defaultUtils != null) {
       keyMgrFilename = sourceBundle.getProperty(key + ".keyStore.filename", "");
@@ -133,8 +150,15 @@ public class EncryptionManager {
    * Returns the password for this alias.
    */
   protected char[] getPasswordForAlias(String alias, boolean check) {
-    // FIXME:  ignoring check for now.
-    return (char[]) aliasPasswordMap.get(alias);
+    char[] returnValue = (char[]) aliasPasswordMap.get(alias);
+    if (returnValue == null || check) {
+      returnValue = net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog();
+      if (returnValue != null) {
+	aliasPasswordMap.put(alias, returnValue);
+      }
+    }
+
+    return returnValue;
   }
 
   /**
