@@ -2,8 +2,9 @@ package net.suberic.util.gui;
 import javax.swing.*;
 import java.util.Vector;
 import java.awt.*;
+import net.suberic.util.VariableBundle;
 
-public class PropertyEditorPane extends Box implements AkpPropertyEditor {
+public class PropertyEditorPane extends Box implements PropertyEditorUI {
     Vector editors;
     PropertyEditorFactory factory;
     JInternalFrame container;
@@ -61,6 +62,21 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
 	}
 	if (container != null)
 	    this.addButtons();
+    }
+
+    public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+    }
+
+    public void configureEditor(String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+	configureEditor(newProperty, templateType, bundle, isEnabled);
+    }
+
+    public void configureEditor(String newProperty, VariableBundle bundle, boolean isEnabled) {
+	configureEditor(newProperty, newProperty, bundle, isEnabled);
+    }
+
+    public void configureEditor(String newProperty, VariableBundle bundle) {
+	configureEditor(newProperty, newProperty, bundle, true);
     }
 
     public void setValue() {
@@ -136,7 +152,7 @@ public class PropertyEditorPane extends Box implements AkpPropertyEditor {
     public void setEnabled(boolean newValue) {
 	if (editors != null && editors.size() > 0) {
 	    for (int i = 0; i < editors.size(); i++) {
-		AkpPropertyEditor currentEditor = (AkpPropertyEditor) editors.elementAt(i);
+		PropertyEditorUI currentEditor = (PropertyEditorUI) editors.elementAt(i);
 		currentEditor.setEnabled(newValue);
 	    }
 	}

@@ -30,10 +30,14 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     Hashtable currentPanels = new Hashtable();
 
     public MultiEditorPane(String newProperty, PropertyEditorFactory newFactory, boolean isEnabled) {
+	this.configureEditor(newFactory, newProperty, newProperty, newFactory.getBundle(), isEnabled);
+    }
+
+    public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String templateType, VariableBundle bundle, boolean isEnabled) { 
 	JLabel label;
-	property=newProperty;
+	property=propertyName;
 	factory = newFactory;
-	sourceBundle=factory.getBundle();
+	sourceBundle=bundle;
 	originalValue = sourceBundle.getProperty(property, "");
 
 	// set the default label.
@@ -85,6 +89,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
                            PropertyEditorFactory newFactory) {
 	this(newProperty, newFactory, true);
     }
+
     private Vector createEditedList(String origValue) {
 	Vector items = new Vector();
 	StringTokenizer tokens;

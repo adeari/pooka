@@ -13,6 +13,10 @@ public class ListEditorPane extends DefaultPropertyEditor {
     String templateType;
 
     public ListEditorPane(String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
+	configureEditor(newProperty, newTemplateType, bundle, isEnabled);
+    }
+
+    public void configureEditor(PropertyEditorFactory factory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
 	property=newProperty;
 	templateType=newTemplateType;
 	sourceBundle=bundle;
@@ -74,7 +78,7 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	return jcb;
     }
 
-    //  as defined in net.suberic.util.gui.AkpPropertyEditor
+    //  as defined in net.suberic.util.gui.PropertyEditorUI
 
     public void setValue() {
 	if (isEnabled() && isChanged())

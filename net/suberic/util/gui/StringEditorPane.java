@@ -11,6 +11,10 @@ public class StringEditorPane extends DefaultPropertyEditor {
     VariableBundle sourceBundle;
 
     public StringEditorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {
+	configureEditor(null, newProperty, newProperty, bundle, isEnabled);
+    }
+
+    public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
 	property=newProperty;
 	sourceBundle=bundle;
 	originalValue = sourceBundle.getProperty(newProperty, "");
