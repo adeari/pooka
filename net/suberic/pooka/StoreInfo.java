@@ -44,10 +44,10 @@ public class StoreInfo implements ValueChangeListener {
     public StoreInfo(String sid) {
 	setStoreID(sid);
     
-	user = Pooka.getProperty("Store." + storeID + ".user");
-	password = Pooka.getProperty("Store." + storeID + ".password");
-	server = Pooka.getProperty("Store." + storeID + ".server");
-	protocol = Pooka.getProperty("Store." + storeID + ".protocol");
+	user = Pooka.getProperty("Store." + storeID + ".user", "");
+	password = Pooka.getProperty("Store." + storeID + ".password", "");
+	server = Pooka.getProperty("Store." + storeID + ".server", "");
+	protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
 	
 	url = new URLName(protocol, server, -1, "", user, password);
 	

@@ -24,7 +24,7 @@ public class StoreNode extends MailTreeNode {
     }
     
     /**
-     * a Store is never a leaf node.  It can always contain stuff
+     * this method returns false--a store is never a leaf.
      */
     public boolean isLeaf() {
 	return false;
@@ -62,16 +62,12 @@ public class StoreNode extends MailTreeNode {
      */
     public void loadChildren() {
 	// connect to the Store if we need to
-
+	
 	if (!store.isConnected()) 
-	    try {
-		store.connectStore();
-	    } catch (MessagingException me) {
-		return;
-	    }
+	    return; 
 	
 	String folderName;
-	
+    
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + store.getStoreID() + ".folderList", "INBOX"), ":");
 	
 	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
@@ -83,6 +79,11 @@ public class StoreNode extends MailTreeNode {
 	} 
 
 	hasLoaded=true;
+
+	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+	if (folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+	    ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
+	}
     }
 
     public String getStoreID() {
