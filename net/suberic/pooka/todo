@@ -66,6 +66,10 @@ for a while, your connection to your Store can go down.
 
 *) takes too long to open a window where there are a lot of new messages.
 
+*) need to separate requests out into different threads.  right now, it's way
+too easy for the entire client to hang if your network connection hangs, be
+it checking to see if there are new messages, loading the information on 
+current messages, etc.
 
 -------
 
