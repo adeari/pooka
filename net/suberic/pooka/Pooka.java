@@ -62,7 +62,10 @@ public class Pooka {
 			ContentPanel cp = new PreviewContentPanel(mp);
 			Pooka.getMainPanel().setContentPanel(cp);
 		    } else {
+			PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
 			uiFactory = new PookaDesktopPaneUIFactory();
+			ContentPanel mp = ((PookaDesktopPaneUIFactory)uiFactory).createContentPanel(pcp);
+			Pooka.getMainPanel().setContentPanel(mp);
 		    }
 		}
 	    }, "Pooka.guiType");

@@ -123,6 +123,22 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * Creates a JPanel which will be used to show messages and folders.
+     *
+     * This implementation creates an instance of MessagePanel.
+     */
+    public ContentPanel createContentPanel(PreviewContentPanel pcp) {
+	messagePanel = new MessagePanel(Pooka.getMainPanel(), pcp);
+	messagePanel.setSize(1000,1000);
+	JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
+	messagePanel.setUIComponent(messageScrollPane);
+	
+	((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+	return messagePanel;
+    }
+
+    /**
      * Returns the MessagePanel associated with this Factory.
      */
     public MessagePanel getMessagePanel() {

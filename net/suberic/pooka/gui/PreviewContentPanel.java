@@ -89,8 +89,12 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 		String folderID = fi.getFolderID();
 		fi.setFolderDisplayUI(newPP);
 		addPreviewPanel(newPP, folderID);
-		if (frames[i].isSelected())
+		if (frames[i].isSelected()) {
 		    selectedID = folderID;
+		} else if (selectedID == null) {
+		    // if it gets overriden later, that's great.
+		    selectedID = folderID;
+		}
 	    } else if (frames[i] instanceof MessageInternalFrame) {
 		if (frames[i].isSelected()) {
 		    if (frames[i] instanceof ReadMessageInternalFrame) {
