@@ -51,7 +51,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   NewMessageUI messageUI;
 
   // the last time this field got a key hit
-  long lastKeyTime;
+  long lastKeyTime = 0;
 
   // the last time this field was updated
   long lastMatchedTime;
@@ -74,6 +74,9 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     areaList.put(this, null);
 
     this.addFocusListener(this);
+    
+    if (updateThread == null)
+      createUpdateThread();
   }
 
   /**
@@ -165,6 +168,13 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    * This updates the list of matched addresses in this entry field.
    */
   protected synchronized void updateAddressList() {
+    updateAddressList(false);
+  }
+
+  /**
+   * This updates the list of matched addresses in this entry field.
+   */
+  protected synchronized void updateAddressList(boolean inThread) {
     final String currentText = getText();
     if (!currentText.equals(lastUpdatedValue)) {
       LinkedList newAddressList = new LinkedList();
@@ -186,11 +196,26 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 
       final LinkedList toUpdateList = newAddressList;
 
-      SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    updateParsedSelections(toUpdateList, currentText);
+      if (! inThread) { 
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      updateParsedSelections(toUpdateList, currentText);
+	    }
+	  });
+      } else {
+	if (SwingUtilities.isEventDispatchThread())
+	  updateParsedSelections(toUpdateList, currentText);
+	else 
+	  try {
+	    SwingUtilities.invokeAndWait(new Runnable() {
+		public void run() {
+		  updateParsedSelections(toUpdateList, currentText);
+		}
+	      });
+	  } catch (Exception e) {
+	    
 	  }
-	});
+      }
     }
   }
 
@@ -211,10 +236,14 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 
       // first see if we're an address book entry.
       net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
-      AddressBookEntry[] matchedEntries = matcher.matchExactly(addressText);
-      if (matchedEntries != null && matchedEntries.length > 0) {
-	status = new SelectionStatus(matchedEntries[0].getAddressString(), ADDRESS_MATCH);
-      } else {
+      if (matcher != null) {
+	AddressBookEntry[] matchedEntries = matcher.matchExactly(addressText);
+	if (matchedEntries != null && matchedEntries.length > 0) {
+	  status = new SelectionStatus(matchedEntries[0].getAddressString(), ADDRESS_MATCH);
+	}
+      }
+
+      if (status == null) {
 	// check to see if it's a valid address
 	try {
 	  InternetAddress newAddress = new InternetAddress(addressText);
@@ -317,7 +346,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    * This gets the parsed address text for this feel.
    */
   public String getParsedAddresses() {
-    updateAddressList();
+    updateAddressList(true);
     StringBuffer returnBuffer = new StringBuffer();
 
     Iterator iter = addressList.iterator();
