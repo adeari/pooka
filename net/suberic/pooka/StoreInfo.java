@@ -317,7 +317,15 @@ public class StoreInfo implements ValueChangeListener {
 	    connected=true;
 	    return;
 	} else { 
-	    store.connect();
+	    try {
+		store.connect();
+	    } catch (MessagingException me) {
+		Exception e = me.getNextException();
+		if (e != null && e instanceof java.io.InterruptedIOException) 
+		    store.connect();
+		else
+		    throw me;
+	    }
 	    connected=true;
 
 	    if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
