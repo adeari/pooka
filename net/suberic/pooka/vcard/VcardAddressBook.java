@@ -64,6 +64,11 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
 	  System.arraycopy(orderedList, insertLocation, newList, insertLocation + 1, orderedList.length - insertLocation); 
 	
 	orderedList = newList;
+	try {
+	  saveAddressBook();
+	} catch (java.io.IOException ioe) {
+	  Pooka.getUIFactory().showError(Pooka.getProperty("error.savingVcard", "Error saving Address Book"), ioe);
+	}
       }
     }
   }
@@ -75,6 +80,23 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
 
   }
   
+
+  /**
+   * Saves the list.
+   */
+  public void saveAddressBook() throws java.io.IOException {
+    File f = new File(fileName);
+    if (f.exists()) {
+      BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+      for(int i = 0; i < orderedList.length; i++) {
+	orderedList[i].write(writer);
+      }
+      writer.flush();
+      writer.close();
+    }
+    
+  }
+
   /**
    * Sorts the list.
    */

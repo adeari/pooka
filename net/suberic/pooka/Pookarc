@@ -198,7 +198,7 @@ NewMessageWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/net/suberic/pooka/gui/images/Object.gif
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:Detach
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/net/suberic/pooka/gui/images/Reply.gif
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -209,6 +209,8 @@ MessageWindowToolbar.Delete.Action=message-delete
 MessageWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 MessageWindowToolbar.Copy.Action=copy-to-clipboard
 MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
+MessageWindowToolbar.SaveAddress.Action=message-save-address
+MessageWindowToolbar.SaveAddress.Image=/net/suberic/pooka/gui/images/DataStore.gif
 MessageWindowToolbar.Detach.Action=window-detach
 MessageWindowToolbar.Detach.Image=/net/suberic/pooka/gui/images/Object.gif
 

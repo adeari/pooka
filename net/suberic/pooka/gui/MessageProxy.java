@@ -213,7 +213,8 @@ public class MessageProxy {
 	    new ActionWrapper(new DeleteAction(), folderThread),
 	    new ActionWrapper(new PrintAction(), folderThread),
 	    new ActionWrapper(new SaveMessageAction(), folderThread),
-	    new ActionWrapper(new CacheMessageAction(), folderThread)
+	    new ActionWrapper(new CacheMessageAction(), folderThread),
+	    new ActionWrapper(new SaveAddressAction(), folderThread)
 		};
 	
         Action[] actions = getActions();
@@ -944,6 +945,36 @@ public class MessageProxy {
 	    if (getMessageUI() != null)
 		getMessageUI().setBusy(false);
 	}
+    }
+
+    public class SaveAddressAction extends AbstractAction {
+      SaveAddressAction() {
+	super("message-save-address");
+      }
+      
+      public void actionPerformed(ActionEvent e) {
+	if (getMessageUI() != null)
+	  getMessageUI().setBusy(true);
+	FolderDisplayUI fw = getFolderDisplayUI();
+	if (fw != null)
+	  fw.setBusy(true);;
+
+	try {
+	  AddressBook book = getDefaultProfile().getAddressBook();
+	  if (book != null)
+	    getMessageInfo().addAddress(book, true);
+	  else {
+	    getMessageUI().showError(Pooka.getProperty("error.noAddressBook", "No Address Book for UserProfile ") + getDefaultProfile().getName());
+	  }
+	} catch (MessagingException me) {
+	  showError(me.getMessage(), me);
+	}
+
+	if (fw != null)
+	  fw.setBusy(false);
+	if (getMessageUI() != null)
+	  getMessageUI().setBusy(false);
+      }
     }
 }
 

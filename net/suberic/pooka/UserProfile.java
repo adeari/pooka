@@ -415,4 +415,8 @@ public class UserProfile extends Object implements ValueChangeListener {
   public AddressMatcher getAddressMatcher() {
     return addressBook.getAddressMatcher();
   }
+
+  public AddressBook getAddressBook() {
+    return addressBook;
+  }
 }

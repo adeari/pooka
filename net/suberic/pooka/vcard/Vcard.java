@@ -23,9 +23,9 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   private InternetAddress address;
   
   /**
-   * Creates a new Vcard from a BufferedReader.
+   * Creates a new Vcard from the given properties.
    */
-  protected Vcard(Properties newProps) {
+  public Vcard(Properties newProps) {
     properties = newProps;
   }
   
@@ -34,6 +34,13 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
    */
   public String getProperty(String propertyName) {
     return properties.getProperty(propertyName);
+  }
+  
+  /**
+   * Sets a property on the Vcard.
+   */
+  public void setProperty(String propertyName, String newValue) {
+    properties.setProperty(propertyName, newValue);
   }
   
   /**
@@ -49,7 +56,18 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       return null;
     }
   }
-  
+
+  /**
+   * Sets the InternetAddress associated with this Vcard.
+   */
+  public void setAddress(InternetAddress newAddress) {
+    if (newAddress != null) {
+      address = newAddress;
+      properties.setProperty("email;internet", newAddress.getAddress());
+      properties.setProperty("fn", newAddress.getPersonal());
+    }
+  }
+
   /**
    * Gets the PersonalName property associated with this Vcard.
    */
@@ -61,6 +79,22 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       return address.getPersonal();
     } catch (java.io.UnsupportedEncodingException uee) {
       return null;
+    }
+  }
+
+  /**
+   * Gets the PersonalName property associated with this Vcard.
+   */
+  public void setPersonalName(String newName) {
+    try {
+      if (address == null) {
+	properties.setProperty("fn", newName);
+	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
+      } else {
+	properties.setProperty("fn", newName);
+	address.setPersonal(newName);
+      }
+    } catch (java.io.UnsupportedEncodingException uee) {
     }
   }
 
@@ -79,6 +113,20 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   }
 
   /**
+   * Gets the FirstName property associated with this Vcard.
+   */
+  public void setFirstName(String newName) {
+    String oldName = properties.getProperty("n");
+    if (oldName != null) {
+      int index = oldName.indexOf(";");
+      if (index > 0) 
+	properties.setProperty("n", oldName.substring(0, index) + ";" + newName);
+    } else {
+      properties.setProperty("n", ";" + newName);
+    }
+  }
+
+  /**
    * Gets the LastName property associated with this Vcard.
    */
   public String getLastName() {
@@ -86,10 +134,25 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     if (name != null) {
       int index = name.indexOf(";");
       if (index > 0) 
-	return name.substring(index);
+	return name.substring(0, index);
     }
 
     return null;
+  }
+
+  /**
+   * Gets the LastName property associated with this Vcard.
+   */
+  public void setLastName(String newName) {
+    String name = properties.getProperty("n");
+    if (name != null) {
+      int index = name.indexOf(";");
+      if (index > 0) 
+	properties.setProperty("n", newName + ";" + name.substring(index + 1));
+    } else {
+      properties.setProperty("n", newName + ";");
+    }
+
   }
   
   /**
@@ -263,5 +326,22 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     returnValue[1] = firstLine.substring(dividerLoc + 1);
     
     return returnValue;
+  }
+
+  /**
+   * Writes this Vcard out to the given BufferedWriter.
+   */
+  public void write(BufferedWriter out) throws java.io.IOException {
+    out.write("begin:vcard");
+    out.newLine();
+    java.util.Enumeration propNames = properties.propertyNames();
+    while (propNames.hasMoreElements()) {
+      String currentName = (String) propNames.nextElement();
+      out.write(currentName);
+      out.write(":");
+      out.write(properties.getProperty(currentName));
+      out.newLine();
+    }
+    out.write("end:vcard");
   }
 }

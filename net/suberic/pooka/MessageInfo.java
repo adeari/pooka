@@ -641,12 +641,62 @@ public class MessageInfo {
 	}
     }
 
-    /**
-     * Returns the Message that this MessageInfo is wrapping.
-     */
-    public Message getMessage() {
-	return message;
+  /**
+   * Adds the sender of the message to the current AddressBook, if any.
+   */
+  public void addAddress(AddressBook book, boolean useVcard) throws MessagingException {
+    System.err.println("adding address.  really.");
+    boolean found = false;
+    if (useVcard) {
+      Attachment vcard = null;
+
+      // see if there's a Vcard attachment on here.
+      Vector attachList = getAttachments();
+      if (attachList != null) {
+	for (int i = 0; i < attachList.size() && vcard==null; i++) {
+	  Attachment current = (Attachment)attachList.get(i);
+	  if (current.getMimeType().match("text/x-vcard")) {
+	    vcard = current;
+	  }
+	}
+
+	if (vcard != null) {
+	  System.err.println("found a vcard.");
+	  try {
+	    String vcardText = (String) vcard.getContent();
+	    BufferedReader reader = new BufferedReader(new StringReader(vcardText));
+	    net.suberic.pooka.vcard.Vcard addressEntry = net.suberic.pooka.vcard.Vcard.parse(reader);
+	    book.addAddress(addressEntry);
+	    found = true;
+	  } catch (Exception e) {
+	    // if we get any exceptions parsing the Vcard, just fall back to
+	    // using the fromAddress.  do print out a debugging message,
+	    // though.
+	    getMessageProxy().showError(Pooka.getProperty("error.parsingVcard", "Error parsing Vcard"), e);
+	  }
+	}
+      }
     }
+
+    if (!found) {
+      System.err.println("no vcard.");
+      Address[] fromAddresses = getMessage().getFrom();
+      javax.mail.internet.InternetAddress addr = (javax.mail.internet.InternetAddress) fromAddresses[0];
+
+      // let's not support multiple froms.
+      AddressBookEntry entry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
+      entry.setPersonalName(addr.getPersonal());
+      entry.setAddress(addr);
+      book.addAddress(entry);
+    }
+  }
+
+  /**
+   * Returns the Message that this MessageInfo is wrapping.
+   */
+  public Message getMessage() {
+    return message;
+  }
 
     /**
      * Returns the real, modifiable message that this MessageInfo is
