@@ -3,6 +3,8 @@ import javax.mail.*;
 import javax.mail.internet.*;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.Pooka;
+import net.suberic.pooka.UIDMimeMessage;
+import net.suberic.pooka.UIDFolderInfo;
 import javax.activation.DataHandler;
 import java.util.Enumeration;
 import java.io.InputStream;
@@ -13,21 +15,14 @@ import java.io.ByteArrayInputStream;
  * disconnected (cached) mode.
  */
 
-public class CachingMimeMessage extends MimeMessage {
+public class CachingMimeMessage extends UIDMimeMessage {
 
-    long uid;
-    CachingFolderInfo parent;
-    
     public CachingMimeMessage(CachingFolderInfo parentFolderInfo, long newUid) {
-	super(Pooka.getDefaultSession());
-	uid = newUid;
-	parent = parentFolderInfo;
-	saved=true;
-	modified=false;
+	super(parentFolderInfo, newUid);
     }
 
     public int getSize() throws MessagingException {
-	return getCache().getSize(uid);
+	return getCache().getSize(getUID());
 	/*
 	try {
 	    if (getContent() != null) {
@@ -42,13 +37,9 @@ public class CachingMimeMessage extends MimeMessage {
 	*/
     }
 
-    protected InputStream getContentStream() throws MessagingException {
-	throw new MessagingException("No getting the content stream!  Bad code!");
-    }
-
     public synchronized DataHandler getDataHandler() 
 		throws MessagingException {
-	return getCache().getDataHandler(uid, getUIDValidity());
+	return getCache().getDataHandler(getUID(), getUIDValidity());
     }
 
     public String[] getHeader(String name)
@@ -159,7 +150,7 @@ public class CachingMimeMessage extends MimeMessage {
      * @see 		javax.mail.Flags
      */
     public synchronized Flags getFlags() throws MessagingException {
-	return (Flags) getCache().getFlags(uid, getUIDValidity()).clone();
+	return (Flags) getCache().getFlags(getUID(), getUIDValidity()).clone();
     }
 
     /**
@@ -205,30 +196,30 @@ public class CachingMimeMessage extends MimeMessage {
     public synchronized void setFlags(Flags flag, boolean set)
 			throws MessagingException {
 	if (set)
-	    getCache().addFlag(uid, getUIDValidity(), flag);
+	    getCache().addFlag(getUID(), getUIDValidity(), flag);
 	else
-	    getCache().removeFlag(uid, getUIDValidity(), flag);
+	    getCache().removeFlag(getUID(), getUIDValidity(), flag);
     }
 
     public MessageCache getCache() {
-	return parent.getCache();
+	return ((CachingFolderInfo)getParent()).getCache();
     }
 
     public void setExpungedValue(boolean newValue) {
 	expunged=newValue;
     }
 
+    /**
+     * Returns whether this message is expunged or not.
+     */
+    public boolean isExpunged() {
+	return expunged;
+    }
+
     public InternetHeaders getHeaders() throws MessagingException {
-	return getCache().getHeaders(uid, getUIDValidity());
+	return getCache().getHeaders(getUID(), getUIDValidity());
     }
 
-    public long getUID() {
-	return uid;
-    }
-
-    public long getUIDValidity() {
-	return parent.getUIDValidity();
-    }
 }
 
 

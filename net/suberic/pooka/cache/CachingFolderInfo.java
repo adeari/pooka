@@ -319,15 +319,19 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
     protected void runMessagesRemoved(MessageCountEvent mce) {
 	Message[] removedMessages = mce.getMessages();
+	Message[] removedCachingMessages = new Message[removedMessages.length];
+	
 	if (Pooka.isDebug())
 	    System.out.println("removedMessages was of size " + removedMessages.length);
 	MessageInfo mi;
 	Vector removedProxies=new Vector();
+
 	for (int i = 0; i < removedMessages.length; i++) {
 	    if (Pooka.isDebug())
 		System.out.println("checking for existence of message.");
 	    
 	    if (removedMessages[i] != null && removedMessages[i] instanceof CachingMimeMessage) {
+		removedCachingMessages[i] = removedMessages[i];
 		mi = getMessageInfo(removedMessages[i]);
 		if (mi.getMessageProxy() != null)
 		    mi.getMessageProxy().close();
@@ -352,7 +356,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		
 		mi = getMessageInfoByUid(uid);
 		if (mi != null) {
-
+		    removedCachingMessages[i] = mi.getMessage();
 		    if (mi.getMessageProxy() != null)
 			mi.getMessageProxy().close();
 		    
@@ -364,15 +368,18 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		    messageToInfoTable.remove(localMsg);
 		    uidToInfoTable.remove(new Long(uid));
 		    getCache().invalidateCache(uid, SimpleFileCache.MESSAGE);
+		} else {
+		    removedCachingMessages[i] = removedMessages[i];
 		}
 	    }
-	    if (getFolderTableModel() != null)
-		getFolderTableModel().removeRows(removedProxies);
 	}
-	resetMessageCounts();
-	fireMessageCountEvent(mce);
 	
-	//}
+	resetMessageCounts();
+
+	MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), removedCachingMessages);
+	fireMessageCountEvent(newMce);
+	if (getFolderTableModel() != null)
+	    getFolderTableModel().removeRows(removedProxies);
     }
 
     /**

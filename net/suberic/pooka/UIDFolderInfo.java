@@ -282,7 +282,15 @@ public class UIDFolderInfo extends FolderInfo {
 		    getFolderTableModel().addRows(addedProxies);
 		setNewMessages(true);
 		resetMessageCounts();
-		fireMessageCountEvent(mce);
+		
+		// change the Message objects in the MessageCountEvent to 
+		// our UIDMimeMessages.
+		Message[] newMsgs = new Message[addedProxies.size()];
+		for (int i = 0; i < addedProxies.size(); i++) {
+		    newMsgs[i] = ((MessageProxy)addedProxies.elementAt(i)).getMessageInfo().getMessage();
+		}
+		MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), newMsgs);
+		fireMessageCountEvent(newMce);
 		}
 	    } catch (MessagingException me) {
 		if (getFolderDisplayUI() != null)
@@ -293,10 +301,14 @@ public class UIDFolderInfo extends FolderInfo {
     }
 
     protected void runMessagesRemoved(MessageCountEvent mce) {
+	MessageCountEvent newMce = null;
 	if (folderTableModel != null) {
 	    Message[] removedMessages = mce.getMessages();
+	    Message[] uidRemovedMessages = new Message[removedMessages.length];
+
 	    if (Pooka.isDebug())
 		System.out.println("removedMessages was of size " + removedMessages.length);
+
 	    MessageInfo mi;
 	    Vector removedProxies=new Vector();
 	    for (int i = 0; i < removedMessages.length; i++) {
@@ -305,6 +317,11 @@ public class UIDFolderInfo extends FolderInfo {
 		
 		try {
 		    UIDMimeMessage removedMsg = getUIDMimeMessage(removedMessages[i]);
+		    if (removedMsg != null)
+			uidRemovedMessages[i] = removedMsg;
+		    else
+			uidRemovedMessages[i] = removedMessages[i];
+
 		    mi = getMessageInfo(removedMsg);
 		    if (mi.getMessageProxy() != null)
 			mi.getMessageProxy().close();
@@ -319,10 +336,14 @@ public class UIDFolderInfo extends FolderInfo {
 		} catch (MessagingException me) {
 		}
 	    }
+	    newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), uidRemovedMessages);
+	    resetMessageCounts();
+	    fireMessageCountEvent(newMce);
 	    getFolderTableModel().removeRows(removedProxies);
+	} else {
+	    resetMessageCounts();
+	    fireMessageCountEvent(mce);
 	}
-	resetMessageCounts();
-	fireMessageCountEvent(mce);
     }
 
     protected void runMessageChanged(MessageChangedEvent mce) {
@@ -350,32 +371,39 @@ public class UIDFolderInfo extends FolderInfo {
 	    // that the message has already been expunged.
 	}
 	
-	fireMessageChangedEvent(mce);
+	// now let's go ahead and get the UIDMimeMessage for the event so
+	// that we can fire that instead.
+
+	try {
+	    Message msg = mce.getMessage();
+	    UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
+	    if (changedMsg != null) {
+		MessageChangedEvent newMce = new MessageChangedEvent(mce.getSource(), mce.getMessageChangeType(), changedMsg);
+		fireMessageChangedEvent(newMce);
+	    } else 
+		fireMessageChangedEvent(mce);
+	} catch (MessagingException me) {
+	    // if we catch a MessagingException, then we can just fire the
+	    // original mce.
+	    fireMessageChangedEvent(mce);
+	    
+	}
     }
 
     
-    /**
-     * Returns the UIDMimeMessage that represents the given Message.  If
-     * this cannot be done (say, if the given Message does not exist in 
-     * the current Folder), returns null.
-     */
 
     public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
 	if (m instanceof UIDMimeMessage)
 	    return (UIDMimeMessage) m;
 
 	// it's not a UIDMimeMessage, so it must be a 'real' message.
-	try {
-	    long uid = ((UIDFolder)getFolder()).getUID(m);
-	    MessageInfo mi = getMessageInfoByUid(uid);
-	    if (mi != null)
-		return (UIDMimeMessage) mi.getMessage();
-	    
-	    // doesn't already exist.  just create a new one.
-	    return new UIDMimeMessage(this, uid);
-	} catch (java.util.NoSuchElementException nsee) {
-	    return null;
-	}
+	long uid = ((UIDFolder)getFolder()).getUID(m);
+	MessageInfo mi = getMessageInfoByUid(uid);
+	if (mi != null)
+	    return (UIDMimeMessage) mi.getMessage();
+	
+	// doesn't already exist.  just create a new one.
+	return new UIDMimeMessage(this, uid);
     }
 
     /**
@@ -476,11 +504,6 @@ public class UIDFolderInfo extends FolderInfo {
 	}
 	fireConnectionEvent(e);
     }
-
-    /**
-     * gets the UID for a given MimeMessage
-     */
-    
 
     /**
      * gets the 'real' message for the given MessageInfo.

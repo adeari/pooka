@@ -1154,7 +1154,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void messagesRemoved(MessageCountEvent e) {
 	if (Pooka.isDebug())
 	    System.out.println("Messages Removed.");
-	
 
 	if (Thread.currentThread() == getFolderThread() )
 	    runMessagesRemoved(e);
@@ -1187,10 +1186,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    messageToInfoTable.remove(mi);
 		}
 	    }
+	    resetMessageCounts();
+	    fireMessageCountEvent(mce);
 	    getFolderTableModel().removeRows(removedProxies);
+	} else {
+	    resetMessageCounts();
+	    fireMessageCountEvent(mce);
 	}
-	resetMessageCounts();
-	fireMessageCountEvent(mce);
     }
     
     /**
