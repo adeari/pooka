@@ -1,43 +1,39 @@
-ava.lang.StackOverflowError
-        at java.util.Properties.getProperty(Properties.java:480)
-        at java.util.Properties.getProperty(Properties.java:499)
-        at net.suberic.util.VariableBundle.getProperty(VariableBundle.java:83)
-        at net.suberic.util.VariableBundle.getParentProperty(VariableBundle.java:122)
-        at net.suberic.util.VariableBundle.getProperty(VariableBundle.java:89)
-        at net.suberic.pooka.Pooka.isDebug(Pooka.java:378)
-        at net.suberic.pooka.FolderInfo.openFolder(FolderInfo.java:390)
-        at net.suberic.pooka.PopInboxFolderInfo.openFolder(PopInboxFolderInfo.java:100)
-        at net.suberic.pooka.FolderInfo.openFolder(FolderInfo.java:419)
-        at net.suberic.pooka.PopInboxFolderInfo.openFolder(PopInboxFolderInfo.java:100)
-*) make sure that backend filters are run on new message loaded at 
-startup (i.e. not just on messagesAdded).
+*) start up disconnected.  connect.  have filters.  get error:
+   class javax.mail.MessagingException: Proxy.
+        at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:357)
+        at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:385)
 
 *) add support for running without any local files.
+   *) diskless pop support (?)
+   *) no caching imap
+   *) no address book
+   *) no .pooka directory
 
-*) add mrpostman support(?)
-
-*) add drag and drop
+*) check:  if a folder realizes that it has become disconnected, it should
+	test to see if the store in general has disconnected.
 
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together
 	(@ sourceforge).
 
-*) add "view pookarc"
-
-*) printing in windows can leave control characters at the end of lines
+*) add drag and drop
 
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
 
 *) new message count in icon
 
+*) add a dependent button/menu item.  so that that way instead of having
+	a separate Caching popup menu, you can just say "if caching,
+	add this menu item; if not, don't."
+
+*) add "view pookarc"
+
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
 	message.  read it.  disconnect there.  get a few new messages.
 	reconnect from original pooka.
 
-*) add a dependent button/menu item.  so that that way instead of having
-	a separate Caching popup menu, you can just say "if caching,
-	add this menu item; if not, don't."
+*) add console?
 
 ------
 
@@ -45,7 +41,9 @@ startup (i.e. not just on messagesAdded).
 
 ------
 
-*) add console?
+*) add mrpostman support(?)
+
+*) printing in windows can leave control characters at the end of lines
 
 *) MoveFilter on closed imap folder:
 java.lang.ArrayIndexOutOfBoundsException: 0

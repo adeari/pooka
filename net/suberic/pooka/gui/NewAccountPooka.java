@@ -24,7 +24,8 @@ public class NewAccountPooka {
   private PropertyEditorManager manager = null;
   private PropertyEditorFactory factory = null;
   private String accountName = null;
-  
+  private boolean useLocalFiles = true;
+
   public NewAccountPooka() {
   };
   
@@ -38,6 +39,8 @@ public class NewAccountPooka {
      * I really should make this easier to configure, shouldn't I?
      */
     
+    useLocalFiles = Pooka.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("true");
+
     // first set up the default connection.
     setupDefaultConnection();
     
@@ -298,7 +301,7 @@ public class NewAccountPooka {
     String protocol = props.getProperty("Store." + storeName + ".protocol");
     String localStoreName = storeName;
 
-    if (protocol.equalsIgnoreCase("imap")) {
+    if (protocol.equalsIgnoreCase("imap") && useLocalFiles) {
       // if we have an imap connection, then we actually have to do some
       // work.
       localStoreName = "local";
@@ -313,36 +316,41 @@ public class NewAccountPooka {
     String pookaDirName = props.getProperty("Pooka.cacheDirectory");
     String mailDirName = pookaDirName + File.separator + localStoreName;
     String subFolderDirName = mailDirName + File.separator + manager.getProperty("Pooka.subFolderName", "folders");
-    
-    File mailDir = new File(mailDirName);
-    if (! mailDir.exists())
-      mailDir.mkdirs();
-    
-    File subFolderDir = new File(subFolderDirName);
-    if (! subFolderDir.exists())
-      subFolderDir.mkdirs();
-    
-    File sentFile = new File(subFolderDirName + File.separator + ".sent");
-    if (! sentFile.exists()) {
-      sentFile.mkdir();
+   
+    if (useLocalFiles) {
+      File mailDir = new File(mailDirName);
+      if (! mailDir.exists())
+	mailDir.mkdirs();
       
-      // i should probably have the maildir store do this.
-      new File(sentFile, "cur").mkdir();
-      new File(sentFile, "new").mkdir();
-      new File(sentFile, "tmp").mkdir();
+      File subFolderDir = new File(subFolderDirName);
+      if (! subFolderDir.exists())
+	subFolderDir.mkdirs();
+      
+      File sentFile = new File(subFolderDirName + File.separator + ".sent");
+      if (! sentFile.exists()) {
+	sentFile.mkdir();
+      
+	// i should probably have the maildir store do this.
+	new File(sentFile, "cur").mkdir();
+	new File(sentFile, "new").mkdir();
+	new File(sentFile, "tmp").mkdir();
+      }
     }
 
-    File outboxFile = new File(subFolderDirName + File.separator + ".outbox");
-    if (! outboxFile.exists()) {
-      outboxFile.mkdir();
+    if (useLocalFiles) {
+      File outboxFile = new File(subFolderDirName + File.separator + ".outbox");
+      if (! outboxFile.exists()) {
+	outboxFile.mkdir();
+	
+	new File(outboxFile, "cur").mkdir();
+	new File(outboxFile, "new").mkdir();
+	new File(outboxFile, "tmp").mkdir();
+      }
 
-      new File(outboxFile, "cur").mkdir();
-      new File(outboxFile, "new").mkdir();
-      new File(outboxFile, "tmp").mkdir();
-    }
-
-    props.setProperty("Store.local.mailDir", mailDirName);
+      props.setProperty("Store.local.mailDir", mailDirName);
     
+    }
+
     
     // actually configure said folders.
     
@@ -357,22 +365,24 @@ public class NewAccountPooka {
    * Creates any other necessary files.
    */
   public void createFiles(Properties props) throws Exception {
-    String pookaDirName = manager.getProperty("NewAccountPooka.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
-
-    File pookaDir = new File(pookaDirName);
-    if (! pookaDir.exists())
-      pookaDir.mkdirs();
-
-    String sslFileName = pookaDirName + File.separator + "sslCertificates";
-
-    File sslFile = new File(sslFileName);
-    if (!sslFile.exists())
-      sslFile.createNewFile();
-
-    props.setProperty("Pooka.cacheDirectory", pookaDirName);
-    props.setProperty("Pooka.defaultMailSubDir", pookaDirName);
-
-    props.setProperty("Pooka.sslCertFile", sslFileName);
+    if (useLocalFiles) {
+      String pookaDirName = manager.getProperty("NewAccountPooka.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
+      
+      File pookaDir = new File(pookaDirName);
+      if (! pookaDir.exists())
+	pookaDir.mkdirs();
+      
+      String sslFileName = pookaDirName + File.separator + "sslCertificates";
+      
+      File sslFile = new File(sslFileName);
+      if (!sslFile.exists())
+	sslFile.createNewFile();
+      
+      props.setProperty("Pooka.cacheDirectory", pookaDirName);
+      props.setProperty("Pooka.defaultMailSubDir", pookaDirName);
+      
+      props.setProperty("Pooka.sslCertFile", sslFileName);
+    }
 
   }
 
@@ -380,16 +390,19 @@ public class NewAccountPooka {
    * Sets up a default address book.
    */
   public void setupAddressBook(Properties props) throws java.io.IOException {
-    String pookaDirName = manager.getProperty("NewAccountPooka.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
-
-    String addressBookFileName = pookaDirName + File.separatorChar + "defaultAddressBook";
-    File addressBookFile = new File(addressBookFileName);
-    addressBookFile.createNewFile();  
+    if (useLocalFiles) {
+      String pookaDirName = manager.getProperty("NewAccountPooka.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
+      
+      String addressBookFileName = pookaDirName + File.separatorChar + "defaultAddressBook";
+      
+      File addressBookFile = new File(addressBookFileName);
+      addressBookFile.createNewFile();  
     
-    props.setProperty("AddressBook", "defaultBook");
-    props.setProperty("AddressBook.defaultBook.type", "file");
-    props.setProperty("AddressBook.defaultBook.filename", addressBookFileName);
-
+      props.setProperty("AddressBook", "defaultBook");
+      props.setProperty("AddressBook.defaultBook.type", "file");
+      props.setProperty("AddressBook.defaultBook.filename", addressBookFileName);
+    }
+    
   }
 
   /**
@@ -510,7 +523,9 @@ public class NewAccountPooka {
 
     transferProperty(props, "OutgoingServer");
 
-    transferProperty(props, "AddressBook");
+    if (useLocalFiles) {
+      transferProperty(props, "AddressBook");
+    }
   }
 
   /**

@@ -1,5 +1,8 @@
 package net.suberic.pooka;
 import net.suberic.pooka.gui.*;
+import net.suberic.util.VariableBundle;
+import net.suberic.pooka.resource.*;
+
 import java.awt.*;
 import javax.swing.*;
 import java.util.Vector;
@@ -8,13 +11,13 @@ import javax.help.*;
 public class Pooka {
 
   // globals
-
+  
   // the resources for Pooka
   static public net.suberic.util.VariableBundle resources;
-
+  
   // the startup/configuration file
   static public String localrc = null;
-
+  
   // mail globals
   static public javax.mail.Session defaultSession;
   static public javax.activation.CommandMap mailcap;
@@ -35,6 +38,8 @@ public class Pooka {
   static public SearchTermManager searchManager;
   static public NetworkConnectionManager connectionManager;
   static public OutgoingMailServerManager outgoingMailManager;
+
+  static public net.suberic.pooka.resource.ResourceManager resourceManager;
 
   // the main Pooka panel.
   static public net.suberic.pooka.gui.MainPanel panel;
@@ -74,18 +79,18 @@ public class Pooka {
 	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
       }
       java.io.InputStream is = url.openStream();
-      try {
-	resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka"));
-      } catch (java.io.IOException ioe) {
-
-	resources = new net.suberic.util.VariableBundle(url.openStream(), "net.suberic.pooka.Pooka");
-	//resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
+      net.suberic.util.VariableBundle pookaDefaultBundle = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
+      if (pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
+	resourceManager = new DisklessResourceManager();
+      } else {
+	resourceManager = new FileResourceManager();
       }
+
+      resources = resourceManager.createVariableBundle(localrc, pookaDefaultBundle);
+
     } catch (Exception e) {
       System.err.println("caught exception:  " + e);
       e.printStackTrace();
-
-      //resources = new net.suberic.util.VariableBundle(new Object().getClass().getClassLoader().getResource("/net/suberic/pooka/Pookarc").openStream(), "net.suberic.pooka.Pooka");
     }
 
     if (! checkJavaVersion()) {
@@ -120,7 +125,7 @@ public class Pooka {
     }
 
     try {
-      mailcap = new FullMailcapCommandMap(mailcapSource);
+      mailcap = resourceManager.createMailcap(mailcapSource);
     } catch (java.io.IOException ioe) {
       System.err.println("exception loading mailcap:  " + ioe);
     }
@@ -336,7 +341,7 @@ public class Pooka {
       }
     }
 
-    Pooka.resources.saveProperties(new java.io.File(Pooka.localrc));
+    Pooka.resources.saveProperties();
     System.exit(exitValue);
   }
   

@@ -234,26 +234,28 @@ public class PookaTrustManager implements X509TrustManager {
    */
   public void loadAccepted() {
     FileInputStream fis = null;
-    try {
-      fis = new FileInputStream(certificateRepositoryFile);
-      DataInputStream dis = new DataInputStream(fis);
-      CertificateFactory cf = CertificateFactory.getInstance("X.509");
-      byte[] bytes = new byte[dis.available()];
-      dis.readFully(bytes);
-      ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-      while (bais.available() > 0) {
-	Certificate cert = cf.generateCertificate(bais);
-
-	trustedCerts.add(cert);
-      }
-    } catch (Exception ioe) {
-      // FIXME -- nothing for now.
-    } finally {
+    if (certificateRepositoryFile != null) {
       try {
-	if (fis != null)
-	  fis.close();
-      } catch (Exception e) {
-
+	fis = new FileInputStream(certificateRepositoryFile);
+	DataInputStream dis = new DataInputStream(fis);
+	CertificateFactory cf = CertificateFactory.getInstance("X.509");
+	byte[] bytes = new byte[dis.available()];
+	dis.readFully(bytes);
+	ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+	while (bais.available() > 0) {
+	  Certificate cert = cf.generateCertificate(bais);
+	  
+	  trustedCerts.add(cert);
+	}
+      } catch (Exception ioe) {
+	// FIXME -- nothing for now.
+      } finally {
+	try {
+	  if (fis != null)
+	    fis.close();
+	} catch (Exception e) {
+	  
+	}
       }
     }
       

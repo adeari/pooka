@@ -168,62 +168,64 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	    writeEntryToSourceFile(mail_cap);
     }
 
-    /**
-     * This writes the entry to the mailcap file.  Note that it actually
-     * ends up overwriting _all_ entries for that particular mime type.
-     */
-    private void writeEntryToSourceFile(String mail_cap) {
-	int semicolonIndex = mail_cap.indexOf(';');
-	if (semicolonIndex > -1) {
-	    String mimeType = mail_cap.substring(0, semicolonIndex);
-	    try {
-		if (!sourceFile.exists())
-		    sourceFile.createNewFile();
-
-		File outputFile  = sourceFile.createTempFile(sourceFile.getName(), ".tmp", sourceFile.getParentFile());
-
-		BufferedReader readSourceFile = new BufferedReader(new FileReader(sourceFile));
-		BufferedWriter writeSourceFile = new BufferedWriter(new FileWriter(outputFile));
-		String currentLine = readSourceFile.readLine();
-		while (currentLine != null) {
-		    int equalsLoc = currentLine.indexOf(';');
-		    if (equalsLoc != -1) {
-			String key = currentLine.substring(0, equalsLoc);
-
-			if (!mimeType.equalsIgnoreCase(key)) {
-			    writeSourceFile.write(currentLine);
-			    writeSourceFile.newLine();
-			}
-		    }
-		    currentLine = readSourceFile.readLine();
-		}
-	    
-
-		writeSourceFile.write(mail_cap);
+  /**
+   * This writes the entry to the mailcap file.  Note that it actually
+   * ends up overwriting _all_ entries for that particular mime type.
+   */
+  private void writeEntryToSourceFile(String mail_cap) {
+    if (sourceFile != null) {
+      int semicolonIndex = mail_cap.indexOf(';');
+      if (semicolonIndex > -1) {
+	String mimeType = mail_cap.substring(0, semicolonIndex);
+	try {
+	  if (!sourceFile.exists())
+	    sourceFile.createNewFile();
+	  
+	  File outputFile  = sourceFile.createTempFile(sourceFile.getName(), ".tmp", sourceFile.getParentFile());
+	  
+	  BufferedReader readSourceFile = new BufferedReader(new FileReader(sourceFile));
+	  BufferedWriter writeSourceFile = new BufferedWriter(new FileWriter(outputFile));
+	  String currentLine = readSourceFile.readLine();
+	  while (currentLine != null) {
+	    int equalsLoc = currentLine.indexOf(';');
+	    if (equalsLoc != -1) {
+	      String key = currentLine.substring(0, equalsLoc);
+	      
+	      if (!mimeType.equalsIgnoreCase(key)) {
+		writeSourceFile.write(currentLine);
 		writeSourceFile.newLine();
-
-		readSourceFile.close();
-		writeSourceFile.flush();
-		writeSourceFile.close();
-
-		// if you don't delete the .old file first, then the
-                // rename fails under Windows.
-                String oldSourceName = sourceFile.getAbsolutePath() + ".old";
-                File oldSource = new File (oldSourceName);
-                if (oldSource.exists())
-                  oldSource.delete();
-
-		String fileName = new String(sourceFile.getAbsolutePath());
-		sourceFile.renameTo(oldSource);
-		outputFile.renameTo(new File(fileName));
-		oldSource.delete();
-	    } catch (Exception e) {
-	      System.out.println("caugh exception while writing source file:  " + e);
-	      e.printStackTrace();
+	      }
 	    }
+	    currentLine = readSourceFile.readLine();
+	  }
+	  
+	  
+	  writeSourceFile.write(mail_cap);
+	  writeSourceFile.newLine();
+	  
+	  readSourceFile.close();
+	  writeSourceFile.flush();
+	  writeSourceFile.close();
+	  
+	  // if you don't delete the .old file first, then the
+	  // rename fails under Windows.
+	  String oldSourceName = sourceFile.getAbsolutePath() + ".old";
+	  File oldSource = new File (oldSourceName);
+	  if (oldSource.exists())
+	    oldSource.delete();
+	  
+	  String fileName = new String(sourceFile.getAbsolutePath());
+	  sourceFile.renameTo(oldSource);
+	  outputFile.renameTo(new File(fileName));
+	  oldSource.delete();
+	} catch (Exception e) {
+	  System.out.println("caugh exception while writing source file:  " + e);
+	  e.printStackTrace();
 	}
+      }
     }
-
+  }
+  
     public void addMailcapFile(java.lang.String mailcapFileName) throws IOException {
       FileInputStream fis = new FileInputStream(mailcapFileName);
       addMailcapFile(fis);

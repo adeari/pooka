@@ -51,9 +51,9 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
       TrustManager[] trustManagers = tmFactory.getTrustManagers();
 
       String fileName = Pooka.getProperty("Pooka.sslCertFile", "");
-      TrustManager[] pookaTrustManagers = new TrustManager[] {
-	new PookaTrustManager(trustManagers, fileName)
-      };
+      PookaTrustManager ptm = Pooka.resourceManager.createPookaTrustManager(trustManagers, fileName);
+      TrustManager[] pookaTrustManagers = new TrustManager[1];
+      pookaTrustManagers[0] = ptm;
 
       java.security.SecureRandom secureRandomGenerator = new java.security.SecureRandom();
       if (Pooka.getProperty("Pooka.SSL.useSecureRandom", "true").equalsIgnoreCase("false")) {
