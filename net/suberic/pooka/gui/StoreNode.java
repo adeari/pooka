@@ -180,7 +180,8 @@ public class StoreNode extends MailTreeNode {
 	    if (returnValue == JFileChooser.APPROVE_OPTION) {
 		net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
 		    ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
-		System.out.println("got folder " + wrapper.getName());
+		System.out.println("got folder " + wrapper.getPath());
+		
 		// FolderChooser.subscribeFolder(wrapper)
 	    }
 	}
