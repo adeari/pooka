@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import javax.swing.JComponent;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.SwingUtilities;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import javax.swing.tree.*;
@@ -298,14 +299,23 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	    SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+			((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		    }
+		});
+
 	    try {
 
 		if (!getFolderInfo().isOpen())
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 
 		if (getFolderInfo().isOpen()) {
-		    if ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0) {
+		    final int folderType = getFolder().getType();
+		    SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+
+		    if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
 			if (getFolderInfo().getFolderDisplayUI() != null)
 			    getFolderInfo().getFolderDisplayUI().openFolderDisplay();
 			else {
@@ -314,14 +324,21 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 			}
 			
 		    }
-		    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) != 0) {
+		    if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
 			javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
 			folderTree.expandPath(folderTree.getSelectionPath());
 		    }
+			    }
+			});
 		}
 	    } catch (MessagingException me) {
 	    }
+	    
+	    SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
 	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		    }
+		});
 	}
 	
     }

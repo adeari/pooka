@@ -28,24 +28,9 @@ public class LoadMessageTracker extends JProgressBar implements MessageLoadedLis
 
     public void handleMessageLoaded(MessageLoadedEvent e) {
 	setValue(e.getSource().getLoadedMessageCount() - initialValue);
-	if (getValue() == getMaximum())
-	    if (this.getParent() != null)
-		this.getParent().remove(this);
+	//if (getValue() == getMaximum())
+	//    if (this.getParent() != null)
+        //      this.getParent().remove(this);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

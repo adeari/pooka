@@ -24,51 +24,11 @@ import net.suberic.util.swing.*;
 public class FolderInternalFrame extends JInternalFrame implements FolderDisplayUI {
     FolderInfo folderInfo = null;
     FolderDisplayPanel folderDisplay = null;
-    StatusBar statusBar = null;
+    FolderStatusBar folderStatusBar = null;
     MessagePanel messagePanel = null;
     ConfigurableToolbar toolbar;
     ConfigurableKeyBinding keyBindings;
     boolean enabled = true;
-
-    public class StatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
-	JLabel folderLabel;
-	JLabel messageCount;
-	JPanel loaderPanel;
-	LoadMessageTracker tracker = null;
-
-	public StatusBar() {
-	    this.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    folderLabel = new JLabel(getFolderInfo().getFolderName());
-	    this.add(folderLabel);
-	    this.add(new JSeparator(SwingConstants.VERTICAL));
-	    messageCount = new JLabel();
-	    updateMessageCount();
-	    this.add(messageCount);
-	    this.add(new JSeparator(SwingConstants.VERTICAL));
-	    loaderPanel = new JPanel();
-	    this.add(loaderPanel);
-	}
-	
-	public void messageChanged(MessageChangedEvent mce) {
-	    updateMessageCount();
-	}
-
-	public void messagesAdded(MessageCountEvent e) {
-	    updateMessageCount();
-	}
-
-	public void messagesRemoved(MessageCountEvent e) {
-	    updateMessageCount();
-	}
-
-	public void updateMessageCount() {
-	    SwingUtilities.invokeLater(new RunnableAdapter() {
-		    public void run() {
-			messageCount.setText(getFolderInfo().getUnreadCount() + " " + Pooka.getProperty("FolderStatusBar.unreadMessages", "Unread") + " / " + getFolderInfo().getMessageCount() + " " + Pooka.getProperty("FolderStatusBar.totalMessages", "Total"));
-		    }
-		});
-	}
-	} // end internal class StatusBar
 
     /**
      * Creates a Folder window from the given Folder.
@@ -95,13 +55,13 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	// FolderDisplayPanel, or else you'll get a null pointer exception
 	// from the LoadMessageThread.
 
-	setStatusBar(new StatusBar());
+	setFolderStatusBar(new FolderStatusBar(this.getFolderInfo()));
 	
 	folderDisplay = new FolderDisplayPanel(getFolderInfo());
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 	this.getContentPane().add("North", toolbar);
 	this.getContentPane().add("Center", folderDisplay);
-	this.getContentPane().add("South", getStatusBar());
+	this.getContentPane().add("South", getFolderStatusBar());
 	
 	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
 	this.setSize(this.getPreferredSize());
@@ -120,8 +80,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 		}
 	    });
 	
-	getFolderInfo().addMessageCountListener(getStatusBar());
-	getFolderInfo().addMessageChangedListener(getStatusBar());
+	getFolderInfo().addMessageCountListener(getFolderStatusBar());
+	getFolderInfo().addMessageChangedListener(getFolderStatusBar());
 	getFolderInfo().addMessageCountListener(new MessageCountAdapter() {
 		public void messagesRemoved(MessageCountEvent e) {
 		    //		    net.suberic.util.swing.RunnableAdapter updateAdapter = new net.suberic.util.swing.RunnableAdapter() {
@@ -307,12 +267,12 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	return folderInfo;
     }
 
-    public StatusBar getStatusBar() {
-	return statusBar;
+    public FolderStatusBar getFolderStatusBar() {
+	return folderStatusBar;
     }
 
-    public void setStatusBar(StatusBar newValue) {
-	statusBar = newValue;
+    public void setFolderStatusBar(FolderStatusBar newValue) {
+	folderStatusBar = newValue;
     }
 
     /**
@@ -348,7 +308,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
 
 	getFolderDisplay().registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	statusBar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	folderStatusBar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
 	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
     }
     
@@ -365,7 +325,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	super.unregisterKeyboardAction(aKeyStroke);
 
 	getFolderDisplay().unregisterKeyboardAction(aKeyStroke);
-	statusBar.unregisterKeyboardAction(aKeyStroke);
+	folderStatusBar.unregisterKeyboardAction(aKeyStroke);
 	toolbar.unregisterKeyboardAction(aKeyStroke);
     }
 
@@ -410,19 +370,32 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     public void handleMessageLoaded(MessageLoadedEvent e) {
 	final MessageLoadedEvent event = e;
 
+	Runnable runMe = new Runnable() {
+
+		public void run() {
 	if (event.getType() == MessageLoadedEvent.LOADING_STARTING) {
-	    if (getStatusBar().tracker != null) {
-		getStatusBar().add(new LoadMessageTracker(event.getLoadedMessageCount(), 0, event.getNumMessages()));
+	    if (getFolderStatusBar().getTracker() != null) {
+		getFolderStatusBar().setTracker(new LoadMessageTracker(event.getLoadedMessageCount(), 0, event.getNumMessages()));
+		getFolderStatusBar().getLoaderPanel().add(getFolderStatusBar().getTracker());
 	    }
-	    getStatusBar().repaint();
 	} else if (event.getType() == MessageLoadedEvent.LOADING_COMPLETE) {
-	    if (getStatusBar().tracker != null) {
-		getStatusBar().remove(getStatusBar().tracker);
-		getStatusBar().tracker = null;
+
+	    if (getFolderStatusBar().getTracker() != null) {
+		getFolderStatusBar().getLoaderPanel().remove(getFolderStatusBar().getTracker());
+		getFolderStatusBar().setTracker(null);
 	    }
 	} else if (event.getType() == MessageLoadedEvent.MESSAGES_LOADED) {
-	    if (getStatusBar().tracker != null)
-		getStatusBar().tracker.handleMessageLoaded(event);
+	    if (getFolderStatusBar().getTracker() != null)
+		getFolderStatusBar().getTracker().handleMessageLoaded(event);
+	}
+	getFolderStatusBar().repaint();
+		}
+	    };
+
+	if (!SwingUtilities.isEventDispatchThread()) {
+	    SwingUtilities.invokeLater(runMe);
+	} else {
+	    runMe.run();
 	}
     }
 

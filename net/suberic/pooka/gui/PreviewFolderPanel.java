@@ -27,6 +27,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     private FolderDisplayPanel folderDisplay = null;
     private FolderInfo displayedFolder = null;
 
+    private FolderStatusBar folderStatusBar = null;
+
     private boolean enabled;
 
     /**
@@ -50,9 +52,12 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
 	displayedFolder = folder;
 	folderDisplay = new FolderDisplayPanel(folder);
+	folderStatusBar = new FolderStatusBar(folder);
+
 	this.setLayout(new java.awt.BorderLayout());
 
 	this.add("Center", folderDisplay);
+	this.add("South", folderStatusBar);
     }
 
     /**
@@ -193,7 +198,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      * Defined in net.suberic.pooka.event.MessageLoadedListener.
      */
     public void handleMessageLoaded(net.suberic.pooka.event.MessageLoadedEvent e) {
-	
+	if (getFolderStatusBar() != null && getFolderStatusBar().getTracker() != null)
+	    getFolderStatusBar().getTracker().handleMessageLoaded(e);
     }
 
     // ConnectionListener
@@ -224,13 +230,20 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      *
      */
     public void messagesAdded(MessageCountEvent e) {
-
+	getFolderStatusBar().messagesAdded(e);
     }
 
     public void messagesRemoved(MessageCountEvent e) { 
-
+	System.out.println("previewfolderpanel got the messaesremoved.");
+	getFolderStatusBar().messagesRemoved(e);
     }
 
+    /**
+     * Gets the folderStatusBar.
+     */
+    public FolderStatusBar getFolderStatusBar() {
+	return folderStatusBar;
+    }
 
     /**
      * Gets the currently available Actions for this component.
