@@ -219,27 +219,29 @@ public class MessageCryptoInfo {
 	  if (o instanceof CryptoAttachment) {
 	    CryptoAttachment ca = (CryptoAttachment) o;
 
-	    // FIXME
-	    EncryptionUtils cryptoUtils = getEncryptionUtils();
-
-	    BodyPart bp = ca.decryptAttachment(cryptoUtils, key);
+	    if (! ca.decryptedSuccessfully()) {
+	      // FIXME
+	      EncryptionUtils cryptoUtils = getEncryptionUtils();
+	      
+	      BodyPart bp = ca.decryptAttachment(cryptoUtils, key);
+	      
+	      // check to see what kind of attachment it is.  if it's a 
+	      // Multipart, then we need to expand it and add it to the 
+	      // attachment list.
+	      
 	    
-	    // check to see what kind of attachment it is.  if it's a 
-	    // Multipart, then we need to expand it and add it to the 
-	    // attachment list.
-	    
-	    
-	    /*
-	    if (bp.getContent() instanceof Multipart) {
-	      AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
-	      bundle.addAll(newBundle);
-	    } else {
-	      bundle.removeAttachment(ca);
-	      bundle.addAttachment(ca);
+	      /*
+		if (bp.getContent() instanceof Multipart) {
+		AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
+		bundle.addAll(newBundle);
+		} else {
+		bundle.removeAttachment(ca);
+		bundle.addAttachment(ca);
+		}
+	      */
+	      //bundle.removeAttachment(ca);
+	      MailUtilities.handlePart((MimeBodyPart) bp, bundle);
 	    }
-	    */
-	    //bundle.removeAttachment(ca);
-	    MailUtilities.handlePart((MimeBodyPart) bp, bundle);
 	  }
 	}
 

@@ -64,56 +64,28 @@ public class CryptoAttachment extends Attachment {
   // accessor methods.
   
   /**
-   * Returns the decrypted version of the wrapped attachment, or null 
-   * if the attachment is either not actually encrypted, or cannot be 
-   * decrypted.
+   * Returns the text of the Attachment, up to maxLength bytes.  If 
+   * the content is truncated, then append the truncationMessage at the
+   * end of the content displayed.
+   *
+   * If withHeaders is set, then show the Headers to go with this message.
+   * If showFullHeaders is also set, then show all the headers.  
    */
-  /*
-  public BodyPart getDecryptedBodyPart() 
-    throws MessagingException, java.io.IOException {
-    if (decryptedBodyPart != null)
-      return decryptedBodyPart;
-
-    return null;
+  public String getText(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws java.io.IOException {
+    StringBuffer retVal = new StringBuffer();
+    if (withHeaders)
+      retVal.append(getHeaderInformation(showFullHeaders));
+    
+    retVal.append(Pooka.getProperty("Pooka.crypto.encryptedMessage", "******  This is an encrypted message.  Click on the 'encryption' button or go to Encrypt->Decrypt message to read it. ******"));
+    
+    return retVal.toString();
   }
-  */
 
   /**
-   * Returns the DataHandler for this Attachment.
+   * Returns if we have already decrypted this attachment successfully.
    */
-  /*
-  public DataHandler getDataHandler() {
-    if (encrypted) {
-      try {
-	BodyPart bp = getDecryptedBodyPart();
-	
-	if (bp != null) {
-	  return bp.getDataHandler();
-	}
-      } catch (Exception e) {
-	e.printStackTrace();
-      }
-    }
-
-    return super.getDataHandler();
+  public boolean decryptedSuccessfully() {
+    return (decryptedBodyPart != null);
   }
-  */
-
-  /**
-   * Returns the MimeType.
-   */
-  /*
-  public ContentType getMimeType() {
-    if (encrypted && decryptedBodyPart != null) {
-      try {
-	BodyPart bp = getDecryptedBodyPart();
-	return new ContentType(bp.getContentType());
-      } catch (Exception e) {
-	//e.printStackTrace();
-      }
-    }
-
-    return super.getMimeType();
-  }
-  */  
+  
 }

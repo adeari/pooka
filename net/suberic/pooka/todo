@@ -1,33 +1,18 @@
+
 *) fix jmaildir on windows xp
 
 *) encryption support:
+   *) fix startup errors if no encryption configured.
+   *) add documentation
    *) test autodecrypt/auto sig check.  requires keys synched to email address.
    *) test auto sign/auto encrypt.
-   *) encryption action should offer key list if no default key for address.
-   *) make sure UI shows up for auto-encrypted messages.
-   *) encrypted message should have some sort of 'this is an encrypted message'
-      text instead of the blank text it currently has.
-   *) when selecting a key, have options for encryption (always use this key,
-	etc.)
    *) key management
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
-  *) fix threading on encryption actions.
-     *) !!! we're parsing each message on load now. !!!
-  *) fix startup errors if no encryption configured.
-  *) add documentation
-
-*) fix:
-java.security.UnrecoverableKeyException: incorrect password.
-        at net.suberic.crypto.cryptix.CryptixKeyManager.getPrivateKey(CryptixKeyManager.java:224)
-        at net.suberic.pooka.PookaEncryptionManager.getPrivateKey(PookaEncryptionManager.java:226)
-        at net.suberic.pooka.UserProfile.getEncryptionKey(UserProfile.java:509)
-        at net.suberic.pooka.UserProfile.getEncryptionKey(UserProfile.java:494)
-        at net.suberic.pooka.gui.NewMessageProxy$EncryptAction.actionPerformed(NewMessageProxy.java:399)
-
-*) arrow keys on read messages should scroll the window.
 
 *) ?? ^D message, hit return for next message, get an error?
+
+*) ?? change replay-add binding?
 
 *) ??? still a chance to send a message twice????? !!!! ????
 
@@ -64,7 +49,20 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
         at net.suberic.pooka.StoreInfo$2.actionPerformed(StoreInfo.java:717)
         at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
 
+*) printing right now truncates long lines.
+
 -----
+
+*) encryption improvements.
+   *) fix keyboard focus on passphrase entry (make textfield have focus).
+   *) encryption action should offer key list if no default key for address.
+	-- figure out timing of that.
+   *) make sure UI shows up for auto-encrypted messages.
+   *) when selecting a key, have options for encryption (always use this key,
+	etc.)
+   *) fix threading on encryption actions.
+     *) !!! we're parsing each message on load now. !!!
+
 
 *) new message count in icon
 

@@ -53,9 +53,13 @@ public class CryptoKeySelector {
 
     Vector keyList = new Vector(keys);
     JList displayList = new JList(keyList);
+    if (displayList.getModel().getSize() > 0)
+      displayList.setSelectedIndex(0);
+
     //int value = JOptionPane.showConfirmDialog(Pooka.getMainPanel(), new JScrollPane(displayList), title, JOptionPane.YES_NO_OPTION);
     JLabel label = new JLabel(message);
     Object[] messageComponents = new Object[] { label, new JScrollPane(displayList) };
+    
     int value = Pooka.getUIFactory().showConfirmDialog(messageComponents, title, JOptionPane.OK_CANCEL_OPTION);
     if (value != JOptionPane.CANCEL_OPTION) {
       String selectAlias = (String)displayList.getSelectedValue();
@@ -73,12 +77,23 @@ public class CryptoKeySelector {
     //int value = JOptionPane.showConfirmDialog(Pooka.getMainPanel(), field, "Enter passphrase", JOptionPane.YES_NO_OPTION);
     JLabel label = new JLabel(Pooka.getProperty("Pooka.crypto.passphrase.message", "Enter passphrase for key ") + alias);
     Object[] messageComponents = new Object[] { label, field };
+    field.setRequestFocusEnabled(true);
+
     int value = Pooka.getUIFactory().showConfirmDialog(messageComponents, Pooka.getProperty("Pooka.crypto.passphrase.title", "Enter passphrase"), JOptionPane.OK_CANCEL_OPTION);
+
     if (value != JOptionPane.CANCEL_OPTION) {
       return field.getPassword();
     }
     
     return null;
+
+    /*
+    String returnValue = Pooka.getUIFactory().showInputDialog(messageComponents, Pooka.getProperty("Pooka.crypto.passphrase.title", "Enter passphrase"));
+    if (returnValue == null)
+      return null;
+    else
+      return returnValue.toCharArray();
+    */
   }
 
 

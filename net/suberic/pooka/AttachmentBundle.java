@@ -77,11 +77,15 @@ class AttachmentBundle {
    * Adds an Attachment using the given ContentType.
    */
   synchronized void addAttachment(Attachment newAttach, ContentType ct) {
-    if (textPart == null && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
+    if ((textPart == null || textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
       textPart = newAttach;
+    } else if (textPart == null && newAttach instanceof net.suberic.pooka.crypto.CryptoAttachment) {
+      textPart = newAttach;
+      allAttachments.add(newAttach);
     } else {
       allAttachments.add(newAttach);
     }
+
   }
   
   /**

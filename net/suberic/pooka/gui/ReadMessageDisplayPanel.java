@@ -130,6 +130,48 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
     keyBindings.setActive(getActions());
     
+    // add up and down arrow scrolling.
+    KeyStroke upArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0);
+    KeyStroke downArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0);
+    
+    javax.swing.text.Keymap keyMap = editorPane.getKeymap();
+
+    keyMap.removeKeyStrokeBinding(upArrowStroke);
+    keyMap.addActionForKeyStroke(upArrowStroke, new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
+	  jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
+	}
+      });
+    keyMap.removeKeyStrokeBinding(downArrowStroke);
+    keyMap.addActionForKeyStroke(downArrowStroke, new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
+	  jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
+	}
+      });
+
+    // actuall probably don't need to do this twice, but...
+
+    keyMap = otherEditorPane.getKeymap();
+
+    keyMap.removeKeyStrokeBinding(upArrowStroke);
+    keyMap.addActionForKeyStroke(upArrowStroke, new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
+	  jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
+	}
+      });
+    keyMap.removeKeyStrokeBinding(downArrowStroke);
+    keyMap.addActionForKeyStroke(downArrowStroke, new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
+	  jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
+	}
+      });
+
+    // </scrolling>
+
     editorPane.addMouseListener(new MouseAdapter() {
 	
 	public void mousePressed(MouseEvent e) {
@@ -517,6 +559,17 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       return editorPane;
     } else {
       return otherEditorPane;
+    }
+  }
+
+  /**
+   * Returns the current ScrollPane being used.
+   */
+  public JScrollPane getCurrentScrollPane() {
+    if (editorStatus == WITHOUT_ATTACHMENTS) {
+      return editorScrollPane;
+    } else {
+      return otherScrollPane;
     }
   }
   

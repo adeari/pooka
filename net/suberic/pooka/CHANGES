@@ -1,3 +1,5 @@
+up and down arrows on ReadMessageWindows now scroll the ScrollPane.  
+
 fixed the handling of incorrectly-formed multipart/alternative messages so 
 that we display the content.
 

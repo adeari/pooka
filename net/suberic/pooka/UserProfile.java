@@ -506,19 +506,20 @@ public class UserProfile extends Object implements ValueChangeListener {
     if (keyAlias != null && keyAlias.length() > 0) {
       try {
 	if (Pooka.getCryptoManager().privateKeyAliases(type).contains(keyAlias)) {
-	  java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
-
-	  return returnValue;
+	  try {
+	    java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
+	    
+	    return returnValue;
+	  } catch (java.security.UnrecoverableKeyException uke) {
+	    // we just haven't accessed the key yet.  skip.
+	  }
 	}
       } catch (Exception ee) {
 	ee.printStackTrace();
       }
       // FIXME
-      System.err.println("unable to find private key " + keyAlias);
       return null;
     }
-    
-    System.err.println("no default key.");
 
     return null;
   }
