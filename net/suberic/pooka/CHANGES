@@ -1,3 +1,5 @@
+made the property editor windows resizable under the desktoppropertyeditor.
+
 changed the SSL server support so that we now can connect using a self-signed
 certificate chain.
 

@@ -13,7 +13,7 @@ import net.suberic.util.*;
  * @author Allen Petersen
  * @version $Revision$
  */
-public class OutgoingMailServer implements net.suberic.util.Item {
+public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.util.ValueChangeListener {
 
   String id = null;
 
@@ -46,16 +46,47 @@ public class OutgoingMailServer implements net.suberic.util.Item {
 
     outboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
 
+    bundle.addValueChangeListener(this, getItemProperty() + ".connection");
+    bundle.addValueChangeListener(this, getItemProperty() + ".server");
+    bundle.addValueChangeListener(this, getItemProperty() + ".outbox");
   }
 
+  /**
+   * <p>Called when one of the values that defines this OutgoingMailServer
+   * is changed.</p>
+   */
+  public void valueChanged(String changedValue) {
+    VariableBundle bundle = Pooka.getResources();
+
+    if (changedValue != null) {
+      if (changedValue.equals(getItemProperty() + ".connection")) {
+	connectionID = bundle.getProperty(getItemProperty() + ".connection", "");
+	
+      } else if (changedValue.equals(getItemProperty() + ".server")) {
+	sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + "/");
+      } else if (changedValue.equals(getItemProperty() + ".outbox")) {
+	String newOutboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
+	if (newOutboxID != outboxID) {
+	  FolderInfo outbox = getOutbox();
+	  if (outbox != null) {
+	    outbox.setOutboxFolder(null);
+	  }
+
+	  outboxID = newOutboxID;
+	  loadOutboxFolder();
+	}
+      }
+    }
+  }
+  
   /**
    * Loads the outbox folders.
    */
   public void loadOutboxFolder() {
     FolderInfo outbox = getOutbox();
-    if (outbox != null)
-      outbox.setOutboxFolder(true);
-
+    if (outbox != null) {
+      outbox.setOutboxFolder(this);
+    }
   }
 
   /**

@@ -2,7 +2,6 @@ next release:
 
 *) add queuing of outgoing mails (?)
 	todo on this:
-	*)  make it so you can manually send the messages in the mail queue.
 	*)  make it so the mail queue automatically flushes when you 
 		connect--if you want it to.
 	*)  make it fault tolerant so that if you still have the old
@@ -10,11 +9,8 @@ next release:
 	*)  fix the local mail store so that it doesn't necessarily put
 		in an INBOX for everything.  this is so we can set up a
 		local mail store for IMAP users.
-	*)  fix the UIDFolderInfo so that you can add new messages directly
-		to it.  -done
 	*)  fix the threading.  sending messages is on the awt thread right
 		now.
-	*)  make mbox stores ignore the NetworkConnection.  
 
 *) make search give a popup window saying it's running, or at least something
 	that makes it obvious that _something's_ going on.
@@ -53,6 +49,10 @@ error:  filterfoldercellrenderer has problems with search forms.
 *) caching messages marks them as read.
 
 *) no way to cache messages as they come in.
+
+*) add a browser to browse/select all registered (open or not) Folders.  in 
+other words, we want everything that appears in the FolderTree, not all 
+possible folders, nor just the ones that are open.
 
 ---------------
 

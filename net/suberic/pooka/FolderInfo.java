@@ -105,13 +105,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   private UserProfile defaultProfile = null;
   
   private boolean sentFolder = false;
-  private boolean outboxFolder = false;
   private boolean trashFolder = false;
   
   private boolean notifyNewMessagesMain = true;
   private boolean notifyNewMessagesNode = true;
   
   protected FetchProfile fetchProfile = null;
+
+  protected OutgoingMailServer mailServer = null;
 
   /**
    * For subclasses.
@@ -1241,6 +1242,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread()),
 	  new EditPropertiesAction()
 	    };
+	} else if (isOutboxFolder()) {
+	defaultActions = new Action[] {
+	  new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+	  new net.suberic.util.thread.ActionWrapper(new SendAllAction(), getFolderThread()),
+	  new EditPropertiesAction()
+	    };
+	  
 	} else {
 	  defaultActions = new Action[] {
 	    new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
@@ -1847,14 +1855,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   }
 
+  /**
+   * Returns whether or not this is an Outbox for an OutgoingMailServer.
+   */
   public boolean isOutboxFolder() {
-    return outboxFolder;
+    return (mailServer != null);
   }
 
-  public void setOutboxFolder(boolean newValue) {
-    outboxFolder = newValue;
-    setNotifyNewMessagesMain(! newValue);
-    setNotifyNewMessagesNode(! newValue);
+  /**
+   * Sets this as an Outbox for the given OutgoingMailServer.  If this
+   * is getting removed as an outbox, set the server to null.
+   */
+  public void setOutboxFolder(OutgoingMailServer newServer) {
+    mailServer = newServer;
+    setNotifyNewMessagesMain(newServer==null);
+    setNotifyNewMessagesNode(newServer==null);
+    resetDefaultActions();
   }
 
     public boolean notifyNewMessagesMain() {
@@ -2010,6 +2026,23 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
         public void actionPerformed(ActionEvent e) {
 	    emptyTrash();
 	}
+    }
+
+
+    class SendAllAction extends AbstractAction {
+      
+      SendAllAction() {
+	super("folder-send");
+      }
+      
+      public void actionPerformed(ActionEvent e) {
+	if (isOutboxFolder())
+	  try {
+	    mailServer.sendAll();
+	  } catch (MessagingException me) {
+	    Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+	  }
+      }
     }
 
 }
