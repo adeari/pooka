@@ -388,7 +388,7 @@ Folder.editableFields.propertyType=Tabbed
 Folder.editableFields.propertyScoped=true
 Folder.editableFields.templateScoped=true
 Folder.editableFields=config:display:backend
-Folder.editableFields.config=defaultProfile:useTrashFolder
+Folder.editableFields.config=defaultProfile:useTrashFolder:notifyNewMessagesMain:notifyNewMessagesNode
 Folder.editableFields.config.scoped=true
 Folder.editableFields.config.scopeRoot=Folder.editableFields
 
@@ -418,6 +418,8 @@ Folder.editableFields.backendFilters.editableFields.action.filterType=backend
 Folder.editableFields.defaultProfile.propertyType=List
 Folder.editableFields.defaultProfile.allowedValues=UserProfile
 Folder.editableFields.useTrashFolder.propertyType=Boolean
+Folder.editableFields.notifyNewMessagesMain.propertyType=Boolean
+Folder.editableFields.notifyNewMessagesNode.propertyType=Boolean
 
 Store.propertyType=Multi
 Store.editableFields.scoped=true
