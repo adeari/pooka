@@ -152,7 +152,7 @@ public class VariableBundle extends Object {
     }
 
 
-    public void saveProperties(File saveFile) {
+  public void saveProperties(File saveFile) {
 	if (writableProperties.size() > 0) { 
 	    File outputFile;
 	    String currentLine, key;
@@ -200,10 +200,17 @@ public class VariableBundle extends Object {
 		readSaveFile.close();
 		writeSaveFile.flush();
 		writeSaveFile.close();
-		String fileName = new String(saveFile.getAbsolutePath());
-		saveFile.renameTo(new File(saveFile.getAbsolutePath() + ".old"));
-		outputFile.renameTo(new File(fileName));
 
+                // if you don't delete the .old file first, then the
+                // rename fails under Windows.
+                String oldSaveName = saveFile.getAbsolutePath() + ".old";
+                File oldSave = new File (oldSaveName);
+                if (oldSave.exists())
+                  oldSave.delete();
+
+		String fileName = new String(saveFile.getAbsolutePath());
+		saveFile.renameTo(oldSave);
+		outputFile.renameTo(new File(fileName));
 		
 	    } catch (Exception e) {
 		System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + saveFile.getName() + ": " + e.getMessage()));
