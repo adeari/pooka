@@ -1,15 +1,17 @@
 *) add drag and drop
+   *) FIX THREADING!!! -- just try doing a big copy into a folde with a 
+	paste operation!!!
+
    *) on win/osx:
      *) fix file export for messages
      *) fix file export for attachments
      *) test with desktop/external apps.
 
-   *) fix naming of dragged/copied file.
-   *) error:  fix (error:  proxy) message if you drag a message into a
-	imap-disconnected closed folder (mailtest inbox).
-
 *) fix disconnected imap so that it shows when it's downloading lots
 	of messages.
+
+*) check efficience on copying a lot of messages.  looks like we're copying
+	and/or loading each message individually.
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.

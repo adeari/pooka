@@ -359,7 +359,9 @@ public class MessageInfo {
       mm.writeTo(baos);
       return baos.toString();
     } catch (IOException ioe) {
-      throw new MessagingException("Error reading Message Stream", ioe);
+      MessagingException returnValue = new MessagingException("Error reading Message Stream", ioe);
+      returnValue.initCause(ioe);
+      throw returnValue;
     }
   }
 
@@ -370,13 +372,17 @@ public class MessageInfo {
     try {
       folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
     } catch (MessagingException me) {
-      throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+      MessagingException returnValue = new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+      returnValue.initCause(me);
+      throw returnValue;
     }
     
     try {
       remove(expunge);
     } catch (MessagingException me) {
-      throw new MessagingException(Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n", me);
+      MessagingException returnValue = new MessagingException(Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n", me);
+      returnValue.initCause(me);
+      throw returnValue;
     }
   }
   
@@ -387,7 +393,9 @@ public class MessageInfo {
     try {
       folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
     } catch (MessagingException me) {
-      throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+      MessagingException returnValue = new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+      returnValue.initCause(me);
+      throw returnValue;
     }
     
   }

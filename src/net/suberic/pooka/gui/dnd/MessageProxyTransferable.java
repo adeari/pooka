@@ -79,7 +79,18 @@ public class MessageProxyTransferable implements Transferable {
    */
   private File extractMessageInfo(MessageInfo info) throws java.io.IOException {
     try {
-      File f = DndUtils.createTemporaryFile("pooka_message.txt");
+      String name = "pooka_message";
+      try {
+	javax.mail.Message m = info.getMessage();
+	if (m instanceof net.suberic.pooka.UIDMimeMessage) {
+	  name = "message_" + ((net.suberic.pooka.UIDMimeMessage) m).getUID() ;
+	}  else {
+	  name = "message_" + m.getMessageNumber();
+	}
+      } catch (Exception me) {
+	// ignore.
+      }
+      File f = DndUtils.createTemporaryFile(name);
       info.saveMessageAs(f);
       return f;
     } catch (javax.mail.MessagingException me) {

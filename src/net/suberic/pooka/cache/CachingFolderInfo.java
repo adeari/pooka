@@ -29,7 +29,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
   public CachingFolderInfo(StoreInfo parent, String fname) {
     super(parent, fname);
-    
+
     autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
   }
   
@@ -37,6 +37,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     super(parent, fname);
     
     autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+
   }
   
   /**
@@ -273,10 +274,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     if (getFolderDisplayUI() != null) {
       if (start) {
 	getFolderDisplayUI().setBusy(true);
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.starting", "Loading messages."));
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("messages.CachingFolder.loading.starting", "Loading messages."));
       } else {
 	getFolderDisplayUI().setBusy(false);
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.finished", "Done loading messages."));
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("messages.CachingFolder.loading.finished", "Done loading messages."));
       }
     }
   }
@@ -310,20 +311,14 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     if (isConnected()) {
       try {
 	// load the list of uid's.
-
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
-      else
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
-      
-      // first write all the changes that we made back to the server.
-      getCache().writeChangesToServer(getFolder());
-      
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
-      else
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
-      
+	
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
+	
+	// first write all the changes that we made back to the server.
+	getCache().writeChangesToServer(getFolder());
+	
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
+	
 	FetchProfile uidFetchProfile = new FetchProfile();
 	uidFetchProfile.add(UIDFolder.FetchProfileItem.UID);
 	if (Pooka.isDebug())
@@ -719,38 +714,30 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       System.out.println("synchronizing cache.");
     
     try {
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
       if (getFolderDisplayUI() != null) {
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
 	getFolderDisplayUI().setBusy(true);
-      } else {
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
-      }
-
+      } 
+      
       long cacheUidValidity = getCache().getUIDValidity();
       
       if (uidValidity != cacheUidValidity) {
-	if (getFolderDisplayUI() != null)
-	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
-	else 
-	  Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
 	
 	getCache().invalidateCache();
 	getCache().setUIDValidity(uidValidity);
 	cacheUidValidity = uidValidity;
       }
       
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
-      else
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
+
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
       
       // first write all the changes that we made back to the server.
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronzing.writingChanges", "Writing local changes to server"));
+
       getCache().writeChangesToServer(getFolder());
       
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
-      else
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
       
       // load the list of uid's.
 
@@ -766,6 +753,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
       if (Pooka.isDebug())
 	System.out.println("fetching messages.");
+
+      String messageCount = messages == null ? "null" : Integer.toString(messages.length);
+
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.fetchingMessages", "Fetching") + " " + messageCount + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
+			
       getFolder().fetch(messages, fp);
       if (Pooka.isDebug())
 	System.out.println("done fetching messages.  getting uid's");
@@ -779,10 +771,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (Pooka.isDebug())
 	System.out.println("synchronizing--uids.length = " + uids.length);
       
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
-      else
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
       
       long[] addedUids = cache.getAddedMessages(uids, uidValidity);
 
@@ -792,6 +781,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (addedUids.length > 0) {
 	Message[] addedMsgs = ((UIDFolder)getFolder()).getMessagesByUID(addedUids);
 	MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.ADDED, false, addedMsgs);
+
+      showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.loadingMessages", "Loading") + " " + addedUids.length + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
+
 	messagesAdded(mce);
       }    
       
@@ -812,13 +804,12 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  }
 	}
 	MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.REMOVED, false, removedMsgs);
+
+	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.removingMessages", "Removing") + " " + removedUids.length + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
+
 	messagesRemoved(mce);
       }
       
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.updatingFlags", "Updating flags..."));
-      else
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.updatingFlags", "Updating flags..."));
       updateFlags(uids, messages, cacheUidValidity);
       
     } finally {
@@ -848,16 +839,18 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    addedProxies.add(new MessageProxy(getColumnValues(), mi));
 	    messageToInfoTable.put(addedMessages[i], mi);
 	    uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mi);
-	    try {
-	      if (autoCache) {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.MESSAGE, false);
-	      } else {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
-	      }
-	    } catch (MessagingException me) {
-	      System.out.println("caught exception:  " + me);
-	      me.printStackTrace();
+	  }
+
+	  // we need to autoCache either way.
+	  try {
+	    if (autoCache) {
+	      getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.MESSAGE, false);
+	    } else {
+	      getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
 	    }
+	  } catch (MessagingException me) {
+	    System.out.println("caught exception:  " + me);
+	    me.printStackTrace();
 	  }
 	} else {
 	  // it's a 'real' message from the server.
@@ -873,22 +866,23 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	      System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
 	  } else {
 	    
-	  
+	    
 	    CachingMimeMessage newMsg = new CachingMimeMessage(CachingFolderInfo.this, uid);
 	    mi = new MessageInfo(newMsg, CachingFolderInfo.this);
 	    addedProxies.add(new MessageProxy(getColumnValues(), mi));
 	    messageToInfoTable.put(newMsg, mi);
 	    uidToInfoTable.put(new Long(uid), mi);
-	    try {
-	      if (autoCache) {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.MESSAGE, false);
-	      } else {
-		getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
-	      }
-	    } catch (MessagingException me) {
-	      System.out.println("caught exception:  " + me);
-	      me.printStackTrace();
+	  }
+	  
+	  try {
+	    if (autoCache) {
+	      getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.MESSAGE, false);
+	    } else {
+	      getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
 	    }
+	  } catch (MessagingException me) {
+	    System.out.println("caught exception:  " + me);
+	    me.printStackTrace();
 	  }
 	}
       }
@@ -1305,6 +1299,16 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     } else {
       return super.getUID(m);
     }
+  }
+
+  /**
+   * Shows a status message, using the given FolderDisplayUI if not null.
+   */
+  public void showStatusMessage(net.suberic.pooka.gui.FolderDisplayUI pUI, String message) {
+    if (pUI != null)
+      pUI.showStatusMessage(message);
+    else
+      Pooka.getUIFactory().showStatusMessage(message);
   }
 }
 
