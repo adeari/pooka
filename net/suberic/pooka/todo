@@ -1,13 +1,6 @@
 beta 1
 ---------------
 
-*) bug:  if you switch back from preview mode to desktop mode, we need
-to remove the listener on the JTable.
-
-*) need to fix the NewAccountPooka to 1) make it look right, and 2) support
-pop3 stores.
-
-----
 
 *) support for ssl?
 

@@ -50,6 +50,7 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
 	try {
 	    iKeys = new StringTokenizer(vars.getProperty(key), ":");
 	} catch (MissingResourceException mre) {
+	    mre.printStackTrace();
 	    try {
 		System.err.println(vars.getProperty("error.NoSuchResource") + " " + mre.getKey());
 	    } catch (MissingResourceException mretwo) {
@@ -135,6 +136,7 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
 		    m = (ConfigurableMenu) menuClass.newInstance();
 		    m.configureComponent(menuID + "." + menuItemID, vars);
 		} catch (Exception e) {
+		    e.printStackTrace();
 		    // if we get any errors, just create a plain 
 		    // ConfigurableMenu.
 		    m = new ConfigurableMenu(menuID + "." + menuItemID, vars);

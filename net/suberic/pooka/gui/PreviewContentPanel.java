@@ -314,5 +314,9 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
     public HashMap getCardTable() {
 	return cardTable;
     }
+
+    public ListSelectionListener getSelectionListener() {
+	return selectionListener;
+    }
 }
 

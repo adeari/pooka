@@ -489,10 +489,17 @@ FolderTree.unavailableIcon=images/Delete.gif
 FolderTree.connectedStoreIcon=images/mailbox.gif
 FolderTree.disconnectedStoreIcon=images/mailbox.gif
 
-NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
+NewAccountPooka=firstPanel:introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:protocol
+NewAccountPooka.firstPanel=userName:fullName:password:serverName:protocol
+NewAccountPooka.firstPanel.propertyType=Composite
+NewAccountPooka.firstPanel.propertyScoped=true
+NewAccountPooka.firstPanel.templateScoped=true
+NewAccountPooka.firstPanel.scoped=true
+NewAccountPooka.firstPanel.scopeRoot=NewAccountPooka
 NewAccountPooka.password.propertyType=Password
-NewAccountPooka.type.propertyType=List
-NewAccountPooka.type.allowedValues=imap:pop3
+NewAccountPooka.password.size=20
+NewAccountPooka.protocol.propertyType=List
+NewAccountPooka.protocol.allowedValues=imap:pop3
 NewAccountPooka.type=imap
 
 FolderSelectorPane.inputButton.image=/net/suberic/pooka/gui/images/More.gif

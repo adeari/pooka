@@ -38,12 +38,14 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
 	FolderNode currentFolder;
 
 	for (int i = 0; i < folderList.size(); i++) {
-	    currentFolder=(FolderNode)folderList.elementAt(i);
-	    JMenuItem mi = new JMenuItem(currentFolder.getFolderID());
-	    mi.setActionCommand(getActionCommand());
+	    if (folderList.elementAt(i) instanceof FolderNode) {
+		currentFolder=(FolderNode)folderList.elementAt(i);
+		JMenuItem mi = new JMenuItem(currentFolder.getFolderID());
+		mi.setActionCommand(getActionCommand());
 	    
-	    this.add(mi);
+		this.add(mi);
 	    }
+	}
     }
     
     /**

@@ -48,11 +48,8 @@ public class NewAccountPooka {
 	PropertyEditorFactory factory = new PropertyEditorFactory(getProperties());
 	setFactory(factory);
 	java.util.Vector propertyVector = new java.util.Vector();
-	propertyVector.add("NewAccountPooka.userName");
-	propertyVector.add("NewAccountPooka.fullName");
-	propertyVector.add("NewAccountPooka.password");
-	propertyVector.add("NewAccountPooka.serverName");
-	propertyVector.add("NewAccountPooka.type");
+
+	propertyVector.add("NewAccountPooka.firstPanel");
 
 	JInternalFrame firstEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.entryWindowMessage.title", "Enter Email Account Information"), false, false, false, false);
         JComponent contentPane = 
@@ -61,9 +58,10 @@ public class NewAccountPooka {
 
         // is there a way to make this wrap automatically, without adding
         // explicit newlines?
-	contentPane.add(new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client.")));
+	 contentPane.add(new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client.")));
 
 	contentPane.add(new PropertyEditorPane(factory,
+                                               propertyVector,
                                                propertyVector,
                                                firstEntryWindow));
 
@@ -72,7 +70,11 @@ public class NewAccountPooka {
 	firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 
 		public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-		    handleFirstEntry();
+		    SwingUtilities.invokeLater( new Runnable() {
+			    public void run() {
+				handleFirstEntry();
+			    }
+			});
 		}
 	    });
 
@@ -90,7 +92,7 @@ public class NewAccountPooka {
 	 * this wizard.
 	 */
 
-	Enumeration en = Pooka.getResources().getPropertyAsEnumeration("NewAccountPooka", "introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type");
+	Enumeration en = Pooka.getResources().getPropertyAsEnumeration("NewAccountPooka", "introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:protocol");
 	VariableBundle vb = new VariableBundle(null, null, null);
 	while (en.hasMoreElements()) {
 	    String property = "NewAccountPooka." + (String)en.nextElement();
@@ -104,6 +106,22 @@ public class NewAccountPooka {
               Pooka.getProperty(property + ".propertyType", "");
 	    if (!(propertyTypeValue.equals("")))
 		vb.setProperty(property + ".propertyType", propertyTypeValue);
+	    String propertyScopedValue =
+              Pooka.getProperty(property + ".propertyScoped", "");
+	    if (!(propertyTypeValue.equals("")))
+		vb.setProperty(property + ".propertyScoped", propertyScopedValue);
+	    String templateScopedValue =
+              Pooka.getProperty(property + ".templateScoped", "");
+	    if (!(propertyTypeValue.equals("")))
+		vb.setProperty(property + ".templateScoped", templateScopedValue);
+	    String scopedValue =
+              Pooka.getProperty(property + ".scoped", "");
+	    if (!(propertyTypeValue.equals("")))
+		vb.setProperty(property + ".scoped", scopedValue);
+	    String scopeRootValue =
+              Pooka.getProperty(property + ".scopeRoot", "");
+	    if (!(propertyTypeValue.equals("")))
+		vb.setProperty(property + ".scopeRoot", scopeRootValue);
 	    String allowedValuesValue =
               Pooka.getProperty(property + ".allowedValues", "");
 	    if (!(allowedValuesValue.equals("")))
@@ -119,12 +137,14 @@ public class NewAccountPooka {
 	 * and Store entry.
 	 */
 	VariableBundle vb = getProperties();
-	String userName = vb.getProperty("NewAccountPooka.userName", "");
-	String fullName = vb.getProperty("NewAccountPooka.fullName", "");
-	String password = vb.getProperty("NewAccountPooka.password", "");
-	String serverName = vb.getProperty("NewAccountPooka.serverName", "");
-	String type = vb.getProperty("NewAccountPooka.type", "");
-	if (vb.getProperty("NewAccountPooka.userName", "").equals(""))
+	String userName = vb.getProperty("NewAccountPooka.firstPanel.userName", "");
+	String fullName = vb.getProperty("NewAccountPooka.firstPanel.fullName", "");
+	String password = vb.getProperty("NewAccountPooka.firstPanel.password", "");
+	String serverName = vb.getProperty("NewAccountPooka.firstPanel.serverName", "");
+	String protocol = vb.getProperty("NewAccountPooka.firstPanel.protocol", "");
+
+
+	if (userName.equals("") || serverName.equals("") || protocol.equals(""))
 	    invalidFirstEntry();
 	else {
 	    String accountName = userName + "@" + serverName;
@@ -136,7 +156,7 @@ public class NewAccountPooka {
 	    vb.setProperty("UserProfile." + accountName + ".sendMailURL", "smtp://" + serverName + "/");
 	    vb.setProperty("Store", accountName);
 	    vb.setProperty("Store." + accountName + ".server", serverName);
-	    vb.setProperty("Store." + accountName + ".protocol", type);
+	    vb.setProperty("Store." + accountName + ".protocol", protocol);
 	    vb.setProperty("Store." + accountName + ".user", userName);
 	    vb.setProperty("Store." + accountName + ".password", password);
 	    vb.setProperty("Store." + accountName + ".defaultProfile", accountName);
@@ -167,7 +187,11 @@ public class NewAccountPooka {
 	secondEntryWindow.show();
 	secondEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 		public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
-		    handleSecondEntry();
+		    SwingUtilities.invokeLater( new Runnable() {
+			    public void run() {
+				handleSecondEntry();
+			    }
+			} );
 		}
 	    });		
 
@@ -214,7 +238,8 @@ public class NewAccountPooka {
     }
 
     public void invalidFirstEntry() {
-	System.out.println("invalid first entry.");
+	Pooka.getUIFactory().showError(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
+	this.start();
     }
 
     public void transferProperty(String propertyName) {
