@@ -27,6 +27,8 @@ and basically just fails all over the place.
 *)  make the editor for new messages wrap properly at 75 (or user configurable)
 characters.
 
+*)  enable keybindings so they work properly.
+
 *)  make cut & paste work from the Toolbar.
 
 *)  make the FolderChooser less clunky.  add the ability to create and
