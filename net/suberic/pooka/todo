@@ -1,10 +1,33 @@
-*) make it so the extra images aren't included in the build.  maybe convert
-	said images to pngs or jpgs?
+*) add documentation and online help.
+  -- general info, plus more detailed configuration information.
+	topics:
+	  running pooka
+	  copyright/gpl
+	  keybindings
+	  configuring stores (imap,pop3,mbox)
+	  reading mail
+	  new mail
+	  user profiles
+	  outgoing mail config
+	  network connections
+	  disconnected operation
+	  address book
+	  searches
+	  subscribing/unsubscribing folders
+	  ui types
+	  trash folder
+	  sent folder
+	  outgoing mail folder
+
+
+*) fix up the error messages, and make sure that they look ok.
 
 *) support windows registry attachment associations.
 	-- check icemail
 
--------
+*) add support for viewing messages as raw (rfc822 format).
+
+-----
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
 
@@ -59,11 +82,7 @@ preview:
 	the connection totally, so that if your network is screwed up 
 	pooka can recover without restarting.
 
-*)  add documentation and online help.
-
 *) editors:  add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
-
-*)  fix up the error messages, and make sure that they look ok.
 
 *) splashscreen?
 

@@ -10,6 +10,7 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.mail.Session;
 import javax.mail.MessagingException;
+import javax.help.*;
 import net.suberic.pooka.MailQueue;
 import net.suberic.pooka.UserProfile;
 import net.suberic.util.gui.*;
@@ -39,77 +40,77 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   private ImageIcon standardIcon = null;
   private ImageIcon newMessageIcon = null;
 
-    public MainPanel(JFrame frame) {
-	super(JSplitPane.HORIZONTAL_SPLIT);
+  public MainPanel(JFrame frame) {
+    super(JSplitPane.HORIZONTAL_SPLIT);
+    
+    SimpleAuthenticator auth = new SimpleAuthenticator(frame);
+    
+    session = Session.getDefaultInstance(System.getProperties(), auth);
+    
+    if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
+      session.setDebug(true);
+    
+    mailQueue = new MailQueue(Pooka.getDefaultSession());
+    
+  }
+  
+  /**
+   * This actually sets up the main panel.
+   */
+  public void configureMainPanel() {
+    // set supported actions
+    // this.setLayout(new BorderLayout());
+    // create the menu bar.
+    
+    contentPanel = Pooka.getUIFactory().createContentPanel();
+    folderPanel = new FolderPanel(this);
+    infoPanel = new InfoPanel();
+    infoPanel.setMessage("Pooka");
+    
+    this.setLeftComponent(folderPanel);
+    this.setRightComponent(contentPanel.getUIComponent());
+    this.setDividerLocation(folderPanel.getPreferredSize().width + 1);
+    
+    mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
+    mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
 
-	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
-
-	session = Session.getDefaultInstance(System.getProperties(), auth);
-	
-	if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
-	    session.setDebug(true);
-
-	mailQueue = new MailQueue(Pooka.getDefaultSession());
-
+    keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
+    keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    
+    // set the default active menus.
+    // actually, don't do this here--let Pooka do it.  this is because
+    // the MenuBar hasn't actually been set yet.
+    //mainMenu.setActive(getActions());
+    //mainToolbar.setActive(getActions());
+    //keyBindings.setActive(getActions());
+    
+    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+    if (standardUrl != null) {
+      standardIcon = new ImageIcon(standardUrl);
+      setCurrentIcon(standardIcon.getImage());
     }
     
-    /**
-     * This actually sets up the main panel.
-     */
-    public void configureMainPanel() {
-      // set supported actions
-      // this.setLayout(new BorderLayout());
-      // create the menu bar.
-      
-      contentPanel = Pooka.getUIFactory().createContentPanel();
-      folderPanel = new FolderPanel(this);
-      infoPanel = new InfoPanel();
-      infoPanel.setMessage("Pooka");
-      
-      this.setLeftComponent(folderPanel);
-      this.setRightComponent(contentPanel.getUIComponent());
-      this.setDividerLocation(folderPanel.getPreferredSize().width + 1);
-      
-      mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
-      mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
-      
-      keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
-      keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-      // set the default active menus.
-      // actually, don't do this here--let Pooka do it.  this is because
-      // the MenuBar hasn't actually been set yet.
-      //mainMenu.setActive(getActions());
-      //mainToolbar.setActive(getActions());
-      //keyBindings.setActive(getActions());
-      
-      java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
-      if (standardUrl != null) {
-	standardIcon = new ImageIcon(standardUrl);
-	setCurrentIcon(standardIcon.getImage());
-      }
-      
-      java.net.URL newMessageUrl = this.getClass().getResource(Pooka.getProperty("Pooka.newMessageIcon", "images/PookaNewMessageIcon.gif")); 
-      if (newMessageUrl != null) {
-	newMessageIcon = new ImageIcon(newMessageUrl);
-      }
-
-      getParentFrame().addWindowListener(new WindowAdapter() {
-	  public void windowActivated(WindowEvent e) {
-	    setNewMessageFlag(false);
-		}
-	  
-	  public void windowClosing(WindowEvent e) {
-	    exitPooka(1);
-	  }
-	});
-      
-      // set the initial currentUser
-      refreshCurrentUser();
-
-      // select the content panel.
-      contentPanel.getUIComponent().requestFocus();
+    java.net.URL newMessageUrl = this.getClass().getResource(Pooka.getProperty("Pooka.newMessageIcon", "images/PookaNewMessageIcon.gif")); 
+    if (newMessageUrl != null) {
+      newMessageIcon = new ImageIcon(newMessageUrl);
     }
+    
+    getParentFrame().addWindowListener(new WindowAdapter() {
+	public void windowActivated(WindowEvent e) {
+	  setNewMessageFlag(false);
+	}
+	
+	public void windowClosing(WindowEvent e) {
+	  exitPooka(1);
+	}
+      });
+    
+      // set the initial currentUser
+    refreshCurrentUser();
+    
+    // select the content panel.
+    contentPanel.getUIComponent().requestFocus();
+  }
 
     /**
      * This gets all the actinos associated with this panel.  Useful for
@@ -401,6 +402,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new EditInterfaceAction(),
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
+	new HelpAction(),
 	new HelpKeyBindingsAction(),
 	new SelectMessagePanelAction(),
 	new SelectFolderPanelAction(),
@@ -574,6 +576,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
 	}
     }
+
+  class HelpAction extends AbstractAction {
+    
+    HelpAction() {
+      super("help");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      new CSH.DisplayHelpFromSource(Pooka.getHelpBroker()).actionPerformed(e);
+    }
+  }
 
     class HelpKeyBindingsAction extends AbstractAction {
 	

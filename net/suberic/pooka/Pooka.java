@@ -3,6 +3,7 @@ import net.suberic.pooka.gui.*;
 import java.awt.*;
 import javax.swing.*;
 import java.util.Vector;
+import javax.help.*;
 
 public class Pooka {
 
@@ -41,6 +42,8 @@ public class Pooka {
   // settings
   static public boolean openFolders = true;
   static public String pookaHome = null;
+
+  static public HelpBroker helpBroker;
 
   /**
    * Runs Pooka.  Takes the following arguments:
@@ -159,6 +162,17 @@ public class Pooka {
 	    System.out.println("Cannot set look and feel..."); }
 	}
       }, "Pooka.looknfeel");
+    
+    // set up help
+    try {
+      ClassLoader cl = new Pooka().getClass().getClassLoader();
+      java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
+      HelpSet hs = new HelpSet(cl, hsURL);
+      helpBroker = hs.createHelpBroker();
+    } catch (Exception ee) {
+      System.out.println("HelpSet net/suberic/pooka/doc/en/help/merge/Master.hs not found:  " + ee);
+      ee.printStackTrace();
+    }
     
     JFrame frame = new JFrame("Pooka");
     defaultAuthenticator = new SimpleAuthenticator(frame);
@@ -441,6 +455,12 @@ public class Pooka {
     return outgoingMailManager;
   }
 
+  /**
+   * The HelpBroker is used to bring up the Pooka help system.
+   */
+  static public HelpBroker getHelpBroker() {
+    return helpBroker;
+  }
 }
 
 

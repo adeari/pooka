@@ -5,9 +5,13 @@
 
 <map version="1.0">
 	<mapID target="pooka.intro" url="pooka/intro.html" />
+	<mapID target="gpl" url="pooka/gpl.html" />
+	<mapID target="pooka.starting" url="pooka/starting.html" />
+	<mapID target="reading.intro" url="pooka/reading.html" />
+	<mapID target="composing.intro" url="pooka/composing.html" />
+	<mapID target="search.intro" url="pooka/search.html" />
 	<mapID target="protocol.imap" url="pooka/store/protocol.html#imap" />
 	<mapID target="protocol.pop" url="pooka/store/protocol.html#pop" />
 	<mapID target="store.intro" url="pooka/store/intro.html" />
-	<mapID target="message.search" url="pooka/message/search.html" />
-	<mapID target="addressBook" url="pooka/addressbook/intro.html" />
+	<mapID target="addressBook.intro" url="pooka/addressbook/intro.html" />
 </map>

@@ -165,7 +165,8 @@ MenuBar.Window.Tile.Action=window-tile
 MenuBar.Window.Cascade.Action=window-cascase
 MenuBar.Window.class=net.suberic.pooka.gui.WindowMenu
 
-MenuBar.Help=About:License:KeyBindings
+MenuBar.Help=Help:About:License:KeyBindings
+MenuBar.Help.Help.Action=help
 MenuBar.Help.About.Action=help-about
 MenuBar.Help.License.Action=help-license
 MenuBar.Help.KeyBindings.Action=help-keybindings

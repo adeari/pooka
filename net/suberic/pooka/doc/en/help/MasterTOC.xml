@@ -5,8 +5,13 @@
 <toc version="1.0">
   <tocitem text="Merging HelpSets">
     <tocitem text="Introduction" target="pooka.intro"/>
+    <tocitem text="Copyright Information" target="gpl"/>
+    <tocitem text="Starting Pooka" target="pooka.starting"/>
     <tocitem text="Configuring Your Email Account" target="store.intro"/>
     <tocitem text="Reading Your Mail" target="reading.intro"/>
+    <tocitem text="Composing New Mail" target="composing.intro"/>
+    <tocitem text="Searches" target="search.intro"/>
+    <tocitem text="Address Books" target="addressBook.intro"/>
     <tocitem text="Configuration Options" target="options">
       <tocitem text="Preferences" target="options.preferences">
         <tocitem text="UI" target="options.preferences.ui"/>
