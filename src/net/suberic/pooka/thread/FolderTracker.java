@@ -50,7 +50,11 @@ public class FolderTracker extends Thread {
    */
   public void addFolder(FolderInfo newFolder) {
     long updateCheckMilliseconds;
-    String updateString = Pooka.getProperty(newFolder.getFolderProperty() + ".updateCheckMilliseconds", Pooka.getProperty("Pooka.updateCheckMilliseconds", "60000"));
+    String updateString = Pooka.getProperty("Pooka.updateCheckMilliseconds", "60000");
+    
+    if (newFolder != null && newFolder.getParentStore() != null) {
+      updateString = Pooka.getProperty(newFolder.getFolderProperty() + ".updateCheckMilliseconds", Pooka.getProperty(newFolder.getParentStore().getStoreProperty() + ".updateCheckMilliseconds", Pooka.getProperty("Pooka.updateCheckMilliseconds", "60000")));
+    }
     try {
       updateCheckMilliseconds = Long.parseLong(updateString);
     } catch (Exception e) {

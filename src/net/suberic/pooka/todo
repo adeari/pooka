@@ -75,6 +75,7 @@ say, like reacting to a mailto: link.
    -) order of events.
    -) handling of events, including timeouts and such.
 	- check isConnected() on IMAPStore
+	  -- download javamail source.  sigh.
 	- check order of handlings; make sure we don't end up in a 
 	  situation where we wait too long to check the connection status.
    -) make sure auto-reconnects work.

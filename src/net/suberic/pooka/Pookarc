@@ -831,7 +831,7 @@ Store.editableFields.editor.config.scoped=true
 Store.editableFields.editor.config.scopeRoot=Store.editableFields
 Store.editableFields.editor.config.propertyType=Composite
 
-Store.editableFields.editor.connection=connection:precommand:mailCheckTime
+Store.editableFields.editor.connection=connection:precommand:updateCheckMilliseconds
 Store.editableFields.editor.connection.scoped=true
 Store.editableFields.editor.connection.scopeRoot=Store.editableFields
 Store.editableFields.editor.connection.propertyType=Composite
@@ -850,7 +850,7 @@ Store.editableFields.trashFolder.onlySubscribed=true
 Store.editableFields.defaultProfile.propertyType=List
 Store.editableFields.defaultProfile.allowedValues=UserProfile
 Store.editableFields.defaultProfile._includeAddButton=true
-Store.editableFields.mailCheckTime=5
+Store.editableFields.updateCheckMilliseconds=300000
 Store.editableFields.connection.propertyType=List
 Store.editableFields.connection.allowedValues=Connection
 Store.editableFields.connection._includeAddButton=true

@@ -253,7 +253,11 @@ public class ListEditorPane extends SwingPropertyEditor {
    * the last save.
    */
   public boolean isChanged() {
-    return (mOriginalValue != (String)labelToValueMap.get(inputField.getSelectedItem()));
+    if (mOriginalValue == null)
+      return (mOriginalValue != (String)labelToValueMap.get(inputField.getSelectedItem()));
+    else 
+      return (! mOriginalValue.equals((String)labelToValueMap.get(inputField.getSelectedItem())));
+
   }
   
   /**

@@ -368,28 +368,37 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   public void closed(ConnectionEvent e) {
+    
     synchronized(this) {
+      
       getLogger().log(Level.FINE, "Folder " + getFolderID() + " closed:  " + e);
-      
-      // check to see if the parent store is still open.
-      
-      StoreInfo parentStoreInfo = getParentStore();
-      if (parentStoreInfo != null) {
-	parentStoreInfo.checkConnection();
-      }
-      
-      if (getFolderDisplayUI() != null) {
-	if (status != CLOSED)
+      // if this happened accidentally, check it.
+      if (getStatus() != CLOSED) {
+	
+	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	      // check to see if the parent store is still open.
+	      
+	      StoreInfo parentStoreInfo = getParentStore();
+	      if (parentStoreInfo != null) {
+		if (parentStoreInfo.isConnected())
+		  parentStoreInfo.checkConnection();
+	      }
+	    }
+	  }, new java.awt.event.ActionEvent(this, 0, "folder-closed"), ActionThread.PRIORITY_HIGH);
+	
+	if (getFolderDisplayUI() != null) {
 	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
-      }
-      
-      
-      if (status == CONNECTED) {
-	setStatus(LOST_CONNECTION);
+	}
+	
+	if (status == CONNECTED) {
+	  setStatus(LOST_CONNECTION);
+	}
       }
       
     }
     fireConnectionEvent(e);
+
   }
   
   public void disconnected(ConnectionEvent e) {
@@ -399,25 +408,30 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Thread.dumpStack();
       }
 
-      // check to see if the parent store is still open.
-      StoreInfo parentStoreInfo = getParentStore();
-      if (parentStoreInfo != null) {
-	Store realParentStore = parentStoreInfo.getStore();
-
-	if (realParentStore != null) {
-	  parentStoreInfo.checkConnection();
+      // if this happened accidentally, check it.
+      if (getStatus() != CLOSED) {
+	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	      // check to see if the parent store is still open.
+	      
+	      StoreInfo parentStoreInfo = getParentStore();
+	      if (parentStoreInfo != null && parentStoreInfo.isConnected()) {
+		parentStoreInfo.checkConnection();
+	      }
+	    }
+	  }, new java.awt.event.ActionEvent(this, 0, "folder-closed"), ActionThread.PRIORITY_HIGH);
+	
+	if (getFolderDisplayUI() != null) {
+	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
 	}
-      }
-      
-      if (getFolderDisplayUI() != null) {
-	if (status != CLOSED)
-	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
-      }
-      
-      if (status == CONNECTED) {
-	setStatus(LOST_CONNECTION);
-      }
+
+	if (status == CONNECTED) {
+	  setStatus(LOST_CONNECTION);
+	}
+      } 
+
     }
+
     fireConnectionEvent(e);
   }
   

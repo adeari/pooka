@@ -210,11 +210,11 @@ public class UIDMimeMessage extends MimeMessage {
       return getMessage().getAllHeaders();	
     } catch (FolderClosedException fce) {
       if (Pooka.isDebug())
-	System.err.println("debug:  caught FolderClosedException.");
+	System.out.println("debug:  caught FolderClosedException.");
       int status = parent.getStatus();
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	if (Pooka.isDebug())
-	  System.err.println("debug:  folder should be open.  trying to re-open folder.");
+	  System.out.println("debug:  folder should be open.  trying to re-open folder.");
 	try {
 	  parent.openFolder(Folder.READ_WRITE);
 	} catch (MessagingException me) {
