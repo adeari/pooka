@@ -59,7 +59,7 @@ public class NewMessageProxy extends MessageProxy {
 		
 		urlName = getNewMessageWindow().populateMessageHeaders(getMessage());
 		String messageText;
-		if (Pooka.getProperty("lineWrap", "").equalsIgnoreCase("true"))
+		if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
 		    messageText=net.suberic.pooka.MailUtilities.wrapText(getMessageWindow().getMessageText());
 		else
 		    messageText = getMessageWindow().getMessageText();

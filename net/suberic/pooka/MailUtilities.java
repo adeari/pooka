@@ -169,42 +169,49 @@ public class MailUtilities {
     }
 
     /**
-     * This takes a String and words wraps it at length wrapLength, 
-     * using lineBreak to indicate line breaks.
+     * This takes a String and words wraps it at length wrapLength.
      */
     public static String wrapText(String originalText, int wrapLength, char lineBreak) {
-	if (originalText == null || originalText.length() < wrapLength)
-	    return originalText;
+	if (originalText == null)
+	    return null;
 
 	StringBuffer wrappedText = new StringBuffer(originalText);
 
-	int lastSpace=-1;
-	char currentChar;
-	for (int caret = 0, lineLocation = 0; caret < wrappedText.length(); caret++, lineLocation++) {
-	    currentChar = wrappedText.charAt(caret);
-	    if (currentChar == lineBreak) {
-		lastSpace=-1;
-		lineLocation=0;
-	    } else if (Character.isWhitespace(currentChar)) {
-		lastSpace=caret;
-	    } 
-
-	    if (lineLocation >= wrapLength) {
-		if (lastSpace < 0) {
-		    // no spaces in the line.  truncate here.
-		    wrappedText.insert(caret, lineBreak);
-		    lineLocation = -1;
+	int nextReal = -1;
+	int lastReal = -1;
+	int newBreak = -1;
+	while (nextReal < wrappedText.length()) {
+	    nextReal= indexOf(wrappedText, lineBreak, lastReal +1);
+	    if (nextReal == -1)
+		nextReal = wrappedText.length();
+	    while ( newBreak < nextReal ) {
+		newBreak = getBreakOffset(wrappedText.substring(lastReal +1, nextReal), wrapLength) + lastReal + 1;
+		if (newBreak < nextReal) {
+		    wrappedText.insert(newBreak, lineBreak); 
+		    nextReal++;
+		    lastReal = newBreak + 1;
 		} else {
-		    // for now, let's just break after lastSpace.
-		    wrappedText.insert(lastSpace + 1, lineBreak);
-		    caret++;
-		    lineLocation = caret - lastSpace;
-		} 
+		    lastReal = nextReal;
+		    newBreak = nextReal;
+		}
 	    }
 	}
 	
 	return wrappedText.toString();
     } 
+
+    
+    /**
+     * This just acts as an indexOf on a StringBuffer.
+     */
+    public static int indexOf(StringBuffer buffer, char toFind, int start) {
+	for (int i = start; i < buffer.length(); i++) {
+	    if (toFind == buffer.charAt(i))
+		return i;
+	}
+
+	return -1;
+    }
 
     /**
      * A convenience method which wraps the given string using the
