@@ -966,7 +966,7 @@ NewAccountPooka.optionPanel.mbox.scoped=true
 NewAccountPooka.optionPanel.mbox.scopeRoot=NewAccountPooka
 
 
-FolderSelectorPane.inputButton.image=/org/javalobby/icons/20x20png/More.gif
+FolderSelectorPane.inputButton.image=/net/suberic/util/gui/images/More.gif
 
 Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent:Cached
 Search.searchTerms.Answered.class=javax.mail.search.FlagTerm

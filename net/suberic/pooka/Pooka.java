@@ -209,8 +209,12 @@ public class Pooka {
 	  
 	  if (getProperty("Store", "").equals("")) {
 	    if (panel.getContentPanel() instanceof MessagePanel) {
-	      NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());
-	      nap.start();
+	      SwingUtilities.invokeLater(new Runnable() {
+		  public void run() {
+		    NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());
+		    nap.start();
+		  }
+		});
 	    }
 	  } else if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true")) {
 	    panel.getContentPanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));

@@ -36,6 +36,7 @@ public class StringEditorPane extends SwingPropertyEditor {
     label = createLabel();
     inputField = new JTextField(originalValue);
     inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
+    inputField.setMinimumSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
     inputField.addFocusListener(new FocusAdapter() {
 	public void focusLost(FocusEvent e) {
 	  if (! inputField.getText().equals(currentValue)) {

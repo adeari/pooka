@@ -66,7 +66,7 @@ public class FolderSelectorPane extends SwingPropertyEditor {
     if (Pooka.isDebug())
       System.out.println("creating an input button.");
     try {
-      java.net.URL url = this.getClass().getResource(manager.getProperty("FolderSelectorPane.inputButton.image", "images/More.gif"));
+      java.net.URL url = this.getClass().getResource(manager.getProperty("FolderSelectorPane.inputButton.image", "/net/suberic/util/gui/images/More.gif"));
       if (url != null) {
 	if (Pooka.isDebug())
 	  System.out.println("url isn't null.");
