@@ -72,23 +72,23 @@ public class LoadMessageThread extends Thread {
 	    if (display != null)
 		this.addMessageLoadedListener(display);
 
-	    fireMessageLoadedEvent(MessageLoadedEvent.LOADING_STARTING);
+	    fireMessageLoadedEvent(MessageLoadedEvent.LOADING_STARTING, getLoadedMessageCount(), messages.size());
 	    
 	    for(int i=numMessages-1; i >= 0; i--) {
 		mp=(MessageProxy)messages.elementAt(i);
 		mp.loadTableInfo();
 		
 		if (++updateCounter >= getUpdateMessagesCount()) {
-		    fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED);
+		    fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
 		    updateCounter = 0;		   
 		}
 		loadedMessageCount++;
 	    }
 	    
 	    if (updateCounter > 0)
-		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED);
+		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
 	    
-	    fireMessageLoadedEvent(MessageLoadedEvent.LOADING_COMPLETE);
+	    fireMessageLoadedEvent(MessageLoadedEvent.LOADING_COMPLETE, getLoadedMessageCount(), messages.size());
 	    
 	    if (display != null)
 		removeMessageLoadedListener(display);
@@ -99,9 +99,9 @@ public class LoadMessageThread extends Thread {
      * Fires a new MessageLoadedEvent to each registered MessageLoadedListener.
      */
 
-    public void fireMessageLoadedEvent(int type) {
+    public void fireMessageLoadedEvent(int type, int numMessages, int max) {
 	for (int i = 0; i < messageLoadedListeners.size(); i ++) {
-	    ((MessageLoadedListener)messageLoadedListeners.elementAt(i)).handleMessageLoaded(new MessageLoadedEvent(this, type, getLoadedMessageCount(), messages.size()));
+	    ((MessageLoadedListener)messageLoadedListeners.elementAt(i)).handleMessageLoaded(new MessageLoadedEvent(this, type, numMessages, max));
 	}
     }
 

@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.text.TextAction;
 import java.util.*;
+import net.suberic.pooka.event.MessageLoadedEvent;
 import net.suberic.util.gui.*;
 import net.suberic.util.event.*;
 import net.suberic.util.thread.*;
@@ -409,19 +410,19 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     public void handleMessageLoaded(MessageLoadedEvent e) {
 	final MessageLoadedEvent event = e;
 
-	if (event.type == MessageLoadedEvent.LOADING_STARTED) {
-	    if (getStatusBar().loadMessageTracker != null) {
-		getStatusBar.add(new loadMessageTracker(event.loadedMessageCount, 0, event.numMessages));
+	if (event.getType() == MessageLoadedEvent.LOADING_STARTING) {
+	    if (getStatusBar().tracker != null) {
+		getStatusBar().add(new LoadMessageTracker(event.getLoadedMessageCount(), 0, event.getNumMessages()));
 	    }
 	    getStatusBar().repaint();
-	} else if (event.type == MessageLoadedEvent.LOADING_COMPLETE) {
-	    if (getStatusBar().loadMessageTracker != null) {
-		getStatusBar.remove(getStatusBar().loadMessageTracker);
-		getStatusBar().loadMessageTracker = null;
+	} else if (event.getType() == MessageLoadedEvent.LOADING_COMPLETE) {
+	    if (getStatusBar().tracker != null) {
+		getStatusBar().remove(getStatusBar().tracker);
+		getStatusBar().tracker = null;
 	    }
-	} else if (event.type == MessageLoadedEvent.MESSAGES_LOADED) {
-	    if (getStatusBar().loadMessageTracker != null)
-		getStatusBar().loadMessageTracker.handleMEssageLoaded(event);
+	} else if (event.getType() == MessageLoadedEvent.MESSAGES_LOADED) {
+	    if (getStatusBar().tracker != null)
+		getStatusBar().tracker.handleMessageLoaded(event);
 	}
     }
 

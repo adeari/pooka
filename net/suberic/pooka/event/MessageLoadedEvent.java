@@ -26,4 +26,13 @@ public class MessageLoadedEvent {
     public int getType() {
 	return type;
     }
+
+    public int getLoadedMessageCount() {
+	return loadedMessageCount;
+    }
+
+    public int getNumMessages() {
+	return numMessages;
+    }
+
 }
