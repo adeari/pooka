@@ -56,55 +56,55 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 		}
 	    }
 
-		public void mousePressed(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
-			// see if anything is selected
-			TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
-			if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
-			    // this means that we're clicking on a node.  make
-			    // sure that it's selected.
-
-			    if (!folderTree.isPathSelected(path))
-				folderTree.setSelectionPath(path);
-			}
-
-			MailTreeNode tmpNode = getSelectedNode();
-			if (tmpNode != null) {
-			    tmpNode.showPopupMenu(FolderPanel.this, e);
-			    
-			}
-		    }
+	    public void mousePressed(MouseEvent e) {
+	      if (e.isPopupTrigger()) {
+		// see if anything is selected
+		TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
+		if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
+		  // this means that we're clicking on a node.  make
+		  // sure that it's selected.
+		  
+		  if (!folderTree.isPathSelected(path))
+		    folderTree.setSelectionPath(path);
 		}
-
-		public void mouseReleased(MouseEvent e) {
-		    if (e.isPopupTrigger()) {
-			// see if anything is selected
-			TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
-			if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
-			    // this means that we're clicking on a node.  make
-			    // sure that it's selected.
-
-			    if (!folderTree.isPathSelected(path))
-				folderTree.setSelectionPath(path);
-			}
-
-			MailTreeNode tmpNode = getSelectedNode();
-			if (tmpNode != null) {
-			    tmpNode.showPopupMenu(FolderPanel.this, e);
-			    
-			}
-		    }
+		
+		MailTreeNode tmpNode = getSelectedNode();
+		if (tmpNode != null) {
+		  tmpNode.showPopupMenu(folderTree, e);
+		  
 		}
-	    });
+	      }
+	    }
+	    
+	    public void mouseReleased(MouseEvent e) {
+	      if (e.isPopupTrigger()) {
+		// see if anything is selected
+		TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
+		if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
+		  // this means that we're clicking on a node.  make
+		  // sure that it's selected.
+		  
+		  if (!folderTree.isPathSelected(path))
+		    folderTree.setSelectionPath(path);
+		}
+		
+		MailTreeNode tmpNode = getSelectedNode();
+		if (tmpNode != null) {
+		  tmpNode.showPopupMenu(folderTree, e);
+		  
+		}
+	      }
+	    }
+	  });
 	folderTree.addTreeSelectionListener(new TreeSelectionListener() {
-		public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
-		    getMainPanel().refreshActiveMenus();
-		    keyBindings.setActive(getActions());
-		}
-	    });
-
+	    public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
+	      getMainPanel().refreshActiveMenus();
+	      keyBindings.setActive(getActions());
+	    }
+	  });
+	
 	folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
-
+	
 	keyBindings = new ConfigurableKeyBinding(this, "FolderPanel.keyBindings", Pooka.getResources());
 	keyBindings.setActive(getActions());
 

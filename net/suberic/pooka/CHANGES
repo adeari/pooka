@@ -5,7 +5,7 @@ improved the startup time, so that open folders show up more quickly.
 
 fixed the popup menu on the attachment pane so that it shows up in the
 right place (and isn't selected by default when you right click and 
-release).
+release).  fixed a similar problem with the nodes in the Folder Tree.
 
 fixed the keybindings in preview pane mode.
 

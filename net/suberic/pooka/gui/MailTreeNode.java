@@ -32,11 +32,11 @@ public class MailTreeNode extends DefaultMutableTreeNode {
      * been created yet, then one is created and shown.
      */
     public void showPopupMenu(JComponent component, MouseEvent e) {
-	configurePopupMenu();
-
-	if (popupMenu != null)
-	    popupMenu.show(component, e.getX(), e.getY());
-	    
+      configurePopupMenu();
+      
+      if (popupMenu != null)
+	popupMenu.show(component, e.getX(), e.getY());
+      
     }
 
   /**
