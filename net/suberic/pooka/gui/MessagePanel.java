@@ -204,6 +204,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * At the moment it just returns 0,0.  :)
    */
   public Point getNewWindowLocation(JComponent c) {
+    int baseDelta = 20;
     // first, figure out what the top left corner of the viewable area is.
 
     JViewport viewport = ((JScrollPane)getUIComponent()).getViewport();
@@ -219,12 +220,101 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
     int maxX = (Math.max(0, viewportSize.width - componentSize.width) + p.x);
     int maxY = (Math.max(0, viewportSize.height - componentSize.height) + p.y);
     
-    if (maxX == p.x && maxY == p.y)
+    if (maxX - p.x <= baseDelta && maxY - p.y <= baseDelta)
       return p;
 
     Point returnValue = new Point(p.x, p.y);
 
+    // get all of the locations of the frames.
+
+    JInternalFrame[] allFrames = getAllFrames();
+
+    if (allFrames.length > 0) {
+      ArrayList problemPoints = new ArrayList();
+
+      for (int i = 0; i < allFrames.length; i++) {
+	if (allFrames[i] != c) {
+	  Point currentLoc = allFrames[i].getLocation();
+
+	  if (currentLoc.x <= maxX + baseDelta && currentLoc.x > p.x - baseDelta && currentLoc.y <= maxY + baseDelta && currentLoc.y > p.y - baseDelta) {
+	    problemPoints.add(currentLoc);
+	  }
+	}
+      }
+
+      if (problemPoints.size() > 0) {
+	// this means that we'll actually have to find a place to put this...
+
+	boolean spotfound = false;
+	// first run down the diagonals
+	for (int delta = 0; ! spotfound && p.x + delta <= maxX && p.y + delta <= maxY; delta += baseDelta) {
+	  if (checkSpot(p.x + delta, p.y + delta, problemPoints)) {
+	    spotfound = true;
+	    returnValue = new Point(p.x + delta, p.y + delta);
+	  }
+	}
+
+	// if that didn't work, then go through the painstaking process of
+	// trying out all available spots.
+
+	if (!spotfound) {
+	  for (int xdelta = 0; ! spotfound && p.x + xdelta <= maxX; xdelta += baseDelta) {
+	    for (int ydelta = 0; ! spotfound && p.y + ydelta <= maxY; ydelta += baseDelta) {
+	      if (checkSpot(p.x + xdelta, p.y + ydelta, problemPoints)) {
+		spotfound = true;
+		returnValue = new Point(p.x + xdelta, p.y + ydelta);
+	      }
+	    }
+	    
+	  }
+	}
+
+	// if that didn't work, then try to find a place relative to the
+	// top pane.
+
+	if (! spotfound) {
+	  JInternalFrame jif = getSelectedFrame();
+	  if (jif != null) {
+	    Point selectedPoint = jif.getLocation();
+	    // check to make sure it's not off the screen
+	    if (selectedPoint.x >= p.x && selectedPoint.y >= p.y) { 
+	      // normalize the point.
+	      int xdelta = selectedPoint.x - p.x;
+	      int ydelta = selectedPoint.y - p.y;
+	      int mindelta = Math.min(xdelta, ydelta);
+	      Point basePoint = new Point(p.x + mindelta, p.y + mindelta);
+	      if (basePoint.x + baseDelta <= maxX && basePoint.y + baseDelta <= maxY) {
+		returnValue = new Point(basePoint.x + baseDelta, basePoint.y + baseDelta);
+	      } else if (basePoint.x + baseDelta <= maxX && basePoint.y <= maxY) {
+		returnValue = new Point(basePoint.x + baseDelta, basePoint.y);
+	      } else if (basePoint.x <= maxX && basePoint.y + baseDelta <= maxY) {
+		returnValue = new Point(basePoint.x, basePoint.y + baseDelta);
+	      }
+	      
+	      // and if none of those work, screw it.
+
+	    }
+	  }
+	}
+      }
+    }
     return returnValue;
+  }
+
+  /**
+   * Checks to see if any other windows are with 5 of the given point.
+   */
+  private boolean checkSpot(int pX, int pY, java.util.List problemPoints) {
+    boolean ok = true;
+    int baseDelta = 20;
+    for (int i = 0; ok && i < problemPoints.size(); i++) {
+      Point currentPoint = (Point) problemPoints.get(i);
+      if (currentPoint.x > pX - baseDelta && currentPoint.x < pX + baseDelta && currentPoint.y > pY - baseDelta && currentPoint.y < pY + baseDelta) {
+	ok = false;
+      }
+    }
+
+    return ok;
   }
   
   /**
@@ -278,7 +368,8 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
 	    if (isNew) {
 	      
 	      MessagePanel.this.add(newMessageWindow);
-	      newMessageWindow.setLocation(getNewWindowLocation(newMessageWindow));
+	      Point p = getNewWindowLocation(newMessageWindow);
+	      newMessageWindow.setLocation(p);
 	      newMessageWindow.setVisible(true);
 	    } else {
 	      if (newMessageWindow.isIcon())
