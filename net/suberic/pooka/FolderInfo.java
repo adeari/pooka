@@ -99,7 +99,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     private boolean sentFolder = false;
     private boolean trashFolder = false;
-    
+
+    /**
+     * For subclasses.
+     */
+    protected FolderInfo() {
+    }
+
     /**
      * Creates a new FolderInfo from a parent FolderInfo and a Folder 
      * name.
@@ -471,7 +477,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	if (isSentFolder())
 	    tableType="SentFolderTable";
-	else
+	else if (this instanceof VirtualFolderInfo)
+	    tableType="SearchResultsTable";
+	else 
 	    tableType="FolderTable";
 
 	FetchProfile fp = new FetchProfile();

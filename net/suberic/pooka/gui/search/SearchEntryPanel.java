@@ -72,7 +72,7 @@ public class SearchEntryPanel extends JPanel {
      * the constructor.
      */
     public void populatePanel() {
-	JPanel basePanel = new JPanel();
+	this.setLayout(new java.awt.BorderLayout());
 	entryPanel = new JPanel();
 	entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
 
@@ -80,15 +80,12 @@ public class SearchEntryPanel extends JPanel {
 
 	createConditionPanel();
 
-	basePanel.setLayout(new java.awt.BorderLayout());
-	basePanel.add(conditionPanel, java.awt.BorderLayout.SOUTH);
-	basePanel.add(entryPanel, java.awt.BorderLayout.CENTER);
-
+	entryScrollPane = new JScrollPane(entryPanel);
 	int defaultHeight = entryPanel.getPreferredSize().height;
-	entryPanel.setPreferredSize(new java.awt.Dimension(entryPanel.getPreferredSize().width, defaultHeight * 3));
+	entryScrollPane.setPreferredSize(new java.awt.Dimension(entryPanel.getPreferredSize().width + 15, defaultHeight * 3));
 
-	entryScrollPane = new JScrollPane(basePanel);
-	this.add(entryScrollPane);
+	this.add(conditionPanel, java.awt.BorderLayout.SOUTH);
+	this.add(entryScrollPane, java.awt.BorderLayout.CENTER);
     }
 
     /**
