@@ -133,42 +133,63 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     // add up and down arrow scrolling.
     KeyStroke upArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0);
     KeyStroke downArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0);
+
+    Action upArrowAction = new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
+	  jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
+	}
+      };
     
-    javax.swing.text.Keymap keyMap = editorPane.getKeymap();
-
-    keyMap.removeKeyStrokeBinding(upArrowStroke);
-    keyMap.addActionForKeyStroke(upArrowStroke, new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
-	  jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
-	}
-      });
-    keyMap.removeKeyStrokeBinding(downArrowStroke);
-    keyMap.addActionForKeyStroke(downArrowStroke, new AbstractAction() {
+    Action downArrowAction = new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
 	  jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
 	}
-      });
+      };
 
-    // actuall probably don't need to do this twice, but...
+    String upArrowKey = "message-scroll-up";
+    String downArrowKey = "message-scroll-down";
 
-    keyMap = otherEditorPane.getKeymap();
+    // add for main panel.
 
-    keyMap.removeKeyStrokeBinding(upArrowStroke);
-    keyMap.addActionForKeyStroke(upArrowStroke, new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
-	  jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
-	}
-      });
-    keyMap.removeKeyStrokeBinding(downArrowStroke);
-    keyMap.addActionForKeyStroke(downArrowStroke, new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
-	  jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
-	}
-      });
+    InputMap newInputMap = new InputMap();
+    ActionMap newActionMap = new ActionMap();
+
+    newInputMap.put(upArrowStroke, upArrowKey);
+    newActionMap.put(upArrowKey, upArrowAction);
+
+    newInputMap.put(downArrowStroke, downArrowKey);
+    newActionMap.put(downArrowKey, downArrowAction);
+
+    InputMap editorInputMap = editorPane.getInputMap();
+    ActionMap editorActionMap = editorPane.getActionMap();
+
+    newInputMap.setParent(editorInputMap);
+    newActionMap.setParent(editorActionMap);
+
+    editorPane.setInputMap(JComponent.WHEN_FOCUSED, newInputMap);
+    editorPane.setActionMap(newActionMap);
+
+    // add for other panel.
+
+    newInputMap = new InputMap();
+    newActionMap = new ActionMap();
+
+    newInputMap.put(upArrowStroke, upArrowKey);
+    newActionMap.put(upArrowKey, upArrowAction);
+
+    newInputMap.put(downArrowStroke, downArrowKey);
+    newActionMap.put(downArrowKey, downArrowAction);
+
+    InputMap otherEditorInputMap = otherEditorPane.getInputMap();
+    ActionMap otherEditorActionMap = otherEditorPane.getActionMap();
+
+    newInputMap.setParent(otherEditorInputMap);
+    newActionMap.setParent(otherEditorActionMap);
+
+    otherEditorPane.setInputMap(JComponent.WHEN_FOCUSED, newInputMap);
+    otherEditorPane.setActionMap(newActionMap);
 
     // </scrolling>
 
