@@ -13,8 +13,6 @@
 		printing page 1 of...  etc.  should be able to cancel
 		during that.  maybe even a progress bar?
 
-*) bug:  check to see if moving a message marks it as read.
-
 *) fix getFirstUnreadMessage on CachingFolderInfo to make sure that we've
 	fetched all of the messages first.
 
