@@ -994,14 +994,8 @@ public class MessageInfo {
   /**
    * Returns whether or not this message has encryption on it.
    */
-  public boolean hasEncryption() {
-    try {
-      return (cryptoInfo.isEncrypted() || cryptoInfo.isSigned());
-    } catch (MessagingException me) {
-      System.out.println("caught exception while checking encryption:  " + me.getMessage());
-      me.printStackTrace();
-      return false;
-    }
+  public boolean hasEncryption() throws MessagingException {
+    return (cryptoInfo.isEncrypted() || cryptoInfo.isSigned());
   }
 
   /**

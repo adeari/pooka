@@ -78,6 +78,7 @@ public class PookaLogManager implements ValueChangeListener {
     }
     getLogger().log(Level.FINE, "set log level for " + pKey + " to " + newLevel);
     setLogLevel(pKey, newLevel);
+    
   }
   
   /**
@@ -116,7 +117,13 @@ public class PookaLogManager implements ValueChangeListener {
     Logger current = Logger.getLogger(pName);
     if (current.getLevel() != pLogLevel) {
       current.setLevel(pLogLevel);
+
     }
+
+    if (pName == "Pooka.debug") {
+      setLogLevel("", pLogLevel);
+    }
+
   }
   
   // ValueChangeListener
@@ -149,7 +156,6 @@ public class PookaLogManager implements ValueChangeListener {
       }
       setLogLevel(pKey, newLevel);
       getLogger().log(Level.FINE, "added key " + pKey + "; set value to " + newLevel);
-      
     }
   }
   

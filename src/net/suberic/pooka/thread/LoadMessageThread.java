@@ -54,7 +54,9 @@ public class LoadMessageThread extends Thread {
       try {
 	loadWaitingMessages();
       } catch (Exception e) {
-	e.printStackTrace();
+	if (getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING)) {
+	  e.printStackTrace();
+	}
       }
 
       try {
@@ -135,8 +137,11 @@ public class LoadMessageThread extends Thread {
 		    toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
 		    getFolderInfo().fetch(toFetch, fetchProfile);
 		  } catch(MessagingException me) {
-		    System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
-		    me.printStackTrace();
+		    if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
+		      
+		      System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+		      me.printStackTrace();
+		    }
 		  }
 		  
 		}
@@ -152,7 +157,9 @@ public class LoadMessageThread extends Thread {
 		    mp.matchFilters();
 		}
 		} catch (Exception e) {
-		  e.printStackTrace();
+		  if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
+		    e.printStackTrace();
+		  }
 		}
 		
 		loadedMessageCount++;
@@ -191,8 +198,10 @@ public class LoadMessageThread extends Thread {
 		  folderInfo.getFolderThread().setCurrentActionName("");
 		}
 	      } catch(MessagingException me) {
-		System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
-		me.printStackTrace();
+		if (getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING)) {
+		  System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+		  me.printStackTrace();
+		}
 	      }
 	      
 	    }
@@ -215,8 +224,9 @@ public class LoadMessageThread extends Thread {
 		}
 	      } // synchronized
 	    } catch (Exception e) {
-	      if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING))
+	      if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
 		e.printStackTrace();
+	      }
 	    }
 	    
 	    loadedMessageCount++;

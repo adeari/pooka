@@ -62,9 +62,18 @@ public class FolderTableModel extends AbstractTableModel {
 	  return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
 	} else {
 	  Object key = columnKeys.get(col);
-	  Object returnValue = ((MessageProxy)data.get(row)).getTableInfo().get(key);
-	  // FIXME this is making us load stuff on the display thread.
+	  Object returnValue = null;
+	  try {
+	    returnValue = ((MessageProxy)data.get(row)).getTableInfo().get(key);
+	  } catch (javax.mail.MessagingException me) {
+	    if (((MessageProxy)data).getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
+	      me.printStackTrace();
+	  }
+
 	  if (returnValue == null) {
+	    return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
+	    /*
+	    // FIXME this is making us load stuff on the display thread.
 	    try {
 	      MessageProxy proxy = (MessageProxy)data.get(row);
 	      HashMap tableInfo = proxy.getTableInfo();
@@ -97,6 +106,7 @@ public class FolderTableModel extends AbstractTableModel {
 	    } catch (Exception e) {
 	      // ignore.
 	    }
+	    */
 	  }
 	  return returnValue;
 	}
@@ -246,8 +256,22 @@ public class FolderTableModel extends AbstractTableModel {
       }
       
       
-      Object o1 = ((MessageProxy)row1).getTableInfo().get(columnKey);
-      Object o2 = ((MessageProxy)row2).getTableInfo().get(columnKey);
+      Object o1 = null;
+      Object o2 = null;
+
+      try {
+	o1 = ((MessageProxy)row1).getTableInfo().get(columnKey);
+      } catch (javax.mail.MessagingException me) {
+	if (((MessageProxy)row1).getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
+	  me.printStackTrace();
+      }
+      
+      try {
+	o2 = ((MessageProxy)row2).getTableInfo().get(columnKey);
+      } catch (javax.mail.MessagingException me) {
+	if (((MessageProxy)row2).getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
+	  me.printStackTrace();
+      }
       
       // again, check for nulls.
       if (o1 == null && o2 == null) {

@@ -1,3 +1,10 @@
+*) open store.  close store.  first, all the folders open anyway.  second,
+	the folders opening are opening with a null action.  third, after
+	the closing, the previously-loaded messages all go to 'loading'.
+
+*) store.showStatus() should go on a JScrollPane or something.  it's too
+long right now.
+
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:
 	*) reuse our connections so we don't have to renegotiate ssl

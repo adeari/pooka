@@ -291,18 +291,86 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * FolderTable) using the columnHeaders property to know which fields
    * to load.
    */
-  public synchronized void loadTableInfo() {
+  public synchronized void loadTableInfo() throws MessagingException {
     if (!loaded) {
-      try {
-	tableInfo = createTableInfo();
-	
-	this.isSeen();
+      tableInfo = createTableInfo();
+      
+      this.isSeen();
+      
+      this.isDeleted();
+      
+      matchFilters();
+      
+      loaded=true;
+      
+      // notify the JTable that this proxy has loaded.
+      MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
+      
+      FolderInfo fi = getFolderInfo();
+      if (fi != null) {
+	fi.fireMessageChangedEvent(mce);
+      }
+      
+    }
+  } 
 
-	this.isDeleted();
-
-	matchFilters();
+  /**
+   * Refreshes the MessageProxy by reloading the information for the
+   * MessageInfo, and then updating the FolderTableInfo if necessary.
+   */
+  public synchronized void refreshMessage() throws MessagingException {
+    if (needsRefresh()) {
+      // first, tag this so we won't need to be refereshed again.
+      
+      refresh = false;
+      
+      // second, refresh the MessageInfo itself.
+      
+      getMessageInfo().refreshFlags();
+      
+      // third, compare.
+      
+      HashMap newTableInfo = createTableInfo();
 	
-	loaded=true;
+      // check to see if anything has actually changed
+      boolean hasChanged = (tableInfo == null);
+      // assume that we're not actually changing the values...
+      java.util.Iterator it = newTableInfo.keySet().iterator();
+      while ((! hasChanged) && it.hasNext()) {
+	Object key = it.next();
+	Object newValue = newTableInfo.get(key);
+	Object oldValue = tableInfo.get(key);
+	if (newValue == null) {
+	  if (oldValue != null) {
+	    hasChanged = true;
+	  }
+	} else if (oldValue == null || ! newValue.equals(oldValue)) {
+	  hasChanged = true;
+	}
+      }
+      
+      // check for the matching filters, also.
+      MessageFilter[] newMatchingFilters = doFilterMatch();
+      if (newMatchingFilters == null) {
+	if (matchingFilters != null)
+	  hasChanged = true;
+      } else if (matchingFilters == null) {
+	hasChanged = true;
+      } else if (matchingFilters.length != newMatchingFilters.length) {
+	hasChanged = true;
+      } else {
+	for (int i = 0; hasChanged != true && i < newMatchingFilters.length; i++) {
+	  MessageFilter newValue = newMatchingFilters[i];
+	  MessageFilter oldValue = matchingFilters[i];
+	  if (newValue != oldValue) {
+	    hasChanged = true;
+	  }
+	}
+      }
+      
+      if (hasChanged) {
+	tableInfo = newTableInfo;
+	matchingFilters = newMatchingFilters;
 	
 	// notify the JTable that this proxy has loaded.
 	MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
@@ -311,88 +379,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	if (fi != null) {
 	  fi.fireMessageChangedEvent(mce);
 	}
-
-      } catch (MessagingException me) {
-	me.printStackTrace();
       }
+      
     }
     
-    
-  } 
-
-  /**
-   * Refreshes the MessageProxy by reloading the information for the
-   * MessageInfo, and then updating the FolderTableInfo if necessary.
-   */
-  public synchronized void refreshMessage() {
-    if (needsRefresh()) {
-      try {
-	
-	// first, tag this so we won't need to be refereshed again.
-	
-	refresh = false;
-	
-	// second, refresh the MessageInfo itself.
-	
-	getMessageInfo().refreshFlags();
-	
-	// third, compare.
-	
-	HashMap newTableInfo = createTableInfo();
-	
-	// check to see if anything has actually changed
-	boolean hasChanged = (tableInfo == null);
-	// assume that we're not actually changing the values...
-	java.util.Iterator it = newTableInfo.keySet().iterator();
-	while ((! hasChanged) && it.hasNext()) {
-	  Object key = it.next();
-	  Object newValue = newTableInfo.get(key);
-	  Object oldValue = tableInfo.get(key);
-	  if (newValue == null) {
-	    if (oldValue != null) {
-	      hasChanged = true;
-	    }
-	  } else if (oldValue == null || ! newValue.equals(oldValue)) {
-	    hasChanged = true;
-	  }
-	}
-
-	// check for the matching filters, also.
-	MessageFilter[] newMatchingFilters = doFilterMatch();
-	if (newMatchingFilters == null) {
-	  if (matchingFilters != null)
-	    hasChanged = true;
-	} else if (matchingFilters == null) {
-	  hasChanged = true;
-	} else if (matchingFilters.length != newMatchingFilters.length) {
-	  hasChanged = true;
-	} else {
-	  for (int i = 0; hasChanged != true && i < newMatchingFilters.length; i++) {
-	    MessageFilter newValue = newMatchingFilters[i];
-	    MessageFilter oldValue = matchingFilters[i];
-	    if (newValue != oldValue) {
-	      hasChanged = true;
-	    }
-	  }
-	}
-	
-	if (hasChanged) {
-	  tableInfo = newTableInfo;
-	  matchingFilters = newMatchingFilters;
-	  
-	  // notify the JTable that this proxy has loaded.
-	  MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
-	  
-	  FolderInfo fi = getFolderInfo();
-	  if (fi != null) {
-	    fi.fireMessageChangedEvent(mce);
-	  }
-	}
-      } catch (MessagingException me) {
-	me.printStackTrace();
-      }
-    }
-
   }
 
   /**
@@ -429,7 +419,8 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	}
       } catch (Exception e) {
 	// if we catch an exception, keep going for the rest.
-	e.printStackTrace();
+	if (getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
+	  e.printStackTrace();
       }
     }
 
@@ -493,15 +484,15 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public void decryptMessage() {
     MessageInfo info = getMessageInfo();
     if (info != null) {
-      if (info.hasEncryption()) {
-
-	MessageCryptoInfo cInfo = info.getCryptoInfo();
-
-	try {
+      try {
+	if (info.hasEncryption()) {
+	  
+	  MessageCryptoInfo cInfo = info.getCryptoInfo();
+	  
 	  if (cInfo != null && cInfo.isEncrypted()) {
 	    
 	    java.security.Key key = getDefaultProfile().getEncryptionKey(cInfo.getEncryptionType());
-
+	    
 	    if (key != null) {
 	      try {
 		cInfo.decryptMessage(key, true);
@@ -525,7 +516,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	      } catch (Exception e) {
 		showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
 	      }
-	      
+		
 	      MessageUI ui = getMessageUI();
 	      if (ui != null) {
 		
@@ -541,9 +532,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	      }
 	    }
 	  }
-	} catch (MessagingException me) {
-	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
 	}
+      } catch (MessagingException me) {
+	showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
       }
     }
   }
@@ -1198,7 +1189,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * This returns the tableInfo for this MessageProxy.
    */
-  public HashMap getTableInfo() {
+  public synchronized HashMap getTableInfo() throws MessagingException {
     if (isLoaded()) {
       return tableInfo;
     } else {
@@ -1288,7 +1279,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    *
    * Note that this also sets the filtersMatched property to false.
    */
-  public void unloadTableInfo() {
+  public synchronized void unloadTableInfo() {
     loaded=false;
     filtersMatched=false;
   }
@@ -1410,7 +1401,11 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     mDeleteInProgress = newValue;
     if (orig != mDeleteInProgress) {
       setRefresh(true);
-      refreshMessage();
+      try {
+	refreshMessage();
+      } catch ( MessagingException me ) {
+	me.printStackTrace();
+      }
     }
   }
 
