@@ -925,7 +925,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void setFlags(MessageInfo[] msgs, Flags flag, boolean value) throws MessagingException {
 	Message[] m = new Message[msgs.length];
 	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = getRealMessage(msgs[i]);
+	    m[i] = msgs[i].getRealMessage();
 	}
 
 	getFolder().setFlags(m, flag, value);
@@ -942,7 +942,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (target != null) {
       Message[] m = new Message[msgs.length];
       for (int i = 0; i < msgs.length; i++) {
-	m[i] = getRealMessage(msgs[i]);
+	m[i] = msgs[i].getRealMessage();
       }
       
       getFolder().copyMessages(m, target);
@@ -959,7 +959,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       openFolder(Folder.READ_WRITE);
     Message[] m = new Message[msgs.length];
     for (int i = 0; i < msgs.length; i++) {
-      m[i] = getRealMessage(msgs[i]);
+      m[i] = msgs[i].getRealMessage();
     }
     
     getFolder().appendMessages(m);

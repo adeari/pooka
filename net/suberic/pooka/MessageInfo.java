@@ -325,7 +325,7 @@ public class MessageInfo {
     }
     
   }
-  
+
     /**
      * A convenience method which sets autoExpunge by the value of 
      * Pooka.autoExpunge, and then calls moveMessage(targetFolder, autoExpunge)
@@ -506,157 +506,127 @@ public class MessageInfo {
 	throws MessagingException {
 	return populateReply(replyAll, false);
     }
+  
+  /**
+   * This populates a new message which is a forwarding of the
+   * current message.
+   */
+  public NewMessageInfo populateForward(boolean withAttachments, int method) 
+    throws MessagingException {
+    MimeMessage mMsg = (MimeMessage) getMessage();
+    MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
+    
+    String parsedText = "";
+    
+    if (method == FORWARD_QUOTED) {
+      String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
+      
+      UserProfile up = getDefaultProfile();
+      
+      String forwardPrefix;
+      String parsedIntro;
+      
+      if (up != null && up.getMailProperties() != null) {
+	forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
+	parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")), true);
+      } else { 
+	forwardPrefix = Pooka.getProperty("Pooka.forwardPrefix", "> ");
+	parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"), true);
+      }
+      parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
+      
+    } else if (method == FORWARD_AS_INLINE) {
+      
+      String textPart = getTextPart(true, false, getMaxMessageDisplayLength(), getTruncationMessage());
+      
+      parsedText = Pooka.getProperty("Pooka.forwardInlineIntro", "----------  Original Message  ----------\n") + textPart;
+      
+    }
+    
+    newMsg.setText(parsedText);
+    newMsg.setSubject(parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
+    
+    NewMessageInfo returnValue = new NewMessageInfo(newMsg);
+    
+    // handle attachments.
+    if (method == FORWARD_AS_ATTACHMENT) {
+      
+      javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+      mbp.setDataHandler(getRealMessage().getDataHandler());
+      returnValue.addAttachment(new MBPAttachment(mbp));
+      returnValue.attachmentsLoaded=true;
+      
+    } else if (withAttachments) {
+      returnValue.attachments = new AttachmentBundle();
+      Vector fromAttachments = attachments.getAttachments();
+      if (fromAttachments != null) {
+	for (int i = 0; i < fromAttachments.size(); i++) {
+	  Attachment current = (Attachment) fromAttachments.elementAt(i);
+	  Attachment newAttachment = null;
 
-    /**
-     * This populates a new message which is a forwarding of the
-     * current message.
-     */
-    public NewMessageInfo populateForward(boolean withAttachments, int method) 
-	throws MessagingException {
-	MimeMessage mMsg = (MimeMessage) getMessage();
-	MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
-
-	String parsedText = "";
-
-	if (method == FORWARD_QUOTED) {
-	    String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
-	    
-	    UserProfile up = getDefaultProfile();
-	    
-	    String forwardPrefix;
-	    String parsedIntro;
-	
-	    if (up != null && up.getMailProperties() != null) {
-		forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
-		parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")), true);
-	    } else { 
-		forwardPrefix = Pooka.getProperty("Pooka.forwardPrefix", "> ");
-		parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"), true);
-	    }
-	    parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
-
-	} else if (method == FORWARD_AS_INLINE) {
-
-	    String textPart = getTextPart(true, false, getMaxMessageDisplayLength(), getTruncationMessage());
-	    
-	    parsedText = Pooka.getProperty("Pooka.forwardInlineIntro", "----------  Original Message  ----------\n") + textPart;
-	    
+	  javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+	  mbp.setDataHandler(current.getDataHandler());
+	  newAttachment = new MBPAttachment(mbp);
+	  returnValue.addAttachment(newAttachment);
 	}
-
-	newMsg.setText(parsedText);
-	newMsg.setSubject(parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
-	
-	NewMessageInfo returnValue = new NewMessageInfo(newMsg);
-
-	// handle attachments.
-	if (method == FORWARD_AS_ATTACHMENT) {
-
-	    javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-	    mbp.setDataHandler(getRealMessage().getDataHandler());
-	    returnValue.addAttachment(new MBPAttachment(mbp));
-	    returnValue.attachmentsLoaded=true;
-
-	    /*
-	    try {
-		final java.io.PipedOutputStream pos = new java.io.PipedOutputStream();
-		final java.io.PipedInputStream pis = new java.io.PipedInputStream(pos);
-
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-			    try {
-				getRealMessage().writeTo(pos);
-				pos.flush();
-				pos.close();
-			    } catch (java.io.IOException ioe) {
-			    } catch (MessagingException me) {
-			    } 
-			}
-		    });
-		t.start();
-		returnValue.addAttachment(new MBPAttachment(new javax.mail.internet.MimeBodyPart(pis)));
-	    } catch (java.io.IOException ioe) {
-		MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
-		me.setNextException(ioe);
-		throw me;
-	    }
-	    */
-	    returnValue.attachmentsLoaded=true;
-	} else if (withAttachments) {
-	    returnValue.attachments = new AttachmentBundle();
-	    Vector fromAttachments = attachments.getAttachments();
-	    if (fromAttachments != null) {
-		for (int i = 0; i < fromAttachments.size(); i++) {
-		    Attachment current = (Attachment) fromAttachments.elementAt(i);
-		    Attachment newAttachment = null;
-		    //try {
-			javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-			mbp.setDataHandler(current.getDataHandler());
-			newAttachment = new MBPAttachment(mbp);
-			/* } catch (java.io.IOException ioe) {
-			MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
-			me.setNextException(ioe);
-			throw me;
-			}*/
-		    returnValue.addAttachment(newAttachment);
-		}
-		returnValue.attachmentsLoaded=true;
-	    }
-	}
-
-	return returnValue;
+	returnValue.attachmentsLoaded=true;
+      }
     }
 
-    /**
-     * This populates a new message which is a forwarding of the
-     * current message.
-     */
-    public NewMessageInfo populateForward() 
-	throws MessagingException {
-	return populateForward(false, FORWARD_QUOTED);
+    return returnValue;
+  }
+
+  /**
+   * This populates a new message which is a forwarding of the
+   * current message.
+   */
+  public NewMessageInfo populateForward() 
+    throws MessagingException {
+    return populateForward(false, FORWARD_QUOTED);
+  }
+  
+  /**
+   *  Caches the current messages.
+   */
+  public void cacheMessage() throws MessagingException {
+    FolderInfo fi = getFolderInfo();
+    if (fi != null && fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+      ((net.suberic.pooka.cache.CachingFolderInfo) fi).cacheMessage(this, net.suberic.pooka.cache.MessageCache.MESSAGE);
+      
     }
-
-    /**
-     *  Caches the current messages.
-     */
-    public void cacheMessage() throws MessagingException {
-	FolderInfo fi = getFolderInfo();
-	if (fi != null && fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
-	    ((net.suberic.pooka.cache.CachingFolderInfo) fi).cacheMessage(this, net.suberic.pooka.cache.MessageCache.MESSAGE);
-	    
-	}
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.UserProfileContainer.
+   *
+   * If the MessageProxy's folderInfo is set, this returns the 
+   * DefaultProfile of that folderInfo.  If the folderInfo isn't set
+   * (should that happen?), this returns null.
+   */
+  
+  public UserProfile getDefaultProfile() {
+    if (getFolderInfo() != null) {
+      return getFolderInfo().getDefaultProfile();
+    } else 
+      return null;
+  }
+  
+  /**
+   * Saves the message to the given filename.
+   */
+  public void saveMessageAs(File saveFile) throws MessagingException{
+    try {
+      FileOutputStream fos = new FileOutputStream(saveFile);
+      ((MimeMessage)getRealMessage()).writeTo(fos);
+      //MimeMessage tmpMM = new MimeMessage((MimeMessage)getRealMessage());
+      //tmpMM.writeTo(fos);
+    } catch (IOException ioe) {
+      MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
+      me.setNextException(ioe);
+      throw me;
+      
     }
-
-    /**
-     * As specified by interface net.suberic.pooka.UserProfileContainer.
-     *
-     * If the MessageProxy's folderInfo is set, this returns the 
-     * DefaultProfile of that folderInfo.  If the folderInfo isn't set
-     * (should that happen?), this returns null.
-     */
-
-    public UserProfile getDefaultProfile() {
-	if (getFolderInfo() != null) {
-	    return getFolderInfo().getDefaultProfile();
-	} else 
-	    return null;
-    }
-
-    /**
-     * Saves the message to the given filename.
-     */
-    public void saveMessageAs(File saveFile) throws MessagingException{
-	try {
-	    FileOutputStream fos = new FileOutputStream(saveFile);
-	    ((MimeMessage)getRealMessage()).writeTo(fos);
-	    //MimeMessage tmpMM = new MimeMessage((MimeMessage)getRealMessage());
-	    //tmpMM.writeTo(fos);
-	} catch (IOException ioe) {
-	    MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
-	    me.setNextException(ioe);
-	    throw me;
-
-	}
-    }
+  }
 
   /**
    * Adds the sender of the message to the current AddressBook, if any.
@@ -712,13 +682,19 @@ public class MessageInfo {
     return message;
   }
 
-    /**
-     * Returns the real, modifiable message that this MessageInfo is
-     * wrapping.
-     */
-    public Message getRealMessage() {
-	return message;
+  /**
+   * Returns the real, modifiable message that this MessageInfo is
+   * wrapping.
+   */
+  public Message getRealMessage() {
+    if (getFolderInfo() != null) {
+      try {
+	return getFolderInfo().getRealMessage(this);
+      } catch (MessagingException me) {
+      }
     }
+    return message;
+  }
 
   /**
    * Returns the FolderInfo to which this message belongs.

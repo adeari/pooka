@@ -218,6 +218,25 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
     if (isConnected()) {
       super.fetch(messages, profile);
+      int cacheStatus = -1;
+      boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);
+      boolean doHeaders = (profile.contains(FetchProfile.Item.ENVELOPE) || profile.contains(FetchProfile.Item.CONTENT_INFO));
+
+      if (doFlags && doHeaders) {
+	cacheStatus = SimpleFileCache.FLAGS_AND_HEADERS;
+      } else if (doFlags) {
+	cacheStatus = SimpleFileCache.FLAGS;
+      } else if (doHeaders) {
+	cacheStatus = SimpleFileCache.HEADERS;
+      }
+      
+      if (cacheStatus != -1) {
+	for (int i = 0; i < messages.length; i++) {
+	  Message m = messages[i];
+	  long uid = ((UIDFolder)getFolder()).getUID(m);
+	  getCache().cacheMessage((MimeMessage)m, uid, cache.getUIDValidity(), cacheStatus);	
+	}
+      }
     }
   }
 

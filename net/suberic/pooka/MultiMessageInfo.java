@@ -74,7 +74,7 @@ public class MultiMessageInfo extends MessageInfo {
     /**
      * Copies the Message into the target Folder.
      */
-    public void copyMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
+    public void copyMessage(FolderInfo targetFolder) throws MessagingException {
 	if (folderInfo != null) {
 	    folderInfo.copyMessages(messages, targetFolder);
 	} else {
