@@ -18,11 +18,12 @@ public class FolderTableModel extends AbstractTableModel {
 
     private Vector data;
     private Vector columnNames;
+    private Vector columnSizes;
     
-    
-    public FolderTableModel(Vector newData, Vector newColumnNames) {
+    public FolderTableModel(Vector newData, Vector newColumnNames, Vector newColumnSizes) {
 	data=newData;
 	columnNames = newColumnNames;
+	columnSizes = newColumnSizes;
     }
 
     public int getColumnCount() {
@@ -134,6 +135,14 @@ public class FolderTableModel extends AbstractTableModel {
 	    }
 	} else {
 	    System.out.println("got an empty/null added or deleted event.");
+	}
+    }
+
+    public int getColumnSize(int columnIndex) {
+	try {
+	    return Integer.parseInt((String)columnSizes.elementAt(columnIndex));
+	} catch (Exception e) {
+	    return 0;
 	}
     }
 }

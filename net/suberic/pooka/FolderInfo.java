@@ -37,6 +37,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private Hashtable messageToProxyTable = new Hashtable();
     private Vector columnValues;
     private Vector columnNames;
+    private Vector columnSizes;
 
     // GUI information.
     private FolderWindow folderWindow;
@@ -225,16 +226,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration("FolderTable", "");
 	    Vector colvals = new Vector();
 	    Vector colnames = new Vector();
-
+	    Vector colsizes = new Vector();
+	    
 	    String tmp;
 	
 	    while (tokens.hasMoreElements()) {
 		tmp = (String)tokens.nextElement();
 		colvals.addElement(Pooka.getProperty("FolderTable." + tmp + ".value", tmp));
 		colnames.addElement(Pooka.getProperty("FolderTable." + tmp + ".label", tmp));
+		colsizes.addElement(Pooka.getProperty("FolderTable." + tmp + ".size", tmp));
 	    }	    
 	    setColumnNames(colnames);
 	    setColumnValues(colvals);
+	    setColumnSizes(colsizes);
 	}
 	    
 	if (loaderThread == null) 
@@ -258,7 +262,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
 	}
 
-	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames());
+	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
 
 	setFolderTableModel(ftm);
 
@@ -683,6 +687,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void setColumnNames(Vector newValue) {
 	columnNames = newValue;
+    }
+
+    public Vector getColumnSizes() {
+	return columnSizes;
+    }
+
+    public void setColumnSizes(Vector newValue) {
+	columnSizes = newValue;
     }
 
     public FolderWindow getFolderWindow() {

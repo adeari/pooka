@@ -158,14 +158,23 @@ FolderPanel.2xClickAction=folder-open
 
 FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 FolderTable.Status.tag=SEEN
+FolderTable.Status.size=2
 FolderTable.Flagged.value=FLAG.FLAGGED
+FolderTable.Flagged.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
+FolderTable.Flagged.size=2
 FolderTable.New.value=FLAG.RECENT
-FolderTable.Seen.value=FLAG.SEEN
+FolderTable.New.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
+FolderTable.New.size=2
 FolderTable.Attachments.value=attachments
+FolderTable.Attachments.icon=/net/suberic/pooka/gui/images/SmallPin.gif
 #FolderTable.Attachments.class=net.suberic.pooka.gui.AttachmentCellRenderer
+FolderTable.Attachments.size=10
 FolderTable.SentDate.value=Date
+FolderTable.SentDate.size=98
 FolderTable.From.value=From
+FolderTable.From.size=120
 FolderTable.Subject.value=Subject
+FolderTable.Subject.size=160
 FolderTable.2xClickAction=message-open
 FolderTable.UnreadStyle=BOLD
 

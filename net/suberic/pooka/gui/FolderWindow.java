@@ -128,6 +128,10 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
 	messageTable=new JTable(getFolderInfo().getFolderTableModel());
 	//messageTable.sizeColumnsToFit(JTable.AUTO_RESIZE_NEXT_COLUMN);
+	
+	for (int i = 0; i < messageTable.getColumnCount(); i++) {
+	    messageTable.getColumnModel().getColumn(i).setPreferredWidth(getFolderInfo().getFolderTableModel().getColumnSize(i));
+	}
 
 	getFolderInfo().getFolderTableModel().addTableModelListener(messageTable);
 
@@ -278,6 +282,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	} else {
 	    messageTable.scrollRectToVisible(messageTable.getCellRect(firstUnread, 1, true));
 	}
+
     }
 
     // Accessor methods.
