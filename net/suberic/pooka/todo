@@ -16,7 +16,9 @@ they appear (i.e. actually appear in front).
 *)  fix the response window size when there are lots of people in the 
 address fields--right now it makes the entire window huge.
 
-*)  add 1.3 compatibility.
+*)  add 1.3 compatibility.  current issues:
+	*)  FolderWindow comes up showing first message rather than last
+	*)  NewMessageWindow splitPane not in the right location.
 
 *)  fix the actions update when a message is unselected/deleted.
 
