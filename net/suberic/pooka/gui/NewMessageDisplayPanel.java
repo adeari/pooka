@@ -87,30 +87,77 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
   /**
    * Configures the style of this DisplayPanel.
    */
-  public void configureInterfaceStyle(HashMap uiStyle) {
+  public void configureInterfaceStyle(HashMap editorStyle, HashMap labelStyle) {
 
-    LinkedList componentList = new LinkedList();
-    componentList.add(editorPane);
+    LinkedList editorList = new LinkedList();
+    LinkedList labelList = new LinkedList();
+    /*
+    editorList.add(editorPane);
 
     Enumeration  keys = inputTable.keys();
     while (keys.hasMoreElements()) {
       Object value = inputTable.get(keys.nextElement());
-      if (value != null && value instanceof JComponent)
-	componentList.add(value);
+      if (value != null && value instanceof JTextComponent) {
+	editorList.add(value);
+      } else if (value != null && value instanceof JComponent) {
+	labelList.add(value);
+      }
     }
 
+    // now go through the items in the headerPanel.
+    Component[] inputRows = headerPanel.getComponents();
+    for (int i = 0; i < inputRows.length; i++) {
+      if (inputRows[i] != null && inputRows[i] instanceof Box) {
+	Box currentRow = (Box) inputRows[i];
+	Component[] rowItems = currentRow.getComponents();
+	for (int j = 0; j < rowItems.length; j++) {
+	  if (rowItems[j] != null && rowItems[j] instanceof JLabel) {
+	    labelList.add(rowItems[j]);
+	  }
+	}
+      }
+    }
+    
+    */
+
+    sortComponents(this, editorList, labelList);
+    applyStyle(editorList, editorStyle);
+    applyStyle(labelList, labelStyle);
+    splitPane.updateUI();
+    tabbedPane.updateUI();
+  }
+
+  /**
+   * Apply the given style to the components in the given List
+   */
+  private void applyStyle(LinkedList componentList, HashMap uiStyle) {
     Color backgroundColor = (Color) uiStyle.get("background");
-    Color foregroundColor = (Color) uiStyle.get("background");
+    Color foregroundColor = (Color) uiStyle.get("foreground");
     Font f = (Font) uiStyle.get("font");
 
     for (int i = 0; i < componentList.size(); i++) {
-      JComponent currentComponent = (JComponent) componentList.get(i);
+      Component currentComponent = (Component) componentList.get(i);
       if (backgroundColor != null && currentComponent.getBackground() != backgroundColor) 
 	currentComponent.setBackground(backgroundColor);
       if (foregroundColor != null && currentComponent.getForeground() != foregroundColor) 
 	currentComponent.setForeground(foregroundColor);
       if (f != null && currentComponent.getFont() != f) 
 	currentComponent.setFont(f);
+    }
+
+  }
+
+  private void sortComponents(Container parentContainer, LinkedList editorList, LinkedList labelList) {
+    Component[] children = parentContainer.getComponents();
+    for (int i = 0; i < children.length; i++) {
+      if (children[i] instanceof JTextComponent) {
+	editorList.add(children[i]);
+      } else if (children[i] instanceof Container) {
+	sortComponents((Container) children[i], editorList, labelList);
+	labelList.add(children[i]);
+      } else {
+	labelList.add(children[i]);
+      }
     }
   }
 

@@ -108,7 +108,7 @@ public class ReadMessageFrame extends MessageFrame {
    */
   public void configureInterfaceStyle() {
     HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessageWindowStyle(this);
-    messageDisplay.configureInterfaceStyle(uiStyle);
+    ((ReadMessageDisplayPanel)messageDisplay).configureInterfaceStyle(uiStyle);
   }
 
     /**

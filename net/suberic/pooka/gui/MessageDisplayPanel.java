@@ -54,11 +54,6 @@ public abstract class MessageDisplayPanel extends JPanel {
     
     public abstract void configureMessageDisplay() throws MessagingException;
 
-  /**
-   * Configures the InterfaceStyle for this component.
-   */
-  public abstract void configureInterfaceStyle(java.util.HashMap properties);
-
     /**
      * This calculates the default size for the EditorPane.
      * 

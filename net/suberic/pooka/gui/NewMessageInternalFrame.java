@@ -102,8 +102,9 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
    * Configures the InterfaceStyle for this component.
    */
   public void configureInterfaceStyle() {
-    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowStyle(this);
-    messageDisplay.configureInterfaceStyle(uiStyle);
+    HashMap editorUiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowEditorStyle(this);
+    HashMap labelUiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowLabelStyle(this);
+    getNewMessageDisplay().configureInterfaceStyle(editorUiStyle, labelUiStyle);
   }
   
   /**

@@ -111,7 +111,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
    */
   public void configureInterfaceStyle() {
     HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessageWindowStyle(this);
-    messageDisplay.configureInterfaceStyle(uiStyle);
+    ((ReadMessageDisplayPanel)messageDisplay).configureInterfaceStyle(uiStyle);
   }
 
     public void detachWindow() {

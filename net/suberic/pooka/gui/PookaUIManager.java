@@ -180,14 +180,28 @@ public class PookaUIManager implements ValueChangeListener {
   }
 
   /**
-   * Returns a UIStyleDefinition for the given NewMessageUI.
+   * Returns a UIStyleDefinition for the editors of the given NewMessageUI.
    */
-  public HashMap getNewMessageWindowStyle(NewMessageUI ui) {
+  public HashMap getNewMessageWindowEditorStyle(NewMessageUI ui) {
     // not the most efficient method, but it should work.
     net.suberic.pooka.UserProfile pr = ui.getSelectedProfile();
 
-    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.newMessageWindow");
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.newMessageWindow-editor");
     HashMap profileValues = createDefinitionForProperty(pr.getUserProperty() + ".uiConfig.newMessageWindow");
+    
+    HashMap returnValue = overrideStyle(defaultValues, profileValues);
+    return returnValue;
+  }
+
+  /**
+   * Returns a UIStyleDefinition for the editors of the given NewMessageUI.
+   */
+  public HashMap getNewMessageWindowLabelStyle(NewMessageUI ui) {
+    // not the most efficient method, but it should work.
+    net.suberic.pooka.UserProfile pr = ui.getSelectedProfile();
+
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.newMessageWindow-labels");
+    HashMap profileValues = createDefinitionForProperty(pr.getUserProperty() + ".labelUiConfig.newMessageWindow");
     
     HashMap returnValue = overrideStyle(defaultValues, profileValues);
     return returnValue;
