@@ -1,3 +1,6 @@
+*) still an error in connecting, disconnecting, getting a new messages/deleting
+	old messages, reconnecting.
+
 *) bounce messages
 
 *) add support for running without any local files.

@@ -845,11 +845,18 @@ public class MessageInfo {
       if (hasLoadedAttachments()) {
 	if (getAttachments() != null && getAttachments().size() > 0)
 	  mHasAttachments = true;
+	
+	mHasCheckedAttachments = true;
+	
+	return mHasAttachments;
+	
       } else {
 	try {
 	  javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
 	  if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
-	    mHasAttachments = true;
+	    return true;
+	  } else {
+	    return false;
 	  }
 	} catch (javax.mail.internet.ParseException pe) {
 	  if (Pooka.isDebug()) {
@@ -858,9 +865,9 @@ public class MessageInfo {
 	  mHasAttachments = false;
 	}
       }
-      mHasCheckedAttachments = true;
-      return mHasAttachments;
     }
+
+    return mHasAttachments;
   }
   
     /**

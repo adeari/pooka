@@ -62,7 +62,15 @@ public class MailUtilities {
     AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
 
     if (EncryptionUtils.isEncrypted((MimeMessage) m)) {
-      bundle.getAttachments().add(new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m));
+      Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
+
+      ContentType ct2 = newAttach.getMimeType();
+
+      if (ct2.match("text/*") && bundle.textPart == null)
+	bundle.textPart = newAttach;
+      else 
+	bundle.getAttachments().add(newAttach);
+
     } else {
       String contentType = ((MimeMessage) m).getContentType().toLowerCase();
       
@@ -123,7 +131,13 @@ public class MailUtilities {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
 
       if (EncryptionUtils.isEncrypted(mbp)) {
-	bundle.getAttachments().add(new net.suberic.pooka.crypto.CryptoAttachment(mbp));
+	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
+	ContentType ct = newAttach.getMimeType();
+	if (ct.match("text/*") && bundle.textPart == null) {
+	  bundle.textPart = newAttach;
+	} else {
+	  bundle.getAttachments().add(newAttach);
+	}
       } else {
 	ContentType ct = new ContentType(mbp.getContentType());
 	if (ct.getPrimaryType().equalsIgnoreCase("text")) {

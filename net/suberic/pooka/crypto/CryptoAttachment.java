@@ -22,7 +22,6 @@ public class CryptoAttachment extends Attachment {
    */
   public CryptoAttachment(MimeBodyPart mbp) throws MessagingException {
     super(mbp);
-    System.out.println("new cryptoattachment.");
   }
   
   /**
@@ -33,7 +32,6 @@ public class CryptoAttachment extends Attachment {
    */
   public CryptoAttachment(MimeMessage msg) throws MessagingException {
     super(msg);
-    System.out.println("new cryptoattachment.");
   }
 
   // accessor methods.
@@ -44,11 +42,12 @@ public class CryptoAttachment extends Attachment {
       return decryptedBodyPart;
     else {
       // we should always be wrapping a Multipart object here.
-      Object o = super.getContent();
+      Object o = super.getDataHandler().getContent();
       if (o instanceof Multipart) {
 	PGPMimeEncryptionUtils utils = new PGPMimeEncryptionUtils();
 	utils.setPGPProviderImpl(new net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl());
 	decryptedBodyPart = utils.decryptMultipart((Multipart)o, new net.suberic.pooka.crypto.gpg.GPGEncryptionKey("allen", "biteme"));
+
 
 	return decryptedBodyPart;
       } else {

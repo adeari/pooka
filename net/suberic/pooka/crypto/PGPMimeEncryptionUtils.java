@@ -196,4 +196,32 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     return returnValue;
   }
 
+  /**
+   * Signs a Part.
+   */
+  public Part signPart(Part p, EncryptionKey key) {
+    return null;
+  }
+
+  /**
+   * Checks the signature on a Part.
+   */
+  public boolean checkSignature(Part p, EncryptionKey key) {
+    return false;
+  }
+
+  /**
+   * Signs a Message.
+   */
+  public Message signMessage(Message m, EncryptionKey key) {
+    return null;
+  }
+
+  /**
+   * Checks the signature on a Message.
+   */
+  public boolean checkSignature(Message m, EncryptionKey key) {
+    return false;
+  }
+
 }

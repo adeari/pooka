@@ -46,6 +46,25 @@ public abstract class EncryptionUtils {
   public abstract BodyPart decryptBodyPart(BodyPart part, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException;
 
+  /**
+   * Signs a Part.
+   */
+  public abstract Part signPart(Part p, EncryptionKey key);
+
+  /**
+   * Checks the signature on a Part.
+   */
+  public abstract boolean checkSignature(Part p, EncryptionKey key);
+
+  /**
+   * Signs a Message.
+   */
+  public abstract Message signMessage(Message m, EncryptionKey key);
+
+  /**
+   * Checks the signature on a Message.
+   */
+  public abstract boolean checkSignature(Message m, EncryptionKey key);
 
   public static boolean isEncrypted(Part pPart) throws MessagingException {
     String contentType = pPart.getContentType().toLowerCase();
