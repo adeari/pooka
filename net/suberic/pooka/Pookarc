@@ -23,6 +23,8 @@ Pooka.lineWrap=true
 Pooka.lineLength=72
 Pooka.displayTextAttachments=true
 
+Pooka.openFoldersOnConnect=true
+
 MenuBar=File:Edit:Mail:Window:Help
 
 MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit

@@ -77,11 +77,12 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 		} else {
 		    setFontToDefault();
 		}
-		
+
 		FolderInfo folderInfo = ((FolderNode)node).getFolderInfo();
-		if (folderInfo == null)
+		
+		if (folderInfo == null){
 		    setIconToDisconnected();
-		else {
+		} else {
 		    if (!((FolderNode)node).isLeaf()) {
 			setIconToSubfolder();
 		    } else if (folderInfo.isOpen()) {

@@ -80,6 +80,8 @@ public class StoreInfo implements ValueChangeListener {
 	    });
 	
 	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
+
+	updateChildren();
     }	
     
     /**
@@ -157,8 +159,10 @@ public class StoreInfo implements ValueChangeListener {
 	} else { 
 	    store.connect();
 	    connected=true;
-	    if (children == null)
-		updateChildren();
+
+	    if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
+		for (int i = 0; i < children.size(); i++)
+		    ((FolderInfo)children.elementAt(i)).openAllFolders(Folder.READ_WRITE);
 	}
 	
     }

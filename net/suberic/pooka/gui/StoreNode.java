@@ -64,25 +64,16 @@ public class StoreNode extends MailTreeNode {
      * This loads or updates the top-level children of the Store.
      */
     public void loadChildren() {
-	/*
-	//   connect to the Store if we need to
-	
-	if (!store.isConnected()) 
-	    return; 
-	*/
-	
-	String folderName;
+	java.util.Vector storeChildren = getStoreInfo().getChildren();
     
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + store.getStoreID() + ".folderList", "INBOX"), ":");
+	if (storeChildren != null)
+	    for (int i = 0 ; i < storeChildren.size() ; i++) {
+		FolderNode node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
+		// we used insert here, since add() would mak
+		// another recursive call to getChildCount();
+		insert(node, i);
+	    } 
 	
-	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-	    folderName = (String)tokens.nextToken();
-	    FolderNode node = new FolderNode(new FolderInfo(store, folderName ), getParentContainer());
-	    // we used insert here, since add() would mak
-	    // another recursive call to getChildCount();
-	    insert(node, i);
-	} 
-
 	hasLoaded=true;
 
 	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();

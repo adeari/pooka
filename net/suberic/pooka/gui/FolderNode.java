@@ -47,7 +47,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		getParentContainer().repaint();
 	    }
 	    
-	    public void messageRemoved(MessageCountEvent e) {
+	    public void messagesRemoved(MessageCountEvent e) {
 		getParentContainer().repaint();
 	    }
 	});

@@ -180,7 +180,8 @@ public class ReadMessageWindow extends MessageWindow {
 	editorPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
 	editorScrollPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
 	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	splitPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+	if (splitPane != null)
+	    splitPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
     }
     
     /**
