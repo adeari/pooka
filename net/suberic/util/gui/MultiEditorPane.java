@@ -233,7 +233,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	String rootProp =new String(property.concat("." + newValueName));
 	Vector propList = createPropertiesList(rootProp, subProperties);
 	
-	PropertyEditorPane pep = new PropertyEditorPane(factory, propList, null);;
+	PropertyEditorPane pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
 	optionListModel.addElement(newValueName);
 
 	entryPanel.add(newValueName, pep);
@@ -298,7 +298,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 		String rootProp =new String(property.concat("." + newName));
 		Vector propList = createPropertiesList(rootProp, subProperties);
 		
-		PropertyEditorPane pep = new PropertyEditorPane(factory, propList, null);;
+		PropertyEditorPane pep = new PropertyEditorPane(factory, propList, templateTypes, null);;
 		java.util.Properties oldProps = oldPane.getValue();
 	    }
 	}
