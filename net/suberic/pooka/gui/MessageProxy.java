@@ -60,19 +60,26 @@ public class MessageProxy {
 	 */
 	public SubjectLine(String newSubject) {
 	    subject = newSubject;
-	    sortingSubject = subject.toLowerCase();
+	    if (subject != null)
+		sortingSubject = subject.toLowerCase();
+	    else
+		sortingSubject = new String("");
+
 	    int cutoffPoint = 0;
-	    while(sortingSubject.startsWith("re:", cutoffPoint)) {
-		for(cutoffPoint = cutoffPoint + 3; cutoffPoint > sortingSubject.length() && Character.isWhitespace(sortingSubject.charAt(cutoffPoint)); cutoffPoint++) { }
-	    }
+	    while(sortingSubject.startsWith("re:", cutoffPoint)) 
+		for(cutoffPoint = cutoffPoint + 3; cutoffPoint < sortingSubject.length() && Character.isWhitespace(sortingSubject.charAt(cutoffPoint)); cutoffPoint++) { }
 	    if (cutoffPoint != 0)
 		sortingSubject = sortingSubject.substring(cutoffPoint);
 	}
-
+	
 	/**
 	 * Compare function.
 	 */
 	public int compareTo(Object o) {
+	    // proper SubjectLines are always greater than null.
+	    if (o == null)
+		return 1;
+
 	    if (o instanceof SubjectLine) {
 		return sortingSubject.compareTo(((SubjectLine)o).sortingSubject);
 	    } else
