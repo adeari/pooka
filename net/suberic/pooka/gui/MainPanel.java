@@ -36,6 +36,9 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
 
 	session = Session.getDefaultInstance(System.getProperties(), auth);
+	
+	if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
+	    session.setDebug(true);
 
 	mailQueue = new MailQueue(Pooka.getDefaultSession());
     }

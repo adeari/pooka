@@ -2,6 +2,7 @@
 #bindings for the menus, etc., are found in locale/Pooka_<Locale>.properties
 
 Pooka.debug=false
+Pooka.sessionDebug=false
 
 Message.sendImmediately=true
 
