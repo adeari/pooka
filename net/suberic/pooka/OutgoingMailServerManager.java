@@ -200,6 +200,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
       outboxID = Pooka.getProperty("OutgoingServer._default.outbox");
 
       mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
+      mailServerThread.start();
     }
     
     /**

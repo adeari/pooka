@@ -62,6 +62,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     bundle.addValueChangeListener(this, getItemProperty() + ".outbox");
 
     mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
+    mailServerThread.start();
   }
 
   /**

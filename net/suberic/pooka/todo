@@ -32,6 +32,9 @@ we lose and regain our imap connections.
 html, we either fall back on the text version (if any) or display
 the straight html.
 
+*) error with the fetching on the UIDProfiles--they're ending up getting the
+uid for each message at the beginning, whether they're in the batch or not.
+
 beta 1
 ---------------
 

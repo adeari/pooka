@@ -46,36 +46,38 @@ public class NewMessageInfo extends MessageInfo {
     if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
       messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
     
-    if (urlName != null) {
-      if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
-	MimeBodyPart mbp = new MimeBodyPart();
-	mbp.setContent(messageText, messageContentType);
-	MimeMultipart multipart = new MimeMultipart();
-	multipart.addBodyPart(mbp);
-	for (int i = 0; i < attachments.getAttachments().size(); i++) 
-	  multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
-	multipart.setSubType("mixed");
-	getMessage().setContent(multipart);
-	getMessage().saveChanges();
-      } else {
-	getMessage().setContent(messageText, messageContentType);
-      }
-      
-      boolean sent = false;
-      if (Pooka.getProperty("Pooka.useOutbox", "false").equalsIgnoreCase("true")) {
-	if (profile != null) {
-	  OutgoingMailServer mailServer = profile.getMailServer();
-	  if (mailServer != null) {
-	    mailServer.sendMessage(this);
-	    sent = true;
-	  }
-	} 
-      } 
-      
-      if (! sent)
-	Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
+    if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
+      MimeBodyPart mbp = new MimeBodyPart();
+      mbp.setContent(messageText, messageContentType);
+      MimeMultipart multipart = new MimeMultipart();
+      multipart.addBodyPart(mbp);
+      for (int i = 0; i < attachments.getAttachments().size(); i++) 
+	multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
+      multipart.setSubType("mixed");
+      getMessage().setContent(multipart);
+      getMessage().saveChanges();
     } else {
-      throw new MessagingException(Pooka.getProperty("error.noMailURL", "Error sending Message:  No mail URL."));
+      getMessage().setContent(messageText, messageContentType);
+    }
+    
+    boolean sent = false;
+    if (profile != null) {
+      OutgoingMailServer mailServer = profile.getMailServer();
+      if (mailServer != null) {
+	mailServer.sendMessage(this);
+	sent = true;
+      }
+    } 
+    
+    if (! sent) {
+      if (urlName != null) {
+	Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
+	sent = true;
+      }
+    } 
+
+    if (! sent) {
+      throw new MessagingException(Pooka.getProperty("error.noSMTPServer", "Error sending Message:  No mail server configured."));
     }
   }
 
