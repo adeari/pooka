@@ -21,7 +21,13 @@ public class PropertyEditorFactory {
   public PropertyEditorFactory(VariableBundle bundle) {
     sourceBundle = bundle;
   }
-  
+
+  /**
+   * Shows an error message.
+   */
+  public void showError(Object component, String errorMessage) {
+    JOptionPane.showMessageDialog((Component) component, errorMessage);
+  }
 }
 
 

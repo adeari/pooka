@@ -1,5 +1,6 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
+import java.awt.event.*;
 import net.suberic.util.*;
 import java.awt.FlowLayout;
 
@@ -11,6 +12,7 @@ public class StringEditorPane extends SwingPropertyEditor {
   
   JLabel label;
   JTextField inputField;
+  String currentValue;
 
   /**
    * @param propertyName The property to be edited.  
@@ -25,7 +27,8 @@ public class StringEditorPane extends SwingPropertyEditor {
     manager=newManager;
     editorTemplate = template;
     originalValue = manager.getProperty(property, "");
-    
+    currentValue = originalValue;
+
     String defaultLabel;
     int dotIndex = property.lastIndexOf(".");
     if (dotIndex == -1) 
@@ -36,9 +39,23 @@ public class StringEditorPane extends SwingPropertyEditor {
     if (debug) {
       System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
     }
+
     label = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
     inputField = new JTextField(originalValue);
     inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
+    inputField.addFocusListener(new FocusAdapter() {
+	public void focusLost(FocusEvent e) {
+	  if (! inputField.getText().equals(currentValue)) {
+	    try {
+	      firePropertyChangingEvent(inputField.getText());
+	      currentValue = inputField.getText();
+	    } catch (PropertyValueVetoException pvve) {
+	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + inputField.getText() + ":  " + pvve.getReason());
+	      inputField.setText(currentValue);
+	    }
+	  }
+	}
+      });
     this.add(label);
     this.add(inputField);
     this.setEnabled(isEnabled);
@@ -52,8 +69,11 @@ public class StringEditorPane extends SwingPropertyEditor {
    * to the source VariableBundle.
    */
   public void setValue() throws PropertyValueVetoException {
-    if (isEnabled() && !(inputField.getText().equals(originalValue))) {
+    if (isEnabled() && !(inputField.getText().equals(currentValue))) {
       firePropertyChangingEvent(inputField.getText());
+    }
+
+    if (isEnabled() && !(inputField.getText().equals(originalValue))) {
       manager.setProperty(property, inputField.getText());
       firePropertyChangedEvent(inputField.getText());
     }
