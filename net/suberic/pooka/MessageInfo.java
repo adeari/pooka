@@ -59,21 +59,21 @@ public class MessageInfo {
      */
 
     public boolean flagIsSet(String flagName) throws MessagingException {
-	Flags f = getFlags();
+
 	if (flagName.equals("FLAG.ANSWERED") )
-	    return f.contains(Flags.Flag.ANSWERED);
+	    return getMessage().isSet(Flags.Flag.ANSWERED);
 	else if (flagName.equals("FLAG.DELETED"))
-	    return f.contains(Flags.Flag.DELETED);
+	    return getMessage().isSet(Flags.Flag.DELETED);
 	else if (flagName.equals("FLAG.DRAFT"))
-	    return f.contains(Flags.Flag.DRAFT);
+	    return getMessage().isSet(Flags.Flag.DRAFT);
 	else if (flagName.equals("FLAG.FLAGGED"))
-	    return f.contains(Flags.Flag.FLAGGED);
+	    return getMessage().isSet(Flags.Flag.FLAGGED);
 	else if (flagName.equals("FLAG.RECENT"))
-	    return f.contains(Flags.Flag.RECENT);
+	    return getMessage().isSet(Flags.Flag.RECENT);
 	else if (flagName.equals("FLAG.SEEN"))
-	    return f.contains(Flags.Flag.SEEN);
-	else
-	    return f.contains(flagName);
+	    return getMessage().isSet(Flags.Flag.SEEN);
+	
+	return false;
     }
 
     /**
