@@ -15,7 +15,7 @@ import javax.activation.DataHandler;
  */
 public class SimpleFileCache implements MessageCache {
 
-    // FIXME:  why isn't anyhting synchronized?
+    // FIXME:  why isn't anything synchronized?
     
     public static int CONTENT = 0;
     public static int HEADERS = 1;
@@ -727,6 +727,14 @@ public class SimpleFileCache implements MessageCache {
 	}
 
 	return unreadCount;
+    }
+
+    /**
+     * Returns whether a given uid exists fully in the cache or not.
+     */
+    public boolean isFullyCached(long uid) {
+	DataHandler dh = getHandlerFromCache(uid);
+	return (dh != null);
     }
 
     public long getUIDValidity() {

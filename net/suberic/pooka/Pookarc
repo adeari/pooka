@@ -315,6 +315,8 @@ AttachmentPane.2xClickAction=file-open
 
 # -- end popup menus.
 
+CachedMessages.notCached.foregroundColor=-65536
+
 MessageWindow.backgroundColor=white
 MessageWindow.vsize=500
 MessageWindow.headerPanel.vsize=200

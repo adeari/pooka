@@ -137,4 +137,9 @@ public interface MessageCache {
      * Writes any offline changes made back to the server.
      */
     public void writeChangesToServer(Folder f) throws MessagingException;
+
+    /**
+     * Returns whether a given uid exists fully in the cache or not.
+     */
+    public boolean isFullyCached(long uid);
 }

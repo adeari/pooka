@@ -15,6 +15,9 @@ caching:  pretty much the same as uid, no?  only difference is that we also have
 	       note on screen saying that we're caching things.
 	   *)  cached folders currently come up with the first message showing
 	       instead of the last.
+	   *)  if you try to read a message that's not cached, it gives
+	       you the right error, but still tries to open up a window and
+	       marks the message as read.
 	   *)  add a ui for configuring caching.
 	   *)  add a ui for seeing the caching mode for each message, and for
 	       explicitly caching the messages themselves.
