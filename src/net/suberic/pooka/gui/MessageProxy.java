@@ -1391,7 +1391,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Sets move or copy value.
    */
   public void setActionType(int pActionType) {
-    System.err.println("setting Action Type to " + pActionType);
     mActionType = pActionType;
   }
 
@@ -1413,7 +1412,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Sets whether or not the import is done.
    */
   public void setImportDone(boolean pImportDone) {
-    System.err.println("setting import done to " + pImportDone);
     mImportDone = pImportDone;
   }
 
@@ -1422,7 +1420,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * action to a copy.  
    */
   public void setCutDisallowed(boolean pCutDisallowed) {
-    System.err.println("setting cutDisallowed to " + pCutDisallowed);
     mCutDisallowed = pCutDisallowed;
   }
 
@@ -1438,7 +1435,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Removes this message if the cut/past/move is complete.
    */
   public boolean removeMessageOnCompletion() {
-    System.err.println("removing message on completion.");
     if (mImportDone && mActionType == javax.swing.TransferHandler.MOVE) {
       if ( !mCutDisallowed) {
 	deleteMessage();

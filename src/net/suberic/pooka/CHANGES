@@ -1,4 +1,7 @@
-added support for drag and drop.
+040914 release
+--------------
+
+added limited support for drag and drop.
 
 added a way to specify caching scheme per folder, so we can avoid autocaching
 of messages in spam and/or sent folders.
@@ -17,6 +20,8 @@ fixed expunging on backend filteres.
 
 changed the Cached search so that you can now make a custom display filter
 for cached and uncached messages.
+
+fixed a NPE in deleting multiple messages from a search window.
 
 changed the theme selection menu so that we should see all of (and only) the
 available look and feels.
