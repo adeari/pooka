@@ -130,6 +130,10 @@ public class NewAccountPooka {
       setupFolders(props);
 
       saveProperties(props);
+
+      Pooka.getStoreManager().loadAllSentFolders();
+      Pooka.getOutgoingMailManager().loadOutboxFolders();
+
       openInbox();
 
     } catch (Exception e) {

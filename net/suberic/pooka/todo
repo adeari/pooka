@@ -1,6 +1,3 @@
-*) startup:
-	--make sure that the outbox gets configured correctly as an outbox
-	--same for sent folder.
 
 *) default domain for outgoing addresses.
 	- test outbox failure.
@@ -128,6 +125,10 @@ preview:
 	click on and view/save without opening the message).
 
 *) make it so we only get one connection failed message for a store.
+
+*) sent folders, outboxes, etc. should be configured without requiring a
+	restart.  also, should be able to change store protcol/connection
+	info without restarting.
 
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.MessageInfo.remove(Unknown Source)

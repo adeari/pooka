@@ -1,3 +1,8 @@
+made it so the outbox and sent folder are both properly configured when
+you start up the first time.  otherwise, though, they still require a 
+restart for changes to be made.  this fix only applies to the first time
+you start.
+
 added a default domain setting, so that if you enter in an email address 
 without a domain, then the default domain is appended.  if no default domain
 is set, then the domain of the user is appended.
