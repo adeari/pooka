@@ -152,6 +152,10 @@ public class FolderTableModel extends AbstractTableModel {
 
     // all of this is the sorting code.
 
+    /**
+     * This is a class which compares the given MessageProxy's by the
+     * value of the particular column in the TableInfo.
+     */
     protected class RowComparator implements Comparator {
 
 	public int column;
@@ -159,8 +163,9 @@ public class FolderTableModel extends AbstractTableModel {
 	public RowComparator(int newColumn) {
 	    column = newColumn;
 	}
+
 	/**
-	 * This compares two row objects by column.
+	 * This compares two row objects (MessageProxy's) by column.
 	 */
 	public int compare(Object row1, Object row2) {
 	    // Check for nulls.
@@ -176,17 +181,17 @@ public class FolderTableModel extends AbstractTableModel {
 	    
 	    Object o1 = ((MessageProxy)row1).getTableInfo().elementAt(column);
 	    Object o2 = ((MessageProxy)row2).getTableInfo().elementAt(column);
+	    
+	    // again, check for nulls.
+	    if (o1 == null && o2 == null) {
+		return 0; 
+	    } else if (o1 == null) { // Define null less than everything. 
+		return -1; 
+	    } else if (o2 == null) { 
+		return 1; 
+	    }
+
 	    Class type = o1.getClass();
-	    
-	    
-	    /*
-	     * We copy all returned values from the getValue call in case
-	     * an optimised model is reusing one object to return many
-	     * values.  The Number subclasses in the JDK are immutable and
-	     * so will not be used in this way but other subclasses of
-	     * Number might want to do this to save space and avoid
-	     * unnecessary heap allocation.
-	     */
 	    
 	    if (type.getSuperclass() == java.lang.Number.class) {
 		Number n1 = (Number)o1;
@@ -240,6 +245,15 @@ public class FolderTableModel extends AbstractTableModel {
 		    return -1;
 		}
 	    } else {
+		try {
+		    
+		    if (Class.forName("java.lang.Comparable").isAssignableFrom(type)) {
+			return ((Comparable)o1).compareTo(o2);
+		    }
+		} catch (ClassNotFoundException cnfe) {
+		    System.out.println("couldn't find class comparable.");
+		}
+
 		Object v1 = o1;
 		String s1 = v1.toString();
 		Object v2 = o2;
@@ -261,6 +275,9 @@ public class FolderTableModel extends AbstractTableModel {
 	}
     }
 
+    /**
+     * This is for the reverse sort.
+     */
     public class ReverseRowComparator extends RowComparator {
 	public ReverseRowComparator(int newColumn) {
 	    super(newColumn);
@@ -271,6 +288,9 @@ public class FolderTableModel extends AbstractTableModel {
 	}
     }
 
+    /**
+     * This sorts the data Vector by the value of the given column.
+     */
     public void sortByColumn(int column, boolean ascending) {
 	if (ascending)
 	    java.util.Collections.sort(data, new RowComparator(column));
