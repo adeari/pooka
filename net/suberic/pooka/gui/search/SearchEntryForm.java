@@ -40,6 +40,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	panel = new Box(BoxLayout.X_AXIS);
 
 	searchFieldCombo = new JComboBox(manager.getTermLabels());
+	searchFieldCombo.setPreferredSize(searchFieldCombo.getMinimumSize());
 
 	searchFieldCombo.addItemListener( this );
 
@@ -64,28 +65,34 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 	stringMatchPanel = new Box(BoxLayout.X_AXIS);
 	Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
 	operationCombo = new JComboBox(operationFields);
-	textField = new JTextField(40);
+	operationCombo.setPreferredSize(operationCombo.getMinimumSize());
+	textField = new JTextField(20);
 	textField.setMaximumSize(new java.awt.Dimension(1000, textField.getPreferredSize().height));
 
 	stringMatchPanel.add(operationCombo);
 	stringMatchPanel.add(textField);
+	stringMatchPanel.add(Box.createGlue());
 
 	booleanPanel = new Box(BoxLayout.X_AXIS);
 	Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
 	booleanValueCombo = new JComboBox(booleanFields);
+	booleanValueCombo.setPreferredSize(booleanValueCombo.getMinimumSize());
 	booleanPanel.add(booleanValueCombo);
+	booleanPanel.add(Box.createGlue());
 
 	datePanel = new Box(BoxLayout.X_AXIS);
 
 	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
 	dateComparisonCombo = new JComboBox(dateFields);
-	dateField = new JTextField(20);
+	dateComparisonCombo.setPreferredSize(dateComparisonCombo.getMinimumSize());
+	dateField = new JTextField(10);
 	dateField.setMaximumSize(new java.awt.Dimension(1000, dateField.getPreferredSize().height));
 
 	JLabel dateFormatLabel = new JLabel(Pooka.getProperty("Search.dateFormat", "mm/dd/yyyy"));
 	datePanel.add(dateComparisonCombo);
 	datePanel.add(dateField);
 	datePanel.add(dateFormatLabel);
+	datePanel.add(Box.createGlue());
     }
 
     /**

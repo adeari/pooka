@@ -109,6 +109,7 @@ public class SearchEntryPanel extends JPanel {
 
 	this.add(conditionPanel, java.awt.BorderLayout.SOUTH);
 	this.add(entryScrollPane, java.awt.BorderLayout.CENTER);
+
     }
 
     /**
