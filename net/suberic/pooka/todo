@@ -4,11 +4,6 @@ alpha 2
 *)  add a way to edit the mailcap file.  this should be doable both from
 a menu option and from the 'open with' dialog.
 
-*)  get JFileChooser to work with the mail stores.  sort of done; still
-	need to deal with disconnection issues and return value issues.
-	 -- disconnection:  check to see if the Store is actually staying
-	    open or not.
-
 *) fix the signature -- started, anyway.  need to add a keybinding for 
 	inserting the sig, support for signature as a file, support for
 	signature as a generator....  lots of stuff, i suppose.
@@ -20,6 +15,23 @@ a menu option and from the 'open with' dialog.
 	that the FolderNodes aren't being redrawn on time.  specifically,
 	i think that when the FolderWindow is selected, the FolderNode is
 	not redrawn.
+	-- note:  i'm switching it to an icon-based alert on the FolderPanel,
+	so i'll need to make sure that it works that way.
+
+*) bug:  fix what happens if you try sending out a bad email.  also, while
+	we're at it, make sure that the from: and smtp: information get 
+	updated live.
+
+*)  get JFileChooser to work with the mail stores.  sort of done; still
+	need to deal with disconnection issues and return value issues.
+	 -- disconnection:  check to see if the Store is actually staying
+	    open or not.
+
+-- final checks before alpha 2 release.
+
+*) bug:  check the internal frame / window focus issue--make sure that 
+	the selected frame always has keyboard focus, and that the keyboard
+	focus defaults to a reasonable place.
 
 *) add keyboard control for everything, including switching between internal
 frames and the folderPanel.  oh, and making it so you can get at the menus.
@@ -27,23 +39,12 @@ frames and the folderPanel.  oh, and making it so you can get at the menus.
 	...  probably just do another run through for all the options before
 	we finish.
 
-*) bug:  fix what happens if you try sending out a bad email.  also, while
-	we're at it, make sure that the from: and smtp: information get 
-	updated live.
-
-*) bug:  check the internal frame / window focus issue--make sure that 
-	the selected frame always has keyboard focus, and that the keyboard
-	focus defaults to a reasonable place.
-
-?????? alpha 2 or not ??????
-----------------------------
+after alpha 2
+----------------
 
 *) enable voice control
 
 *)  make the windows detachable.
-
-after alpha 2
-----------------
 
 *) add an optional preview pane.
 
