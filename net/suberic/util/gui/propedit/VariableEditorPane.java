@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.util.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.CardLayout;
 
 /**
  * This will made a panel which can change depending on 
@@ -12,9 +13,7 @@ import java.awt.event.ActionEvent;
 public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
   String keyProperty;
-  HashMap valueToTemplateMap = new HashMap();
-  
-  JButton button;
+  HashMap idToEditorMap = new HashMap();
   
   boolean scoped;
   
@@ -47,81 +46,64 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     } else {
       keyProperty =  manager.getProperty(editorTemplate + ".keyProperty", "");
     }
+
     if (debug) {
       System.out.println("Variable:  property = " + property + "; keyProperty = " + keyProperty);
     }
-    
-    List allowedValues = manager.getPropertyAsList(editorTemplate + ".allowedValues", "");
-    for (int i = 0; i < allowedValues.size(); i++) {
-      String value = (String) allowedValues.get(i);
-      String editValue = manager.getProperty(editorTemplate + ".allowedValues." + value,  "");
-      valueToTemplateMap.put(value, editValue);
-    }
-    
+
+    manager.addPropertyEditorListener(keyProperty, new PropertyEditorAdapter() {
+	public void propertyChanged(String newValue) {
+	  showPanel(newValue);
+	}
+      });
+
     valueComponent = new JPanel();
     valueComponent.setLayout(new java.awt.CardLayout());
+
+    String currentValue = manager.getProperty(keyProperty, "");
+    showPanel(currentValue);
   }
   
   /**
    * This shows the editor window for the configured value.
    */
-  public void showEditorWindow() {
-    PropertyEditorUI parent = getParentPropertyEditor();
-    //System.out.println("keyProperty = " + keyProperty);
-    String currentValue = manager.getProperty(keyProperty, "");
-    
-    //System.out.println("currentValue initial = " + keyProperty + ":  " + currentValue);
-    if (parent != null) {
-      String test = parent.getValue().getProperty(keyProperty);
-      //System.out.println("parent.getValue() = ");
-      //parent.getValue().list(System.out);
-      //System.out.println("parent != null; parent.getValue.getProperty(" + keyProperty + ") = " + test);
-      if (test != null)
-	currentValue = test;
+  public void showPanel(String selectedId) {
+    CardLayout layout = (CardLayout)this.getLayout();
+
+    Object newSelected = idToEditorMap.get(selectedId);
+    if (newSelected == null) {
+      // we'll have to make a new window.
+      SwingPropertyEditor spe = createEditorPane(selectedId);
+      
+      // save reference to new pane in hash table
+      idToEditorMap.put(selectedId, spe);
+      editors.add(spe);
+      
+      this.add(selectedId, spe);
+      
     }
-    
-    /*
-      String editValue = (String) valueToEditorTemplateMap.get(currentValue);
-      if (editValue == null)
-      editValue = (String) valueToEditorTemplateMap.get("default");
-    */
-    
-    String editValue = currentValue;
-    
-    if (scoped) {
-      editValue = editorTemplate + "." + editValue;
-      //System.out.println("scoped; editValue = " + editValue);
-    } else {
-      //System.out.println("not scoped; editValue = " + editValue);
-    }
-    
-    Vector propertyVector = new Vector();
-    propertyVector.add(property);
-    Vector editorTemplateVector = new Vector();
-    editorTemplateVector.add(editValue);
-    
-    manager.getFactory().showNewEditorWindow(manager.getProperty(editValue + ".title", editValue), propertyVector, editorTemplateVector, manager);
-  }
-  
+    layout.show(this, selectedId);
+  }    
+ 
   /**
-   * Returns the parent PropertyEditorUI.
+   * Creates a SwingPropertyEditor for the given subproperty.
    */
-  protected PropertyEditorUI getParentPropertyEditor() {
-    java.awt.Container parent = valueComponent.getParent();
-    PropertyEditorUI returnValue = null;
-    while (returnValue == null && parent != null) {
-      if (parent instanceof PropertyEditorUI)
-	returnValue = (PropertyEditorUI) parent;
-      else
-	parent = parent.getParent();
+  public SwingPropertyEditor createEditorPane(String selectedId) {
+    
+    String editValue = selectedId;
+
+    if (scoped) {
+      editValue = editorTemplate + "." + selectedId;
+      if (debug) {
+	System.out.println("scoped; editValue = " + editValue);
+      }
+    } else {
+      if (debug) 
+	System.out.println("not scoped; editValue = " + editValue);
     }
     
+    SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.createEditor(property, editValue);
     return returnValue;
-  }
-  
-  public void setEnabled(boolean newValue) {
-    button.setEnabled(newValue);
-    enabled=newValue;
   }
 }
 

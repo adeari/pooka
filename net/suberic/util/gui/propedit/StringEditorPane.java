@@ -60,7 +60,7 @@ public class StringEditorPane extends SwingPropertyEditor {
   
   /**
    * This writes the currently configured value in the PropertyEditorUI
-   * to the source VariableBundle.
+   * to the source PropertyEditorManager.
    */
   public void setValue() throws PropertyValueVetoException {
     if (isEnabled() && !(inputField.getText().equals(currentValue))) {
