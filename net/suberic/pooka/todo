@@ -1,23 +1,11 @@
 beta 1
 ---------------
 
-immediate todo: 
-
-	1)  fix the window sizing (at least on 1.2.2 and 1.3 on linux, using
-	both desktop and prevew settings.)
-	 -- done for 1.2.2; don't have 1.3 on here.
-
-	2)  add a way to move directly to a message.
-
-	3)  work out a test case for the JFileChooser bug.
-
-	bug:  openwith doesn't work under preview.
+bug:  openwith doesn't work under preview.
 
 ui engine
 ---------
 *)  make the windows detachable.
-
-*) add an optional preview pane.
 
 *) fix all of the thread issues that i've introduced.  :)
 
@@ -29,9 +17,6 @@ connection information, trash/sent folders, etc.) available, and make it
 so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
 
-*) takes too long to open a window where there are a lot of new messages.
-	note:  this is much better now.
-
 *) add the ability to save messages to files.
 
 *) add ability to reply/forward with attachments, or as inline, and so forth
@@ -39,8 +24,6 @@ a big ui overhaul.
 *) add copying messages.
 
 *) add undo/redo support
-
-*) make it so you can skip directly to any message in the folder.
 
 *) add the ability for reply-all to exclude your own email address.
 
