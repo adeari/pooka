@@ -14,7 +14,7 @@ class AttachmentBundle {
     Attachment textPart = null;
     Vector allAttachments = new Vector();
     Vector attachmentsAndTextPart = null;
-    HashMap headers = null;
+    InternetHeaders headers = null;
     Vector headerLines = null;
 
     AttachmentBundle() {
@@ -169,9 +169,10 @@ class AttachmentBundle {
 	    StringBuffer headerText = new StringBuffer();
 	    
 	    if (showFullHeaders) {
-		for (int i = 0; i < headers.size(); i++) {
-		    headerText.append((String) headerLines.elementAt(i));
-		}
+		Enumeration allHdrs = headers.getAllHeaderLines();
+		while (allHdrs.hasMoreElements()) {
+		    headerText.append((String) allHdrs.nextElement());
+		}		
 	    } else {
 		StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
 		String hdrLabel,currentHeader = null;
@@ -180,7 +181,7 @@ class AttachmentBundle {
 		while (tokens.hasMoreTokens()) {
 		    currentHeader=tokens.nextToken();
 		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		    hdrValue = (String) headers.get(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
+		    hdrValue = (String) headers.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader), ":");
 		    if (hdrValue != null) {
 			if (useHtml) {
 			    headerText.append("<b>" + hdrLabel + ":</b><nbsp><nbsp>");
@@ -211,13 +212,12 @@ class AttachmentBundle {
     /**
      * Parses the Enumeration of Header objects into a HashMap.
      */
-    private HashMap parseHeaders(Enumeration enum) {
-	HashMap retVal = new HashMap();
+    private InternetHeaders parseHeaders(Enumeration enum) {
+	InternetHeaders retVal = new InternetHeaders();
 	while (enum.hasMoreElements()) {
 	    Header hdr = (Header) enum.nextElement();
-	    retVal.put(hdr.getName(), hdr.getValue());
+	    retVal.addHeader(hdr.getName(), hdr.getValue());
 	}
-
 	return retVal;
     }
 

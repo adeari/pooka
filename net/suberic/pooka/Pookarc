@@ -391,10 +391,13 @@ Store.editableFields.defaultProfile.allowedValues=UserProfile
 Store.editableFields.trashFolder.propertyType=Folder
 Store.editableFields.trashFolder.selectionRoot=currentStore
 
-Store.imap.editableFields=server:user:password:mailCheckTime:SSL:cachingEnabled
+Store.new.editableFields=protocol:trashFolder:defaultProfile:mailCheckTime
+
+Store.imap.editableFields=server:user:password:SSL:cachingEnabled
 
 Store.pop.editableFields=server:user:password:leaveMessagesOnServer:removeMessagesOnServer
 
+Store.mbox.editableFields=
 
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder

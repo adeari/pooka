@@ -22,6 +22,8 @@ public class CachingMimeMessage extends MimeMessage {
 	super(Pooka.getDefaultSession());
 	uid = newUid;
 	parent = parentFolderInfo;
+	saved=true;
+	modified=false;
     }
 
     public int getSize() throws MessagingException {

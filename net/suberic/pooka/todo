@@ -52,11 +52,10 @@ ui engine
 ---------
 *)  make the windows detachable. 
 	-- done, at least for read messages and new message.
-	-- to fix:  1)  location isn't quite right for top-level frame to
-	   intenral frame change. -- only on linux?
-	-- 2)  make it not get included for preview pane ui windows.
-	-- 3)  make it available for folder windows?
-	-- 4)  the windows are being resized, meaning that if you make the
+	-- to fix:  
+	-- *)  make it not get included for preview pane ui windows.
+	-- *)  make it available for folder windows?
+	-- *)  the windows are being resized, meaning that if you make the
 	       window larger and then detach it, or if you move the split
 		pane divider, then it reverts to its original state when you
 		detach/attach the window.

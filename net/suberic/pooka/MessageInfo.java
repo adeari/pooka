@@ -116,13 +116,19 @@ public class MessageInfo {
 		return ((javax.mail.internet.InternetAddress)fromAddr[0]).toString();
 	    else 
 		return null;
-	} else if (prop.equals("receivedDate")) {
+	} else if (prop.equalsIgnoreCase("receivedDate")) {
 	    return msg.getReceivedDate();
-	} else if (prop.equals("recipients")) {
+	} else if (prop.equalsIgnoreCase("recipients")) {
+	    return msg.getAllRecipients();
+	} else if (prop.equalsIgnoreCase("to")) {
 	    return msg.getRecipients(Message.RecipientType.TO).toString();
-	} else if (prop.equals("Date")) {
+	} else if (prop.equalsIgnoreCase("cc")) {
+	    return msg.getRecipients(Message.RecipientType.CC).toString();
+	} else if (prop.equalsIgnoreCase("bcc")) {
+	    return msg.getRecipients(Message.RecipientType.BCC).toString();
+	} else if (prop.equalsIgnoreCase("Date")) {
 	    return msg.getSentDate();
-	} else if (prop.equals("Subject")) {
+	} else if (prop.equalsIgnoreCase("Subject")) {
 	    return msg.getSubject();
 	} 
 	
@@ -612,7 +618,9 @@ public class MessageInfo {
     public void saveMessageAs(File saveFile) throws MessagingException{
 	try {
 	    FileOutputStream fos = new FileOutputStream(saveFile);
-	    getRealMessage().writeTo(fos);
+	    ((MimeMessage)getRealMessage()).writeTo(fos);
+	    //MimeMessage tmpMM = new MimeMessage((MimeMessage)getRealMessage());
+	    //tmpMM.writeTo(fos);
 	} catch (IOException ioe) {
 	    MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
 	    me.setNextException(ioe);
