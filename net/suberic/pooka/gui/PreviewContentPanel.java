@@ -307,5 +307,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 	    return null;
     }
 
+    public HashMap getCardTable() {
+	return cardTable;
+    }
 }
 

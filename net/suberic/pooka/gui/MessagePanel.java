@@ -115,7 +115,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
 
 	java.util.HashMap cardTable = pcp.getCardTable();
 	Set keys = cardTable.keySet();
-	Interator keyIt = keys.iterator();
+	Iterator keyIt = keys.iterator();
 	while (keyIt.hasNext()) {
 	    String folderID = (String) keyIt.next();
 	    PreviewFolderPanel pfp = (PreviewFolderPanel) cardTable.get(folderID);

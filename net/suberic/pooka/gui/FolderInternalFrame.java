@@ -98,10 +98,10 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     }
 
 
-    public FolderInternalFrame(MessagePanel newMessagePanel, PreviewFolderPanel pfp) {
-	FolderInfo newFolderInfo = pfp.getFolderInfo();
+    public FolderInternalFrame(PreviewFolderPanel pfp, MessagePanel newMessagePanel) {
+	super(pfp.getFolderInfo().getFolderName() + " - " + pfp.getFolderInfo().getParentStore().getStoreID(), true, true, true, true);
 
-	super(newFolderInfo.getFolderName() + " - " + newFolderInfo.getParentStore().getStoreID(), true, true, true, true);
+	FolderInfo newFolderInfo = pfp.getFolderInfo();
 
 	this.getContentPane().setLayout(new BorderLayout());
 	
