@@ -125,7 +125,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 		    //		    net.suberic.util.swing.RunnableAdapter updateAdapter = new net.suberic.util.swing.RunnableAdapter() {
 		    Runnable updateAdapter = new Runnable() {
 			    public void run() {
-		    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
+		    getMessagePanel().getMainPanel().refreshActiveMenus();
 		    if (toolbar != null)
 			toolbar.setActive(getActions());
 		    if (keyBindings != null)
@@ -394,7 +394,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
 
 	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-	    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
+	    getMessagePanel().getMainPanel().refreshActiveMenus();
 	    if (toolbar != null)
 		toolbar.setActive(getActions());
 	    if (keyBindings != null)
