@@ -1,3 +1,6 @@
+fixed a bug where deleted messages weren't be removed from the folder table
+after reconnecting under disconnected imap.
+
 fixed a bug in which, when switching from desktop mode to preview mode
 with autopreview off, you could end up opening a new window with the enter 
 key instead of just showing the message in the preview pane.

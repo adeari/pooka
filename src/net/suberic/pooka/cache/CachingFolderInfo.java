@@ -106,10 +106,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    if (tmpFolder == null || tmpFolder.length == 0) {
 	      // not a shared namespace
 	      tmpParentFolder = store.getDefaultFolder();
-	      if (Pooka.isDebug())
+	      if (Pooka.isDebug()) {
 		System.out.println("got " + tmpParentFolder + " as Default Folder for store.");
-	      if (Pooka.isDebug())
-		System.err.println("doing a list on default folder " + tmpParentFolder + " for folder " + getFolderName());
+		System.out.println("doing a list on default folder " + tmpParentFolder + " for folder " + getFolderName());
+	      }
+	      
 	      tmpFolder = tmpParentFolder.list(getFolderName());
 	    }
 	    
@@ -759,10 +760,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (removedUids.length > 0) {
 	Message[] removedMsgs = new Message[removedUids.length];
 	for (int i = 0 ; i < removedUids.length; i++) {
+
 	  MessageInfo mi =  getMessageInfoByUid(removedUids[i]);
 	  if (mi != null)
 	    removedMsgs[i] = mi.getRealMessage();
-	  
+
 	  if (removedMsgs[i] == null) {
 	    removedMsgs[i] = new CachingMimeMessage(this, removedUids[i]);
 	  }
@@ -895,7 +897,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       
       if (removedMessages[i] != null && removedMessages[i] instanceof CachingMimeMessage) {
 	removedCachingMessages[i] = removedMessages[i];
-	mi = getMessageInfo(removedMessages[i]);
+	long uid = ((CachingMimeMessage) removedMessages[i]).getUID();
+	mi = getMessageInfoByUid(uid);
 	
 	if (mi != null) {
 	  if (Pooka.isDebug())
@@ -916,7 +919,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	try {
 	  uid = getUID(removedMessages[i]);
 	} catch (MessagingException me) {
-	  
 	}
 	
 	mi = getMessageInfoByUid(uid);
@@ -940,7 +942,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
     
     MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), removedCachingMessages);
-    
     
     if (getFolderDisplayUI() != null) {
       if (removedProxies.size() > 0) {

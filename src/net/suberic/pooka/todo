@@ -7,21 +7,22 @@
 
 -----
 
-*) bug:  html text is always black, no matter the theme or the 
-specifications in the html itself.
-
 *) give spam buttom a keybinding.  
 
-*) bug?? - chance when running in cached mode of having a difference in the
-	message count?  looks like the messages are correct in the count,
-	but incorrect in the display table.
-
 *) bug:  disconnected mode:  connect.  close folder.  try to re-open folder.
-
-*) still an error in connecting, disconnecting, getting a new messages/deleting
-	old messages, reconnecting.
+*) make a way to reopen folders that have been disconnected other than
+	closing and reopening the store. -- get testcase?
 
 *) theme bug in folder table display between preview and desktop.
+
+*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
+	message.  read it.  disconnect there.  get a few new messages.
+	reconnect from original pooka.
+	-- works, but refresh of messages takes too long.  specifically
+	read messages?
+	
+*) bug:  html text is always black, no matter the theme or the 
+specifications in the html itself.
 
 --?
 
@@ -41,6 +42,37 @@ specifications in the html itself.
 *) fix error display with exception so that you can see the stack trace.
 
 *) disconneted:  use downloaded headers when available?
+
+*) new message count in icon
+
+*) add drag and drop
+	*) include message
+	*) move message
+	*) attach file
+	*) save attachment?
+
+*) -- windows --
+  *) support windows registry attachment associations.
+	-- check icemail
+	-- more or less added, but need to be able to access the library.
+
+*) queuing of outgoing mails
+	todo on this:
+	*)  add some sort of an administrative api to the NetworkConnection
+		so that the application and the admin tools (the bottom right
+		config) don't have the same restrictions (or lack thereof).
+		 -- somewhat started with the new test address api.
+	*) make it so there is some way for the NetworkConnection to detect
+		whether or not it's up.
+			-- started.  make sure it's enough.
+*) add support for jdk1.4
+	-- NetworkInterface classes
+
+
+*) printing in windows can leave control characters at the end of lines
+	-- test.
+
+*) add support for saved searches.
 
 ----
 
@@ -106,8 +138,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
      *) !!! we're parsing each message on load now. !!!
 
 
-*) new message count in icon
-
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
 *) add a dependent button/menu item.  so that that way instead of having
@@ -122,12 +152,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) html with text attachment should show text attachment at the end. (??)
 
-*) add drag and drop
-	*) include message
-	*) move message
-	*) attach file
-	*) save attachment?
-
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
 
@@ -138,10 +162,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) add console?
 
-*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
-	message.  read it.  disconnect there.  get a few new messages.
-	reconnect from original pooka.
-
 ------
 
 *) add plugin for spam checker?
@@ -149,25 +169,8 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
 
-*) -- windows --
-  *) support windows registry attachment associations.
-	-- check icemail
-	-- more or less added, but need to be able to access the library.
-
-*) queuing of outgoing mails
-	todo on this:
-	*)  add some sort of an administrative api to the NetworkConnection
-		so that the application and the admin tools (the bottom right
-		config) don't have the same restrictions (or lack thereof).
-		 -- somewhat started with the new test address api.
-	*) make it so there is some way for the NetworkConnection to detect
-		whether or not it's up.
-			-- started.  make sure it's enough.
-
 *) add mrpostman support(?)
 
-*) printing in windows can leave control characters at the end of lines
-	-- test.
 *) printing
 	*) better layout of printer frame.  center things?
 
@@ -216,9 +219,7 @@ say, like reacting to a mailto: link.
 	-- keybindings for opening folders.
 	-- keybindings for detachwindow
 
-*) make a way to reopen folders that have been disconnected other than
-	closing and reopening the store. -- get testcase?
-	-- make it so there's a way to close the store that actually resets
+*) make it so there's a way to close the store that actually resets
 	the connection totally, so that if your network is screwed up 
 	pooka can recover without restarting.
 
@@ -256,10 +257,6 @@ icons changing?  test.
 
 *) check disconnection/reconnection on network removal/restoral.
 
-preview:
-	check what happens when we switch from desktop to preview and
-		autopreview is off
-
 *) disconnected:  
 	*)  make an option for caching everything.
 	*)  check sent folder with disconnected / especially not using
@@ -284,9 +281,6 @@ preview:
 		panel.
 
 *) threading of attachment actions.
-
-*) add support for jdk1.4
-	-- NetworkInterface classes
 
 *) add ldap support
 
@@ -345,13 +339,9 @@ preview:
 
 *) make search window look different than normal window.
 
-*) add support for saved searches.
-
 *) add 'filter by message'
 
 *) remove 'where' clause from filter.
-
-*) MoveFilter editor needs to use subscribed folders, not all folders.
 
 *) add support for hierarchical new message notification--so getting an email
 	in foo/bar would show up on foo as well as bar.
@@ -379,8 +369,6 @@ preview:
 
 *) make it so you can stop html displays from showing non-local images.
  	-- support RFC-2557??
-
-*) check the open/close/open pattern on disconnected folders.
 
 	-- disconnected imap --
 
@@ -410,10 +398,6 @@ rather than the calling thread.
 
 *)  all MessagingExceptions should be handled correctly, not ignored.  there
 should only be a few of these left.
-
-*) add ability of setting return values by hand (not by UserProfile) on 
-	new messages.
-
 
 *) mail import?
 

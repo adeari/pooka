@@ -883,7 +883,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  }
 
 	  loadImmediately = new Vector();
-	  for (int i = lastLoaded; i > firstLoaded; i--) {
+	  for (int i = lastLoaded; i >= firstLoaded; i--) {
 	    loadImmediately.add(messageProxies.get(i));
 	  }
 	} else {
