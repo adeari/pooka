@@ -13,8 +13,9 @@ import net.suberic.pooka.Pooka;
 import javax.mail.FolderNotFoundException;
 import javax.swing.JOptionPane;
 import net.suberic.pooka.FolderInfo;
+import javax.mail.event.*;
 
-public class FolderNode extends MailTreeNode {
+public class FolderNode extends MailTreeNode implements MessageChangedListener {
     
     protected FolderInfo folderInfo = null;
     protected boolean hasLoaded = false;
@@ -39,6 +40,20 @@ public class FolderNode extends MailTreeNode {
 		commands.put(a.getValue(Action.NAME), a);
 	    }
 	}
+
+
+	folderInfo.addMessageCountListener(new MessageCountAdapter() {
+		public void messagesAdded(MessageCountEvent e) {
+		    getParentContainer().repaint();
+		}
+
+		public void messageRemoved(MessageCountEvent e) {
+		    getParentContainer().repaint();
+		}
+	    });
+
+	folderInfo.addMessageChangedListener(this);
+	
     }
 
     
@@ -114,6 +129,10 @@ public class FolderNode extends MailTreeNode {
 
 	hasLoaded = true;
 
+    }
+
+    public void messageChanged(MessageChangedEvent mce) {
+	getParentContainer().repaint();
     }
 
     public String getFolderID() {

@@ -23,7 +23,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
 	mainPanel=newMainPanel;
 	session = newSession;
 
-	setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.hsize", "200")), Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.vsize", Pooka.getProperty("Pooka.vsize","600")))));
+	setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.hsize", "200")), Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
 
 	folderModel = new DefaultTreeModel(createTreeRoot());
 	folderTree = new JTree(folderModel);
@@ -46,6 +46,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
 	    }
 	});
 	folderTree.addTreeSelectionListener(getMainPanel());
+	folderTree.setCellRenderer(new DefaultFolderTreeCellRenderer());
     }
 
     public MailTreeNode getSelectedNode() {

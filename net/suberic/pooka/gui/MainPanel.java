@@ -44,8 +44,8 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	folderPanel = new FolderPanel(this, session);
 	Pooka.getResources().addValueChangeListener(folderPanel, "Store");
 
-	this.setLeftComponent(folderPanel);
-	this.setRightComponent(messagePanel);
+	this.setLeftComponent(new JScrollPane(folderPanel));
+	this.setRightComponent(new JScrollPane(messagePanel));
 
 	setActions();
 
