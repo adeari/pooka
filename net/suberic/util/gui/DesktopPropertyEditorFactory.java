@@ -6,7 +6,7 @@ import java.util.Vector;
 
 public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
 
-    JDesktopPane desktop;
+    protected JDesktopPane desktop;
 
     public DesktopPropertyEditorFactory(VariableBundle bundle, JDesktopPane newDesktop) {
 	super(bundle);

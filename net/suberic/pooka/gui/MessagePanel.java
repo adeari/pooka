@@ -308,7 +308,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       
       Point returnValue = new Point(p.x + (diffWidth / 2), p.y + (diffHeight / 2));
 
-      System.err.println("returning " + returnValue);
       return returnValue;
      }
   }
