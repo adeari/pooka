@@ -94,7 +94,7 @@ public class MessageProxy {
      */
 
     public void loadAttachmentInfo() {
-	attachments = MailUtilities.getAttachments(getMessage());
+	attachments = MailUtilities.getAttachments(getMessage(), false);
     }
 
     /**
@@ -269,7 +269,7 @@ public class MessageProxy {
      */
     protected void populateReply(MimeMessage mMsg) 
 	throws MessagingException {
-	String textPart = MailUtilities.getTextPart(message);
+	String textPart = MailUtilities.getTextPart(message, false);
 	UserProfile up = getDefaultProfile();
 
 	String parsedText;
@@ -295,7 +295,7 @@ public class MessageProxy {
      */
     protected void populateForward(MimeMessage mMsg) 
 	throws MessagingException {
-	String textPart = MailUtilities.getTextPart(message);
+	String textPart = MailUtilities.getTextPart(message, false);
 	UserProfile up = getDefaultProfile();
 
 	String parsedText = null;

@@ -189,7 +189,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	// see if this message already has a text part, and if so,
 	// include it.
 	
-	String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage());
+	String origText = net.suberic.pooka.MailUtilities.getTextPart(aMsg.getMessage(), false);
 	if (origText != null && origText.length() > 0) 
 	    retval.setText(origText);
 	

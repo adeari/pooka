@@ -103,47 +103,13 @@ public class ReadMessageWindow extends MessageWindow {
 	if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
 	    javax.mail.internet.MimeMessage mMsg = (javax.mail.internet.MimeMessage) aMsg.getMessage();
 
-	    // first do the headers.
+	    //	    messageText.append(MailUtilities.getHeaderInformation(mMsg, showFullHeaders()));
 
-	    if (showFullHeaders()) {
-	    }
-	    else {
-		StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
-		String hdrLabel,currentHeader = null;
-		String[] hdrValue = null;
-		
-		while (tokens.hasMoreTokens()) {
-		    currentHeader=tokens.nextToken();
-		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		    try {
-			hdrValue = mMsg.getHeader(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
-		    } catch (MessagingException me) {
-			hdrValue = null;
-		    }
-		    
-		    if (hdrValue != null && hdrValue.length > 0) {
-			messageText.append(hdrLabel + ":  ");
-			for (int i = 0; i < hdrValue.length; i++) {
-			    messageText.append(hdrValue[i]);
-			    if (i != hdrValue.length -1) 
-				messageText.append(", ");
-			}
-			messageText.append("\n");
-		    }
-		}
-		String separator = Pooka.getProperty("MessageWindow.separator", "");
-		if (separator.equals(""))
-		    messageText.append("\n\n");
-		else
-		    messageText.append(separator);
-	    }
-
-	    // then do the content
 	    String content = null;
 	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true"))
-		content = net.suberic.pooka.MailUtilities.getTextAndTextInlines(mMsg, Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"));
+		content = net.suberic.pooka.MailUtilities.getTextAndTextInlines(mMsg, Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
 	    else
-		content = net.suberic.pooka.MailUtilities.getTextPart(mMsg);
+		content = net.suberic.pooka.MailUtilities.getTextPart(mMsg, showFullHeaders(), true);
 
 	    if (content != null) {
 		messageText.append(content);

@@ -19,6 +19,16 @@ class AttachmentBundle {
     void addAll(AttachmentBundle subBundle) {
 	if (textPart == null)
 	    textPart = subBundle.textPart;
+	else if (subBundle.textPart != null) {
+	    javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+	    try {
+		mbp.setText(subBundle.textPart.toString());
+	    } catch (javax.mail.MessagingException me) {
+	    }
+	    textAttachments.add(mbp);
+	    allAttachments.add(mbp);
+	}
+
 	allText.append(subBundle.allText);
 	textAttachments.addAll(subBundle.textAttachments);
 	nonTextAttachments.addAll(subBundle.nonTextAttachments);
