@@ -16,6 +16,12 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   // the list of all AddressEntryTextAreas
   static java.util.WeakHashMap areaList = new java.util.WeakHashMap();
 
+  // if we're doing this by delay or by keystroke
+  boolean automaticallyDisplay = false;
+
+  // if by keystroke, the key that is used to request address completion
+  javax.swing.KeyStroke completionKey = javax.swing.KeyStroke.getKeyStroke(net.suberic.pooka.Pooka.getProperty("Pooka.addressComplete", "control D"));
+
   // the underlying NewMessageInfo
   NewMessageUI messageUI;
 
@@ -74,11 +80,21 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 	// ignore
 	break;
       default:
-	lastKeyTime = new java.util.Date().getTime();
-	if (updateThread != null)
-	  updateThread.interrupt();
-	else
-	  createUpdateThread();
+	if (automaticallyDisplay) {
+	  lastKeyTime = new java.util.Date().getTime();
+	  if (updateThread != null)
+	    updateThread.interrupt();
+	  else
+	    createUpdateThread();
+	} else {
+	  if (keyCode == completionKey.getKeyCode() && e.getModifiers() == completionKey.getModifiers()) {
+	    lastKeyTime = new java.util.Date().getTime();
+	    if (updateThread != null)
+	      updateThread.interrupt();
+	    else
+	      createUpdateThread();
+	  }
+	}
       }
     }
   }
@@ -95,7 +111,12 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     final String entryString = getAddressText();
 
     if (needToMatch(entryString)) {
-      final InternetAddress[] matchedAddresses = matcher.match(entryString);
+      net.suberic.pooka.AddressBookEntry[] matchedEntries = matcher.match(entryString);
+      InternetAddress[] tmpMatched = new InternetAddress[matchedEntries.length];
+      for (int i = 0; i < matchedEntries.length; i++) {
+	tmpMatched[i] = matchedEntries[i].getAddress();
+      }
+      final InternetAddress[] matchedAddresses = tmpMatched;
 
       try {
 	SwingUtilities.invokeAndWait(new Runnable() {
@@ -188,7 +209,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   public void selectNextEntry() {
     Selection currentSelection = getCurrentSelection();
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
-    InternetAddress newValue = matcher.getNextMatch(currentSelection.text);
+    InternetAddress newValue = matcher.getNextMatch(currentSelection.text).getAddress();
     if (newValue != null) {
       replaceAddressText(currentSelection, newValue.toString());
     }
@@ -201,7 +222,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   public void selectPreviousEntry() {
     Selection currentSelection = getCurrentSelection();
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
-    InternetAddress newValue = matcher.getPreviousMatch(currentSelection.text);
+    InternetAddress newValue = matcher.getPreviousMatch(currentSelection.text).getAddress();
     if (newValue != null) {
       replaceAddressText(currentSelection, newValue.toString());
     }
@@ -260,7 +281,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 	while (entryIter.hasNext()) {
 	  long currentTime = new java.util.Date().getTime();
 	  AddressEntryTextArea area = (AddressEntryTextArea) ((java.util.Map.Entry)entryIter.next()).getKey();
-	  if (area.lastKeyTime > area.lastMatchedTime) {
+	  if (area.lastKeyTime > area.lastMatchedTime || ! area.automaticallyDisplay) {
 	    if (area.lastKeyTime + area.delayInMilliSeconds < currentTime) {
 	      area.updateTextValue();
 	    } else {

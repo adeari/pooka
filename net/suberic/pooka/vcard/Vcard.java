@@ -6,7 +6,7 @@ import javax.mail.internet.InternetAddress;
 /**
  * A class which represents a vcard address book entry.
  */
-public class Vcard implements Comparable {
+public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
 
   public static final int SORT_BY_ADDRESS = 0;
   

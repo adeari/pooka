@@ -10,4 +10,14 @@ public interface AddressBook {
    */
   public AddressMatcher getAddressMatcher();
 
+  /**
+   * Adds an AddressBookEntry to the AddressBook.
+   */
+  public void addAddress(AddressBookEntry newEntry);
+
+  /**
+   * Removes an AddressBookEntry from the AddressBook.
+   */
+  public void removeAddress(AddressBookEntry removeEntry);
+
 }

@@ -50,19 +50,29 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   /**
    * Adds the given Vcard to the address book.
    */
-  public void addAddress(Vcard newCard) {
-    Vcard[] newList = new Vcard[orderedList.length + 1];
-    int searchResult = java.util.Arrays.binarySearch(orderedList, newCard);
-    if (searchResult < 0) {
-      int insertLocation = (searchResult + 1) * -1;
-      if (insertLocation > 0)
-	System.arraycopy(orderedList, 0, newList, 0, insertLocation);
-      newList[insertLocation] = newCard;
-      if (orderedList.length - insertLocation > 0)
-	System.arraycopy(orderedList, insertLocation, newList, insertLocation + 1, orderedList.length - insertLocation); 
-
-      orderedList = newList;
+  public void addAddress(AddressBookEntry newAddress) {
+    if (newAddress instanceof Vcard) {
+      Vcard newCard = (Vcard) newAddress;
+      Vcard[] newList = new Vcard[orderedList.length + 1];
+      int searchResult = java.util.Arrays.binarySearch(orderedList, newCard);
+      if (searchResult < 0) {
+	int insertLocation = (searchResult + 1) * -1;
+	if (insertLocation > 0)
+	  System.arraycopy(orderedList, 0, newList, 0, insertLocation);
+	newList[insertLocation] = newCard;
+	if (orderedList.length - insertLocation > 0)
+	  System.arraycopy(orderedList, insertLocation, newList, insertLocation + 1, orderedList.length - insertLocation); 
+	
+	orderedList = newList;
+      }
     }
+  }
+
+  /**
+   * Removes the entry from the AddressBook.
+   */
+  public void removeAddress(AddressBookEntry removeAddress) {
+
   }
   
   /**
@@ -84,11 +94,11 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   /**
    * Returns all of the InternetAddresses which match the given String.
    */
-  public InternetAddress[] match(String matchString) {
+  public AddressBookEntry[] match(String matchString) {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
-      return new InternetAddress[0];
+      return new AddressBookEntry[0];
     }
 
     if (orderedList[value].compareTo(matchString) == 0) {
@@ -102,15 +112,15 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
       while (maximum < orderedList.length -1 && (orderedList[maximum + 1].compareTo(matchString) == 0))
 	maximum++;
 
-      InternetAddress[] returnValue = new InternetAddress[maximum - minimum + 1];
+      AddressBookEntry[] returnValue = new AddressBookEntry[maximum - minimum + 1];
 
       for(int i = 0; i < returnValue.length; i++) {
-	returnValue[i] = orderedList[minimum + i].getAddress();
+	returnValue[i] = orderedList[minimum + i];
       }
 
       return returnValue;
     } else {
-      return new InternetAddress[0];
+      return new AddressBookEntry[0];
     }
     //return binarySearch(matchString, 0, orderedList.size());
   }
@@ -119,7 +129,7 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns all of the InternetAddresses whose FirstName matches the given 
    * String.
    */
-  public InternetAddress[] matchFirstName(String matchString) {
+  public AddressBookEntry[] matchFirstName(String matchString) {
     return match(matchString);
   }
   
@@ -127,7 +137,7 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns all of the InternetAddresses whose LastName matches the given 
    * String.
    */
-  public InternetAddress[] matchLastName(String matchString) {
+  public AddressBookEntry[] matchLastName(String matchString) {
     return match(matchString);
   }
   
@@ -135,14 +145,14 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns all of the InternetAddresses whose email addresses match the
    * given String.
    */
-  public InternetAddress[] matchEmailAddress(String matchString) {
+  public AddressBookEntry[] matchEmailAddress(String matchString) {
     return match(matchString);
   }
   
   /**
    * Returns the InternetAddress which follows the given String alphabetically.
    */
-  public InternetAddress getNextMatch(String matchString) {
+  public AddressBookEntry getNextMatch(String matchString) {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
@@ -152,9 +162,9 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
       value = value + 1;
     }
     if (value >= orderedList.length) {
-      return orderedList[orderedList.length - 1].getAddress();
+      return orderedList[orderedList.length - 1];
     } else {
-      return orderedList[value].getAddress();
+      return orderedList[value];
     }
   }
   
@@ -162,7 +172,7 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Returns the InternetAddress which precedes the given String 
    * alphabetically.
    */
-  public InternetAddress getPreviousMatch(String matchString) {
+  public AddressBookEntry getPreviousMatch(String matchString) {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
@@ -172,9 +182,9 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
       value = value - 1;
     }
     if (value < 0) {
-      return orderedList[0].getAddress();
+      return orderedList[0];
     } else {
-      return orderedList[value].getAddress();
+      return orderedList[value];
     }
   }
   

@@ -8,36 +8,36 @@ import javax.mail.internet.InternetAddress;
 public interface AddressMatcher {
 
   /**
-   * Returns all of the InternetAddresses which match the given String.
+   * Returns all of the AddressBookEntryes which match the given String.
    */
-  public InternetAddress[] match(String matchString);
+  public AddressBookEntry[] match(String matchString);
 
   /**
-   * Returns all of the InternetAddresses whose FirstName matches the given 
+   * Returns all of the AddressBookEntries whose FirstName matches the given 
    * String.
    */
-  public InternetAddress[] matchFirstName(String matchString);
+  public AddressBookEntry[] matchFirstName(String matchString);
 
   /**
-   * Returns all of the InternetAddresses whose LastName matches the given 
+   * Returns all of the AddressBookEntries whose LastName matches the given 
    * String.
    */
-  public InternetAddress[] matchLastName(String matchString);
+  public AddressBookEntry[] matchLastName(String matchString);
 
   /**
-   * Returns all of the InternetAddresses whose email addresses match the
+   * Returns all of the AddressBookEntryes whose email addresses match the
    * given String.
    */
-  public InternetAddress[] matchEmailAddress(String matchString);
+  public AddressBookEntry[] matchEmailAddress(String matchString);
 
   /**
-   * Returns the InternetAddress which follows the given String alphabetically.
+   * Returns the AddressBookEntry which follows the given String alphabetically.
    */
-  public InternetAddress getNextMatch(String matchString);
+  public AddressBookEntry getNextMatch(String matchString);
 
   /**
-   * Returns the InternetAddress which precedes the given String 
+   * Returns the AddressBookEntry which precedes the given String 
    * alphabetically.
    */
-  public InternetAddress getPreviousMatch(String matchString);
+  public AddressBookEntry getPreviousMatch(String matchString);
 }
