@@ -5,6 +5,7 @@ import net.suberic.pooka.gui.filechooser.*;
 import net.suberic.pooka.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * This displays the currently selected folder (if any), along with a 
@@ -145,28 +146,29 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
      * the value of the property.
      */
     public void selectNewFolder() {
-	MailFileSystemView mfsv = createFileSystemView();
 
-	String defaultRoot = valueDisplay.getText();
-	if (defaultRoot.equals(""))
-	    defaultRoot = "/";
-	    
-	JFileChooser jfc =
-	    new JFileChooser(defaultRoot, mfsv);
-	    jfc.setMultiSelectionEnabled(false);
-	    jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-
-	    int returnValue =
-		jfc.showDialog(Pooka.getMainPanel(),
-			       Pooka.getProperty("FolderEditorPane.Select",
-						 "Select"));
-
-	    if (returnValue == JFileChooser.APPROVE_OPTION) {
-		net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
-		    ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
-		valueDisplay.setText(wrapper.getAbsolutePath());
-	    }
-	    
+      FileSystemView mfsv = createFileSystemView();
+      
+      String defaultRoot = valueDisplay.getText();
+      if (defaultRoot.equals(""))
+	defaultRoot = "/";
+      
+      JFileChooser jfc =
+	new JFileChooser(defaultRoot, mfsv);
+      jfc.setMultiSelectionEnabled(false);
+      jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+      
+      int returnValue =
+	jfc.showDialog(Pooka.getMainPanel(),
+		       Pooka.getProperty("FolderEditorPane.Select",
+					 "Select"));
+      
+      if (returnValue == JFileChooser.APPROVE_OPTION) {
+	net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
+	  ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
+	valueDisplay.setText(wrapper.getAbsolutePath());
+      }
+      
     }
 
     /**
@@ -175,22 +177,29 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
      * folders, or just the folders of a single store.  This is determined
      * by the 'selectionRoot' subproperty of the edited property's template.
      */
-    public MailFileSystemView createFileSystemView() {
-	
-	MailFileSystemView returnValue = null;
-	if (sourceBundle.getProperty(propertyTemplate + ".selectionRoot", "allStores").equals("allStores")) {
-	    returnValue = new MailFileSystemView();
-	} else {
-	    int prefixSize = sourceBundle.getProperty(propertyTemplate + ".namePrefix", "Store.").length();
-	    int suffixSize = sourceBundle.getProperty(propertyTemplate + ".nameSuffix", "trashFolder").length();
-	    String currentStoreName = property.substring(prefixSize, property.length() - suffixSize);
-	    net.suberic.pooka.StoreInfo currentStore = Pooka.getStoreManager().getStoreInfo(currentStoreName);
-	    if (currentStore != null) {
-		returnValue = new MailFileSystemView(currentStore);
-	    }
+    public FileSystemView createFileSystemView() {
+      
+      FileSystemView returnValue = null;
+      boolean justSubscribed = sourceBundle.getProperty(propertyTemplate + ".onlySubscribed", "false").equalsIgnoreCase("true");
+      if (sourceBundle.getProperty(propertyTemplate + ".selectionRoot", "allStores").equals("allStores")) {
+	if (justSubscribed) 
+	  returnValue = new PookaFileSystemView();
+	else 
+	  returnValue = new MailFileSystemView();
+      } else {
+	int prefixSize = sourceBundle.getProperty(propertyTemplate + ".namePrefix", "Store.").length();
+	int suffixSize = sourceBundle.getProperty(propertyTemplate + ".nameSuffix", "trashFolder").length();
+	String currentStoreName = property.substring(prefixSize, property.length() - suffixSize);
+	net.suberic.pooka.StoreInfo currentStore = Pooka.getStoreManager().getStoreInfo(currentStoreName);
+	if (currentStore != null) {
+	  if (justSubscribed)
+	    returnValue = new PookaFileSystemView(currentStore);
+	  else 
+	    returnValue = new MailFileSystemView(currentStore);
 	}
-
-	return returnValue;
+      }
+      
+      return returnValue;
     }
 	
     //  as defined in net.suberic.util.gui.PropertyEditorUI

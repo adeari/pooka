@@ -1,53 +1,84 @@
 package net.suberic.pooka.gui.filechooser;
 import javax.swing.*;
 import java.io.*;
-import javax.mail.*;
-import net.suberic.pooka.Pooka;
-
-// TODO make StoreFileWrapper for selecting from available stores
-// --jphekman
-
+import java.util.Vector;
+import net.suberic.pooka.*;
 
 /**
  * This wraps a Folder or Store in a File object.
  */
-public class FolderFileWrapper extends File {
-  private Folder folder;
-  private FolderFileWrapper parent;
-  private FolderFileWrapper[] children = null;
+public class FolderInfoFileWrapper extends File {
+  private FolderInfo folder;
+  private StoreInfo store;
+  private FolderInfoFileWrapper parent;
+  private FolderInfoFileWrapper[] children = null;
   private String path;
   
   /**
-   * Creates a new FolderFileWrapper from a Folder.  This should only
-   * be used for direct children of the Folder.  
+   * Creates a new FolderInfoFileWrapper from a FolderInfo.  This should only
+   * be used for direct children of this FolderInfo.
    */
-  public FolderFileWrapper(Folder f, FolderFileWrapper p) {
-    super(f.getName());
+  public FolderInfoFileWrapper(FolderInfo f, FolderInfoFileWrapper p) {
+    super(f.getFolderName());
     folder = f;
     parent = p;
-    path = f.getName();
+    path = f.getFolderName();
     if (Pooka.isDebug())
       if (p != null)
-	System.out.println("creating FolderFileWrapper from parent '" + p.getAbsolutePath() + "' from folder '" + f.getName() + "'");
+	System.out.println("creating FolderInfoFileWrapper from parent '" + p.getAbsolutePath() + "' from folder '" + f.getFolderName() + "'");
       else
-	System.out.println("creating FolderFileWrapper from parent 'null' from folder '" + f.getName() + "'");
+	System.out.println("creating FolderInfoFileWrapper from parent 'null' from folder '" + f.getFolderName() + "'");
   }
   
   /**
-   * Creates a new FolderFileWrapper from a Folder with the given path
+   * Creates a new FolderInfoFileWrapper from a StoreInfo.  This probably
+   * really shouldn't be used.
+   */
+  public FolderInfoFileWrapper(StoreInfo s, FolderInfoFileWrapper p) {
+    super(s.getStoreID());
+    store = s;
+    parent = p;
+    path = s.getStoreID();
+    if (Pooka.isDebug())
+      if (p != null)
+	System.out.println("creating FolderInfoFileWrapper from parent '" + p.getAbsolutePath() + "' from store '" + s.getStoreID() + "'");
+      else
+	System.out.println("creating FolderInfoFileWrapper from parent 'null' from store '" + s.getStoreID() + "'");
+  }
+  
+  /**
+   * Creates a new FolderInfoFileWrapper from a FolderInfo with the given path
    * and parent.  This is used for making relative paths to files, i.e.
    * a child of '/foo' called 'bar/baz'.
    */
-  public FolderFileWrapper(Folder f, FolderFileWrapper p, String filePath) {
-    super(f.getName());
+  public FolderInfoFileWrapper(FolderInfo f, FolderInfoFileWrapper p, String filePath) {
+    super(f.getFolderName());
     folder = f;
     parent = p;
     path = filePath;
     if (Pooka.isDebug())
       if (p != null)
-	System.out.println("creating FolderFileWrapper from parent '" + p.getAbsolutePath() + "' called '" + filePath + "'");
+	System.out.println("creating FolderInfoFileWrapper from parent '" + p.getAbsolutePath() + "' called '" + filePath + "'");
       else
-	System.out.println("creating FolderFileWrapper from parent 'null' called '" + filePath + "'");
+	System.out.println("creating FolderInfoFileWrapper from parent 'null' called '" + filePath + "'");
+  }
+  
+  /**
+   * Creates a new FolderInfoFileWrapper from a StoreInfo with the given path
+   * and parent.  This is used for making relative paths to files, i.e.
+   * a child of '/foo' called 'bar/baz'.  For StoreInfos, the parent should
+   * really always be null.
+   */
+  public FolderInfoFileWrapper(StoreInfo s, FolderInfoFileWrapper p, String filePath) {
+    super(s.getStoreID());
+    store = s;
+    parent = p;
+    path = filePath;
+    if (Pooka.isDebug())
+      if (p != null)
+	System.out.println("creating FolderInfoFileWrapper from parent '" + p.getAbsolutePath() + "' called '" + filePath + "'");
+      else
+	System.out.println("creating FolderInfoFileWrapper from parent 'null' called '" + filePath + "'");
   }
   
   /**
@@ -65,37 +96,19 @@ public class FolderFileWrapper extends File {
   }
   
   /**
-   * If the wrapped Folder does not exist, creates the new Folder
-   * and returns true.  If it does exist, returns false.  If a
-   * MessagingException is thrown, wraps it with an IOException.
+   * Throws an IOException; use the folder subscription mechanism to 
+   * subscribe to new folders.
    */
-  public boolean createNewFile() {
-    try {
-      if (folder.exists())
-	return false;
-      else {
-	folder.create(Folder.HOLDS_MESSAGES);
-	return true;
-      }
-    } catch (MessagingException me) {
-      System.out.println("caught exception: " + me.getMessage());
-      me.printStackTrace();
-      return false;
-    }
+  public boolean createNewFile() throws IOException {
+    throw new IOException (Pooka.getProperty("error.folderinfofilewrapper.cantcreate", "Cannot create new Folders here.  Use Subscribe instead."));
   }
   
   
   /**
-   * Attempts to delete the Folder.
+   * Attempts to delete the Folder.  And fails--returns false always.
    */
   public boolean delete() {
-    try {
-      return folder.delete(true);
-    } catch (MessagingException me) {
-      System.out.println("caughed exception: " + me.getMessage());
-      me.printStackTrace();
-      return false;
-    }
+    return false;
   }
   
   /**
@@ -108,21 +121,22 @@ public class FolderFileWrapper extends File {
    * Equals if the underlying Folder objects are equal.
    */
   public boolean equals(Object obj) {
-    if (obj instanceof FolderFileWrapper)
-      return ( folder == ((FolderFileWrapper)obj).folder );
-    else
-      return false;
+    if (obj instanceof FolderInfoFileWrapper) {
+      FolderInfoFileWrapper wrapper = ((FolderInfoFileWrapper) obj);
+      if (folder != null && wrapper.folder != null)
+	return (folder == wrapper.folder);
+      else if (store != null && wrapper.store != null)
+	return (store == wrapper.store);
+    }
+
+    return false;
   }
   
   /**
-   * Returns folder.exists().
+   * Always true for our purposes.
    */
   public boolean exists() {
-    try {
-      return folder.exists();
-    } catch (MessagingException me) {
-      return false;
-    }
+    return true;
   }
   
   /**
@@ -133,17 +147,21 @@ public class FolderFileWrapper extends File {
       System.out.println("calling getAbsoluteFile() on " + getAbsolutePath());
     if (this.isAbsolute())
       return this;
-    else 
-      return new FolderFileWrapper(getFolder(), getRoot(), getAbsolutePath());
+    else {
+      if (store != null)
+	return new FolderInfoFileWrapper(store, getRoot(), getAbsolutePath());
+      else 
+	return new FolderInfoFileWrapper(folder, getRoot(), getAbsolutePath());
+    }
   }
   
   /**
    * returns the root of this tree.
    */
-  private FolderFileWrapper getRoot() {
-    FolderFileWrapper parent = this;
+  private FolderInfoFileWrapper getRoot() {
+    FolderInfoFileWrapper parent = this;
     while (parent.getParent() != null) {
-      parent = (FolderFileWrapper)parent.getParentFile();
+      parent = (FolderInfoFileWrapper)parent.getParentFile();
     }
     return parent;
   }
@@ -200,7 +218,12 @@ public class FolderFileWrapper extends File {
    * Returns the Folder's name.
    */
   public String getName() {
-    return folder.getName();
+    if (folder != null)
+      return folder.getFolderName();
+    else if (store != null)
+      return store.getStoreID();
+
+    return "null";
   }
   
   /**
@@ -214,7 +237,7 @@ public class FolderFileWrapper extends File {
   }
   
   /**
-   * This returns the parent Folder as a FolderFileWrapper.
+   * This returns the parent Folder as a FolderInfoFileWrapper.
    */
   public File getParentFile() {
     return parent;
@@ -238,22 +261,21 @@ public class FolderFileWrapper extends File {
    * Tests to see if this can act as a directory.
    */
   public boolean isDirectory() {
-    try {
-      return ((folder.getType() & Folder.HOLDS_FOLDERS) != 0);
-    } catch (MessagingException me) {
-      return false;
-    }
+    if (store != null)
+      return true;
+    
+    return (folder.getType() & javax.mail.Folder.HOLDS_FOLDERS) != 0;
+
   }
   
   /**
    * Tests to see if we should call this a File.
    */
   public boolean isFile() {
-    try {
-      return ((folder.getType() & Folder.HOLDS_MESSAGES) != 0);
-    } catch (MessagingException me) {
+    if (store != null)
       return false;
-    }
+
+    return (folder.getType() & javax.mail.Folder.HOLDS_MESSAGES) != 0;
   }
   
   /**
@@ -317,7 +339,6 @@ public class FolderFileWrapper extends File {
   public File[] listFiles() {
     if (Pooka.isDebug()) {
       System.out.println("Running listFiles() on '" + getAbsolutePath() + "'");
-      //Thread.dumpStack();
     }
     
     if (isDirectory()) {
@@ -332,7 +353,7 @@ public class FolderFileWrapper extends File {
 	return children;
     } 
     
-    return new FolderFileWrapper[0];
+    return new FolderInfoFileWrapper[0];
   }
   
   public File[] listFiles(FileFilter filter) {
@@ -378,68 +399,39 @@ public class FolderFileWrapper extends File {
   }
   
   /**
-   * This creates a new directory.
+   * This fails to create a new directory.  (return false)
    */
   public boolean mkdir() {
-    try {
-      if (folder.exists())
-	return false;
-      else {
-	folder.create(Folder.HOLDS_FOLDERS);
-	return true;
-      }
-    } catch (MessagingException me) {
-      return false;
-    }
+    return false;
   }
   
   /**
-   * This creates a new directory, also creating any higher-level
-   * directories if needed.
+   * This fails to created a new directory.  (return false)
    */
   public boolean mkdirs() {
-    try {
-      if (folder.exists())
-	return false;
-      
-      boolean create = true;
-      if (!parent.exists())
-	create = parent.mkdirs();
-      
-      if (create) {
-	folder.create(Folder.HOLDS_FOLDERS);
-	return true;
-      } else
-	return false;
-    } catch (MessagingException me) {
-      return false;
-    }
+    return false;
   }
   
   
   /**
-   * This renames the underlying Folder.
+   * Returns false.
    */
   public boolean renameTo(File dest) {
-    try {
-      if (dest instanceof FolderFileWrapper) {
-	boolean returnValue = folder.renameTo(((FolderFileWrapper)dest).getFolder());
-	if (parent != null)
-	  parent.refreshChildren();
-	return returnValue;
-      } else
-	return false;
-    } catch (MessagingException me) {
-      Pooka.getUIFactory().showError(Pooka.getProperty("error.renamingFolder", "Error renaming folder ") + getName(), me);
-      return false;
-    }
+    return false;
   }
   
   /**
-   * This returns the wrapped Folder.
+   * This returns the wrapped FolderInfo.
    */
-  public Folder getFolder() {
+  public FolderInfo getFolderInfo() {
     return folder;
+  }
+  
+  /**
+   * This returns the wrapped StoreInfo.
+   */
+  public StoreInfo getStoreInfo() {
+    return store;
   }
   
   /**
@@ -448,49 +440,34 @@ public class FolderFileWrapper extends File {
   private synchronized void loadChildren() {
     if (Pooka.isDebug()) {
       System.out.println(Thread.currentThread().getName() + ":  calling loadChildren() on " + getAbsolutePath());
-      //Thread.dumpStack();
     }
     
     if (children == null) {
       if (Pooka.isDebug()) {
 	System.out.println(Thread.currentThread().getName() + ":  children is null on " + getAbsolutePath() + ".  loading children.");
       }
-      if (isDirectory() ||  ! exists()) {
-	try {
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  checking for connection.");
-	  
-	  if (!folder.getStore().isConnected()) {
-	    if (Pooka.isDebug()) {
-	      System.out.println(Thread.currentThread().getName() + ":  parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
-	    }
-	    folder.getStore().connect();
-	  } else {
-	    if (Pooka.isDebug())
-	      System.out.println(Thread.currentThread().getName() + ":  connection is ok.");
-	  }
-	  
-	  
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
-	  Folder[] childList = folder.list();
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  folder.list() returned " + childList + "; creating new folderFileWrapper.");
-	  
-	  FolderFileWrapper[] tmpChildren = new FolderFileWrapper[childList.length];
-	  for (int i = 0; i < childList.length; i++) {
-	    if (Pooka.isDebug())
-	      System.out.println(Thread.currentThread().getName() + ":  calling new FolderFileWrapper for " + childList[i].getName() + " (entry # " + i);
-	    
-	    tmpChildren[i] = new FolderFileWrapper(childList[i], this);
-	  }
-	  
-	  children = tmpChildren;
-	} catch (MessagingException me) {
-	  if (Pooka.isDebug())
-	    System.out.println("caught exception during FolderFileWrapper.loadChildren() on " + getAbsolutePath() + ".");
-	  me.printStackTrace();
+
+      if (isDirectory()) {
+	if (Pooka.isDebug())
+	  System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
+
+	Vector origChildren = null;
+	if (store != null)
+	  origChildren = new Vector (store.getChildren());
+	else if (folder != null)
+	  origChildren = new Vector (folder.getChildren());
+
+	if (origChildren == null)
+	  origChildren = new Vector();
+
+	FolderInfoFileWrapper[] tmpChildren = new FolderInfoFileWrapper[origChildren.size()];
+	for (int i = 0; i < origChildren.size(); i++) {
+	
+	  FolderInfo fi = (FolderInfo) origChildren.get(i);
+	  tmpChildren[i] = new FolderInfoFileWrapper(fi, this);
 	}
+	  
+	children = tmpChildren;
       }
     }
     
@@ -511,62 +488,47 @@ public class FolderFileWrapper extends File {
       }
       loadChildren();
     } else {
-      if (isDirectory() ||  ! exists()) {
-	try {
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  checking for connection.");
-	  
-	  if (!folder.getStore().isConnected()) {
-	    if (Pooka.isDebug()) {
-	      System.out.println(Thread.currentThread().getName() + ":  parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
-	    }
-	    folder.getStore().connect();
-	  } else {
-	    if (Pooka.isDebug())
-	      System.out.println(Thread.currentThread().getName() + ":  connection is ok.");
-	  }
-	  
-	  
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
-	  Folder[] childList = folder.list();
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  folder.list() returned " + childList + "; creating new folderFileWrapper.");
-	  
-	  FolderFileWrapper[] tmpChildren = new FolderFileWrapper[childList.length];
-	  for (int i = 0; i < childList.length; i++) {
-	    if (Pooka.isDebug())
-	      System.out.println(Thread.currentThread().getName() + ":  calling new FolderFileWrapper for " + childList[i].getName() + " (entry # " + i);
-	    
-	    // yeah, this is n! or something like that. shouldn't matter--
-	    // if we have somebody running with that many folders, or with
-	    // that slow of a machine, we're in trouble anyway.
+      if (isDirectory()) {
 
-	    //try to get a match.
-	    boolean found = false;
-	    for (int j = 0; ! found && j < children.length; j++) {
-	      if (children[j].getName().equals(childList[i].getName())) {
-		tmpChildren[i] = children[j];
-		found = true;
-	      }
-	    }
+	Vector origChildren = null;
+	if (store != null)
+	  origChildren = new Vector (store.getChildren());
+	else if (folder != null)
+	  origChildren = new Vector (folder.getChildren());
 
-	    if (! found) {
-	      tmpChildren[i] = new FolderFileWrapper(childList[i], this);
+	if (origChildren == null)
+	  origChildren = new Vector();
+
+	FolderInfoFileWrapper[] tmpChildren = new FolderInfoFileWrapper[origChildren.size()];
+	for (int i = 0; i < origChildren.size(); i++) {
+	  
+	  // yeah, this is n! or something like that. shouldn't matter--
+	  // if we have somebody running with that many folders, or with
+	  // that slow of a machine, we're in trouble anyway.
+	  FolderInfo fi = (FolderInfo) origChildren.get(i);
+	  
+	  //try to get a match.
+	  boolean found = false;
+	  for (int j = 0; ! found && j < children.length; j++) {
+	    if (children[j].getName().equals(fi.getFolderName())) {
+	      tmpChildren[i] = children[j];
+	      found = true;
 	    }
 	  }
 	  
-	  children = tmpChildren;
-	} catch (MessagingException me) {
-	  Pooka.getUIFactory().showError(Pooka.getProperty("error.refreshingFolder", "error refreshing folder's children: "), me);
+	  if (! found) {
+	    tmpChildren[i] = new FolderInfoFileWrapper(fi, this);
+	  }
 	}
+	
+	children = tmpChildren;
       }
     }
     
   }
   
   /* Only accepts relative filenames. */
-  public FolderFileWrapper getFileByName(String filename) {
+  public FolderInfoFileWrapper getFileByName(String filename) {
     
     if (Pooka.isDebug())
       System.out.println("calling getFileByName(" + filename + ") on folder " + getName() + " (" + getPath() + ") (abs " + getAbsolutePath() + ")");
@@ -599,10 +561,10 @@ public class FolderFileWrapper extends File {
       filename=filename.substring(0, dirMarker);
     }
     
-    FolderFileWrapper currentFile = getChildFile(filename);
+    FolderInfoFileWrapper currentFile = getChildFile(filename);
     if (currentFile != null && subdirFile != null) {
       // recurse with rest of components
-      FolderFileWrapper tmp = currentFile.getFileByName(subdirFile);
+      FolderInfoFileWrapper tmp = currentFile.getFileByName(subdirFile);
       //	    tmp.path = origFilename; 
       
       if (Pooka.isDebug())
@@ -616,7 +578,7 @@ public class FolderFileWrapper extends File {
     
   }
   
-  private FolderFileWrapper getChildFile(String filename) {
+  private FolderInfoFileWrapper getChildFile(String filename) {
     if (Pooka.isDebug())
       System.out.println("calling getChildFile on " + getName() + " with filename " + filename);
     
@@ -628,20 +590,9 @@ public class FolderFileWrapper extends File {
 	if (children[i].getName().equals(filename))
 	  return children[i];
       }
-      
-      FolderFileWrapper[] newChildren = new FolderFileWrapper[children.length +1];
-      for (int i = 0; i < children.length; i++)
-	newChildren[i] = children[i];
-      
-      try {
-	newChildren[children.length] = new FolderFileWrapper(folder.getFolder(filename), this);
-      } catch (MessagingException me) {
-      }
-      
-      children = newChildren;
-      return children[children.length -1];
+
     }
-    
+
     return this;
     
   }
@@ -658,6 +609,6 @@ public class FolderFileWrapper extends File {
     
     return relative;
   }
-
+  
   
 }

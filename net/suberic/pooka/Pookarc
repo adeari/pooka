@@ -500,6 +500,8 @@ UserProfile.editableFields.uiConfig.theme.allowedValues=Pooka.theme
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
+UserProfile.editableFields.sentFolder.onlySubscribed=true
+
 UserProfile.editableFields.mailServer.propertyType=List
 UserProfile.editableFields.mailServer.allowedValues=OutgoingServer
 
@@ -533,6 +535,7 @@ OutgoingServer.editableFields.password.propertyType=Password
 OutgoingServer.editableFields.sendOnConnect.propertyType=Boolean
 OutgoingServer.editableFields.sendOnConnect=false
 OutgoingServer.editableFields.outbox.propertyType=Folder
+OutgoingServer.editableFields.outbox.onlySubscribed=true
 
 OutgoingServer._default.propertyType=List
 OutgoingServer._default.allowedValues=OutgoingServer
@@ -667,6 +670,7 @@ Store.editableFields.storeConfig.keyProperty=protocol
 Store.editableFields.storeConfig.allowedValues=imap:pop3:mbox
 Store.editableFields.trashFolder.propertyType=Folder
 Store.editableFields.trashFolder.selectionRoot=currentStore
+Store.editableFields.trashFolder.onlySubscribed=true
 Store.editableFields.defaultProfile.propertyType=List
 Store.editableFields.defaultProfile.allowedValues=UserProfile
 Store.editableFields.mailCheckTime=5
