@@ -15,7 +15,6 @@ import javax.mail.internet.InternetAddress;
  * addresses.  It also will store 
  */
 public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea implements java.awt.event.FocusListener {
-  
   //---------- static variables -------------//
   // the update thread for all AddressEntryTextAreas
   static Thread updateThread;
@@ -503,6 +502,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 
     ImageIcon addressIcon = new ImageIcon(defaultImage);
     JButton returnValue = new JButton(addressIcon);
+    returnValue.setFocusable(false);
     returnValue.addActionListener(new AbstractAction() {
 	public void actionPerformed(java.awt.event.ActionEvent e) {
 	  getNewMessageUI().showAddressWindow(AddressEntryTextArea.this);

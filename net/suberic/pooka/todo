@@ -108,7 +108,6 @@ preview:
 +++ version 1.1 +++++++++++++++ 
 
 *) add support for jdk1.4
-	-- tabbing between the address components for New Messages
 	-- the MailFileSystemView doesn't seem to work at all (!) -- ok, it
 	does work, but only if you browse to something other than the default.
 	-- up and down arrows while composing new messages.
@@ -116,6 +115,13 @@ preview:
 	-- property editors like User Email info aren't correctly sized.
 	-- keybindings aren't right; open a message.  ^D it.  try to select
 	another message in the message list.
+	-- new printing system.
+	-- new focus architecture
+	-- NetworkInterface classes
+	-- regexp?
+	-- InputVerifier
+
+*) add a keybinding to bring up the address book selector.
 
 *) add support for other mail formats, like maildir (and maybe hotmail?).
 	shift pop3 backing from mbox to maildir.
