@@ -127,16 +127,16 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    newFolderWindow.setVisible(false);
 	    this.add(newFolderWindow);
 	    try {
-		String folderID = f.getFolderID();
-		int x = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.x"));
-		int y = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.y"));
-		int layer = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.layer"));
-		int position = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.position"));
+		String folderProperty = f.getFolderProperty();
+		int x = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.x"));
+		int y = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.y"));
+		int layer = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.layer"));
+		int position = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.position"));
 
 		newFolderWindow.setLocation(x, y);
 		setLayer(newFolderWindow, layer, position);
 		
-		if ( selectWindow || Pooka.getProperty(folderID + ".windowLocation.selected", "false").equalsIgnoreCase("true"))
+		if ( selectWindow || Pooka.getProperty(folderProperty + ".windowLocation.selected", "false").equalsIgnoreCase("true"))
 		    try {
 			newFolderWindow.setSelected(true);
 		    } catch (java.beans.PropertyVetoException e) {
@@ -307,7 +307,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
      */
 
     public void saveWindowLocation(FolderWindow current) {
-	String folderID = current.getFolderInfo().getFolderID();
+	String folderProperty = current.getFolderInfo().getFolderProperty();
 
 	// we have to do these as absolute values.
 	int x = current.getX() + getMainPanel().getMessageScrollPane().getHorizontalScrollBar().getValue();
@@ -316,15 +316,15 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	int position = getPosition(current);
 	boolean selected = current.isSelected();
 	
-	Pooka.setProperty(folderID + ".windowLocation.x", Integer.toString(x));
-	Pooka.setProperty(folderID + ".windowLocation.y", Integer.toString(y));
-	Pooka.setProperty(folderID + ".windowLocation.layer", Integer.toString(layer));
-	Pooka.setProperty(folderID + ".windowLocation.position", Integer.toString(position));
+	Pooka.setProperty(folderProperty + ".windowLocation.x", Integer.toString(x));
+	Pooka.setProperty(folderProperty + ".windowLocation.y", Integer.toString(y));
+	Pooka.setProperty(folderProperty + ".windowLocation.layer", Integer.toString(layer));
+	Pooka.setProperty(folderProperty + ".windowLocation.position", Integer.toString(position));
 
 	if (selected)
-	    Pooka.setProperty(folderID + ".windowLocation.selected", "true");
+	    Pooka.setProperty(folderProperty + ".windowLocation.selected", "true");
 	else
-	    Pooka.setProperty(folderID + ".windowLocation.selected", "false");
+	    Pooka.setProperty(folderProperty + ".windowLocation.selected", "false");
     }
 
     /**
