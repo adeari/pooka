@@ -134,7 +134,7 @@ public class Attachment {
      * bytes.
      */
     String getText(int maxLength, String truncationMessage) throws IOException {
-	if (maxLength <= size) {
+	if (maxLength >= size) {
 	    try {
 		return (String) handler.getContent();
 	    } catch (UnsupportedEncodingException uee) {

@@ -32,8 +32,9 @@ public class MailUtilities {
 			ContentType ct2 = attachment.getMimeType();
 			if (ct2.getPrimaryType().equalsIgnoreCase("text") && ct2.getSubType().equalsIgnoreCase("plain")) {
 			    bundle.textPart = attachment;
+			} else {
+			    bundle.getAttachments().add(attachment);
 			}
-			bundle.getAttachments().add(attachment);
 		    }
 		} else {
 		    bundle.addAll(parseAttachments((Multipart)m.getContent()));
@@ -41,7 +42,6 @@ public class MailUtilities {
 	    } else if (contentType.startsWith("text")) {
 		Attachment attachment = new Attachment((MimeMessage)m);
 		bundle.textPart = attachment;
-		bundle.getAttachments().add(attachment);
 	    } else {
 		Attachment attachment = new Attachment((MimeMessage)m);
 		bundle.getAttachments().add(attachment);
@@ -65,9 +65,9 @@ public class MailUtilities {
 		Attachment current = new Attachment(mbp);
 		if (bundle.textPart == null) {
 		    bundle.textPart = current;
+		} else {
+		    bundle.getAttachments().add(current);
 		}
-		bundle.getAttachments().add(current);
-		
 	    } else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 		try {
 		    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));

@@ -10,6 +10,7 @@ import java.io.IOException;
 class AttachmentBundle {
     Attachment textPart = null;
     Vector allAttachments = new Vector();
+    Vector attachmentsAndTextPart = null;
     
     AttachmentBundle() {
     }
@@ -39,6 +40,26 @@ class AttachmentBundle {
      */
     public Vector getAttachments() {
 	return allAttachments;
+    }
+
+    /**
+     * This returns the Attachments (basically, all the Parts in a Multipart
+     * except for the main body of the message) using the given 
+     * messageLength to determine whether or not the main text part is an
+     * attachment or not.
+     */
+    public Vector getAttachments(int maxLength) {
+	if (textPart != null && textPart.getSize() >= maxLength) {
+	    if (attachmentsAndTextPart != null)
+		return attachmentsAndTextPart;
+	    else {
+		attachmentsAndTextPart = new Vector();
+		attachmentsAndTextPart.add(textPart);
+		attachmentsAndTextPart.addAll(allAttachments);
+		return attachmentsAndTextPart;
+	    }
+	} else
+	    return allAttachments;
     }
     
     /**

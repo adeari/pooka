@@ -51,12 +51,7 @@ public class MessageInfo {
      */
 
     public void loadAttachmentInfo() throws MessagingException {
-	try {
-	    if (getMessage().getContent() != null)
-		attachments = MailUtilities.parseAttachments(getMessage());
-	} catch (java.io.IOException ioe) {
-	    throw new MessagingException(ioe.getMessage());
-	}
+	attachments = MailUtilities.parseAttachments(getMessage());
 	
 	attachmentsLoaded = true;
     }
@@ -157,6 +152,13 @@ public class MessageInfo {
     }
 
     /**
+     * Gets the Content and inline text content for the Message.
+     */
+    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
+	return getTextAndTextInlines(attachmentSeparator, showFullHeaders, withHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+    }
+
+    /**
      * Gets the Text part of the Content of this Message.
      */
     public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
@@ -175,6 +177,13 @@ public class MessageInfo {
 	} catch (java.io.IOException ioe) {
 	    throw new MessagingException(ioe.getMessage()); 
 	}
+    }
+
+    /**
+     * Gets the Text part of the Content of this Message.
+     */
+    public String getTextPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+	return getTextPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
     }
 
     /**
@@ -330,7 +339,7 @@ public class MessageInfo {
 
 	MimeMessage mMsg = (MimeMessage) getMessage();
 
-	String textPart = getTextPart(false, false, 10000, "foo");
+	String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
 	UserProfile up = getDefaultProfile();
 
 	String parsedText;
@@ -364,7 +373,7 @@ public class MessageInfo {
 	MimeMessage mMsg = (MimeMessage) getMessage();
 	MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
 
-	String textPart = getTextPart(false, false, 10000, "foo");
+	String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
 	UserProfile up = getDefaultProfile();
 
 	String parsedText = null;
@@ -480,14 +489,13 @@ public class MessageInfo {
     }
 
     public boolean hasAttachments() throws MessagingException {
-	String contentType = (String)getMessageProperty("Content-Type");
-	if (contentType.length() >= 15) {
-	    String type = contentType.substring(0, 15);
-	    if (type.equalsIgnoreCase("multipart/mixed"))
-		return true;
-	}
+	if (!hasLoadedAttachments())
+	    loadAttachmentInfo();
 
-	return false;
+	if (getAttachments() != null && getAttachments().size() > 0)
+	    return true;
+	else
+	    return false;
     }
 
     /**
@@ -496,10 +504,10 @@ public class MessageInfo {
      */
     public Vector getAttachments() throws MessagingException {
 	if (hasLoadedAttachments())
-	    return attachments.getAttachments();
+	    return attachments.getAttachments(getMaxMessageDisplayLength());
 	else {
 	    loadAttachmentInfo();
-	    return attachments.getAttachments();
+	    return attachments.getAttachments(getMaxMessageDisplayLength());
 	}
 	    
     }
@@ -511,6 +519,20 @@ public class MessageInfo {
     public void setMessageProxy(MessageProxy newMp) {
 	messageProxy = newMp;
     }
+
+    public int getMaxMessageDisplayLength() {
+	int displayLength = 10000;
+	try {
+	    displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
+	} catch (NumberFormatException nfe) {
+	}
+	return displayLength;
+    }
+
+    public String getTruncationMessage() {
+	return Pooka.getProperty("Pooka.messageTruncation", "------ Message truncated ------");
+    }
+
 }
 
 
