@@ -20,7 +20,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
   String propertyName = null;
 
-  URLName sendMailURL = null;
+  protected URLName sendMailURL = null;
 
   String connectionID = null;
 
@@ -225,7 +225,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	sendTransport = prepareTransport(connect);
 	sendTransport.connect();
 	connected = true;
-      } catch (MessagingException me) {
+      } catch (Exception me) {
 	// if the connection/mail transport isn't available.
 	me.printStackTrace();
 
@@ -259,6 +259,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	    }
 	  }
 	} else {
+	  me.printStackTrace();
 	  MessagingException nme = new MessagingException("Connection unavailable, and no Outbox specified.");
 	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(nme);	  
 	}
@@ -369,7 +370,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	session.setDebug(true);
     }
-    Transport sendTransport = session.getTransport(sendMailURL); 
+    Transport sendTransport = session.getTransport(getSendMailURL()); 
     return sendTransport;
   }
 
@@ -419,4 +420,11 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     return propertyName;
   }
 
+  /**
+   * Returns the sendMailURL.
+   */
+  public URLName getSendMailURL() {
+    return sendMailURL;
+  }
+  
 }

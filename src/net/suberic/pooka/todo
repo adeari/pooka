@@ -18,9 +18,6 @@
 *) bug:  html text is always black, no matter the theme or the 
 specifications in the html itself.
 
-*) bug:  NPE when adding a new (user?  smtp server) and accepting the default
-	with a new pooka config.
-
 --?
 
 *) add support for running without any local files.

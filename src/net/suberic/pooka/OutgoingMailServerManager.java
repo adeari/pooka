@@ -177,7 +177,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    */
   class DefaultOutgoingMailServer extends OutgoingMailServer {
     String defaultServerId = null;
-    OutgoingMailServer underlyingServer = null;
+    OutgoingMailServer underlyingServer;
     String outboxID = null;
 
     /**
@@ -196,8 +196,11 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
       id = Pooka.getProperty("OutgoingServer._default.label", "*default*");
       propertyName = "OutgoingServer._default";
 
-      underlyingServer = getOutgoingMailServer(defaultServerId);
-      outboxID = Pooka.getProperty("OutgoingServer._default.outbox");
+      // changing because we get a NPE here for some reason...
+      //underlyingServer = getOutgoingMailServer(defaultServerId);
+
+      underlyingServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(defaultServerId);
+      outboxID = Pooka.getProperty("OutgoingServer." + defaultServerId + ".outbox");
 
       mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
       mailServerThread.start();
@@ -221,7 +224,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
 	throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Mail Server:  ") + getItemID());
       }
       
-      Transport sendTransport = Pooka.getDefaultSession().getTransport(underlyingServer.sendMailURL); 
+      Transport sendTransport = Pooka.getDefaultSession().getTransport(underlyingServer.getSendMailURL()); 
       try {
 	sendTransport.connect();
 	
@@ -278,6 +281,12 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
       return Pooka.getStoreManager().getFolder(outboxID);
     }
     
+    /**
+     * Returns the sendMailURL.
+     */
+    public URLName getSendMailURL() {
+      return underlyingServer.getSendMailURL();
+    }
   }
 
 }

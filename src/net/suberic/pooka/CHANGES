@@ -1,3 +1,6 @@
+fixed a bug in configuration where a new user without an explicit SMTP
+server set would end up causing NPE's when it tried to send a message.
+
 made a way to reconnect to a folder after it's been disconnected, other than
 closing and reopening the entire store.
 
