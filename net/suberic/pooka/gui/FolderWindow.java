@@ -313,8 +313,9 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     }
 
     public Action[] getActions() {
-	if (getSelectedMessage() != null) 
-	    return TextAction.augmentList(getSelectedMessage().getActions(), getDefaultActions());
+	MessageProxy m = getSelectedMessage();
+	if (m != null) 
+	    return TextAction.augmentList(m.getActions(), getDefaultActions());
 	else 
 	    return getDefaultActions();
     }
