@@ -50,11 +50,17 @@ public class Pooka {
 	frame.pack();
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
         frame.show();
+
 	if (getProperty("Store", "").equals("")) {
 	    NewAccountPooka nap = new NewAccountPooka(panel.getMessagePanel());
 	    nap.start();
+	} else {
+	    if (getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true"))
+		panel.getMessagePanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
 	}
+
 	//UserProfile.loadAllSentFolders();
+	panel.refreshActiveMenus();
     }
 
     static public String getProperty(String propName, String defVal) {
@@ -105,6 +111,18 @@ public class Pooka {
     }
 
     /**
+     * This returns a Vector with all the currently registered StoreInfo
+     * objects.
+     */
+    static java.util.Vector getAllStoreInfos() {
+	// i really should store all the StoreInfos as a static variable
+	// on the StoreInfo class, or something like that.  instead, i'm
+	// getting it from the FolderPanel.  *sigh*
+
+	return getMainPanel().getFolderPanel().getAllStoreInfos();
+    }
+
+    /**
      * This returns the StoreInfo which corresponds with the storeName.
      */
     static public StoreInfo getStore(String storeName) {
@@ -116,23 +134,43 @@ public class Pooka {
      * The folderName should be in the form "/storename/folder/subfolder".
      */
     static public FolderInfo getFolder(String folderName) {
-	System.out.println("getting Folder " + folderName);
 	if (folderName.length() < 1) {
 	    int divider = folderName.indexOf('/', 1);
 	    if (divider > 0) {
 		String storeName = folderName.substring(1, divider);
 		StoreInfo store = getStore(storeName);
 		if (store != null) {
-		    System.out.println("store != null; getting child " + folderName.substring(divider + 1) + " on store " + storeName);
 		    return store.getChild(folderName.substring(divider +1));
-		} else
-		    System.out.println("getStore on " + storeName + " returned null.");
+		} 
 	    }
 	}
 
-	System.out.println("returning null.");
 	return null;
     }
+
+    /**
+     * This returns the FolderInfo which corresponds to the given folderID.
+     * The folderName should be in the form "storename.folderID.folderID".
+     */
+    static public FolderInfo getFolderById(String folderID) {
+	// hurm.  the problem here is that '.' is a legal value in a name...
+
+	java.util.Vector allStores = getAllStoreInfos();
+
+	for (int i = 0; i < allStores.size(); i++) {
+	    StoreInfo currentStore = (StoreInfo) allStores.elementAt(i);
+	    if (folderID.startsWith(currentStore.getStoreID())) {
+		FolderInfo possibleMatch = currentStore.getFolderById(folderID);
+		if (possibleMatch != null) {
+		    return possibleMatch;
+		}
+	    }
+	}
+
+	return null;
+    }
+
+    
 }
 
 
