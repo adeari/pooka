@@ -328,7 +328,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Vector messageProxies = new Vector();
 
 	FetchProfile fp = new FetchProfile();
-
+	fp.add(FetchProfile.Item.FLAGS);
 	if (columnValues == null) {
 	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
 	    Vector colvals = new Vector();
@@ -986,13 +986,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	// if we got to this point, we should assume that the open worked.
 
-	/*
 	if (getFolderTracker() == null) {
 	    FolderTracker tracker = Pooka.getFolderTracker();
 	    tracker.addFolder(this);
 	    this.setFolderTracker(tracker);
 	}
-	*/
     }
 
     /**
@@ -1049,12 +1047,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	setFolderWindow(null);
 
-	/*
 	if (getFolderTracker() != null) {
 	    getFolderTracker().removeFolder(this);
 	    setFolderTracker(null);
 	}
-	*/
 
 	if (isLoaded()) {
 	    open=false;
