@@ -15,12 +15,13 @@ import java.io.*;
  */
 
 public class VariableBundle extends Object {
-    private Properties properties;
-    private Properties writableProperties;
-    private ResourceBundle resources;
-    private VariableBundle parentProperties;
-    private Vector removeList = new Vector();
-    private Hashtable VCListeners = new Hashtable();
+  private Properties properties;
+  private Properties writableProperties;
+  private ResourceBundle resources;
+  private VariableBundle parentProperties;
+  private Vector removeList = new Vector();
+  private Hashtable VCListeners = new Hashtable();
+  private Hashtable VCGlobListeners = new Hashtable();
     
     public VariableBundle(InputStream propertiesFile, String resourceFile, VariableBundle newParentProperties) {
 	
@@ -318,11 +319,36 @@ public class VariableBundle extends Object {
      * value has changed.
      */
     public void fireValueChanged(String changedValue) {
-	Vector listeners = (Vector)VCListeners.get(changedValue);
-	if (listeners != null && listeners.size() > 0) {
-	    for (int i=0; i < listeners.size(); i++)
-		((ValueChangeListener)listeners.elementAt(i)).valueChanged(changedValue);
-	}	    
+      // only notify each listener once.
+      Set notified = new HashSet();
+
+      Vector listeners = (Vector)VCListeners.get(changedValue);
+      if (listeners != null && listeners.size() > 0) {
+	for (int i=0; i < listeners.size(); i++) {
+	  ((ValueChangeListener)listeners.elementAt(i)).valueChanged(changedValue);
+	  notified.add(listeners.elementAt(i));
+	}
+      }	    
+
+      // now add the glob listeners.
+
+      Enumeration keys = VCGlobListeners.keys();
+      while (keys.hasMoreElements()) {
+	String currentPattern = (String) keys.nextElement();
+	if (changedValue.startsWith(currentPattern)) {
+	  Vector globListeners = (Vector) VCGlobListeners.get(currentPattern);
+	  if (globListeners != null && globListeners.size() > 0) {
+	    for (int i = 0; i < globListeners.size(); i++) {
+	      ValueChangeListener currentListener = ((ValueChangeListener)globListeners.elementAt(i));
+	      if (!notified.contains(currentListener)) {
+		currentListener.valueChanged(changedValue);
+		notified.add(currentListener);
+	      }
+	    }
+	  }
+	}
+      }
+
     }
 
     /**
@@ -330,15 +356,29 @@ public class VariableBundle extends Object {
      * given property.
      */
     public void addValueChangeListener(ValueChangeListener vcl, String property) {
+      if (property.endsWith("*")) {
+	String startProperty = property.substring(0, property.length() - 1);
+	Vector listeners = (Vector)VCGlobListeners.get(startProperty);
+	if (listeners == null) {
+	  listeners = new Vector();
+	  listeners.add(vcl);
+	  VCGlobListeners.put(startProperty, listeners);
+	} else {
+	  if (!listeners.contains(vcl)) 
+	    listeners.add(vcl);
+	}
+
+      } else {
 	Vector listeners = (Vector)VCListeners.get(property);
 	if (listeners == null) {
-	    listeners = new Vector();
-	    listeners.add(vcl);
-	    VCListeners.put(property, listeners);
+	  listeners = new Vector();
+	  listeners.add(vcl);
+	  VCListeners.put(property, listeners);
 	} else {
-	    if (!listeners.contains(vcl)) 
-		listeners.add(vcl);
+	  if (!listeners.contains(vcl)) 
+	    listeners.add(vcl);
 	}
+      }
     }
 		
     /**
@@ -346,13 +386,20 @@ public class VariableBundle extends Object {
      * it's listening to.
      */
     public void removeValueChangeListener(ValueChangeListener vcl) {
-	Enumeration keys = VCListeners.keys();
-	Vector currentListenerList;
-	while (keys.hasMoreElements()) {
-	    currentListenerList = (Vector)VCListeners.get(keys.nextElement());
-	    while (currentListenerList.contains(vcl))
-		currentListenerList.remove(vcl);
-	}
+      Enumeration keys = VCListeners.keys();
+      Vector currentListenerList;
+      while (keys.hasMoreElements()) {
+	currentListenerList = (Vector)VCListeners.get(keys.nextElement());
+	while (currentListenerList.contains(vcl))
+	  currentListenerList.remove(vcl);
+      }
+
+      keys = VCGlobListeners.keys();
+      while (keys.hasMoreElements()) {
+	currentListenerList = (Vector)VCGlobListeners.get(keys.nextElement());
+	while (currentListenerList.contains(vcl))
+	  currentListenerList.remove(vcl);
+      }
     }
 	
 }

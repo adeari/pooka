@@ -21,8 +21,6 @@ import java.awt.event.*;
 
 public class ColorSelectorPane extends DefaultPropertyEditor {
   
-  public static int NO_VALUE = -1;
-
   String property;
   String propertyTemplate;
   String origValue;
@@ -30,7 +28,7 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
   JButton inputButton;
   VariableBundle sourceBundle;
 
-  int originalRgb = NO_VALUE;
+  int originalRgb = -1;
   Color currentColor;
 
   boolean useEnabledBox = false;
@@ -80,20 +78,17 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
       defaultLabel = new String(property);
     else
       defaultLabel = property.substring(dotIndex+1);
-    
-    origValue = sourceBundle.getProperty(property + ".rgb", Integer.toString(NO_VALUE));
-    originalRgb = Integer.parseInt(origValue);
 
     label = new JLabel(sourceBundle.getProperty(propertyTemplate + ".label", defaultLabel));
 
     inputButton = createInputButton();
-
-    if (originalRgb != NO_VALUE) {
-      setCurrentColor(new Color(originalRgb));
-    } else {
-      setCurrentColor(inputButton.getBackground());
-    }
     
+    int defaultValue = inputButton.getBackground().getRGB();
+
+    origValue = sourceBundle.getProperty(property + ".rgb", Integer.toString(defaultValue));
+    originalRgb = Integer.parseInt(origValue);
+
+    setCurrentColor(new Color(originalRgb));
     
     inputButton.setPreferredSize(new java.awt.Dimension(150, label.getMinimumSize().height));
     
@@ -186,11 +181,8 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
   }
 
   public void resetDefaultValue() {
-    if (originalRgb != NO_VALUE) {
-      setCurrentColor(new Color(originalRgb));
-    } else {
-      setCurrentColor(Color.blue);
-    }
+    setCurrentColor(new Color(originalRgb));
+    
     if (useEnabledBox)
       enabledBox.setSelected(origEnabled);
   }

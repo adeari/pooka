@@ -87,6 +87,10 @@ public class PookaUIManager implements ValueChangeListener {
 	    }
 	  }
 	}
+
+	// and, what the hell, we also update the UI.
+	//if (Pooka.getMainPanel() != null)
+	//  javax.swing.SwingUtilities.updateComponentTreeUI(Pooka.getMainPanel());
       }
     
     }
@@ -122,7 +126,6 @@ public class PookaUIManager implements ValueChangeListener {
     // which top-level component has changed and just redo it.
     
     String resource = changedValue.substring(15, changedValue.indexOf('.', 15));
-    System.err.println("resource changed was " + resource);
     updateResource(resource);
   }
 
