@@ -156,10 +156,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
       setNotifyNewMessagesMain(true);
+    else
+      setNotifyNewMessagesMain(false);
     
-    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false")) {
       setNotifyNewMessagesNode(true);
+    } else {
+      setNotifyNewMessagesNode(false);
+    }
   }
+
   
   
   /**
@@ -195,9 +201,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
       setNotifyNewMessagesMain(true);
+    else
+      setNotifyNewMessagesMain(false);
     
     if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
       setNotifyNewMessagesNode(true);
+    else
+      setNotifyNewMessagesNode(false);
   }
   
   /**
@@ -2270,8 +2280,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public void setTrashFolder(boolean newValue) {
     trashFolder = newValue;
-    setNotifyNewMessagesMain(! newValue);
-    setNotifyNewMessagesNode(! newValue);
+    if (newValue) {
+      setNotifyNewMessagesMain(false);
+      setNotifyNewMessagesNode(false);
+    } else {
+      if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
+	setNotifyNewMessagesMain(true);
+      else
+	setNotifyNewMessagesMain(false);
+      
+      if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
+	setNotifyNewMessagesNode(true);
+      else
+	setNotifyNewMessagesNode(false);
+    }
+
     resetDefaultActions();
     if (getFolderNode() != null)
       getFolderNode().popupMenu = null;
@@ -2285,8 +2308,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   public void setSentFolder(boolean newValue) {
     sentFolder = newValue;
-    setNotifyNewMessagesMain(! newValue);
-    setNotifyNewMessagesNode(! newValue);
+    if (newValue) {
+      setNotifyNewMessagesMain(false);
+      setNotifyNewMessagesNode(false);
+    } else {
+      if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
+	setNotifyNewMessagesMain(true);
+      else
+	setNotifyNewMessagesMain(false);
+      
+      if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
+	setNotifyNewMessagesNode(true);
+      else
+	setNotifyNewMessagesNode(false);
+    }
     setTracksUnreadMessages (! newValue);
     createFilters();
   }
@@ -2304,8 +2339,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public void setOutboxFolder(OutgoingMailServer newServer) {
     mailServer = newServer;
-    setNotifyNewMessagesMain(newServer==null);
-    setNotifyNewMessagesNode(newServer==null);
+    if (newServer != null) {
+      setNotifyNewMessagesMain(false);
+      setNotifyNewMessagesNode(false);
+    } else {
+      if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
+	setNotifyNewMessagesMain(true);
+      else
+	setNotifyNewMessagesMain(false);
+      
+      if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
+	setNotifyNewMessagesNode(true);
+      else
+	setNotifyNewMessagesNode(false);
+    }
+
     resetDefaultActions();
   }
 
@@ -2321,16 +2369,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     return notifyNewMessagesNode;
   }
   
+  public void setNotifyNewMessagesNode(boolean newValue) {
+    notifyNewMessagesNode = newValue;
+  }
+  
   public void setTracksUnreadMessages(boolean newValue) {
     tracksUnreadMessages = newValue;
   }
   
   public boolean tracksUnreadMessages() {
     return tracksUnreadMessages;
-  }
-  
-  public void setNotifyNewMessagesNode(boolean newValue) {
-    notifyNewMessagesNode = newValue;
   }
   
   public MessageFilter[] getDisplayFilters() {

@@ -13,11 +13,6 @@
 		printing page 1 of...  etc.  should be able to cancel
 		during that.  maybe even a progress bar?
 
-*) fix notification settings.  my spam folder shouldn't show a star when
-	new messages come in.
-	-- test
-	-- tested.  does happen even when settings are correct. fix.
-
 *) bug:  check to see if moving a message marks it as read.
 
 *) fix getFirstUnreadMessage on CachingFolderInfo to make sure that we've

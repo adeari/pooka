@@ -96,9 +96,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	if (folderInfo == null){
 	  setIconToClosedFolder();
 	} else {
+	  //System.out.println("folderInfo is " + folderInfo.getFolderID() + "; hasNewMessages is " + folderInfo.hasNewMessages() + "; notifyNewMessagesNode is "+ folderInfo.notifyNewMessagesNode());
 	  if (!((FolderNode)node).isLeaf()) {
 	    //System.out.println("folderInfo is " + folderInfo.getFolderID() + "; hasNewMessages is " + folderInfo.hasNewMessages());
-	    if (folderInfo.hasNewMessages())
+	    if (folderInfo.hasNewMessages() && folderInfo.notifyNewMessagesNode())
 	      setIconToSubfolderWithNew();
 	    else 
 	      setIconToSubfolder();
