@@ -171,7 +171,7 @@ MainToolbar.FolderNew.Image=/net/suberic/pooka/gui/images/New.gif
 MainToolbar.FolderClose.Action=folder-close
 MainToolbar.FolderClose.Image=/net/suberic/pooka/gui/images/Delete.gif
 MainToolbar.MessageNew.Action=message-new
-MainToolbar.MessageNew.Image=/net/suberic/pooka/gui/images/New.gif
+MainToolbar.MessageNew.Image=/net/suberic/pooka/gui/images/NewEnvelope.gif
 MainToolbar.Open.Action=file-open
 MainToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
 MainToolbar.MessageSave.Action=message-save
@@ -187,7 +187,7 @@ MainToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 MainToolbar.Print.Action=file-print
 MainToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 
-FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:SelectAll:Print:Search
+FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:SelectAll:Print:Update:Search
 FolderWindowToolbar.Down.Action=message-next
 FolderWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
 FolderWindowToolbar.Up.Action=message-previous
@@ -204,6 +204,8 @@ FolderWindowToolbar.SelectAll.Action=select-all
 FolderWindowToolbar.SelectAll.Image=/net/suberic/pooka/gui/images/Select.gif
 FolderWindowToolbar.Print.Action=file-print
 FolderWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
+FolderWindowToolbar.Update.Action=folder-update
+FolderWindowToolbar.Update.Image=/net/suberic/pooka/gui/images/EnvelopeIn.gif
 FolderWindowToolbar.Search.Action=folder-search
 FolderWindowToolbar.Search.Image=/net/suberic/pooka/gui/images/Binocular.gif
 

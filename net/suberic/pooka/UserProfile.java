@@ -59,9 +59,11 @@ public class UserProfile extends Object implements ValueChangeListener {
 	mailProperties.put(profileKey, mainProperties.getProperty("UserProfile." + name + ".mailHeaders." + profileKey, ""));
       }
       
-      sentFolderName=mainProperties.getProperty("UserProfile." + name + ".sentFolder", "");
-      
+      setSentFolderName(mainProperties.getProperty("UserProfile." + name + ".sentFolder", ""));
+       
       mailServerName = mainProperties.getProperty("UserProfile." + name + ".mailServer", "_default");
+      mailServer = null; // reload it next time it's requested.
+      
       sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
       sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
       sigGenerator=createSignatureGenerator();
@@ -86,23 +88,7 @@ public class UserProfile extends Object implements ValueChangeListener {
    */
   private void registerChangeListeners() {
     VariableBundle resources = Pooka.getResources();
-    if (mailPropertiesMap != null) {
-      
-      String profileKey;
-      
-      
-      for (int i = 0; i < mailPropertiesMap.size(); i++) {
-	profileKey = (String)mailPropertiesMap.elementAt(i);
-	resources.addValueChangeListener(this, "UserProfile." + name + ".mailHeaders." + profileKey);
-      }
-      
-    }
-    resources.addValueChangeListener(this, "UserProfile." + name + ".sentFolder");
-    resources.addValueChangeListener(this, "UserProfile." + name + ".mailServer");
-    
-    resources.addValueChangeListener(this, "UserProfile." + name + ".sendMailURL");
-    
-    
+    resources.addValueChangeListener(this, "UserProfile." + name + ".*");
   }
   
   /**
@@ -363,7 +349,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   }
   
   public FolderInfo getSentFolder() {
-    if (sentFolderName == null)
+    if (sentFolder == null)
       loadSentFolder();
     
     return sentFolder;
@@ -393,11 +379,14 @@ public class UserProfile extends Object implements ValueChangeListener {
    * property.
    */
   public void loadSentFolder() {
-    sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
-    
-    if (sentFolder != null) {
-      sentFolder.setSentFolder(true);
-    } 
+    StoreManager sm = Pooka.getStoreManager();
+    if (sm != null) {
+      sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
+      
+      if (sentFolder != null) {
+	sentFolder.setSentFolder(true);
+      } 
+    }
   }
 
   /**

@@ -43,6 +43,11 @@
         <include name="**/*"/>
       </fileset>
     </copy>
+    <copy todir="${builddir}/net/suberic/util/gui/images">
+      <fileset dir="${sourcedir}/suberic/util/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
     <copy file="${sourcedir}/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
     <copy todir="${builddir}/net/suberic/pooka/doc">
       <fileset dir="${sourcedir}/suberic/pooka/doc"/>

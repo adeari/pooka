@@ -1,3 +1,10 @@
+changed the new message icon, the folder->Update title to folder->Get
+New Messages, and put a new Get New Messages icon on the FolderDisplay.
+
+some properties of the UserProfile, such as the selected sent folder and
+the selected mail server, used to require a restart to change them.  they
+now change without a restart.
+
 changed the selection of things like the sent folder, trash folder, etc.,
 to use only already subscribed folders.
 
