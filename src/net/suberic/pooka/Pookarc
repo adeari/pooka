@@ -976,7 +976,7 @@ Pooka.folderPanel.theme.propertyType=List
 Pooka.folderPanel.theme.allowedValues=Pooka.theme
 Pooka.folderPanel.theme._includeAddButton=true
 
-Pooka.theme=default
+Pooka.theme=default:Ocean
 Pooka.theme.propertyType=Multi
 Pooka.theme.editableFields=primary1:primary2:primary3:secondary1:secondary2:secondary3:black:white:controlFont:systemFont:userFont:smallFont:monospacedFont
 Pooka.theme.editableFields.scoped=true
@@ -1009,7 +1009,7 @@ Pooka.theme.editableFields.smallFont._enabledBox=true
 Pooka.theme.editableFields.monospacedFont.propertyType=Font
 Pooka.theme.editableFields.monospacedFont._enabledBox=true
 
-Pooka.theme._default=default
+Pooka.theme._default=Ocean
 Pooka.theme._default.propertyType=List
 Pooka.theme._default.allowedValues=Pooka.theme
 
@@ -1213,9 +1213,9 @@ FolderFilters.display.ColorFilter.editorClass=net.suberic.pooka.gui.filter.Color
 FolderFilters.display.FontFilter.class=net.suberic.pooka.gui.filter.FontDisplayFilter
 FolderFilters.display.FontFilter.editorClass=net.suberic.pooka.gui.filter.FontFilterEditor
 
-CachingFolderInfo.defaultDisplayFilters=Unread:Uncached:DeleteInProgress:Deleted
+CachingFolderInfo.defaultDisplayFilters=Unread:Uncached:DeleteInProgress
 CachingFolderInfo.sentFolderDefaultDisplayFilters=Uncached
-FolderInfo.defaultDisplayFilters=Unread:DeleteInProgress:Deleted
+FolderInfo.defaultDisplayFilters=Unread:DeleteInProgress
 FolderInfo.sentFolderDefaultDisplayFilters=
 
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen

@@ -8,6 +8,8 @@ import javax.mail.event.*;
 import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import java.io.*;
 
 public class MessageInfo {
@@ -108,6 +110,13 @@ public class MessageInfo {
    * This gets a Flag property from the Message.
    */
   public boolean flagIsSet(String flagName) throws MessagingException {
+    if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
+      Logger folderLogger = getFolderInfo().getLogger();
+      if (folderLogger.isLoggable(Level.WARNING)) {
+	folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
+	Thread.currentThread().dumpStack();
+      }
+    }
     
     if (flagName.equals("FLAG.ANSWERED") )
       return getMessage().isSet(Flags.Flag.ANSWERED);
@@ -133,6 +142,14 @@ public class MessageInfo {
    * This gets the Flags object for the wrapped Message.
    */
   public Flags getFlags() throws MessagingException {
+    if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
+      Logger folderLogger = getFolderInfo().getLogger();
+      if (folderLogger.isLoggable(Level.WARNING)) {
+	folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
+	Thread.currentThread().dumpStack();
+	
+      }
+    }
     return getMessage().getFlags();
   }
   
@@ -140,6 +157,14 @@ public class MessageInfo {
    * Refreshes the flags object.
    */
   public void refreshFlags() throws MessagingException {
+    if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
+      Logger folderLogger = getFolderInfo().getLogger();
+      if (folderLogger.isLoggable(Level.WARNING)) {
+	folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
+	Thread.currentThread().dumpStack();
+	
+      }
+    }
     getFolderInfo().refreshFlags(this);
   }
   
@@ -147,6 +172,14 @@ public class MessageInfo {
    * Refreshes the Headers object.
    */
   public void refreshHeaders() throws MessagingException {
+    if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
+      Logger folderLogger = getFolderInfo().getLogger();
+      if (folderLogger.isLoggable(Level.WARNING)) {
+	folderLogger.log(Level.WARNING, "Accessing Message Headers not on Folder Thread.");
+	Thread.currentThread().dumpStack();
+	
+      }
+    }
     getFolderInfo().refreshHeaders(this);
   }
   
@@ -155,6 +188,14 @@ public class MessageInfo {
    * about any Email Header) from the Message.
    */
   public Object getMessageProperty(String prop) throws MessagingException {
+    if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
+      Logger folderLogger = getFolderInfo().getLogger();
+      if (folderLogger.isLoggable(Level.WARNING)) {
+	folderLogger.log(Level.WARNING, "Getting Message Property not on Folder Thread.");
+	Thread.currentThread().dumpStack();
+	
+      }
+    }
     Message msg = getMessage();
     if (prop.equals("From")) {
       try {
@@ -882,7 +923,6 @@ public class MessageInfo {
    * setFlag(Flags.Flag.SEEN, newValue) on the wrapped Message.
    */
   public void setSeen(boolean newValue) throws MessagingException {
-    
     if (folderInfo != null && ! folderInfo.tracksUnreadMessages())
       return;
     else {

@@ -296,8 +296,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       try {
 	tableInfo = createTableInfo();
 	
-	getMessageInfo().isSeen();
-	
+	this.isSeen();
+
+	this.isDeleted();
+
 	matchFilters();
 	
 	loaded=true;
@@ -1213,10 +1215,42 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     tableInfo=newValue;
   }
   
-  public boolean isSeen() {
-    return getMessageInfo().isSeen();
+  boolean mDeleted = false;
+  /**
+   * A shortcut for getting the deleted status of this message.  This
+   * method is safe to use on the AWTEventThread.
+   */
+  public boolean isDeleted() throws MessagingException {
+    // if there's a delete in progress, return true.
+    if (isDeleteInProgress())
+      return true;
+
+    // if we're on the appropriate thread, go ahead and check the flags.
+    if (Thread.currentThread() == getMessageInfo().getFolderInfo().getFolderThread() || Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread) {
+      mDeleted= getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
+    }
+
+    return mDeleted;
   }
-  
+
+  boolean mSeen = false;
+  /**
+   * A shortcut for getting the read/unread status of this message.  This
+   * method is safe to use on the AWTEventThread.
+   */
+  public boolean isSeen() {
+    // if we're on the appropriate thread, go ahead and check the flags.
+    if (Thread.currentThread() == getMessageInfo().getFolderInfo().getFolderThread() || Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread) {
+      mSeen = getMessageInfo().isSeen();
+    }
+    
+    return mSeen;
+  }
+
+  /**
+   * Sets the current seen value.  Note that this is not safe to use
+   * on any thread; it should only be used on the propery Folder/Store Thread.
+   */
   public void setSeen(boolean newValue) {
     if (newValue != getMessageInfo().isSeen()) {
       try {
@@ -1357,63 +1391,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	return matchingFilters;
       } else {
 	return new MessageFilter[0];
-      }
-    }
-  }
-
-  /**
-   * A shortcut for getting the deleted status of this message.  This
-   * method is safe to use on the AWTEventThread.
-   */
-  public boolean isDeleted() throws MessagingException {
-    // if there's a delete in progress, return true.
-    if (isDeleteInProgress())
-      return true;
-
-    // if we're on the appropriate thread, go ahead and check the flags.
-    if (Thread.currentThread() == getMessageInfo().getFolderInfo().getFolderThread()) {
-      return getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
-    } else {
-      // testing; let's see what filter info we can get.
-      if (matchedFilters()) {
-	boolean deletedFound = false;
-	for (int i = 0; ! deletedFound && i < matchingFilters.length; i++) {
-	  if (matchingFilters[i].getProperty().equalsIgnoreCase("FolderInfo.defaultDisplayFilters.Deleted")) {
-	    deletedFound =true;
-	  }
-	}
-
-	//return getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
-	return deletedFound;
-      } else {
-	// oh well.
-	return getMessageInfo().getFlags().contains(Flags.Flag.DELETED);
-      }
-    }
-  }
-
-  /**
-   * A shortcut for getting the read/unread status of this message.  This
-   * method is safe to use on the AWTEventThread.
-   */
-  public boolean isUnread() throws MessagingException {
-    // if we're on the appropriate thread, go ahead and check the flags.
-    if (Thread.currentThread() == getMessageInfo().getFolderInfo().getFolderThread()) {
-      return getMessageInfo().getFlags().contains(Flags.Flag.SEEN);
-    } else {
-      // testing; let's see what filter info we can get.
-      if (matchedFilters()) {
-	boolean foundUnread = false;
-	for (int i = 0; ! foundUnread && i < matchingFilters.length; i++) {
-	  if (matchingFilters[i].getProperty().equalsIgnoreCase("FolderInfo.defaultDisplayFilters.Unread"))
-	    foundUnread = true;
-	  
-	}
-	//return ! getMessageInfo().getFlags().contains(Flags.Flag.SEEN);
-	return foundUnread;
-      } else {
-	// oh well.
-	return ! getMessageInfo().getFlags().contains(Flags.Flag.SEEN);
       }
     }
   }

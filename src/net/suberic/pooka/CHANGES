@@ -1,3 +1,8 @@
+modified date display to use dd/MM/yy for non-US English.
+
+fixed a few situations in which the mail store could be accessed on the
+AWTEventThread.
+
 moved shutdown off of the AWTEvent thread.  also moved the shutdown action
 to a higher priority.
 
