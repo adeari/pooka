@@ -77,8 +77,9 @@ MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
 MenuBar.Window.Cascade.Action=window-cascase
 
-MenuBar.Help=About Pooka
-MenuBar.Help.About Pooka.Action=help-about
+MenuBar.Help=About:License
+MenuBar.Help.About.Action=help-about
+MenuBar.Help.License.Action=help-license
 
 MainToolbar = FolderNew:FolderOpen:FolderClose:|:MessageNew:MessageOpen:MessageSave:MessageClose:|:Cut:Copy:Paste
 MainToolbar.FolderNew.Action=folder-new

@@ -108,6 +108,31 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     */
 
     /**
+     * This method shows a help screen.  At the moment, it just takes the
+     * given URL, creates a JInteralFrame and a JEditorPane, and then shows
+     * the doc with those components.
+     */
+    public void showHelpScreen(String title, java.net.URL url) {
+	JInternalFrame jif = new JInternalFrame(title, true, true, true);
+	JEditorPane jep = new JEditorPane();
+	try {
+	    jep.setPage(url);
+	} catch (IOException ioe) {
+	    jep.setText(Pooka.getProperty("err.noHelpPage", "No help available."));
+	}
+	jep.setEditable(false);
+	jif.setSize(500,500);
+	jif.getContentPane().add(new JScrollPane(jep));
+	getMessagePanel().add(jif);
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException e) {
+	} 
+	
+    }
+
+    /**
      * Called by ExtendedDesktopManager every time the focus on the windows
      * changes.  Resets the Actions associated with the menu items and toolbar
      * to the ones in the active window.
@@ -242,7 +267,9 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
     private Action[] defaultActions = {
 	new ExitAction(),
 	new EditUserConfigAction(),
-	new EditStoreConfigAction()
+	new EditStoreConfigAction(),
+	new HelpAboutAction(),
+	new HelpLicenseAction()
     };
 
 
@@ -321,6 +348,33 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	    } catch (java.beans.PropertyVetoException pve) {
 	    }
 	    
+	}
+    }
+
+    class HelpAboutAction extends AbstractAction {
+	
+	HelpAboutAction() {
+	    super("help-about");
+	}
+	
+	public void actionPerformed(ActionEvent e) {
+	    String fileName="About.html";
+	    String dir="/net/suberic/pooka/doc";
+	    showHelpScreen(Pooka.getProperty("MenuBar.Help.About.Label", "About Pooka"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
+	    
+	}
+    }
+    
+    class HelpLicenseAction extends AbstractAction {
+	
+	HelpLicenseAction() {
+	    super("help-license");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    String fileName="COPYING";
+	    String dir="/net/suberic/pooka";
+	    showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
 	}
     }
 }
