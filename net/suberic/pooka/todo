@@ -1,5 +1,3 @@
-*) fix synch w/subscribed folders and INBOX problem.
-
 *) -- windows --
   *) support windows registry attachment associations.
 	-- check icemail
@@ -43,6 +41,11 @@
 -----
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
+
+*) change the keybinding for the address book.  otherwise you get address book
+	entries while you're navigating the to field.
+
+*) check why the bcc field sometimes doesn't show the address book icon.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath

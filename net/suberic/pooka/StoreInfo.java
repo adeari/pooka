@@ -721,6 +721,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * folder information from the IMAP server.
    */
   public void synchSubscribed() throws MessagingException {
+    // require the inbox.  this is to work around a bug in which the inbox
+    // doesn't show up in certain conditions.
+
+    boolean foundInbox=false;
+
     Folder[] subscribedFolders = store.getDefaultFolder().list();
     
     StringBuffer newSubscribed = new StringBuffer();
@@ -730,8 +735,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
       // sometimes listSubscribed() doesn't work.
       // and sometimes list() returns duplicate entries for some reason.
-      if (subscribedFolders[i].isSubscribed()) {
-	String folderName = subscribedFolders[i].getName();
+      String folderName = subscribedFolders[i].getName();
+      if (folderName.equalsIgnoreCase("inbox")) {
+	if (!foundInbox) {
+	  foundInbox=true;
+	  subscribedNames.add(folderName);
+	}
+      } else if (subscribedFolders[i].isSubscribed()) {
 	if (! subscribedNames.contains(folderName))
 	  subscribedNames.add(folderName);
       }

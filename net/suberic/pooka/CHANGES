@@ -1,3 +1,7 @@
+made it so the INBOX is required for imap servers.  with luck this will work
+around a problem in which the inbox sometimes doesn't show up for imap 
+stores.
+
 temporary files for attachments now have the attachment's extension.  
 
 fixed a bug where the copy button on messages wasn't getting enabled.
