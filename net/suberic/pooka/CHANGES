@@ -1,3 +1,7 @@
+fixed a bug in the VariableBundle which made it so backslashes weren't
+handled properly.  this caused file selection under windows to fail 
+horribly.
+
 added support for dynamically switching between LookAndFeels.
 
 clicking Ok on a property editor now saves the current properties to disk.

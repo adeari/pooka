@@ -1,12 +1,3 @@
-top todo:
-
-(windows)
-
-*) (related to above) check to make sure that files (especially the address
-	book file) are created correctly under windows. -- especially check
-	handing of '\' in properties.
-
-------------------
 
 *) bug:  the ReadMessageDisplayPanel always uses both EditorPanes.  this is
 	probably extremely inefficient.  
@@ -17,7 +8,7 @@ top todo:
 	have a way to display unloaded infos, and an event system that will
 	update the table when the tableInfo is loaded.
 
-*) fix the window size--it's possible that if you change the foldertable
+*) fix the window size--it's possible that if you change the foldertree
 size and the desktop pane size, but not the main window size, your main
 window size will end up changing anyway.
 
