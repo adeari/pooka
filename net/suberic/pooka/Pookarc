@@ -149,8 +149,12 @@ AttachmentPane=ContentType
 AttachmentPane.ContentType=Content-Type
 AttachmentPane.Actions=Open:OpenWith:SaveAs
 AttachmentPane.Actions.Open.Action=file-open
-AttachmentPane.Actions.OpenWin.Action=file-open-with
+AttachmentPane.Actions.OpenWith.Action=file-open-with
 AttachmentPane.Actions.SaveAs.Action=file-save-as
+AttachmentPane.NewMsgActions=Remove
+AttachmentPane.NewMsgActions.Remove.Action=file-remove
+
+AttachmentPane.2xClickAction=file-open
 
 MessageWindow.backgroundColor=white
 MessageWindow.vsize=500

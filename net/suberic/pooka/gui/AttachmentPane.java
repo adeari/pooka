@@ -120,9 +120,19 @@ public class AttachmentPane extends JPanel {
 
 	table.addMouseListener(new MouseAdapter() {
 	    public void mousePressed(MouseEvent e) {
-		if (e.isPopupTrigger()) {
+		if (e.getClickCount() == 2) {
+		    MimeBodyPart selectedPart = getSelectedPart();
+		    String actionCommand = Pooka.getProperty("AttachmentPane.2xClickAction", "file-open");
+		    if (selectedPart != null) {
+			Action clickAction = getActionByName(actionCommand);
+			if (clickAction != null) {
+			    clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+			    
+			}
+		    }
+		} else if (e.isPopupTrigger()) {
 		    getPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
-		}
+		} 
 	       
 	    }
 	});
@@ -206,13 +216,41 @@ public class AttachmentPane extends JPanel {
 
     /**
      * This opens the Attachment with the program of the user's choice.
-     * Not implemented yet. (akp)
      */
     public void openWith() {
 	if (Pooka.isDebug())
 	    System.out.println("calling AttachmentPane.openWith()");
-	MimeBodyPart mbp = getSelectedPart();
+
+	String inputMessage = Pooka.getProperty("AttchmentPane.openWith.message", "Enter the command with which \nto open the attchment.");
+	String inputTitle = Pooka.getProperty("AttachmentPane.openWith.title", "Open Attachment With");
+
+	String newCmd = message.getMessageWindow().showInputDialog(inputMessage, inputTitle);
+
+	if (newCmd.indexOf("%s") == -1)
+	    newCmd = newCmd.concat(" %s");
+
+	if (newCmd != null) {
+	    MimeBodyPart mbp = getSelectedPart();
+	    if (mbp != null) {
+		DataHandler dh = null;
+		try {
+		    dh = mbp.getDataHandler();
+		} catch (MessagingException me) {
+		}
+		if (dh != null) {
+		    dh.setCommandMap(Pooka.getMailcap());
+		    try {
+			ExternalLauncher el = new ExternalLauncher();
+			el.setCommandContext(newCmd, dh);
+			el.show();
+		    } catch (IOException ioe) {
+				//
+		    }
+		}
+	    }
+	}
     }
+    
 
     /**
      * This opens up a JFileChooser to let the user choose under what
@@ -236,8 +274,7 @@ public class AttachmentPane extends JPanel {
 		try {
 		    saveFileAs(mbp, saveChooser.getSelectedFile());
 		} catch (IOException exc) {
-		    //JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.SaveFile", "Error saving file") + "\n" + ioe.getMessage());
-		    System.out.println(Pooka.getProperty("error.SaveFile", "Error saving file") + "\n" + exc.getMessage());
+		    message.getMessageWindow().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
 		}
 	}
     }
@@ -407,11 +444,12 @@ public class AttachmentPane extends JPanel {
 
     class OpenWithAction extends AbstractAction {
 	OpenWithAction() {
-	    super("file-open");
+	    super("file-open-with");
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    openSelectedAttachment();
+	    System.out.println("open-with");
+	    openWith();
 	}
     }
 

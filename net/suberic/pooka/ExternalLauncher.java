@@ -67,7 +67,6 @@ public class ExternalLauncher implements CommandObject, Runnable {
 		parsedVerb = substituteString(fileHandler, "%v", verb);
 		parsedVerb = substituteString(parsedVerb, "%s", fileName);
 		
-		System.out.println("wrapper is " + wrapper);
 		StringTokenizer tok = new StringTokenizer(wrapper);
 		cmdArray = new String[tok.countTokens()];
 		for (int i = 0; tok.hasMoreTokens(); i++) {

@@ -86,11 +86,20 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 
     /**
      * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
+     * the MessageProxy can call the method without caring about the
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title, Exception e) {
 	showError(errorMessage + e.getMessage(), title);
+    }
+
+    /**
+     * This shows an Input window.  We include this so that the 
+     * MessageProxy can call the method without caring about the actual
+     * implementation of the dialog.
+     */
+    public String showInputDialog(String inputMessage, String title) {
+	return JOptionPane.showInternalInputDialog(this.getDesktopPane(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
     }
 
     /**
