@@ -30,44 +30,44 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     private boolean savingOpenFolders;
 
-    /**
-     * Creates a new PreviewContentPanel.
-     */
-    public PreviewContentPanel() {
-	folderDisplay = new JPanel();
-	folderDisplay.setLayout(new CardLayout());
-	folderDisplay.add("emptyPanel", new JPanel());
-	
-	messageDisplay = new ReadMessageDisplayPanel();
-
-	try {
-	  messageDisplay.configureMessageDisplay();
-	} catch (javax.mail.MessagingException me) {
-	  // showError();
-	}
-
-	splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
-
-	
-	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
-
-	this.setLayout(new BorderLayout());
-
-	this.add("North", toolbar);
-	this.add("Center", splitPanel);
-
-	splitPanel.setDividerLocation(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200")));
-
-	selectionListener = new ListSelectionListener() {
-		public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-		    selectedMessageChanged();
-		}
-	    };
-
-	this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
-	
+  /**
+   * Creates a new PreviewContentPanel.
+   */
+  public PreviewContentPanel() {
+    folderDisplay = new JPanel();
+    folderDisplay.setLayout(new CardLayout());
+    folderDisplay.add("emptyPanel", new JPanel());
+    
+    messageDisplay = new ReadMessageDisplayPanel();
+    
+    try {
+      messageDisplay.configureMessageDisplay();
+    } catch (javax.mail.MessagingException me) {
+      // showError();
     }
-
+    
+    splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
+    
+    
+    toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
+    
+    this.setLayout(new BorderLayout());
+    
+    this.add("North", toolbar);
+    this.add("Center", splitPanel);
+    
+    splitPanel.setDividerLocation(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200")));
+    
+    selectionListener = new ListSelectionListener() {
+	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+	  selectedMessageChanged();
+	}
+      };
+    
+    this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
+    
+  }
+  
   /**
    * Creates a new PreviewContentPanel from an existing MessagePanel.
    */
@@ -147,15 +147,21 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    */
   public void refreshCurrentMessage() {
     if (current != null) {
-      MessageProxy mp = current.getFolderDisplay().getSelectedMessage();
+      final MessageProxy mp = current.getFolderDisplay().getSelectedMessage();
       if (! (mp instanceof MultiMessageProxy)) {
-	messageDisplay.setMessageUI(this);
-	try {
-	  messageDisplay.resetEditorText();
-	  if (mp != null && mp.getMessageInfo() != null)
-	    mp.getMessageInfo().setSeen(true);
-	} catch (javax.mail.MessagingException me) {
-	  //showError();
+	if (current != null) {
+	  current.getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	      public void actionPerformed(java.awt.event.ActionEvent ae) {
+		messageDisplay.setMessageUI(PreviewContentPanel.this);
+		try {
+		  messageDisplay.resetEditorText();
+		  if (mp != null && mp.getMessageInfo() != null)
+		    mp.getMessageInfo().setSeen(true);
+		} catch (javax.mail.MessagingException me) {
+		  //showError();
+		}
+	      }
+	    },  new java.awt.event.ActionEvent(this, 0, "message-refresh"));
 	}
       }
     }

@@ -1,3 +1,6 @@
+fixed a NPE that could happen when switching from preview pane mode to
+desktop pane mode.
+
 fixed some minor bugs involving detaching windows.
 
 fixed the theme support so that the default theme is actually used for

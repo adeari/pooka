@@ -1,9 +1,4 @@
 
-*) bug:  in preview mode, select multiple messages, including the last
-	one.  delete.  get error.
-	-- fixed.  need to fix the PreviewContentPane's threading for
-	selectionChanged, though.
-
 *) make it so starting up is quicker (?).  -- check with threading, maybe?
 	either multiple threads for folders, or maybe check the threading
 	and connections for javamail.

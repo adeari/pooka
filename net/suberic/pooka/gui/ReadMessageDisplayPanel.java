@@ -142,8 +142,16 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   /**
    * This sets the text of the editorPane to the content of the current
    * message.
+   * 
+   * Should only be called from within the FolderThread for the message.
    */
   public void resetEditorText() throws MessagingException {
+    // ok.  here's how this has to go:  we need to load the information from
+    // the message on the message editor thread, but then actually do the
+    // display changing on the awt event thread.  seem simple enough?
+
+    // assume that we're actually on the FolderThread for now.
+
     if (getMessageProxy() != null) {
       StringBuffer messageText = new StringBuffer();
       
@@ -179,78 +187,98 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
 	contentType = "text/plain";
       }
-      
-      if (content != null) {
+
+      if (content != null)
 	messageText.append(content);
-	
-	if (getMessageProxy().hasAttachments()) {
-	  try {
-	    otherEditorPane.setContentType(contentType);
-	    otherEditorPane.setEditable(false);
-	    otherEditorPane.setText(messageText.toString());
-	    otherEditorPane.setCaretPosition(0);
-	  } catch (Exception e) {
-	    // if we can't show the html, just set the type as text/plain.
-	    otherEditorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
+
+      final String finalMessageText = messageText.toString();
+      final String finalContentType = contentType;
+      final boolean hasAttachments = getMessageProxy().hasAttachments();
+      final boolean contentIsNull = (content == null);
+
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    if (! contentIsNull) {
+	      if (hasAttachments) {
+		try {
+		  otherEditorPane.setContentType(finalContentType);
+		  otherEditorPane.setEditable(false);
+		  otherEditorPane.setText(finalMessageText);
+		  otherEditorPane.setCaretPosition(0);
+		} catch (Exception e) {
+		  // if we can't show the html, just set the type as text/plain.
+		  otherEditorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
+		  
+		  otherEditorPane.setEditable(false);
+		  otherEditorPane.setText(finalMessageText);
+		  otherEditorPane.setCaretPosition(0);
+		}
+	      } else {
+		try {
+		  editorPane.setContentType(finalContentType);
+		  editorPane.setEditable(false);
+		  editorPane.setText(finalMessageText);
+		  editorPane.setCaretPosition(0);
+		} catch (Exception e) {
+		  // if we can't show the html, just set the type as 
+		  // text/plain.
+		  
+		  editorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
+		  
+		  editorPane.setEditable(false);
+		  editorPane.setText(finalMessageText);
+		  editorPane.setCaretPosition(0);
+		  
+		}
+	      }
+	    }
 	    
-	    otherEditorPane.setEditable(false);
-	    otherEditorPane.setText(messageText.toString());
-	    otherEditorPane.setCaretPosition(0);
+	    if (hasAttachments) {
+	      attachmentPanel = new AttachmentPane(getMessageProxy());
+	      attachmentScrollPane.setViewportView(attachmentPanel);
+	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITH_ATTACHMENTS);
+	      editorStatus = WITH_ATTACHMENTS;
+	      
+	      if (splitPane != null && attachmentPanel != null) {
+		double paneHeight = splitPane.getSize().getHeight();
+		if (paneHeight <= 0)
+		  paneHeight = splitPane.getPreferredSize().getHeight();
+		splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
+	      } else {
+		splitPane.setDividerLocation(400);
+	      }
+	      
+	    } else {
+	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITHOUT_ATTACHMENTS);
+	      editorStatus = WITHOUT_ATTACHMENTS;
+	    }
 	  }
-	} else {
-	  try {
-	    editorPane.setContentType(contentType);
-	    editorPane.setEditable(false);
-	    editorPane.setText(messageText.toString());
-	    editorPane.setCaretPosition(0);
-	  } catch (Exception e) {
-	    // if we can't show the html, just set the type as text/plain.
-	    
-	    editorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
-	    
-	    editorPane.setEditable(false);
-	    editorPane.setText(messageText.toString());
-	    editorPane.setCaretPosition(0);
-	    
-	  }
-	}
-      } 
-      
-      if (getMessageProxy().hasAttachments()) {
-	attachmentPanel = new AttachmentPane(getMessageProxy());
-	attachmentScrollPane.setViewportView(attachmentPanel);
-	((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
-	editorStatus = WITH_ATTACHMENTS;
-	
-	if (splitPane != null && attachmentPanel != null) {
-	  double paneHeight = splitPane.getSize().getHeight();
-	  if (paneHeight <= 0)
-	    paneHeight = splitPane.getPreferredSize().getHeight();
-	  splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
-	} else {
-	  splitPane.setDividerLocation(400);
-	}
-	
-      } else {
-	((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
-	editorStatus = WITHOUT_ATTACHMENTS;
-      }
+	});
+
     } else {
-      // if getMessageProxy() == null
-      editorPane.setEditable(false);
-      editorPane.setText("");
-      editorPane.setCaretPosition(0);
       
-      otherEditorPane.setEditable(false);
-      otherEditorPane.setText("");
-      otherEditorPane.setCaretPosition(0);
-
-      ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
-      editorStatus = WITHOUT_ATTACHMENTS;
-
+      SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  // if getMessageProxy() == null
+	  editorPane.setEditable(false);
+	  editorPane.setText("");
+	  editorPane.setCaretPosition(0);
+	  
+	  otherEditorPane.setEditable(false);
+	  otherEditorPane.setText("");
+	  otherEditorPane.setCaretPosition(0);
+	  
+	  ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITHOUT_ATTACHMENTS);
+	  editorStatus = WITHOUT_ATTACHMENTS;
+	} 
+	});
     }
     
-    this.repaint();
+    SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  ReadMessageDisplayPanel.this.repaint();
+	}
+      });
   }
   
   public boolean showFullHeaders() {
