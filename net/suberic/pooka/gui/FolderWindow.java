@@ -28,6 +28,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     MessagePanel messagePanel = null;
     ConfigurableToolbar toolbar;
     ConfigurableKeyBinding keyBindings;
+    boolean enabled = true;
 
     public class StatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
 	JLabel folderLabel;
@@ -174,7 +175,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 			String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
 			if (selectedMessage != null) {
 			    Action clickAction = selectedMessage.getAction(actionCommand);
-			    if (clickAction != null) {
+			    if (clickAction != null && isEnabled()) {
 				clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
 				
 			    }
@@ -192,7 +193,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 		    }
 		    
 		    MessageProxy selectedMessage = getSelectedMessage();
-		    if (selectedMessage != null)
+		    if (selectedMessage != null && isEnabled())
 			selectedMessage.showPopupMenu(getMessageTable(), e);
 		}
 	    }
@@ -458,19 +459,41 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
     }
 
+    /**
+     * Returns whether or not this window is enabled.  This should be true
+     * just about all of the time.  The only time it won't be true is if
+     * the Folder is closed or disconnected, and the mail store isn't set
+     * up to work in disconnected mode.
+     */
+    public boolean isEnabled() {
+	return enabled;
+    }
+
+    /**
+     * This sets whether or not the window is enabled.  This should only
+     * be set to false when the Folder is no longer available.
+     */
+    public void setEnabled(boolean newValue) {
+	enabled = newValue;
+    }
+
     public Action[] getActions() {
-	Action[] returnValue;
-	MessageProxy m = getSelectedMessage();
-
-	if (m != null) 
-	    returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
-	else 
-	    returnValue = getDefaultActions();
-
-	if (folderInfo.getActions() != null)
-	    returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
-
-	return returnValue;
+	if (isEnabled()) {
+	    Action[] returnValue;
+	    MessageProxy m = getSelectedMessage();
+	    
+	    if (m != null) 
+		returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
+	    else 
+		returnValue = getDefaultActions();
+	    
+	    if (folderInfo.getActions() != null)
+		returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
+	    
+	    return returnValue;
+	} else {
+	    return null;
+	}
     }
 
     public Action[] getDefaultActions() {

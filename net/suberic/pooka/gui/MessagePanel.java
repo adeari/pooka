@@ -527,11 +527,16 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public Action[] getActions() {
 	JInternalFrame cw = getCurrentWindow();
 	if (cw != null) {
+	    Action[] windowActions = null;
 	    if (cw instanceof FolderWindow) {
-		return TextAction.augmentList(((FolderWindow)cw).getActions(), getDefaultActions());
+		windowActions = ((FolderWindow)cw).getActions();
 	    } else if (cw instanceof MessageWindow) {
-		return TextAction.augmentList(((MessageWindow)cw).getActions(), getDefaultActions());
+		windowActions = ((MessageWindow)cw).getActions();
 	    }
+	    
+	    if (windowActions != null)
+		return TextAction.augmentList(windowActions, getDefaultActions());
+	    
 	}
 	return getDefaultActions();
     }

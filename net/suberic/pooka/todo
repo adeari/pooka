@@ -59,6 +59,11 @@ messages.  for that matter, maybe also do an optimizeit audit.
 
 *) add address book and alias support
 
+*) fix bug with showing a new message--right now, if your imap connection is
+hanging and you try to show a new message, the entire app will hang.
+
+*) same bug can happen when getting the attachment count from the Attachment
+Panel.  we need to cache that.
 
 after beta 1
 ----------------

@@ -300,6 +300,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	public void actionPerformed(ActionEvent e) {
 	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 	    try {
+
 		if (!getFolderInfo().isOpen())
 		    getFolderInfo().openFolder(Folder.READ_WRITE);
 

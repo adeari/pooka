@@ -231,15 +231,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
-
+	
 	folder.addConnectionListener(new ConnectionAdapter() { 
 		public void closed(ConnectionEvent e) {
 		    if (Pooka.isDebug()) {
 			System.out.println("Folder " + getFolderID() + " closed:  " + e);
 		    }
-
+		    
 		    /*
-		    if (open == true) {
+		      if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
 			    if (!(store.isConnected()))
@@ -377,9 +377,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	loaderThread.loadMessages(messageProxies);
 	
-	loaderThread.start();
+	if (!loaderThread.isAlive())
+	    loaderThread.start();
 
 	return ftm;
+    }
+    
+    /**
+     * Unloads all messages.  This should be run if ever the current message
+     * information becomes out of date, as can happen when the connection
+     * to the folder goes down.
+     */
+    public void unloadAllMessages() {
+	folderTableModel = null;
     }
     
     /**
@@ -1027,17 +1037,24 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * FolderInfo will try to reopen the folder.
      */
     public void closeFolder(boolean expunge) throws MessagingException {
+
+	unloadAllMessages();
+
+	if (getFolderWindow() != null)
+	    getFolderWindow().setEnabled(false);
+
+	setFolderWindow(null);
+
 	if (getFolderTracker() != null) {
 	    getFolderTracker().removeFolder(this);
 	    setFolderTracker(null);
 	}
 
 	if (isLoaded()) {
-	    if (folder.isOpen()) {
-		open=false;
-		folder.close(expunge);
-	    }
+	    open=false;
+	    folder.close(expunge);
 	}
+
     }
 
     /**
