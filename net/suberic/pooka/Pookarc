@@ -32,6 +32,9 @@ Pooka.attachmentPanel.vsize=100
 Pooka.searchFolderDisplay.hsize=500
 Pooka.searchFolderDisplay.vsize=100
 
+Pooka.addressBookEditor.hsize=300
+Pooka.addressBookEditor.vsize=100
+
 Pooka.replyPrefix=>
 Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
@@ -338,6 +341,11 @@ ReadMessageWindow.popupMenu.Reply.Action=message-reply
 ReadMessageWindow.popupMenu.ReplyAll.Action=message-reply-all
 ReadMessageWindow.popupMenu.Forward.Action=message-forward
 ReadMessageWindow.popupMenu.Delete.Action=message-delete
+
+AddressBookEditor.popupMenu=Edit:Delete:Add
+AddressBookEditor.popupMenu.Edit.Action=address-edit
+AddressBookEditor.popupMenu.Delete.Action=address-delete
+AddressBookEditor.popupMenu.Add.Action=address-add
 
 AttachmentPane=ContentType
 AttachmentPane.ContentType=Content-Type

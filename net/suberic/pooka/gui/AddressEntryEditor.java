@@ -20,7 +20,6 @@ public class AddressEntryEditor extends CompositeEditorPane {
   public AddressEntryEditor(PropertyEditorFactory newFactory, AddressBookEntry newEntry, VariableBundle sourceBundle) {
     super(BoxLayout.X_AXIS);
     entry = newEntry;
-    System.out.println("creating new AddressEntryEditor; newFactory = " + newFactory + ", newEntry = " + newEntry);
     PropertyEditorFactory nFactory;
     VariableBundle wrappedBundle = new VariableBundle(entry.getProperties(), sourceBundle);
     
@@ -61,8 +60,6 @@ public class AddressEntryEditor extends CompositeEditorPane {
       wrappedFactory = newWrappedFactory;
       Properties props = entry.getProperties();
       wrappedBundle = new VariableBundle(props, wrappedFactory.getBundle());
-      System.out.println("for ref, currentAddress.personalName in the wrappedBundle is " + wrappedBundle.getProperty("currentAddress.personalName", ""));
-      System.out.println("meanwhile,  currentAddress.personalName in the props is " + props.getProperty("currentAddress.personalName"));
     }
 
     public DefaultPropertyEditor createEditor(String property) {

@@ -54,7 +54,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     returnValue.setProperty("currentAddress.personalName", getPersonalName());
     returnValue.setProperty("currentAddress.firstName", getFirstName());
     returnValue.setProperty("currentAddress.lastName", getLastName());
-    returnValue.setProperty("currentAddress.address", getAddress().getAddress());
+    returnValue.setProperty("currentAddress.address", getAddress().getAddress() != null ? getAddress().getAddress() : "" );
     return returnValue;
   }
 
@@ -92,7 +92,10 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       if (address == null) {
 	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
       }
-      return address.getPersonal();
+      if (address.getPersonal() != null)
+	return address.getPersonal();
+      else 
+	return "";
     } catch (java.io.UnsupportedEncodingException uee) {
       return "";
     }
@@ -121,7 +124,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String name = properties.getProperty("n");
     if (name != null) {
       int index = name.indexOf(";");
-      if (index > 0) 
+      if (index >= 0) 
 	return name.substring(index + 1);
     }
 
@@ -137,6 +140,10 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       int index = oldName.indexOf(";");
       if (index > 0) 
 	properties.setProperty("n", oldName.substring(0, index) + ";" + newName);
+      else if (index == 0) {
+	properties.setProperty("n", ";" + newName);
+
+      }
     } else {
       properties.setProperty("n", ";" + newName);
     }
@@ -149,7 +156,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String name = properties.getProperty("n");
     if (name != null) {
       int index = name.indexOf(";");
-      if (index > 0) 
+      if (index >= 0) 
 	return name.substring(0, index);
     }
 
@@ -163,8 +170,8 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String name = properties.getProperty("n");
     if (name != null) {
       int index = name.indexOf(";");
-      if (index > 0) 
-	properties.setProperty("n", newName + ";" + name.substring(index + 1));
+      if (index >= 0) 
+	properties.setProperty("n", newName + ";" + ((index + 1 < name.length()) ? name.substring(index + 1) : ""));
     } else {
       properties.setProperty("n", newName + ";");
     }

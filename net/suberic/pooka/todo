@@ -5,9 +5,6 @@ next release:
 *) make vcard address book at least come close to working for simple cases.
 	editor:
 		right click menu
-		add
-		delete
-		disable
 	should work for groups.
 
 *) fix "got an empty/null added or deleted event" message after a search has

@@ -5,6 +5,7 @@ import net.suberic.util.gui.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.Cursor;
+import javax.swing.Action;
 
 /**
  * A property editor which edits an AddressBook.
@@ -17,9 +18,19 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   JPanel searchEntryPanel;
   JTextField searchEntryField;
   JTable addressTable;
+  JButton editButton, addButton, deleteButton, searchButton;
+  boolean enabled = true;
 
   VariableBundle sourceBundle = null;
   PropertyEditorFactory factory = null;
+
+  Action[] defaultActions = new Action[] {
+    new AddAction(),
+    new EditAction(),
+    new DeleteAction()
+      };
+
+  JPopupMenu popupMenu;
 
   public AddressBookEditorPane(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
     configureEditor(newFactory, newProperty, newTemplateType, bundle, isEnabled);
@@ -49,8 +60,17 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     labelComponent = this;
     
     this.add(searchEntryPanel);
-    this.add(addressTable);
+    //this.add(new JScrollPane(addressTable));
+    JScrollPane addressPane = new JScrollPane(addressTable);
+    try {
+      addressPane.setPreferredSize(new java.awt.Dimension(Integer.parseInt(sourceBundle.getProperty("Pooka.addressBookEditor.hsize", "300")), Integer.parseInt(sourceBundle.getProperty("Pooka.addressBookEditor.vsize", "100"))));
+    } catch (Exception e) {
+      addressPane.setPreferredSize(new java.awt.Dimension(300, 100));
+    }
+    this.add(addressPane);
     this.add(editPanel);
+
+    popupMenu = new ConfigurablePopupMenu("AddressBookEditor.popupMenu", bundle);
   }
 
   /**
@@ -66,7 +86,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 
     Action a = new SearchAction();
 
-    JButton searchButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Search", "Search"));
+    searchButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Search", "Search"));
     searchButton.addActionListener(a);
     searchEntryPanel.add(searchButton);
     
@@ -120,19 +140,19 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     editPanel = new JPanel();
 
     Action a = new AddAction();
-    JButton button = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Add", "Add"));
-    button.addActionListener(a);
-    editPanel.add(button);
+    addButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Add", "Add"));
+    addButton.addActionListener(a);
+    editPanel.add(addButton);
 
     a = new EditAction();
-    button = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Edit", "Edit"));
-    button.addActionListener(a);
-    editPanel.add(button);
+    editButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Edit", "Edit"));
+    editButton.addActionListener(a);
+    editPanel.add(editButton);
 
     a = new DeleteAction();
-    button = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Delete", "Delete"));
-    button.addActionListener(a);
-    editPanel.add(button);
+    deleteButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Delete", "Delete"));
+    deleteButton.addActionListener(a);
+    editPanel.add(deleteButton);
     
   }
 
@@ -150,11 +170,14 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    */
   public void performAdd() {
     AddressBookEntry newEntry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
-    editEntry(newEntry);
+    try {
+      newEntry.setAddress(new javax.mail.internet.InternetAddress("example@example.com"));
+    } catch (Exception e) { }
     if (newEntry.getAddress() != null) {
       book.addAddress(newEntry);
       ((AddressBookTableModel)addressTable.getModel()).addEntry(newEntry);
     }
+    editEntry(newEntry);
   }
 
   /**
@@ -200,7 +223,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    * Brings up the current popup menu.
    */
   public void showPopupMenu() {
-
+    
   }
 
   /**
@@ -239,7 +262,14 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
 
   public void setEnabled(boolean newValue) {
+    enabled = newValue;
+    searchButton.setEnabled(newValue);
+    addButton.setEnabled(newValue);
+    editButton.setEnabled(newValue);
+    deleteButton.setEnabled(newValue);
+    searchEntryField.setEnabled(newValue);
   }
+
 
   public void setBusy(boolean newValue) {
     if (newValue)
@@ -348,6 +378,13 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 	}
       }
     }
+  }
+
+  /**
+   * Returns the actions associated with this editor.
+   */
+  public Action[] getActions() {
+    return defaultActions;
   }
 
   public class SearchAction extends AbstractAction {
