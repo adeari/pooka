@@ -11,6 +11,8 @@ import java.util.Vector;
  */
 public class ActionThread extends Thread {
 
+    boolean stopMe = false;
+
     public ActionThread(String threadName) {
 	super(threadName);
     }
@@ -31,7 +33,7 @@ public class ActionThread extends Thread {
     private boolean sleeping;
 
     public void run() {
-	while(true) {
+	while(! stopMe ) {
 	    sleeping = false;
 	    ActionEventPair pair = popQueue();
 	    while (pair != null) {
@@ -74,5 +76,8 @@ public class ActionThread extends Thread {
 	if (sleeping)
 	    this.interrupt();
     } 	
-	
+
+    public void setStop(boolean newValue) {
+	stopMe = newValue;
+    }
 }
