@@ -1,3 +1,7 @@
+fixed a bug where the ExternalLauncher wasn't executing correctly if there
+was no wrapper specified.  this resulted in the inability to open attachments
+on windows.
+
 fixed a bug where the StoreNode and FolderNode were each updating their
 gui components on the mail thread, rather than on the swint eventdispatcher
 thread.
