@@ -17,7 +17,15 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
     public FolderMenu() {
     }
 
+    /**
+     * Overrides ConfigurableMenu.configureComponent().
+     */
     public void configureComponent(String key, VariableBundle vars) {
+	try {
+	    setText(vars.getProperty(key + ".Label"));
+	} catch (MissingResourceException mre) {
+	}
+
 	this.setActionCommand(vars.getProperty(key + ".Action", "message-move"));
 
 	fPanel = Pooka.getMainPanel().getFolderPanel();
@@ -56,8 +64,7 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
     public void setActiveMenuItems() {
 	for (int j = 0; j < getItemCount(); j++) {
 	    JMenuItem mi = getItem(j);
-	    Action a = null;
-	    // Action a = mp.getAction(getActionCommand());
+	    Action a = getAction(getActionCommand());
 	    if (a != null) {
 		Action newAction = a;
 		if (a instanceof net.suberic.util.DynamicAbstractAction) {

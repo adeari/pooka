@@ -150,23 +150,36 @@ public class MessageProxy {
     /**
      * Moves the Message into the target Folder.
      */
-    public void moveMessage(Folder targetFolder) {
+    public void moveMessage(FolderInfo targetFolder) {
+	int success=false;
 	try {
+	    /*
+	      this shouldn't be necessary according to the api.
 	    if (!targetFolder.isOpen()) {
-		targetFolder.open(Folder.READ_WRITE);
-	    } else if (! (targetFolder.getMode() != Folder.READ_WRITE)) {
-		targetFolder.close(false);
-		targetFolder.open(Folder.READ_WRITE);
+		targetFolder.openFolder(Folder.READ_WRITE);
+	    } else if (! (targetFolder.getFolder().getMode() != Folder.READ_WRITE)) {
+		targetFolder.openFolder(Folder.READ_WRITE);
 	    }
+	    */
 
-	    folderInfo.getFolder().copyMessages(new Message[] {message}, targetFolder);
-	    message.setFlag(Flags.Flag.DELETED, true);
-	    if ( Pooka.getProperty("Pooka.autoExpunge", "true").equals("true") )
-		folderInfo.getFolder().expunge();
+	    folderInfo.getFolder().copyMessages(new Message[] {message}, targetFolder.getFolder());
+	    success=true;
 	} catch (MessagingException me) {
 	    if (folderInfo != null && folderInfo.getFolderWindow() != null)
 		JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n" + me.getMessage());
 	}
+
+	if (success == true) 
+	    try {
+		message.setFlag(Flags.Flag.DELETED, true);
+		
+		if ( Pooka.getProperty("Pooka.autoExpunge", "true").equals("true") )
+		    folderInfo.getFolder().expunge();
+	    } catch (MessagingException me) {
+		if (folderInfo != null && folderInfo.getFolderWindow() != null)
+		    JOptionPane.showInternalMessageDialog(folderInfo.getFolderWindow().getDesktopPane(), Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n" + me.getMessage());
+	    }		
+	
     }
 
     /**
@@ -178,8 +191,8 @@ public class MessageProxy {
      */
     public void deleteMessage() {
 
-	Folder trashFolder = getMessagePanel().getMainPanel().getFolderPanel().getTrashFolder();
-	if ((trashFolder != null) && (trashFolder != message.getFolder()))
+	FolderInfo trashFolder = getMessagePanel().getMainPanel().getFolderPanel().getTrashFolder();
+	if ((trashFolder != null) && (trashFolder != getFolderInfo()))
 	    moveMessage(trashFolder);
 	else {
 	    try {
@@ -424,7 +437,7 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {
-	    moveMessage((Folder)getValue("target"));
+	    moveMessage((FolderInfo)getValue("target"));
 	}
 
     }
