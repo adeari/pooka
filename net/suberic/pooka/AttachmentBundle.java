@@ -42,17 +42,23 @@ class AttachmentBundle {
      * to display just the 'body' of the message without the attachments.
      */
     public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
-	StringBuffer retVal = new StringBuffer();
-
-	if (withHeaders)
-	    retVal.append(getHeaderInformation(showFullHeaders, false));
-
-	if (textPart != null)
-	    retVal.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
-
+      StringBuffer retVal = new StringBuffer();
+      
+      if (withHeaders)
+	retVal.append(getHeaderInformation(showFullHeaders, false));
+      
+      String text = null;
+      if (textPart != null) {
+	text = textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage);
+      }
+	
+      if (text != null) {
+	retVal.append(text);
 	return retVal.toString();
+      } else
+	return null;
     }
-
+  
     /**
      * This gets the Html part of a message.  This is useful if you want
      * to display just the 'body' of the message without the attachments.

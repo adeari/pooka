@@ -1,3 +1,9 @@
+made it so replying to or forwarding messages with only html content results
+in the inclusion of the html code.  best i can do for now.
+
+fixed a bug in the search window display in which read messages were included
+in the unread message count.
+
 switched the popup menus from checking to see if the event is a right
 click to actually checking the isPopupTrigger() method.
 

@@ -1,13 +1,5 @@
 *) a nested message which is of type text/html doesn't get shown on the
 	display.
-
-*) need a way for forward/include html-only messages.
-
-*) make an option where message windows size to the viewport of the
-desktop pane.
-
-*) search results window shows all (? at least lots) messages as unread.
-
 --
 
 *) queuing of outgoing mails
@@ -98,6 +90,10 @@ should only be a few of these left.
 
 *) add ability of setting return values by hand (not by UserProfile) on 
 	new messages.
+
+
+*) make an option where message windows size to the viewport of the
+desktop pane.
 
 ++++++++++++++++++++++++++++++++++++++++++++++++
 

@@ -183,37 +183,49 @@ public class MessageInfo {
     }
 
     /**
-     * Gets the Text part of the Content of this Message.
+     * Gets the Text part of the Content of this Message.  If no real text
+     * content is found, returns the html content.  If there's none of that,
+     * either, then returns null.
      */
     public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+      try {
+	if (!hasLoadedAttachments()) 
+	  loadAttachmentInfo();
+	String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	if (returnValue != null)
+	  return returnValue;
+	else
+	  return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
+      } catch (FolderClosedException fce) {
 	try {
-	    if (!hasLoadedAttachments()) 
-		loadAttachmentInfo();
-	    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} catch (FolderClosedException fce) {
-	    try {
-		if (getFolderInfo().shouldBeConnected()) {
-		    getFolderInfo().openFolder(Folder.READ_WRITE);
-		    loadAttachmentInfo();
-		    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-		} else {
-		    throw fce;
-		}
-	    } catch (java.io.IOException ioe) {
-		throw new MessagingException(ioe.getMessage()); 
-	    }
+	  if (getFolderInfo().shouldBeConnected()) {
+	    getFolderInfo().openFolder(Folder.READ_WRITE);
+	    loadAttachmentInfo();
+	    String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	    if (returnValue != null)
+	      return returnValue;
+	    else
+	      return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
+	  } else {
+	    throw fce;
+	  }
 	} catch (java.io.IOException ioe) {
-	    throw new MessagingException(ioe.getMessage()); 
+	  throw new MessagingException(ioe.getMessage()); 
 	}
+      } catch (java.io.IOException ioe) {
+	throw new MessagingException(ioe.getMessage()); 
+      }
     }
-
-    /**
-     * Gets the Text part of the Content of this Message.
-     */
-    public String getTextPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
-	return getTextPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
-    }
-
+  
+  /**
+   * Gets the Text part of the Content of this Message.  If no real text
+   * content is found, returns the html content.  If there's none of that,
+   * either, then returns null.
+   */
+  public String getTextPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+    return getTextPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+  }
+  
     /**
      * Gets the Html part of the Content of this Message.
      */
@@ -450,6 +462,10 @@ public class MessageInfo {
 	MimeMessage mMsg = (MimeMessage) getMessage();
 
 	String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
+	if (textPart == null) {
+	  textPart = "";
+	}
+
 	UserProfile up = getDefaultProfile();
 
 	String parsedText;
@@ -731,7 +747,11 @@ public class MessageInfo {
     }
 
     public boolean isSeen() {
-	return seen;
+      try {
+	return flagIsSet("FLAG.SEEN");
+      } catch (MessagingException me) {
+	return true;
+      }
     }
 
     /**
@@ -739,12 +759,12 @@ public class MessageInfo {
      * setFlag(Flags.Flag.SEEN, newValue) on the wrapped Message.
      */
     public void setSeen(boolean newValue) throws MessagingException {
-	if (newValue != seen) {
-	    seen=newValue;
-	    Message m = getRealMessage();
-	    m.setFlag(Flags.Flag.SEEN, newValue);
-	    getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
-	}
+      boolean seen = isSeen();
+      if (newValue != seen) {
+	Message m = getRealMessage();
+	m.setFlag(Flags.Flag.SEEN, newValue);
+	getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
+      }
     }
 
     public boolean isLoaded() {
