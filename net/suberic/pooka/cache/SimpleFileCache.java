@@ -16,6 +16,9 @@ public class SimpleFileCache implements MessageCache {
     public static int HEADERS = 1;
     public static int FLAGS = 2;
 
+    public static int ADDED = 10;
+    public static int REMOVED = 11;
+
     // the source FolderInfo.
     private FolderInfo folderInfo;
 
@@ -83,7 +86,21 @@ public class SimpleFileCache implements MessageCache {
      * server, if the server is available.
      */
     public void addFlag(long uid, Flags flag) throws MessagingException {
-
+	Flags f = getFlags(uid);
+	if (f != null) {
+	    f.add(flag);
+	} else {
+	    f = flag;
+	}
+	if (getFolderInfo().isAvailable()) {
+	    MimeMessage m = getMessageById(uid);
+	    if (m != null)
+		m.addFlags(flag);
+	} else {
+	    writeToChangeLog(uid, flag, ADDED);
+	}
+	    
+	saveFlags(uid, f);
     }
 
     /**
@@ -93,7 +110,20 @@ public class SimpleFileCache implements MessageCache {
      * server, if the server is available.
      */
     public void removeFlag(long uid, Flags flag) throws MessagingException {
+	Flags f = getFlags(uid);
+	if (f != null) {
+	    f.remove(flag);
 
+	    if (getFolderInfo().isAvailable()) {
+		MimeMessage m = getMessageById(uid);
+		if (m != null)
+		    m.removeFlags(flag);
+	    } else {
+		writeToChangeLog(uid, flag, REMOVED);
+	    }
+	    
+	    saveFlags(uid, f);
+	}
     }
 
     /**
