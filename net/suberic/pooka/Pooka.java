@@ -34,6 +34,7 @@ public class Pooka {
        	} catch (Exception e) {
 	    resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
 	}
+	java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
 
 	dateFormatter = new DateFormatter();
 

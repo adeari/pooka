@@ -87,7 +87,9 @@ public class StoreInfo implements ValueChangeListener {
 	url = new URLName(protocol, server, -1, "", user, password);
 	
 	try {
-	    store = Pooka.getDefaultSession().getStore(url);
+	    Properties p = loadProperties();
+	    Session s = Session.getInstance(p, Pooka.defaultAuthenticator);
+	    store = s.getStore(url);
 	    available=true;
 	} catch (NoSuchProviderException nspe) {
 	    available=false;
@@ -151,6 +153,25 @@ public class StoreInfo implements ValueChangeListener {
 		trashFolder.setTrashFolder(true);
 	}
     }	
+
+    /**
+     * This loads in the default session properties for this Store's
+     * Session.
+     */
+    public Properties loadProperties() {
+	Properties p = new Properties(System.getProperties());
+	p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
+	p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
+	if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
+	    p.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+
+	    p.setProperty("mail.imap.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
+	    
+	    p.setProperty("mail.imap.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "993"));
+	}
+
+	return p;
+    }
     
     /**
      * This updates the children of the current store.  Generally called
