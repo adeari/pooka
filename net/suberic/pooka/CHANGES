@@ -1,3 +1,6 @@
+added a progress dialog to caching multiple messages during disconnected
+operation.  
+
 changed the sorting method on the message tables.  now clicking a column
 a second time will reverse the sort on that column.  doing a shift+click
 will still explicitly do a reverse sort.

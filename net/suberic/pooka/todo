@@ -1,7 +1,7 @@
 preview:
 	check what happens when we switch from desktop to preview and
 		autopreview is off
-	fix it so you the folder table gets keyboard focus at startup.
+	fix it so the folder table gets keyboard focus at startup.
 
 *) disconnected:  
 	*)  make an option for caching everything.
@@ -12,8 +12,14 @@ preview:
 		it seems to take a while.
 	*)  disconnected:  think that you're still connected.  lose connection.
 	    get new messages.  doesn't work properly.
+	*)  open disconnected folder when connection is unavailable?
 
 *) fix the connection order.  it's too painful right now.
+
+*) display filters can end up being determined on the awt event thread:
+	at net.suberic.pooka.gui.MessageProxy.getMatchingFilters(MessageProxy.java:971)
+	at net.suberic.pooka.gui.FilterFolderCellRenderer.getTableCellRendererComponent(FilterFolderCellRenderer.java:83)
+	at javax.swing.JTable.prepareRenderer(JTable.java:3535)
 
 --------
 
