@@ -46,6 +46,9 @@ public class Pooka {
 
   // settings
   static public boolean openFolders = true;
+  static public boolean useHttp = false;
+  static public boolean useLocalFiles = true;
+
   static public String pookaHome = null;
 
   static public HelpBroker helpBroker;
@@ -58,51 +61,19 @@ public class Pooka {
    * 
    * -rc <filename>
    * --rcfile <filename>     use the given file as the pooka startup file.
+   *
+   * --http  runs with a configuration file loaded via http
    */
   static public void main(String argv[]) {
     parseArgs(argv);
 
-    // if localrc hasn't been set, use the user's home directory.
-    if (localrc == null)
-      localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
-    
-    try {
-      ClassLoader cl = new Pooka().getClass().getClassLoader();
-      java.net.URL url;
-      if (cl == null) {
-	url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
-      } else {
-	url = cl.getResource("net/suberic/pooka/Pookarc");
-      }
-      if (url == null) {
-	//sigh
-	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
-      }
-      java.io.InputStream is = url.openStream();
-      net.suberic.util.VariableBundle pookaDefaultBundle = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
-      if (pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
-	resourceManager = new DisklessResourceManager();
-      } else {
-	resourceManager = new FileResourceManager();
-      }
-
-      resources = resourceManager.createVariableBundle(localrc, pookaDefaultBundle);
-
-    } catch (Exception e) {
-      System.err.println("caught exception:  " + e);
-      e.printStackTrace();
-    }
+    loadResources();
 
     if (! checkJavaVersion()) {
       versionError();
       System.exit(-1);
     }
     
-    if (resources.getProperty("Pooka.httpConfig", "false").equalsIgnoreCase("true")) {
-      net.suberic.pooka.gui.LoadHttpConfigPooka configPooka = new net.suberic.pooka.gui.LoadHttpConfigPooka();
-      configPooka.start();
-    }
-
     StoreManager.setupSSL();
 
     try {
@@ -253,6 +224,50 @@ public class Pooka {
 
   }
   
+
+  /**
+   * Loads all the resources for Pooka.
+   */
+  public static void loadResources() {
+    
+    try {
+      ClassLoader cl = new Pooka().getClass().getClassLoader();
+      java.net.URL url;
+      if (cl == null) {
+	url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
+      } else {
+	url = cl.getResource("net/suberic/pooka/Pookarc");
+      }
+      if (url == null) {
+	//sigh
+	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
+      }
+      
+      java.io.InputStream is = url.openStream();
+      net.suberic.util.VariableBundle pookaDefaultBundle = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
+      if (! useLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
+	resourceManager = new DisklessResourceManager();
+      } else {
+	resourceManager = new FileResourceManager();
+      }
+
+      // if localrc hasn't been set, use the user's home directory.
+      if (localrc == null)
+	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
+      
+      resources = resourceManager.createVariableBundle(localrc, pookaDefaultBundle);
+      
+    } catch (Exception e) {
+      System.err.println("caught exception:  " + e);
+      e.printStackTrace();
+    }
+
+    if (useHttp || resources.getProperty("Pooka.httpConfig", "false").equalsIgnoreCase("true")) {
+      net.suberic.pooka.gui.LoadHttpConfigPooka configPooka = new net.suberic.pooka.gui.LoadHttpConfigPooka();
+      configPooka.start();
+    }
+  }
+
   /**
    * This parses any command line arguments, and makes the appropriate
    * changes.
@@ -263,24 +278,25 @@ public class Pooka {
     
     for (int i = 0; i < argv.length; i++) {
       if (argv[i] != null) {
-	if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders"))
+	if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders")) {
 	  openFolders = false;
-	
-	
-	if (argv[i].equals("-rc") || argv[i].equals("--rcfile")) {
+	} else if (argv[i].equals("-rc") || argv[i].equals("--rcfile")) {
 	  String filename = argv[++i];
 	  if (filename == null) {
 	    System.err.println("error:  no startup file specified.");
 	    System.err.println("Usage:  java net.suberic.pooka.Pooka [-rc <filename>]");
 	    System.exit(-1);
 	  }
-
+	  
 	  localrc = filename;
+	} else if (argv[i].equals("--http")) {
+	  useHttp = true;
+	  useLocalFiles = false;
 	}
       }
     }
   }
-
+  
   /**
    * Checks to make sure that the Java version is valid.
    */

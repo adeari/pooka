@@ -27,8 +27,8 @@
 	-- support for http: access?
 	    -- fix variable bundle to make sure that we close the stream
 	    -- better error messages
-	    -- test .htaccess connection.
-
+	    -- come up with configuration/usage plan.
+	  
 *) ?? ^D message, hit return for next message, get an error?
 	tough.  could fix by having a temporary 'deleted' flag on the message
 	itself, maybe?
