@@ -221,10 +221,10 @@ public class SimpleFileCache implements MessageCache {
       if (getFolderInfo().shouldBeConnected()) {
 	MimeMessage m = getFolderInfo().getRealMessageById(uid);
 	if (m != null) {
-	  java.util.Enumeration enum = m.getAllHeaderLines();
+	  java.util.Enumeration headerLines = m.getAllHeaderLines();
 	  h = new InternetHeaders();
-	  while (enum.hasMoreElements()) {
-	    h.addHeaderLine((String) enum.nextElement());
+	  while (headerLines.hasMoreElements()) {
+	    h.addHeaderLine((String) headerLines.nextElement());
 	  }
 	  if (saveToCache)
 	    cacheMessage(m, uid, newUidValidity, HEADERS);
@@ -341,12 +341,12 @@ public class SimpleFileCache implements MessageCache {
 	
 	StringWriter outString = new StringWriter();
 	
-	java.util.Enumeration enum = m.getAllHeaderLines();
+	java.util.Enumeration headerLines = m.getAllHeaderLines();
 	BufferedWriter bos = new BufferedWriter(outString);
 	
 	int foo = 0;
-	while (enum.hasMoreElements()) {
-	  bos.write((String) enum.nextElement());
+	while (headerLines.hasMoreElements()) {
+	  bos.write((String) headerLines.nextElement());
 	  bos.newLine();
 	}
 	

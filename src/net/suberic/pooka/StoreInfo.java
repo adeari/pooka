@@ -430,10 +430,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
       
       if (storeNode != null) {
-	Enumeration enum = storeNode.children();
+	Enumeration childEnum = storeNode.children();
 	Vector v = new Vector();
-	while (enum.hasMoreElements())
-	  v.add(enum.nextElement());
+	while (childEnum.hasMoreElements())
+	  v.add(childEnum.nextElement());
 	
 	storeNode.removeChildren(v);
       }

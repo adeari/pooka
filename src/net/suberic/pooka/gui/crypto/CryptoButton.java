@@ -333,12 +333,23 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
    */
   public JToolBar getToolBar() {
     try {
-      return (JToolBar) SwingUtilities.getAncestorOfClass(Class.forName("javax.swing.JToolBar"), this);
+      return (JToolBar) getAncestorOfClass(Class.forName("javax.swing.JToolBar"), this);
     } catch (Exception e) {
       e.printStackTrace();
       return null;
     }
   }
 
+  /**
+   * Workaround for jdk 1.5 weirdness.
+   */
+  private java.awt.Container getAncestorOfClass(Class c, java.awt.Component comp) {
+    if(comp == null || c == null)
+      return null;
+    java.awt.Container parent = comp.getParent();
+    while(parent != null && !(c.isInstance(parent)))
+      parent = parent.getParent();
+    return parent;
+  }
 }
     

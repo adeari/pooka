@@ -81,9 +81,9 @@ public class MessageInfo {
 	AttachmentBundle bundle = new AttachmentBundle(mimeMessage);
 	ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	java.util.List headerList = new java.util.ArrayList();
-	java.util.Enumeration enum = mimeMessage.getAllHeaders();
-	while (enum.hasMoreElements()) {
-	  Header hdr = (Header) enum.nextElement();
+	java.util.Enumeration headerEnum = mimeMessage.getAllHeaders();
+	while (headerEnum.hasMoreElements()) {
+	  Header hdr = (Header) headerEnum.nextElement();
 	  headerList.add(hdr.getName());
 	}
 	String[] excludeList = (String[]) headerList.toArray(new String[0]);

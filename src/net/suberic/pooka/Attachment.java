@@ -299,10 +299,10 @@ public class Attachment {
   /**
    * Parses the Enumeration of Header objects into a HashMap.
    */
-  private InternetHeaders parseHeaders(Enumeration enum) {
+  private InternetHeaders parseHeaders(Enumeration pHeaders) {
     InternetHeaders retVal = new InternetHeaders();
-    while (enum.hasMoreElements()) {
-      Header hdr = (Header) enum.nextElement();
+    while (pHeaders.hasMoreElements()) {
+      Header hdr = (Header) pHeaders.nextElement();
       retVal.addHeader(hdr.getName(), hdr.getValue());
     }
     
@@ -312,10 +312,10 @@ public class Attachment {
   /**
    * Parses the Enumeration of header lines into a Vector.
    */
-  private Vector parseHeaderLines(Enumeration enum) {
+  private Vector parseHeaderLines(Enumeration pHeaderLines) {
     Vector retVal = new Vector();
-    while (enum.hasMoreElements())
-      retVal.add(enum.nextElement());
+    while (pHeaderLines.hasMoreElements())
+      retVal.add(pHeaderLines.nextElement());
     return retVal;
   }
   
