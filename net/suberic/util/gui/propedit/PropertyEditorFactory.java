@@ -31,6 +31,13 @@ public class PropertyEditorFactory {
   }
 
   /**
+   * Shows an input dialog.
+   */
+  public String showInputDialog(SwingPropertyEditor dpe, String query) {
+    return JOptionPane.showInputDialog(dpe, query);
+  }
+
+  /**
    * Creates and displays an editor window.  
    */
   public void showNewEditorWindow(String title, List properties) {

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * This will made an editor for a list of properties.  Each property, in
+ * This will make an editor for a list of properties.  Each property, in
  * turn, should have a list of properties wihch it itself edits.  Each
  * top-level property will be a tab, with its values shown on the panel.
  *
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
   JTabbedPane tabbedPane;
+  protected boolean templateScoped = false;
+  protected boolean propertyScoped = false;
   
   /**
    * This configures this editor with the following values.
@@ -50,7 +52,8 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
     enabled=isEnabled;
 
-    calculateScope();
+    templateScoped = manager.getProperty(editorTemplate + ".templateScoped", "false").equalsIgnoreCase("true");
+    propertyScoped = manager.getProperty(editorTemplate + ".propertyScoped", "false").equalsIgnoreCase("true");
 
     tabbedPane = new JTabbedPane();
     

@@ -82,7 +82,7 @@ public class PropertyEditorPane extends Box {
   /**
    * Resets the original values for the edited properties.
    */
-  public void resetDefaultValue() {
+  public void resetDefaultValue() throws PropertyValueVetoException {
     editor.resetDefaultValue();
   }
   

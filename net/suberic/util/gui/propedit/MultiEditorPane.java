@@ -32,15 +32,13 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
   JList optionList;
   JPanel entryPanel;
+  JLabel label;
   boolean changed = false;
   Vector removeValues = new Vector();
   DefaultListModel optionListModel;
-  Vector templateTypes;
+  Vector templates;
   Box optionBox;
   
-  String template;
-  
-  String originalValue;
   Hashtable originalPanels = new Hashtable();
   Hashtable currentPanels = new Hashtable();
   
@@ -60,7 +58,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     editorTemplate = template;
     originalValue = manager.getProperty(property, "");
     
-    JLabel label;
     
     if (manager.getProperty(editorTemplate + "._useTemplateForValue", "false").equalsIgnoreCase("true")) {
       originalValue = manager.getProperty(editorTemplate, "");
@@ -70,14 +67,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     // set the default label.
     
-    String defaultLabel;
-    int dotIndex = property.lastIndexOf(".");
-    if (dotIndex == -1) 
-      defaultLabel = new String(property);
-    else
-      defaultLabel = property.substring(dotIndex+1);
-    
-    label = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
+    label = createLabel();
     
     // create the current list of edited items.  so if this is a User list,
     // these values might be 'allen', 'deborah', 'marc', 'jessica', etc.
@@ -163,8 +153,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   private JPanel createEntryPanel (Vector itemList, boolean original) {
     JPanel entryPanel = new JPanel(new CardLayout());
     
-    CompositeEditorPane pep;
-    
     String rootProp;
     Vector propList;
     Vector templateList;
@@ -175,14 +163,15 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     rootProp = new String(property + ".default");
     
-    pep = new CompositeEditorPane(factory, rootProp, template, false);
+    SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate);
+    pep.setEnabled(false);
     
     if (original == true) {
       originalPanels.put("___default", pep);
     }
     
     currentPanels.put("___default", pep);
-    
+
     entryPanel.add("___default", pep);
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
     entryLayout.show(entryPanel, "___default");
@@ -219,14 +208,17 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     return buttonBox;
   }
   
+  /**
+   * Creates a Button for the ButtonBox with the appropriate label and
+   * Action.
+   */
   private JButton createButton(String label, Action e, boolean isDefault) {
     JButton thisButton;
     
-    thisButton = new JButton(factory.getBundle().getProperty("label." + label, label));
-    try {
-      thisButton.setMnemonic(factory.getBundle().getProperty("label." + label + ".mnemonic").charAt(0));
-    } catch (java.util.MissingResourceException mre) {
-    }
+    thisButton = new JButton(manager.getProperty("label." + label, label));
+    String mnemonic = manager.getProperty("label." + label + ".mnemonic", "");
+    if (!mnemonic.equals(""))
+      thisButton.setMnemonic(mnemonic.charAt(0));
     
     thisButton.setSelected(isDefault);
     
@@ -237,10 +229,11 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   
   
   /**
-   * Called when the selected value changed.  should result in the 
+   * Called when the selected value changed.  Should result in the 
    * entryPane changing.
    */
   public void valueChanged(ListSelectionEvent e) {
+    
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
     
     String selectedId = (String)((JList)e.getSource()).getSelectedValue();
@@ -250,10 +243,11 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       if (newSelected == null) {
 	String rootProp = new String(property + "." + selectedId);
 	
-	CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
+	SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate);
 
 	// save reference to new pane in hash table
 	currentPanels.put(selectedId, pep);
+	editors.add(pep);
 	
 	entryPanel.add(selectedId, pep);
 	
@@ -261,59 +255,96 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       entryLayout.show(entryPanel, selectedId);
     } else
       entryLayout.show(entryPanel, "___default");
-    
   }
   
+  /**
+   * Adds a new value to the edited List.
+   */
   public void addNewValue(String newValueName) {
     if (newValueName == null || newValueName.length() == 0)
       return;
     
-    String rootProp =new String(property.concat("." + newValueName));
+    try {
+      // get what will be the new value.
+      String newValueString = getStringFromList(optionListModel);
+      newValueString = newValueString + "." + newValueName;
+      firePropertyChangingEvent(newValueString);
+
+      String rootProp = new String(property + "." + newValueName);
+      
+      SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate);
+      
+      optionListModel.addElement(newValueName);
+      
+      entryPanel.add(newValueName, pep);
+      
+      getOptionList().setSelectedValue(newValueName, true);
     
-    CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
-    optionListModel.addElement(newValueName);
-    
-    entryPanel.add(newValueName, pep);
-    
-    getOptionList().setSelectedValue(newValueName, true);
-    
-    this.setChanged(true);
+      this.setChanged(true);
+
+      firePropertyChangedEvent(getStringFromList(optionListModel));
+
+    } catch (PropertyValueVetoException pvve) {
+      manager.getFactory().showError(this, "Error adding value " + newValueName + " to " + label.getText() + ":  " + pvve.getReason());
+    }
   }
   
+  /**
+   * Removes the currently selected value from the edited List.
+   */
   public void removeSelectedValue() {
+    
     String selValue = (String)getOptionList().getSelectedValue();
     if (selValue == null)
       return;
     
-    String rootProp = new String(property.concat("." + selValue));
-    PropertyEditorUI removedUI = (PropertyEditorUI) currentPanels.get(selValue);
-    if (removedUI != null) {
-      java.util.Properties removedProperties = removedUI.getValue();
-      java.util.Enumeration keys = removedProperties.keys();
-      while (keys.hasMoreElements()) {
-	String currentKey = (String) keys.nextElement();
-	removeValues.add(currentKey);
+    try {
+      DefaultListModel tmpListModel = new DefaultListModel();
+      for (int i = 0; i < optionListModel.size(); i++) {
+	tmpListModel.addElement(optionListModel.get(i));
       }
-      currentPanels.remove(selValue);
+
+      tmpListModel.removeElement(selValue);
+      firePropertyChangingEvent(getStringFromList(tmpListModel));
+
+      String rootProp = new String(property.concat("." + selValue));
+      PropertyEditorUI removedUI = (PropertyEditorUI) currentPanels.get(selValue);
+      if (removedUI != null) {
+	editors.remove(removedUI);
+	java.util.Properties removedProperties = removedUI.getValue();
+	java.util.Enumeration keys = removedProperties.keys();
+	while (keys.hasMoreElements()) {
+	  String currentKey = (String) keys.nextElement();
+	  removeValues.add(currentKey);
+	}
+
+	currentPanels.remove(selValue);
+      }
+      
+      optionListModel.removeElement(selValue);
+      
+      this.setChanged(true);
+    } catch (PropertyValueVetoException pvve) {
+      manager.getFactory().showError(this, "Error removing value " + selValue + " from " + label.getText() + ":  " + pvve.getReason());
     }
     
-    ListModel lm = getOptionList().getModel();
-    
-    if (lm instanceof DefaultListModel)
-      ((DefaultListModel)lm).removeElement(selValue);
-    
-    this.setChanged(true);
   }
   
+  /**
+   * Edits the currently selected value.
+   */
   public void editSelectedValue() {
   }
   
+  /**
+   * Puts up a dialog to get a name for the new value.
+   */
   public String getNewValueName() {
     boolean goodValue = false;
     boolean matchFound = false;
     
     String newName = null;
-    newName = factory.showInputDialog(this, manager.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
+    newName = manager.getFactory().showInputDialog(this, manager.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
     
     while (goodValue == false) {
       matchFound = false;
@@ -327,7 +358,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 	if (matchFound == false)
 	  goodValue = true;
 	else
-	  newName = factory.showInputDialog(this, manager.getProperty("MultiEditorPane.error.duplicateName", "Name already exists:") + "  " + newName + "\n" + manager.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
+	  newName = manager.getFactory().showInputDialog(this, manager.getProperty("MultiEditorPane.error.duplicateName", "Name already exists:") + "  " + newName + "\n" + manager.getProperty("MultiEditorPane.renameProperty", "Enter new name."));
       } else {
 	goodValue = true;
       }
@@ -340,31 +371,33 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * This renames the selected property.
    */
   public void renameProperty(String oldName, String newName) {
+    /*
     newName = getNewValueName();
     if (newName != null) {
       CompositeEditorPane oldPane = (CompositeEditorPane)currentPanels.get(oldName);
       if (oldPane != null) {
 	String rootProp =new String(property.concat("." + newName));
 	
-	CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
+	CompositeEditorPane pep = new CompositeEditorPane(manager, rootProp, editorTemplate);;
 	java.util.Properties oldProps = oldPane.getValue();
       }
     }
+    */
   }
   
   /**
    * This produces a string for the given JList.
    */
-  public String getStringFromList(JList list) {
+  public String getStringFromList(DefaultListModel dlm) {
     
     String retVal;
-    if (optionListModel.getSize() < 1)
+    if (dlm.getSize() < 1)
       return "";
     else 
-      retVal = new String((String)optionListModel.getElementAt(0));
+      retVal = new String((String)dlm.getElementAt(0));
     
-    for (int i = 1; i < optionListModel.getSize(); i++) {
-      retVal = retVal.concat(":" + (String)optionListModel.getElementAt(i));
+    for (int i = 1; i < dlm.getSize(); i++) {
+      retVal = retVal.concat(":" + (String)dlm.getElementAt(i));
     }
     
     return retVal;
@@ -373,30 +406,34 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   /**
    * Sets the value for this MultiEditorPane.
    */
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
     if (isEnabled()) {
+      
       for (int i = 0; i < removeValues.size() ; i++) 
 	manager.removeProperty((String)removeValues.elementAt(i));
       
       removeValues = new Vector();
       
-      java.awt.Component[] components = entryPanel.getComponents();
-      for (int i = 0; i < components.length; i++) {
-	((CompositeEditorPane)components[i]).setValue();
-      }
+      super.setValue();
       
       if (isChanged()) {
-	//System.out.println("setting property.  property is " + property + "; getStringFromList is " + getStringFromList(getOptionList()));
-	manager.setProperty(property, getStringFromList(getOptionList()));
+	if (debug) {
+	  System.out.println("setting property.  property is " + property + "; getStringFromList is " + getStringFromList(optionListModel));
+	}
+	manager.setProperty(property, getStringFromList(optionListModel));
       }
     }
   }
   
-  public void resetDefaultValue() {
+  /**
+   * Resets the default values.
+   */
+  public void resetDefaultValue() throws PropertyValueVetoException {
     
     removeValues = new Vector();
     
     if (isChanged()) {
+      firePropertyChangingEvent(originalValue);
       optionListModel.removeAllElements();
       entryPanel.removeAll();
       
@@ -406,6 +443,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 	String key = (String)en.nextElement();
 	entryPanel.add(key, (JPanel)originalPanels.get(key));
       }
+      firePropertyChangedEvent(originalValue);
     }
     
     java.awt.Component[] components = entryPanel.getComponents();
@@ -414,29 +452,41 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     }
   }
   
+  /**
+   * Returns the currently edited values as a Properties object.
+   */
   public java.util.Properties getValue() {
-    java.util.Properties currentRetValue = new java.util.Properties();
-    java.util.Collection panels = currentPanels.values();
-    java.util.Iterator iter = panels.iterator();
-    while (iter.hasNext()) {
-      currentRetValue.putAll(((DefaultPropertyEditor)iter.next()).getValue());
-    }
-    
+    java.util.Properties currentRetValue = super.getValue();
+    currentRetValue.setProperty(property, getStringFromList(optionListModel));
     return currentRetValue;
   }
   
+  /**
+   * Returns whether or not the top-level edited values of this EditorPane
+   * have changed.
+   */
   public boolean isChanged() {
     return changed;
   }
   
+  /**
+   * Sets whether or not the top-level edited values of this EditorPane
+   * have changed.
+   */
   public void setChanged(boolean newChanged) {
     changed=newChanged;
   }
   
+  /**
+   * Returns the optionList.
+   */
   public JList getOptionList() {
     return optionList;
   }
   
+  /**
+   * Returns the entryPanel.
+   */
   public JPanel getEntryPanel() {
     return entryPanel;
   }

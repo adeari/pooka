@@ -64,7 +64,7 @@ public interface PropertyEditorUI {
    * This resets the editor to the original (or latest set, if setValue() 
    * has been called) value of the edited property.
    */
-  public void resetDefaultValue();
+  public void resetDefaultValue() throws PropertyValueVetoException;
   
   /**
    * Returns the current values of the edited properties as a 

@@ -75,6 +75,13 @@ public class PropertyEditorManager {
   }
 
   /**
+   * Removes the given property.
+   */
+  public void removeProperty(String property) {
+    sourceBundle.removeProperty(property);
+  }
+
+  /**
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using this PropertyEditorManager.
    */
