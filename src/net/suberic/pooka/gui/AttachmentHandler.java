@@ -141,9 +141,9 @@ public class AttachmentHandler {
 	      
 	      ProgressDialog dlg;
 	      if (getMessageUI() != null) {
-		dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+		dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Fetching attachment...","Fetching attachment");
 	      } else {
-		dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+		dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Fetching attachment","Fetching attachment");
 	      }
 	      
 	      final ExternalLauncher fLauncher = el;
@@ -166,28 +166,44 @@ public class AttachmentHandler {
 	  }
 	} else if (isWindows()) {
 	  try {
-	    JNIDDE dde=new JNIDDE();
+	    String mimeType = pAttachment.getMimeType().toString();
+	    if (mimeType.indexOf(';') != -1)
+	      mimeType = mimeType.substring(0, mimeType.indexOf(';'));
+
+	    String cmd = "rundll32 url.dll,FileProtocolHandler %s";
+
+	    ExternalLauncher el = new ExternalLauncher();
 	    
-	    String extension = ".tmp";
-	    String filename = dh.getName();
-	    int dotLoc = filename.lastIndexOf('.');
-	    if (dotLoc > 0) {
-	      extension = filename.substring(dotLoc);
+	    el.setCommandContext(cmd, dh);
+	    
+	    // create a progress dialog for the external launcher
+	    int attachmentSize = pAttachment.getSize();
+	    if (pAttachment.getEncoding() != null && pAttachment.getEncoding().equalsIgnoreCase("base64"))
+	      attachmentSize = (int) (attachmentSize * .73);
+	    
+	    ProgressDialog dlg;
+	    if (getMessageUI() != null) {
+	      dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Fetching attachment","Fetching attachment");
+	    } else {
+	      dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Fetching attachment","Fetching attachment");
 	    }
-	    File tmpFile = File.createTempFile("pooka_", extension);
 	    
-	    FileOutputStream fos = new FileOutputStream(tmpFile);
-	    dh.writeTo(fos);
-	    fos.close();
+	    final ExternalLauncher fLauncher = el;
+	    dlg.addCancelListener(new ProgressDialogListener() {
+		public void dialogCancelled() {
+		  fLauncher.cancelSave();
+		}
+	      });
 	    
-	    tmpFile.deleteOnExit();
+	    el.setProgressDialog(dlg);
 	    
-	    JNIDDE.shellExecute("open", tmpFile.getAbsolutePath(), null, tmpFile.getAbsoluteFile().getParent(), JNIDDE.SW_SHOWNORMAL);
-	  } catch (Throwable e) {
-	    System.err.println("got exception " + e);
-	    e.printStackTrace();
-	    openWith(pAttachment);
+	    if (Pooka.isDebug())
+	      System.out.println("opening external launcher with ");
+	    el.show();
+	  } catch (Exception elException) {
+	    getMessageUI().showError("Error opening attachment", elException);
 	  }
+	  
 	} else {
 	  openWith(pAttachment);
 	}
@@ -356,9 +372,9 @@ public class AttachmentHandler {
 			
 			ProgressDialog dlg;
 			if (getMessageUI() != null) {
-			  dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+			  dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, "Fetching attachment","Fetching attachment");
 			} else {
-			  dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Saving temporary file","Saving temporary file");
+			  dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, "Fetching attachment","Fetching attachment");
 			}
 			
 			final ExternalLauncher fLauncher = el;
