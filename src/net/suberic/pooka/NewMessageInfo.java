@@ -70,16 +70,21 @@ public class NewMessageInfo extends MessageInfo {
       final String sMessageContentType = messageContentType;
       final NewMessageCryptoInfo sCryptoInfo = cryptoInfo;
 
-      if (profile != null && profile.getMailServer() != null) {
-	OutgoingMailServer mailServer = profile.getMailServer();
+      OutgoingMailServer mailServer = null;
+      if (profile != null)
+	mailServer = profile.getMailServer();
+
+      if (mailServer != null) {
+
+	final OutgoingMailServer sMailServer = mailServer;
 	mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent ae) {
-	      internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo);
+	      internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo, sMailServer);
 	    }
 	  }, new java.awt.event.ActionEvent(this, 0, "message-send"));
       } else {
 	// oh well.
-	internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo);
+	internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo, null);
       } 
       
     } catch (MessagingException me) {
@@ -99,7 +104,7 @@ public class NewMessageInfo extends MessageInfo {
    * Does the part of message sending that should really not happen on 
    * the AWTEventThread.
    */
-  private void internal_sendMessage(UserProfile profile, MimeMessage mMsg, String messageText, String messageContentType, NewMessageCryptoInfo cryptoInfo) {
+  private void internal_sendMessage(UserProfile profile, MimeMessage mMsg, String messageText, String messageContentType, NewMessageCryptoInfo cryptoInfo, OutgoingMailServer mailServer) {
     net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
 
     try {
@@ -158,14 +163,11 @@ public class NewMessageInfo extends MessageInfo {
       }
       
       boolean sent = false;
-      if (profile != null) {
-	OutgoingMailServer mailServer = profile.getMailServer();
-	if (mailServer != null) {
-	  factory.showStatusMessage(Pooka.getProperty("info.sendMessage.sendingMessage", "Sending message to mailserver..."));
-	  mailServer.sendMessage(this);
-	  sent = true;
-	}
-      } 
+      if (mailServer != null) {
+	factory.showStatusMessage(Pooka.getProperty("info.sendMessage.sendingMessage", "Sending message to mailserver..."));
+	mailServer.sendMessage(this);
+	sent = true;
+      }
       
       if (! sent) {
 	if (profile != null) {
@@ -175,8 +177,6 @@ public class NewMessageInfo extends MessageInfo {
 	  Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
 	  sent = true;
 	}
-      } else {
-	saveToSentFolder(profile);
       }
       
       if (! sent) {

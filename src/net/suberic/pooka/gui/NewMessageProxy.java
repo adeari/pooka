@@ -104,6 +104,8 @@ public class NewMessageProxy extends MessageProxy {
    * Called when the send succeeds.
    */
   public void sendSucceeded() {
+    getNewMessageInfo().saveToSentFolder(getNewMessageUI().getSelectedProfile());
+    
     Pooka.getUIFactory().clearStatus();
     final NewMessageUI nmui = getNewMessageUI();
     if (nmui != null) {

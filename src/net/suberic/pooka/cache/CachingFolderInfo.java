@@ -1024,10 +1024,12 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
 	
 	MessageInfo mi = getMessageInfoByUid(uid);
-	MessageProxy mp = mi.getMessageProxy();
-	if (mp != null) {
-	  mp.unloadTableInfo();
-	  mp.loadTableInfo();
+	if (mi != null) {
+	  MessageProxy mp = mi.getMessageProxy();
+	  if (mp != null) {
+	    mp.unloadTableInfo();
+	    mp.loadTableInfo();
+	  }
 	}
 	
       }
