@@ -1,5 +1,7 @@
-040525 release
+040615 release
 --------------
+disconnection events now test the entire store to see if the connection
+has gone down.
 
 left and right arrows on read message pane now just scrolls left and right.
 

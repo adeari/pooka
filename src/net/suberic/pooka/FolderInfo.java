@@ -369,7 +369,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  System.out.println("Folder " + getFolderID() + " closed:  " + e);
 	}
 	
-	
+	// check to see if the parent store is still open.
+	StoreInfo parentStoreInfo = getParentStore();
+	if (parentStoreInfo != null) {
+	  Store realParentStore = parentStoreInfo.getStore();
+	  
+	  if (realParentStore != null) {
+	    realParentStore.isConnected();
+	  }
+	}
+      
 	if (getFolderDisplayUI() != null) {
 	  if (status != CLOSED)
 	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));

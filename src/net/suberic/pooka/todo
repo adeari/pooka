@@ -1,5 +1,3 @@
-*) new message count in icon
-
 *) add drag and drop
 	*) include message
 	*) move message
@@ -12,9 +10,11 @@
 	    -- better error messages
 	    -- come up with configuration/usage plan.
 	  
+*) add support for saved searches.
+
 *) fix error display with exception so that you can see the stack trace.
 
-*) add support for saved searches.
+*) make status icon for store itself.
 
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
@@ -25,11 +25,15 @@
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
 
+*) test w/gnu javamail
+
 -----------
 
 *) fix NPE if try to send a new message without configuring client.
 
 *) add mark as unread 
+
+*) new message count in icon
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5
@@ -75,6 +79,8 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	correctly?  one instance is how we're handling multipart/alternative
 	entries that don't actually have multiple parts.
 	see pooka_problems blob
+
+*) add color support for replies (i.e. > in one color, >> in another, etc.)
 
 -----
 
@@ -131,7 +137,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 *) printing
 	*) better layout of printer frame.  center things?
 
-
 *) make it so folder windows save their settings (column width, sort order)
 
 *) more doc
@@ -187,7 +192,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) regexp? (add search/replace to editor)
   -- started.  todo:
-		--  ??? jdk bug ???
 	*) add feature to NewMessage
 	*) add replace feature
 		-- check the caret location, too.
@@ -211,8 +215,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) disconnected from store (like if the server goes down) doesn't result in 
 icons changing?  test.
-
-*) check disconnection/reconnection on network removal/restoral.
 
 *) disconnected:  
 	*)  make an option for caching everything.
@@ -461,8 +463,6 @@ window at -5, -5.
 *) add 'edit message as new' for normal messages.
 
 *) add support for flowed text
-
-*) add color support for replies (i.e. > in one color, >> in another, etc.)
 
 *) add ability to edit received messages, so you can do things like remove
 attachments that you don't want to keep (?) -- and change the subject.
