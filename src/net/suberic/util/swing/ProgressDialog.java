@@ -19,7 +19,7 @@ public interface ProgressDialog {
   /**
    * Sets the maximum value for the progress dialog.
    */
-  public void setMaximumValue(int minimum);
+  public void setMaximumValue(int maximum);
 
   /**
    * Gets the maximum value for the progress dialog.
@@ -29,7 +29,7 @@ public interface ProgressDialog {
   /**
    * Sets the current value for the progress dialog.
    */
-  public void setValue(int minimum);
+  public void setValue(int value);
 
   /**
    * Gets the current value for the progress dialog.
