@@ -15,6 +15,9 @@ public class Pooka {
   // the resources for Pooka
   static public net.suberic.util.VariableBundle resources;
   
+  // the log manager.
+  static public PookaLogManager mLogManager;
+
   // the startup/configuration file
   static public String localrc = null;
   
@@ -72,6 +75,8 @@ public class Pooka {
     updateTime("args parsed.");
 
     loadResources();
+
+    mLogManager = new PookaLogManager();
 
     updateTime("resources loaded.");
 

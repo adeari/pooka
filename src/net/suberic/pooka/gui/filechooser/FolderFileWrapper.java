@@ -222,10 +222,7 @@ public class FolderFileWrapper extends File {
    * This returns the parent Folder as a FolderFileWrapper.
    */
   public File getParentFile() {
-    if (parent != null)
-      return parent;
-    else
-      return this;
+    return parent;
   }
   
   /**

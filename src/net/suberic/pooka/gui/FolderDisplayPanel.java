@@ -67,6 +67,8 @@ public class FolderDisplayPanel extends JPanel {
     // the messageTable
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
+	  java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("folder display panel:  gained focus.");
+
 	  if (messageTable != null) {
 	    messageTable.requestFocus();
 	  }
@@ -368,8 +370,7 @@ public class FolderDisplayPanel extends JPanel {
 	  int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
 	  int column = messageTable.convertColumnIndexToModel(viewColumn); 
 	  if (e.getClickCount() == 1 && column != -1) {
-	    if (Pooka.isDebug())
-	      System.out.println("Sorting ..."); 
+	    java.util.logging.Logger.getLogger("Pooka.debug").fine("Sorting ..."); 
 	    
 	    int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
 	    boolean ascending = (shiftPressed == 0); 

@@ -5,13 +5,28 @@
 	    -- come up with configuration/usage plan.
 *) add support for running off of removable media (run from directory; cache/
 	config files relative to config file)
-
+	*) startup
+	   - needs to ask where to get configuration file.  either can be 
+	     http: or local file
+	   - configuration file needs to support relative directories to
+	     configuration file--so if conf file is in z:\pooka\pookarc,
+	     then .\.pooka should map to z:\pooka\.pooka.
+	*) usage
+	   - need some plan for http access such that we can write a
+	     proper usage file.  something like 'export for http use'?
+	
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
 
 *) add status messages on shutdown.
 
 *) fix error display with exception so that you can see the stack trace.
+
+*) bug:  can't switch back to original theme in theme configuration (starts
+	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
+
+*) support jdk 1.5
+   *) add support for ocean theme 
 
 -----
 

@@ -37,8 +37,7 @@ public class PookaFileSystemView
    */
   public PookaFileSystemView(StoreInfo newStore) {
     storeList = new StoreInfo[] { newStore };
-    if (Pooka.isDebug())
-      System.out.println("creating new PookaFileSystemView for store " + newStore.getStoreID());
+    getLogger().info("creating new PookaFileSystemView for store " + newStore.getStoreID());
     
     getRoots();
   }
@@ -52,12 +51,10 @@ public class PookaFileSystemView
    * @filename a string representing a FolderInfo name.
    */
   public File createFileObject(File dir, String filename) {
-    if (Pooka.isDebug()) {
-      if (dir != null)
-	System.out.println("calling createFileObject on directory " + dir.getName() + " (" + dir.getPath() + "), filename " + filename);
-      else
-	System.out.println("calling createFileObject on directory null, filename " + filename);
-    }
+    if (dir != null)
+      getLogger().info("calling createFileObject on directory " + dir.getName() + " (" + dir.getPath() + "), filename " + filename);
+    else
+      getLogger().info("calling createFileObject on directory null, filename " + filename);
     
     if (dir != null && dir instanceof FolderInfoFileWrapper)
       return ((FolderInfoFileWrapper)dir).getFileByName(filename);
@@ -74,17 +71,14 @@ public class PookaFileSystemView
     // want to call getFileByName with a relative path (in this case
     // to the root directory) always.
     
-    if (Pooka.isDebug())
-      System.out.println("running createFileObject2 on filename '" + filename + "'");
+    getLogger().info("running createFileObject2 on filename '" + filename + "'");
     
     if (roots == null || roots.length == 0) {
-      if (Pooka.isDebug())
-	System.out.println("root == null");
+      getLogger().info("root == null");
       return null;
     }
     
-    if (Pooka.isDebug())
-      System.out.println("root != null");
+    getLogger().info("root != null");
     
     if (filename.equals("/") || filename.equals("")) {
       return roots[0];
@@ -95,34 +89,28 @@ public class PookaFileSystemView
     String filePart = "";
     if (firstSlash > -1) {
       storeName = filename.substring(0, firstSlash);
-      if (Pooka.isDebug())
-	System.out.println("store name is " + storeName);
+      getLogger().info("store name is " + storeName);
       if (firstSlash < filename.length()) {
 	filePart = filename.substring(firstSlash + 1);
-	if (Pooka.isDebug())
-	  System.out.println("file name is " + filePart);
+	getLogger().info("file name is " + filePart);
       }
     } else {
-      if (Pooka.isDebug())
-	System.out.println("store name is " + filename);
+      getLogger().info("store name is " + filename);
       
       storeName = filename;
     }
     
-    if (Pooka.isDebug())
-      System.out.println("store name is " + filename + ", file name is " + filePart);
+    getLogger().info("store name is " + filename + ", file name is " + filePart);
 
     FolderInfoFileWrapper currentRoot = findRoot(storeName);
     if (currentRoot == null) {
-      if (Pooka.isDebug())
-	System.out.println("found no matching store root for " + storeName + ".");
+      getLogger().info("found no matching store root for " + storeName + ".");
       return new File(filename);
     }
     
     File returnValue = currentRoot.getFileByName(filePart);
 
-    if (Pooka.isDebug())
-      System.out.println("returning " + returnValue + " for " + currentRoot + ".getFileByName(\"" + filePart + "\")");
+    getLogger().info("returning " + returnValue + " for " + currentRoot + ".getFileByName(\"" + filePart + "\")");
     
     return returnValue;
     
@@ -161,8 +149,7 @@ public class PookaFileSystemView
    * Gets the default starting directory for the file chooser.
    */
   public File getDefaultDirectory() {
-    if (Pooka.isDebug()) 
-      System.out.println("calling getDefaultDirectory()");
+    getLogger().info("calling getDefaultDirectory()");
 
     return getDefaultRoot();
   }
@@ -171,37 +158,30 @@ public class PookaFileSystemView
    * Returns all of the files under a particular directory.
    */
   public File[] getFiles(File dir, boolean useFileHiding) {
-    if (Pooka.isDebug())
-      System.out.println("running getFiles " + dir + ", " + useFileHiding + ".");
+    getLogger().info("running getFiles " + dir + ", " + useFileHiding + ".");
     
     if (dir instanceof FolderInfoFileWrapper) {
-      if (Pooka.isDebug())
-	System.out.println("getFiles:  returning dir.listFiles()");
+      getLogger().info("getFiles:  returning dir.listFiles()");
       return ((FolderInfoFileWrapper)dir).listFiles();
     } else {
-      if (Pooka.isDebug())
-	System.out.println("getFiles:  dir isn't a FFW.");
+      getLogger().info("getFiles:  dir isn't a FFW.");
       if (dir == null) {
-	if (Pooka.isDebug())
-	  System.out.println("getFiles:  dir is null; returning null.");
+	getLogger().info("getFiles:  dir is null; returning null.");
 	return null; // FIXME: or set dir to root?
       }
       
       // FIXME: ugly?
       
-      if (Pooka.isDebug())
-	System.out.println("getFiles:  just returning the root.");
+      getLogger().info("getFiles:  just returning the root.");
       
       File f = ((FolderInfoFileWrapper)getDefaultRoot()).getFileByName(dir.getAbsolutePath());
       
       if (f == null) {
-	if (Pooka.isDebug())
-	  System.out.println("getFiles:  tried returning the root, but got null.  returning the root itself instead.");
+	getLogger().info("getFiles:  tried returning the root, but got null.  returning the root itself instead.");
 	return new FolderInfoFileWrapper[0];
       }
       
-      if (Pooka.isDebug())
-	System.out.println("getFiles:  returning " + f + ".listFiles() for getFiles()");
+      getLogger().info("getFiles:  returning " + f + ".listFiles() for getFiles()");
       return f.listFiles();
     }
   }
@@ -211,8 +191,7 @@ public class PookaFileSystemView
    * on a mail system...
    */
   public File getHomeDirectory() {
-    if (Pooka.isDebug())
-      System.out.println("running getHomeDirectory().");
+    getLogger().info("running getHomeDirectory().");
     
     return getDefaultRoot();
   }
@@ -221,8 +200,7 @@ public class PookaFileSystemView
    * Returns the parent directory of the current File.
    */
   public File getParentDirectory(File dir) {
-    if (Pooka.isDebug())
-      System.out.println("running getParentDirectory on " + dir);
+    getLogger().info("running getParentDirectory on " + dir);
     
     if (dir == null)
       return null; // at root
@@ -245,17 +223,15 @@ public class PookaFileSystemView
    * Gets all the roots for this PookaFileSystemView.
    */
     public File[] getRoots() {
-      if (Pooka.isDebug())
-	System.out.println("calling getRoots() on PookaFileSystemView.");
+      getLogger().info("calling getRoots() on PookaFileSystemView.");
 
       if (roots != null) {
-	if (Pooka.isDebug())
-	  System.out.println("root has already been set.");
+	getLogger().info
+	  ("root has already been set.");
 	return roots;
       }
 
-      if (Pooka.isDebug())
-	System.out.println("setting folder f to store.getDefaultFolder().");
+      getLogger().info("setting folder f to store.getDefaultFolder().");
       roots = new FolderInfoFileWrapper[storeList.length];
       for (int i = 0; i < storeList.length; i++) {
 	roots[i] = new FolderInfoFileWrapper(storeList[i], null, storeList[i].getStoreID());
@@ -285,9 +261,7 @@ public class PookaFileSystemView
    * Returns true if the directory is traversable.
    */
   public Boolean isTraversable(File f) {
-    if (Pooka.isDebug()) {
-      System.out.println("pfsv:  checking isTraversable on file " + f);
-    }
+    getLogger().info("pfsv:  checking isTraversable on file " + f);
     
     if (f != null && f instanceof FolderInfoFileWrapper) {
       return new Boolean(true);
@@ -410,8 +384,7 @@ public class PookaFileSystemView
   /* Not inherited. */
   
   public File getDefaultRoot() {
-    if (Pooka.isDebug())
-      System.out.println("running getDefaultRoot().");
+    getLogger().info("running getDefaultRoot().");
 
     if (roots == null) {
       File[] localRoots = getRoots();
@@ -421,8 +394,7 @@ public class PookaFileSystemView
 	return null;
     }
     
-    if (Pooka.isDebug())
-      System.out.println("returning " + roots[0] + " as default root.");
+    getLogger().info("returning " + roots[0] + " as default root.");
 
     return roots[0];
   }
@@ -436,5 +408,12 @@ public class PookaFileSystemView
 	return roots[i];
     }
     return null;
+  }
+
+  /**
+   * Returns the Logger object for this class.
+   */
+  public java.util.logging.Logger getLogger() {
+    return java.util.logging.Logger.getLogger("Pooka.debug.gui.filechooser");
   }
 }

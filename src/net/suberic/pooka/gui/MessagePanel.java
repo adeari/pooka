@@ -91,8 +91,10 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
 	  JInternalFrame selectedFrame = getCurrentWindow();
-	  if (selectedFrame != null)
+	  if (selectedFrame != null) {
+	    java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("sending focus from MessagePanel to " + selectedFrame);
 	    selectedFrame.requestFocus();
+	  }
 	}
       });
     

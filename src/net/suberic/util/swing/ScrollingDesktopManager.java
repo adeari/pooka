@@ -78,12 +78,15 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
   public void closeFrame(JInternalFrame f) {
     super.closeFrame(f);
     updateDesktopSize();
-    // workaround for bug in jdk1.4
-    if (pane != null) {
-      JInternalFrame jif = pane.getSelectedFrame();
-      if (jif != null)
-	jif.requestFocus();
-    }
+
+    // workaround for bug in jdk 1.5 (sigh)
+    SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  
+	  java.awt.KeyboardFocusManager mgr = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
+	  pane.requestFocus();
+	}
+      });
   }
     
     /**

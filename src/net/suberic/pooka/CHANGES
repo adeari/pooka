@@ -1,3 +1,9 @@
+added some support for jdk 1.4 logging framework.
+
+fixed OutOfMemoryError when trying to subscribe to folders.
+
+fixed focus with jdk1.5 and closing internal frames bug.
+
 040914 release
 --------------
 
