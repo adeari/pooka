@@ -43,6 +43,8 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
    */
   public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String templateType, VariableBundle bundle, boolean isEnabled) {
 
+    debug = bundle.getProperty("editors.debug", "false").equalsIgnoreCase("true");
+
     //System.err.println("configuring editor with property " + propertyName + ", templateType " + templateType);
     property=propertyName;
     template=templateType;
@@ -94,9 +96,12 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
     //tabbedPane.layoutComponent
     //tabbedPane.setMinimumSize(new Dimension(200,200));
     //tabbedPane.setPreferredSize(new Dimension(200,200));
-    //System.out.println("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
-    //System.out.println("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
-    //System.out.println("size for tabbedPane = " + tabbedPane.getSize());
+
+    if (debug) {
+      System.out.println("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
+      System.out.println("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
+      System.out.println("size for tabbedPane = " + tabbedPane.getSize());
+    }
     this.add(tabbedPane);
   }
   
