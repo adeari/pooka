@@ -96,6 +96,21 @@ public abstract class EncryptionUtils {
   public abstract boolean checkSignature(MimeMultipart m, EncryptionKey key)
     throws EncryptionException, MessagingException, IOException;
 
+  /**
+   * Creates an empty EncryptionKeyManager that's appropriate for this
+   * Encryption provider.
+   */
+  public abstract EncryptionKeyManager createKeyManager();
+
+  /**
+   * Creates and loads an EncryptionKeyManager that's appropriate for this
+   * Encryption provider.
+   */
+  public abstract EncryptionKeyManager createKeyManager(String filename, char[] passwd);
+
+  /**
+   * Returns whether or not this email is encrypted.
+   */
   public static boolean isEncrypted(Part pPart) throws MessagingException {
     String contentType = pPart.getContentType().toLowerCase();
     
@@ -106,4 +121,5 @@ public abstract class EncryptionUtils {
     }
     return false;
   }
+
 }

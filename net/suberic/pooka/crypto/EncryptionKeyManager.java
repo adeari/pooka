@@ -83,9 +83,8 @@ public interface EncryptionKeyManager {
    * @exception UnrecoverableKeyException if the key cannot be recovered
    * (e.g., the given password is wrong).
    */
-  public Key getKey(String alias, char[] password)
-    throws KeyStoreException, NoSuchAlgorithmException,
-	   UnrecoverableKeyException;
+  public EncryptionKey getKey(String alias, char[] password)
+    throws EncryptionException;
   
   
   /**

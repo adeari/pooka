@@ -105,7 +105,7 @@ public class Pooka {
 
     StoreManager.setupSSL();
 
-    cryptoManager = new EncryptionManager();
+    cryptoManager = new EncryptionManager(resources, "EncryptionManager");
 
     try {
       UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));

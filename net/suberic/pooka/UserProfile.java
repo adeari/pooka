@@ -478,8 +478,12 @@ public class UserProfile extends Object implements ValueChangeListener {
    */
   public net.suberic.pooka.crypto.EncryptionKey getEncryptionKey() {
     if (encryptionKeyId != null && encryptionKeyId.length() > 0) {
-      net.suberic.pooka.crypto.EncryptionKey returnValue = Pooka.getCryptoManager().getEncryptionKey(encryptionKeyId);
-      return returnValue;
+      try {
+	net.suberic.pooka.crypto.EncryptionKey returnValue = Pooka.getCryptoManager().getEncryptionKey(encryptionKeyId);
+	return returnValue;
+      } catch (net.suberic.pooka.crypto.EncryptionException ee) {
+	ee.printStackTrace();
+      }
     }
 
     return null;

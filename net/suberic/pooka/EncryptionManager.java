@@ -1,11 +1,17 @@
 package net.suberic.pooka;
 
+import java.util.Map;
+
+import javax.mail.internet.*;
+import javax.mail.*;
+
 import net.suberic.pooka.crypto.*;
-import javax.mail.internet.MimeMessage;
-import javax.mail.MessagingException;
+import net.suberic.util.VariableBundle;
+
 
 /**
- * The EncryptionManager manages Pooka's encryption facilities.
+ * The EncryptionManager manages Pooka's encryption facilities.  It's 
+ * basically one-stop shopping for all of your email encryption needs.
  */
 public class EncryptionManager {
 
@@ -14,6 +20,51 @@ public class EncryptionManager {
   EncryptionUtils pgpUtils = null;
   
   EncryptionUtils smimeUtils = null;
+
+  EncryptionKeyManager keyMgr = null;
+
+  String keyMgrFilename = null;
+
+  char[] keyMgrPasswd = null;
+
+  Map addressToPrivateKeyMap = null;
+  
+  Map addressToPublicKeyMap = null;
+
+  /**
+   * Creates an EncryptionManager using the given VariableBundle and
+   * key property.
+   */
+  public EncryptionManager(VariableBundle sourceBundle, String key) {
+    String utilsClassName = sourceBundle.getProperty(key + ".provider", "");
+    if (utilsClassName != null) {
+      try {
+	Class utilsClass = Class.forName(utilsClassName);
+	PGPProviderImpl providerImpl = (PGPProviderImpl) utilsClass.newInstance();
+	PGPMimeEncryptionUtils cryptoUtils  = new PGPMimeEncryptionUtils();
+	cryptoUtils.setPGPProviderImpl(providerImpl);
+	defaultUtils = cryptoUtils;
+      } catch (Exception e) {
+	e.printStackTrace();
+      }
+    }
+
+    if (defaultUtils != null) {
+      keyMgrFilename = sourceBundle.getProperty(key + ".keyStore.filename", "");
+      String pwString = sourceBundle.getProperty(key + ".keyStore.password", "");
+      char[] pwArray = new char[pwString.length()];
+      for (int i = 0; i < pwString.length(); i++) {
+	pwArray[i] = pwString.charAt(i);
+      }
+      keyMgrPasswd = pwArray;
+
+      try {
+	keyMgr = defaultUtils.createKeyManager(keyMgrFilename, keyMgrPasswd);
+      } catch (Exception e) {
+	e.printStackTrace();
+      }
+    }
+  }
 
   /**
    * Returns the default EncryptionUtilities.
@@ -36,18 +87,72 @@ public class EncryptionManager {
   }
 
   /**
+   * Returns the EncryptionKeyManager that this EncryptionManager is using.
+   */
+  public EncryptionKeyManager getKeyManager() {
+    return keyMgr;
+  }
+
+  /**
+   * Returns the private key(s) for the given email address.
+   */
+  public EncryptionKey[] getPrivateKeys(String address) {
+    EncryptionKeyManager mgr = getKeyManager();
+    if (mgr != null) {
+      
+    }
+
+    return null;
+  }
+
+  /**
+   * Returns the public key(s) for the given email address.
+   */
+  public EncryptionKey[] getPublicKeys(String address) {
+    EncryptionKeyManager mgr = getKeyManager();
+    if (mgr != null) {
+      
+    }
+
+    return null;
+  }
+
+  /**
    * Returns the given EncryptionKey, or null if no such key exists.
    */
-  public EncryptionKey getEncryptionKey(String keyId) {
-    return null;
+  public EncryptionKey getEncryptionKey(String alias) 
+    throws EncryptionException {
+    EncryptionKeyManager mgr = getKeyManager();
+    if (mgr != null) {
+      return mgr.getKey(alias, keyMgrPasswd);
+    } else {
+      return null;
+    }
   }
 
   /**
    * Encrypts to given message.  Actually checks all of the recipients
    * configured to see if we have a key for each one.
    */
-  public MimeMessage encryptMessage(MimeMessage mMsg) {
-    return null;
+  public MimeMessage encryptMessage(MimeMessage mMsg) 
+    throws EncryptionException, MessagingException  {
+    
+    // if we don't have a key, see if we can get a default.
+    EncryptionKey key = null;
+    Address[] recipients = mMsg.getRecipients(Message.RecipientType.TO);
+    for (int i = 0; key == null && i < recipients.length; i++) {
+      if (recipients[i] instanceof InternetAddress) {
+	String inetAddr = ((InternetAddress) recipients[i]).getAddress();
+	EncryptionKey[] matchingKeys = getPublicKeys(inetAddr);
+	if (matchingKeys != null) {
+	  for (int j = 0; key != null && j < matchingKeys.length; j++) {
+	    key = matchingKeys[j];
+	  }
+	}
+      }
+    }
+    
+    return encryptMessage(mMsg, key);
   }
 
   /**
