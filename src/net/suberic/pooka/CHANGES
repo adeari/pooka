@@ -1,10 +1,22 @@
-fixed a bug in configuration where a new user without an explicit SMTP
-server set would end up causing NPE's when it tried to send a message.
+040325 release
+--------------
+
+added a configurable spam button.
+
+added a button for using custom headers on an outgoing mail message.
+
+updated printing to use the new jdk 1.4 printing system.  also made 
+printing, err, work correctly now.
+
+fixed notifyNewMessagesMain and Node so that they actually work.
+
+running with maildir support (including POP3 with a maildir backend), you
+no longer get excess ...subFolder directories on WinXP.
 
 made a way to reconnect to a folder after it's been disconnected, other than
 closing and reopening the entire store.
 
-fixed a bug where deleted messages weren't be removed from the folder table
+fixed a bug where deleted messages weren't being removed from the folder table
 after reconnecting under disconnected imap.
 
 fixed a bug in which, when switching from desktop mode to preview mode
@@ -21,28 +33,22 @@ get their themes set correctly.
 made it so selecting or scrolling in a messagepanel will remove the
 new message icon.
 
+fixed a bug in configuration where a new user without an explicit SMTP
+server set would end up causing NPE's when it tried to send a message.
+
 optimized IMAP folder loading so that we initially fetch the SEEN flag,
 and then pre-fetch the messages we'll actually display (by loading around
 the getFirstUnreadMessage() value)
-
-fixed notifyNewMessagesMain and Node so that they actually work.
-
-added a button for using custom headers on an outgoing mail message.
 
 fixed editor display of boolean properties in Folder editor.
 
 worked around a sun bug in jdk1.4 which would result in the 
 FolderSelectorPane being empty the first time it was brought up.
 
-updated printing to use the new jdk 1.4 printing system.  also made 
-printing, err, work correctly now.
-
 added Bounce Message command, plus a BounceMessage filter.
 
 modified the sendMessageList of the NewMessageInfo to use a sendMessageMap
 instead.
-
-added a configurable spam button.
 
 changed the default action of the FolderSelectorPane to be only subscribed
 folders.  this also fixes an exception you could get when trying to edit

@@ -6,14 +6,6 @@
 *) sign up for doc and release-engineering tasks
 
 -----
-*) bug:  html text is always black, no matter the theme or the 
-specifications in the html itself.
-
-*) new javamaildir bug/fix.
-	found.  test on windows, then fix just in my code and report it
-	to az.
-
---?
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -31,7 +23,12 @@ specifications in the html itself.
 *) fix error display with exception so that you can see the stack trace.
 
 *) disconneted:  use downloaded headers when available?
-
+*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
+	message.  read it.  disconnect there.  get a few new messages.
+	reconnect from original pooka.
+	-- works, but refresh of messages takes too long.  specifically
+	read messages?
+	
 *) new message count in icon
 
 *) add drag and drop
@@ -52,12 +49,6 @@ specifications in the html itself.
 *) add support for jdk1.4
 	-- NetworkInterface classes
 
-*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
-	message.  read it.  disconnect there.  get a few new messages.
-	reconnect from original pooka.
-	-- works, but refresh of messages takes too long.  specifically
-	read messages?
-	
 *) add support for saved searches.
 
 *) -- windows --
@@ -65,7 +56,7 @@ specifications in the html itself.
 	-- check icemail
 	-- more or less added, but need to be able to access the library.
 *) printing in windows can leave control characters at the end of lines
-	-- test.
+	-- test.  shouldn't happen anymore.
 
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
@@ -73,7 +64,7 @@ specifications in the html itself.
 	a separate Caching popup menu, you can just say "if caching,
 	add this menu item; if not, don't."
 
-----
+-----------
 
 *) fix NPE if try to send a new message without configuring client.
 
@@ -364,6 +355,8 @@ icons changing?  test.
 
 *) make it so you can stop html displays from showing non-local images.
  	-- support RFC-2557??
+*) bug:  html text is always black, no matter the theme or the 
+specifications in the html itself.
 
 	-- disconnected imap --
 
