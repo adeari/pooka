@@ -59,13 +59,15 @@ public class NewMessageInfo extends MessageInfo {
       }
       
       boolean sent = false;
-      if (profile != null) {
-	OutgoingFolderInfo outbox = profile.getOutgoingFolder();
-	if (outbox != null) {
-	  outbox.sendMessage(this);
-	  sent = true;
-	}
-      } 
+      if (Pooka.getProperty("Pooka.useOutbox", "false").equalsIgnoreCase("true")) {
+	if (profile != null) {
+	  OutgoingMailServer mailServer = profile.getMailServer();
+	  if (mailServer != null) {
+	    mailServer.sendMessage(this);
+	    sent = true;
+	  }
+	} 
+      }
 
       if (! sent)
 	Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);

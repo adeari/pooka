@@ -9,11 +9,11 @@ public class UserProfile extends Object implements ValueChangeListener {
   Properties mailProperties;
   String name;
   URLName sendMailURL;
+  String mailServerName;
+  OutgoingMailServer mailServer;
   String sendPrecommand;
   String sentFolderName;
   FolderInfo sentFolder;
-  String outboxName;
-  OutgoingFolderInfo outbox;
   public boolean autoAddSignature = true;
   public boolean signatureFirst = true;
   private SignatureGenerator sigGenerator;
@@ -61,7 +61,7 @@ public class UserProfile extends Object implements ValueChangeListener {
       
       sentFolderName=mainProperties.getProperty("UserProfile." + name + ".sentFolder", "");
       
-      outboxName = mainProperties.getProperty("UserProfile." + name + ".outbox", "");
+      mailServerName = mainProperties.getProperty("UserProfile." + name + ".mailServer", "_default");
       sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
       sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
       sigGenerator=createSignatureGenerator();
@@ -98,7 +98,7 @@ public class UserProfile extends Object implements ValueChangeListener {
       
     }
     resources.addValueChangeListener(this, "UserProfile." + name + ".sentFolder");
-    resources.addValueChangeListener(this, "UserProfile." + name + ".outbox");
+    resources.addValueChangeListener(this, "UserProfile." + name + ".mailServer");
     
     resources.addValueChangeListener(this, "UserProfile." + name + ".sendMailURL");
     
@@ -371,17 +371,17 @@ public class UserProfile extends Object implements ValueChangeListener {
     loadSentFolder();
   }
 
-  public OutgoingFolderInfo getOutgoingFolder() {
-    if (outboxName == null)
-      loadOutbox();
+  public OutgoingMailServer getMailServer() {
+    if (mailServerName == null)
+      loadMailServer();
     
-    return outbox;
+    return mailServer;
   }
   
-  public void setOutgoingFolderName(String newValue) {
-    outboxName = newValue;
+  public void setMailServerName(String newValue) {
+    mailServerName = newValue;
     
-    loadOutbox();
+    loadMailServer();
   }
   
   /**
@@ -397,11 +397,13 @@ public class UserProfile extends Object implements ValueChangeListener {
   }
 
   /**
-   * Loads the outbox from the UserProfile.username.outbox 
+   * Loads the MailServer from the UserProfile.username.mailServer 
    * property.
    */
-  public void loadOutbox() {
-    outbox = (OutgoingFolderInfo) Pooka.getStoreManager().getFolder(outboxName);
+  public void loadMailServer() {
+    mailServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(mailServerName);
+    if (mailServer == null)
+      mailServer = Pooka.getOutgoingMailManager().getDefaultOutgoingMailServer();
   }
 
   

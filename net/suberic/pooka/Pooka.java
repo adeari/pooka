@@ -13,6 +13,7 @@ public class Pooka {
   static public net.suberic.pooka.gui.MainPanel panel;
   static public SearchTermManager searchManager;
   static public NetworkConnectionManager connectionManager;
+  static public OutgoingMailServerManager outgoingMailManager;
 
   static public javax.mail.Session defaultSession;
   static public net.suberic.pooka.thread.FolderTracker folderTracker;
@@ -48,6 +49,8 @@ public class Pooka {
     addressBookManager = new AddressBookManager();
 
     connectionManager = new NetworkConnectionManager();
+
+    outgoingMailManager = new OutgoingMailServerManager();
 
     dateFormatter = new DateFormatter();
 
@@ -209,6 +212,10 @@ public class Pooka {
 
   static public NetworkConnectionManager getConnectionManager() {
     return connectionManager;
+  }
+
+  static public OutgoingMailServerManager getOutgoingMailManager() {
+    return outgoingMailManager;
   }
 }
 

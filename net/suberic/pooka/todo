@@ -80,6 +80,11 @@ typing in informatio and then be surprised when add clears it out.
 *) bug:  trying to go to a folder editor when there aren't any folders
 or stores configured is a big problem.
 
+*) fix the mimetypes/mailcap settings--we should use our own configuration
+file, with the defaults as a backup.  otherwise, you have the problem where
+if you set up a default handler for images, then, say, netscape also ends
+up getting configured the same way.
+
 after beta 1
 ----------------
 
