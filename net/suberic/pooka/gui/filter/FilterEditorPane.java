@@ -16,6 +16,7 @@ public class FilterEditorPane extends DefaultPropertyEditor implements java.awt.
     
     JLabel label;
     JComboBox typeCombo;
+    JPanel labelPanel;
     JPanel filterConfigPanel;
     java.awt.CardLayout layout;
     
@@ -69,6 +70,16 @@ public class FilterEditorPane extends DefaultPropertyEditor implements java.awt.
 	    editorTable.put(label, currentEditor);
 	}
 
+	labelPanel = new JPanel();
+	labelPanel.add(label);
+	labelPanel.add(typeCombo);
+	
+	this.add(labelPanel);
+	this.add(filterConfigPanel);
+
+	labelComponent = labelPanel;
+	valueComponent = filterConfigPanel;
+	
 	resetDefaultValue();
     }
 

@@ -383,6 +383,20 @@ UserProfile.editableFields.sentFolder.selectionRoot=allStores
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
 
+Folder.editableFields.scoped=true
+Folder.editableFields.propertyType=Composite
+Folder.editableFields=filters:defaultProfile:useTrashFolder
+
+Folder.editableFields.filters.propertyType=Multi
+Folder.editableFields.filters.editableFields.scoped=true
+Folder.editableFields.filters.editableFields=searchTerm:action
+Folder.editableFields.filters.editableFields.searchTerm.propertyType=SearchTerm
+Folder.editableFields.filters.editableFields.action.propertyType=Filter
+
+Folder.editableFields.defaultProfile.propertyType=List
+Folder.editableFields.defaultProfile.allowedValues=UserProfile
+Folder.editableFields.useTrashFolder.propertyType=Boolean
+
 Store.propertyType=Multi
 Store.editableFields.scoped=true
 Store.editableFields.propertyType=Composite
@@ -558,6 +572,10 @@ Search.operations.After=after
 Search.operations.Equals=equals
 Search.operations.True=equals
 Search.operations.False=notEquals
+
+FolderFilters=ColorFilter
+FolderFilters.ColorFilter.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
+FolderFilters.ColorFilter.editorClass=net.suberic.pooka.gui.filter.ColorFilterEditor
 
 FolderInfo.defaultDisplayFilters=Unread
 FolderInfo.defaultDisplayFilters.Unread.searchTerm=Search.searchTerms.Seen

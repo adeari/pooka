@@ -12,11 +12,11 @@ public abstract class DefaultPropertyEditor extends JPanel implements PropertyEd
 
     // the label component.  this is used for a default implementation
     // of the sizing code we have below.
-    protected JComponent labelComponent;
+    protected java.awt.Container labelComponent;
 
     // the value component.  this is used for a default implementation
     // of the sizing code we have below.
-    protected JComponent valueComponent;
+    protected java.awt.Container valueComponent;
 
     /**
      * Creates a new DefaultPropertyEditor, in this case a Box with an

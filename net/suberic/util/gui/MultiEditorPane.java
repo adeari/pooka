@@ -23,6 +23,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     Vector removeValues = new Vector();
     DefaultListModel optionListModel;
     Vector templateTypes;
+    Box optionBox;
 
     String template;
 
@@ -66,24 +67,30 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	
 	optionListModel = new DefaultListModel();
 
-	for (int i = 0; i < optionVector.size(); i++)
+	for (int i = 0; i < optionVector.size(); i++) {
 	    optionListModel.addElement(optionVector.elementAt(i));
-	
+	}
+
 	// and, using this list, create the actual list.
 
 	optionList = new JList(optionListModel);
 
-	this.add(createOptionBox(label, optionList));
+	optionBox = createOptionBox(label, optionList);
+	this.add(optionBox);
 
 	// first create the subproperties and templateTypes lists
 
-	template = property + ".editableFields";
+	template = newTemplate + ".editableFields";
 
 	// create entryPanels (the panels which show the subproperties
 	// of each item in the optionList) for each option.
 
 	entryPanel = createEntryPanel(optionVector, true);
 	this.add(entryPanel);
+
+	labelComponent = optionBox;
+	valueComponent = entryPanel;
+
 	this.setEnabled(isEnabled);
     }
 
@@ -131,6 +138,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	
 	for (int i = 0; i < itemList.size(); i++) {
 	    rootProp = new String(property + "." + (String)(itemList.elementAt(i)));
+
 	    pep = new CompositeEditorPane(factory, rootProp, template);;
 	    
 	    if (original == true) {

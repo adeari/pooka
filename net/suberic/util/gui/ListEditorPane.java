@@ -36,9 +36,9 @@ public class ListEditorPane extends DefaultPropertyEditor {
 	this.setEnabled(isEnabled);
 
 	labelComponent = label;
-	valueComponent = new JPanel();
-	valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
-	valueComponent.add(inputField);
+	valueComponent = inputField;
+	//valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
+	//valueComponent.add(inputField);
     }
     
     public ListEditorPane(String newProperty, VariableBundle bundle, boolean isEnabled) {

@@ -23,8 +23,12 @@ public class PookaPropertyEditorFactory extends PropertyEditorFactory {
      */
     public DefaultPropertyEditor createEditor(String property) {
 	String test = getBundle().getProperty(property + ".propertyType", "");
-	if (test.equals("Folder"))
+	if (test.equalsIgnoreCase("Folder"))
 	    return createFolderEditor(property);
+	else if (test.equalsIgnoreCase("Filter"))
+	    return createFilterEditor(property);
+	//else if (test.equalsIgnoreCase("SearchTerm"))
+	//  return createSearchEditor(property);
 	else
 	    return super.createEditor(property);
     }
@@ -43,6 +47,10 @@ public class PookaPropertyEditorFactory extends PropertyEditorFactory {
 	String test = getBundle().getProperty(typeTemplate + ".propertyType", "");
 	if (test.equals("Folder"))
 	    return createFolderEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("Filter"))
+	    return createFilterEditor(property, typeTemplate);
+	//else if (test.equalsIgnoreCase("SearchTerm"))
+	//    return createSearchEditor(property, typeTemplate);
 	else
 	    return super.createEditor(property, typeTemplate);
     }
@@ -60,4 +68,42 @@ public class PookaPropertyEditorFactory extends PropertyEditorFactory {
     public DefaultPropertyEditor createFolderEditor(String property, String typeTemplate) {
 	return new FolderSelectorPane(property, typeTemplate, getBundle());
     }
+
+
+    /**
+     * This returns a new FilterEditor.
+     */
+    public DefaultPropertyEditor createFilterEditor(String property) {
+	return new net.suberic.pooka.gui.filter.FilterEditorPane(property, property, getBundle());
+    }
+
+    /**
+     * This returns a new FilterEditor.
+     */
+    public DefaultPropertyEditor createFilterEditor(String property, String typeTemplate) {
+	return new net.suberic.pooka.gui.filter.FilterEditorPane(property, typeTemplate, getBundle());
+    }
+
+    /**
+     * This returns a new SearchTermEditor.
+    public DefaultPropertyEditor createSearchEditor(String property, String typeTemplate) {
+	return new net.suberic.pooka.gui.search.SearchEditorPane(property, typeTemplate, getBundle());
+    }
+     */
+
+
+    /**
+     * This returns a new SearchTermEditor.
+    public DefaultPropertyEditor createSearchEditor(String property) {
+	return new net.suberic.pooka.gui.search.SearchEditorPane(property, property, getBundle());
+    }
+     */
+
 }
+
+
+
+
+
+
+

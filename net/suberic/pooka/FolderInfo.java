@@ -1081,12 +1081,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (isTrashFolder())
 	    defaultActions = new Action[] {
 		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-		new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread())
+		new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread()),
+		new EditPropertiesAction()
 		    
 		    };
 	else
 	    defaultActions = new Action[] {
-		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread())
+		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+		new EditPropertiesAction()
 		    };
     }
 
@@ -1738,6 +1740,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public FolderInfo getTrashFolder() {
 	return getParentStore().getTrashFolder();
+    }
+
+    class EditPropertiesAction extends AbstractAction {
+	
+	EditPropertiesAction() {
+	    super("file-edit");
+	} 
+
+	public void actionPerformed(ActionEvent e) {
+	    Pooka.getUIFactory().showEditorWindow(getFolderProperty(), getFolderProperty(), "Folder.editableFields");
+	}
     }
 
     class UpdateCountAction extends AbstractAction {
