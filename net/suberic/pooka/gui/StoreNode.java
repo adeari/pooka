@@ -19,6 +19,7 @@ public class StoreNode extends MailTreeNode {
     public StoreNode(StoreInfo newStore, JComponent parent) {
 	super(newStore, parent);
 	store = newStore;
+	newStore.setStoreNode(this);
 	displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
 	setCommands();
 	loadChildren();
@@ -69,7 +70,7 @@ public class StoreNode extends MailTreeNode {
 	if (storeChildren != null)
 	    for (int i = 0 ; i < storeChildren.size() ; i++) {
 		FolderNode node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
-		// we used insert here, since add() would mak
+		// we used insert here, since add() would make
 		// another recursive call to getChildCount();
 		insert(node, i);
 	    } 
@@ -77,10 +78,10 @@ public class StoreNode extends MailTreeNode {
 	hasLoaded=true;
 
 	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	/*	if (folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+	if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
 	    ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
 	}
-	*/
+	
     }
 
     public String getStoreID() {
