@@ -1,3 +1,8 @@
+unsuccessful open attachment commands now show an error.
+
+right-clicking on the Attachment icon now brings up a menu to open, save
+(shift-rightclick), or open with (control-rightclick) the attachment.
+
 optimized loading/displaying of new messages in disconnected imap mode.
 
 fixed opening attachments from preview panel.

@@ -6,12 +6,6 @@
 *) sign up for doc and release-engineering tasks
 
 -----
-*) make attachments openable from the messge panel.
-	-- started.  make it so we can save them from the message panel
-	also, plus show the file type.
-	-- make it so we see an error if we try to do a bogus open with.
-
-*) windows attachments associated with correct item (icemail lib)
 
 *) queuing of outgoing mails
 	todo on this:
@@ -29,8 +23,11 @@
   *) support windows registry attachment associations.
 	-- check icemail
 	-- more or less added, but need to be able to access the library.
+*) test error message with OpenWith
 *) printing in windows can leave control characters at the end of lines
 	-- test.  shouldn't happen anymore.
+
+*) filtering multiple message should show a status.
 
 ---
 
@@ -57,8 +54,6 @@
 *) add a dependent button/menu item.  so that that way instead of having
 	a separate Caching popup menu, you can just say "if caching,
 	add this menu item; if not, don't."
-
-*) filtering multiple message should show a status.
 
 -----------
 

@@ -967,7 +967,7 @@ Pooka.looknfeel.listMapping.Windows.value=com.sun.java.swing.plaf.windows.Window
 Pooka.looknfeel.listMapping.Kunststoff.value=com.incors.plaf.kunststoff.KunststoffLookAndFeel
 Pooka.looknfeel.listMapping.GTK.value=com.sun.java.swing.plaf.gtk.GTKLookAndFeel
 
-ExternalLauncher.fileHandler./=%v; rm %s
+ExternalLauncher.fileHandler./=%v; retVal=$?; rm %s; exit $retVal
 ExternalLauncher.cmdWrapper./=sh -c %v
 
 Pooka.urlHandler=netscape %s

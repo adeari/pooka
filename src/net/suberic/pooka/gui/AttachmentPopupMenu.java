@@ -84,7 +84,12 @@ public class AttachmentPopupMenu extends JPopupMenu {
       if (label == null || label.length() == 0) {
 	label = Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
       }
-      item.setText(label);
+      javax.mail.internet.ContentType mimeType = current.getMimeType();
+      if (mimeType != null) {
+	item.setText(label + " (" + mimeType.getBaseType() + ")");
+      } else {
+	item.setText(label);
+      }
       this.add(item);
     }
 

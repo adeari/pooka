@@ -109,7 +109,7 @@ public class AttachmentHandler {
 	    openAttachmentWindow((Component)beanViewer, title, false);
 	  } else if (beanViewer instanceof ExternalLauncher) {
 	    ((ExternalLauncher)beanViewer).show();
-	  } else if (beanViewer instanceof com.sun.mail.handlers.text_plain) {
+	  } else if (beanViewer instanceof com.sun.mail.handlers.text_plain || beanViewer instanceof com.sun.mail.handlers.text_html) {
 	    // sigh
 	    JTextPane jtp = new JTextPane();
 	    try {
@@ -131,6 +131,8 @@ public class AttachmentHandler {
 	    } catch (IOException ioe) {
 	      //
 	    }
+	  } else {
+	    openWith(pAttachment);
 	  }
 	} else {
 	    /*

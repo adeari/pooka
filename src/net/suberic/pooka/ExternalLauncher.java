@@ -38,7 +38,7 @@ public class ExternalLauncher implements CommandObject, Runnable {
    */
   public void show() {
     Thread t = new Thread(this, "External Viewer");
-    t.run();
+    t.start();
   }
   
   /**
@@ -51,6 +51,8 @@ public class ExternalLauncher implements CommandObject, Runnable {
     try {
       String extension = ".tmp";
       String filename = dh.getName();
+      if (filename == null)
+	filename = "unavailable";
       int dotLoc = filename.lastIndexOf('.');
       if (dotLoc > 0) {
 	extension = filename.substring(dotLoc);
@@ -68,6 +70,8 @@ public class ExternalLauncher implements CommandObject, Runnable {
       String parsedVerb;
       String[] cmdArray;
       
+      String origParsedCommand = substituteString(verb, "%s", fileName);
+
       if (fileHandler != null && wrapper != null) { 
 	
 	parsedVerb = substituteString(fileHandler, "%v", verb);
@@ -81,7 +85,7 @@ public class ExternalLauncher implements CommandObject, Runnable {
 	    cmdArray[i] = parsedVerb;
 	  else
 	    cmdArray[i]=currentString;
-	}
+	} 
       } else {
 	parsedVerb = substituteString(verb, "%s", fileName);
 	
@@ -89,11 +93,82 @@ public class ExternalLauncher implements CommandObject, Runnable {
 	
 	tmpFile.deleteOnExit();
       }
+
+      if (Pooka.isDebug()) {
+	System.out.println("running external command " + parsedVerb);
+      }
+
+      Process p = Runtime.getRuntime().exec(cmdArray);
+
+      long startTime = System.currentTimeMillis();
       
-      Runtime.getRuntime().exec(cmdArray);
+      try {
+	p.waitFor();
+      } catch (InterruptedException ie) {
+      }
+
+      int exitValue = p.exitValue();
+
+      if (Pooka.isDebug()) {
+	System.out.println("finished external command " + parsedVerb);
+      }
+
+      if (exitValue != 0) {
+	long externalTimeoutMillis = 5000;
+	try {
+	  externalTimeoutMillis = Long.parseLong(Pooka.getProperty("ExternalLauncher.externalTimeoutMillis", "5000"));
+	} catch (NumberFormatException nfe) {
+	  // just use the default.
+	}
+	if (System.currentTimeMillis() - startTime < externalTimeoutMillis) {
+	  if (Pooka.isDebug())
+	    System.out.println("external command " + parsedVerb + ":  exitValue is " + exitValue + " and timeout < externalTimeoutMillis; showing error.");
+	  
+	  showError(origParsedCommand, p);
+	}
+      }
       
     } catch (java.io.IOException ioe) {
       System.out.println("Error opening temp file " + ioe.getMessage());
+    }
+  }
+
+  /**
+   * Shows an error.
+   */
+  public void showError(String command, Process p) {
+
+    // build up the error message.
+    try {
+      StringWriter errorWriter = new StringWriter();
+      BufferedWriter bw = new BufferedWriter(errorWriter);
+      bw.write(Pooka.getProperty("ExternalLauncher.error.failedToRun", "Failed executing command:"));
+      bw.newLine();
+      bw.write(command);
+      bw.newLine();
+      bw.newLine();
+      bw.write(Pooka.getProperty("ExternalLauncher.error.output", "Output:"));
+      bw.newLine();
+    
+      try {
+	InputStream errorStream = p.getErrorStream();
+	BufferedReader br = new BufferedReader(new InputStreamReader(errorStream));
+	for (String nextLine = br.readLine(); nextLine != null; nextLine = br.readLine()) {
+	  bw.write(nextLine);
+	  bw.newLine();
+	}
+      } catch (IOException ioe) {
+	bw.write("Error not available");
+	bw.newLine();
+      }
+      bw.flush();
+      bw.close();
+    
+      String errorMessage = errorWriter.toString();
+      Pooka.getUIFactory().showError(errorMessage);
+    } catch (IOException ioe) {
+      // shouldn't happen, but...
+      Pooka.getUIFactory().showError(Pooka.getProperty("ExternalLauncher.error.failedToRun", "Failed executing command:"));
     }
   }
   
