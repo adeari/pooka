@@ -29,9 +29,11 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
         at net.suberic.pooka.StoreInfo$2.actionPerformed(StoreInfo.java:717)
         at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
 
+*) ?? ^D message, hit return for next message, get an error?
+
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together
-	(@ sourceforge).
+	(@ sourceforge).  -- use rfc3156.
 
 *) add drag and drop
 	*) include message
