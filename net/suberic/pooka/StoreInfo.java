@@ -142,6 +142,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".server");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".port");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".connection");
+    Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".useSubscribed");
     
     if (available) {
       store.addConnectionListener(new ConnectionAdapter() { 
@@ -463,6 +464,8 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       if (connection != null) {
 	connection.addConnectionListener(this);
       }
+    } else if (changedValue.equals(getStoreProperty() + ".useSubscribed")) {
+      useSubscribed = Pooka.getProperty(getStoreProperty() + ".useSubscribed", "false").equalsIgnoreCase("true");
     }
 
   }
@@ -819,7 +822,22 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	  subscribedNames.add(folderName);
       }
     }
-    
+
+    // add subscribed namespaces.
+    List tmpChildren = getChildren();
+    if (tmpChildren != null) {
+      // go through each.  check to see if it's a namespace.  if so,
+      // add it, too.
+      
+      Iterator it = tmpChildren.iterator();
+      while (it.hasNext()) {
+	FolderInfo fi = (FolderInfo) it.next();
+	String folderName = fi.getFolderName();
+	if (fi.isNamespace() && ! subscribedNames.contains(folderName))
+	  subscribedNames.add(folderName);
+      }
+    }
+
     for (int i = 0; i < subscribedNames.size(); i++) {
       newSubscribed.append((String)subscribedNames.get(i)).append(':');
     }
@@ -831,7 +849,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Pooka.setProperty(getStoreProperty() + ".folderList", newSubscribed.toString());
 
     for (int i = 0; children != null && i < children.size(); i++) {
-      FolderInfo fi = (FolderInfo) children.elementAt(i);
+      FolderInfo fi = (FolderInfo) children.get(i);
       fi.synchSubscribed();
     }
   }

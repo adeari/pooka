@@ -87,6 +87,12 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	      if (sharedFolders != null && sharedFolders.length > 0) {
 		for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
 		  if (sharedFolders[i].getName().equalsIgnoreCase(getFolderName())) {
+
+		    if (!mNamespace) {
+		      Pooka.setProperty(getFolderID() + "._namespace", "true");
+		      mNamespace = true;
+		    }
+
 		    tmpFolder = new Folder[1];
 		    tmpFolder[0] =  sharedFolders[i] ;
 		  }

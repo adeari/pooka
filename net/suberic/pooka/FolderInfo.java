@@ -116,6 +116,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
   protected OutgoingMailServer mailServer = null;
 
+  // whether or not this is a namespace
+  protected boolean mNamespace = false;
+
   /**
    * For subclasses.
    */
@@ -169,6 +172,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     setFolderID(parent.getStoreID() + "." + fname);
     mFolderName = fname;
     
+    mNamespace = Pooka.getProperty(getFolderID() + "._namespace", "false").equalsIgnoreCase("true");
+
     try {
       if (parent.isConnected())
 	loadFolder();
@@ -238,6 +243,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  if (sharedFolders != null && sharedFolders.length > 0) {
 	    for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
 	      if (sharedFolders[i].getName().equalsIgnoreCase(mFolderName)) {
+		if (!mNamespace) {
+		  Pooka.setProperty(getFolderID() + "._namespace", "true");
+		  mNamespace = true;
+		}
 		tmpFolder = new Folder[1];
 		tmpFolder[0] =  sharedFolders[i] ;
 	      }
@@ -606,8 +615,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * folder information from the IMAP server.
    */
   public void synchSubscribed() throws MessagingException {
-    // at this point we should get folder objects.
 
+    // if we're a namespace, then ignore.
+    if (mNamespace)
+      return;
+
+    // at this point we should get folder objects.
     if (! isLoaded())
       loadFolder();
 
@@ -2348,40 +2361,43 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
 
-    /**
-     * This returns the parentFolder.  If this FolderInfo is a direct
-     * child of a StoreInfo, this method will return null.
-     */
-    public FolderInfo getParentFolder() {
-	return parentFolder;
+  /**
+   * This returns the parentFolder.  If this FolderInfo is a direct
+   * child of a StoreInfo, this method will return null.
+   */
+  public FolderInfo getParentFolder() {
+    return parentFolder;
+  }
+  
+  /**
+   * This method actually returns the parent StoreInfo.  If this 
+   * particular FolderInfo is a child of another FolderInfo, this
+   * method will call getParentStore() on that FolderInfo.
+   */
+  public StoreInfo getParentStore() {
+    if (parentStore == null)
+      return parentFolder.getParentStore();
+    else
+      return parentStore;
+  }
+  
+  /**
+   * Gets the default profile for this Folder.
+   */
+  public UserProfile getDefaultProfile() {
+    if (defaultProfile != null) {
+      return defaultProfile;
     }
-
-    /**
-     * This method actually returns the parent StoreInfo.  If this 
-     * particular FolderInfo is a child of another FolderInfo, this
-     * method will call getParentStore() on that FolderInfo.
-     */
-    public StoreInfo getParentStore() {
-	if (parentStore == null)
-	    return parentFolder.getParentStore();
-	else
-	    return parentStore;
+    else if (parentFolder != null) {
+      return parentFolder.getDefaultProfile();
     }
-
-    public UserProfile getDefaultProfile() {
-	if (defaultProfile != null) {
-	    return defaultProfile;
-	}
-	else if (parentFolder != null) {
-	    return parentFolder.getDefaultProfile();
-	}
-	else if (parentStore != null) {
-	    return parentStore.getDefaultProfile();
-	}
-	else {
-	    return null;
-	}
+    else if (parentStore != null) {
+      return parentStore.getDefaultProfile();
     }
+    else {
+      return null;
+    }
+  }
   
   /**
    * sets the status.
@@ -2392,30 +2408,37 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
   
-    /**
-     * gets the status.
-     */
-    public int getStatus() {
-      return status;
-    }
-
-    public ActionThread getFolderThread() {
-	return getParentStore().getStoreThread();
-    }
-
-    public FolderInfo getTrashFolder() {
-	return getParentStore().getTrashFolder();
-    }
-
+  /**
+   * gets the status.
+   */
+  public int getStatus() {
+    return status;
+  }
+  
+  public ActionThread getFolderThread() {
+    return getParentStore().getStoreThread();
+  }
+  
+  public FolderInfo getTrashFolder() {
+    return getParentStore().getTrashFolder();
+  }
+  
   public FetchProfile getFetchProfile() {
     return fetchProfile;
   }
 
-    class EditPropertiesAction extends AbstractAction {
-	
-	EditPropertiesAction() {
-	    super("file-edit");
-	} 
+  /**
+   * Returns whether or not this folder is actually a namespace.
+   */
+  public boolean isNamespace() {
+    return mNamespace;
+  }
+
+  class EditPropertiesAction extends AbstractAction {
+    
+    EditPropertiesAction() {
+      super("file-edit");
+    } 
 
 	public void actionPerformed(ActionEvent e) {
 	    Pooka.getUIFactory().showEditorWindow(getFolderProperty(), getFolderProperty(), "Folder.editableFields");

@@ -1,3 +1,6 @@
+no longer have to restart for change in IMAP synch with subscribed folders
+setting.
+
 added support for IMAP shared folders.
 
 fixed the StoreInfo so that we now properly use the custom port for

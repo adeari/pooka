@@ -1,21 +1,39 @@
+*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
+	for that.  slimpgp or cyptix.  s/mime is available from together
+	(@ sourceforge).  -- use rfc3156.
+
+	-- started.  todo on api:
+		- key management
+			- including importing keys from emails.
+		- sign and encrypt
+		- more checks, proper excpetions
+	-- todo on pooka
+		- key management
+		  - inc. default key for user, addressbookentry 
+		  - ?? different KeyStores for different users?
+		- way to show encryption information (ui)
+		  -- thought:  show decrypted or encrypted.  which by default
+			       is configurable.  when decryption is attempted,
+			       there's a ui, though it will probably try the
+			       default for the user, first.
+			       - sigs auto-verified?
+		  -- need a way to show current encryption status, plus a way
+			to decrypt/check signature
+		  -- ?? button at bottom that shows status?
+			
+	-- mozilla does s/mime.
+
 *) fix error in encoded stream problem.
 	-- just better error (?)  or maybe print out as far as it goes.
 
 *) still an error in connecting, disconnecting, getting a new messages/deleting
 	old messages, reconnecting.
 
-*) support shared folders.
-	-- started.  see if there are any bugs in there.
-	-- make sync with subscribed work w/namespaces
-
 *) bounce messages
 
 *) some case(s) in which we're not generating the attachment bundle 
 	correctly?  one instance is how we're handling multipart/alternative
 	entries that don't actually have multiple parts.
-
-*) changing using store's subscribed list doesn't happen in realtime; have
-	to reload instead.
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -49,31 +67,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 *) ?? ^D message, hit return for next message, get an error?
 
 *) new message count in icon
-
-*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
-	for that.  slimpgp or cyptix.  s/mime is available from together
-	(@ sourceforge).  -- use rfc3156.
-
-	-- started.  todo on api:
-		- key management
-			- including importing keys from emails.
-		- sign and encrypt
-		- more checks, proper excpetions
-	-- todo on pooka
-		- key management
-		  - inc. default key for user, addressbookentry 
-		  - ?? different KeyStores for different users?
-		- way to show encryption information (ui)
-		  -- thought:  show decrypted or encrypted.  which by default
-			       is configurable.  when decryption is attempted,
-			       there's a ui, though it will probably try the
-			       default for the user, first.
-			       - sigs auto-verified?
-		  -- need a way to show current encryption status, plus a way
-			to decrypt/check signature
-		  -- ?? button at bottom that shows status?
-			
-	-- mozilla does s/mime.
 
 -----
 
