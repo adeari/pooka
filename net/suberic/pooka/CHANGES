@@ -1,3 +1,7 @@
+added support for specifying SMTP port number (dan)
+
+folder menu now uses submenus to display folders instead of one huge menu (dan)
+
 added selectAll support for read messages, new messages, and the FolderTable.
 
 added undo/redo support for the new message editor
