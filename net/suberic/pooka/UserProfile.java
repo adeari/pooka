@@ -14,6 +14,7 @@ public class UserProfile extends Object {
     FolderInfo sentFolder;
     public boolean autoAddSignature = true;
     public boolean signatureFirst = true;
+    private SignatureGenerator sigGenerator;
 
     static Vector profileList = new Vector();
     static Vector mailPropertiesMap = null;
@@ -253,6 +254,10 @@ public class UserProfile extends Object {
 	loadSentFolder();
     }
 
+    /**
+     * Loads the sent folder from the UserProfile.username.sentFolder 
+     * property.
+     */
     public void loadSentFolder() {
 	sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
 
@@ -261,8 +266,34 @@ public class UserProfile extends Object {
 	} 
     }
 
+    /**
+     * Creates the signatureGenerator for this Profile.
+     */
+    public SignatureGenerator createSignatureGenerator() {
+	String classname = Pooka.getProperty("UserProfile." + name + ".sigClass", Pooka.getProperty("Pooka.defaultSigGenerator", "net.suberic.pooka.StringSignatureGenerator"));
+	
+    }
+
+    /**
+     * This returns a signature appropriate for the given text.
+     */
+    public String getSignature(String text) {
+	if (sigGenerator != null)
+	    return sigGenerator.generateSignature(this, text);
+	else
+	    return null;
+    }
+
+    /**
+     * Returns the default signature for this UserProfile.  Use 
+     * getSignature(String text) instead.
+     */
     public String getSignature() {
-	return (Pooka.getProperty("UserProfile." + name + ".signature", null));
+	if (sigGenerator != null)
+	    return sigGenerator.generateSignature(this, null);
+	else
+	    return null;
+	//return (Pooka.getProperty("UserProfile." + name + ".signature", null));
     }
 
     public void setSignature(String newValue) {

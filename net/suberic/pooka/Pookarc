@@ -31,6 +31,7 @@ Pooka.saveFolderWindowLocationsOnExit=true
 
 Pooka.newMessage.autoAddSignature=true
 Pooka.newMessage.signatureBeforeCopiedMessage=false
+Pooka.defaultSigGenerator=net.suberic.pooka.StringSignatureGenerator
 
 MenuBar=File:Edit:Mail:Window:Help
 
