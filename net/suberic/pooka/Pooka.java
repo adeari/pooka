@@ -55,7 +55,6 @@ public class Pooka {
    * --rcfile <filename>     use the given file as the pooka startup file.
    */
   static public void main(String argv[]) {
-    System.err.println("starting.");
     parseArgs(argv);
 
     // if localrc hasn't been set, use the user's home directory.
@@ -88,8 +87,6 @@ public class Pooka {
 
       //resources = new net.suberic.util.VariableBundle(new Object().getClass().getClassLoader().getResource("/net/suberic/pooka/Pookarc").openStream(), "net.suberic.pooka.Pooka");
     }
-
-    System.err.println("checking version...");
 
     if (! checkJavaVersion()) {
       versionError();

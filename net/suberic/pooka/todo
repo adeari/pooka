@@ -1,5 +1,4 @@
-*) add a check for java version to make sure that you're running the 
-correct version of pooka for the jdk.
+*) make the PreviewPane work w/themes
 
   *) printing in windows can leave control characters at the end of lines
 
