@@ -105,11 +105,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   private UserProfile defaultProfile = null;
   
   private boolean sentFolder = false;
+  private boolean outboxFolder = false;
   private boolean trashFolder = false;
   
   private boolean notifyNewMessagesMain = true;
   private boolean notifyNewMessagesNode = true;
   
+  protected FetchProfile fetchProfile = null;
+
   /**
    * For subclasses.
    */
@@ -553,11 +556,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	String tableType;
 
 	if (isSentFolder())
-	    tableType="SentFolderTable";
+	  tableType="SentFolderTable";
 	//else if (this instanceof VirtualFolderInfo)
 	//    tableType="SearchResultsTable";
-	else 
-	    tableType="FolderTable";
+	else if (isOutboxFolder()) 
+	  tableType="SentFolderTable";
+	else
+	  tableType="FolderTable";
 
 	FetchProfile fp = new FetchProfile();
 	fp.add(FetchProfile.Item.FLAGS);
@@ -618,7 +623,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (folderTableModel == null) {
       Vector messageProxies = new Vector();
       
-      FetchProfile fp = createColumnInformation();
+      fetchProfile = createColumnInformation();
       if (loaderThread == null) 
 	loaderThread = createLoaderThread();
       
@@ -628,14 +633,36 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       if (! isConnected() ) {
 	openFolder(Folder.READ_WRITE);
       }
+
+      int fetchBatchSize = 50;
+      try {
+	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+      } catch (NumberFormatException nfe) {
+      }
       
       Message[] msgs = folder.getMessages();
-      folder.fetch(msgs, fp);
+
+      Message[] toFetch = msgs;
+
+      // go ahead and fetch the first set of messages; the rest will be
+      // taken care of by the loaderThread.
+      if (msgs.length > fetchBatchSize) {
+	toFetch = new Message[fetchBatchSize];
+	System.arraycopy(msgs, msgs.length - fetchBatchSize, toFetch, 0, fetchBatchSize);
+      }
+
+      folder.fetch(toFetch, fetchProfile);
+      
+      int firstFetched = Math.max(msgs.length - fetchBatchSize, 0);
+
       MessageInfo mi;
       
       for (int i = 0; i < msgs.length; i++) {
 	mi = new MessageInfo(msgs[i], this);
 	
+	if ( i >= firstFetched)
+	  mi.setFetched(true);
+
 	messageProxies.add(new MessageProxy(getColumnValues() , mi));
 	messageToInfoTable.put(msgs[i], mi);
       }
@@ -1817,12 +1844,24 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public boolean isSentFolder() {
 	return sentFolder;
     }
+  
 
-    public void setSentFolder(boolean newValue) {
-	sentFolder = newValue;
-	setNotifyNewMessagesMain(! newValue);
-	setNotifyNewMessagesNode(! newValue);
-    }
+  public void setSentFolder(boolean newValue) {
+    sentFolder = newValue;
+    setNotifyNewMessagesMain(! newValue);
+    setNotifyNewMessagesNode(! newValue);
+  
+  }
+
+  public boolean isOutboxFolder() {
+    return outboxFolder;
+  }
+
+  public void setOutboxFolder(boolean newValue) {
+    outboxFolder = newValue;
+    setNotifyNewMessagesMain(! newValue);
+    setNotifyNewMessagesNode(! newValue);
+  }
 
     public boolean notifyNewMessagesMain() {
 	return notifyNewMessagesMain;
@@ -1925,6 +1964,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public FolderInfo getTrashFolder() {
 	return getParentStore().getTrashFolder();
     }
+
+  public FetchProfile getFetchProfile() {
+    return fetchProfile;
+  }
 
     class EditPropertiesAction extends AbstractAction {
 	

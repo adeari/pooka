@@ -43,32 +43,60 @@ public class UIDFolderInfo extends FolderInfo {
 	if (folderTableModel == null) {
 	    Vector messageProxies = new Vector();
 	    
-	    FetchProfile fp = createColumnInformation();
-	    fp.add(UIDFolder.FetchProfileItem.UID);
+	    fetchProfile = createColumnInformation();
+	    // fetchProfile.add(UIDFolder.FetchProfileItem.UID);
 	    
 	    if (loaderThread == null) 
 		loaderThread = createLoaderThread();
 	    
 	    try {
-		if (!isConnected()) {
-		    openFolder(Folder.READ_WRITE);
-		}
+	      if (!isConnected()) {
+		openFolder(Folder.READ_WRITE);
+	      }
+	      
+	      // get the UID's first.
+	      FetchProfile uidProfile = new FetchProfile();
+	      uidProfile.add(UIDFolder.FetchProfileItem.UID);
+
+	      int fetchBatchSize = 50;
+	      try {
+		fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+	      } catch (NumberFormatException nfe) {
+	      }
+	      
+	      Message[] msgs = getFolder().getMessages();
+
+	      getFolder().fetch(msgs, uidProfile);
+	      
+	      Message[] toFetch = msgs;
+	      
+	      // go ahead and fetch the first set of messages; the rest will be
+	      // taken care of by the loaderThread.
+	      if (msgs.length > fetchBatchSize) {
+		toFetch = new Message[fetchBatchSize];
+		System.arraycopy(msgs, msgs.length - fetchBatchSize, toFetch, 0, fetchBatchSize);
+	      }
+	      
+	      getFolder().fetch(toFetch, fetchProfile);
+	      
+	      int firstFetched = Math.max(msgs.length - fetchBatchSize, 0);
+	      
+	      MessageInfo mi;
+	      
+	      for (int i = 0; i < msgs.length; i++) {
+		long uid = ((UIDFolder)getFolder()).getUID(msgs[i]);
+		UIDMimeMessage newMessage = new UIDMimeMessage(this, uid);
+		mi = new MessageInfo(newMessage, this);
+
+		if ( i >= firstFetched)
+		  mi.setFetched(true);
 		
-		Message[] msgs = getFolder().getMessages();
-		getFolder().fetch(msgs, fp);
-		MessageInfo mi;
-		
-		for (int i = 0; i < msgs.length; i++) {
-		    long uid = ((UIDFolder)getFolder()).getUID(msgs[i]);
-		    UIDMimeMessage newMessage = new UIDMimeMessage(this, uid);
-		    mi = new MessageInfo(newMessage, this);
-		    
-		    messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		    messageToInfoTable.put(newMessage, mi);
-		    uidToInfoTable.put(new Long(uid), mi);
-		}
+		messageProxies.add(new MessageProxy(getColumnValues() , mi));
+		messageToInfoTable.put(newMessage, mi);
+		uidToInfoTable.put(new Long(uid), mi);
+	      }
 	    } catch (MessagingException me) {
-		Pooka.getUIFactory().showError(Pooka.getProperty("Pooka.error.errorLoadingMessages", "Error loading message for folder ") + getFolderID(), me);
+	      Pooka.getUIFactory().showError(Pooka.getProperty("Pooka.error.errorLoadingMessages", "Error loading message for folder ") + getFolderID(), me);
 	    }
 	    
 	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());

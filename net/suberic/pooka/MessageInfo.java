@@ -11,33 +11,36 @@ import java.util.Vector;
 import java.io.*;
 
 public class MessageInfo {
-    // the wrapped Message 
-    Message message;
+  // the wrapped Message 
+  Message message;
+  
+  // the source FolderInfo
+  FolderInfo folderInfo;
+  
+  // if the tableInfo has been loaded yet.
+  boolean loaded = false;
+  
+  // if the message has been read
+  boolean seen = false;
+  
+  // if the attachments have been loaded yet.
+  boolean attachmentsLoaded = false;
+  
+  // the MessageProxy associated with this MessageInfo
+  MessageProxy messageProxy;
+  
+  // the attachments on the message.
+  AttachmentBundle attachments;
+  
+  // if the Message itself has been loaded via fetch()
+  boolean fetched = false;
 
-    // the source FolderInfo
-    FolderInfo folderInfo;
-
-    // if the tableInfo has been loaded yet.
-    boolean loaded = false;
-
-    // if the message has been read
-    boolean seen = false;
-
-    // if the attachments have been loaded yet.
-    boolean attachmentsLoaded = false;
-
-    // the MessageProxy associated with this MessageInfo
-    MessageProxy messageProxy;
-
-    // the attachments on the message.
-    AttachmentBundle attachments;
-
-    public static int FORWARD_AS_ATTACHMENT = 0;
-    public static int FORWARD_QUOTED = 1;
-    public static int FORWARD_AS_INLINE = 2;
-
-    protected MessageInfo() {
-    }
+  public static int FORWARD_AS_ATTACHMENT = 0;
+  public static int FORWARD_QUOTED = 1;
+  public static int FORWARD_AS_INLINE = 2;
+  
+  protected MessageInfo() {
+  }
 
     /**
      * This creates a new MessageInfo from the given FolderInfo and Message.
@@ -46,9 +49,11 @@ public class MessageInfo {
 	folderInfo = newFolderInfo;
 	message = newMessage;
 
+	/*
 	try {
 	    seen = flagIsSet("FLAG.SEEN");
 	} catch (MessagingException me) { }
+	*/
     }
 
     /**
@@ -837,6 +842,21 @@ public class MessageInfo {
 	return attachments.isHtml();
     }
 
+  /**
+   * Returns whether or not the underlying Message object has been 
+   * fetch()ed from the server yet.
+   */
+  public boolean hasBeenFetched() {
+    return fetched;
+  }
+
+  /**
+   * Sets whether or not the underlying Message has been fetch()ed from
+   * the server.
+   */
+  public void setFetched(boolean newValue) {
+    fetched = newValue;
+  }
 }
 
 
