@@ -96,6 +96,8 @@ public class FolderDisplayPanel extends JPanel {
     
     Pooka.getHelpBroker().enableHelpKey(this, "ui.folderWindow", Pooka.getHelpBroker().getHelpSet());
 
+    setTransferHandler(new net.suberic.pooka.gui.dnd.MessageTransferHandler());
+
   }
   
   /**
@@ -133,6 +135,11 @@ public class FolderDisplayPanel extends JPanel {
       messageTable.setColumnSelectionAllowed(false);
       messageTable.setRowSelectionAllowed(true);
       addListeners();
+
+      messageTable.setTransferHandler(new net.suberic.pooka.gui.dnd.MessageTransferHandler());
+
+      messageTable.setDragEnabled(true);
+
     }
   
   /**
