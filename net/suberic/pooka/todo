@@ -4,29 +4,40 @@ top todo:
 	begun.  todo:
 	*) color chooser needs to disable the color button when the checkbox
 		isn't checked.
-	*) create a decent secondary interface style.
+	*) create a decent secondary interface style. (?)
 	*) test the folderPanel, messagePanel, and Folder settings.
-	*) make the NewMessageWindow change when you change your selected
-		user.
-
-*) fix the UserProfile editor display.
+	*) Themes don't change immediately after you edit them; rather,
+	they wait until you restart.
+	*) Changing a Theme should notify everything that's using that
+		theme, and they should update appropriately.
+	*) The font for new messages doesn't update using the themes.
+	*) Add places to configure all of these settings.
+	
+*) fix the UserProfile editor display.  (linux, jdk1.3.x)
 
 *) have Pooka itself change its icon if you get new messages, in addition to 
 changing the title bar.
 	done.  todo:  get good icons.
 	add same for Message and NewMessage windows.
 	
-
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
 possible folders, nor just the ones that are open.
 
-*) test and fix the external editor spawning on windows.
+*) test and fix the external editor spawning on windows.  -- more or less
+	done, but we should go ahead and see if we can add a wrapper for
+	windows.
 
 *) make sure that the file editor actually is getting used for everything
-that's set as a propertyType=file
+that's set as a propertyType=file.  --especially test to make sure this
+works when you package up a .jar file.
+
+*) (related to above) check to make sure that files (especially the address
+	book file) are created correctly under windows.
 
 *) <sigh> save properties to a file at the end of an editor.
+
+*) fix the 'save draft?' messages under jdk1.2.
 
 ------------------
 
