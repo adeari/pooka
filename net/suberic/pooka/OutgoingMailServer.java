@@ -84,30 +84,32 @@ public class OutgoingMailServer implements net.suberic.util.Item {
 
     FolderInfo outbox = getOutbox();
     
-    Message[] msgs = outbox.getFolder().getMessages();    
-    
-    try {
-      for (int i = 0; i < msgs.length; i++) {
-	Message m = msgs[i];
-	if (! m.isSet(Flags.Flag.DRAFT)) {
-	  try {
-	    sendTransport.sendMessage(m, m.getAllRecipients());
-	    m.setFlag(Flags.Flag.DELETED, true);
-	  } catch (MessagingException me) {
-	    exceptionList.add(me);
+    if (outbox != null) {
+      Message[] msgs = outbox.getFolder().getMessages();    
+      
+      try {
+	for (int i = 0; i < msgs.length; i++) {
+	  Message m = msgs[i];
+	  if (! m.isSet(Flags.Flag.DRAFT)) {
+	    try {
+	      sendTransport.sendMessage(m, m.getAllRecipients());
+	      m.setFlag(Flags.Flag.DELETED, true);
+	    } catch (MessagingException me) {
+	      exceptionList.add(me);
+	    }
 	  }
 	}
-      }
-    } finally {
-      if (exceptionList.size() > 0) {
-	final int exceptionCount = exceptionList.size();
-	javax.swing.SwingUtilities.invokeLater( new Runnable() {
-	    public void run() {
-	      Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.queuedSendFailed", "Failed to send message(s) in the Outbox.  Number of errors:  ") +  exceptionCount );
-	    }
-	  } );
-      }
+      } finally {
+	if (exceptionList.size() > 0) {
+	  final int exceptionCount = exceptionList.size();
+	  javax.swing.SwingUtilities.invokeLater( new Runnable() {
+	      public void run() {
+		Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.queuedSendFailed", "Failed to send message(s) in the Outbox.  Number of errors:  ") +  exceptionCount );
+	      }
+	    } );
+	}
       outbox.getFolder().expunge();
+      }
     }
   }
 
