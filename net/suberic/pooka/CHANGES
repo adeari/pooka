@@ -1,3 +1,12 @@
+made it so that the ReadMessageDisplay only populates one JEditorPane,
+instead of 2 like it used to.
+
+made it so that the main Pooka window shouldn't change size between 
+starts as often.
+
+changed the window place while in desktop pane mode.  new windows are now
+not always places in the top left corner of the desktop.
+
 020304 release
 --------------
 

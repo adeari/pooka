@@ -3,6 +3,9 @@ package net.suberic.pooka.gui;
 import net.suberic.util.gui.*;
 import net.suberic.util.*;
 
+import javax.swing.JInternalFrame;
+import java.util.Vector;
+
 public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFactory {
     /**
      * This creates a new PookaDesktopPropertyEditorFactory from the given
@@ -117,5 +120,58 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
     public DefaultPropertyEditor createAddressEditor(String property) {
 	return new net.suberic.pooka.gui.AddressBookEditorPane(this, property, property, getBundle());
     }
+
+
+    /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, Vector properties) {
+	JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties);
+	desktop.add(jif);
+	if (desktop instanceof MessagePanel) {
+	  jif.setLocation(((MessagePanel) desktop).getNewWindowLocation(jif, true));
+	}
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
+    }
+
+    /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, Vector properties, Vector templates) {
+	JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates);
+	desktop.add(jif);
+	if (desktop instanceof MessagePanel) {
+	  jif.setLocation(((MessagePanel) desktop).getNewWindowLocation(jif, true));
+	}
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
+    }
+    
+    /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, DefaultPropertyEditor editor) {
+      JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
+      jif.getContentPane().add(new PropertyEditorPane(this, editor, jif));
+      jif.setSize(100,100);
+      jif.pack();
+      desktop.add(jif);
+	if (desktop instanceof MessagePanel) {
+	  jif.setLocation(((MessagePanel) desktop).getNewWindowLocation(jif, true));
+	}
+      jif.setVisible(true);
+      try {
+	jif.setSelected(true);
+      } catch (java.beans.PropertyVetoException pve) {
+      }
+    }
+
 
 }

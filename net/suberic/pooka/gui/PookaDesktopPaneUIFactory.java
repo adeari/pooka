@@ -79,6 +79,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
 	JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, properties, templates);
 	getMessagePanel().add(jif);
+	jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
+
 	jif.setVisible(true);
 	try {
 	    jif.setSelected(true);

@@ -11,10 +11,6 @@ possible folders, nor just the ones that are open.
 *) fix it so the file (and font and so forth?) editor actually includes
 	the '...' icon.
 
-*) fix the window placement for the desktop pane.
-	-- done for folder windows and new message windows.  do it for
-	configuration windows, too.
-
 *) test the following:  open a folder.  do right click->close folder.
 	try reopening the folder and reading from it.
 
