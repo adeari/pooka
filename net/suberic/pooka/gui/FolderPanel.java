@@ -92,7 +92,51 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 		}
 	    });
 
+	this.configureInterfaceStyle();
     }
+
+  /**
+   * Configures the interfaceStyle for this Pane.
+   */
+  public void configureInterfaceStyle() {
+    java.util.HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getFolderPanelStyle();
+    
+    Color c = null;
+
+    c = (Color) uiStyle.get("background");
+    if (c != null) {
+      folderTree.setBackground(c);
+    }
+
+    c = (Color) uiStyle.get("foreground");
+    if (c != null) {
+      folderTree.setForeground(c);
+    }
+
+    /*
+      c = uiStyle.get("disabledText");
+      if (c != null) {
+      folderTree.setDisabledText(c);
+      }
+      
+      c = uiStyle.get("select");
+      if (c != null) {
+      folderTree.setSelectColor(c);
+      }
+      
+      c = uiStyle.get("focus");
+      if (c != null) {
+      folderTree.setFocusColor(c);
+      }
+      
+    */
+
+    Font f = (Font) uiStyle.get("font");
+    if (f != null) {
+      folderTree.setFont(f);
+    }
+
+  }
 
     /**
      * This returns the currently highlighted node on the FolderTree.

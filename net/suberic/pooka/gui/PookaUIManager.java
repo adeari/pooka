@@ -54,6 +54,8 @@ public class PookaUIManager implements ValueChangeListener {
     "Tree"
   };
 
+  boolean updateUI = false;
+
   /**
    * Creates a PookaUIManager.
    */
@@ -70,7 +72,12 @@ public class PookaUIManager implements ValueChangeListener {
   private void updateResource(String resource) {
     if (resource != null && resource.length() > 0) {
       if (resource.equalsIgnoreCase("messagePanel")) {
+	ContentPanel cp = Pooka.getMainPanel().getContentPanel();
+	if (cp instanceof MessagePanel) {
+	  ((MessagePanel) cp).configureInterfaceStyle();
+	}
       } else if (resource.equalsIgnoreCase("folderPanel")) {
+	Pooka.getMainPanel().getFolderPanel().configureInterfaceStyle();
       } else if (resource.equalsIgnoreCase("messageWindow")) {
       } else if (resource.equalsIgnoreCase("newMessageWindow")) {
       } else if (resource.equalsIgnoreCase("folderTable")) {
@@ -88,9 +95,16 @@ public class PookaUIManager implements ValueChangeListener {
 	  }
 	}
 
-	// and, what the hell, we also update the UI.
-	//if (Pooka.getMainPanel() != null)
-	//  javax.swing.SwingUtilities.updateComponentTreeUI(Pooka.getMainPanel());
+	//and, what the hell, we also update the UI.
+	updateUI = true;
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      if (updateUI) {
+		if (Pooka.getMainPanel() != null)
+		  javax.swing.SwingUtilities.updateComponentTreeUI(Pooka.getMainPanel());
+	      }
+	    }
+	  });
       }
     
     }
@@ -134,6 +148,76 @@ public class PookaUIManager implements ValueChangeListener {
    */
   public HashMap getMessagePanelStyle() {
     return createDefinitionForProperty("Pooka.uiConfig.messagePanel");
+  }
+
+  /**
+   * Returns a UIStyleDefinition for the folder panel.
+   */
+  public HashMap getFolderPanelStyle() {
+    return createDefinitionForProperty("Pooka.uiConfig.folderPanel");
+  }
+
+  /**
+   * Returns a UIStyleDefinition for the given MessageUI.
+   */
+  public HashMap getMessageWindowStyle(MessageUI ui) {
+    // not the most efficient method, but it should work.
+    net.suberic.pooka.FolderInfo fi = ui.getMessageProxy().getMessageInfo().getFolderInfo();
+    net.suberic.pooka.StoreInfo si = fi.getParentStore();
+
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.mesageWindow");
+    HashMap storeValues = createDefinitionForProperty(si.getStoreProperty() + ".uiConfig.messageWindow");
+    HashMap folderValues = createDefinitionForProperty(fi.getFolderProperty() + ".uiConfig.messageWindow");
+    
+    HashMap returnValue = overrideStyle(defaultValues, storeValues);
+    returnValue = overrideStyle(returnValue, folderValues);
+    return returnValue;
+  }
+
+  /**
+   * Returns a UIStyleDefinition for the given NewMessageUI.
+   */
+  public HashMap getNewMessageWindowStyle(NewMessageUI ui) {
+    // not the most efficient method, but it should work.
+    net.suberic.pooka.UserProfile pr = ui.getSelectedProfile();
+
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.newMesageWindow");
+    HashMap profileValues = createDefinitionForProperty(pr.getUserProperty() + ".uiConfig.newMessageWindow");
+    
+    HashMap returnValue = overrideStyle(defaultValues, profileValues);
+    return returnValue;
+  }
+
+  /**
+   * Returns a UIStyleDefinition for the given FolderDisplayUI.
+   */
+  public HashMap getFolderDisplayStyle(FolderDisplayUI ui) {
+    // not the most efficient method, but it should work.
+    net.suberic.pooka.FolderInfo fi = ui.getFolderInfo();
+    net.suberic.pooka.StoreInfo si = fi.getParentStore();
+
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.folderTable");
+    HashMap storeValues = createDefinitionForProperty(si.getStoreProperty() + ".uiConfig.folderTable");
+    HashMap folderValues = createDefinitionForProperty(fi.getFolderProperty() + ".uiConfig.folderTable");
+    
+    HashMap returnValue = overrideStyle(defaultValues, storeValues);
+    returnValue = overrideStyle(returnValue, folderValues);
+    return returnValue;
+  }
+
+  /**
+   * Overrides the values in defaultMap with the values in overrideMap.
+   */
+  public HashMap overrideStyle(HashMap defaultMap, HashMap overrideMap) {
+    HashMap returnValue = new HashMap(defaultMap);
+    Set overrideSet = overrideMap.keySet();
+    Iterator iter = overrideSet.iterator();
+    while (iter.hasNext()) {
+      Object key = iter.next();
+      returnValue.put(key, overrideMap.get(key));
+    }
+
+    return returnValue;
   }
 
   /**

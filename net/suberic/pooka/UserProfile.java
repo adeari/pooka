@@ -340,6 +340,10 @@ public class UserProfile extends Object implements ValueChangeListener {
   public String getName() {
     return name;
   }
+
+  public String getUserProperty() {
+    return "UserProfile." + getName();
+  }
   
   public Properties getMailProperties() {
     return mailProperties;

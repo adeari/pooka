@@ -104,7 +104,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
     this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
     
     // set up the colors
-    configureColors();
+    configureInterfaceStyle();
   }
   
   /**
@@ -503,12 +503,12 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
   /**
    * Configures the colors for this Pane.
    */
-  public void configureColors() {
-    String backgroundRGBString = Pooka.getProperty("Pooka.background", "-1");
-    int backgroundRGB = Integer.parseInt(backgroundRGBString);
-    if (backgroundRGB >= 0) {
-      this.setBackground(new Color(backgroundRGB));
-    }
+  public void configureInterfaceStyle() {
+    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessagePanelStyle();
+    // only pay attention to the background.
+    Color c = (Color) uiStyle.get("background");
+    if (c != null)
+      this.setBackground(c);
   }
 
   /**
