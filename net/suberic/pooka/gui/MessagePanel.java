@@ -63,6 +63,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	FolderWindow newFolderWindow = new FolderWindow(f, this);
 	newFolderWindow.pack();
 	this.add(newFolderWindow);
+	newFolderWindow.setVisible(true);
 	try {
 	    newFolderWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
@@ -74,6 +75,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public void openMessageWindow(MessageProxy m) {
 	MessageWindow newMessageWindow = new MessageWindow(this, m, false);
 	this.add(newMessageWindow);
+	newMessageWindow.setVisible(true);
 	try {
 	    newMessageWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
@@ -85,6 +87,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
 	MessageWindow newMessageWindow = new MessageWindow(this, new NewMessageProxy(m), true);
 	this.add(newMessageWindow);
+	newMessageWindow.setVisible(true);
 	try {
 	    newMessageWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
@@ -94,6 +97,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public void createNewMessage(javax.mail.Message m) {
 	MessageWindow newMessageWindow = new MessageWindow(this, new NewMessageProxy(m), true);
 	this.add(newMessageWindow);
+	newMessageWindow.setVisible(true);
 	try {
 	    newMessageWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
