@@ -247,117 +247,89 @@ public class StoreNode extends MailTreeNode {
 	}
     }
 
-    class SubscribeAction extends AbstractAction {
-	
-        SubscribeAction() {
-            super("folder-subscribe");
-        }
-	
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-
-	    JFileChooser jfc =
-		new JFileChooser(getStoreInfo().getStoreID(), new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo()));
-	    jfc.setMultiSelectionEnabled(true);
-	    jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-	    int returnValue =
-		jfc.showDialog(getParentContainer(),
-			       Pooka.getProperty("FolderEditorPane.Select",
-						 "Select"));
-	    if (returnValue == JFileChooser.APPROVE_OPTION) {
-		net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
-		    ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
-		String absFileName = wrapper.getAbsolutePath();
-		int firstSlash = absFileName.indexOf('/');
-		String normalizedFileName = absFileName;
-		if (firstSlash >= 0)
-		    normalizedFileName = absFileName.substring(firstSlash);
-		    
-		getStoreInfo().subscribeFolder(normalizedFileName);
-	    }
-		/*
-		  String newFolder = JOptionPane.showInternalInputDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), "Subscribe to what folder?");
-		  getStoreInfo().subscribeFolder(newFolder);
-		*/
-	}
+  class SubscribeAction extends AbstractAction {
+    
+    SubscribeAction() {
+      super("folder-subscribe");
     }
     
-    class TestAction extends AbstractAction {
-	
-        TestAction() {
-            super("file-test");
-        }
-	
-        public void actionPerformed(java.awt.event.ActionEvent e) {
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      
+      JFileChooser jfc =
+	new JFileChooser(getStoreInfo().getStoreID(), new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo()));
+      jfc.setMultiSelectionEnabled(true);
+      jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+      int returnValue =
+	jfc.showDialog(getParentContainer(),
+		       Pooka.getProperty("FolderEditorPane.Select",
+					 "Select"));
+      if (returnValue == JFileChooser.APPROVE_OPTION) {
+	net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
+	  ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
 
-	    /*
-	    JInternalFrame jif = new JInternalFrame();
-	    
-	    SearchForm sf = new SearchForm(new StoreInfo[] { getStoreInfo() });
-	    int returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
-	    if (returnValue == JOptionPane.OK_OPTION) {
-		System.out.println("got ok option.");
-		Vector selectedFolders = sf.getSelectedFolders();
-		javax.mail.search.SearchTerm searchTerm = sf.getSearchTerm();
-		Vector matchingValues = new Vector();
-		for (int i = 0; i < selectedFolders.size(); i++) {
-		    try {
-			net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
-			for (int j = 0; j < matches.length; j++) {
-			    matchingValues.add(matches[j]);
-			}
-		    } catch (MessagingException me) {
-			System.out.println("caught exception " + me);
-		    }
-		}
-
-		System.out.println("got " + matchingValues.size() + " matches.");
-	    }
-	    */
-	    /*
-	    jif.getContentPane().add(sf);
-
-	    MessagePanel mp = (MessagePanel)((FolderPanel)getParentContainer()).getMainPanel().getContentPanel();
-	    jif.pack();
-	    mp.add(jif);
-	    jif.setVisible(true);
-	    try {
-		jif.setSelected(true);
-	    } catch (java.beans.PropertyVetoException pve) { }
-	    */
-
-	    
+	try {
+	  // if it doesn't exist, try to create it.
+	  if (! wrapper.exists()) {
+	    wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+	  }
+	  String absFileName = wrapper.getAbsolutePath();
+	  int firstSlash = absFileName.indexOf('/');
+	  String normalizedFileName = absFileName;
+	  if (firstSlash >= 0)
+	    normalizedFileName = absFileName.substring(firstSlash);
+	  
+	  getStoreInfo().subscribeFolder(normalizedFileName);
+	} catch (MessagingException me) {
+	  Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + wrapper.getName());
 	}
-	
-    }
-
-    class DisconnectAction extends AbstractAction {
-	
-        DisconnectAction() {
-            super("file-close");
-        }
-	
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-	    try {
-		getStoreInfo().disconnectStore();
-	    } catch (Exception ex) {
-		System.out.println("caught exception:  " + ex.getMessage());
-	    }
+      }
+      /*
+	String newFolder = JOptionPane.showInternalInputDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), "Subscribe to what folder?");
+	getStoreInfo().subscribeFolder(newFolder);
+      */
 	}
+  }
+    
+  class TestAction extends AbstractAction {
+    
+    TestAction() {
+      super("file-test");
     }
-
-    class EditAction extends AbstractAction {
-	
+    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      
+    }
+    
+  }
+  
+  class DisconnectAction extends AbstractAction {
+    
+    DisconnectAction() {
+      super("file-close");
+    }
+    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      try {
+	getStoreInfo().disconnectStore();
+      } catch (Exception ex) {
+	System.out.println("caught exception:  " + ex.getMessage());
+      }
+    }
+  }
+  
+  class EditAction extends AbstractAction {
+    
         EditAction() {
-            super("file-edit");
+	  super("file-edit");
         }
+    
+    EditAction(String nm) {
+      super(nm);
+    }
 	
-        EditAction(String nm) {
-            super(nm);
-        }
-	
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-	    Pooka.getUIFactory().showEditorWindow(getStoreInfo().getStoreProperty(), getStoreInfo().getStoreProperty(), "Store.editableFields");
-	}
-    }    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      Pooka.getUIFactory().showEditorWindow(getStoreInfo().getStoreProperty(), getStoreInfo().getStoreProperty(), "Store.editableFields");
+    }
+  }    
 }
 
