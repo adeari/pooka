@@ -15,6 +15,12 @@ public class MessageProxy {
     // the underlying message
     Message message;
 
+    // the unique id of the message, if any.
+    long uid;
+
+    // the UIDValidity of the above uid.
+    long uidValidity;
+
     // the source FolderInfo
     FolderInfo folderInfo;
 
@@ -104,6 +110,18 @@ public class MessageProxy {
     public MessageProxy(Vector newColumnHeaders, Message newMessage, FolderInfo newFolderInfo) {
 	folderInfo = newFolderInfo;
 	message=newMessage;
+	
+	// try getting the uid for this message
+	Folder f = folderInfo.getFolder();
+	if (f instanceof UIDFolder) {
+	    try {
+		UIDFolder uidf = (UIDFolder) f;
+		uid = uidf.getUID(message);
+		uidValidity = uidf.getUIDValidity();
+	    } catch (MessagingException me) {
+	    }
+	}
+
 	columnHeaders = newColumnHeaders;
 
 	commands = new Hashtable();
@@ -505,6 +523,25 @@ public class MessageProxy {
 
     public Message getMessage() {
 	return message;
+    }
+
+    /**
+     * Refreshes the message using the underlying UID.
+     */
+    public Message refreshMessage() {
+	Folder sourceFolder = getFolderInfo().getFolder();
+	if (sourceFolder != null && sourceFolder instanceof UIDFolder) {
+	    UIDFolder uidFolder = (UIDFolder)sourceFolder;
+	    try {
+		if (uidFolder.getUIDValidity() == uidValidity) {
+		    message = uidFolder.getMessageByUID(uid);
+		    return message;
+		}
+	    } catch (MessagingException me) {
+
+	    }
+	}
+	return null;
     }
 
     public Vector getTableInfo() {

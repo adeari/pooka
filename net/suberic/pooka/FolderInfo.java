@@ -239,8 +239,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			Thread.dumpStack();
 		    }
 
-		    /* let's try getting rid of this.  i don't think it
-		       works, anyway.
 
 		    if (open == true) {
 			try {
@@ -248,16 +246,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    if (!(store.isConnected()))
 				store.connect();
 			    openFolder(Folder.READ_WRITE);
+			    refreshAllMessages();
 			} catch (MessagingException me) {
 			    System.out.println("Folder " + getFolderID() + " closed and unable to reopen:  " + me.getMessage());
+			    try {
+				closeFolder(false);
+			    } catch (Exception ex) {
+			    }
 			}
 		    }
-		    */
 		    
-		    try {
-			closeFolder(false);
-		    } catch (Exception ex) {
-		    }
 		}
 		
 		public void disconnected(ConnectionEvent e) {
@@ -266,24 +264,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			Thread.dumpStack();
 		    }
 
-		    /* let's try getting rid of this.  i don't think it
-		       works, anyway.
 		    if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
 			    if (!(store.isConnected()))
 				store.connect();
 			    openFolder(Folder.READ_WRITE);
+			    refreshAllMessages();
 			} catch (MessagingException me) {
 			    System.out.println("Folder " + getFolderID() + " disconnected and unable to reconnect:  " + me.getMessage());
+			    try {
+				closeFolder(false);
+			    } catch (Exception ex) {
+			    }
 			}
 		    }
-		    */
 		    
-		    try {
-			closeFolder(false);
-		    } catch (Exception ex) {
-		    }
 		}
 	    });
 
@@ -362,6 +358,23 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return ftm;
     }
     
+    /**
+     * Refreshes all the MessageProxy objects by the UID, if any.
+     */
+    public void refreshAllMessages() {
+	if (folder instanceof UIDFolder) {
+	    UIDFolder uidFolder = (UIDFolder) folder;
+	    Hashtable newMessageToProxyTable = new Hashtable();
+	    Enumeration keys = messageToProxyTable.keys(); 
+	    while (keys.hasMoreElements()) {
+		MessageProxy proxy = (MessageProxy) messageToProxyTable.get(keys.nextElement());
+		Message m = proxy.refreshMessage();
+		if (m != null)
+		    newMessageToProxyTable.put(m, proxy);
+	    }
+	}	
+    }
+
     /**
      * Gets the row number of the first unread message.  Returns -1 if
      * there are no unread messages, or if the FolderTableModel is not
