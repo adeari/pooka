@@ -399,6 +399,15 @@ FolderNode.popupMenu.Edit.Action=file-edit
 FolderNode.popupMenu.Unsubscribe.Action=folder-unsubscribe
 FolderNode.popupMenu.Delete.Action=folder-delete
 
+CachingFolderNode.popupMenu=Open:Reconnect:Update:Close:Edit:Unsubscribe:Delete
+CachingFolderNode.popupMenu.Open.Action=file-open
+CachingFolderNode.popupMenu.Reconnect.Action=folder-connect
+CachingFolderNode.popupMenu.Update.Action=folder-update
+CachingFolderNode.popupMenu.Close.Action=folder-close
+CachingFolderNode.popupMenu.Edit.Action=file-edit
+CachingFolderNode.popupMenu.Unsubscribe.Action=folder-unsubscribe
+CachingFolderNode.popupMenu.Delete.Action=folder-delete
+
 TrashFolderNode.popupMenu=Open:Empty:Close:Edit
 TrashFolderNode.popupMenu.Open.Action=file-open
 TrashFolderNode.popupMenu.Close.Action=folder-close

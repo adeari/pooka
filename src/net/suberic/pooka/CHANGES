@@ -1,3 +1,6 @@
+made a way to reconnect to a folder after it's been disconnected, other than
+closing and reopening the entire store.
+
 fixed a bug where deleted messages weren't be removed from the folder table
 after reconnecting under disconnected imap.
 

@@ -35,6 +35,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     defaultActions = new Action[] {
       new ActionWrapper(new OpenAction(), folderInfo.getFolderThread()),
+      new ActionWrapper(new ReconnectAction(), folderInfo.getFolderThread()),
       new ActionWrapper(new CloseAction(), folderInfo.getFolderThread()),
       new UnsubscribeAction(),
       new NewFolderAction(),
@@ -222,6 +223,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	popupMenu.configureComponent("TrashFolderNode.popupMenu", Pooka.getResources());
       else if (getFolderInfo().isOutboxFolder())
 	popupMenu.configureComponent("OutboxFolderNode.popupMenu", Pooka.getResources());
+      else if (getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo) 
+	popupMenu.configureComponent("CachingFolderNode.popupMenu", Pooka.getResources());
       else
 	popupMenu.configureComponent("FolderNode.popupMenu", Pooka.getResources());
       
@@ -431,6 +434,72 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       }
     }
   }
+
+  /**
+   * Opens the folder.
+   */
+  public void openFolder(boolean pReconnect) {
+
+    try {
+      
+      getFolderInfo().loadAllMessages();
+      
+      if (! getFolderInfo().isSortaOpen() || (pReconnect && ! getFolderInfo().isConnected())) {
+	getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE);
+      }
+      
+      int firstUnread = -1;
+      int messageCount = -1;
+      
+      final int folderType = getFolderInfo().getType();
+      
+      if (getFolderInfo().isSortaOpen() && (folderType & Folder.HOLDS_MESSAGES) != 0 && getFolderInfo().getFolderDisplayUI() == null) {
+	firstUnread = getFolderInfo().getFirstUnreadMessage();
+	messageCount = getFolderInfo().getMessageCount();
+      }
+      
+      final int finalFirstUnread = firstUnread;
+      final int finalMessageCount = messageCount;
+	
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
+	      if (getFolderInfo().getFolderDisplayUI() != null) {
+		getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+	      } else {
+		getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
+		if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {
+		  if (finalFirstUnread >= 0)
+		    getFolderInfo().getFolderDisplayUI().selectMessage(finalFirstUnread);
+		  else
+		    getFolderInfo().getFolderDisplayUI().selectMessage(finalMessageCount);
+		} else {
+		  if (finalFirstUnread >= 0)
+		    getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalFirstUnread);
+		  else
+		    getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalMessageCount);
+		  
+		}
+		getFolderInfo().getFolderDisplayUI().openFolderDisplay();
+	      }
+	      
+	    }
+	    if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
+	      javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+	      folderTree.expandPath(folderTree.getSelectionPath());
+	    }
+	  }
+	});
+    }  catch (MessagingException me) {
+      final MessagingException newMe = me;
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + "\n", newMe);
+	  }
+	});
+    }
+    
+  }
   
   /**
    * Returns the FolderID of the FolderInfo that's defining this FolderNode.
@@ -491,65 +560,36 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	  }
 	});
       
-      try {
-	
-	getFolderInfo().loadAllMessages();
-	
-	if (! getFolderInfo().isSortaOpen()) {
-	  getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE);
-	}
-	
-	int firstUnread = -1;
-	int messageCount = -1;
-	
-	final int folderType = getFolderInfo().getType();
+      openFolder(false);
 
-	if (getFolderInfo().isSortaOpen() && (folderType & Folder.HOLDS_MESSAGES) != 0 && getFolderInfo().getFolderDisplayUI() == null) {
-	  firstUnread = getFolderInfo().getFirstUnreadMessage();
-	  messageCount = getFolderInfo().getMessageCount();
-	}
-	
-	final int finalFirstUnread = firstUnread;
-	final int finalMessageCount = messageCount;
-	
-	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
-		if (getFolderInfo().getFolderDisplayUI() != null) {
-		  getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-		} else {
-		  getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
-		  if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {
-		    if (finalFirstUnread >= 0)
-		      getFolderInfo().getFolderDisplayUI().selectMessage(finalFirstUnread);
-		    else
-		      getFolderInfo().getFolderDisplayUI().selectMessage(finalMessageCount);
-		  } else {
-		    if (finalFirstUnread >= 0)
-		      getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalFirstUnread);
-		    else
-		      getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalMessageCount);
-		    
-		  }
-		  getFolderInfo().getFolderDisplayUI().openFolderDisplay();
-		}
-		
-	      }
-	      if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
-		javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-		folderTree.expandPath(folderTree.getSelectionPath());
-	      }
-	    }
-	  });
-      }  catch (MessagingException me) {
-	final MessagingException newMe = me;
-	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + "\n", newMe);
-	    }
-	  });
-      }
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	  }
+	});
+    }
+    
+  }
+  
+  class ReconnectAction extends AbstractAction {
+    
+    ReconnectAction() {
+      super("folder-connect");
+    }
+    
+    ReconnectAction(String nm) {
+      super(nm);
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	  }
+	});
       
+      openFolder(true);
+
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

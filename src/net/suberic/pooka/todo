@@ -9,10 +9,6 @@
 
 *) give spam buttom a keybinding.  
 
-*) bug:  disconnected mode:  connect.  close folder.  try to re-open folder.
-*) make a way to reopen folders that have been disconnected other than
-	closing and reopening the store. -- get testcase?
-
 *) theme bug in folder table display between preview and desktop.
 
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
@@ -51,11 +47,6 @@ specifications in the html itself.
 	*) attach file
 	*) save attachment?
 
-*) -- windows --
-  *) support windows registry attachment associations.
-	-- check icemail
-	-- more or less added, but need to be able to access the library.
-
 *) queuing of outgoing mails
 	todo on this:
 	*)  add some sort of an administrative api to the NetworkConnection
@@ -69,10 +60,20 @@ specifications in the html itself.
 	-- NetworkInterface classes
 
 
+*) add support for saved searches.
+
+*) -- windows --
+  *) support windows registry attachment associations.
+	-- check icemail
+	-- more or less added, but need to be able to access the library.
 *) printing in windows can leave control characters at the end of lines
 	-- test.
 
-*) add support for saved searches.
+*) add ability for ui components to be enabled/disabled programmatically.
+	- both for adding to menus/tables and enabling/disabling options.
+*) add a dependent button/menu item.  so that that way instead of having
+	a separate Caching popup menu, you can just say "if caching,
+	add this menu item; if not, don't."
 
 ----
 
@@ -137,12 +138,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
    *) fix threading on encryption actions.
      *) !!! we're parsing each message on load now. !!!
 
-
-*) add ability for ui components to be enabled/disabled programmatically.
-	- both for adding to menus/tables and enabling/disabling options.
-*) add a dependent button/menu item.  so that that way instead of having
-	a separate Caching popup menu, you can just say "if caching,
-	add this menu item; if not, don't."
 
 *) filtering multiple message should show a status.
 
