@@ -161,16 +161,20 @@ public class PookaUIManager implements ValueChangeListener {
    * Returns a UIStyleDefinition for the given MessageUI.
    */
   public HashMap getMessageWindowStyle(MessageUI ui) {
+
     // not the most efficient method, but it should work.
     net.suberic.pooka.FolderInfo fi = ui.getMessageProxy().getMessageInfo().getFolderInfo();
     net.suberic.pooka.StoreInfo si = fi.getParentStore();
 
-    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.mesageWindow");
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.messageWindow");
+
     HashMap storeValues = createDefinitionForProperty(si.getStoreProperty() + ".uiConfig.messageWindow");
     HashMap folderValues = createDefinitionForProperty(fi.getFolderProperty() + ".uiConfig.messageWindow");
     
     HashMap returnValue = overrideStyle(defaultValues, storeValues);
+
     returnValue = overrideStyle(returnValue, folderValues);
+
     return returnValue;
   }
 
@@ -181,7 +185,7 @@ public class PookaUIManager implements ValueChangeListener {
     // not the most efficient method, but it should work.
     net.suberic.pooka.UserProfile pr = ui.getSelectedProfile();
 
-    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.newMesageWindow");
+    HashMap defaultValues= createDefinitionForProperty("Pooka.uiConfig.newMessageWindow");
     HashMap profileValues = createDefinitionForProperty(pr.getUserProperty() + ".uiConfig.newMessageWindow");
     
     HashMap returnValue = overrideStyle(defaultValues, profileValues);

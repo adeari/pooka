@@ -47,6 +47,8 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	SwingUtilities.convertPointFromScreen(loc, parentContainer);
 	this.setLocation(loc);
 
+	configureInterfaceStyle();
+
     }
 
     /**
@@ -77,8 +79,18 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	    showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."));
 	    me.printStackTrace();
 	}
+
+	configureInterfaceStyle();
     }
     
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowStyle(this);
+    messageDisplay.configureInterfaceStyle(uiStyle);
+  }
+
     /**
      * Closes the message window.  This checks to see if the underlying
      * message is modified, and if so, pops up a dialog to make sure that

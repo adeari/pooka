@@ -29,6 +29,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 		getMessageDisplay().requestFocus();
 	    }
 	  });
+
     }
 
     public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
@@ -60,6 +61,8 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 		getMessageDisplay().requestFocus();
 	    }
 	  });
+
+	configureInterfaceStyle();
     }
 
     /**
@@ -84,8 +87,18 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	
 	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
 	keyBindings.setActive(getActions());
+
+	configureInterfaceStyle();
 	
     }
+
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessageWindowStyle(this);
+    messageDisplay.configureInterfaceStyle(uiStyle);
+  }
 
     public void detachWindow() {
 	ReadMessageFrame rmf = new ReadMessageFrame(this);

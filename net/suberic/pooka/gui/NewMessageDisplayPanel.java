@@ -75,8 +75,39 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       });
     
     splitPane.resetToPreferredSizes();
+
   }
-    
+
+  /**
+   * Configures the style of this DisplayPanel.
+   */
+  public void configureInterfaceStyle(HashMap uiStyle) {
+
+    LinkedList componentList = new LinkedList();
+    componentList.add(editorPane);
+
+    Enumeration  keys = inputTable.keys();
+    while (keys.hasMoreElements()) {
+      Object value = inputTable.get(keys.nextElement());
+      if (value != null && value instanceof JComponent)
+	componentList.add(value);
+    }
+
+    Color backgroundColor = (Color) uiStyle.get("background");
+    Color foregroundColor = (Color) uiStyle.get("background");
+    Font f = (Font) uiStyle.get("font");
+
+    for (int i = 0; i < componentList.size(); i++) {
+      JComponent currentComponent = (JComponent) componentList.get(i);
+      if (backgroundColor != null && currentComponent.getBackground() != backgroundColor) 
+	currentComponent.setBackground(backgroundColor);
+      if (foregroundColor != null && currentComponent.getForeground() != foregroundColor) 
+	currentComponent.setForeground(foregroundColor);
+      if (f != null && currentComponent.getFont() != f) 
+	currentComponent.setFont(f);
+    }
+  }
+
     /**
      * Sets the window to its preferred size.
      */

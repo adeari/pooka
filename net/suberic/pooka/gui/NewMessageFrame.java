@@ -43,6 +43,8 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	
 	toolbar.setActive(this.getActions());
 
+	configureInterfaceStyle();
+
 	this.setLocation(source.getLocationOnScreen());
     }
 
@@ -74,8 +76,18 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	    showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
 	    me.printStackTrace();
 	}
+	
+	configureInterfaceStyle();
     }
     
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowStyle(this);
+    messageDisplay.configureInterfaceStyle(uiStyle);
+  }
+
     /**
      * Closes the message window.  This checks to see if the underlying
      * message is modified, and if so, pops up a dialog to make sure that

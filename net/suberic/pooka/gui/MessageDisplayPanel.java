@@ -54,8 +54,13 @@ public abstract class MessageDisplayPanel extends JPanel {
     
     public abstract void configureMessageDisplay() throws MessagingException;
 
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public abstract void configureInterfaceStyle(java.util.HashMap properties);
+
     /**
-      * This calculates the default size for the EditorPane.
+     * This calculates the default size for the EditorPane.
      * 
      * Here, we use the MessageWindow.editorPane.* properties to determine
      * the size.  Specifically, we check for the hsizeByCharLength

@@ -63,6 +63,7 @@ public class ReadMessageFrame extends MessageFrame {
 	    }
 	  });
 
+	configureInterfaceStyle();
     }
 
     protected void configureMessageFrame() {
@@ -90,8 +91,17 @@ public class ReadMessageFrame extends MessageFrame {
 	    showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
 	    me.printStackTrace();
 	}
-	
+
+	configureInterfaceStyle();
     }
+
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessageWindowStyle(this);
+    messageDisplay.configureInterfaceStyle(uiStyle);
+  }
 
     /**
      * Attaches the window to a MessagePanel.

@@ -133,6 +133,50 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   }
   
   /**
+   * Configures the style of this DisplayPanel.
+   */
+  public void configureInterfaceStyle(HashMap uiStyle) {
+
+    Color c = null;
+
+    c = (Color) uiStyle.get("background");
+    if (c != null) {
+      editorPane.setBackground(c);
+      otherEditorPane.setBackground(c);
+    }
+
+    c = (Color) uiStyle.get("foreground");
+    if (c != null) {
+      editorPane.setForeground(c);
+      otherEditorPane.setForeground(c);
+    }
+
+    /*
+      c = uiStyle.get("disabledText");
+      if (c != null) {
+      editorPane.setDisabledText(c);
+      }
+      
+      c = uiStyle.get("select");
+      if (c != null) {
+      editorPane.setSelectColor(c);
+      }
+      
+      c = uiStyle.get("focus");
+      if (c != null) {
+      editorPane.setFocusColor(c);
+      }
+    */
+
+    Font f = (Font) uiStyle.get("font");
+    if (f != null) {
+      editorPane.setFont(f);
+      otherEditorPane.setFont(f);
+    }
+
+  }
+
+  /**
    * This sets the text of the editorPane to the content of the current
    * message.
    */
