@@ -14,7 +14,7 @@ import net.suberic.pooka.event.*;
  * for a Folder, the FolderInfo object has a reference to it.
  */
 
-public class FolderInfo {
+public class FolderInfo implements MessageCountListener {
     private Folder folder;
     private String folderID;
     private EventListenerList messageCountListeners = new EventListenerList();
@@ -33,6 +33,7 @@ public class FolderInfo {
 
     public FolderInfo(Folder f, String fid) {
 	folder=f;
+	f.addMessageCountListener(this);
 	folderID=fid;
     }
 
@@ -74,6 +75,7 @@ public class FolderInfo {
 		mp = new MessageProxy(getColumnValues(), msgs[i], this);
 
 		messageProxies.add(mp);
+		messageToProxyTable.put(msgs[i], mp);
 	    }
 
 	} catch (MessagingException me) {
@@ -197,6 +199,43 @@ public class FolderInfo {
 
     public void removeMessageChangedListener(MessageChangedListener oldListener) {
 	messageChangedListeners.remove(MessageChangedListener.class, oldListener);
+    }
+
+    // as defined in javax.mail.event.MessageCountListener
+
+    public void messagesAdded(MessageCountEvent e) {
+	System.out.println("Messages added.");
+	if (folderTableModel != null) {
+	    Message[] addedMessages = e.getMessages();
+	    MessageProxy mp;
+	    Vector addedProxies = new Vector();
+	    for (int i = 0; i < addedMessages.length; i++) {
+		mp = new MessageProxy(getColumnValues(), addedMessages[i], this);
+		addedProxies.add(mp);
+		messageToProxyTable.put(addedMessages[i], mp);
+	    }
+	    getFolderTableModel().addRows(addedProxies);
+	}
+    }
+
+    public void messagesRemoved(MessageCountEvent e) {
+	System.out.println("Messages Removed.");
+	if (folderTableModel != null) {
+	    Message[] removedMessages = e.getMessages();
+	    System.out.println("removedMessages was of size " + removedMessages.length);
+	    MessageProxy mp;
+	    Vector removedProxies=new Vector();
+	    for (int i = 0; i < removedMessages.length; i++) {
+		System.out.println("checking for existence of message.");
+		mp = getMessageProxy(removedMessages[i]);
+		if (mp != null) {
+		    System.out.println("message exists--removing");
+		    removedProxies.add(mp);
+		    messageToProxyTable.remove(mp);
+		}
+	    }
+	    getFolderTableModel().removeRows(removedProxies);
+	}
     }
 
     // Accessor methods.
