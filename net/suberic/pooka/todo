@@ -6,12 +6,6 @@ alpha release
 *)  make the editor for new messages wrap properly at 75 (or user configurable)
 characters.
 
-*)  Do a simple encryption of the password fields in the
-.pookarc file so that you can read .pookarc and not have everyone see your
-password.
-
-*)  add context-sensitive menus (right-click menus)
-
 *)  make the GUI Authenticator (which should come up when you don't enter
 your password in the Store Configuration) work--right now it doesn't.  note:
 it actually works ok (just ok) when you start it up from scratch--but when
@@ -21,12 +15,6 @@ and basically just fails all over the place.
 *)  add the ability to forward messages (oops)
 
 *)  enable keybindings so they work properly.
-
-*)  fix what happens if you select an unreachable/incorrectly written
-mailbox--right now it hangs.
-
-*)  associated with above, multithread properly--too many actions happen
-on the main i/o thread.
 
 *)  make cut & paste work from the Toolbar.
 
@@ -42,6 +30,21 @@ the UserProfile only gets updated at startup.
 
 after release
 -------------
+
+*) fix the AttachmentPane right-click menu--it doesn't work right now.
+
+*)  Do a simple encryption of the password fields in the
+.pookarc file so that you can read .pookarc and not have everyone see your
+password.
+
+*)  add context-sensitive menus (right-click menus)
+
+*)  fix what happens if you select an unreachable/incorrectly written
+mailbox--right now it hangs.
+
+*)  associated with above, multithread properly--too many actions happen
+on the main i/o thread.
+
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
 
