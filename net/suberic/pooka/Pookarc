@@ -292,7 +292,7 @@ NewMessageWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle:Crypto
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -324,16 +324,6 @@ MessageWindowToolbar.HeaderStyle.Default.Action=file-open-defaultdisplay
 MessageWindowToolbar.HeaderStyle.Default.Image=/org/javalobby/icons/20x20png/Check.png
 MessageWindowToolbar.HeaderStyle.Full.Action=file-open-fulldisplay
 MessageWindowToolbar.HeaderStyle.Full.Image=/org/javalobby/icons/20x20png/CheckAll.png
-MessageWindowToolbar.Crypto.Action=message-decrypt
-MessageWindowToolbar.Crypto.class=net.suberic.pooka.gui.crypto.CryptoButton
-MessageWindowToolbar.Crypto.notEncrypted.Image=/org/javalobby/icons/20x20png/Book.png
-MessageWindowToolbar.Crypto.uncheckedEncrypted.Image=/org/javalobby/icons/20x20png/Lock.png
-MessageWindowToolbar.Crypto.decryptedSuccessfully.Image=/org/javalobby/icons/20x20png/UnLock.png
-MessageWindowToolbar.Crypto.decryptedUnsuccessfully.Image=/org/javalobby/icons/20x20png/Delete.png
-MessageWindowToolbar.Crypto.uncheckedSigned.Image=/org/javalobby/icons/20x20png/CheckAll.png
-MessageWindowToolbar.Crypto.signatureVerified.Image=/org/javalobby/icons/20x20png/TrafficGreen.png
-MessageWindowToolbar.Crypto.signatureBad.Image=/org/javalobby/icons/20x20png/Delete.png
-MessageWindowToolbar.Crypto.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/Delete.png
 
 FolderPanel.2xClickAction=file-open
 
@@ -515,6 +505,19 @@ AttachmentPane.NewMsgActions=Remove
 AttachmentPane.NewMsgActions.Remove.Action=file-remove
 
 AttachmentPane.2xClickAction=file-open
+
+CryptoPanel.notEncrypted.Image=/org/javalobby/icons/20x20png/UnLock.png
+CryptoPanel.uncheckedEncrypted.Image=/org/javalobby/icons/20x20png/Lock.png
+CryptoPanel.decryptedSuccessfully.Image=/org/javalobby/icons/20x20png/OpenLock.png
+CryptoPanel.decryptedUnsuccessfully.Image=/org/javalobby/icons/20x20png/Bomb.png
+
+CryptoPanel.notSigned.Image=/org/javalobby/icons/20x20png/EnvelopeOpen.png
+CryptoPanel.uncheckedSigned.Image=/org/javalobby/icons/20x20png/Draw.png
+CryptoPanel.signatureVerified.Image=/org/javalobby/icons/20x20png/Check.png
+CryptoPanel.signatureBad.Image=/org/javalobby/icons/20x20png/Caution.png
+CryptoPanel.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/Caution.png
+
+CryptoPanel.hasAttachedkKey.Image=/org/javalobby/icons/20x20png/Key.png
 
 FolderSelectorPane.popupMenu=Select
 FolderSelectorPane.popupMenu.Select.Action=select-folder

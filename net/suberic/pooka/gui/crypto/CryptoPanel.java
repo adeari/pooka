@@ -22,6 +22,17 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
   static ImageIcon signatureBadIcon;
   static ImageIcon signatureFailedVerificationIcon;
 
+  // the various tooltips
+  static String notEncryptedTooltip;
+  static String uncheckedEncryptedTooltip;
+  static String decryptedSuccessfullyTooltip;
+  static String decryptedUnsuccessfullyTooltip;
+  static String notSignedTooltip;
+  static String uncheckedSignedTooltip;
+  static String signatureVerifiedTooltip;
+  static String signatureBadTooltip;
+  static String signatureFailedVerificationTooltip;
+
   // the various status colors
   static Color signedEncryptedColor = Color.MAGENTA;
   static Color signedColor = Color.GREEN;
@@ -64,6 +75,9 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
    */
   public JButton createEncryptionButton() {
     JButton returnValue = new JButton();
+    if (notEncryptedIcon != null)
+      returnValue.setIcon(notEncryptedIcon);
+    returnValue.setSize(20,20);
     return returnValue;
   }
   
@@ -72,6 +86,9 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
    */
   public JButton createSignatureButton() {
     JButton returnValue = new JButton();
+    if (notSignedIcon != null)
+      returnValue.setIcon(notSignedIcon);
+    returnValue.setSize(20,20);
     return returnValue;
   }
   
@@ -85,12 +102,16 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
 
       if (currentSigStatus == NOT_SIGNED) {
 	signatureButton.setIcon(notSignedIcon);
+	signatureButton.setToolTipText(notSignedTooltip);
       } else if (currentSigStatus == UNCHECKED_SIGNED) {
 	signatureButton.setIcon(uncheckedSignedIcon);
+	signatureButton.setToolTipText(uncheckedSignedTooltip);
       } else if (currentSigStatus == SIGNATURE_VERIFIED) {
 	signatureButton.setIcon(signatureVerifiedIcon);
+	signatureButton.setToolTipText(signatureVerifiedTooltip);
       } else if (currentSigStatus == SIGNATURE_BAD) {
 	signatureButton.setIcon(signatureBadIcon);
+	signatureButton.setToolTipText(signatureBadTooltip);
       }
     }
 
@@ -99,12 +120,16 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
 
       if (currentCryptStatus == UNCHECKED_ENCRYPTED) {
 	encryptionButton.setIcon(uncheckedEncryptedIcon);
+	encryptionButton.setToolTipText(uncheckedEncryptedTooltip);
       } else if (currentCryptStatus == DECRYPTED_SUCCESSFULLY) {
 	encryptionButton.setIcon(decryptedSuccessfullyIcon);
+	encryptionButton.setToolTipText(decryptedSuccessfullyTooltip);
       } else if (currentCryptStatus == DECRYPTED_UNSUCCESSFULLY) {
 	encryptionButton.setIcon(decryptedUnsuccessfullyIcon);
+	encryptionButton.setToolTipText(decryptedUnsuccessfullyTooltip);
       } else {
 	encryptionButton.setIcon(notEncryptedIcon);
+	encryptionButton.setToolTipText(notEncryptedTooltip);
       }    
       repaint();
     }
@@ -240,6 +265,37 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       return;
     }
     
+  }
+
+  /**
+   * This loads all of the tooltips for this button.
+   */
+  static void loadTooltips(String key, VariableBundle vars) {
+
+    /*
+     * this is going to have several tooltips:
+     * Unchecked Encrypted
+     * Decrypted Successfully
+     * Decrypted Unsuccessfully
+     * Unchecked Signed
+     * Signature verified
+     * Signature bad
+     * Signature failed verification
+     * ...and maybe more.
+     */
+
+
+    notEncryptedTooltip = vars.getProperty(key + ".notEncrypted.Tooltip", "NotEncrypted");
+    
+    uncheckedEncryptedTooltip = vars.getProperty(key + ".uncheckedEncrypted.Tooltip", "Encrypted Message");
+    decryptedSuccessfullyTooltip = vars.getProperty(key + ".decryptedSuccessfully.Tooltip", "Message Decrypted with Key ");
+    decryptedUnsuccessfullyTooltip = vars.getProperty(key + ".decryptedUnsuccessfully.Tooltip", "Message Failed Decryption");
+
+    uncheckedSignedTooltip = vars.getProperty(key + ".uncheckedSigned.Tooltip");
+    notSignedTooltip = vars.getProperty(key + ".notSigned.Tooltip", "Not Signed");
+    signatureVerifiedTooltip = vars.getProperty(key + ".signatureVerified.Tooltip", "Signature Verified with Key ");
+    signatureBadTooltip = vars.getProperty(key + ".signatureBad.Tooltip", "Signature Failed Verification by Key ");
+    signatureFailedVerificationTooltip = vars.getProperty(key + ".signatureFailedVerification.Tooltip", "Unable to Verfify Signature");
   }
 
 }

@@ -115,8 +115,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     attachmentSlot = new Box(BoxLayout.Y_AXIS);
     cryptoSlot = new Box(BoxLayout.Y_AXIS);
     
+    attachmentDisplayPanel.add(Box.createHorizontalStrut(5));
     attachmentDisplayPanel.add(attachmentSlot);
+    attachmentDisplayPanel.add(Box.createHorizontalStrut(5));
     attachmentDisplayPanel.add(cryptoSlot);
+    attachmentDisplayPanel.add(Box.createHorizontalStrut(5));
 
     splitPane.setTopComponent(otherScrollPane);
     splitPane.setBottomComponent(attachmentDisplayPanel);
@@ -299,7 +302,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    }
 	    
 	    if (hasEncryption) {
-	      net.suberic.pooka.gui.crypto.CryptoStatusDisplay csd = new net.suberic.pooka.gui.crypto.CryptoButton();
+	      net.suberic.pooka.gui.crypto.CryptoStatusDisplay csd = new net.suberic.pooka.gui.crypto.CryptoPanel();
 	      setCryptoStatusDisplay(csd);
 	      MessageCryptoInfo cryptoInfo = getMessageProxy().getMessageInfo().getCryptoInfo();
 	      if (cryptoInfo != null)
