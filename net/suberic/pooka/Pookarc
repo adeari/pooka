@@ -604,10 +604,13 @@ UserProfile.editableFields.sigPolicy.propertyType=List
 UserProfile.editableFields.sigPolicy.allowedValues=Manual:PGP:SMIME
 UserProfile.editableFields.cryptPolicy.propertyType=List
 UserProfile.editableFields.cryptPolicy.allowedValues=Manual:MatchingKey
-UserProfile.editableFields.pgpKey.propertyType=Manual
-UserProfile.editableFields.pgpKey.keyType=PGP
+UserProfile.editableFields.cryptPolicy=Manual
+UserProfile.editableFields.pgpKey.propertyType=Key
+UserProfile.editableFields.pgpKey.encryptionType=PGP
+UserProfile.editableFields.pgpKey.keyType=private
 UserProfile.editableFields.smimeKey.propertyType=Key
-UserProfile.editableFields.smimeKey.keyType=SMIME
+UserProfile.editableFields.smimeKey.keyType=private
+UserProfile.editableFields.smimeKey.encryptionType=S/MIME
 
 UserProfile.editableFields.editor.uiConfig.scoped=true
 UserProfile.editableFields.editor.uiConfig.scopeRoot=UserProfile.editableFields.uiConfig
@@ -1136,7 +1139,8 @@ FolderInfo.defaultDisplayFilters.Uncached.action.rgb=-8648439
 Pooka.background=0
 
 # PropertyEditors
-PropertyEditor=String:Boolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList
+PropertyEditor=String:Boolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key
+
 PropertyEditor.String.class=net.suberic.util.gui.propedit.StringEditorPane
 PropertyEditor.Boolean.class=net.suberic.util.gui.propedit.BooleanEditorPane
 PropertyEditor.List.class=net.suberic.util.gui.propedit.ListEditorPane
@@ -1153,6 +1157,7 @@ PropertyEditor.Folder.class=net.suberic.pooka.gui.propedit.FolderSelectorPane
 PropertyEditor.Filter.class=net.suberic.pooka.gui.filter.FilterEditorPane
 PropertyEditor.SearchTerm.class=net.suberic.pooka.gui.search.SearchEditorPane
 PropertyEditor.AddressList.class=net.suberic.pooka.gui.propedit.AddressBookEditorPane
+PropertyEditor.Key.class=net.suberic.pooka.gui.propedit.KeySelectorPane
 
 PropertyEditor.filter.portFilter.class=net.suberic.util.gui.propedit.NumberFilter
 PropertyEditor.filter.portFilter.min=0
