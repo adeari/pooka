@@ -244,7 +244,30 @@ public class FolderDisplayPanel extends JPanel {
 	}
     }
 
+    /**
+     * This selects the message at the given row, and also scrolls the
+     * MessageTable to make the given row visible.
+     *
+     * If the number entered is below the range of available messages, then
+     * the first message is selected.  If the number entered is above that
+     * range, then the last message is selected.  If the MessageTable 
+     * contains no messages, nothing happens.
+     */
+    public void goToMessage(int messageNumber) {
+	int rowCount = messageTable.getRowCount();
 
+	if (rowCount > 0) {
+	    int numberToSet = messageNumber;
+	    
+	    if (messageNumber < 0) {
+		numberToSet = 0;
+	    } else if (messageNumber >= rowCount) {
+		numberToSet = rowCount - 1;
+	    }
+	    messageTable.setRowSelectionInterval(numberToSet, numberToSet);
+	    makeSelectionVisible(numberToSet);
+	}
+    }
     /**
      * This method takes the currently selected row(s) and returns the
      * appropriate MessageProxy object.
