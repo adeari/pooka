@@ -1,24 +1,3 @@
-
-network on AWTEventThread:
-
-        at com.sun.mail.imap.IMAPMessage.getFlags(IMAPMessage.java:704)
-        - locked <0x462522d0> (a com.sun.mail.imap.IMAPMessage)
-        at net.suberic.pooka.UIDMimeMessage.getFlags(UIDMimeMessage.java:380)
-        - locked <0x44f481f0> (a net.suberic.pooka.UIDMimeMessage)
-        at net.suberic.pooka.MessageInfo.getFlags(MessageInfo.java:87)
-        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:536)
-        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:516)
-        at net.suberic.pooka.gui.FolderDisplayPanel.selectNextMessage(FolderDisplayPanel.java:489)
-        at net.suberic.pooka.gui.FolderInternalFrame.selectNextMessage(FolderInternalFrame.java:316)
-        at net.suberic.pooka.gui.FolderDisplayPanel$7.actionPerformed(FolderDisplayPanel.java:372)
-        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:2863)
-        at javax.swing.SwingUtilities.notifyAction(SwingUtilities.java:1512)
-        at javax.swing.JComponent.processKeyBinding(JComponent.java:2435)
-        at javax.swing.JTable.processKeyBinding(JTable.java:3254)
-        at javax.swing.JComponent.processKeyBindings(JComponent.java:2470)
-        at javax.swing.JComponent.processKeyEvent(JComponent.java:2398)
-
-
 *) -- windows --
   *) support windows registry attachment associations.
 	-- check icemail
@@ -157,6 +136,27 @@ preview:
 	*) make it so there is some way for the NetworkConnection to detect
 		whether or not it's up.
 			-- started.  make sure it's enough.
+
+
+*)  network on AWTEventThread:
+    i think that i did this for a reason.  possible that in 1.4 original
+	problem goes away?  maybe?
+        at com.sun.mail.imap.IMAPMessage.getFlags(IMAPMessage.java:704)
+        - locked <0x462522d0> (a com.sun.mail.imap.IMAPMessage)
+        at net.suberic.pooka.UIDMimeMessage.getFlags(UIDMimeMessage.java:380)
+        - locked <0x44f481f0> (a net.suberic.pooka.UIDMimeMessage)
+        at net.suberic.pooka.MessageInfo.getFlags(MessageInfo.java:87)
+        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:536)
+        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:516)
+        at net.suberic.pooka.gui.FolderDisplayPanel.selectNextMessage(FolderDisplayPanel.java:489)
+        at net.suberic.pooka.gui.FolderInternalFrame.selectNextMessage(FolderInternalFrame.java:316)
+        at net.suberic.pooka.gui.FolderDisplayPanel$7.actionPerformed(FolderDisplayPanel.java:372)
+        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:2863)
+        at javax.swing.SwingUtilities.notifyAction(SwingUtilities.java:1512)
+        at javax.swing.JComponent.processKeyBinding(JComponent.java:2435)
+        at javax.swing.JTable.processKeyBinding(JTable.java:3254)
+        at javax.swing.JComponent.processKeyBindings(JComponent.java:2470)
+        at javax.swing.JComponent.processKeyEvent(JComponent.java:2398)
 
 *) forward to all.
  

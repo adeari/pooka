@@ -1,6 +1,12 @@
+fixed lots of other problems in jdk 1.4, including incorrect sizing of some
+of the configuration dialogs, some times when focus wouldn't follow back from
+a deleted message, and....  some other stuff.  don't remember it all.
+
 fixed SSL on jdk 1.4
 
 ----- branched for 1.1/2.0 release. -----
+
+fixed a bug where part of the error message was getting shown twice.
 
 made it so the INBOX is required for imap servers.  with luck this will work
 around a problem in which the inbox sometimes doesn't show up for imap 
