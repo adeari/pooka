@@ -642,13 +642,20 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * Configures the interfaceStyle for this Pane.
    */
   public void configureInterfaceStyle() {
-     
-    try {
-      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
-    } catch (Exception e) {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  try {
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI(MessagePanel.this, MessagePanel.this);
+	  } catch (Exception e) {
+	  }
+	}
+      };
 
+    if (! SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(runMe);
+    } else {
+      runMe.run();
     }
-
   }
 
  /**

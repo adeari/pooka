@@ -66,13 +66,23 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * Configures the InterfaceStyle for this component.
    */
   public void configureInterfaceStyle() {
-    try {
-      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
-      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
-      getMessageDisplay().sizeToDefault();
-      MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
-      
-    } catch (Exception e) {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  try {
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageInternalFrame.this, MessageInternalFrame.this);
+	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	    getMessageDisplay().sizeToDefault();
+	    MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
+	    
+	  } catch (Exception e) {
+	  }
+	}
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(runMe);
+    } else {
+      runMe.run();
     }
   }
 

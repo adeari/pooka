@@ -127,18 +127,29 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     configureInterfaceStyle(false);
   }
 
-  private void configureInterfaceStyle(boolean force) {
-    try {
-      Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this, force);
-      LinkedList allNodes = getAllNodes();
-      for (int i = 0; i < allNodes.size(); i++) {
-	Object currentNode = allNodes.get(i);
-	if (currentNode instanceof MailTreeNode) {
-	  ((MailTreeNode) currentNode).updatePopupTheme();
+  private void configureInterfaceStyle(boolean pForce) {
+    final boolean force = pForce;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  try {
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI(FolderPanel.this, FolderPanel.this, force);
+	    LinkedList allNodes = getAllNodes();
+	    for (int i = 0; i < allNodes.size(); i++) {
+	      Object currentNode = allNodes.get(i);
+	      if (currentNode instanceof MailTreeNode) {
+		((MailTreeNode) currentNode).updatePopupTheme();
+	      }
+	    }
+	  } catch (Exception e) {
+	    
+	  }
 	}
-      }
-    } catch (Exception e) {
-      
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(runMe);
+    } else {
+      runMe.run();
     }
 
   }
