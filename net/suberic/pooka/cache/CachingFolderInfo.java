@@ -9,18 +9,7 @@ import net.suberic.pooka.*;
 
 public class CachingFolderInfo extends FolderInfo {
     protected MessageCache cache = null;
-    protected int status;
 
-    // folder is currently open and available.
-    public static int CONNECTED = 0;
-
-    // folder is available, but only 
-    public static int DISCONNECTED = 1;
-    public static int UNAVAILABLE = 2;
-
-    // folder does not exist on server
-    public static int INVALID = 3;
-    
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
 	
@@ -137,48 +126,40 @@ public class CachingFolderInfo extends FolderInfo {
 	// i'm taking this almost directly from ICEMail; i don't know how
 	// to keep the stores/folders open, either.  :)
 
-	if (isAvailable()) {
-	    Store s = getParentStore().getStore();
-	    try {
-		//Folder f = s.getFolder("nfdsaf238sa");
-		//f.exists();
-		Folder current = getFolder();
-		if (current != null && current.isOpen()) {
-		    current.getNewMessageCount();
-		    current.getUnreadMessageCount();
-		}
-	    } catch ( MessagingException me ) {
-		try {
-		    if ( ! s.isConnected() )
-			s.connect();
-		} catch ( MessagingException me2 ) {
-		}
+	try {
+	    if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
+		StoreInfo s = getParentStore();
+		if (! s.isConnected())
+		    s.connectStore();
+		
+		openFolder(Folder.READ_WRITE);
+		
+		
 	    }
 	    
-	    resetMessageCounts();
-	}
+	} catch ( MessagingException me ) {
+	    try {
+		if ( ! s.isConnected() )
+		    s.connect();
+	    } catch ( MessagingException me2 ) {
+	    }
+	}	    
+	
+	resetMessageCounts();
     }
 
     /**
-     * Refreshes all the MessageInfo objects by the UID, if any.
+     * This synchronizes the cache with the new information from the 
+     * Folder.
      */
-    /*
-    public void refreshAllMessages() {
-	if (folder instanceof UIDFolder) {
-	    UIDFolder uidFolder = (UIDFolder) folder;
-	    Hashtable newMessageToInfoTable = new Hashtable();
-	    Enumeration keys = messageToInfoTable.keys(); 
-	    while (keys.hasMoreElements()) {
-		MessageInfo proxy = (MessageInfo) messageToInfoTable.get(keys.nextElement());
-		Message m = proxy.refreshMessage();
-		if (m != null)
-		    newMessageToInfoTable.put(m, proxy);
-	    }
-	}	
+    public void synchronizeCache() throws MessagingException {
+	Message[] messages = getFolder().getMessages();
+	long[] uids = new long[messages.length];
+	for (int i = 0; i < messages.length; i++) {
+	    uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
+	}
     }
-    */
-
-
+    
     /**
      * This returns the MessageCache associated with this FolderInfo,
      * if any.

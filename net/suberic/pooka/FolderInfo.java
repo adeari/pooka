@@ -21,6 +21,27 @@ import net.suberic.util.thread.ActionThread;
 
 public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer, MessageChangedListener {
 
+    // folder is currently open and available.
+    public static int CONNECTED = 0;
+
+    // folder is disconnected, but should be open; try to reopen at first
+    // opportunity
+    public static int LOST_CONNECTION = 1;
+
+    // folder is available, but only should be accessed during the checkFolder
+    // phase.
+
+    public static int PASSIVE = 2;
+
+    // folder is running in disconnected mode; only act on the cached 
+    // messages.
+    public static int DISCONNECTED = 3;
+
+    // folder does not exist on server
+    public static int INVALID = 4;
+    
+    protected int status;
+
     private Folder folder;
 
     // The is the folder ID: storeName.parentFolderName.folderName
