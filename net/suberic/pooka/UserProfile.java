@@ -482,11 +482,17 @@ public class UserProfile extends Object implements ValueChangeListener {
   public java.security.Key getEncryptionKey() {
     if (encryptionKeyId != null && encryptionKeyId.length() > 0) {
       try {
-	java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(encryptionKeyId);
-	return returnValue;
+	if (Pooka.getCryptoManager().privateKeyAliases().contains(encryptionKeyId)) {
+	  java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(encryptionKeyId);
+
+	  return returnValue;
+	}
       } catch (Exception ee) {
 	ee.printStackTrace();
       }
+      // FIXME
+      System.err.println("unable to find private key " + encryptionKeyId);
+      return null;
     }
 
     return null;

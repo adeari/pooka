@@ -13,7 +13,13 @@ import java.util.*;
 public class MessageCryptoInfo {
   
   // the MessageInfo that we're analyzing.
-  MessageInfo msgInfo;
+  MessageInfo mMsgInfo;
+
+  // the type of encryption (s/mime, pgp)
+  String mEncryptionType = null;
+
+  // whether or not we've checked to see if this is encrypted at all
+  boolean mCheckedEncryption = false;
 
   // whether we've checked the signature yet
   boolean mCheckedSignature = false;
@@ -31,23 +37,50 @@ public class MessageCryptoInfo {
    * Creates a MessageCryptoInfo for this given Message.
    */
   public MessageCryptoInfo(MessageInfo sourceMsg) {
-    msgInfo = sourceMsg;
+    mMsgInfo = sourceMsg;
+  }
+
+  /**
+   * Returns the EncryptionUtils to use with this MessageCryptoInfo.
+   */
+  public EncryptionUtils getEncryptionUtils() throws MessagingException {
+    if (! mCheckedEncryption) {
+      mEncryptionType = net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) mMsgInfo.getMessage());
+    }
+
+    if (mEncryptionType != null) {
+      try {
+	return net.suberic.crypto.EncryptionManager.getEncryptionUtils(mEncryptionType);
+      } catch (java.security.NoSuchProviderException nspe) {
+	return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   /**
    * Returns whether or not this message is signed.
    */
   public boolean isSigned() throws MessagingException {
-    // FIXME
-    return (net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) msgInfo.getMessage()) != null);
+    EncryptionUtils utils = getEncryptionUtils();
+    if (utils != null) {
+      // FIXME 
+      return true;
+    } else
+      return false;
   }
 
   /**
    * Returns whether or not this message is encrypted.
    */
   public boolean isEncrypted() throws MessagingException {
-    // FIXME
-    return (net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) msgInfo.getMessage()) != null);
+    EncryptionUtils utils = getEncryptionUtils();
+    if (utils != null) {
+      // FIXME
+      return true;
+    } else
+      return false;
   }
 
   /**
@@ -89,8 +122,8 @@ public class MessageCryptoInfo {
    */
   public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     if (recheck || ! hasCheckedSignature()) {
-      EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils((MimeMessage) msgInfo.getMessage());
-      mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)msgInfo.getMessage(), key);
+      EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils((MimeMessage) mMsgInfo.getMessage());
+      mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)mMsgInfo.getMessage(), key);
       mCheckedSignature = true;
     }
 
@@ -108,7 +141,7 @@ public class MessageCryptoInfo {
       } else {
 	mCheckedDecryption = true;
 	// run through all of the attachments and decrypt them.
-	AttachmentBundle bundle = msgInfo.getAttachmentBundle();
+	AttachmentBundle bundle = mMsgInfo.getAttachmentBundle();
 	List attachmentList = bundle.getAttachmentsAndTextPart();
 	for (int i = 0; i < attachmentList.size(); i++) {
 	  Object o = attachmentList.get(i);
@@ -116,7 +149,7 @@ public class MessageCryptoInfo {
 	    CryptoAttachment ca = (CryptoAttachment) o;
 
 	    // FIXME
-	    EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils("PGP");
+	    EncryptionUtils cryptoUtils = getEncryptionUtils();
 
 	    BodyPart bp = ca.decryptAttachment(cryptoUtils, key);
 	    

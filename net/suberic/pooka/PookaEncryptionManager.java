@@ -33,6 +33,8 @@ public class PookaEncryptionManager {
 
   Map aliasPasswordMap = new HashMap();
 
+  boolean savePasswordsForSession = false;
+
   /**
    * Creates an EncryptionManager using the given VariableBundle and
    * key property.
@@ -105,7 +107,8 @@ public class PookaEncryptionManager {
       System.out.println("Error loading S/MIME key store:  " + e.getMessage());
     }
 
-
+    savePasswordsForSession = Pooka.getProperty(key + ".savePasswordsForSession", "false").equalsIgnoreCase("true");
+    
   }
 
 
@@ -164,22 +167,22 @@ public class PookaEncryptionManager {
   /**
    * Returns the Private key for the given alias.
    */
-  public Key getPrivateKey(String alias) {
-
-    try {
+  public Key getPrivateKey(String alias) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
     if (pgpKeyMgr != null || smimeKeyMgr != null) {
       char[] password = getPasswordForAlias(alias, false);
-      
-      try {
-	return pgpKeyMgr.getPrivateKey(alias, password);
-      } catch (java.security.KeyStoreException kse) {
-	
+
+      // check to see if this exists anywhere.
+      if (pgpKeyMgr != null) {
+	if (pgpKeyMgr.containsPrivateKeyAlias(alias))
+	  return pgpKeyMgr.getPrivateKey(alias,password);
       }
       
+      if (smimeKeyMgr!= null) {
+	if (smimeKeyMgr.containsPrivateKeyAlias(alias))
+	  return smimeKeyMgr.getPrivateKey(alias, password);
+      }
     }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+    
     return null;
   }
 
@@ -206,7 +209,9 @@ public class PookaEncryptionManager {
     if (returnValue == null || check) {
       returnValue = net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog();
       if (returnValue != null) {
-	aliasPasswordMap.put(alias, returnValue);
+	if (savePasswordsForSession) {
+	  aliasPasswordMap.put(alias, returnValue);
+	}
       }
     }
 
@@ -253,7 +258,7 @@ public class PookaEncryptionManager {
    * Encrypts to given message.  Actually checks all of the recipients
    * configured to see if we have a key for each one.
    */
-  public MimeMessage encryptMessage(MimeMessage mMsg) throws MessagingException {
+  public MimeMessage encryptMessage(MimeMessage mMsg) throws MessagingException, java.security.GeneralSecurityException, java.io.IOException {
     
     // if we don't have a key, see if we can get a default.
     Key key = null;
@@ -277,18 +282,14 @@ public class PookaEncryptionManager {
    * Encrypts the given message.  If there's no key, return null.
    */
   public MimeMessage encryptMessage(MimeMessage mMsg, Key key)
-    throws MessagingException  {
+    throws MessagingException, java.security.GeneralSecurityException, java.io.IOException {
     if (key != null) {
-      try {
-	if (key instanceof EncryptionKey) {
-	  return ((EncryptionKey) key).getEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
-	} else {
-	  return EncryptionManager.getEncryptionUtils("PGP").encryptMessage(Pooka.getDefaultSession(), mMsg, key);
-	}
-      } catch (Exception e) {
-	e.printStackTrace();
+      if (key instanceof EncryptionKey) {
+	return ((EncryptionKey) key).getEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+      } else {
+	return EncryptionManager.getEncryptionUtils("PGP").encryptMessage(Pooka.getDefaultSession(), mMsg, key);
       }
-
+      
     }
     return mMsg;
   }
@@ -297,25 +298,19 @@ public class PookaEncryptionManager {
    * Signs the given message.
    */
   public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, Key key) 
-    throws MessagingException, java.io.IOException  {
+    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
     if (key == null) {
       key = profile.getEncryptionKey();
     }
-
+    
     if (key == null) {
-      // get user input.
+      // get user input
     }
-
-    try {
+    
     if (key != null)
       return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
     else
       return mMsg;
-    } catch (Exception e) {
-      e.printStackTrace();
-      return null;
-    }
-
   }
 
 }

@@ -61,9 +61,7 @@ public class MailUtilities {
   public static AttachmentBundle parseAttachments(Message m) throws MessagingException, java.io.IOException {
     AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
 
-    System.err.println("checking " + ((MimeMessage)m).getContentType() + " for isEncrypted.");
     if (EncryptionManager.checkEncryptionType((MimeMessage) m) != null) {
-      System.err.println("it is.");
       Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
       
       bundle.getAttachments().add(newAttach);
@@ -172,9 +170,7 @@ public class MailUtilities {
     for (int i = 0; i < mp.getCount(); i++) {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
       
-      System.err.println("checking " + mbp.getContentType() + " for isEncrypted.");
       if (EncryptionManager.checkEncryptionType(mbp) != null) {
-	System.err.println("it is.");
 	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mbp);
 	bundle.getAttachments().add(newAttach);
 	/*

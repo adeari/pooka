@@ -87,19 +87,14 @@ public class CryptoAttachment extends Attachment {
 	return null;
       }
       */
-      System.err.println("super.getDataHandler() = " + super.getDataHandler());
-      super.getDataHandler().writeTo(System.out);
 
       //MimeBodyPart mbp = new MimeBodyPart(super.getDataHandler().getInputStream());
       MimeBodyPart mbp = new MimeBodyPart();
       mbp.setDataHandler(super.getDataHandler());
       mbp.setHeader("Content-Type", super.getDataHandler().getContentType());
 
-      System.err.println("decrypting part.");
       decryptedBodyPart = utils.decryptBodyPart(mbp, key);
 
-      System.err.println("part decrypted.");
-      System.err.println("content = " + decryptedBodyPart.getContent());
       return decryptedBodyPart;
     }
     

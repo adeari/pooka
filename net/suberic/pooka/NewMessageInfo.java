@@ -90,27 +90,32 @@ public class NewMessageInfo extends MessageInfo {
 
     // do encryption stuff, if necessary.
 
-    try {
-      System.err.println("checking on crypto stuff.");
-      if (mSignMessage == CRYPTO_YES || (mSignMessage == CRYPTO_DEFAULT && profile != null && profile.getSignAsDefault())) {
+    if (mSignMessage == CRYPTO_YES || (mSignMessage == CRYPTO_DEFAULT && profile != null && profile.getSignAsDefault())) {
+      try {
 	message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile, mSignatureKey);
+      } catch (Exception e) {
+	e.printStackTrace();
       }
-      
-      if (mEncryptMessage == CRYPTO_YES) {
-	System.err.println("encrypting with " + getEncryptionKey());
+    }
+    
+    if (mEncryptMessage == CRYPTO_YES) {
+      try {
 	if (getEncryptionKey() != null) {
 	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getEncryptionKey());
-	  message.writeTo(System.out);
 	} else {
 	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
 	}
-      } else if (mEncryptMessage == CRYPTO_DEFAULT) {
-	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+      } catch (Exception e) {
+	e.printStackTrace();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
+    } else if (mEncryptMessage == CRYPTO_DEFAULT) {
+      try {
+	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
+      } catch (Exception e) {
+	e.printStackTrace();
+      }
     }
-
+    
     boolean sent = false;
     if (profile != null) {
       OutgoingMailServer mailServer = profile.getMailServer();

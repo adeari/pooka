@@ -487,11 +487,9 @@ public class MessageProxy {
    */
   public void decryptMessage() {
     MessageInfo info = getMessageInfo();
-    System.err.println("decrypting message.");
     if (info != null) {
       if (info.hasEncryption()) {
 
-	System.err.println("has encryption.");
 	java.security.Key key = getDefaultProfile().getEncryptionKey();
 
 	try {
@@ -500,7 +498,6 @@ public class MessageProxy {
 	  }
 	} catch (Exception e) {
 	  showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
-	  
 	}
 	  
 	MessageCryptoInfo cInfo = info.getCryptoInfo();
