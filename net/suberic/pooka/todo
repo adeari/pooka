@@ -1,23 +1,49 @@
 top todo:
 
+(windows)
+
+*) (related to above) check to make sure that files (especially the address
+	book file) are created correctly under windows. -- especially check
+	handing of '\' in properties.
+
+------------------
+
+*) bug:  the ReadMessageDisplayPanel always uses both EditorPanes.  this is
+	probably extremely inefficient.  
+
+*) fix it so no tableInfos are ever loaded on the awt even thread.  this
+	means that we'll probably have to either a) load all of the 
+	tableInfos before we add the messages to the FolderTable, or b)
+	have a way to display unloaded infos, and an event system that will
+	update the table when the tableInfo is loaded.
+
+*) fix the window size--it's possible that if you change the foldertable
+size and the desktop pane size, but not the main window size, your main
+window size will end up changing anyway.
+
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
 possible folders, nor just the ones that are open.
 
-(windows)
+*) fix it so the file (and font and so forth?) editor actually includes
+	the '...' icon.
 
-*) test and fix the external editor spawning on windows.  -- more or less
-	done, but we should go ahead and see if we can add a wrapper for
-	windows.
+*) test the following:  open a folder.  do right click->close folder.
+	try reopening the folder and reading from it.
 
-*) make sure that the file editor actually is getting used for everything
-that's set as a propertyType=file.  --especially test to make sure this
-works when you package up a .jar file.
+*) add support for jdk1.4
+	-- tabbing between the address components for New Messages
+	-- the MailFileSystemView doesn't seem to work at all (!)
+	-- up and down arrows while composing new messages.
 
-*) (related to above) check to make sure that files (especially the address
-	book file) are created correctly under windows.
+*) support java jnlp (?)
 
-------------------
+*) a nested message which is of type text/html doesn't get shown on the
+	display.
+
+*) need a way for forward/include html-only messages.
+
+*) come up with a wrapper for spawning external editors on windows.
 
 	-- search --
 
@@ -43,6 +69,13 @@ works when you package up a .jar file.
 	with the uid system) use the LoadMessageThread.  also make the
 	LoadMessageThread use the main FolderThread synchronization.
 
+*) new message count on disconnected imap folders is a bit strange.  might 
+want to get it from the cache instead of the folder itself when we haven't
+downloaded the new messages yet.  kind of weird to see '6 new messages' and
+have nothing new in your inbox because it hasn't been d/l'ed yet.
+
+*) incorrect number of messages/unread messages when in disconnected mode.
+
 ------------
 
 *)  when you change users for a new message, then, even if the theme 
@@ -64,9 +97,7 @@ doesn't change, you still resize the window.
 	*)  change the new user setup so that it configures an outbox
 		automatically.
 
-*) have Pooka itself change its icon if you get new messages, in addition to 
-changing the title bar.
-	done.  todo:  get good icons.
+*) get some decent pooka icons.
 	
 *) add support for external editors, such as emacs.
 
@@ -87,8 +118,6 @@ error:  filterfoldercellrenderer has problems with search forms.
 *) check:  see how outgoing and incoming mail handle tab characters.
 	-- a little bit of a bug, but not too much.  should probably
 	check the actual message source to see how tabs are sent.
-
-*) incorrect number of messages/unread messages when in disconnected mode.
 
 *)  make the windows detachable. 
 	-- done, at least for read messages and new message.
@@ -117,21 +146,9 @@ typing in information and then be surprised when add clears it out.
 *) bug:  trying to go to a folder editor when there aren't any folders
 or stores configured is a big problem.
 
-*) new message count on disconnected imap folders is a bit strange.  might 
-want to get it from the cache instead of the folder itself when we haven't
-downloaded the new messages yet.  kind of weird to see '6 new messages' and
-have nothing new in your inbox because it hasn't been d/l'ed yet.
-
 *) some messages aren't parsed properly by the mbox provider.
 *) the mbox provider isn't safe for mailboxes that are edited by
 	     other processes.
-
-*) bug:  the ReadMessageDisplayPanel always uses both EditorPanes.  this is
-	probably extremely inefficient.  
-
-*) fix the window size--it's possible that if you change the foldertable
-size and the desktop pane size, but not the main window size, your main
-window size will end up changing anyway.
 
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.  -- only on unix.  
@@ -139,11 +156,6 @@ use it--or at least so it doesn't matter if it does.  -- only on unix.
 
 *) fix the startup bugs:  
 	1)  windows take too long to show up
-
-*) a nested message which is of type text/html doesn't get shown on the
-	display.
-
-*) need a way for forward/include html-only messages.
 
 *) enable voice control
 
@@ -176,9 +188,9 @@ window at -5, -5.
 
 *) add interfaces for all the rest of the features.  :)
 
-*) add 'edit message as new' for normal messages.
-
 *) add ldap support
+
+*) add 'edit message as new' for normal messages.
 
 *) add ability to edit received messages, so you can do things like remove
 attachments that you don't want to keep (?)
@@ -202,5 +214,4 @@ attachments available from message list.
 
 the Spice is life
 
-write profile changes to disk immediately on setting (?)
 
