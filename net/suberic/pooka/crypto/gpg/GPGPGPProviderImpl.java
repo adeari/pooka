@@ -241,4 +241,19 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     return tmpFile;
   }
 
+  /**
+   * Returns a KeyStore provider.
+   */
+  public EncryptionKeyManager createKeyManager() {
+    return new GPGEncryptionKeyManager();
+  }
+
+  /**
+   * Returns a KeyStore provider.
+   */
+  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws java.io.IOException {
+    GPGEncryptionKeyManager mgr = new GPGEncryptionKeyManager();
+    mgr.load(inputStream, password);
+    return mgr;
+  }
 }

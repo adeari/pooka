@@ -344,4 +344,21 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     return checkSignature(bais, sigBytes, key);
       
   }
+
+  /**
+   * Returns a KeyStore provider.
+   */
+  public EncryptionKeyManager createKeyManager() {
+    return getPGPProviderImpl().createKeyManager();
+  }
+
+  /**
+   * Returns a KeyStore provider.
+   */
+  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws java.io.IOException {
+    return getPGPProviderImpl().createKeyManager(inputStream, password);
+
+  }
+
+
 }

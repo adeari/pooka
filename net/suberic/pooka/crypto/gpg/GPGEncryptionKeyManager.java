@@ -1,6 +1,7 @@
-package net.suberic.pooka.crypto;
+package net.suberic.pooka.crypto.gpg;
 
 import net.suberic.pooka.*;
+import net.suberic.pooka.crypto.*;
 import net.suberic.util.*;
 
 import java.security.*;
@@ -8,9 +9,14 @@ import java.io.*;
 import java.util.*;
 
 /**
- * This manages a set of Encryption keys for use with PGP or S/MIME.
+ * This manages a set of Encryption keys to be used with GPG.
  */
-public interface EncryptionKeyManager {
+public class GPGEncryptionKeyManager implements EncryptionKeyManager {
+
+  HashMap publicKeyMap = null;
+  HashMap privateKeyMap = null;
+
+  boolean loaded = false;
 
   /*
    * Loads this KeyStore from the given input stream.
@@ -37,7 +43,116 @@ public interface EncryptionKeyManager {
    * the integrity of the keystore cannot be found
    */
   public void load(InputStream stream, char[] password)
-    throws IOException;
+    throws IOException {
+    // we'll ignore the input and just load the default store.
+
+    publicKeyMap = new HashMap();
+    privateKeyMap = new HashMap();
+
+    Process p = Runtime.getRuntime().exec("gpg --list-keys");
+
+    try {
+      p.waitFor();
+    } catch (InterruptedException ie) {
+    }
+    
+    BufferedReader resultReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+    String currentLine = resultReader.readLine();
+    while (currentLine != null && currentLine.startsWith("gpg:")) {
+      System.err.println("skipping " + currentLine);
+      // skip all of the gpg: headers.
+      currentLine = resultReader.readLine();
+    }
+
+    if (currentLine != null) {
+      // read the next two lines.
+      System.err.println("skipping " + currentLine);
+      currentLine = resultReader.readLine();
+      System.err.println("skipping " + currentLine);
+      currentLine = resultReader.readLine();
+    }    
+
+    // now we actually create the keys.
+    while (currentLine != null) {
+      try {
+	System.err.println("adding key from line:");
+	System.err.println(currentLine);
+	int keyTypeEnd = currentLine.indexOf(' ', 0);
+	int keyIdEnd = currentLine.indexOf(' ', keyTypeEnd + 2);
+	int keyDateEnd = currentLine.indexOf(' ', keyIdEnd + 1);
+	System.err.println("keyTypeEnd=" + keyTypeEnd + ", id " + keyIdEnd + ", keyDate " + keyDateEnd);
+	String keyAlias = currentLine.substring(keyDateEnd + 1);
+	EncryptionKey key = new GPGEncryptionKey(keyAlias, "");
+	publicKeyMap.put(keyAlias, key);
+	System.err.println("adding public alias for '" + keyAlias + "'");
+	currentLine = resultReader.readLine();
+	while (currentLine != null && currentLine.length() > 0) {
+	  currentLine = resultReader.readLine();
+	}
+      } catch (IndexOutOfBoundsException ioobe) {
+	System.out.println("error reading key:  '" + currentLine + "'");
+	ioobe.printStackTrace();
+      }
+      
+      currentLine = resultReader.readLine();
+    }
+
+    // do the same for the private keys
+
+    Process sp = Runtime.getRuntime().exec("gpg --list-secret-keys");
+
+    try {
+      sp.waitFor();
+    } catch (InterruptedException ie) {
+    }
+    
+    System.err.println("getting private keys.");
+    resultReader = new BufferedReader(new InputStreamReader(sp.getInputStream()));
+
+    currentLine = resultReader.readLine();
+    while (currentLine != null && currentLine.startsWith("gpg:")) {
+      // skip all of the gpg: headers.
+      System.err.println("skipping " + currentLine);
+      currentLine = resultReader.readLine();
+    }
+    
+    if (currentLine != null) {
+      // read the next two lines.
+      System.err.println("skipping " + currentLine);
+      currentLine = resultReader.readLine();
+      System.err.println("skipping " + currentLine);
+      currentLine = resultReader.readLine();
+    }    
+
+    // now we actually create the keys.
+    while (currentLine != null) {
+      try {
+	System.err.println("adding key from line:");
+	System.err.println(currentLine);
+	int keyTypeEnd = currentLine.indexOf(' ', 0);
+	int keyIdEnd = currentLine.indexOf(' ', keyTypeEnd + 2);
+	int keyDateEnd = currentLine.indexOf(' ', keyIdEnd + 1);
+	System.err.println("keyTypeEnd=" + keyTypeEnd + ", id " + keyIdEnd + ", keyDate " + keyDateEnd);
+	String keyAlias = currentLine.substring(keyDateEnd + 1);
+	EncryptionKey key = new GPGEncryptionKey(keyAlias, "");
+	privateKeyMap.put(keyAlias, key);
+	System.err.println("adding private alias for '" + keyAlias + "'");
+	currentLine = resultReader.readLine();
+	while (currentLine != null && currentLine.length() > 0) {
+	  currentLine = resultReader.readLine();
+	}
+      } catch (IndexOutOfBoundsException ioobe) {
+	System.out.println("error reading secret key:  '" + currentLine + "'");
+	ioobe.printStackTrace();
+      }
+      
+      currentLine = resultReader.readLine();
+    }
+
+    loaded = true;
+  }
+
   
   /**
    * Stores this keystore to the given output stream, and protects its
@@ -53,7 +168,11 @@ public interface EncryptionKeyManager {
    * algorithm could not be found
    */
   public void store(OutputStream stream, char[] password)
-    throws KeyStoreException, IOException;
+    throws KeyStoreException, IOException {
+    // again, we'll actually store all keys directly, so this has no
+    // effect.
+    return;
+  }
   
   /**
    * Retrieves the number of entries in this keystore.
@@ -64,8 +183,14 @@ public interface EncryptionKeyManager {
    * (loaded).
    */
   public int size()
-    throws KeyStoreException;
-  
+    throws KeyStoreException {
+    if (loaded) {
+      return publicKeyMap.size() + privateKeyMap.size();
+    } else {
+      throw new KeyStoreException ( "store not loaded." );
+    }
+  }
+
   /**
    * Returns the key associated with the given alias, using the given
    * password to recover it.
@@ -84,7 +209,12 @@ public interface EncryptionKeyManager {
    * (e.g., the given password is wrong).
    */
   public EncryptionKey getPublicKey(String alias)
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+    return (EncryptionKey) publicKeyMap.get(alias);
+  }
 
   /**
    * Returns the key associated with the given alias, using the given
@@ -104,7 +234,15 @@ public interface EncryptionKeyManager {
    * (e.g., the given password is wrong).
    */
   public EncryptionKey getPrivateKey(String alias, char[] password)
-    throws KeyStoreException;
+    throws KeyStoreException {
+
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+    System.err.println("returning private key for alias '" + alias + "'");
+
+    return (EncryptionKey) privateKeyMap.get(alias);
+  }
   
   
   /**
@@ -131,7 +269,12 @@ public interface EncryptionKeyManager {
    * for some other reason
    */
   public void setPublicKeyEntry(String alias, EncryptionKey key)
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+    // not yet implemented
+  }
   
   /**
    * Assigns the given key to the given alias, protecting it with the given
@@ -157,7 +300,12 @@ public interface EncryptionKeyManager {
    * for some other reason
    */
   public void setPrivateKeyEntry(String alias, EncryptionKey key, char[] password)
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+    // not yet implemented
+  }
   
   /**
    * Deletes the entry identified by the given alias from this keystore.
@@ -168,7 +316,15 @@ public interface EncryptionKeyManager {
    * or if the entry cannot be removed.
    */
   public void deletePublicKeyEntry(String alias)
-    throws KeyStoreException;
+    throws KeyStoreException {
+
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+
+    // not yet implemented
+  }
+
   
   /**
    * Deletes the entry identified by the given alias from this keystore.
@@ -179,7 +335,12 @@ public interface EncryptionKeyManager {
    * or if the entry cannot be removed.
    */
   public void deletePrivateKeyEntry(String alias, char[] password)
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+    // not yet implemented
+  }
   
   /**
    * Lists all the alias names of this keystore.
@@ -190,8 +351,13 @@ public interface EncryptionKeyManager {
    * (loaded).
    */
   public Set publicKeyAliases()
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
 
+    return new HashSet(publicKeyMap.keySet());
+    
+  }
   /**
    * Lists all the alias names of this keystore.
    *
@@ -201,7 +367,13 @@ public interface EncryptionKeyManager {
    * (loaded).
    */
   public Set privateKeyAliases()
-    throws KeyStoreException;
+    throws KeyStoreException {
+    
+    if (! loaded)
+      throw new KeyStoreException ( "store not loaded." );
+
+    return new HashSet(privateKeyMap.keySet());
+  }
   
   
   /**
@@ -215,8 +387,13 @@ public interface EncryptionKeyManager {
    * (loaded).
    */
   public boolean containsPublicKeyAlias(String alias)
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      return false;
 
+    return publicKeyMap.containsKey(alias);
+
+  }
   /**
    * Checks if the given alias exists in this keystore.
    *
@@ -228,6 +405,12 @@ public interface EncryptionKeyManager {
    * (loaded).
    */
   public boolean containsPrivateKeyAlias(String alias)
-    throws KeyStoreException;
+    throws KeyStoreException {
+    if (! loaded)
+      return false;
+
+    return privateKeyMap.containsKey(alias);
+  }
+  
   
 }

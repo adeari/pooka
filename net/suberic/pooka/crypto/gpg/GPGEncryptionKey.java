@@ -30,5 +30,5 @@ public class GPGEncryptionKey extends EncryptionKey {
   public String getPassphrase() {
     return passphrase;
   }
-  
+
 }

@@ -21,6 +21,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   private SignatureGenerator sigGenerator;
   private AddressBook addressBook;
   private String encryptionKeyId;
+  private boolean signAsDefault = false;
   
   private Vector excludeAddresses;
   
@@ -84,6 +85,8 @@ public class UserProfile extends Object implements ValueChangeListener {
     }
 
     encryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".defaultEncryptionKeyId", "");
+
+    signAsDefault = mainProperties.getProperty("UserProfile." + name + ".signAsDefault", "").equalsIgnoreCase("true");
 
     String addressBookId = mainProperties.getProperty("UserProfile." + name + ".addressBook", "");
     if (!addressBookId.equals("")) {
@@ -479,7 +482,7 @@ public class UserProfile extends Object implements ValueChangeListener {
   public net.suberic.pooka.crypto.EncryptionKey getEncryptionKey() {
     if (encryptionKeyId != null && encryptionKeyId.length() > 0) {
       try {
-	net.suberic.pooka.crypto.EncryptionKey returnValue = Pooka.getCryptoManager().getEncryptionKey(encryptionKeyId);
+	net.suberic.pooka.crypto.EncryptionKey returnValue = Pooka.getCryptoManager().getPrivateEncryptionKey(encryptionKeyId);
 	return returnValue;
       } catch (net.suberic.pooka.crypto.EncryptionException ee) {
 	ee.printStackTrace();
@@ -494,7 +497,7 @@ public class UserProfile extends Object implements ValueChangeListener {
    * UserProfile.
    */
   public boolean getSignAsDefault() {
-    return false;
+    return signAsDefault;
   }
 
   /**

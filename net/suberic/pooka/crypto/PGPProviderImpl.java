@@ -33,4 +33,14 @@ public interface PGPProviderImpl {
   public abstract boolean checkSignature(InputStream rawStream, 
 					 byte[] signature, EncryptionKey key)
     throws EncryptionException;
+
+  /**
+   * Returns a KeyStore provider.
+   */
+  public abstract EncryptionKeyManager createKeyManager();
+
+  /**
+   * Returns a KeyStore provider.
+   */
+  public abstract EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException;
 }

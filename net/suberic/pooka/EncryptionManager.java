@@ -1,6 +1,10 @@
 package net.suberic.pooka;
 
 import java.util.Map;
+import java.util.HashMap;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 import javax.mail.internet.*;
 import javax.mail.*;
@@ -31,6 +35,8 @@ public class EncryptionManager {
   
   Map addressToPublicKeyMap = null;
 
+  Map aliasPasswordMap = new HashMap();
+
   /**
    * Creates an EncryptionManager using the given VariableBundle and
    * key property.
@@ -59,7 +65,7 @@ public class EncryptionManager {
       keyMgrPasswd = pwArray;
 
       try {
-	keyMgr = defaultUtils.createKeyManager(keyMgrFilename, keyMgrPasswd);
+	keyMgr = defaultUtils.createKeyManager(new FileInputStream(new File(keyMgrFilename)), keyMgrPasswd);
       } catch (Exception e) {
 	e.printStackTrace();
       }
@@ -106,28 +112,59 @@ public class EncryptionManager {
   }
 
   /**
-   * Returns the public key(s) for the given email address.
+   * Returns the Private key for the given alias.
    */
-  public EncryptionKey[] getPublicKeys(String address) {
+  public EncryptionKey getPrivateEncryptionKey(String alias) 
+  throws EncryptionException {
     EncryptionKeyManager mgr = getKeyManager();
     if (mgr != null) {
-      
+      try {
+	char[] password = getPasswordForAlias(alias, false);
+	return mgr.getPrivateKey(alias, password);
+      } catch (java.security.KeyStoreException kse) {
+	throw new EncryptionException(kse);
+      }
     }
 
     return null;
   }
 
   /**
-   * Returns the given EncryptionKey, or null if no such key exists.
+   * Returns the password for this alias.
    */
-  public EncryptionKey getEncryptionKey(String alias) 
-    throws EncryptionException {
+  protected char[] getPasswordForAlias(String alias, boolean check) {
+    // FIXME:  ignoring check for now.
+    return (char[]) aliasPasswordMap.get(alias);
+  }
+
+  /**
+   * Returns the Private key for the given alias.
+   */
+  public EncryptionKey getPublicEncryptionKey(String alias) 
+  throws EncryptionException {
     EncryptionKeyManager mgr = getKeyManager();
     if (mgr != null) {
-      return mgr.getKey(alias, keyMgrPasswd);
-    } else {
-      return null;
+      try {
+	return mgr.getPublicKey(alias);
+      } catch (java.security.KeyStoreException kse) {
+	throw new EncryptionException(kse);
+      }
     }
+    
+    return null;
+  }
+
+  /**
+   * Returns the public key(s) for the given email address.
+   */
+  public EncryptionKey[] getPublicKeys(String address) {
+
+    EncryptionKeyManager mgr = getKeyManager();
+    if (mgr != null) {
+      
+    }
+
+    return null;
   }
 
   /**

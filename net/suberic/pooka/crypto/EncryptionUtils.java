@@ -106,7 +106,7 @@ public abstract class EncryptionUtils {
    * Creates and loads an EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
-  public abstract EncryptionKeyManager createKeyManager(String filename, char[] passwd);
+  public abstract EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] passwd) throws java.io.IOException;
 
   /**
    * Returns whether or not this email is encrypted.
