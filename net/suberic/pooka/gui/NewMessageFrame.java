@@ -30,6 +30,22 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	configureMessageFrame();
     }
 
+    public NewMessageFrame(NewMessageInternalFrame source) {
+	this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
+	messageDisplay = source.getMessageDisplay();
+	msg = source.getMessageProxy();
+	toolbar = source.getToolbar();
+	keyBindings = source.getKeyBindings();
+	msg.setMessageUI(this);
+
+	this.getContentPane().add("North", toolbar);
+	this.getContentPane().add("Center", messageDisplay);
+	
+	toolbar.setActive(this.getActions());
+
+	this.setLocation(source.getLocationOnScreen());
+    }
+
     /**
      * This configures the MessageFrame.  This means that here is 
      * where we create the headerPanel and editorPane and add them to the 
@@ -82,6 +98,19 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	} else {
 	    this.dispose();
 	}
+    }
+
+    /**
+     * Reattaches the window to the MessagePanel, if there is one.
+     */
+    public void attachWindow() {
+	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
+            MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+            NewMessageInternalFrame nmif = new NewMessageInternalFrame(mp, this);
+            nmif.openMessageUI();
+	    this.setModified(false);
+            this.dispose();
+        }
     }
 
     /**

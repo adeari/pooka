@@ -38,13 +38,24 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
 	msg.setMessageUI(this);
 	
 	this.addWindowListener(new WindowAdapter() {
-		public void windowClosed(WindowEvent e) {
+		public void windowClosing(WindowEvent e) {
 		    if (getMessageProxy().getMessageUI() == MessageFrame.this)
 			getMessageProxy().setMessageUI(null);
 		}
 	    });
     }
-    
+
+    protected MessageFrame() {
+	this.getContentPane().setLayout(new BorderLayout());
+
+	this.addWindowListener(new WindowAdapter() {
+		public void windowClosing(WindowEvent e) {
+		    if (getMessageProxy().getMessageUI() == MessageFrame.this)
+			getMessageProxy().setMessageUI(null);
+		}
+	    });
+    }
+
     /**
      * this method is expected to do all the implementation-specific
      * duties.
@@ -65,6 +76,11 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
     public void closeMessageUI() {
 	this.dispose();
     }
+
+    /**
+     * Attaches the window to a MessagePanel.
+     */
+    public abstract void attachWindow();
 
     /**
      * This shows an Confirm Dialog window.  We include this so that
@@ -189,6 +205,15 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
     public AttachmentPane getAttachmentPanel() {
 	return getMessageDisplay().getAttachmentPanel();
     }
+
+    public ConfigurableToolbar getToolbar() {
+	return toolbar;
+    }
+
+    public ConfigurableKeyBinding getKeyBindings() {
+	return keyBindings;
+    }
+
     //------- Actions ----------//
 
     public Action[] getActions() {
@@ -204,7 +229,8 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
     // The actions supported by the window itself.
 
     public Action[] defaultActions = {
-	new CloseAction()
+	new CloseAction(),
+	new AttachAction()
     };
 
     class CloseAction extends AbstractAction {
@@ -218,6 +244,15 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
 	}
     }
 
+    public class AttachAction extends AbstractAction {
+	AttachAction() {
+	    super("window-detach");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    attachWindow();
+	}
+    }
 }
 
 

@@ -156,7 +156,7 @@ FolderWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 FolderWindowToolbar.Print.Action=file-print
 FolderWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 
-NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste:Print
+NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste:Print:|:Detach
 NewMessageWindowToolbar.Send.Action=message-send
 NewMessageWindowToolbar.Send.Image=/net/suberic/pooka/gui/images/Envelope.gif
 NewMessageWindowToolbar.AttachFile.Action=message-attach-file
@@ -169,9 +169,10 @@ NewMessageWindowToolbar.Paste.Action=paste-from-clipboard
 NewMessageWindowToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 NewMessageWindowToolbar.Print.Action=file-print
 NewMessageWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
+NewMessageWindowToolbar.Detach.Action=window-detach
+NewMessageWindowToolbar.Detach.Image=/net/suberic/pooka/gui/images/Object.gif
 
-
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:Detach
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/net/suberic/pooka/gui/images/Reply.gif
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -182,6 +183,8 @@ MessageWindowToolbar.Delete.Action=message-delete
 MessageWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 MessageWindowToolbar.Copy.Action=copy-to-clipboard
 MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
+MessageWindowToolbar.Detach.Action=window-detach
+MessageWindowToolbar.Detach.Image=/net/suberic/pooka/gui/images/Object.gif
 
 FolderPanel.2xClickAction=file-open
 

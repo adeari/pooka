@@ -50,6 +50,23 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	    });
 	
     }
+
+    /**
+     * Creates a MessageInternalFrame from the given Message.
+     */
+
+    protected MessageInternalFrame() {
+	super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"), true, true, true, true);
+	this.getContentPane().setLayout(new BorderLayout());
+	
+	this.addInternalFrameListener(new InternalFrameAdapter() {
+		public void internalFrameClosed(InternalFrameEvent e) {
+		    if (getMessageProxy().getMessageUI() == MessageInternalFrame.this)
+			getMessageProxy().setMessageUI(null);
+		}
+	    });
+	
+    }
     
     /**
      * this method is expected to do all the implementation-specific
@@ -212,6 +229,14 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 
     public MessagePanel getParentContainer() {
 	return parentContainer;
+    }
+
+    public ConfigurableToolbar getToolbar() {
+	return toolbar;
+    }
+
+    public ConfigurableKeyBinding getKeyBindings() {
+	return keyBindings;
     }
 
     //------- Actions ----------//

@@ -25,7 +25,31 @@ public class ReadMessageFrame extends MessageFrame {
 
 	configureMessageFrame();
     }
-    
+
+    /**
+     * Creates a ReadMessageFrame from an existing ReadMessageInternalFrame.
+     */
+    ReadMessageFrame(ReadMessageInternalFrame source) {
+	messageDisplay = source.getMessageDisplay();
+	msg = source.getMessageProxy();
+	toolbar = source.getToolbar();
+	keyBindings = source.getKeyBindings();
+	msg.setMessageUI(this);
+
+	try {
+	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+	} catch (MessagingException me) {
+	    this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
+	}
+
+	this.getContentPane().add("North", toolbar);
+	this.getContentPane().add("Center", messageDisplay);
+	
+	toolbar.setActive(this.getActions());
+
+	this.setLocation(source.getLocationOnScreen());
+    }
+
     protected void configureMessageFrame() {
 	try {
 	    try {
@@ -52,6 +76,18 @@ public class ReadMessageFrame extends MessageFrame {
 	    me.printStackTrace();
 	}
 	
+    }
+
+    /**
+     * Attaches the window to a MessagePanel.
+     */
+    public void attachWindow() {
+	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
+	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+	    ReadMessageInternalFrame rmif = new ReadMessageInternalFrame(mp, this);
+	    rmif.openMessageUI();
+	    this.dispose();
+	}
     }
 
     /**
@@ -104,6 +140,7 @@ public class ReadMessageFrame extends MessageFrame {
 	toolbar.unregisterKeyboardAction(aKeyStroke);
     }
 
+
     //------- Actions ----------//
 
     public Action[] getActions() {
@@ -117,6 +154,7 @@ public class ReadMessageFrame extends MessageFrame {
 
 	return actionList;
     }
+
 
 }
 

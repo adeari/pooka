@@ -30,6 +30,25 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	configureMessageInternalFrame();
     }
 
+    public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageFrame source) {
+	parentContainer = newParentContainer;
+    	messageDisplay = source.getMessageDisplay();
+	msg = source.getMessageProxy();
+	toolbar = source.getToolbar();
+	keyBindings = source.getKeyBindings();
+	msg.setMessageUI(this);
+
+	this.getContentPane().add("North", toolbar);
+	this.getContentPane().add("Center", messageDisplay);
+	
+	toolbar.setActive(this.getActions());
+
+	Point loc = source.getLocationOnScreen();
+	SwingUtilities.convertPointFromScreen(loc, parentContainer);
+	this.setLocation(loc);
+
+    }
+
     /**
      * This configures the MessageInternalFrame.  This means that here is 
      * where we create the headerPanel and editorPane and add them to the 
@@ -91,7 +110,13 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
     }
 
     public void detachWindow() {
+	NewMessageFrame nmf = new NewMessageFrame(this);
 
+	nmf.show();
+	try {
+	    this.setClosed(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
     }
 
     /**
@@ -257,6 +282,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	return defaultActions;
     }
 
+    
     private void createDefaultActions() {
 	// The actions supported by the window itself.
 
@@ -266,11 +292,12 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	    new CopyAction(),
 	    new PasteAction(),
 	    new TestAction()
-	    };*/
+	    };
 
 	defaultActions = new Action[] {
 	    new CloseAction(),
-	};
+	    };
+	*/
     }
 
     //-----------actions----------------

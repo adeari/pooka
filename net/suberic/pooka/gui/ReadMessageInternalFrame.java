@@ -26,6 +26,30 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	configureMessageInternalFrame();
     }
 
+    public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
+	parentContainer = newParentContainer;
+    	messageDisplay = source.getMessageDisplay();
+	msg = source.getMessageProxy();
+	toolbar = source.getToolbar();
+	keyBindings = source.getKeyBindings();
+	msg.setMessageUI(this);
+
+	try {
+	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+	} catch (MessagingException me) {
+	    this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
+	}
+	
+	this.getContentPane().add("North", toolbar);
+	this.getContentPane().add("Center", messageDisplay);
+	
+	toolbar.setActive(this.getActions());
+
+	Point loc = source.getLocationOnScreen();
+	SwingUtilities.convertPointFromScreen(loc, parentContainer);
+	this.setLocation(loc);
+    }
+
     /**
      * Configures the MessageInteralFrame.
      */
@@ -58,9 +82,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     }
 
     public void detachWindow() {
-	ReadMessageFrame rmf = new ReadMessageFrame(getMessageProxy());
-	Point loc = getLocationOnScreen();
-	rmf.setLocation(loc);
+	ReadMessageFrame rmf = new ReadMessageFrame(this);
 
 	rmf.show();
 	try {

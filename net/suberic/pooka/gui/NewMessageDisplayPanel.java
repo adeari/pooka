@@ -335,7 +335,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      */
     public void showPopupMenu(JComponent component, MouseEvent e) {
 	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
-	popupMenu.configureComponent("NewMessageDisplayPanel.popupMenu", Pooka.getResources());	
+	popupMenu.configureComponent("NewMessageWindow.popupMenu", Pooka.getResources());	
 	popupMenu.setActive(getActions());
 	popupMenu.show(component, e.getX(), e.getY());
 	    
