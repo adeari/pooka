@@ -11,8 +11,6 @@ public interface MessageCache {
 
     public static int CACHE_FLAGS_AND_HEADERS = 2;
 
-    public static int CACHE_ALL = 3;
-
     public DataHandler getDataHandler(long uid) throws MessagingException;
 
     public void addFlag(long uid, Flags flag) throws MessagingException;
@@ -20,6 +18,8 @@ public interface MessageCache {
     public void removeFlag(long uid, Flags flag) throws MessagingException;
 
     public InternetHeaders getHeaders(long uid) throws MessagingException;
+
+    public Flags getFlags(long uid) throws MessagingException;
 
     public boolean addMessage(MimeMessage m, long uid, int status);
 

@@ -4,6 +4,8 @@
 Pooka.debug=false
 Pooka.sessionDebug=false
 
+Pooka.cacheDirectory=~/Mail/pooka
+
 Message.sendImmediately=true
 
 Pooka.hsize=800
