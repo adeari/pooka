@@ -21,10 +21,13 @@ Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
 
 Pooka.lineWrap=true
-Pooka.lineLength=76
+Pooka.lineLength=78
 Pooka.displayTextAttachments=true
 
 Pooka.openFoldersOnConnect=true
+Pooka.openSavedFoldersOnStartup=true
+Pooka.saveOpenFoldersOnExit=true
+Pooka.saveFolderWindowLocationsOnExit=true
 
 MenuBar=File:Edit:Mail:Window:Help
 
