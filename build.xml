@@ -20,6 +20,7 @@
 <!-- libaries that will get included in the distribution -->
   <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
   <property name="mbox_lib" value="${importdir}/mbox.jar"/>
+  <property name="maildir_lib" value="${importdir}/javamaildir.jar"/>
   <property name="mail_dist_lib" value="${importdir}/mail.jar"/>
   <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
   <property name="activation_dist_lib" value="${importdir}/activation_dist.jar"/>
@@ -120,6 +121,7 @@
       <zipfileset src="${mbox_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
+      <zipfileset src="${maildir_lib}"/>
     </jar>
     <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
   </target>
