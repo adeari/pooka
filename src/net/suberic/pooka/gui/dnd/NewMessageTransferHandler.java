@@ -46,6 +46,8 @@ public class NewMessageTransferHandler extends TransferHandler {
 	try {
 	  String value = (String) t.getTransferData(DataFlavor.stringFlavor);
 	  System.err.println("yep; String is '" + value + "'");
+	  return importFileList(c, t);
+
 	} catch (Exception e) {
 	  System.err.println("caught exception " + e);
 	}
@@ -89,18 +91,20 @@ public class NewMessageTransferHandler extends TransferHandler {
     try {
       NewMessageDisplayPanel nmdp = (NewMessageDisplayPanel) SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.NewMessageDisplayPanel"), c);
       if (nmdp != null) {
-	java.util.List fileList = (java.util.List) t.getTransferData(DataFlavor.javaFileListFlavor);
+	java.util.List fileList = DndUtils.extractFileList(t);
 	
-	Iterator it = fileList.iterator();
-	while (it.hasNext()) {
-	  File f = (File) it.next();
-	  nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f);
-	  
-	  nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	if (fileList != null) {
+	  Iterator it = fileList.iterator();
+	  while (it.hasNext()) {
+	    File f = (File) it.next();
+	    nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f);
+	    
+	    nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	  }
+	
+	  System.err.println("returning true.");
+	  return true;
 	}
-	
-	System.err.println("returning true.");
-	return true;
       }
     } catch (Exception e) {
       e.printStackTrace();
