@@ -573,6 +573,7 @@ AddressBook.editableFields.editor.scoped=true
 AddressBook.editableFields.editor.propertyType=Tabbed
 AddressBook.editableFields.editor.propertyScoped=true
 AddressBook.editableFields.editor.templateScoped=true
+AddressBook.editableFields.editor.addSubProperty=false
 
 AddressBook.editableFields.editor.config=type:edit
 AddressBook.editableFields.editor.config.scoped=true
@@ -580,9 +581,9 @@ AddressBook.editableFields.editor.config.scopeRoot=AddressBook.editableFields
 AddressBook.editableFields.editor.config.propertyType=Composite
 
 AddressBook.editableFields.edit.propertyType=Variable
-AddressBook.editableFields.edit.allowedValues=file:ldap
 AddressBook.editableFields.edit.scoped=true
 AddressBook.editableFields.edit.keyProperty=type
+AddressBook.editableFields.edit.removeString=.edit
 AddressBook.editableFields.edit.allowedValues=file:ldap
 
 AddressBook.editableFields.type.propertyType=List

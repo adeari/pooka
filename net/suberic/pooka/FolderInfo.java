@@ -2141,9 +2141,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * gets the status.
      */
     public int getStatus() {
-	synchronized(this) {
-	    return status;
-	}
+      return status;
     }
 
     public ActionThread getFolderThread() {
