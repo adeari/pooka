@@ -14,6 +14,9 @@ possible folders, nor just the ones that are open.
 *) test the following:  open a folder.  do right click->close folder.
 	try reopening the folder and reading from it.
 
+*) make an option where message windows size to the viewport of the
+desktop pane.
+
 *) add support for jdk1.4
 	-- tabbing between the address components for New Messages
 	-- the MailFileSystemView doesn't seem to work at all (!)

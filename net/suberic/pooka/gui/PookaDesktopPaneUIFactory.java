@@ -6,6 +6,7 @@ import net.suberic.pooka.gui.search.*;
 import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 import javax.mail.MessagingException;
 
 /**
@@ -245,7 +246,16 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
      * Shows a status message.
      */
     public void showStatusMessage(String newMessage) {
-	Pooka.getMainPanel().getInfoPanel().setMessage(newMessage);
+      final String msg = newMessage;
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
+	  }
+	};
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
     }
 
     /**

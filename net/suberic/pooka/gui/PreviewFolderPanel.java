@@ -110,9 +110,18 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
      */
     public void openFolderDisplay() {
-	if (displayedFolder != null) 
-	    contentPanel.showFolder(displayedFolder.getFolderID());
-	setEnabled(true);
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    if (displayedFolder != null) 
+	      contentPanel.showFolder(displayedFolder.getFolderID());
+	    setEnabled(true);
+	  } 
+	};
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
+
     }
 
     /**

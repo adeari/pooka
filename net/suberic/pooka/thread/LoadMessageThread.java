@@ -47,8 +47,12 @@ public class LoadMessageThread extends Thread {
   public void run() {
     int uptime = 0;
     while (true) {
-      loadWaitingMessages();
-      
+      try {
+	loadWaitingMessages();
+      } catch (Exception e) {
+	e.printStackTrace();
+      }
+
       try {
 	sleeping = true;
 	if (updateCheckMilliseconds < 1) {
@@ -116,7 +120,11 @@ public class LoadMessageThread extends Thread {
 	  }
 	}
 
-	mp.loadTableInfo();
+	try {
+	  mp.loadTableInfo();
+	} catch (Exception e) {
+	  e.printStackTrace();
+	}
 	
 	if (++updateCounter >= getUpdateMessagesCount()) {
 	  fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());

@@ -313,13 +313,12 @@ public class MessageProxy {
 	
 	loaded=true;
 	// notify the JTable that this proxy has loaded.
-	/*
-	fireTableInfoLoadedEvent();
+	MessageChangedEvent mce = new MessageChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
+
 	FolderInfo fi = getFolderInfo();
 	if (fi != null) {
-	  fi.notifyTableInfoLoaded(this);
+	  fi.fireMessageChangedEvent(mce);
 	}
-	*/
 
       } catch (MessagingException me) {
       }

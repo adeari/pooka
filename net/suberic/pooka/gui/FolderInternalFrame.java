@@ -197,7 +197,15 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * This opens the FolderInternalFrame.
      */
     public void openFolderDisplay() {
-	getMessagePanel().openFolderWindow(getFolderInfo());
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    getMessagePanel().openFolderWindow(getFolderInfo());
+	  } 
+	};
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
     }
 
     /**
@@ -571,14 +579,22 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
+      if (getFolderStatusBar() != null)
 	getFolderStatusBar().messageChanged(e);
+      if (getFolderDisplay() != null)
 	getFolderDisplay().moveSelectionOnRemoval(e);
 	
-	SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    getFolderDisplay().repaint();
-		}
+      final MessageInfo mi = getFolderInfo().getMessageInfo(e.getMessage());
+      if (mi != null) {
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		// really, all we should do here is update the individual
+		// row.
+		// getFolderDisplay().repaint();
+		getFolderDisplay().repaintMessage(mi.getMessageProxy());
+	      }
 	    });
+	}
     }
 
     /**

@@ -527,6 +527,17 @@ public class FolderDisplayPanel extends JPanel {
 	}
     }
 
+  /**
+   * This updates the entry for the given message, if that message is 
+   * visible.
+   */
+  public void repaintMessage(MessageProxy mp) {
+    int row = getFolderTableModel().getRowForMessage(mp);
+    if (row >=0) {
+      getFolderTableModel().fireTableRowsUpdated(row, row);
+    }
+  }
+
     /**
      * This resets the size to that of the parent component.
      */
