@@ -1,3 +1,6 @@
+fixed the StoreInfo so that we now properly use the custom port for
+IMAP/SSL.
+
 fixed the FullMailcapCommandMap so that we support custom DataContentHandlers
 now.
 
