@@ -586,15 +586,16 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	
       final MessageInfo mi = getFolderInfo().getMessageInfo(e.getMessage());
       if (mi != null) {
-	  SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		// really, all we should do here is update the individual
-		// row.
-		// getFolderDisplay().repaint();
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      // really, all we should do here is update the individual
+	      // row.
+	      // getFolderDisplay().repaint();
+	      if (mi.getMessageProxy() != null)
 		getFolderDisplay().repaintMessage(mi.getMessageProxy());
-	      }
-	    });
-	}
+	    }
+	  });
+      }
     }
 
     /**

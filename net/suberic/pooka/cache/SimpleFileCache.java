@@ -111,26 +111,26 @@ public class SimpleFileCache implements MessageCache {
      * server, if the server is available.
      */
     public void addFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
-	if (newUidValidity != uidValidity) {
-	    throw new StaleCacheException(uidValidity, newUidValidity);
-	}
-	Flags f = getFlags(uid, newUidValidity);
-	if (f != null) {
-	    f.add(flag);
-	} else {
-	    f = flag;
-	}
-
-	if (getFolderInfo().shouldBeConnected()) {
-	    MimeMessage m = getFolderInfo().getRealMessageById(uid);
-	    if (m != null)
-		m.setFlags(flag, true);
-	} else {
-	    writeToChangeLog(uid, flag, ADDED);
-	    getFolderInfo().messageChanged(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getFolderInfo().getMessageInfoByUid(uid).getMessage()));
-	}
-	
-	saveFlags(uid, uidValidity, f);
+      if (newUidValidity != uidValidity) {
+	throw new StaleCacheException(uidValidity, newUidValidity);
+      }
+      Flags f = getFlags(uid, newUidValidity);
+      if (f != null) {
+	f.add(flag);
+      } else {
+	f = flag;
+      }
+      
+      if (getFolderInfo().shouldBeConnected()) {
+	MimeMessage m = getFolderInfo().getRealMessageById(uid);
+	if (m != null)
+	  m.setFlags(flag, true);
+      } else {
+	writeToChangeLog(uid, flag, ADDED);
+	getFolderInfo().messageChanged(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getFolderInfo().getMessageInfoByUid(uid).getMessage()));
+      }
+      
+      saveFlags(uid, uidValidity, f);
     }
 
     /**
@@ -237,72 +237,72 @@ public class SimpleFileCache implements MessageCache {
      * count on the client.
      */  
     public boolean cacheMessage(MimeMessage m, long uid, long newUidValidity, int status) throws MessagingException {
-
-	if (newUidValidity != uidValidity) {
-	    throw new StaleCacheException(uidValidity, newUidValidity);
-	}
-	try {
-	  if (status == CONTENT || status == MESSAGE) {
-	    // we have to reset the seen flag if it's not set, since getting
-	    // the message from the server sets the flag.
-	    Flags flags = m.getFlags();
-	    boolean resetSeen = (! flags.contains(Flags.Flag.SEEN));
-	      
-	    File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
-	    if (outFile.exists())
-	      outFile.delete();
-	    
-	    FileOutputStream fos = new FileOutputStream(outFile);
-	    m.writeTo(fos);
-	    
-	    fos.flush();
-	    fos.close();
-
-	    if (resetSeen) {
-	      m.setFlag(Flags.Flag.SEEN, false);
-	    }
-	  }
+      
+      if (newUidValidity != uidValidity) {
+	throw new StaleCacheException(uidValidity, newUidValidity);
+      }
+      try {
+	if (status == CONTENT || status == MESSAGE) {
+	  // we have to reset the seen flag if it's not set, since getting
+	  // the message from the server sets the flag.
+	  Flags flags = m.getFlags();
+	  boolean resetSeen = (! flags.contains(Flags.Flag.SEEN));
 	  
-	  if (status == MESSAGE || status == FLAGS || status == FLAGS_AND_HEADERS) {
-	    Flags flags = m.getFlags();
-	    saveFlags(uid, uidValidity, flags);
+	  File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
+	  if (outFile.exists())
+	    outFile.delete();
+	  
+	  FileOutputStream fos = new FileOutputStream(outFile);
+	  m.writeTo(fos);
+	  
+	  fos.flush();
+	  fos.close();
+	  
+	  if (resetSeen) {
+	    m.setFlag(Flags.Flag.SEEN, false);
 	  }
-
-
-	    if (status == MESSAGE || status == HEADERS || status == FLAGS_AND_HEADERS) {
-	    
-		File outFile = new File(cacheDir, uid + DELIMETER + HEADER_EXT);
-		if (outFile.exists())
-		    outFile.delete();
-		
-		outFile.createNewFile();
-		
-		FileWriter fos = new FileWriter(outFile);
-		java.util.Enumeration enum = m.getAllHeaderLines();
-		BufferedWriter bos = new BufferedWriter(fos);
-		
-		int foo = 0;
-		while (enum.hasMoreElements()) {
-		    bos.write((String) enum.nextElement());
-		    bos.newLine();
-		}
-		
-		bos.newLine();
-		bos.flush();
-		bos.close();
-	    }
-
-	    if (! cachedMessages.contains(new Long(uid))) {
-		cachedMessages.add(new Long(uid));
-		writeMsgFile();
-	    } 
-	} catch (IOException ioe) {
-	    throw new MessagingException(ioe.getMessage(), ioe);
+	}
+	  
+	if (status == MESSAGE || status == FLAGS || status == FLAGS_AND_HEADERS) {
+	  Flags flags = m.getFlags();
+	  saveFlags(uid, uidValidity, flags);
 	}
 	
-	return true;
+	
+	if (status == MESSAGE || status == HEADERS || status == FLAGS_AND_HEADERS) {
+	  
+	  File outFile = new File(cacheDir, uid + DELIMETER + HEADER_EXT);
+	  if (outFile.exists())
+	    outFile.delete();
+	  
+	  outFile.createNewFile();
+	  
+	  FileWriter fos = new FileWriter(outFile);
+	  java.util.Enumeration enum = m.getAllHeaderLines();
+	  BufferedWriter bos = new BufferedWriter(fos);
+	  
+	  int foo = 0;
+	  while (enum.hasMoreElements()) {
+	    bos.write((String) enum.nextElement());
+	    bos.newLine();
+	  }
+	  
+	  bos.newLine();
+	  bos.flush();
+	  bos.close();
+	}
+	
+	if (! cachedMessages.contains(new Long(uid))) {
+	  cachedMessages.add(new Long(uid));
+	  writeMsgFile();
+	} 
+      } catch (IOException ioe) {
+	throw new MessagingException(ioe.getMessage(), ioe);
+      }
+      
+      return true;
     }
-
+  
     /**
      * Removes a message from the cache only.  This has no effect on the
      * server.

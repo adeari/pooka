@@ -289,153 +289,153 @@ public class UIDFolderInfo extends FolderInfo {
     }
   
     
-    protected void runMessagesAdded(MessageCountEvent mce)  {
-	if (folderTableModel != null) {
-	    try {
-	      Message[] addedMessages = mce.getMessages();
-	      FetchProfile fp = new FetchProfile();
-	      fp.add(FetchProfile.Item.ENVELOPE);
-	      fp.add(FetchProfile.Item.FLAGS);
-	      fp.add(UIDFolder.FetchProfileItem.UID);
-	      getFolder().fetch(addedMessages, fp);
-	      MessageInfo mi;
-	      Vector addedProxies = new Vector();
-	      for (int i = 0; i < addedMessages.length; i++) {
-		UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
-		long uid = newMsg.getUID();
-		if (getMessageInfoByUid(uid) != null) {
-		  if (Pooka.isDebug())
-		    System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
-		} else {
-		  mi = new MessageInfo(newMsg, this);
-		  // this has already been fetched; no need to do so again.
-		  mi.setFetched(true);
-		  addedProxies.add(new MessageProxy(getColumnValues(), mi));
-		  messageToInfoTable.put(newMsg, mi);
-		  uidToInfoTable.put(new Long(uid), mi);
-		}
-	      }
-	      addedProxies.removeAll(applyFilters(addedProxies));
-	      if (addedProxies.size() > 0) {
-		getFolderTableModel().addRows(addedProxies);
-		setNewMessages(true);
-		resetMessageCounts();
-		
-		// notify the message loaded thread.
-		MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-		loaderThread.loadMessages(addedArray);
-		
-		// change the Message objects in the MessageCountEvent to 
-		// our UIDMimeMessages.
-		Message[] newMsgs = new Message[addedProxies.size()];
-		for (int i = 0; i < addedProxies.size(); i++) {
-		    newMsgs[i] = ((MessageProxy)addedProxies.elementAt(i)).getMessageInfo().getMessage();
-		}
-		MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), newMsgs);
-		fireMessageCountEvent(newMce);
-		}
-	    } catch (MessagingException me) {
-		if (getFolderDisplayUI() != null)
-		    getFolderDisplayUI().showError(Pooka.getProperty("error.handlingMessages", "Error handling messages."), Pooka.getProperty("error.handlingMessages.title", "Error handling messages."), me);
-	    }
-	}
-		
-    }
-
-    protected void runMessagesRemoved(MessageCountEvent mce) {
-	if (Pooka.isDebug())
-	    System.out.println("running MessagesRemoved on " + getFolderID());
-
-	MessageCountEvent newMce = null;
-	if (folderTableModel != null) {
-	    Message[] removedMessages = mce.getMessages();
-	    Message[] uidRemovedMessages = new Message[removedMessages.length];
-
+  protected void runMessagesAdded(MessageCountEvent mce)  {
+    if (folderTableModel != null) {
+      try {
+	Message[] addedMessages = mce.getMessages();
+	FetchProfile fp = new FetchProfile();
+	fp.add(FetchProfile.Item.ENVELOPE);
+	fp.add(FetchProfile.Item.FLAGS);
+	fp.add(UIDFolder.FetchProfileItem.UID);
+	getFolder().fetch(addedMessages, fp);
+	MessageInfo mi;
+	Vector addedProxies = new Vector();
+	for (int i = 0; i < addedMessages.length; i++) {
+	  UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
+	  long uid = newMsg.getUID();
+	  if (getMessageInfoByUid(uid) != null) {
 	    if (Pooka.isDebug())
-		System.out.println("removedMessages was of size " + removedMessages.length);
-
-	    MessageInfo mi;
-	    Vector removedProxies=new Vector();
-	    for (int i = 0; i < removedMessages.length; i++) {
-		if (Pooka.isDebug())
-		    System.out.println("checking for existence of message.");
-		
-		try {
-		    UIDMimeMessage removedMsg = getUIDMimeMessage(removedMessages[i]);
-		    if (removedMsg != null)
-			uidRemovedMessages[i] = removedMsg;
-		    else
-			uidRemovedMessages[i] = removedMessages[i];
-
-		    mi = getMessageInfo(removedMsg);
-		    if (mi.getMessageProxy() != null)
-			mi.getMessageProxy().close();
-		    
-		    if (mi != null) {
-			if (Pooka.isDebug())
-			    System.out.println("message exists--removing");
-			removedProxies.add(mi.getMessageProxy());
-		    messageToInfoTable.remove(mi);
-		    uidToInfoTable.remove(new Long(removedMsg.getUID()));
-		    }
-		} catch (MessagingException me) {
-		}
-	    }
-	    newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), uidRemovedMessages);
-	    if (getFolderDisplayUI() != null)
-		getFolderDisplayUI().removeRows(removedProxies);
-	    resetMessageCounts();
-	    fireMessageCountEvent(newMce);
-	} else {
-	    resetMessageCounts();
-	    fireMessageCountEvent(mce);
+	      System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
+	  } else {
+	    mi = new MessageInfo(newMsg, this);
+	    // this has already been fetched; no need to do so again.
+	    mi.setFetched(true);
+	    addedProxies.add(new MessageProxy(getColumnValues(), mi));
+	    messageToInfoTable.put(newMsg, mi);
+	    uidToInfoTable.put(new Long(uid), mi);
+	  }
 	}
+	addedProxies.removeAll(applyFilters(addedProxies));
+	if (addedProxies.size() > 0) {
+	  getFolderTableModel().addRows(addedProxies);
+	  setNewMessages(true);
+	  resetMessageCounts();
+	  
+	  // notify the message loaded thread.
+	  MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
+	  loaderThread.loadMessages(addedArray);
+	  
+	  // change the Message objects in the MessageCountEvent to 
+	  // our UIDMimeMessages.
+	  Message[] newMsgs = new Message[addedProxies.size()];
+	  for (int i = 0; i < addedProxies.size(); i++) {
+	    newMsgs[i] = ((MessageProxy)addedProxies.elementAt(i)).getMessageInfo().getMessage();
+	  }
+	  MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), newMsgs);
+	  fireMessageCountEvent(newMce);
+	}
+      } catch (MessagingException me) {
+	if (getFolderDisplayUI() != null)
+	  getFolderDisplayUI().showError(Pooka.getProperty("error.handlingMessages", "Error handling messages."), Pooka.getProperty("error.handlingMessages.title", "Error handling messages."), me);
+      }
     }
+    
+  }
 
-    protected void runMessageChanged(MessageChangedEvent mce) {
-	// if the message is getting deleted, then we don't
-	// really need to update the table info.  for that 
-	// matter, it's likely that we'll get MessagingExceptions
-	// if we do, anyway.
-	try {
-	    if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
-		Message msg = mce.getMessage();
-		UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
-		long uid = changedMsg.getUID();
-		
-		MessageInfo mi = getMessageInfoByUid(uid);
-		if (mi != null) {
-		    MessageProxy mp = mi.getMessageProxy();
-		    if (mp != null) {
-			mp.unloadTableInfo();
-			mp.loadTableInfo();
-		    }
-		}
-	    }
-	} catch (MessagingException me) {
-	    // if we catch a MessagingException, it just means
-	    // that the message has already been expunged.
-	}
+  protected void runMessagesRemoved(MessageCountEvent mce) {
+    if (Pooka.isDebug())
+      System.out.println("running MessagesRemoved on " + getFolderID());
+    
+    MessageCountEvent newMce = null;
+    if (folderTableModel != null) {
+      Message[] removedMessages = mce.getMessages();
+      Message[] uidRemovedMessages = new Message[removedMessages.length];
+      
+      if (Pooka.isDebug())
+	System.out.println("removedMessages was of size " + removedMessages.length);
+      
+      MessageInfo mi;
+      Vector removedProxies=new Vector();
+      for (int i = 0; i < removedMessages.length; i++) {
+	if (Pooka.isDebug())
+	  System.out.println("checking for existence of message.");
 	
-	// now let's go ahead and get the UIDMimeMessage for the event so
-	// that we can fire that instead.
-
 	try {
-	    Message msg = mce.getMessage();
-	    UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
-	    if (changedMsg != null) {
-		MessageChangedEvent newMce = new MessageChangedEvent(mce.getSource(), mce.getMessageChangeType(), changedMsg);
-		fireMessageChangedEvent(newMce);
-	    } else 
-		fireMessageChangedEvent(mce);
+	  UIDMimeMessage removedMsg = getUIDMimeMessage(removedMessages[i]);
+	  if (removedMsg != null)
+	    uidRemovedMessages[i] = removedMsg;
+	  else
+	    uidRemovedMessages[i] = removedMessages[i];
+	  
+	  mi = getMessageInfo(removedMsg);
+	  if (mi.getMessageProxy() != null)
+	    mi.getMessageProxy().close();
+	  
+	  if (mi != null) {
+	    if (Pooka.isDebug())
+	      System.out.println("message exists--removing");
+	    removedProxies.add(mi.getMessageProxy());
+	    messageToInfoTable.remove(mi);
+	    uidToInfoTable.remove(new Long(removedMsg.getUID()));
+		    }
 	} catch (MessagingException me) {
-	    // if we catch a MessagingException, then we can just fire the
-	    // original mce.
-	    fireMessageChangedEvent(mce);
-	    
 	}
+      }
+      newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), uidRemovedMessages);
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().removeRows(removedProxies);
+      resetMessageCounts();
+      fireMessageCountEvent(newMce);
+    } else {
+      resetMessageCounts();
+      fireMessageCountEvent(mce);
     }
-
+  }
+  
+  protected void runMessageChanged(MessageChangedEvent mce) {
+    // if the message is getting deleted, then we don't
+    // really need to update the table info.  for that 
+    // matter, it's likely that we'll get MessagingExceptions
+    // if we do, anyway.
+    try {
+      if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+	Message msg = mce.getMessage();
+	UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
+	long uid = changedMsg.getUID();
+	
+	MessageInfo mi = getMessageInfoByUid(uid);
+	if (mi != null) {
+	  MessageProxy mp = mi.getMessageProxy();
+	  if (mp != null) {
+	    mp.unloadTableInfo();
+	    mp.loadTableInfo();
+	  }
+	}
+      }
+    } catch (MessagingException me) {
+      // if we catch a MessagingException, it just means
+      // that the message has already been expunged.
+    }
+    
+    // now let's go ahead and get the UIDMimeMessage for the event so
+    // that we can fire that instead.
+    
+    try {
+      Message msg = mce.getMessage();
+      UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
+      if (changedMsg != null) {
+	MessageChangedEvent newMce = new MessageChangedEvent(mce.getSource(), mce.getMessageChangeType(), changedMsg);
+	fireMessageChangedEvent(newMce);
+      } else 
+	fireMessageChangedEvent(mce);
+    } catch (MessagingException me) {
+      // if we catch a MessagingException, then we can just fire the
+      // original mce.
+      fireMessageChangedEvent(mce);
+      
+    }
+  }
+  
     
     /**
      * This updates the children of the current folder.  Generally called
