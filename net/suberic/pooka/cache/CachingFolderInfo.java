@@ -4,10 +4,11 @@ import javax.mail.event.MessageCountEvent;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.MessageChangedEvent;
 import javax.mail.event.ConnectionEvent;
-import net.suberic.pooka.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
 import java.util.HashMap;
+import java.io.File;
+import net.suberic.pooka.*;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderTableModel;
 
@@ -40,7 +41,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     public void loadFolder() {
 	if (cache == null) {
 	    try {
-		cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
+		cache = new SimpleFileCache(this, getCacheDirectory());
+		type =  type | Folder.HOLDS_MESSAGES;
 		setStatus(DISCONNECTED);
 	    } catch (java.io.IOException ioe) {
 		System.out.println("Error creating cache!");
@@ -139,7 +141,13 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    try {
 		
 		if (preferredStatus < DISCONNECTED && !(isConnected())) {
-		    openFolder(Folder.READ_WRITE);
+		    try {
+			openFolder(Folder.READ_WRITE);
+		    } catch (MessagingException me) {
+
+			uidValidity = cache.getUIDValidity();
+			preferredStatus = DISCONNECTED;
+		    }
 		} else {
 		    uidValidity = cache.getUIDValidity();
 		}
@@ -240,6 +248,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
      * Folder.
      */
     public void synchronizeCache() throws MessagingException {
+	
+	Thread.currentThread().dumpStack();
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
@@ -680,6 +690,35 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    } else
 		return true;
 	}
+    }
+
+    /**
+     * Returns the cache directory for this FolderInfo.
+     */
+    public String getCacheDirectory() {
+	String localDir = Pooka.getProperty(getFolderProperty() + ".cacheDir", "");
+	if (!localDir.equals(""))
+	    return localDir;
+
+	localDir = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+	if (localDir.equals(""))
+	    localDir = System.getProperty("user.home") + File.separator + ".pooka";
+
+	localDir = localDir + File.separatorChar + "cache";
+	FolderInfo currentFolder = this;
+	StringBuffer subDir = new StringBuffer();
+	subDir.insert(0, currentFolder.getFolderName());
+	subDir.insert(0, File.separatorChar);
+	while (currentFolder.getParentFolder() != null) {
+	    currentFolder = currentFolder.getParentFolder();
+	    subDir.insert(0, currentFolder.getFolderName());
+	    subDir.insert(0, File.separatorChar);
+	} 
+
+	subDir.insert(0, currentFolder.getParentStore().getStoreID());
+	subDir.insert(0, File.separatorChar);
+
+	return localDir + subDir.toString();
     }
 }
 

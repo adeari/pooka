@@ -82,7 +82,7 @@ public class SimpleFileCache implements MessageCache {
 	if (h != null) {
 	    return h;
 	} else {
-	    if (getFolderInfo().shouldBeOpen()) {
+	    if (getFolderInfo().shouldBeConnected()) {
 		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null) {
 		    h = m.getDataHandler();
@@ -121,7 +121,7 @@ public class SimpleFileCache implements MessageCache {
 	    f = flag;
 	}
 
-	if (getFolderInfo().shouldBeOpen()) {
+	if (getFolderInfo().shouldBeConnected()) {
 	    MimeMessage m = getFolderInfo().getRealMessageById(uid);
 	    if (m != null)
 		m.setFlags(flag, true);
@@ -147,7 +147,7 @@ public class SimpleFileCache implements MessageCache {
 	if (f != null) {
 	    f.remove(flag);
 
-	    if (getFolderInfo().shouldBeOpen()) {
+	    if (getFolderInfo().shouldBeConnected()) {
 		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null)
 		    m.setFlags(flag, false);
@@ -170,7 +170,7 @@ public class SimpleFileCache implements MessageCache {
 	if (h != null) {
 	    return h;
 	} else {
-	    if (getFolderInfo().shouldBeOpen()) {
+	    if (getFolderInfo().shouldBeConnected()) {
 		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null) {
 		    java.util.Enumeration enum = m.getAllHeaderLines();
@@ -205,7 +205,7 @@ public class SimpleFileCache implements MessageCache {
 	if (f != null) {
 	    return f;
 	} else {
-	    if (getFolderInfo().shouldBeOpen()) {
+	    if (getFolderInfo().shouldBeConnected()) {
 		MimeMessage m = getFolderInfo().getRealMessageById(uid);
 		if (m != null) {
 		    f = m.getFlags();
@@ -361,7 +361,7 @@ public class SimpleFileCache implements MessageCache {
 	if (newUidValidity != uidValidity) {
 	    throw new StaleCacheException(uidValidity, newUidValidity);
 	}
-	if (getFolderInfo().shouldBeOpen()) {
+	if (getFolderInfo().shouldBeConnected()) {
 	    getFolderInfo().appendMessages(msgs);
 	} else {
 	    throw new MessagingException("Error:  cannot append to an unavailable folder.");
@@ -616,7 +616,7 @@ public class SimpleFileCache implements MessageCache {
     public void loadCache() {
 	cachedMessages = new Vector();
 	cachedFlags = new HashMap();
-	
+
 	File msgListFile = new File(cacheDir, "messageList");
 	if (msgListFile.exists()) {
 	    try {
