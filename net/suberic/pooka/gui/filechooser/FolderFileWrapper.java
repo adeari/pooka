@@ -169,7 +169,6 @@ public class FolderFileWrapper extends File {
      * Returns the Folder's name.
      */
     public String getName() {
-	System.out.println("calling getName on " + folder.getName());
 	return folder.getName();
     }
 
@@ -413,6 +412,9 @@ public class FolderFileWrapper extends File {
     /* Only accepts relative filenames. */
     public FolderFileWrapper getFileByName(String filename) {
 
+	if (Pooka.isDebug())
+	    System.out.println("calling getFileByName(" + filename + ") on folder " + getName() + " (" + getPath() + ") (abs " + getAbsolutePath() + ")");
+
 	String origFilename = new String(filename);
 	if (filename == null || filename.length() < 1) {
 	    return this;
@@ -443,9 +445,13 @@ public class FolderFileWrapper extends File {
 	if (currentFile != null && subdirFile != null) {
 	    // recurse with rest of components
 	    FolderFileWrapper tmp = currentFile.getFileByName(subdirFile);
-	    System.out.println("created file " + 
-	    tmp.path = origFilename; 
+	    //	    tmp.path = origFilename; 
+
+	    if (Pooka.isDebug())
+		System.out.println("created file " + tmp.getName() + " (" + tmp.getPath() + ") (abs " + tmp.getAbsolutePath() + ") from string " + origFilename + " on folder " + getName() + " (" + getPath() + ") (abs " + getAbsolutePath() + ")");
+
 	    return tmp;
+
 	} else {
 	    return currentFile;
 	}
