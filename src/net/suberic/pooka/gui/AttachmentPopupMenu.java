@@ -23,13 +23,14 @@ public class AttachmentPopupMenu extends JPopupMenu {
   public static int OPEN_WITH = 5;
   public static int SAVE = 10;
 
-  int actionType = OPEN;
+  int mActionType = OPEN;
 
   /**
    * Creates a new AttachmentPopupMenu from the given MessageProxy.
    */
-  public AttachmentPopupMenu(MessageProxy pProxy) {
+  public AttachmentPopupMenu(MessageProxy pProxy, int pActionType) {
     mProxy = pProxy;
+    mActionType = pActionType;
   }
 
   /**
@@ -87,8 +88,14 @@ public class AttachmentPopupMenu extends JPopupMenu {
       this.add(item);
     }
 
-    this.setLabel(Pooka.getProperty("AttachmentPopupMenu.notloaded.title", "Open Attachment"));
-    
+    if (mActionType == SAVE) {
+      this.setLabel(Pooka.getProperty("AttachmentPopupMenu.save.title", "Save Attachment"));
+    } else if (mActionType == OPEN_WITH) {
+      this.setLabel(Pooka.getProperty("AttachmentPopupMenu.openWith.title", "Open Attachment With..."));
+    } else {
+      this.setLabel(Pooka.getProperty("AttachmentPopupMenu.open.title", "Open Attachment"));
+    }
+ 
     this.pack();
     this.setSize(this.getMinimumSize());
     if (this.isVisible())
@@ -129,9 +136,9 @@ public class AttachmentPopupMenu extends JPopupMenu {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       AttachmentHandler ah = new AttachmentHandler(mProxy);
-      if (actionType == SAVE) {
+      if (mActionType == SAVE) {
 	ah.saveAttachment(mAttachment, AttachmentPopupMenu.this);
-      } else if (actionType == OPEN_WITH) {
+      } else if (mActionType == OPEN_WITH) {
 	ah.openWith(mAttachment);
       } else {
 	ah.openAttachment(mAttachment);

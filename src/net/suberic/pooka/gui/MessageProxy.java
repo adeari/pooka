@@ -1140,7 +1140,15 @@ public class MessageProxy {
    * This creates and shows a PopupMenu for this component.  
    */
   public void showAttachmentPopupMenu(JComponent component, MouseEvent e) {
-    AttachmentPopupMenu atMenu = new AttachmentPopupMenu(this);
+    AttachmentPopupMenu atMenu = null;
+    if (e.isShiftDown()) {
+      atMenu = new AttachmentPopupMenu(this, AttachmentPopupMenu.SAVE);
+    } else if (e.isControlDown()) {
+      atMenu = new AttachmentPopupMenu(this, AttachmentPopupMenu.OPEN_WITH);
+    } else {
+      atMenu = new AttachmentPopupMenu(this, AttachmentPopupMenu.OPEN);
+    }
+
     try {
       atMenu.loadAttachments(new java.awt.event.ActionEvent(e, 0, "show-attachments"));
       atMenu.show(component, e.getX(), e.getY());
