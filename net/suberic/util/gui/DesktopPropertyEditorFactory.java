@@ -84,10 +84,17 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
      * This shows an input Dialog.
      */
     public String showInputDialog(DefaultPropertyEditor dpe, String query) {
-	if (dpe instanceof java.awt.Component) 
-	    return JOptionPane.showInternalInputDialog(dpe, query);
-	else
-	    return null;
+	if (dpe instanceof java.awt.Component) {
+	    if (SwingUtilities.windowForComponent((java.awt.Component)dpe) != null)
+		return JOptionPane.showInternalInputDialog(dpe, query);
+	    else {
+		if (SwingUtilities.windowForComponent(dpe.getValueComponent()) != null)
+		    return JOptionPane.showInternalInputDialog(dpe.getValueComponent(), query);
+	    }
+
+	}
+
+	return null;
     }
 	    
 }

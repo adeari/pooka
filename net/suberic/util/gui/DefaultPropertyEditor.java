@@ -138,4 +138,11 @@ public abstract class DefaultPropertyEditor extends JPanel implements PropertyEd
 	if (valueComponent != null)
 	    valueComponent.setSize(new Dimension(valueComponent.getSize().width, valueHeight));
     }
+
+    /**
+     * Gets the current valueComponent.
+     */
+    public java.awt.Container getValueComponent() {
+	return valueComponent;
+    } 
 }
