@@ -29,8 +29,6 @@ public class PookaEncryptionManager {
 
   char[] keyMgrPasswd = null;
 
-  Map aliasPasswordMap = new HashMap();
-
   Map cachedPrivateKeys = new HashMap();
 
   Map cachedPublicKeys = new HashMap();
@@ -260,17 +258,7 @@ public class PookaEncryptionManager {
    * Returns the password for this alias.
    */
   protected char[] getPasswordForAlias(String alias, boolean check) {
-    char[] returnValue = (char[]) aliasPasswordMap.get(alias);
-    if (returnValue == null || check) {
-      returnValue = net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog(alias);
-      if (returnValue != null) {
-	if (savePasswordsForSession) {
-	  aliasPasswordMap.put(alias, returnValue);
-	}
-      }
-    }
-
-    return returnValue;
+    return net.suberic.pooka.gui.crypto.CryptoKeySelector.showPassphraseDialog(alias);
   }
 
   /**

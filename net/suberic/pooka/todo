@@ -1,19 +1,8 @@
 *) add pgp/gpg support.
 features:
-
-  show status:  encrypted/unchecked, unencrypted, not encrypted
-	        signed/unchecked, signed/failed, signed/checked, encrypted
-  mutt:   [-- the following data is signed --] [-- end of signed data --]
   mozilla:  key, click on it and it gives you status.  good idea!
 
-  thought:  change toolbar color????  go ahead and create a toolbar
-	for preview panel also, for things like headers and display type.
-  color:  blue = encrypted; red = failure, gray = normal,
-	  green = signed, purple = encrypted&signed ...  
-	  orange or yellow = needs attention?
-  maybe add a border, too?
-
-  add one for outgoing, also?
+  add crypto ui display for outgoing, also?
 
   pgp&smime encrypt, decrypt, sign, check sig, sign&encrypt
     check signature with default key(s)
@@ -53,7 +42,6 @@ bugs:
 	- no crypto status display in preview pane mode.
 	- check keys--they seem to not all work.  make sure that all 
 	  available keys work, and that only keys that work are available?
-	- check decryption.  doesn't seem to work.
 	- key management
 	  - inc. default key for user, addressbookentry 
 	  - make sure you can use alternate keys even if one is set for
@@ -360,6 +348,10 @@ preview:
 *) add support for saved searches.
 
 *) add 'filter by message'
+
+*) remove 'where' clause from filter.
+
+*) MoveFilter editor needs to use subscribed folders, not all folders.
 
 *) add support for hierarchical new message notification--so getting an email
 	in foo/bar would show up on foo as well as bar.
