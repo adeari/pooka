@@ -173,13 +173,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public void loadFolder() {
 	if (Pooka.isDebug())
-	    System.out.println("loading folder " + getFolderID());
+	    System.out.println(Thread.currentThread() + "loading folder " + getFolderID());
 
 	if (isLoaded() || (loading && children == null)) 
 	    return;
 
 	if (Pooka.isDebug())
-	    System.out.println("past first check--folder " + getFolderID() + " isn't loaded yet.");
+	    System.out.println(Thread.currentThread() + "past first check--folder " + getFolderID() + " isn't loaded yet.");
 
 	Folder[] tmpFolder;
 	Folder tmpParentFolder;
@@ -189,7 +189,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    if (parentStore != null) {
 		try {
 		    if (Pooka.isDebug())
-			System.out.println("loading folder " + getFolderID() + ":  checking parent store connection.");
+			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
 
 		    if (!parentStore.isConnected())
 			parentStore.connectStore();
@@ -197,19 +197,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    tmpParentFolder = store.getDefaultFolder();
 		    tmpFolder = tmpParentFolder.list(mFolderName);
 		} catch (MessagingException me) {
-		    if (Pooka.isDebug())
-			System.out.println("loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
+		    if (Pooka.isDebug()) {
+			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
+			me.printStackTrace();
+		    }
 		    tmpFolder =null;
 		}
 	    } else {
 		if (Pooka.isDebug())
-		    System.out.println("loading folder " + getFolderID() + ":  checking parent folder connection.");
+		    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent folder connection.");
 
 		if (!parentFolder.isLoaded())
 		    parentFolder.loadFolder();
 		if (!parentFolder.isLoaded()) {
 		    if (Pooka.isDebug())
-			System.out.println("loading folder " + getFolderID() + ":  parentFolder is still not loaded after calling loadFolder().");
+			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  parentFolder is still not loaded after calling loadFolder().");
 
 		    tmpFolder = null;
 		} else {
@@ -218,7 +220,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			tmpFolder = tmpParentFolder.list(mFolderName);
 		    else {
 			if (Pooka.isDebug())
-			    System.out.println("loading folder " + getFolderID() + ":  parentFolder loaded, but couldn't find folder " + mFolderName);
+			    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  parentFolder loaded, but couldn't find folder " + mFolderName);
 			
 			tmpFolder = null;
 		    }
@@ -230,7 +232,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		folder.addMessageChangedListener(this);
 	    } else {
 		if (Pooka.isDebug())
-		    System.out.println("loading folder " + getFolderID() + ":  setting available to false.");
+		    System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  setting available to false.");
 		available = false;
 		open = false;
 		setFolder(null);
@@ -238,7 +240,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    loaded = true;
 	} catch (MessagingException me) {
 	    if (Pooka.isDebug()) {
-		System.out.println("loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
+		System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
 		me.printStackTrace();
 	    }
 	    loaded = false;
