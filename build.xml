@@ -12,10 +12,12 @@
   <property name="jsse_cp" value="${importdir}/jsse.jar"/>
   <property name="jcert_cp" value="${importdir}/jcert.jar"/>
   <property name="jnet_cp" value="${importdir}/jnet.jar"/>
+  <property name="javahelp_cp" value="${importdir}/jh.jar"/>
+  <property name="javahelp_dist_cp" value="${importdir}/jh_dist.jar"/>
   <property name="mbox_cp" value="${importdir}/mbox.jar"/>
   <property name="kunststofff_cp" value="${importdir}/kunststoff.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${mbox_cp}:${kunstsoff_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${javahelp_cp}:${mbox_cp}:${kunstsoff_cp}"/> 
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -75,11 +77,12 @@
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
+    <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka_full.manifest"> 
       <zipfileset src="${activation_cp}"/>
       <zipfileset src="${jcert_cp}"/>
       <zipfileset src="${jnet_cp}"/>
       <zipfileset src="${jsse_cp}"/>
+      <zipfileset src="${javahelp_dist_cp}"/>
       <zipfileset src="${mail_cp}"/>
       <zipfileset src="${mbox_cp}"/>
     </jar>
