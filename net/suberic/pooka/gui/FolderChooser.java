@@ -38,6 +38,7 @@ public class FolderChooser {
 			MailTreeNode tmpNode = getSelectedNode();
 			if (tmpNode != null && tmpNode instanceof FolderNode)
 			    toggleSubscribed((FolderNode)tmpNode);
+			tree.repaint();
 		    } 
 		    
 		}
@@ -126,10 +127,10 @@ public class FolderChooser {
 	    node = (FolderNode)children.nextElement();
 	    if (node.isLeaf()) {
 		if (node.isSubscribed())
-		    subscribed.add(node.getFolder().getName());
+		    subscribed.add(node.getFolderInfo().getFolderName());
 	    } else {
-		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), p))
-		    subscribed.add(node.getFolder().getName());
+		if (readSubscribedTree(node, prefix + "." + node.getFolderInfo().getFolderName(), p))
+		    subscribed.add(node.getFolderInfo().getFolderName());
 	    }
 	}    
 
@@ -176,10 +177,10 @@ public class FolderChooser {
 	    node = (FolderNode)children.nextElement();
 	    if (node.isLeaf()) {
 		if (node.isSubscribed())
-		    subscribed.add(node.getFolder().getName());
+		    subscribed.add(node.getFolderInfo().getFolderName());
 	    } else {
-		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), properties))
-		    subscribed.add(node.getFolder().getName());
+		if (readSubscribedTree(node, prefix + "." + node.getFolderInfo().getFolderName(), properties))
+		    subscribed.add(node.getFolderInfo().getFolderName());
 	    }
 	}    
 	
@@ -245,7 +246,7 @@ public class FolderChooser {
 	FolderNode currentFolder;
 	while (children.hasMoreElements()) {
 	    currentFolder = (FolderNode) children.nextElement();
-	    if (folderName.equals(currentFolder.getFolder().getName()))
+	    if (folderName.equals(currentFolder.getFolderInfo().getFolderName()))
 		return currentFolder;
 	}
 

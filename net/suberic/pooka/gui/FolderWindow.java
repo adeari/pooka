@@ -30,7 +30,7 @@ public class FolderWindow extends JInternalFrame {
 
 	public StatusBar() {
 	    this.setLayout(new FlowLayout(FlowLayout.LEFT));
-	    folderLabel = new JLabel(getFolderInfo().getFolder().getName());
+	    folderLabel = new JLabel(getFolderInfo().getFolderName());
 	    this.add(folderLabel);
 	    this.add(new JSeparator(SwingConstants.VERTICAL));
 	    messageCount = new JLabel();
@@ -66,7 +66,7 @@ public class FolderWindow extends JInternalFrame {
      */
 
     public FolderWindow(FolderInfo newFolderInfo, MessagePanel newMessagePanel) {
-	super(newFolderInfo.getFolder().getName(), true, true, true, true);
+	super(newFolderInfo.getFolderName(), true, true, true, true);
 
 	messagePanel = newMessagePanel;
 

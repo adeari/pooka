@@ -7,6 +7,7 @@ import java.util.*;
 import net.suberic.pooka.gui.*;
 import net.suberic.pooka.thread.LoadMessageThread;
 import net.suberic.pooka.event.*;
+import net.suberic.util.ValueChangeListener;
 
 /**
  * This class does all of the work for a Folder.  If a FolderTableModel,
@@ -14,15 +15,29 @@ import net.suberic.pooka.event.*;
  * for a Folder, the FolderInfo object has a reference to it.
  */
 
-public class FolderInfo implements MessageCountListener {
+public class FolderInfo implements MessageCountListener, ValueChangeListener {
     private Folder folder;
+
+    // The is the folder ID: storeName.parentFolderName.folderName
     private String folderID;
+
+    // This is just the simple folderName, such as "INBOX"
+    private String folderName;
+
     private EventListenerList messageCountListeners = new EventListenerList();
     private EventListenerList messageChangedListeners = new EventListenerList();
+    
+    // Information for the FolderNode
+    private FolderNode folderNode;
+    private Vector children;
+
+    // Information for the FolderTable.
     private FolderTableModel folderTableModel;
     private Hashtable messageToProxyTable = new Hashtable();
     private Vector columnValues;
     private Vector columnNames;
+
+    // GUI information.
     private LoadMessageThread loaderThread;
     private FolderWindow folderWindow;
 
@@ -36,7 +51,13 @@ public class FolderInfo implements MessageCountListener {
     public FolderInfo(Folder f, String fid) {
 	folder=f;
 	f.addMessageCountListener(this);
-	folderID=fid;
+	setFolderID(fid);
+	folderName = f.getName();
+	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
+	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
+
+	this.updateChildren();
+
 	f.addConnectionListener(new ConnectionAdapter() { 
 		public void closed(ConnectionEvent e) {
 		    if (Pooka.isDebug())
@@ -171,6 +192,73 @@ public class FolderInfo implements MessageCountListener {
     }
 
     /**
+     * This updates the children of the current folder.  Generally called
+     * when the folderList property is changed.
+     */
+
+    public void updateChildren() {
+	try {
+	    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) == 0) {
+		return;
+	    }
+	} catch (MessagingException me) { }
+
+	Vector newChildren = new Vector();
+
+	// get the default folder, and list the
+	// subscribed folders on it
+
+	Folder folder = getFolder();
+
+	Folder[] subscribed;
+	
+	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getFolderProperty() + ".folderList", "INBOX"), ":");
+	
+	String newFolderName;
+
+	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+	    try {
+		newFolderName = (String)tokens.nextToken();
+		FolderInfo childFolder = getChild(newFolderName);
+		if (childFolder == null) {
+		    subscribed = folder.list(newFolderName);
+		    if (subscribed.length > 0) {
+			childFolder = new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName);
+			newChildren.add(childFolder);
+		    }
+		} else {
+		    newChildren.add(childFolder);
+		}
+	    } catch (MessagingException me) {
+		if (me instanceof FolderNotFoundException) {
+		    System.out.println( Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
+		} else {
+		    me.printStackTrace();
+		}
+	    }
+	}
+
+	children = newChildren;
+    }
+
+    /**
+     * This goes through the list of children of this folder and
+     * returns the FolderInfo for the given childName, if one exists.
+     * If none exists, or if the children Vector has not been loaded
+     * yet, or if this is a leaf node, then this method returns null.
+     */
+    public FolderInfo getChild(String childName) {
+	if (children != null) {
+	    for (int i = 0; i < children.size(); i++)
+		if (((FolderInfo)children.elementAt(i)).getFolderName().equals(childName))
+		    return (FolderInfo)children.elementAt(i);
+	}
+	
+	// no match.
+	return null;
+    }
+
+    /**
      * Creates the column values from the FolderTable property.
      */
     public Vector createColumnValues() {
@@ -212,6 +300,18 @@ public class FolderInfo implements MessageCountListener {
 	    }              
 	}
     }  
+
+    /**
+     * This handles the changes if the source property is modified.
+     *
+     * As defined in net.suberic.util.ValueChangeListener.
+     */
+
+    public void valueChanged(String changedValue) {
+	if (changedValue.equals(getFolderProperty() + ".folderList")) {
+	    updateChildren();
+	}
+    }
 
     // semi-accessor methods.
 
@@ -358,12 +458,45 @@ public class FolderInfo implements MessageCountListener {
 	folder=newValue;
     }
 
+    /**
+     * This returns the FolderID, such as "myStore.INBOX".
+     */
     public String getFolderID() {
 	return folderID;
     }
 
+    /**
+     * This sets the folderID.
+     */
     private void setFolderID(String newValue) {
 	folderID=newValue;
+    }
+
+    /**
+     * This returns the simple folderName, such as "INBOX".
+     */
+    public String getFolderName() {
+	return folderName;
+    }
+
+    /**
+     * This returns the property which defines this FolderNode, such as
+     * "Store.myStore.INBOX".
+     */
+    public String getFolderProperty() {
+	return "Store." + getFolderID();
+    }
+
+    public Vector getChildren() {
+	return children;
+    }
+
+    public FolderNode getFolderNode() {
+	return folderNode;
+    }
+
+    public void setFolderNode(FolderNode newValue) {
+	folderNode = newValue;
     }
 
     public FolderTableModel getFolderTableModel() {

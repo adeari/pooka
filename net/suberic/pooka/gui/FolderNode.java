@@ -9,6 +9,7 @@ import javax.mail.Folder;
 import javax.mail.MessagingException;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
+import java.util.Vector;
 import net.suberic.pooka.Pooka;
 import javax.mail.FolderNotFoundException;
 import javax.swing.JOptionPane;
@@ -33,6 +34,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	super(newFolderInfo, newParent);
 	listSubscribedOnly=subscribedOnly;
 	folderInfo = newFolderInfo;
+
+	folderInfo.setFolderNode(this);
 
 	commands = new Hashtable();
 	
@@ -116,39 +119,29 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	    hasLoaded = true;
 	    return;
 	}
-	// get the default folder, and list the
-	// subscribed folders on it
-	
-	Folder folder = getFolder();
 
 	if (listSubscribedOnly) {
-	    Folder[] subscribed;
-	    
-	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + getFolderID() + ".folderList", "INBOX"), ":");
-	    
-	    String newFolderName;
-	    
-	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-		try {
-		    newFolderName = (String)tokens.nextToken();
-		    subscribed = folder.list(newFolderName);
-		    if (subscribed.length > 0) {
-			FolderNode node = new FolderNode(new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName), getParentContainer(), true);
-			// we used insert here, since add() would mak
-			// another recursive call to getChildCount();
-			insert(node, i);
-		    }
-		} catch (MessagingException me) {
-		    if (me instanceof FolderNotFoundException) {
-			JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
-		    } else {
-			me.printStackTrace();
-		    }
+	    Vector folderChildren = getFolderInfo().getChildren();
+
+	    if (folderChildren != null) {
+		
+		for (int i = 0; i < folderChildren.size(); i++) {
+		    
+		    FolderNode node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer(), true);
+		    // we used insert here, since add() would mak
+		    // another recursive call to getChildCount();
+		    insert(node, i);
 		}
 	    }
+
+	    hasLoaded=true;
 	} else {
+	    // get the default folder, and list the
+	    // subscribed folders on it
+	    
+	    Folder folder = getFolder();
+	    
 	    try {
-		
 		Folder[] folderList = folder.list();
 		
 		for (int i = 0 ; i < folderList.length ; i++) {
@@ -158,7 +151,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 		    // another recursive call to getChildCount();
 		    insert(node, i);
 		}
-
+		
 	    } catch (MessagingException me) {
 		if (me instanceof FolderNotFoundException) {
 		    JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
@@ -189,7 +182,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
      * name, and not the full path of the folder
      */
     public String toString() {
-	return getFolder().getName();
+	return getFolderInfo().getFolderName();
     }
     
     public Action[] getActions() {
