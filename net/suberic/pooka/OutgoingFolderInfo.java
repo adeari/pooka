@@ -8,6 +8,7 @@ import javax.mail.internet.*;
  */
 public class OutgoingFolderInfo extends FolderInfo {
   URLName transportURL;
+  Thread sendMailThread = new net.suberic.util.thread.ActionThread(Pooka.getProperty("SendMailThread.name", "Send Mail Thread"));
 
   /**
    * Creates a new OutgoingFolderInfo for the given URLName.
@@ -20,8 +21,8 @@ public class OutgoingFolderInfo extends FolderInfo {
   /**
    * Sends all available messages.
    */
-  public void sendAll() throws MessagingException {
-
+  public void sendAll() {
+    
     Transport sendTransport = Pooka.getDefaultSession().getTransport(transportURL); 
     try {
       sendTransport.connect();

@@ -29,6 +29,8 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
 	    return createFilterEditor(property);
 	else if (test.equalsIgnoreCase("SearchTerm"))
 	  return createSearchEditor(property);
+	else if (test.equalsIgnoreCase("AddressList"))
+	  return createAddressEditor(property);
 	else
 	    return super.createEditor(property);
     }
@@ -52,6 +54,8 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
 	    return createFilterEditor(property, typeTemplate);
 	else if (test.equalsIgnoreCase("SearchTerm"))
 	    return createSearchEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("AddressList"))
+	  return createAddressEditor(property, typeTemplate);
 	else
 	    return super.createEditor(property, typeTemplate);
     }
@@ -99,4 +103,19 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
     public DefaultPropertyEditor createSearchEditor(String property) {
 	return new net.suberic.pooka.gui.search.SearchEditorPane(property, property, getBundle());
     }
+
+    /**
+     * This returns a new AddressBookEditorPane.
+     */
+    public DefaultPropertyEditor createAddressEditor(String property, String typeTemplate) {
+	return new net.suberic.pooka.gui.AddressBookEditorPane(property, typeTemplate, getBundle());
+    }
+
+    /**
+     * This returns a new AddressBookEditorPane.
+     */
+    public DefaultPropertyEditor createAddressEditor(String property) {
+	return new net.suberic.pooka.gui.AddressBookEditorPane(property, property, getBundle());
+    }
+
 }

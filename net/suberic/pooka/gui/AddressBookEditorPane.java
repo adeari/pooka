@@ -17,13 +17,19 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   JTextField searchEntryField;
   JTable addressTable;
 
-  VariableBundle resources = null;
+  VariableBundle sourceBundle = null;
 
   public AddressBookEditorPane(String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
     configureEditor(newProperty, newTemplateType, bundle, isEnabled);
   }
+
+  public AddressBookEditorPane(String newProperty, String newTemplateType, VariableBundle bundle) {
+    configureEditor(newProperty, newTemplateType, bundle, true);
+  }
   
   public void configureEditor(PropertyEditorFactory factory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
+    sourceBundle = bundle;
+
     property=newProperty;
     book = Pooka.getAddressBookManager().getAddressBook(property);
 
@@ -45,14 +51,14 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
    */
   public void createSearchEntryPanel() {
     searchEntryPanel = new JPanel();
-    searchEntryPanel.add(new JLabel(resources.getProperty("AddressBookEditor.matchString", "Match String: ")));
+    searchEntryPanel.add(new JLabel(sourceBundle.getProperty("AddressBookEditor.matchString", "Match String: ")));
 
     searchEntryField = new JTextField(30);
     searchEntryPanel.add(searchEntryField);
 
     Action a = new SearchAction();
 
-    JButton searchButton = new JButton(resources.getProperty("AddressBookEditor.title.Search", "Search"));
+    JButton searchButton = new JButton(sourceBundle.getProperty("AddressBookEditor.title.Search", "Search"));
     searchButton.addActionListener(a);
     searchEntryPanel.add(searchButton);
     
