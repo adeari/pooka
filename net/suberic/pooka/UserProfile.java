@@ -12,6 +12,8 @@ public class UserProfile extends Object implements ValueChangeListener {
   String sendPrecommand;
   String sentFolderName;
   FolderInfo sentFolder;
+  String outboxName;
+  OutgoingFolderInfo outbox;
   public boolean autoAddSignature = true;
   public boolean signatureFirst = true;
   private SignatureGenerator sigGenerator;
@@ -59,6 +61,7 @@ public class UserProfile extends Object implements ValueChangeListener {
       
       sentFolderName=mainProperties.getProperty("UserProfile." + name + ".sentFolder", "");
       
+      outboxName = mainProperties.getProperty("UserProfile." + name + ".outbox", "");
       sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
       sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
       sigGenerator=createSignatureGenerator();
@@ -95,6 +98,7 @@ public class UserProfile extends Object implements ValueChangeListener {
       
     }
     resources.addValueChangeListener(this, "UserProfile." + name + ".sentFolder");
+    resources.addValueChangeListener(this, "UserProfile." + name + ".outbox");
     
     resources.addValueChangeListener(this, "UserProfile." + name + ".sendMailURL");
     
@@ -366,6 +370,19 @@ public class UserProfile extends Object implements ValueChangeListener {
     
     loadSentFolder();
   }
+
+  public OutgoingFolderInfo getOutgoingFolder() {
+    if (outboxName == null)
+      loadOutbox();
+    
+    return outbox;
+  }
+  
+  public void setOutgoingFolderName(String newValue) {
+    outboxName = newValue;
+    
+    loadOutbox();
+  }
   
   /**
    * Loads the sent folder from the UserProfile.username.sentFolder 
@@ -378,6 +395,15 @@ public class UserProfile extends Object implements ValueChangeListener {
       sentFolder.setSentFolder(true);
     } 
   }
+
+  /**
+   * Loads the outbox from the UserProfile.username.outbox 
+   * property.
+   */
+  public void loadOutbox() {
+    outbox = (OutgoingFolderInfo) Pooka.getStoreManager().getFolder(outboxName);
+  }
+
   
   /**
    * Creates the signatureGenerator for this Profile.

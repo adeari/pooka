@@ -58,7 +58,17 @@ public class NewMessageInfo extends MessageInfo {
 	getMessage().setContent(messageText, messageContentType);
       }
       
-      Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
+      boolean sent = false;
+      if (profile != null) {
+	OutgoingFolderInfo outbox = profile.getOutgoingFolder();
+	if (outbox != null) {
+	  outbox.sendMessage(this);
+	  sent = true;
+	}
+      } 
+
+      if (! sent)
+	Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
   
       /*
       if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {

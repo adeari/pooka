@@ -44,5 +44,11 @@ public class OutgoingFolderInfo extends FolderInfo {
       sendTransport.close();
     }
   }
-  
+
+  /**
+   * Virtually sends a message.
+   */
+  public void sendMessage(NewMessageInfo nmi) throws javax.mail.MessagingException {
+    this.appendMessages(new MessageInfo[] { nmi });
+  }
 }

@@ -1,5 +1,8 @@
 next release:
 
+******* fix email so that you don't try to send the message before you've
+updated the to: list!
+
 *) add queuing of outgoing mails (?)
 
 *) make vcard address book at least come close to working for simple cases.
