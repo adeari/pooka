@@ -154,4 +154,8 @@ public abstract class MessageDisplayPanel extends JPanel {
     public Action[] getActions() {
 	return null;
     }
+
+    public JSplitPane getSplitPane() {
+	return splitPane;
+    }
 }

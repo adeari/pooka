@@ -67,8 +67,8 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     public void addNotify() {
 	super.addNotify();
 	if (firstShow) {
-	    getMessageDisplay().sizeToDefault();
 	    resizeByWidth();
+	    getMessageDisplay().sizeToDefault();
 	    firstShow = false;
 	}
     }

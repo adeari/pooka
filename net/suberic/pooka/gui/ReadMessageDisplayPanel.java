@@ -129,7 +129,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    ((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
 
 	    if (splitPane != null && attachmentPanel != null) {
-		splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+		double paneHeight = splitPane.getSize().getHeight();
+		if (paneHeight <= 0)
+		    paneHeight = splitPane.getPreferredSize().getHeight();
+		//splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
 	    } else {
 		splitPane.setDividerLocation(400);
 	    }
@@ -227,8 +230,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    sizeToDefault();
 	    firstShow = false;
 	}
+
     }
-    
 
     //------- Actions ----------//
     
