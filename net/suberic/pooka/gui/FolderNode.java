@@ -8,13 +8,13 @@ import javax.mail.Store;
 import javax.mail.Folder;
 import javax.mail.MessagingException;
 import java.util.*;
-import net.suberic.pooka.Pooka;
+import net.suberic.pooka.*;
 import javax.mail.FolderNotFoundException;
 import javax.swing.JOptionPane;
 import net.suberic.pooka.FolderInfo;
 import javax.mail.event.*;
 
-public class FolderNode extends MailTreeNode implements MessageChangedListener {
+public class FolderNode extends MailTreeNode implements MessageChangedListener, UserProfileContainer {
     
     protected FolderInfo folderInfo = null;
     protected boolean hasLoaded = false;
@@ -200,6 +200,16 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	return getFolderInfo().getFolderName();
     }
     
+    /**
+     * As specified by interface net.suberic.pooka.UserProfileContainer
+     */
+
+    public UserProfile getDefaultProfile() {
+	if (getFolderInfo() != null) 
+	    return getFolderInfo().getDefaultProfile();
+	else
+	    return null;
+    }
     public Action[] getActions() {
 	return defaultActions;
     }

@@ -38,7 +38,8 @@ public class FolderMenu extends net.suberic.util.DynamicMenu {
 
 	for (int j = 0; j < getItemCount(); j++) {
 	    JMenuItem mi = getItem(j);
-	    Action a = mp.getAction(getActionCommand());
+	    Action a = null;
+	    // Action a = mp.getAction(getActionCommand());
 	    if (a != null) {
 		Action newAction = a;
 		if (a instanceof net.suberic.util.DynamicAbstractAction) {

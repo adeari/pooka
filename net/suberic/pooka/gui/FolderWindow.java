@@ -16,7 +16,7 @@ import java.util.*;
  * class.
  */
 
-public class FolderWindow extends JInternalFrame {
+public class FolderWindow extends JInternalFrame implements UserProfileContainer {
     JTable messageTable = null;
     JScrollPane scrollPane = null;
     FolderInfo folderInfo = null;
@@ -220,6 +220,17 @@ public class FolderWindow extends JInternalFrame {
 	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
 	    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
 	}
+    }
+
+    /**
+     * As specified by net.subeic.pooka.UserProfileContainer
+     */
+
+    public UserProfile getDefaultProfile() {
+	if (getFolderInfo() != null)
+	    return getFolderInfo().getDefaultProfile();
+	else
+	    return null;
     }
 
     public Action[] getActions() {

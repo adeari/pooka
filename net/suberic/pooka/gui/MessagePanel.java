@@ -16,7 +16,7 @@ import javax.swing.border.*;
  *
  */
 
-public class MessagePanel extends JDesktopPane {
+public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     class ExtendedDesktopManager extends DefaultDesktopManager {
 	/* ExtendedDesktopManager is just a Desktop Manager which also
 	 * calls refreshActiveMenus() and refreshCurrentUser()  when the 
@@ -72,7 +72,7 @@ public class MessagePanel extends JDesktopPane {
     }
 
     public void openMessageWindow(MessageProxy m) {
-	MessageWindow newMessageWindow = new MessageWindow(m, false);
+	MessageWindow newMessageWindow = new MessageWindow(this, m, false);
 	this.add(newMessageWindow);
 	try {
 	    newMessageWindow.setSelected(true);
@@ -83,7 +83,7 @@ public class MessagePanel extends JDesktopPane {
     public void createNewMessage() {
 	MimeMessage m = new MimeMessage(getMainPanel().getSession());
 
-	MessageWindow newMessageWindow = new MessageWindow(new NewMessageProxy(m), true);
+	MessageWindow newMessageWindow = new MessageWindow(this, new NewMessageProxy(m), true);
 	this.add(newMessageWindow);
 	try {
 	    newMessageWindow.setSelected(true);
@@ -92,7 +92,7 @@ public class MessagePanel extends JDesktopPane {
     }
 
     public void createNewMessage(javax.mail.Message m) {
-	MessageWindow newMessageWindow = new MessageWindow(new NewMessageProxy(m), true);
+	MessageWindow newMessageWindow = new MessageWindow(this, new NewMessageProxy(m), true);
 	this.add(newMessageWindow);
 	try {
 	    newMessageWindow.setSelected(true);
@@ -113,6 +113,18 @@ public class MessagePanel extends JDesktopPane {
 
     public MainPanel getMainPanel() {
 	return mainPanel;
+    }
+
+    /**
+     * As defined in net.suberic.pooka.UserProfileContainer.
+     */
+
+    public UserProfile getDefaultProfile() {
+	JInternalFrame cw = getCurrentWindow();
+	if (cw != null && cw instanceof UserProfileContainer)
+	    return ((UserProfileContainer)cw).getDefaultProfile();
+	else
+	    return null;
     }
 
     public Action[] defaultActions = {

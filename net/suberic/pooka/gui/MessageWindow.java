@@ -1,6 +1,5 @@
 package net.suberic.pooka.gui;
-import net.suberic.pooka.Pooka;
-import net.suberic.pooka.UserProfile;
+import net.suberic.pooka.*;
 import net.suberic.util.gui.ConfigurableToolbar;
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -13,10 +12,12 @@ import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
 
-public class MessageWindow extends JInternalFrame {
+public class MessageWindow extends JInternalFrame implements UserProfileContainer {
 
     public static int HEADERS_DEFAULT = 0;
     public static int HEADERS_FULL = 1;
+
+    MessagePanel parentContainer;
 
     MessageProxy msg;
     JSplitPane splitPane = null;
@@ -40,13 +41,13 @@ public class MessageWindow extends JInternalFrame {
      * Creates a MessageWindow from the given Message.
      */
 
-    public MessageWindow(MessageProxy newMsgProxy, boolean isEditable) {
+    public MessageWindow(MessagePanel newParentContainer, MessageProxy newMsgProxy, boolean isEditable) {
 	super(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"), true, true, true, true);
 
+	parentContainer = newParentContainer;
 	editable = isEditable;
 	if (isEditable()) 
 	    inputTable = new Hashtable();
-
 	this.getContentPane().setLayout(new BorderLayout());
 
 	msg=newMsgProxy;
@@ -185,7 +186,14 @@ public class MessageWindow extends JInternalFrame {
 	inputRow.add(userProfileLabel);
 	inputRow.add(profileCombo);
 	
-	profileCombo.setSelectedItem(UserProfile.getDefaultProfile());
+	UserProfile selectedProfile = getParentContainer().getMainPanel().getCurrentUser();
+	if (selectedProfile != null)
+	    System.out.println("MessageWindow:  got default Profile " + selectedProfile.getName());
+	else
+	    System.out.println("MessageWindow:  got default Profile null.");
+
+	profileCombo.setSelectedItem(selectedProfile);
+	//	profileCombo.setSelectedItem(getParentContainer().getMainPanel().getDefaultProfile());
 	proptDict.put("UserProfile", profileCombo);
 
 	inputPanel.add(inputRow);
@@ -277,7 +285,7 @@ public class MessageWindow extends JInternalFrame {
 		key = (String)(keys.nextElement());
 
 		if (key.equals("UserProfile")) {
-		    UserProfile up =  (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
+		    UserProfile up = (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
 		    up.populateMessage(mMsg);
 		    urlName = new URLName(up.getMailProperties().getProperty("sendMailURL", "smtp://localhost/"));
 		} else {
@@ -400,6 +408,32 @@ public class MessageWindow extends JInternalFrame {
 	showError(errorMessage + e.getMessage(), title);
     }
 
+    /**
+     * As specified by interface net.suberic.pooka.UserProfileContainer.
+     *
+     * This implementation returns the DefaultProfile of the associated
+     * MessageProxy if the MessageWindow is not editable.  If the 
+     * MessageWindow is editable, it returns the currently selected 
+     * UserProfile object.
+     */
+
+    public UserProfile getDefaultProfile() {
+	if (isEditable())
+	    return getSelectedProfile();
+	else
+	    return getMessageProxy().getDefaultProfile();
+    }
+
+
+    /**
+     * This method returns the UserProfile currently selected in the 
+     * drop-down menu.
+     */
+
+    public UserProfile getSelectedProfile() {
+	return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
+    }
+
     public String getMessageText() {
 	return getEditorPane().getText();
     }
@@ -439,6 +473,10 @@ public class MessageWindow extends JInternalFrame {
 
     public AttachmentPane getAttachmentPanel() {
 	return attachmentPanel;
+    }
+
+    public MessagePanel getParentContainer() {
+	return parentContainer;
     }
 
     //------- Actions ----------//

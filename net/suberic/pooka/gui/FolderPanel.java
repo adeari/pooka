@@ -12,14 +12,14 @@ import net.suberic.pooka.gui.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-public class FolderPanel extends JScrollPane implements ValueChangeListener {
+public class FolderPanel extends JScrollPane implements ValueChangeListener, UserProfileContainer {
     MainPanel mainPanel=null;
     JTree folderTree;
     DefaultTreeModel folderModel;
     Session session;
     Folder trashFolder = null;
     
-     public FolderPanel(MainPanel newMainPanel) {
+    public FolderPanel(MainPanel newMainPanel) {
 	mainPanel=newMainPanel;
 
 	setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.hsize", "200")), Integer.parseInt(Pooka.getProperty("Pooka.folderPanel.vsize", Pooka.getProperty("Pooka.vsize","570")))));
@@ -159,7 +159,19 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
     public void valueChanged(String changedValue) {
 	if (changedValue.equals("Store"))
 	    refreshStores();
-	
+    }
+
+    /**
+     * Specified by interface net.suberic.pooka.UserProfileContainer
+     */
+   
+    public UserProfile getDefaultProfile() {
+	MailTreeNode selectedNode = getSelectedNode();
+
+	if (selectedNode != null && selectedNode instanceof UserProfileContainer) 
+	    return ((UserProfileContainer)selectedNode).getDefaultProfile();
+	else
+	    return null;
     }
 
     public Folder getTrashFolder() {

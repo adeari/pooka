@@ -15,7 +15,7 @@ import net.suberic.util.ValueChangeListener;
  * for a Folder, the FolderInfo object has a reference to it.
  */
 
-public class FolderInfo implements MessageCountListener, ValueChangeListener {
+public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer {
     private Folder folder;
 
     // The is the folder ID: storeName.parentFolderName.folderName
@@ -605,7 +605,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 	else if (parentStore != null)
 	    return parentStore.getDefaultProfile();
 	else
-	    // sigh.
-	    return UserProfile.getDefaultProfile();
+	    return null;
     }
 }

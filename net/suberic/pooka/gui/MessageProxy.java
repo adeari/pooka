@@ -19,7 +19,7 @@ public class MessageProxy {
     Vector tableInfo;
     
     // the column Headers for the FolderInfo Vector; used for loading the
-    // folderInfo.
+    // tableInfo.
     Vector columnHeaders;
 
     // if the message has been read
@@ -270,7 +270,22 @@ public class MessageProxy {
 	mMsg.setText(parsedText);
 	
     }
-        
+
+    /**
+     * As specified by interface net.suberic.pooka.UserProfileContainer.
+     *
+     * If the MessageProxy's folderInfo is set, this returns the 
+     * DefaultProfile of that folderInfo.  If the folderInfo isn't set
+     * (should that happen?), this returns null.
+     */
+
+    public UserProfile getDefaultProfile() {
+	if (getFolderInfo() != null) {
+	    return getFolderInfo().getDefaultProfile();
+	} else 
+	    return null;
+    }
+
     public Message getMessage() {
 	return message;
     }

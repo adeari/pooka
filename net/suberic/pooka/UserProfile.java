@@ -72,9 +72,9 @@ public class UserProfile extends Object {
 	// Initialize Profile Map
 
 	StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL"), ":");
-	while (tokens.hasMoreTokens()) 
+	while (tokens.hasMoreTokens()) {
 	    profileMap.addElement(tokens.nextToken());
-	
+	}
 
 	// Create each Profile
 
@@ -85,17 +85,20 @@ public class UserProfile extends Object {
 	UserProfile tmpProfile;
 
 	while (tokens.hasMoreTokens()) {
-	    userProperties = new Properties();
-
 	    currentProfileName = (String)(tokens.nextToken());
 
-	    for (int i = 0; i < profileMap.size(); i++) {
-		profileKey = (String)profileMap.elementAt(i);
-		userProperties.put(profileKey, mainProperties.getProperty("UserProfile." + currentProfileName + "." + profileKey, ""));
+	    // don't add it if it's empty.
+	    if (currentProfileName.length() > 0) {
+		System.out.println("adding profile " + currentProfileName);
+		userProperties = new Properties();
+
+		for (int i = 0; i < profileMap.size(); i++) {
+		    profileKey = (String)profileMap.elementAt(i);
+		    userProperties.put(profileKey, mainProperties.getProperty("UserProfile." + currentProfileName + "." + profileKey, ""));
+		}
+		tmpProfile = new UserProfile(currentProfileName, userProperties);
 	    }
-	    tmpProfile = new UserProfile(currentProfileName, userProperties);
 	}
-	
     }
 
     static public Vector getProfileList() {
@@ -132,9 +135,17 @@ public class UserProfile extends Object {
 
 	try {
 	    defaultProfile = UserProfile.getProfile(Pooka.getProperty("UserProfile.default"));
+	    System.out.println("returning value from getProfile(getProperty('UserProfile.default'");
 	    return defaultProfile;
 	} catch (Exception e) {
-	    return (UserProfile)(profileList.firstElement());
+	    System.out.println("returning profileList.firstElement");
+	    UserProfile retValue = (UserProfile)(profileList.firstElement());
+	    if (retValue != null)
+		System.out.println("profile returned is " + retValue.getName());
+	    else
+		System.out.println("returned value is null.");
+	    return retValue;
+	    //	    return (UserProfile)(profileList.firstElement());
 	}
     }
 

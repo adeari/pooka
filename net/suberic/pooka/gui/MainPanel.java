@@ -19,16 +19,14 @@ import net.suberic.util.gui.*;
  * @version 0.7 02/28/2000
  */
 
-public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelectionListener {
+public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelectionListener, net.suberic.pooka.UserProfileContainer {
     private ConfigurableMenuBar mainMenu;
     private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
     private MessagePanel messagePanel;
-    private Action[] actions;
-    private Hashtable commands;
     private Session session;
     private MailQueue mailQueue;
-    private UserProfile currentUser;
+    private UserProfile currentUser = null;
     private PropertyEditorFactory editorFactory = new PropertyEditorFactory(Pooka.getResources());
 
     public MainPanel(JFrame frame) {
@@ -49,116 +47,24 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	this.setLeftComponent(new JScrollPane(folderPanel));
 	this.setRightComponent(new JScrollPane(messagePanel));
 
-	setActions();
-
-	mainMenu = createMenubar();
+	mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
 	mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
 
-	setActiveMenus(mainMenu);
-	mainToolbar.setActive(commands);
+	// set the default active menus.
+	mainMenu.setActive(getActions());
+	mainToolbar.setActive(getActions());
 
+	// set the initial currentUser
+	refreshCurrentUser();
     }
-    
-    // creates the Menubar.
 
-    protected JMenuBar createMenubar() {
-	JMenuItem mItem;
-	JMenuBar mBar = new JMenuBar();
-
-	if (Pooka.getProperty("MenuBar", "") == "") {
-	  System.err.println("Fatal:  no resource MenuBar.  Exiting.");
-	  System.exit(-1);
-	}
-	
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MenuBar", ""), ":");
-	while (tokens.hasMoreTokens()) {
-	  JMenu m = createMenu("MenuBar." + tokens.nextToken());
-	  if (m != null) {
-	    mBar.add(m);
-	  }
-	}
-	
-	return mBar;
-    }
-    
-  /**
-   * Create a menu for the app.  By default this pulls the
-   * definition of the menu from the associated resource file.
-   */
-
-    protected JMenu createMenu(String key) {
-	StringTokenizer iKeys = null;
-	try {
-	    iKeys = new StringTokenizer(Pooka.getProperty(key), ":");
-	} catch (MissingResourceException mre) {
-	    try {
-		System.err.println(Pooka.getProperty("error.NoSuchResource") + " " + mre.getKey());
-	    } catch (MissingResourceException mretwo) {
-		System.err.println("Unable to load resource " + mre.getKey());
-	    } finally {
-	      return null;
-	    }
-	}
-	String currentToken;
-	JMenu menu;
-	
-	try {
-	    menu = new JMenu(Pooka.getProperty(key + ".Label"));
-	} catch (MissingResourceException mre) {
-	    menu = new JMenu(key);
-    }
-	
-    while (iKeys.hasMoreTokens()) {
-	currentToken=iKeys.nextToken();
-	if (currentToken.equals("-")) {
-	    menu.addSeparator();
-	} else {
-	    JMenuItem mi = createMenuItem(key, currentToken);
-	    menu.add(mi);
-	}
-    }
-    return menu;
-    }
-    
     /**
-     * And this actually creates the menu items themselves.
-     */
-    protected JMenuItem createMenuItem(String menuID, String menuItemID) {
-    // TODO:  should also make these undo-able.
-	
-	if (Pooka.getProperty(menuID + "." + menuItemID, "") == "") {
-	    JMenuItem mi;
-	    try {
-		mi = new JMenuItem(Pooka.getProperty(menuID + "." + menuItemID + ".Label"));
-	    } catch (MissingResourceException mre) {
-		mi = new JMenuItem(menuItemID);
-	    }
-	    
-	    java.net.URL url = null;
-	    
-	    try {
-		url = this.getClass().getResource(Pooka.getProperty(menuID + "." + menuItemID + ".Image"));
-	    } catch (MissingResourceException mre) {
-	    } /*catch (java.net.MalformedURLException mue) {
-		System.out.println("malformedURL for " + menuID + "." + menuItemID + ".Image");
-		}*/
-	    if (url != null) {
-		mi.setHorizontalTextPosition(JButton.RIGHT);
-		mi.setIcon(new ImageIcon(url));
-	    }
-	    
-	    String cmd = Pooka.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
-	    
-	    mi.setActionCommand(cmd);	
-	    return mi;
-	} else 
-	    if (Pooka.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
-		return new FolderMenu(menuID + "." + menuItemID, getFolderPanel());
-	    }
-	    else
-		return createMenu(menuID + "." + menuItemID );
-    }
-    
+     * This gets all the actinos associated with this panel.  Useful for
+     * populating the MenuBar and Toolbar.
+     *
+     * The method actually returns the Panel's defaultActions plus the
+     * actions of the folderPanel and messagePanel.
+     */    
     public Action[] getActions() {
 	Action[] actions = getDefaultActions();
 	if (folderPanel != null) 
@@ -169,45 +75,8 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 		actions = TextAction.augmentList(messagePanel.getActions(), actions);
 	return actions;
     }
-    
-    /**
-     * This gets an action from the supported commands.  If there is no
-     * supported action, it returns null
-     */
 
-    public Action getAction(String command) {
-	return (Action)commands.get(command);
-    }
-
-    private void setActiveMenuItems(JMenu men) {
-	if (men instanceof net.suberic.util.DynamicMenu) {
-	    ((net.suberic.util.DynamicMenu)men).setActiveMenus(this);
-	} else {
-	    for (int j = 0; j < men.getItemCount(); j++) {
-		if ((men.getItem(j)) instanceof JMenu) {
-		    setActiveMenuItems((JMenu)(men.getItem(j)));
-		} else {
-		    JMenuItem mi = men.getItem(j);
-		    Action a = getAction(mi.getActionCommand());
-		    if (a != null) {
-			//mi.removeActionListener(a);
-			mi.addActionListener(a);
-			mi.setEnabled(true);
-		    } else {
-			mi.setEnabled(false);
-		    }
-		}
-	    }
-	}
-    }	    
-
-    private void setActiveMenus(JMenuBar menuBar) {
-	for (int i = 0; i < menuBar.getMenuCount(); i++) {
-	    setActiveMenuItems(menuBar.getMenu(i));
-	}
-	setWindowsMenu(menuBar);
-    }
-
+    /*
     private void setWindowsMenu(JMenuBar menuBar) {
 	// TODO:  fix this.  Currently we just recreate the Windows menu
 	// every time.  It works, and doesn't seem all that slow, but still....
@@ -231,47 +100,85 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	    }
 	}
     }
-
-    /* Called by ExtendedDesktopManager every time the focus on the windows
-       changes.  Resets the Actions associated with the menu items and toolbar
-       to the ones in the active window.
-
-       Also called by the 
     */
 
-    protected void refreshActiveMenus(JMenuBar menuBar) {
-	setActions();
-	mainMenu.setActive(commands);
-	mainToolbar.setActive(commands);
+    /**
+     * Called by ExtendedDesktopManager every time the focus on the windows
+     * changes.  Resets the Actions associated with the menu items and toolbar
+     * to the ones in the active window.
+     *
+     * Also called when the selected message in a FolderWindow is changed.
+     */
 
+    protected void refreshActiveMenus(JMenuBar menuBar) {
+	mainMenu.setActive(getActions());
+	mainToolbar.setActive(getActions());
     }
 
+    /**
+     * refreshCurrentUser() is called to get a new value for the currently
+     * selected item.  In MainPanel, all it does is tries to get a 
+     * UserProfile from the currently selected object in the MessagePanel.
+     * If there is no object in the MessagePanel which gives a default
+     * UserProfile, it then checks the FolderPanel.  If neither of these
+     * returns a UserProfile, then the default UserProfile is returned.
+     */
+    protected void refreshCurrentUser() {
+	System.out.println("refreshCurrentUser().");
+	UserProfile selectedProfile = getDefaultProfile();
+	if (selectedProfile != null) {
+	    System.out.println("currentUser getting set to dynamic value:  " + selectedProfile.getName());
+	    currentUser = selectedProfile;
+	} else {
+	    System.out.println("setting currentUser to the default Profile.");
+	    currentUser = UserProfile.getDefaultProfile();
+	    if (currentUser != null)
+		System.out.println("currentUser is now " + currentUser.getName());
+	    else
+		System.out.println("currentUser is now null.");
+	}
+    }
 
     public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
 	refreshActiveMenus(mainMenu);
     }
 
-    /* Set the actions supported by the current windows.
+    /**
+     * As defined in net.suberic.pooka.UserProfileContainer.
+     *
+     * Note that this method can return null, and is primarily used to 
+     * get the currentUser.  If you want to get the current default 
+     * profile, use getCurrentUser() instead.
      */
-    public void setActions() {
-	actions = getActions();
-	
-	commands = new Hashtable();
-	for (int i = 0; i < actions.length; i++) {
-	    Action a = actions[i];
-	    commands.put(a.getValue(Action.NAME), a);
+    public UserProfile getDefaultProfile() {
+	UserProfile returnValue = null;
 
+	if (messagePanel != null) {
+	    returnValue = messagePanel.getDefaultProfile();
 	}
-    }	
+
+	if (returnValue != null)
+	    return returnValue;
+
+	if (folderPanel != null)
+	    returnValue = folderPanel.getDefaultProfile();
+
+	return returnValue;
+
+    }
+
+    public UserProfile getCurrentUser() {
+	return currentUser;
+    }
 
     // Accessor methods.
     // These shouldn't all be public.
 
-    public JMenuBar getMainMenu() {
+    public ConfigurableMenuBar getMainMenu() {
 	return mainMenu;
     }
     
-    public void setMainMenu(JMenuBar newMainMenu) {
+    public void setMainMenu(ConfigurableMenuBar newMainMenu) {
 	mainMenu=newMainMenu;
     }
 
@@ -408,4 +315,3 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	}
     }
 }
-
