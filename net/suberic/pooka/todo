@@ -8,11 +8,10 @@
 *) ??? still a chance to send a message twice????? !!!! ????
 
 *) encryption support:
-   *) add encryption button to new message window.
    *) fix 'encrypted message' text display.
 	make sure to test with attachments.
-   *) fix startup errors if no encryption configured.
-	if no keystore named, don't try loading?
+   *) if no keystore named, don't try loading?  test.
+
    *) add documentation
    *) test autodecrypt/auto sig check.  requires keys synched to email address.
 	test
@@ -24,9 +23,9 @@
 
 *) fix ant.
 	see about prepackaging cryptix and bouncycastle.
-*) fix jmaildir on windows xp
-	done.  test.
 ----
+
+*) fix NPE if try to send a new message without configuring client.
 
 *) fix error display with exception so that you can see the stack trace.
 

@@ -270,7 +270,7 @@ OutboxWindowToolbar.Open.Image=/org/javalobby/icons/20x20png/OpenArrow.png
 OutboxWindowToolbar.Send.Action=folder-send
 OutboxWindowToolbar.Send.Image=/org/javalobby/icons/20x20png/EnvelopeOut.png
 
-NewMessageWindowToolbar=Send:AttachFile:SaveDraft:|:Cut:Copy:Paste:Undo:Redo:|:Print:|:Detach
+NewMessageWindowToolbar=Send:AttachFile:SaveDraft:|:Cut:Copy:Paste:Undo:Redo:|:Print:|:Detach:Sign:Encrypt
 NewMessageWindowToolbar.Send.Action=message-send
 NewMessageWindowToolbar.Send.Image=/org/javalobby/icons/20x20png/EnvelopeOut.png
 NewMessageWindowToolbar.AttachFile.Action=message-attach-file
@@ -291,6 +291,10 @@ NewMessageWindowToolbar.Print.Action=file-print
 NewMessageWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
+NewMessageWindowToolbar.Sign.Action=message-sign
+NewMessageWindowToolbar.Sign.Image=/org/javalobby/icons/20x20png/Draw.png
+NewMessageWindowToolbar.Encrypt.Action=message-encrypt
+NewMessageWindowToolbar.Encrypt.Image=/org/javalobby/icons/20x20png/Lock.png
 
 MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply

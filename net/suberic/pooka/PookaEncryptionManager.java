@@ -73,7 +73,13 @@ public class PookaEncryptionManager {
 	}      
       }
     } catch (java.security.NoSuchProviderException nspe) {
-      System.out.println("Error loading PGP key store:  " + nspe.getMessage());
+      // check to see if there is a keystore configured.  if not, this
+      // isn't a problem.
+      if ((pgpPublicFilename == null || pgpPublicFilename.equals("")) && (pgpPrivateFilename == null || pgpPrivateFilename.equals(""))) {
+	// ignore; we're just not configured.
+      } else {
+	System.out.println("Error loading PGP key store:  " + nspe.getMessage());
+      }
     } catch (Exception e) {
       System.out.println("Error loading PGP key store:  " + e.getMessage());
     }
@@ -106,7 +112,11 @@ public class PookaEncryptionManager {
 	}      
       }
     } catch (java.security.NoSuchProviderException nspe) {
-      System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
+      if ((smimePublicFilename == null || smimePublicFilename.equals("")) && (smimePrivateFilename == null || smimePrivateFilename.equals(""))) {
+	// ignore; we're just not configured.
+      } else {
+	System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
+      }
     } catch (Exception e) {
       System.out.println("Error loading S/MIME key store:  " + e.getMessage());
     }
