@@ -1,15 +1,12 @@
-*) check the redraw for both the messages in the table and (especially)
-	the FolderTree.
+*) threading of attachment actions.
 
---------
+*)  ?? if network connection goes down, pooka hangs on exit.
 
 *) document keybindings
 	-- keybindings for address book
 	-- keybindings for saving attachments.
 	-- keybindings for opening folders.
 	-- keybindings for detachwindow
-
-*) threading of attachment actions.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
@@ -75,6 +72,8 @@ preview:
 	    get new messages.  doesn't work properly.
 	*)  reading a message in disconnected mode doesn't actually mark
 	     it read. -- ?? test.  seems to work.
+*) make a way to reopen folders that have been disconnected other than
+	closing and reopening the store. -- get testcase?
 
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
@@ -84,15 +83,9 @@ preview:
 
 *)  add documentation and online help.
 
-
 *) editors:  add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
 
 *)  fix up the error messages, and make sure that they look ok.
-
-*)  ?? if network connection goes down, pooka hangs on exit.
-
-*) make a way to reopen folders that have been disconnected other than
-	closing and reopening the store. -- get testcase?
 
 *) splashscreen?
 

@@ -1,3 +1,6 @@
+made it so we don't do unnecessary redraws on the folder panel every time
+a message changes or is loaded.
+
 removed several excess communications with the mail store.
 
 added a disconnected icon so that it looks different if you're browsing

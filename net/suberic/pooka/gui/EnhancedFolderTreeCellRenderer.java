@@ -39,7 +39,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
    */
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
     // from super().
-    
+
     String stringValue = tree.convertValueToText(value, sel,
 					     expanded, leaf, row, hasFocus);
     
