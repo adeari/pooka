@@ -35,6 +35,15 @@ public class MultiMessageProxy extends MessageProxy{
 	}
     }
 
+    /**
+     * deletes all the messages in this proxy.
+     */
+    public void deleteMessages() {
+	for (int i = 0; i < messages.size(); i++) {
+	    ((MessageProxy)messages.elementAt(i)).deleteMessage();
+	}
+    }
+
     public Message getMessage() { return null; }
 
     public Action getAction(String name) {
@@ -46,7 +55,8 @@ public class MultiMessageProxy extends MessageProxy{
     }
 
     public Action[] defaultActions = {
-	new OpenAction()
+	new OpenAction(),
+	new DeleteAction()
     };
 
     public class OpenAction extends AbstractAction {
@@ -56,6 +66,16 @@ public class MultiMessageProxy extends MessageProxy{
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {
 	    openWindow();
+	}
+    }
+
+    public class DeleteAction extends AbstractAction {
+	DeleteAction() {
+	    super("message-delete");
+	}
+
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	    deleteMessages();
 	}
     }
 
