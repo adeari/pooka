@@ -7,6 +7,8 @@ beta 1
 
 *) bug:  send mail seems to be on the awt event thread.
 
+*) bug:  no dialog is shown when you do a save-as for an attachment.
+
 *) bug:  drop-down list, especially for defaultProfile, isn't populated
 properly when you add a new Mail Store.
 
