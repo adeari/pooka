@@ -3,11 +3,6 @@ alpha 2
 
 *) enable voice control
 
-*) finish fixing the threading problems--specifically, see if we can get
-the FolderWindow to refresh properly, the ReadMessageWindow to come up with
-an AttachmentPane, and the new message windows to look a bit better when
-they appear (i.e. actually appear in front).
-
 *)  fix the response window size when there are lots of people in the 
 address fields--right now it makes the entire window huge.
 
@@ -35,6 +30,10 @@ available.
 
 *)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
+
+*)  check all of my actions and make sure that they are threading 
+properly--both that the email work is being done on the proper thread,
+and that all the gui updates are happening on the EventDispatcher thread.
 
 *)  all MessagingExceptions should be handled correctly, not ignored.
 
