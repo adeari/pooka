@@ -71,6 +71,41 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
     }
 
     /**
+     * Creates a new PreviewContentPanel from an existing MessagePanel.
+     */
+    public PreviewContentPanel(MessagePanel mp) {
+	this();
+
+	// go through each window on the MessagePanel.
+
+	JInternalFrame[] frames = mp.getAllFrames();
+	
+	String selectedID = null;
+
+	for (int i = 0; i < frames.length; i++) {
+	    if (frames[i] instanceof FolderInternalFrame) {
+		PreviewFolderPanel newPP = new PreviewFolderPanel(this, (FolderInternalFrame) frames[i]);
+		net.suberic.pooka.FolderInfo fi = newPP.getFolderInfo();
+		String folderID = fi.getFolderID();
+		fi.setFolderDisplayUI(newPP);
+		addPreviewPanel(newPP, folderID);
+		if (frames[i].isSelected())
+		    selectedID = folderID;
+	    } else if (frames[i] instanceof MessageInternalFrame) {
+		if (frames[i].isSelected()) {
+		    if (frames[i] instanceof ReadMessageInternalFrame) {
+			selectedID = ((ReadMessageInternalFrame) frames[i]).getMessageProxy().getMessageInfo().getFolderInfo().getFolderID();
+		    }
+		}
+		((MessageInternalFrame) frames[i]).detachWindow();
+	    }
+	}
+
+	if (selectedID != null)
+	    showFolder(selectedID);
+    }
+
+    /**
      * Shows the PreviewFolderPanel indicated by the given FolderId.
      */
     public void showFolder(String folderId) {

@@ -54,6 +54,19 @@ public class Pooka {
 	else
 	    uiFactory = new PookaDesktopPaneUIFactory();
 
+	resources.addValueChangeListener(new net.suberic.util.ValueChangeListener() {
+		public void valueChanged(String changedValue) {
+		    if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
+			MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+			uiFactory=new PookaPreviewPaneUIFactory();
+			ContentPanel cp = new PreviewContentPanel(mp);
+			Pooka.getMainPanel().setContentPanel(cp);
+		    } else {
+			uiFactory = new PookaDesktopPaneUIFactory();
+		    }
+		}
+	    }, "Pooka.guiType");
+
 	JFrame frame = new JFrame("Pooka");
 	defaultAuthenticator = new SimpleAuthenticator(frame);
 	java.util.Properties sysProps = System.getProperties();

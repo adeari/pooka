@@ -70,6 +70,31 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     }
 
     /**
+     * Creates a new PreviewFolderPanel for the given Folder.
+     */
+    public PreviewFolderPanel(PreviewContentPanel newContentPanel, FolderInternalFrame fif) {
+	contentPanel = newContentPanel;
+
+	this.setSize(newContentPanel.getSize());
+
+	displayedFolder = fif.getFolderInfo();
+	folderDisplay = fif.getFolderDisplay();
+	folderStatusBar = new FolderStatusBar(displayedFolder);
+
+	this.setLayout(new java.awt.BorderLayout());
+
+	this.add("Center", folderDisplay);
+	this.add("South", folderStatusBar);
+
+	defaultActions = new Action[] {
+	    new ActionWrapper(new ExpungeAction(), displayedFolder.getFolderThread()),
+	    new NextMessageAction(),
+	    new PreviousMessageAction(),
+	    new GotoMessageAction()
+		};
+    }
+
+    /**
      * Opens the display for the given Folder.
      *
      * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.

@@ -271,6 +271,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	return contentPanel;
     }
 
+    public void setContentPanel(ContentPanel newCp) {
+	contentPanel = newCp;
+	this.setRightComponent(newCp.getUIComponent());
+	this.repaint();
+    }
+
     public FolderPanel getFolderPanel() {
 	return folderPanel;
     }

@@ -24,10 +24,6 @@ import net.suberic.util.swing.*;
  * FolderDisplayUI to use as the actual UI object for the Folder.  That
  * component can then use the FolderDisplayPanel to display the messages.
  *
- * Note also that this class does not add a MouseListener to the JTable.
- * Again, the parent FolderDisplayUI will need to add that.  This way,
- * the FolderDisplayPanel may be used by parent components which want to
- * have it perform different actions when messages are selected.
  */
 
 public class FolderDisplayPanel extends JPanel {
@@ -240,6 +236,35 @@ public class FolderDisplayPanel extends JPanel {
 		}
 	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
 
+	messageTable.registerKeyboardAction(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    MessageProxy selectedMessage = getSelectedMessage();
+		    String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
+		    if (selectedMessage != null) {
+			Action clickAction = selectedMessage.getAction(actionCommand);
+			if (clickAction != null && isEnabled()) {
+			    clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+			    
+			}
+		    }
+		}
+	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_ENTER, 0),  JComponent.WHEN_FOCUSED);
+	
+	messageTable.registerKeyboardAction(new ActionListener() {
+		public void actionPerformed(ActionEvent e) {
+		    MessageProxy selectedMessage = getSelectedMessage();
+		    String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
+		    if (selectedMessage != null) {
+			Action clickAction = selectedMessage.getAction(actionCommand);
+			if (clickAction != null && isEnabled()) {
+			    clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+			    
+			}
+		    }
+		}
+	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SPACE, 0),  JComponent.WHEN_FOCUSED);
+
+	
     }
     
     /**

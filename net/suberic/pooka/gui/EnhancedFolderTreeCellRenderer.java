@@ -20,6 +20,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     Icon connectedStoreIcon;
     Icon disconnectedStoreIcon;
     Icon subfolderIcon;
+    Icon subfolderWithNewIcon;
     Icon connectedWithNewIcon;
 
     public EnhancedFolderTreeCellRenderer() {
@@ -86,7 +87,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 		    setIconToDisconnected();
 		} else {
 		    if (!((FolderNode)node).isLeaf()) {
-			setIconToSubfolder();
+			if (folderInfo.hasNewMessages())
+			    setIconToSubfolderWithNew();
+			else 
+			    setIconToSubfolder();
 		    } else if (folderInfo.isOpen()) {
 			if ((! folderInfo.isTrashFolder()) && (! folderInfo.isSentFolder()) && folderInfo.hasNewMessages()) {
 			    setIconToOpenWithNew();
@@ -202,6 +206,19 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	}
     }
 
+    public void setIconToSubfolderWithNew() {
+	if (getSubfolderWithNewIcon() != null)
+	    setIcon(getSubfolderWithNewIcon());
+	else {
+	    // create the new Icon.
+	    java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderWithNewIcon", "images/FolderNew.gif"));
+	    if (url != null) {
+		setSubfolderIcon(new ImageIcon(url));
+		setIcon(getSubfolderIcon());
+	    }
+	}
+    }
+
     public Icon getConnectedIcon() {
 	return connectedIcon;
     }
@@ -212,6 +229,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 
     public Icon getConnectedWithNewIcon() {
 	return connectedWithNewIcon;
+    }
+
+    public Icon getSubfolderWithNewIcon() {
+	return subfolderWithNewIcon;
     }
 
     public void setConnectedWithNewIcon(Icon newIcon) {

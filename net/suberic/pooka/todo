@@ -6,9 +6,6 @@ and subfolders.
 
 *) add ability to switch between preview and desktop mode without restarting.
 
-*) fix key binding on tables so that enter/space (or both) will open the
-message.
-
 *) make it so you can switch a mail store from pop to imap (or vice-versa)
    without restarting pooka.
 
