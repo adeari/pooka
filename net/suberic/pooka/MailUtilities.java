@@ -9,47 +9,68 @@ public class MailUtilities {
     }
 
     /**
+     * This parses the message given into an AttachmentBundle.
+     */
+    private static AttachmentBundle parseAttachments(Message m) {
+	AttachmentBundle bundle = new AttachmentBundle();
+	try {
+	    Object content = m.getContent();
+
+	    if (content instanceof Multipart) {
+		bundle.addAll(parseAttachments((Multipart)content));
+	    } else if (content instanceof String) {
+		bundle.textPart = new StringBuffer((String)content);
+		bundle.allText.append(content);
+	    }
+	} catch (Exception e) {
+	}
+	return bundle;
+    }
+
+    /**
+     * This parses a Mulitpart object into an AttachmentBundle.
+     */
+    private static AttachmentBundle parseAttachments(Multipart mp) {
+	AttachmentBundle bundle = new AttachmentBundle();
+	try {
+	    for (int i = 0; i < mp.getCount(); i++) {
+		MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
+		ContentType ct = new ContentType(mbp.getContentType());
+		if (ct.getPrimaryType().equalsIgnoreCase("text") && ct.getSubType().equalsIgnoreCase("plain")) {
+		    if (bundle.textPart == null) {
+			bundle.textPart = new StringBuffer((String)mbp.getContent());
+		    } else {
+			bundle.textAttachments.add(mbp);
+			bundle.allAttachments.add(mbp);
+		    }
+		    bundle.allText.append((String)mbp.getContent());
+
+		} else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
+		    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
+		} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
+		    bundle.nonTextAttachments.add(mbp);
+		    bundle.allAttachments.add(mbp);
+		    bundle.addAll(parseAttachments((Message)mbp.getContent()));
+		} else {
+		    bundle.nonTextAttachments.add(mbp);
+		    bundle.allAttachments.add(mbp);
+		}
+	    }
+	} catch (Exception e) {
+	    System.out.println("caught exception.");
+	    e.printStackTrace();
+	}
+	
+	return bundle;
+    }
+
+    /**
      * This gets the Text part of a message.  This is useful if you want
      * to display just the 'body' of the message without the attachments.
      */
     public static String getTextPart(Message m) {
-	System.out.println("getting text part.");
-	try {
-	    Object content = m.getContent();
-
-	    if (content instanceof String)
-		return (String)content;
-	    else if (content instanceof MimeMultipart) {
-		MimeMultipart mmp = (MimeMultipart)content;
-		ContentType ct = new ContentType(mmp.getContentType());
-		if (ct.getSubType().equalsIgnoreCase("alternative")) {
-		    for (int i = 0; i < mmp.getCount(); i++) {
-			MimeBodyPart mbp = (MimeBodyPart)mmp.getBodyPart(i);
-
-			if (mbp.getContentType().equalsIgnoreCase("text/plain"))
-			    return (String)(mbp.getContent());
-		    }
-		}
-		    
-		for (int i = 0; i < mmp.getCount(); i++) {
-		    MimeBodyPart mbp = (MimeBodyPart)mmp.getBodyPart(i);
-		    ct = new ContentType(mmp.getContentType());
-		    System.out.println("not an alternative. type is " + ct.getPrimaryType());
-		    if (ct.getPrimaryType().equalsIgnoreCase("text")) {
-			System.out.println("returning " + (String)(mbp.getContent()));
-			return (String)(mbp.getContent());
-		    }
-		}
-	    } 
-	} catch (Exception e) {
-	    System.out.println("caught exception.");
-	    e.printStackTrace();
-	    // with any excpetion, we just return null.  i think that's
-	    // safe for now.
-	}
-
-	return null;
-	
+	AttachmentBundle bundle = parseAttachments(m);
+	return bundle.textPart.toString();
     }
 
     /**
@@ -57,24 +78,8 @@ public class MailUtilities {
      * are also of text or message/rfc822 types.
      */
     public static Vector getInlineTextAttachments(Message m) {
-	Vector v = getAttachments(m);
-	if (v == null || v.size() < 1)
-	    return null;
-
-	Vector retval = new Vector();
-	try {
-	    for (int i = 0; i < v.size(); i++) {
-		MimeBodyPart mbp = (MimeBodyPart) v.elementAt(i);
-		if (mbp.getContentType().equalsIgnoreCase("text/plain"))
-		    retval.add(mbp);
-	    }
-	} catch (Exception e) {
-	    System.out.println("caught exception.");
-	    e.printStackTrace();
-
-	}
-	
-	return retval;
+	AttachmentBundle bundle = parseAttachments(m);
+	return bundle.textAttachments;
     }
 
 
@@ -83,67 +88,8 @@ public class MailUtilities {
      * except for the main body of the message).
      */
     public static Vector getAttachments(Message m) {
-	try {
-	    Object content = m.getContent();
-
-	    if (content instanceof Multipart) {
-		Multipart mp = (Multipart)content;
-		boolean textFound = false;
-		Vector attachments = new Vector();
-		for (int i = 0; i < mp.getCount(); i++) {
-		    MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
-		    ContentType ct = new ContentType(mbp.getContentType());
-		    if (textFound == false) {
-			if (ct.getPrimaryType().equalsIgnoreCase("text")) {
-			    textFound = true;
-			} else {
-			    if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-				System.out.println("attachment is another multipart.");
-				Vector v = getAttachments((MimeMultipart)mbp.getContent());
-				if (v != null && v.size() > 0)
-				    attachments.addAll(v);
-			    } /*else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-				System.out.println("attachment is a message.");				
-				Vector v = getAttachments((Message)mbp.getContent());
-				if (v != null && v.size() > 0)
-				    attachments.addAll(v);
-				    } */ else {
-				System.out.println("attachment is just a plain attachment.  adding.");
-				attachments.add(mbp);
-			    }  
-			}
- 
-		    } else {
-			
-			if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-			    System.out.println("attachment is another multipart.");
-			    Vector v = getAttachments((MimeMultipart)mbp.getContent());
-			    if (v != null && v.size() > 0)
-				attachments.addAll(v);
-			} /*else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-				System.out.println("attachment is a message.");				
-				Vector v = getAttachments((Message)mbp.getContent());
-				if (v != null && v.size() > 0)
-				    attachments.addAll(v);
-				    } */ else {
-				System.out.println("attachment is just a plain attachment.  adding.");
-				attachments.add(mbp);
-			    }
-		    }
-		}
-		
-		return attachments;
-	    }
-	} catch (Exception e) {
-	    System.out.println("caught exception.");
-	    e.printStackTrace();
-
-	    // with any excpetion, we just return null.  i think that's
-	    // safe for now.
-	}
-	
-	return null;
-	
+	AttachmentBundle bundle = parseAttachments(m);
+	return bundle.allAttachments;
     }
 
     /**
@@ -187,30 +133,8 @@ public class MailUtilities {
      * except for the main body of the message).
      */
     public static Vector getAttachments(Multipart mp) {
-	try {
-	    Vector attachments = new Vector();
-	    for (int i = 0; i < mp.getCount(); i++) {
-		MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
-		ContentType ct = new ContentType(mbp.getContentType());
-		if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-		    Vector v = getAttachments((MimeMultipart)mbp.getContent());
-		    if (v != null && v.size() > 0)
-			attachments.addAll(v);
-		} else
-		    
-		    attachments.add(mbp);
-	    }
-	    return attachments;
-	} catch (Exception e) {
-	    System.out.println("caught exception.");
-	    e.printStackTrace();
-
-	    // with any excpetion, we just return null.  i think that's
-	    // safe for now.
-	}
-	
-	return null;
-	
+	AttachmentBundle bundle = parseAttachments(mp);
+	return bundle.allAttachments;
     }
 
     /**
