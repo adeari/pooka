@@ -220,9 +220,23 @@ public class SearchEntryPanel extends JPanel {
      */
     public java.util.Properties generateSearchTermProperties(String rootProperty) {
 	java.util.Properties returnValue = new java.util.Properties();
-
+	
 	if (searchTerms.size() > 0) {
-	}
+	    if (Pooka.isDebug())
+		System.out.println("SearchEntryPanel:  searchTerms.size() > 0.");
+	    SearchEntryPair pair = (SearchEntryPair) searchTerms.elementAt(0);
+	    java.util.Properties termProps = pair.form.generateSearchTermProperties(rootProperty));
+	    if (Pooka.isDebug())
+		System.out.println("SearchEntryPanel:  setting term to " + term);
+	    for (int i = 1; i < searchTerms.size(); i++) {
+		SearchEntryPair newPair = (SearchEntryPair) searchTerms.elementAt(i);
+		SearchTerm newTerm = newPair.form.generateSearchTerm();
+		if (newPair.connector.getType() == AND) {
+		    term = new javax.mail.search.AndTerm(term, newTerm);
+		} else if (newPair.connector.getType() == OR) {
+		    term = new javax.mail.search.OrTerm(term, newTerm);
+		}
+	    }
 
 	return returnValue;
     }
