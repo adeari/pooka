@@ -1,3 +1,8 @@
+changed the error display so that we now have a button to show the
+stack trace.
+
+made the text in the SendFailedDialog non-editable.
+
 modified trusted SSL certs code so that we remember to trust the certificate
 even if there is no local cert file backing it up.
 

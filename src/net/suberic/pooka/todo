@@ -1,8 +1,6 @@
 *) bug:  can't switch back to original theme in theme configuration (starts
 	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
 
-*) bug:  error sending message text is editable.
-
 -----------
 
 *) add support for running without any local files.
@@ -45,8 +43,6 @@
 	
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
-
-*) fix error display with exception so that you can see the stack trace.
 
 *) fix problem with starting up work account and having it select first
 	message (???)

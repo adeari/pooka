@@ -71,6 +71,7 @@ public class SendFailedDialog extends JPanel {
     mMessageDisplay.setBackground(testLabel.getBackground());
     mMessageDisplay.setFont(testLabel.getFont());
     mMessageDisplay.setForeground(testLabel.getForeground());
+    mMessageDisplay.setEditable(false);
 
     messagePanel.add(mMessageDisplay);
 

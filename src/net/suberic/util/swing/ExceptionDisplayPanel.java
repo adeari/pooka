@@ -30,7 +30,12 @@ public class ExceptionDisplayPanel extends JPanel {
     
     mButton = new JButton(pButtonText);
     
-    this.add("BUTTON", mButton);
+    Box buttonBox = Box.createHorizontalBox();
+    buttonBox.add(Box.createHorizontalGlue());
+    buttonBox.add("BUTTON", mButton);
+    buttonBox.add(Box.createHorizontalGlue());
+
+    this.add("BUTTON", buttonBox);
 
     mButton.addActionListener(new AbstractAction() {
 
