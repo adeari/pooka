@@ -17,13 +17,16 @@ import javax.mail.*;
 
 import net.suberic.crypto.*;
 import net.suberic.util.VariableBundle;
-
+import net.suberic.util.ValueChangeListener;
 
 /**
  * The EncryptionManager manages Pooka's encryption facilities.  It's 
  * basically one-stop shopping for all of your email encryption needs.
  */
-public class PookaEncryptionManager {
+public class PookaEncryptionManager implements ValueChangeListener {
+
+  String key;
+  VariableBundle sourceBundle;
 
   EncryptionKeyManager pgpKeyMgr = null;
 
@@ -39,13 +42,36 @@ public class PookaEncryptionManager {
 
   boolean savePasswordsForSession = false;
 
+  boolean needsReload = false;
+
   /**
    * Creates an EncryptionManager using the given VariableBundle and
    * key property.
    */
-  public PookaEncryptionManager(VariableBundle sourceBundle, String key) {
-    // load the given pgp and smime stores.
+  public PookaEncryptionManager(VariableBundle pSourceBundle, String pKey) {
+    sourceBundle = pSourceBundle;
+    key = pKey;
 
+    // register this for listening to changes to the store filenames and the
+    // store passwords.
+    sourceBundle.addValueChangeListener(this, key + ".pgp.keyStore.private.filename");
+    sourceBundle.addValueChangeListener(this, key + ".pgp.keyStore.private.password");
+    sourceBundle.addValueChangeListener(this, key + ".pgp.keyStore.public.filename");
+
+    sourceBundle.addValueChangeListener(this, key + ".smime.keyStore.public.filename");
+    sourceBundle.addValueChangeListener(this, key + ".smime.keyStore.private.filename");
+    sourceBundle.addValueChangeListener(this, key + ".smime.keyStore.private.password");
+
+    sourceBundle.addValueChangeListener(this, key + ".savePasswordsForSession");
+
+    // load the given pgp and smime stores.
+    loadStores(sourceBundle, key);
+  }
+
+  /**
+   * Loads the stores.
+   */
+  public void loadStores(VariableBundle sourceBundle, String key) {
     String pgpPublicFilename = sourceBundle.getProperty(key + ".pgp.keyStore.public.filename", "");
 
     String pgpPrivateFilename = sourceBundle.getProperty(key + ".pgp.keyStore.private.filename", "");
@@ -53,35 +79,32 @@ public class PookaEncryptionManager {
     if (!pgpPrivatePwString.equals(""))
       pgpPrivatePwString = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(pgpPrivatePwString);
 
-    try {
-      EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
-      if (pgpUtils != null) {
-	pgpKeyMgr = pgpUtils.createKeyManager();
-	try {
-	  pgpKeyMgr.loadPrivateKeystore(new FileInputStream(new File(pgpPrivateFilename)), pgpPrivatePwString.toCharArray());
-	} catch (java.io.IOException fnfe) {
-	  System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + fnfe.getMessage());
-	} catch (java.security.GeneralSecurityException gse) {
-	  System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + gse.getMessage());
+    // if either store is configured, try loading.
+    if (! (pgpPrivateFilename.equals("") && pgpPublicFilename.equals(""))) {
+      try {
+	EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
+	if (pgpUtils != null) {
+	  pgpKeyMgr = pgpUtils.createKeyManager();
+	  try {
+	    pgpKeyMgr.loadPrivateKeystore(new FileInputStream(new File(pgpPrivateFilename)), pgpPrivatePwString.toCharArray());
+	  } catch (java.io.IOException fnfe) {
+	    System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + fnfe.getMessage());
+	  } catch (java.security.GeneralSecurityException gse) {
+	    System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + gse.getMessage());
+	  }
+	  try {
+	    pgpKeyMgr.loadPublicKeystore(new FileInputStream(new File(pgpPublicFilename)), null);
+	  } catch (java.io.IOException fnfe) {
+	    System.out.println("Error loading PGP public keystore from file " + pgpPublicFilename + ":  " + fnfe.getMessage());
+	  } catch (java.security.GeneralSecurityException gse) {
+	    System.out.println("Error loading PGP private keystore from file " + pgpPublicFilename + ":  " + gse.getMessage());
+	  }      
 	}
-	try {
-	  pgpKeyMgr.loadPublicKeystore(new FileInputStream(new File(pgpPublicFilename)), null);
-	} catch (java.io.IOException fnfe) {
-	  System.out.println("Error loading PGP public keystore from file " + pgpPublicFilename + ":  " + fnfe.getMessage());
-	} catch (java.security.GeneralSecurityException gse) {
-	  System.out.println("Error loading PGP private keystore from file " + pgpPublicFilename + ":  " + gse.getMessage());
-	}      
-      }
-    } catch (java.security.NoSuchProviderException nspe) {
-      // check to see if there is a keystore configured.  if not, this
-      // isn't a problem.
-      if ((pgpPublicFilename == null || pgpPublicFilename.equals("")) && (pgpPrivateFilename == null || pgpPrivateFilename.equals(""))) {
-	// ignore; we're just not configured.
-      } else {
+      } catch (java.security.NoSuchProviderException nspe) {
 	System.out.println("Error loading PGP key store:  " + nspe.getMessage());
+      } catch (Exception e) {
+	System.out.println("Error loading PGP key store:  " + e.getMessage());
       }
-    } catch (Exception e) {
-      System.out.println("Error loading PGP key store:  " + e.getMessage());
     }
 
     String smimePublicFilename = sourceBundle.getProperty(key + ".smime.keyStore.public.filename", "");
@@ -91,39 +114,74 @@ public class PookaEncryptionManager {
     if (!smimePrivatePwString.equals(""))
       smimePrivatePwString = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(smimePrivatePwString);
 
-    try {
-      EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
-      if (smimeUtils != null) {
-	smimeKeyMgr = smimeUtils.createKeyManager();
-	try {
-	  smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
-	} catch (java.security.GeneralSecurityException gse) {
-	  System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
-	} catch (java.io.IOException fnfe) {
-	  System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + fnfe.getMessage());
+    // if either store is configured, try loading.
+    if (! (smimePrivateFilename.equals("") && smimePublicFilename.equals(""))) {
+      try {
+	EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
+	if (smimeUtils != null) {
+	  smimeKeyMgr = smimeUtils.createKeyManager();
+	  try {
+	    smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
+	  } catch (java.security.GeneralSecurityException gse) {
+	    System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
+	  } catch (java.io.IOException fnfe) {
+	    System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + fnfe.getMessage());
+	  }
+	  
+	  try {
+	    smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), smimePrivatePwString.toCharArray());
+	  } catch (java.io.IOException fnfe) {
+	    System.out.println("Error loading S/MIME public keystore from file " + smimePublicFilename + ":  " + fnfe.getMessage());
+	  } catch (java.security.GeneralSecurityException gse) {
+	    System.out.println("Error loading S/MIME private keystore from file " + smimePublicFilename + ":  " + gse.getMessage());
+	  }      
 	}
-      
-	try {
-	  smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), smimePrivatePwString.toCharArray());
-	} catch (java.io.IOException fnfe) {
-	  System.out.println("Error loading S/MIME public keystore from file " + smimePublicFilename + ":  " + fnfe.getMessage());
-	} catch (java.security.GeneralSecurityException gse) {
-	  System.out.println("Error loading S/MIME private keystore from file " + smimePublicFilename + ":  " + gse.getMessage());
-	}      
-      }
-    } catch (java.security.NoSuchProviderException nspe) {
-      if ((smimePublicFilename == null || smimePublicFilename.equals("")) && (smimePrivateFilename == null || smimePrivateFilename.equals(""))) {
-	// ignore; we're just not configured.
-      } else {
+      } catch (java.security.NoSuchProviderException nspe) {
 	System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
+      } catch (Exception e) {
+	System.out.println("Error loading S/MIME key store:  " + e.getMessage());
       }
-    } catch (Exception e) {
-      System.out.println("Error loading S/MIME key store:  " + e.getMessage());
     }
 
     savePasswordsForSession = Pooka.getProperty(key + ".savePasswordsForSession", "false").equalsIgnoreCase("true");
     
+    cachedPrivateKeys = new HashMap();
+
+    cachedPublicKeys = new HashMap();
+
+    addressToPublicKeyMap = null;
+
   }
+
+  /**
+   * As defined in net.suberic.util.ValueChangeListener.
+   * 
+   */
+  public void valueChanged(String changedValue) {
+    if (changedValue.equals(key + ".savePasswordsForSession")) {
+      savePasswordsForSession = Pooka.getProperty(key + ".savePasswordsForSession", "false").equalsIgnoreCase("true");
+    } else {
+      // this is crazy.
+      needsReload = true;
+      javax.swing.SwingUtilities.invokeLater(new Runnable() {
+
+	  public void run() {
+	    if (needsReload) {
+	      needsReload = false;
+	      
+	      Thread updateThread = new Thread(new Runnable() {
+		  public void run() {
+		    loadStores(sourceBundle, key);
+		  }
+		});
+	      
+	      updateThread.start();
+	    }
+	  }
+	});
+    }
+  }
+  
   
   /**
    * Adds the private key to the store.

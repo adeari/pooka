@@ -1,5 +1,9 @@
 *) encryption support:
    *) if no keystore named, don't try loading?  test.
+	-- we still get errors there.  fix.
+   *) make keystores get updated if you change them while running.  in other
+	words, don't require a restart for encryption the first time.
+	  -- done.  make update only happen once per change, though.
 
    *) add documentation
    *) test autodecrypt/auto sig check.  requires keys synched to email address.
@@ -12,6 +16,11 @@
 
 *) fix ant.
 	see about prepackaging cryptix and bouncycastle.
+	three targets:
+	1)  pooka without encryption support.
+	2)  pooka with encryption support; jar file with libs under it.
+	?? maybe these should be the same, but packaged differently?
+	3)  jnlp
 ----
 
 *) ?? ^D message, hit return for next message, get an error?
