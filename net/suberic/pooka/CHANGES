@@ -1,3 +1,6 @@
+fixed pooka so that the default image and text viewers that come with
+javamail will actually work when you double click on an attachment.
+
 preview pane mode now gives a resonable size for the message table.
 
 nested subfolders were not being cached when in disconnected imap mode.

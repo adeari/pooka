@@ -2,12 +2,13 @@
 *) make it so the connection objects actually have a clue as to whether
 or not they're actually connected, instead of relying on the user.
 
-*) make it so the default text/image viewer actually works.
-
 *) _really_ fix the window resizing problem.
 
 *) fix the new account creation / new mailbox creation so that the
 	folder display actually gets updated.  (jdk 1.3.1?)
+
+*) disconn:  open window.  delete message using "x" on the window.
+next selected goes two down instead of one.
 
 ----------
 
@@ -41,6 +42,9 @@ or not they're actually connected, instead of relying on the user.
 *) make search window look different than normal window.
 
 ------------
+
+*) disconnected:  sometimes when you delete the last message, the first
+message is selected.
 
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
