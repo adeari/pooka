@@ -126,7 +126,14 @@
     <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
   </target>
 
+  <target name="dist-jnlp-noFile" depends="compile-jnlp">
+    <copy file="${sourcedir}/suberic/pooka/Pookarc.noFile" tofile="${builddir}/net/suberic/pooka/Pookarc" overwrite="yes"/>
+    <jar jarfile="${distdir}/pooka_11_noFile.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
+    </jar>
+  </target>
+
   <target name="dist-jnlp" depends="compile-jnlp">
+
     <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
     </jar>
   </target>
