@@ -14,6 +14,9 @@ import java.io.File;
 
 public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
+    private JTextPane otherEditorPane = null;
+    private JScrollPane otherScrollPane = null;
+
     public boolean firstShow = true;
 
     public static int HEADERS_DEFAULT = 0;
@@ -55,11 +58,19 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
 	setDefaultFont(editorPane);
 
+	// temp
+
+	otherEditorPane = new JTextPane();
+	otherEditorPane.setEditable(false);
+	otherScrollPane = new JScrollPane(otherEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+	setDefaultFont(otherEditorPane);
+
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	
 	attachmentScrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	
-	splitPane.setTopComponent(editorScrollPane);
+	splitPane.setTopComponent(otherScrollPane);
 	splitPane.setBottomComponent(attachmentScrollPane);
 	
 	this.add(WITH_ATTACHMENTS, splitPane);
@@ -105,6 +116,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		editorPane.setEditable(false);
 		editorPane.setText(messageText.toString());
 		editorPane.setCaretPosition(0);
+
+		otherEditorPane.setEditable(false);
+		otherEditorPane.setText(messageText.toString());
+		otherEditorPane.setCaretPosition(0);
 	    } 
 	}
 
