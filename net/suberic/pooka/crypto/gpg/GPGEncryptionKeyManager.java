@@ -60,32 +60,25 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
 
     String currentLine = resultReader.readLine();
     while (currentLine != null && currentLine.startsWith("gpg:")) {
-      System.err.println("skipping " + currentLine);
       // skip all of the gpg: headers.
       currentLine = resultReader.readLine();
     }
 
     if (currentLine != null) {
       // read the next two lines.
-      System.err.println("skipping " + currentLine);
       currentLine = resultReader.readLine();
-      System.err.println("skipping " + currentLine);
       currentLine = resultReader.readLine();
     }    
 
     // now we actually create the keys.
     while (currentLine != null) {
       try {
-	System.err.println("adding key from line:");
-	System.err.println(currentLine);
 	int keyTypeEnd = currentLine.indexOf(' ', 0);
 	int keyIdEnd = currentLine.indexOf(' ', keyTypeEnd + 2);
 	int keyDateEnd = currentLine.indexOf(' ', keyIdEnd + 1);
-	System.err.println("keyTypeEnd=" + keyTypeEnd + ", id " + keyIdEnd + ", keyDate " + keyDateEnd);
 	String keyAlias = currentLine.substring(keyDateEnd + 1);
 	EncryptionKey key = new GPGEncryptionKey(keyAlias, new String(password));
 	publicKeyMap.put(keyAlias, key);
-	System.err.println("adding public alias for '" + keyAlias + "'");
 	currentLine = resultReader.readLine();
 	while (currentLine != null && currentLine.length() > 0) {
 	  currentLine = resultReader.readLine();
@@ -107,37 +100,29 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
     } catch (InterruptedException ie) {
     }
     
-    System.err.println("getting private keys.");
     resultReader = new BufferedReader(new InputStreamReader(sp.getInputStream()));
 
     currentLine = resultReader.readLine();
     while (currentLine != null && currentLine.startsWith("gpg:")) {
       // skip all of the gpg: headers.
-      System.err.println("skipping " + currentLine);
       currentLine = resultReader.readLine();
     }
     
     if (currentLine != null) {
       // read the next two lines.
-      System.err.println("skipping " + currentLine);
       currentLine = resultReader.readLine();
-      System.err.println("skipping " + currentLine);
       currentLine = resultReader.readLine();
     }    
 
     // now we actually create the keys.
     while (currentLine != null) {
       try {
-	System.err.println("adding key from line:");
-	System.err.println(currentLine);
 	int keyTypeEnd = currentLine.indexOf(' ', 0);
 	int keyIdEnd = currentLine.indexOf(' ', keyTypeEnd + 2);
 	int keyDateEnd = currentLine.indexOf(' ', keyIdEnd + 1);
-	System.err.println("keyTypeEnd=" + keyTypeEnd + ", id " + keyIdEnd + ", keyDate " + keyDateEnd);
 	String keyAlias = currentLine.substring(keyDateEnd + 1);
 	EncryptionKey key = new GPGEncryptionKey(keyAlias, new String(password));
 	privateKeyMap.put(keyAlias, key);
-	System.err.println("adding private alias for '" + keyAlias + "'");
 	currentLine = resultReader.readLine();
 	while (currentLine != null && currentLine.length() > 0) {
 	  currentLine = resultReader.readLine();
@@ -238,8 +223,6 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
 
     if (! loaded)
       throw new KeyStoreException ( "store not loaded." );
-
-    System.err.println("returning private key for alias '" + alias + "'");
 
     return (EncryptionKey) privateKeyMap.get(alias);
   }

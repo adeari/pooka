@@ -90,7 +90,6 @@ public class NewMessageInfo extends MessageInfo {
     try {
       if (mSignMessage == CRYPTO_YES || (mSignMessage == CRYPTO_DEFAULT && profile != null && profile.getSignAsDefault())) {
 	message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile, mSignatureKey);
-	message.writeTo(System.out);
       }
       
       if (mEncryptMessage == CRYPTO_YES) {
