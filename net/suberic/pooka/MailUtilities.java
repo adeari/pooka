@@ -50,14 +50,16 @@ public class MailUtilities {
 			} else if (htmlPart != null) {
 			    Attachment attachment = new Attachment(htmlPart);
 			    bundle.textPart = attachment;
-			} else 
+			} else {
 			    bundle.addAll(parseAttachments(mp));
+			}
 		    }
 		} else {
 		    bundle.addAll(parseAttachments((Multipart)m.getContent()));
 		}
 	    } else if (contentType.startsWith("text")) {
 		Attachment attachment = new Attachment((MimeMessage)m);
+
 		bundle.textPart = attachment;
 	    } else {
 		Attachment attachment = new Attachment((MimeMessage)m);
@@ -226,6 +228,25 @@ public class MailUtilities {
 	    tabSize = 8;
 	}
 	return wrapText(originalText, wrapLength, '\n', tabSize);
+    }
+
+    /**
+     * Escapes html special characters.
+     */
+    public static String escapeHtml(String input) {
+	char[] characters = input.toCharArray();
+	StringBuffer retVal = new StringBuffer();
+	for (int i = 0; i < characters.length; i++) {
+	    if (characters[i] == '&')
+		retVal.append("&amp;");
+	    else if (characters[i] == '<')
+		retVal.append("&lt;");
+	    else if (characters[i] == '>')
+		retVal.append("&gt;");
+	    else
+		retVal.append(characters[i]);
+	}
+	return retVal.toString();
     }
 }
 

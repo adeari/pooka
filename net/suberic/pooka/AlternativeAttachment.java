@@ -54,7 +54,9 @@ public class AlternativeAttachment extends Attachment {
     String getHtml(int maxLength, String truncationMessage) throws IOException {
 	if (maxLength >= size) {
 	    try {
-		return (String) htmlHandler.getContent();
+		String retVal = (String) htmlHandler.getContent();
+		return retVal;
+		//return (String) htmlHandler.getContent();
 	    } catch (UnsupportedEncodingException uee) {
 		/**
 		 * Just read the InputStream directly into a byte array and

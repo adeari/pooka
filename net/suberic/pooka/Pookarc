@@ -38,7 +38,7 @@ Pooka.displayTextAttachments.propertyType=Boolean
 Pooka.attachmentDisplayMaxLength=100000
 
 Pooka.displayHtml=true
-Pooka.displayHtmlAsDefault=true
+Pooka.displayHtmlAsDefault=false
 
 Pooka.openFoldersOnConnect=true
 Pooka.openFoldersOnConnect.propertyType=Boolean

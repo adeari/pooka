@@ -45,7 +45,7 @@ class AttachmentBundle {
 	StringBuffer retVal = new StringBuffer();
 
 	if (withHeaders)
-	    retVal.append(getHeaderInformation(showFullHeaders));
+	    retVal.append(getHeaderInformation(showFullHeaders, false));
 
 	if (textPart != null)
 	    retVal.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
@@ -60,12 +60,15 @@ class AttachmentBundle {
     public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
 	StringBuffer retVal = new StringBuffer();
 
+	retVal.append("<html><body>");
+
 	if (withHeaders)
-	    retVal.append(getHeaderInformation(showFullHeaders));
+	    retVal.append(getHeaderInformation(showFullHeaders, true));
 
 	if (textPart != null)
 	    retVal.append(textPart.getHtml(withHeaders, showFullHeaders, maxLength, truncationMessage));
 
+	retVal.append("</body></html>");
 	return retVal.toString();
     }
 
@@ -105,7 +108,7 @@ class AttachmentBundle {
 	StringBuffer returnValue = new StringBuffer();
 
 	if (withHeaders)
-	    returnValue.append(getHeaderInformation(showFullHeaders));
+	    returnValue.append(getHeaderInformation(showFullHeaders, false));
 
 	if (textPart != null)
 	    returnValue.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
@@ -131,8 +134,10 @@ class AttachmentBundle {
     public String getHtmlAndTextInlines(String separator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
 	StringBuffer returnValue = new StringBuffer();
 
+	returnValue.append("<html><body>");
+
 	if (withHeaders)
-	    returnValue.append(getHeaderInformation(showFullHeaders));
+	    returnValue.append(getHeaderInformation(showFullHeaders, true));
 
 	if (textPart != null)
 	    returnValue.append(textPart.getHtml(withHeaders, showFullHeaders, maxLength, truncationMessage));
@@ -147,6 +152,7 @@ class AttachmentBundle {
 	    }
 	}
 
+	returnValue.append("</body></html>");
 	return returnValue.toString();
     }	
     
@@ -158,7 +164,7 @@ class AttachmentBundle {
     /**
      * This returns the formatted header information for a message.
      */
-    public StringBuffer getHeaderInformation (boolean showFullHeaders) {
+    public StringBuffer getHeaderInformation (boolean showFullHeaders, boolean useHtml) {
 	if (headers != null) {
 	    StringBuffer headerText = new StringBuffer();
 	    
@@ -176,10 +182,17 @@ class AttachmentBundle {
 		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
 		    hdrValue = (String) headers.get(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
 		    if (hdrValue != null) {
-			headerText.append(hdrLabel + ":  ");
-			headerText.append(hdrValue);
-			
-			headerText.append("\n");
+			if (useHtml) {
+			    headerText.append("<b>" + hdrLabel + ":</b><nbsp><nbsp>");
+			    headerText.append(MailUtilities.escapeHtml(hdrValue));
+			    
+			    headerText.append("<br>\n");
+			} else {
+			    headerText.append(hdrLabel + ":  ");
+			    headerText.append(hdrValue);
+			    
+			    headerText.append("\n");
+			}
 		    }
 		}
 	    } 
