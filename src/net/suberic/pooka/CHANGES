@@ -1,7 +1,8 @@
 added a configurable spam button.
 
 changed the default action of the FolderSelectorPane to be only subscribed
-folders.
+folders.  this also fixes an exception you could get when trying to edit
+filters while disconnected from an IMAP server.
 
 040128 release
 --------------

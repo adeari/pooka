@@ -683,7 +683,7 @@ public class MessageInfo {
     FilterAction spamFilter = MessageFilter.generateFilterAction("Pooka.spamAction");
     if (spamFilter != null) {
       Vector v = new Vector();
-      v.add(this);
+      v.add(this.getMessageProxy());
       spamFilter.performFilter(v);
     }
   }

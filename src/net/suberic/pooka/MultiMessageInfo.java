@@ -2,6 +2,7 @@ package net.suberic.pooka;
 import javax.mail.*;
 import net.suberic.pooka.filter.FilterAction;
 import java.util.List;
+import java.util.LinkedList;
 
 /**
  * This represents a bundle of MessageInfos.
@@ -135,7 +136,10 @@ public class MultiMessageInfo extends MessageInfo {
   public void runBackendFilters() {
     if (folderInfo != null) {
       
-      java.util.List list = java.util.Arrays.asList(messages);
+      java.util.List list = new LinkedList();
+      for (int i = 0; i < messages.length; i++) {
+	list.add(messages[i].getMessageProxy());
+      }
       folderInfo.applyFilters(list);
     } else {
       for (int i = 0; i < messages.length; i++) {
@@ -153,7 +157,10 @@ public class MultiMessageInfo extends MessageInfo {
   public void runSpamAction() {
     FilterAction spamFilter = MessageFilter.generateFilterAction("Pooka.spamAction");
     if (spamFilter != null) {
-      List l = java.util.Arrays.asList(messages);
+      List l = new LinkedList();
+      for (int i = 0; i < messages.length; i++) {
+	l.add(messages[i].getMessageProxy());
+      }
       spamFilter.performFilter(l);
     }
   }

@@ -32,20 +32,8 @@
 *) printing right now truncates long lines.
 	-- try new jdk1.4 printing system?
 
-*) MoveFilter on closed imap folder:
-java.lang.ArrayIndexOutOfBoundsException: 0
-        at net.suberic.pooka.gui.filechooser.MailFileSystemView.getDefaultRoot(MailFileSystemView.java:461)
-        at net.suberic.pooka.gui.filechooser.MailFileSystemView.getHomeDirectory(MailFileSystemView.java:238)
-        at javax.swing.plaf.metal.MetalFileChooserUI.installComponents(MetalFileChooserUI.java:213)
-        at javax.swing.plaf.basic.BasicFileChooserUI.installUI(BasicFileChooserUI.java:130)
-        at javax.swing.plaf.metal.MetalFileChooserUI.installUI(MetalFileChooserUI.java:152)
-        at javax.swing.JComponent.setUI(JComponent.java:449)
-        at javax.swing.JFileChooser.updateUI(JFileChooser.java:1700)
-        at javax.swing.JFileChooser.setup(JFileChooser.java:345)
-        at javax.swing.JFileChooser.<init>(JFileChooser.java:329)
-        at net.suberic.pooka.gui.propedit.FolderSelectorPane.selectNewFolder(FolderSelectorPane.java:120)
-        at net.suberic.pooka.gui.propedit.FolderSelectorPane$1.actionPerformed(FolderSelectorPane.java:83)
-
+*) bug:  on startup, FolderSelectorPane is empty; have to unselect and 
+	reselect to get info.
 ----
 
 *) fix NPE if try to send a new message without configuring client.
