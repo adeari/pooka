@@ -42,7 +42,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    super.activateFrame(f);
 	    
 	    f.requestFocus();
-	    mainPanel.refreshActiveMenus(mainPanel.getMainMenu());
+	    mainPanel.refreshActiveMenus();
 	    mainPanel.refreshCurrentUser();
 	}
 	
@@ -62,7 +62,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 		}
 
 	    // is this necessary?
-	    mainPanel.refreshActiveMenus(mainPanel.getMainMenu());
+	    mainPanel.refreshActiveMenus();
 	    mainPanel.refreshCurrentUser();
 	}
 
@@ -72,6 +72,8 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
     MainPanel mainPanel;
     ConfigurableKeyBinding keyBindings;
+    boolean savingWindowLocations = false;
+    boolean savingOpenFolders = false;
 
     /**
      * Creates a new MessagePanel to go in the given MainPanel.
@@ -95,12 +97,26 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 			selectedFrame.requestFocus();
 		}
 	    });
+
+	this.setSavingWindowLocations(Pooka.getProperty("Pooka.saveFolderWindowLocationsOnExit", "false").equalsIgnoreCase("true"));
+	this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
     }
 
     /**
-     * This opens a new FolderWindow for the given FolderInfo.
+     * This opens a new FolderWindow for the given FolderInfo, and sets
+     * it as the selected window.
      */
     public void openFolderWindow(FolderInfo f) {
+	openFolderWindow(f, true);
+    }
+
+    /**
+     * This opens a new FolderWindow for the given FolderInfo.  If
+     * selectWindow is set to true, then the window is also automatically
+     * selected; if set to false, the folderID.windowLocation.selected 
+     * property is used, if set.
+     */
+    public void openFolderWindow(FolderInfo f, boolean selectWindow) {
 
 	FolderWindow newFolderWindow;
 	newFolderWindow = f.getFolderWindow();
@@ -111,9 +127,28 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    newFolderWindow.setVisible(false);
 	    this.add(newFolderWindow);
 	    try {
-		newFolderWindow.setSelected(true);
-	    } catch (java.beans.PropertyVetoException e) {
-	    } 
+		String folderID = f.getFolderID();
+		int x = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.x"));
+		int y = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.y"));
+		int layer = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.layer"));
+		int position = Integer.parseInt(Pooka.getProperty(folderID + ".windowLocation.position"));
+
+		newFolderWindow.setLocation(x, y);
+		setLayer(newFolderWindow, layer, position);
+		
+		if ( selectWindow || Pooka.getProperty(folderID + ".windowLocation.selected", "false").equalsIgnoreCase("true"))
+		    try {
+			newFolderWindow.setSelected(true);
+		    } catch (java.beans.PropertyVetoException e) {
+		    } 
+	    } catch (Exception e) {
+		newFolderWindow.setLocation(getNewWindowLocation(newFolderWindow));
+		if (selectWindow)
+		    try {
+			newFolderWindow.setSelected(true);
+		    } catch (java.beans.PropertyVetoException pve) {
+		    } 
+	    }
 	    
 	    newFolderWindow.setVisible(true);
 	} else {
@@ -128,6 +163,36 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    } 
 	}
 
+    }
+
+    /**
+     * This returns an available location for JComponent c to be placed
+     * in the MessageWindow.
+     *
+     * At the moment it just returns 0,0.  :)
+     */
+    public Point getNewWindowLocation(JComponent c) {
+	return new Point(0,0);
+    }
+
+    /**
+     * This gets the FolderInfo associated with each name in the
+     * folderList Vector, and attempts to open the FolderWindow for 
+     * each.
+     *
+     * Normally called at startup if Pooka.openSavedFoldersOnStartup
+     * is set.
+     */
+    public void openSavedFolders(Vector folderList) {
+	if (folderList != null) 
+	    for (int i = 0; i < folderList.size(); i++) {
+		FolderInfo fInfo = Pooka.getFolderById((String)folderList.elementAt(i));
+		if (fInfo != null && fInfo.getFolderNode() != null) {
+		    FolderNode fNode = fInfo.getFolderNode();
+		    Action a = fNode.getAction("file-open");
+		    a.actionPerformed(new ActionEvent(this, 0, "file-open"));
+		}
+	    }
     }
 
     /**
@@ -219,6 +284,74 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
     }
 
+    /**
+     * This saves the location of all FolderWindows, so that the next
+     * time we start up, we can put the windows in the proper places.
+     */
+
+    public void saveWindowLocations() {
+	JInternalFrame[] allFrames = getAllFrames();
+	
+	for(int i = 0; i < allFrames.length; i++) {
+	    if (allFrames[i] instanceof FolderWindow)
+		saveWindowLocation((FolderWindow)allFrames[i]);
+	}
+	
+    }
+
+    /**
+     * This saves the location of this FolderWindow, so that the next
+     * time we start up, we can put it in the same place.
+     */
+
+    public void saveWindowLocation(FolderWindow current) {
+	String folderID = current.getFolderInfo().getFolderID();
+
+	// we have to do these as absolute values.
+	int x = current.getX() + getMainPanel().getMessageScrollPane().getHorizontalScrollBar().getValue();
+	int y = current.getY() + getMainPanel().getMessageScrollPane().getVerticalScrollBar().getValue();
+	int layer = getLayer(current);
+	int position = getPosition(current);
+	boolean selected = current.isSelected();
+	
+	Pooka.setProperty(folderID + ".windowLocation.x", Integer.toString(x));
+	Pooka.setProperty(folderID + ".windowLocation.y", Integer.toString(y));
+	Pooka.setProperty(folderID + ".windowLocation.layer", Integer.toString(layer));
+	Pooka.setProperty(folderID + ".windowLocation.position", Integer.toString(position));
+
+	if (selected)
+	    Pooka.setProperty(folderID + ".windowLocation.selected", "true");
+	else
+	    Pooka.setProperty(folderID + ".windowLocation.selected", "false");
+    }
+
+    /**
+     * This saves a list of open folders, so that on future startup we
+     * can automatically reopen them.
+     */
+
+    public void saveOpenFolders() {
+	JInternalFrame[] allFrames = getAllFrames();
+	boolean isFirst = true;
+
+	StringBuffer savedFolderValues = new StringBuffer();
+	for(int i = 0; i < allFrames.length; i++) {
+	    if (allFrames[i] instanceof FolderWindow) {
+		String folderID = ((FolderWindow)allFrames[i]).getFolderInfo().getFolderID();
+		if (! isFirst)
+		    savedFolderValues.append(":");
+		
+		savedFolderValues.append(folderID);
+	    }
+	}
+
+	Pooka.setProperty("Pooka.openFolderList", savedFolderValues.toString());
+	
+    }
+
+    /**
+     * This returns the currently selected window for this JDesktopPane.
+     */
     public JInternalFrame getCurrentWindow() {
 	JInternalFrame[] allFrames = getAllFrames();
 	
@@ -338,6 +471,40 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    return ((UserProfileContainer)cw).getDefaultProfile();
 	else
 	    return null;
+    }
+
+    /**
+     * This returns whether or not we want to save the location of windows
+     * so we can use them again at startup.
+     */
+
+    public boolean isSavingWindowLocations() {
+	return savingWindowLocations;
+    }
+
+    /**
+     * This sets whether or not we want to save the locations of windows
+     * for later use.
+     */
+    public void setSavingWindowLocations(boolean newValue) {
+	savingWindowLocations = newValue;
+    }
+
+    /**
+     * This returns whether or not we want to save which folders are open
+     * so we can use them again at startup.
+     */
+
+    public boolean isSavingOpenFolders() {
+	return savingOpenFolders;
+    }
+
+    /**
+     * This sets whether or not we want to save which folders are open
+     * for later use.
+     */
+    public void setSavingOpenFolders(boolean newValue) {
+	savingOpenFolders = newValue;
     }
 
     public Action[] defaultActions = {
