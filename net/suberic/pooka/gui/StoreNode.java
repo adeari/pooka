@@ -277,7 +277,7 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    Pooka.getUIFactory().showEditorWindow(getStoreInfo().getStoreProperty(), "Store.editableFields");
+	    Pooka.getUIFactory().showEditorWindow(getStoreInfo().getStoreProperty(), getStoreInfo().getStoreProperty(), "Store.editableFields");
 	}
     }    
 }

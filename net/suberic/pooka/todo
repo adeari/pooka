@@ -92,6 +92,8 @@ message that you wrote, the lines will wrap at the correct place.
 
 *) bug:  handle attachments of type X-UNKNOWN
 
+*) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
+
 after beta 1
 ----------------
 

@@ -326,6 +326,7 @@ UserProfile.default.allowedValues=UserProfile
 
 Store.propertyType=Multi
 Store.editableFields.scoped=true
+Store.editableFields.propertyType=Composite
 Store.editableFields=server:protocol:user:password:trashFolder:defaultProfile
 Store.editableFields.protocol.propertyType=List
 Store.editableFields.protocol.allowedValues=imap:pop3
