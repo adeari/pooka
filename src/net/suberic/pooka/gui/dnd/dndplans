@@ -1,0 +1,20 @@
+read message window
+  export;  attachment
+  import:  nothing
+
+new message window
+  export:  none
+  import:  other message (attachment)
+	   file (attachment)
+ 	   key (encrypt/sign)
+
+folder window
+  export:  message(s)
+  import:  message(s)
+
+folder node
+  export:  none
+  import:  message(s)
+
+attachment panel
+

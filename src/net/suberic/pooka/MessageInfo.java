@@ -659,7 +659,6 @@ public class MessageInfo {
     
     // handle attachments.
     if (method == FORWARD_AS_ATTACHMENT) {
-      
       javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
       mbp.setDataHandler(getRealMessage().getDataHandler());
       returnValue.addAttachment(new MBPAttachment(mbp));
