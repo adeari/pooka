@@ -1,3 +1,8 @@
+040128 release
+--------------
+
+added support for S/MIME and OpenPGP encryption.
+
 fixed a bug in which the new message notification didn't appear immediately
 on the FolderNode.
 
@@ -22,8 +27,6 @@ that we display the content.
 
 changed the default UserProfile handling so that if a message doesn't have 
 a default UserProfile set, we use the default instead of returning null.
-
-put in another check to try to avoid sending multiple copies of one message.
 
 modified the resizing code for message tables so that we now just resize
 the next column.

@@ -23,6 +23,19 @@
 	3)  jnlp
 ----
 
+*) move source from pooka/net to pooka/src/net.
+
+*) add configurable spam button/action.
+	*) bounce messages
+
+*) fix error display with exception so that you can see the stack trace.
+
+*) add support for running without any local files.
+	-- support for http: access?
+	    -- fix variable bundle to make sure that we close the stream
+	    -- better error messages
+	    -- test .htaccess connection.
+
 *) ?? ^D message, hit return for next message, get an error?
 	tough.  could fix by having a temporary 'deleted' flag on the message
 	itself, maybe?
@@ -31,22 +44,6 @@
 	work.
 
 *) fix NPE if try to send a new message without configuring client.
-
-*) add configurable spam button/action.
-
-*) fix error display with exception so that you can see the stack trace.
-
-*) ?? change reply-all binding?
-
-*) check:  if a folder realizes that it has become disconnected, it should
-	test to see if the store in general has disconnected.
-	-- see what happens when the network goes down and then we try to
-	check folder/store connection again.
-
-*) some case(s) in which we're not generating the attachment bundle 
-	correctly?  one instance is how we're handling multipart/alternative
-	entries that don't actually have multiple parts.
-	see pooka_problems blob
 
 *) still an error in connecting, disconnecting, getting a new messages/deleting
 	old messages, reconnecting.
@@ -72,6 +69,19 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
         at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
 
 *) printing right now truncates long lines.
+	-- try new jdk1.4 printing system?
+
+*) ?? change reply-all binding?
+
+*) check:  if a folder realizes that it has become disconnected, it should
+	test to see if the store in general has disconnected.
+	-- see what happens when the network goes down and then we try to
+	check folder/store connection again.
+
+*) some case(s) in which we're not generating the attachment bundle 
+	correctly?  one instance is how we're handling multipart/alternative
+	entries that don't actually have multiple parts.
+	see pooka_problems blob
 
 -----
 
@@ -90,17 +100,9 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
-
-*) add support for running without any local files.
-	-- support for http: access?
-	    -- fix variable bundle to make sure that we close the stream
-	    -- better error messages
-	    -- test .htaccess connection.
-
-*) new message notification showing up in title bar, but not until you click
-	on the folder in folder display? (jdk 1.4.1).
-
-*) bounce messages
+*) add a dependent button/menu item.  so that that way instead of having
+	a separate Caching popup menu, you can just say "if caching,
+	add this menu item; if not, don't."
 
 *) filtering multiple message should show a status.
 
@@ -119,10 +121,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.
 
-*) add a dependent button/menu item.  so that that way instead of having
-	a separate Caching popup menu, you can just say "if caching,
-	add this menu item; if not, don't."
-
 *) make VariableBundle support #include, or something like it.
 
 *) add "view pookarc"
@@ -137,7 +135,23 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) add plugin for spam checker?
 
-------
+*) add support for composing new email messages from an external source,
+say, like reacting to a mailto: link.
+
+*) -- windows --
+  *) support windows registry attachment associations.
+	-- check icemail
+	-- more or less added, but need to be able to access the library.
+
+*) queuing of outgoing mails
+	todo on this:
+	*)  add some sort of an administrative api to the NetworkConnection
+		so that the application and the admin tools (the bottom right
+		config) don't have the same restrictions (or lack thereof).
+		 -- somewhat started with the new test address api.
+	*) make it so there is some way for the NetworkConnection to detect
+		whether or not it's up.
+			-- started.  make sure it's enough.
 
 *) add mrpostman support(?)
 
@@ -290,24 +304,9 @@ preview:
 	  -- down arrow fairly consistently doesn't work when you type in a 
 	     line and then hit it.  hitting up, left, right resets it.
 
-*) -- windows --
-  *) support windows registry attachment associations.
-	-- check icemail
-	-- more or less added, but need to be able to access the library.
-
 *) add a keybinding to bring up the address book selector.
 
 *) spam filtering
-
-*) queuing of outgoing mails
-	todo on this:
-	*)  add some sort of an administrative api to the NetworkConnection
-		so that the application and the admin tools (the bottom right
-		config) don't have the same restrictions (or lack thereof).
-		 -- somewhat started with the new test address api.
-	*) make it so there is some way for the NetworkConnection to detect
-		whether or not it's up.
-			-- started.  make sure it's enough.
 
 *)  network on AWTEventThread:
     i think that i did this for a reason.  possible that in 1.4 original
@@ -382,9 +381,6 @@ preview:
 
 *) make it so you can stop html displays from showing non-local images.
  	-- support RFC-2557??
-
-*) add support for composing new email messages from an external source,
-say, like reacting to a mailto: link.
 
 *) check the open/close/open pattern on disconnected folders.
 
