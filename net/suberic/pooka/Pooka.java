@@ -43,9 +43,9 @@ public class Pooka {
 	frame.setBackground(Color.lightGray);
 	frame.getContentPane().setLayout(new BorderLayout());
 	panel = new MainPanel(frame);
+	frame.getContentPane().add("Center", panel);
 	panel.configureMainPanel();
 	frame.getContentPane().add("North", panel.getMainToolbar());
-	frame.getContentPane().add("Center", panel);
 	frame.setJMenuBar(panel.getMainMenu());
 	frame.pack();
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
