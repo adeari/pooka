@@ -101,6 +101,34 @@ public class Pooka {
     static public MainPanel getMainPanel() {
 	return panel;
     }
+
+    /**
+     * This returns the StoreInfo which corresponds with the storeName.
+     */
+    static public StoreInfo getStore(String storeName) {
+	MainPanel mp = getMainPanel();
+	if (mp != null && mp.getFolderPanel() != null)
+	    return mp.getFolderPanel().getStore(storeName);
+
+	return null;
+    }
+
+    /**
+     * This returns the FolderInfo which corresponds to the given folderName.
+     * The folderName should be in the form "/storename/folder/subfolder".
+     */
+    static public FolderInfo getFolder(String folderName) {
+	if (folderName.length() < 1) {
+	    int divider = folderName.indexOf('/', 1);
+	    if (divider > 0) {
+		String storeName = folderName.substring(1, divider);
+		StoreInfo store = getStore(storeName);
+		if (store != null)
+		    return store.getChild(folderName.substring(divider +1));
+	    }
+	}
+	return null;
+    }
 }
 
 

@@ -182,6 +182,22 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
     }
 
     /**
+     * This returns the Store identified by the given id.
+     */
+    public StoreInfo getStore(String storeName) {
+	MailTreeNode root = (MailTreeNode) getFolderTree().getModel().getRoot();
+	java.util.Enumeration storeNodes = root.children();
+	while (storeNodes.hasMoreElements()) {
+	    
+	    StoreInfo inf = ((StoreNode)storeNodes.nextElement()).getStoreInfo();
+	    if (inf.getStoreID().equals(storeName))
+		return inf;
+	}
+
+	return null;
+    }
+
+    /**
      * Specified by interface net.suberic.pooka.UserProfileContainer
      */
    

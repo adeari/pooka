@@ -131,8 +131,8 @@ public class NewAccountPooka {
 	    setAccountName(accountName);
 
 	    vb.setProperty("UserProfile", accountName);
-	    vb.setProperty("UserProfile." + accountName + ".From", accountName);
-	    vb.setProperty("UserProfile." + accountName + ".FromPersonal", fullName);
+	    vb.setProperty("UserProfile." + accountName + ".mailHeaders.From", accountName);
+	    vb.setProperty("UserProfile." + accountName + ".mailHeaders.FromPersonal", fullName);
 	    vb.setProperty("UserProfile." + accountName + ".sendMailURL", "smtp://" + serverName + "/");
 	    vb.setProperty("Store", accountName);
 	    vb.setProperty("Store." + accountName + ".server", serverName);
@@ -140,6 +140,8 @@ public class NewAccountPooka {
 	    vb.setProperty("Store." + accountName + ".user", userName);
 	    vb.setProperty("Store." + accountName + ".password", password);
 	    vb.setProperty("Store." + accountName + ".defaultProfile", accountName);
+	    vb.setProperty("UserProfile.default", accountName);
+
 	    showSecondEntryWindow();
 	}
     }
@@ -181,8 +183,8 @@ public class NewAccountPooka {
 	
 	String accountName = getAccountName();
 
-	transferProperty("UserProfile." + accountName + ".From");
-	transferProperty("UserProfile." + accountName + ".FromPersonal");
+	transferProperty("UserProfile." + accountName + ".mailHeaders.From");
+	transferProperty("UserProfile." + accountName + ".mailHeaders.FromPersonal");
 	transferProperty("UserProfile." + accountName + ".sendMailURL");
 	transferProperty("Store." + accountName + ".server");
 	transferProperty("Store." + accountName + ".protocol");
@@ -193,12 +195,12 @@ public class NewAccountPooka {
 	// have to add these after the others, else we get an
 	// exception.
 
-	if (Pooka.getProperty("UserProfile", "").equals(""))
+	if (!Pooka.getProperty("UserProfile", "").equals(""))
 	    Pooka.setProperty("UserProfile", Pooka.getProperty("UserProfile", "") + ":" + getProperties().getProperty("UserProfile", ""));
 	else
 	    transferProperty("UserProfile");
 
-	if (Pooka.getProperty("Store", "").equals(""))
+	if (!Pooka.getProperty("Store", "").equals(""))
 	    Pooka.setProperty("Store", Pooka.getProperty("Store", "") + ":" + getProperties().getProperty("Store", ""));
 	else
 	    transferProperty("Store");
@@ -216,8 +218,9 @@ public class NewAccountPooka {
     }
 
     public void transferProperty(String propertyName) {
-	if (!(getProperties().getProperty(propertyName, "").equals("")))
+	if (!(getProperties().getProperty(propertyName, "").equals(""))) {
 	    Pooka.setProperty(propertyName, getProperties().getProperty(propertyName, ""));
+	}
     }
 
     public MessagePanel getMessagePanel() {

@@ -15,6 +15,11 @@ different icon and different folder information (to: instead of from:).
 
 *) fix the signature
 
+*) the update feature doesn't show up for INBOX (or maybe just doesn't show
+up for top-level folders?).
+
+*) the first unread message keeps getting selected on the FolderWindow.
+
 ?????? alpha 2 or not ??????
 ----------------------------
 
@@ -31,7 +36,15 @@ after alpha 2
 
 *) add pop3/local mail spool support.
 
+*) add disconnected imap support.
+
 *) add something to search through all messages in the folder.
+
+*) revamp the UserProfile, Store, and Folder editing process.  make a full
+screen for each with all the possible information (update time, colors,
+connection information, trash/sent folders, etc.) available, and make it
+so you can edit them by right-clicking on the folder.  in other words, do
+a big ui overhaul.
 
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
@@ -43,6 +56,9 @@ available.
 
 *)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
+
+*)  check on file->exit to make sure that there are no unsent messages,
+and give an option on what you want to do with each one if there are any.
 
 *)  check all of my actions and make sure that they are threading 
 properly--both that the email work is being done on the proper thread,
@@ -72,7 +88,7 @@ too much date info, not enough Subject.
 
 *) select all/all messages
 
-*) add interfaces for all of the features.  :)
+*) add interfaces for all the rest of the features.  :)
 
 *) add support for mail filters.
 

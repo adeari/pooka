@@ -8,8 +8,13 @@ import javax.mail.internet.InternetAddress;
 public class UserProfile extends Object {
     Properties mailProperties;
     String name;
+    URLName sendMailURL;
+
+    FolderInfo sentFolder;
+
     static Vector profileList = new Vector();
-    static Vector profileMap = null;
+    static Vector mailPropertiesMap = null;
+
     public static ValueChangeListener vcl = new ValueChangeAdapter() {
 	    public void valueChanged(String changedValue) {
 		if (changedValue.equals("UserProfile") )
@@ -17,10 +22,25 @@ public class UserProfile extends Object {
 	    }
 	};
 
-    public UserProfile(String newName, Properties newProps) {
-	mailProperties = newProps;
-	name = newName;
-	profileList.addElement(this);
+    public UserProfile(String newName, VariableBundle mainProperties) {
+	if (mailPropertiesMap == null)
+	    createMailPropertiesMap(mainProperties);
+
+	if (mailPropertiesMap != null) {
+	    
+	    name = newName;
+	    mailProperties = new Properties();
+	    String profileKey;
+
+	    for (int i = 0; i < mailPropertiesMap.size(); i++) {
+		profileKey = (String)mailPropertiesMap.elementAt(i);
+		mailProperties.put(profileKey, mainProperties.getProperty("UserProfile." + name + ".mailHeaders." + profileKey, ""));
+	    }
+	    
+	    sentFolder=Pooka.getFolder(mainProperties.getProperty("UserProfile." + name + ".sentFolder", ""));
+	    sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
+	    profileList.addElement(this);
+	}
     }
 
     public void finalize() {
@@ -37,9 +57,7 @@ public class UserProfile extends Object {
 	while (keys.hasMoreElements()) {
 	    String key = (String)(keys.nextElement());
 
-	    if (key.equals("sendMailURL")) {
-		// just drop it for now.
-	    } else if (key.equals("FromPersonal")) {
+	    if (key.equals("FromPersonal")) {
 		fromPersonal = mailProperties.getProperty(key);
 	    } else if (key.equals("From")) {
 		fromAddr = mailProperties.getProperty(key);
@@ -47,8 +65,6 @@ public class UserProfile extends Object {
 		replyAddr = mailProperties.getProperty(key);
 	    } else if (key.equals("ReplyToPersonal")) {
 		replyPersonal = mailProperties.getProperty(key);
-	    } else if (key.equals("Signature")) {
-		// just drop it.
 	    } else {
 		mMsg.setHeader(key, mailProperties.getProperty(key));
 	    }
@@ -111,8 +127,8 @@ public class UserProfile extends Object {
      */ 
     static public void createProfilesFromList(VariableBundle mainProperties, Vector newProfileKeys) {
 	
-	if (profileMap == null)
-	    createProfileMap(mainProperties);
+	if (mailPropertiesMap == null)
+	    createMailPropertiesMap(mainProperties);
 	
 	// Create each Profile
 
@@ -125,13 +141,7 @@ public class UserProfile extends Object {
 	    
 	    // don't add it if it's empty.
 	    if (currentProfileName.length() > 0) {
-		userProperties = new Properties();
-		
-		for (int i = 0; i < profileMap.size(); i++) {
-		    profileKey = (String)profileMap.elementAt(i);
-		    userProperties.put(profileKey, mainProperties.getProperty("UserProfile." + currentProfileName + "." + profileKey, ""));
-		}
-		tmpProfile = new UserProfile(currentProfileName, userProperties);
+		tmpProfile = new UserProfile(currentProfileName, mainProperties);
 	    }
 	}
     }
@@ -140,14 +150,14 @@ public class UserProfile extends Object {
      * This creates the profile map that we'll use to create new 
      * Profile objects.
      */
-    static public void createProfileMap(VariableBundle mainProperties) {
-	profileMap = new Vector();
-	
+    static public void createMailPropertiesMap(VariableBundle mainProperties) {
+	mailPropertiesMap = new Vector();
+
 	// Initialize Profile Map
 	
-	StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL"), ":");
+	StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.mailHeaders.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization"), ":");
 	while (tokens.hasMoreTokens()) {
-	    profileMap.addElement(tokens.nextToken());
+	    mailPropertiesMap.addElement(tokens.nextToken());
 	}
 	
     }
@@ -190,22 +200,6 @@ public class UserProfile extends Object {
 	return upc.getDefaultProfile();
     }
 
-    /*    static public UserProfile getDefaultProfile(net.suberic.pooka.gui.MessageProxy msg) {
-	if (msg.getFolderInfo() != null)
-	    return UserProfile.getDefaultProfile(msg.getFolderInfo());
-	else
-	    return UserProfile.getDefaultProfile();
-    }
-
-    static public UserProfile getDefaultProfile(FolderInfo fdr) {
-	return fdr.getDefaultProfile();
-    }
-
-    static public UserProfile getDefaultProfile(StoreInfo store) {
-	return store.getDefaultProfile();
-    }
-    */
-
     /**
      * returns the default Profile object as defined by the 
      * "UserProfile.default" property, or null if there are no Profiles
@@ -236,5 +230,25 @@ public class UserProfile extends Object {
 
     public String toString() {
 	return name;
+    }
+
+    public URLName getSendMailURL() {
+	return sendMailURL;
+    }
+
+    public FolderInfo getSentFolder() {
+	return sentFolder;
+    }
+
+    public void setSentFolder(FolderInfo newValue) {
+	sentFolder = newValue;
+    }
+
+    public String getSignature() {
+	return (Pooka.getProperty("UserProfile." + name + ".signature", null));
+    }
+
+    public void setSignature(String newValue) {
+	Pooka.setProperty("UserProfile." + name + ".signature", newValue);
     }
 }

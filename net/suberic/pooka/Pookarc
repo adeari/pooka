@@ -263,14 +263,14 @@ MessageWindow.Input.CC.MIMEHeader=CC
 MessageWindow.Input.BCC.MIMEHeader=BCC
 MessageWindow.Input.Subject.MIMEHeader=Subject
 
-UserProfile.mailHeaders.fields=From:FromPersonal:ReplyTo:ReplyToPersonal:Organization:Signature:sendMailURL
+UserProfile.mailHeaders.fields=From:FromPersonal:ReplyTo:ReplyToPersonal:Organization
 UserProfile.mailHeaders.fields.From.value=From
 UserProfile.mailHeaders.fields.FromPerseonal.value=FromPersonal
 UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
 UserProfile.mailHeaders.fields.ReplyToPersonal.value=Return-PathPersonal
 UserProfile.mailHeaders.fields.Organization.value=Organization
 
-UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Orgainization:mailHeaders.sendMailURL:signature:sentFolder
+UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Orgainization:sendMailURL:signature:sentFolder
 UserProfile.propertyType=Multi
 
 UserProfile.default.propertyType=List

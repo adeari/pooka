@@ -221,27 +221,26 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
      * MessageWindow.
      */
 
-    public URLName populateMessageHeaders(Message m) throws MessagingException {
+    public UserProfile populateMessageHeaders(Message m) throws MessagingException {
 	if (m instanceof MimeMessage) {
 	    MimeMessage mMsg = (MimeMessage)m;
 	    String key;
-	    URLName urlName = null;
 	    
 	    Enumeration keys = inputTable.keys();
+	    UserProfile up = null;
 	    while (keys.hasMoreElements()) {
 		key = (String)(keys.nextElement());
-
+		
 		if (key.equals("UserProfile")) {
-		    UserProfile up = (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
+		    up = (UserProfile)(((JComboBox)(inputTable.get(key))).getSelectedItem());
 		    up.populateMessage(mMsg);
-		    urlName = new URLName(up.getMailProperties().getProperty("sendMailURL", "smtp://localhost/"));
 		} else {
 		    String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
 		    String value = ((EntryTextArea)(inputTable.get(key))).getText();
 		    mMsg.setHeader(header, value);
 		}
 	    }
-	    return urlName;
+	    return up;
 	}
 	return null;
     }

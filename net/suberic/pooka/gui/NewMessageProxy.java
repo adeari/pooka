@@ -6,6 +6,7 @@ import javax.activation.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import net.suberic.pooka.Pooka;
+import net.suberic.pooka.UserProfile;
 import java.awt.event.ActionEvent;
 import java.io.*;
 
@@ -55,9 +56,12 @@ public class NewMessageProxy extends MessageProxy {
     public void send() {
 	if (getNewMessageWindow() != null) { 
 	    try {
-		URLName urlName;
-		
-		urlName = getNewMessageWindow().populateMessageHeaders(getMessage());
+		URLName urlName = null;
+
+		UserProfile profile = getNewMessageWindow().populateMessageHeaders(getMessage());
+		if (profile != null)
+		    urlName = profile.getSendMailURL();
+
 		String messageText;
 		if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
 		    messageText=net.suberic.pooka.MailUtilities.wrapText(getMessageWindow().getMessageText());
@@ -82,6 +86,12 @@ public class NewMessageProxy extends MessageProxy {
 		    }
 	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);
+		    try {
+			if (profile.getSentFolder() != null)
+			    profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
+		    } catch (MessagingException me) {
+			getMessageWindow().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+		    }
 		}
 		getNewMessageWindow().setModified(false);
 		getMessageWindow().closeMessageWindow();
