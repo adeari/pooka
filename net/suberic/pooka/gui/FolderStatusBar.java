@@ -54,7 +54,7 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
 			gotoInputField.selectAll();
 		    }
 		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
+	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
 
 	gotoInputField.registerKeyboardAction(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -65,7 +65,7 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
 			gotoInputField.selectAll();
 		    }
 		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
+	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
 
 	gotoPanel.add(gotoInputField);
 

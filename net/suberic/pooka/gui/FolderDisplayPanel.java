@@ -250,7 +250,7 @@ public class FolderDisplayPanel extends JPanel {
      */
     public int selectNextMessage() {
 	int selectedRow = messageTable.getSelectedRow();
-	if (selectedRow <= 0) {
+	if (selectedRow < 0) {
 	    return selectMessage(0);
 	} else {
 	    return selectMessage(selectedRow + 1);
