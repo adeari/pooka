@@ -307,6 +307,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	type = getFolder().getType();
 	setStatus(CLOSED);
       } else {
+	getLogger().log(Level.FINE, "folder " + mFolderName + " does not exist; setting as INVALID.");
 	if (parentIsConnected)
 	  setStatus(INVALID);
 	setFolder(null);
@@ -1305,78 +1306,72 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     getFolder().appendMessages(m);
   }
     
-    /**
-     * This expunges the deleted messages from the Folder.
-     */
-    public void expunge() throws MessagingException {
-	getFolder().expunge();
-    }
-
-    /**
-     * This handles the MessageLoadedEvent.
-     *
-     * As defined in interface net.suberic.pooka.event.MessageLoadedListener.
-     */
-
-    public void fireMessageChangedEvent(MessageChangedEvent mce) {
-      // from the EventListenerList javadoc, including comments.
-      
-      if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
-	resetMessageCounts();
-      }
-      
-      // Guaranteed to return a non-null array
-      Object[] listeners = eventListeners.getListenerList();
-      // Process the listeners last to first, notifying
-      // those that are interested in this event
-      for (int i = listeners.length-2; i>=0; i-=2) {
-	if (listeners[i]==MessageChangedListener.class) {
-	  ((MessageChangedListener)listeners[i+1]).messageChanged(mce);
-	}              
-      }
-    }  
+  /**
+   * This expunges the deleted messages from the Folder.
+   */
+  public void expunge() throws MessagingException {
+    getFolder().expunge();
+  }
   
-    public void addConnectionListener(ConnectionListener newListener) {
-	eventListeners.add(ConnectionListener.class, newListener);
+  /**
+   * This handles the MessageLoadedEvent.
+   *
+   * As defined in interface net.suberic.pooka.event.MessageLoadedListener.
+   */
+  
+  public void fireMessageChangedEvent(MessageChangedEvent mce) {
+    // from the EventListenerList javadoc, including comments.
+    
+    // Guaranteed to return a non-null array
+    Object[] listeners = eventListeners.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length-2; i>=0; i-=2) {
+      if (listeners[i]==MessageChangedListener.class) {
+	((MessageChangedListener)listeners[i+1]).messageChanged(mce);
+      }              
     }
+  }  
+  
+  public void addConnectionListener(ConnectionListener newListener) {
+    eventListeners.add(ConnectionListener.class, newListener);
+  }
+  
+  public void removeConnectionListener(ConnectionListener oldListener) {
+    eventListeners.remove(ConnectionListener.class, oldListener);
+  }
+  
 
-    public void removeConnectionListener(ConnectionListener oldListener) {
-	eventListeners.remove(ConnectionListener.class, oldListener);
+  /**
+   * This handles the distributions of any Connection events.
+   *
+   * As defined in interface net.suberic.pooka.event.MessageLoadedListener.
+   */
+  public void fireConnectionEvent(ConnectionEvent e) {
+    // from the EventListenerList javadoc, including comments.
+    
+    // Guaranteed to return a non-null array
+    Object[] listeners = eventListeners.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    for (int i = listeners.length-2; i>=0; i-=2) {
+      if (listeners[i]==ConnectionListener.class) {
+	ConnectionListener listener = (ConnectionListener) listeners[i+1];
+	if (e.getType() == ConnectionEvent.CLOSED)
+	  listener.closed(e);
+	else if (e.getType() == ConnectionEvent.DISCONNECTED)
+	  listener.disconnected(e);
+	else if (e.getType() == ConnectionEvent.OPENED)
+	  listener.opened(e);
+      }  
     }
-
-
-    /**
-     * This handles the distributions of any Connection events.
-     *
-     * As defined in interface net.suberic.pooka.event.MessageLoadedListener.
-     */
-
-    public void fireConnectionEvent(ConnectionEvent e) {
-      // from the EventListenerList javadoc, including comments.
-      
-      // Guaranteed to return a non-null array
-      Object[] listeners = eventListeners.getListenerList();
-      // Process the listeners last to first, notifying
-      // those that are interested in this event
-      for (int i = listeners.length-2; i>=0; i-=2) {
-	if (listeners[i]==ConnectionListener.class) {
-	  ConnectionListener listener = (ConnectionListener) listeners[i+1];
-	  if (e.getType() == ConnectionEvent.CLOSED)
-	    listener.closed(e);
-	  else if (e.getType() == ConnectionEvent.DISCONNECTED)
-	    listener.disconnected(e);
-	  else if (e.getType() == ConnectionEvent.OPENED)
-	    listener.opened(e);
-	}  
-      }
-    }  
-
+  }  
+  
   /**
    * This handles the changes if the source property is modified.
    *
    * As defined in net.suberic.util.ValueChangeListener.
    */
-  
   public void valueChanged(String changedValue) {
     if (changedValue.equals(getFolderProperty() + ".folderList")) {
       final Runnable runMe = new  Runnable() {
@@ -1805,7 +1800,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * overridden by subclasses.
    */
   protected void runMessagesRemoved(MessageCountEvent mce) {
-    getLogger().log(Level.FINE, "running MessagesRemoved on " + getFolderID());
+    getLogger().log(Level.FINE, "running MessagesRemoved on " + getFolderID());    
     
     if (folderTableModel != null) {
       Message[] removedMessages = mce.getMessages();
@@ -1849,52 +1844,67 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
   
-    /**
-     * This updates the TableInfo on the changed messages.
-     * 
-     * As defined by java.mail.MessageChangedListener.
-     */
-    public void messageChanged(MessageChangedEvent e) {
-	// blech.  we really have to do this on the action thread.
-	
-	if (Thread.currentThread() == getFolderThread() )
-	    runMessageChanged(e);
-	else 
-	    getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-		    runMessageChanged((MessageChangedEvent)actionEvent.getSource());
-		}
-	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+  /**
+   * This updates the TableInfo on the changed messages.
+   * 
+   * As defined by java.mail.MessageChangedListener.
+   */
+  public void messageChanged(MessageChangedEvent e) {
+    // blech.  we really have to do this on the action thread.
+    
+    if (Thread.currentThread() == getFolderThread() )
+      runMessageChanged(e);
+    else 
+      getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	    runMessageChanged((MessageChangedEvent)actionEvent.getSource());
+	  }
+	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+  }
+  
+  
+  protected void runMessageChanged(MessageChangedEvent mce) {
+    // if the message is getting deleted, then we don't
+    // really need to update the table info.  for that 
+    // matter, it's likely that we'll get MessagingExceptions
+    // if we do, anyway.
+    boolean updateInfo = false;
+    try {
+      updateInfo = (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true"));
+    } catch (MessagingException me) {
+      // if we catch a MessagingException, it just means
+      // that the message has already been expunged.  in 
+      // that case, assume it's ok if we don't update; it'll
+      // happen in the messagesRemoved().
     }
-
-
-    protected void runMessageChanged(MessageChangedEvent mce) {
-	
-	// if the message is getting deleted, then we don't
-	// really need to update the table info.  for that 
-	// matter, it's likely that we'll get MessagingExceptions
-	// if we do, anyway.
-	try {
-	    if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
-		MessageInfo mi = getMessageInfo(mce.getMessage());
-		MessageProxy mp = mi.getMessageProxy();
-		if (mp != null) {
-		    mp.unloadTableInfo();
-		    mp.loadTableInfo();
-		    if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
-			mi.refreshFlags();
-		    else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
-			mi.refreshHeaders();
-		}
-	    }
-	} catch (MessagingException me) {
-	    // if we catch a MessagingException, it just means
-	    // that the message has already been expunged.
+    
+    if (updateInfo) {
+      try {
+	MessageInfo mi = getMessageInfo(mce.getMessage());
+	MessageProxy mp = mi.getMessageProxy();
+	if (mp != null) {
+	  mp.unloadTableInfo();
+	  mp.loadTableInfo();
+	  if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
+	    mi.refreshFlags();
+	  else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
+	    mi.refreshHeaders();
 	}
-	
-	fireMessageChangedEvent(mce);
+      } catch (MessagingException me) {
+	// if we catch a MessagingException, it just means
+	// that the message has already been expunged.
+      }
+      
+      // if we're not just a tableinfochanged event, do a resetmessagecouts.
+      // don't do this if we're just a delete.
+      if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
+	resetMessageCounts();
+      }
     }
-
+    
+    fireMessageChangedEvent(mce);
+  }
+  
   /**
    * This puts up the gui for the Search.
    */
@@ -2451,7 +2461,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This forces an update of both the total and unread message counts.
    */
   public void resetMessageCounts() {
-
     try {
       if (getFolder() != null)
 	getLogger().log(Level.FINE, "running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());

@@ -4,6 +4,7 @@ import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -373,7 +374,20 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     final String fTitle = title;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+	  //JLabel displayPanel = new JLabel(displayMessage);
+	  JTextArea displayPanel = new JTextArea(displayMessage);
+	  displayPanel.setEditable(false);
+	  java.awt.Dimension dpSize = displayPanel.getPreferredSize();
+	  JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	  scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
+	  //System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
+	  //System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
+	  //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	  //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
+	  //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
+	  
+	  JOptionPane.showMessageDialog(contentPanel.getUIComponent(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
+	  //JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
 	}
       };
 

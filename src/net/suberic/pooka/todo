@@ -1,12 +1,9 @@
-*) imap (caching?):  delete like 200 messages.  see if we get 200 requests
-	in the queue for updating the new message count.
+*) starting: if the info can't be connected to, you should have an option
+	to accept anyway.
 
 *) open store.  close store.  first, all the folders open anyway.  second,
 	the folders opening are opening with a null action.  third, after
 	the closing, the previously-loaded messages all go to 'loading'.
-
-*) store.showStatus() should go on a JScrollPane or something.  it's too
-long right now. -- started on Desktop; add on Preview.
 
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:
@@ -43,6 +40,9 @@ testing:
    -) make sure auto-reconnects work.
    -) ?:  when you close the store, should we notify all of the folders
 	that they're closing, too?
+
+*) test messages, esp. encryption messages, on both desktop and preview.
+   make sure they look ok.
 
 next release
 -----------
@@ -313,6 +313,8 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
   -- switching from desktop to preview, hitting return both opens window
 	and shows the message in the preview pane.
 
+*) ui:  stack trace button should really be with ok button, not by itself.
+
 *) NPE -- is that from switching from preview to desktop?
 	-- check window menu from switching preview to desktop.
 
@@ -355,26 +357,6 @@ icons changing?  test.
 *) add a keybinding to bring up the address book selector.
 
 *) spam filtering
-
-*)  network on AWTEventThread:
-    i think that i did this for a reason.  possible that in 1.4 original
-	problem goes away?  maybe?
-        at com.sun.mail.imap.IMAPMessage.getFlags(IMAPMessage.java:704)
-        - locked <0x462522d0> (a com.sun.mail.imap.IMAPMessage)
-        at net.suberic.pooka.UIDMimeMessage.getFlags(UIDMimeMessage.java:380)
-        - locked <0x44f481f0> (a net.suberic.pooka.UIDMimeMessage)
-        at net.suberic.pooka.MessageInfo.getFlags(MessageInfo.java:87)
-        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:536)
-        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:516)
-        at net.suberic.pooka.gui.FolderDisplayPanel.selectNextMessage(FolderDisplayPanel.java:489)
-        at net.suberic.pooka.gui.FolderInternalFrame.selectNextMessage(FolderInternalFrame.java:316)
-        at net.suberic.pooka.gui.FolderDisplayPanel$7.actionPerformed(FolderDisplayPanel.java:372)
-        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:2863)
-        at javax.swing.SwingUtilities.notifyAction(SwingUtilities.java:1512)
-        at javax.swing.JComponent.processKeyBinding(JComponent.java:2435)
-        at javax.swing.JTable.processKeyBinding(JTable.java:3254)
-        at javax.swing.JComponent.processKeyBindings(JComponent.java:2470)
-        at javax.swing.JComponent.processKeyEvent(JComponent.java:2398)
 
 *) forward to all.
  

@@ -1018,12 +1018,23 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     // really need to update the table info.  for that 
     // matter, it's likely that we'll get MessagingExceptions
     // if we do, anyway.
+
+    boolean updateInfo = false;
     try {
-      if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+      updateInfo = (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true"));
+    } catch (MessagingException me) {
+      // if we catch a MessagingException, it just means
+      // that the message has already been expunged.  in 
+      // that case, assume it's ok if we don't update; it'll
+      // happen in the messagesRemoved().
+    }
+    
+    if (updateInfo) {
+      try {
 	Message msg = mce.getMessage();
 	long uid = -1;
 	uid = getUID(msg);
-
+	
 	if (msg != null){
 	  if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
 	    getCache().cacheMessage((MimeMessage)msg, uid, uidValidity, SimpleFileCache.FLAGS);
@@ -1040,10 +1051,17 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  }
 	}
 	
+      } catch (MessagingException me) {
+	// if we catch a MessagingException, it just means
+	// that the message has already been expunged.
       }
-    } catch (MessagingException me) {
-      // if we catch a MessagingException, it just means
-      // that the message has already been expunged.
+
+      // if we're not just a tableinfochanged event, do a resetmessagecouts.
+      // don't do this if we're just a delete.
+      if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
+	resetMessageCounts();
+      }
+      
     }
     
     fireMessageChangedEvent(mce);

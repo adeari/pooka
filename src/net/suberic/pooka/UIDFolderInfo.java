@@ -47,6 +47,10 @@ public class UIDFolderInfo extends FolderInfo {
       
     Vector messageProxies = new Vector();
     
+    Folder f = getFolder();
+    if (f == null)
+      throw new MessagingException("Folder does not exist or is unavailable.");
+
     Message[] msgs = getFolder().getMessages();
     
     // get the UIDs first.
@@ -427,8 +431,18 @@ public class UIDFolderInfo extends FolderInfo {
     // really need to update the table info.  for that 
     // matter, it's likely that we'll get MessagingExceptions
     // if we do, anyway.
+    boolean updateInfo = false;
     try {
-      if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+      updateInfo = (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true"));
+    } catch (MessagingException me) {
+      // if we catch a MessagingException, it just means
+      // that the message has already been expunged.  in 
+      // that case, assume it's ok if we don't update; it'll
+      // happen in the messagesRemoved().
+    }
+    
+    if (updateInfo) {
+      try {
 	Message msg = mce.getMessage();
 	UIDMimeMessage changedMsg = getUIDMimeMessage(msg);
 	long uid = changedMsg.getUID();
@@ -441,10 +455,16 @@ public class UIDFolderInfo extends FolderInfo {
 	    mp.loadTableInfo();
 	  }
 	}
+      } catch (MessagingException me) {
+	// if we catch a MessagingException, it just means
+	// that the message has already been expunged.
       }
-    } catch (MessagingException me) {
-      // if we catch a MessagingException, it just means
-      // that the message has already been expunged.
+      
+      // if we're not just a tableinfochanged event, do a resetmessagecouts.
+      // don't do this if we're just a delete.
+      if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
+	resetMessageCounts();
+      }
     }
     
     // now let's go ahead and get the UIDMimeMessage for the event so
@@ -467,37 +487,37 @@ public class UIDFolderInfo extends FolderInfo {
   }
   
     
-    /**
-     * This updates the children of the current folder.  Generally called
-     * when the folderList property is changed.
-     */
-    public void updateChildren() {
-	Vector newChildren = new Vector();
-
-	String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
-	if (childList != "") {
-	    StringTokenizer tokens = new StringTokenizer(childList, ":");
-	    
-	    String newFolderName;
-	
-	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-		newFolderName = (String)tokens.nextToken();
-		FolderInfo childFolder = getChild(newFolderName);
-		if (childFolder == null) {
-		    childFolder = new UIDFolderInfo(this, newFolderName);
-		    newChildren.add(childFolder);
-		} else {
-		    newChildren.add(childFolder);
-		}
-	    }
-       
-	    children = newChildren;
-	    
-	    if (folderNode != null) 
-		folderNode.loadChildren();
+  /**
+   * This updates the children of the current folder.  Generally called
+   * when the folderList property is changed.
+   */
+  public void updateChildren() {
+    Vector newChildren = new Vector();
+    
+    String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
+    if (childList != "") {
+      StringTokenizer tokens = new StringTokenizer(childList, ":");
+      
+      String newFolderName;
+      
+      for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+	newFolderName = (String)tokens.nextToken();
+	FolderInfo childFolder = getChild(newFolderName);
+	if (childFolder == null) {
+	  childFolder = new UIDFolderInfo(this, newFolderName);
+	  newChildren.add(childFolder);
+	} else {
+	  newChildren.add(childFolder);
 	}
+      }
+      
+      children = newChildren;
+      
+      if (folderNode != null) 
+	folderNode.loadChildren();
     }
-
+  }
+  
   /**
    * Fetches the information for the given messages using the given
    * FetchProfile.
