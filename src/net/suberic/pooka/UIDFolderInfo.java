@@ -565,7 +565,7 @@ public class UIDFolderInfo extends FolderInfo {
   
   /**
    * Returns the "real" message from the underlying folder that matches up
-   * to the given UID.
+   * to the given UID.  If no such message exists, returns null.
    */
   public javax.mail.internet.MimeMessage getRealMessageById(long uid) throws MessagingException {
     Folder f = getFolder();
@@ -573,9 +573,6 @@ public class UIDFolderInfo extends FolderInfo {
       javax.mail.internet.MimeMessage m = null;
       try {
 	m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
-	if (m == null) {
-	  throw new MessagingException("UID " + uid + ":  no such message.");
-	}
 	return m;
       } catch (IllegalStateException ise) {
 	throw new MessagingException(ise.getMessage());
