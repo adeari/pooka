@@ -1,3 +1,11 @@
+modified the New Account creation on startup to use the new Connection /
+OutgoingMailServer system.
+
+fixed the Search date formater to be MM/dd/yyyy instead of MM/hh/yyyy.
+
+fixed a problem with synchronizing with subscribed IMAP folders--subfolders
+weren't being synchronized properly.
+
 made the property editor windows resizable under the desktoppropertyeditor.
 
 changed the SSL server support so that we now can connect using a self-signed

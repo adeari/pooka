@@ -9,8 +9,6 @@ next release:
 		local mail store for IMAP users.
 	*)  fix the threading.  sending messages is on the awt thread right
 		now.
-	*)  fix the NewAccountPooka to set up the new system instead of
-		the old system.
 	*)  add some sort of an administrative api to the NetworkConnection
 		so that the application and the admin tools (the bottom right
 		config) don't have the same restrictions (or lack thereof).
@@ -31,6 +29,10 @@ next release:
 
 *) fix the multiple copies of new messages that sometimes happens when
 we lose and regain our imap connections.
+
+*) fix the display of html messages so that if there are errors in the
+html, we either fall back on the text version (if any) or display
+the straight html.
 
 beta 1
 ---------------
@@ -100,7 +102,7 @@ changing the title bar.
 
 *) bug:  if you go into the multi configuration editors and it's empty, you
 should more or less be forced to create a new entity.  otherwise you'll start
-typing in informatio and then be surprised when add clears it out.
+typing in information and then be surprised when add clears it out.
 
 *) bug:  trying to go to a folder editor when there aren't any folders
 or stores configured is a big problem.
@@ -123,6 +125,10 @@ have nothing new in your inbox because it hasn't been d/l'ed yet.
 	     other processes.
 
 *) disconnected imap is way too slow.  
+
+*) fix the window size--it's possible that if you change the foldertable
+size and the desktop pane size, but not the main window size, your main
+window size will end up changing anyway.
 
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.  -- only on unix.  

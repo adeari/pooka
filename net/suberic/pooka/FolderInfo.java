@@ -524,11 +524,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (! isLoaded())
       loadFolder();
 
-    if ((getType() & Folder.HOLDS_MESSAGES) != 0) {
+    if ((getType() & Folder.HOLDS_FOLDERS) != 0) {
+
       Folder[] subscribedFolders = folder.list();
       
       StringBuffer newSubscribed = new StringBuffer();
       
+
       for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
 	// sometimes listSubscribed() doesn't work.
 	if (subscribedFolders[i].isSubscribed()) {
@@ -536,7 +538,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  newSubscribed.append(folderName).append(':');
 	}
       }
-      
+
       if (newSubscribed.length() > 0)
 	newSubscribed.deleteCharAt(newSubscribed.length() -1);
       

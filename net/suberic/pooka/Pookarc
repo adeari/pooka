@@ -703,8 +703,7 @@ FolderTree.unavailableIcon=images/Delete.gif
 FolderTree.connectedStoreIcon=images/mailbox.gif
 FolderTree.disconnectedStoreIcon=images/mailbox.gif
 
-NewAccountPooka=firstPanel:introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:protocol
-NewAccountPooka.firstPanel=userName:fullName:password:serverName:protocol
+NewAccountPooka.firstPanel=userName:fullName:password:serverName:protocol:smtpServer
 NewAccountPooka.firstPanel.propertyType=Composite
 NewAccountPooka.firstPanel.propertyScoped=true
 NewAccountPooka.firstPanel.templateScoped=true

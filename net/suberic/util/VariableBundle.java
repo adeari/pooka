@@ -132,6 +132,10 @@ public class VariableBundle extends Object {
 	return parentProperties;
     }
 
+    public Properties getWritableProperties() {
+	return writableProperties;
+    }
+
     public void setProperty(String propertyName, String propertyValue) {
 	writableProperties.setProperty(propertyName, propertyValue);
 	unRemoveProperty(propertyName);
