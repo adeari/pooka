@@ -17,8 +17,16 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     throws EncryptionException {
     GPGEncryptionKey gpgKey = (GPGEncryptionKey) key;
 
-    String alias = gpgKey.getAlias();
-    String passphrase = gpgKey.getPassphrase();
+    String alias = null;
+    String passphrase = null;
+
+    if (gpgKey != null) {
+      alias = gpgKey.getAlias();
+      passphrase = gpgKey.getPassphrase();
+    } else {
+      alias = "allen";
+      passphrase = "biteme";
+    }
 
     try {
       File outFile = writeStreamToFile(encryptedStream);

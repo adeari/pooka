@@ -534,6 +534,14 @@ public class MessageProxy {
 	CryptoStatusDisplay csd = getCryptoStatusDisplay();
 	if (csd != null)
 	  csd.cryptoUpdated(sigStatus, encryptStatus);
+
+	if (getMessageUI() != null) {
+	  try {
+	    getMessageUI().refreshDisplay();
+	  } catch (MessagingException me) {
+	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed"), me);
+	  }
+	}
       }
     }
   }

@@ -122,6 +122,13 @@ public class MessageCryptoInfo {
 	    if (bp.getContent() instanceof Multipart) {
 	      AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
 	      bundle.addAll(newBundle);
+	    } else if (ca.getMimeType().getPrimaryType().equalsIgnoreCase("text")) {
+	      // if it's a text part, then we might need to set it as 
+	      // such in the attachment bundle.
+	      if (bundle.textPart == null) {
+		bundle.textPart = ca;
+		bundle.allAttachments.remove(ca);
+	      }
 	    }
 	  }
 	}

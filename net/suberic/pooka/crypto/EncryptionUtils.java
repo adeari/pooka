@@ -103,8 +103,6 @@ public abstract class EncryptionUtils {
       ContentType ct = new ContentType(contentType);
       if (ct.getSubType().equalsIgnoreCase("encrypted")) 
 	return true;
-      else if (ct.getSubType().equalsIgnoreCase("signed")) 
-	return true;
     }
     return false;
   }

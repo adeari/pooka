@@ -32,16 +32,6 @@ public class CryptoAttachment extends Attachment {
     else if (ct.getSubType().equalsIgnoreCase("signed"))
       signed = true;
 
-    /*
-    if (signed) {
-      try {
-	System.err.println("checkSignature = " + checkSignature());
-      } catch (Exception ee) {
-	System.err.println("caught exception checking signature:  " + ee.getMessage());
-	ee.printStackTrace();
-      }
-    }
-    */
   }
   
   /**
@@ -66,6 +56,11 @@ public class CryptoAttachment extends Attachment {
    */
   public CryptoAttachment(MimeMessage msg) throws MessagingException {
     super(msg);
+    ContentType ct = new ContentType(msg.getContentType());
+    if (ct.getSubType().equalsIgnoreCase("encrypted"))
+      encrypted = true;
+    else if (ct.getSubType().equalsIgnoreCase("signed"))
+      signed = true;
   }
 
   /**
@@ -73,6 +68,7 @@ public class CryptoAttachment extends Attachment {
    */
   public BodyPart decryptAttachment(EncryptionUtils utils, EncryptionKey key)
     throws EncryptionException, MessagingException, java.io.IOException {
+    
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
     else {
@@ -128,12 +124,12 @@ public class CryptoAttachment extends Attachment {
    * Returns the MimeType.
    */
   public ContentType getMimeType() {
-    if (encrypted) {
+    if (encrypted && decryptedBodyPart != null) {
       try {
 	BodyPart bp = getDecryptedBodyPart();
 	return new ContentType(bp.getContentType());
       } catch (Exception e) {
-	e.printStackTrace();
+	//e.printStackTrace();
       }
     }
 
