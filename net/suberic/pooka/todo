@@ -1,14 +1,14 @@
 	-- disconnected imap --
 
-*) fully cached filter doesn't work anymore.
-
-*) in general, make reconnecting/resynching (with disconnected imap or
-	with the uid system) use the LoadMessageThread.  also make the
-	LoadMessageThread use the main FolderThread synchronization.
+*) things are still too slow.  :)  i had something happen where the old
+messages appeared, but the ones that had been read since were sitll marked
+as unread.  a bit later, they were marked as read.
 
 *) each loading of the FolderTableInfo rechecks the unread message
 	count, which sucks for performance.  improvements with new
 	caching system???
+
+*) fully cached filter doesn't work anymore.
 
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
@@ -22,10 +22,10 @@
 *) make it so the connection objects actually have a clue as to whether
 or not they're actually connected, instead of relying on the user.
 
-*) preview pane:  make it so the status bar is at the bottom, underneath
+*) preview pane:  make the separator show up at the right place !! 
+	--make it so the status bar is at the bottom, underneath
 	the readmessagedisplaypanel--or possibly on the status pane.
 	-- maybe change the toolbars so there's only 1?
-	-- make the separator show up at the right place.
 	-- ?? make it so you can compose messages in the main window ??
 	-- make it so it doesn't automatically display the first new message.
 
@@ -68,6 +68,8 @@ or not they're actually connected, instead of relying on the user.
 	pane instead or something.
 
 *)  add documentation and online help.
+
+*)  fix up the error messages, and make sure that they look ok.
 
 +++++++
 

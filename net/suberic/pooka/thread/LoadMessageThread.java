@@ -93,42 +93,45 @@ public class LoadMessageThread extends Thread {
       FetchProfile fetchProfile = getFolderInfo().getFetchProfile();
 
       for(int i=numMessages-1; i >= 0; i--) {
-	mp=(MessageProxy)messages.elementAt(i);
-	
-	if (! mp.getMessageInfo().hasBeenFetched()) {
-	  try {
-	    int firstToFetch = Math.max(1 + i - fetchBatchSize, 0);
-	    // we need to fetch the next batch.
-	    
-	    Message[] toFetch = new Message[ 1 + i - firstToFetch];
-	    
-	    for (int j = 0; j < toFetch.length; j++) {
-	      MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(firstToFetch + j)).getMessageInfo();
+	synchronized(folderInfo.getFolderThread().getRunLock()) {
+	  mp=(MessageProxy)messages.elementAt(i);
+	  
+	  if (! mp.getMessageInfo().hasBeenFetched()) {
+	    try {
+	      int firstToFetch = Math.max(1 + i - fetchBatchSize, 0);
+	      // we need to fetch the next batch.
 	      
-	      Message currentMsg = fetchInfo.getRealMessage();
-	      if (currentMsg instanceof UIDMimeMessage)
-		currentMsg = ((UIDMimeMessage)currentMsg).getMessage();
+	      Message[] toFetch = new Message[ 1 + i - firstToFetch];
 	      
-	      toFetch[j] = currentMsg;
-
-	      fetchInfo.setFetched(true);
+	      for (int j = 0; j < toFetch.length; j++) {
+		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(firstToFetch + j)).getMessageInfo();
+		
+		Message currentMsg = fetchInfo.getRealMessage();
+		if (currentMsg instanceof UIDMimeMessage)
+		  currentMsg = ((UIDMimeMessage)currentMsg).getMessage();
+		
+		toFetch[j] = currentMsg;
+		
+		fetchInfo.setFetched(true);
+	      }
+	      getFolderInfo().fetch(toFetch, fetchProfile);
+	    } catch(MessagingException me) {
+	      System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+	      me.printStackTrace();
 	    }
-	    getFolderInfo().fetch(toFetch, fetchProfile);
-	  } catch(MessagingException me) {
-	    System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
-	    me.printStackTrace();
+	  
+	  }
+
+	  try {
+	    if (! mp.isLoaded())
+	      mp.loadTableInfo();
+	    else if (mp.needsRefresh())
+	      mp.refreshMessage();
+	  } catch (Exception e) {
+	    e.printStackTrace();
 	  }
 	}
 
-	try {
-	  if (! mp.isLoaded())
-	    mp.loadTableInfo();
-	  else if (mp.needsRefresh())
-	    mp.refreshMessage();
-	} catch (Exception e) {
-	  e.printStackTrace();
-	}
-	
 	if (++updateCounter >= getUpdateMessagesCount()) {
 	  fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED, getLoadedMessageCount(), messages.size());
 	  updateCounter = 0;		   

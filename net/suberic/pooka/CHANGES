@@ -1,3 +1,5 @@
+changed the load message tracker to synchronize on the folder thread.
+
 fixed a problem where a second request for an invalid message would
 result in an empty window.
 
