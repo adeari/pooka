@@ -1035,24 +1035,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	}
 		
-	if (folderTableModel != null) {
-	    Message[] addedMessages = mce.getMessages();
-	    MessageInfo mp;
-	    Vector addedProxies = new Vector();
-	    for (int i = 0; i < addedMessages.length; i++) {
-		mp = new MessageInfo(addedMessages[i], FolderInfo.this);
-		addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		messageToInfoTable.put(addedMessages[i], mp);
-	    }
-	    addedProxies.removeAll(applyFilters(addedProxies));
-	    if (addedProxies.size() > 0) {
-		getFolderTableModel().addRows(addedProxies);
-		setNewMessages(true);
-		resetMessageCounts();
-		fireMessageCountEvent(mce);
-	    }
-	}
-	
     }
 
     public void messagesRemoved(MessageCountEvent e) {
