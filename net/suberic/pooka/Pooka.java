@@ -12,6 +12,7 @@ public class Pooka {
     static public net.suberic.pooka.gui.MainPanel panel;
 
     static public javax.mail.Session defaultSession;
+    static public net.suberic.pooka.thread.FolderTracker folderTracker;
 
     static public void main(String argv[]) {
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
@@ -28,6 +29,8 @@ public class Pooka {
 	resources.addValueChangeListener(UserProfile.vcl, "UserProfile");
 
 	mailcap = new FullMailcapCommandMap();
+	folderTracker = new net.suberic.pooka.thread.FolderTracker();
+	folderTracker.start();
 
 	javax.activation.CommandMap.setDefaultCommandMap(mailcap);
 	javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
@@ -89,6 +92,10 @@ public class Pooka {
 
     static public javax.mail.Session getDefaultSession() {
 	return defaultSession;
+    }
+
+    static public net.suberic.pooka.thread.FolderTracker getFolderTracker() {
+	return folderTracker;
     }
 
     static public MainPanel getMainPanel() {

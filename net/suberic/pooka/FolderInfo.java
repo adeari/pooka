@@ -8,6 +8,7 @@ import net.suberic.pooka.gui.*;
 import net.suberic.pooka.thread.*;
 import net.suberic.pooka.event.*;
 import net.suberic.util.ValueChangeListener;
+import net.suberic.util.thread.ActionThread;
 
 /**
  * This class does all of the work for a Folder.  If a FolderTableModel,
@@ -534,10 +535,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
 
     public void messageChanged(MessageChangedEvent e) {
-	MessageProxy mp = getMessageProxy(e.getMessage());
-	mp.unloadTableInfo();
-	mp.loadTableInfo();
-	fireMessageChangedEvent(e);
+	// blech.  we really have to do this on the action thread.
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		    MessageChangedEvent mce = (MessageChangedEvent)actionEvent.getSource();
+		    MessageProxy mp = getMessageProxy(mce.getMessage());
+		    mp.unloadTableInfo();
+		    mp.loadTableInfo();
+		    fireMessageChangedEvent(mce);
+		}
+	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
     }
 
     /**
@@ -574,9 +581,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	// if we got to this point, we should assume that the open worked.
 
 	if (getFolderTracker() == null) {
-	    FolderTracker tracker = new FolderTracker(this);
+	    FolderTracker tracker = Pooka.getFolderTracker();
+	    tracker.addFolder(this);
 	    this.setFolderTracker(tracker);
-	    tracker.start();
 	}
     }
 
@@ -620,7 +627,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 
 	if (getFolderTracker() != null) {
-	    getFolderTracker().interrupt();
+	    getFolderTracker().removeFolder(this);
 	    setFolderTracker(null);
 	}
     }
@@ -790,5 +797,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	else {
 	    return null;
 	}
+    }
+
+    public ActionThread getFolderThread() {
+	return getParentStore().getStoreThread();
     }
 }
