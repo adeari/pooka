@@ -96,7 +96,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 
     if (needToMatch(entryString)) {
       final InternetAddress[] matchedAddresses = matcher.match(entryString);
-      
+
       try {
 	SwingUtilities.invokeAndWait(new Runnable() {
 	    public void run() {
@@ -104,7 +104,6 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 	      if (lastModifiedTime == lastKeyTime) {
 		if (matchedAddresses.length > 0) {
 		  String newAddress = matchedAddresses[0].toString(); 
-		  System.err.println("checking--newAddress = '" + newAddress + "', while entryString = '" + entryString + "'.");
 		  if (!newAddress.equalsIgnoreCase(entryString))
 		    updateAddressText(newAddress);
 		} else {
@@ -124,7 +123,6 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    * This tests to see if the given string needs to be matched or not.
    */
   public boolean needToMatch(String entry) {
-    System.err.println("need to match " + entry + "?");
     if (entry.length() == 0) 
       return false;
     else

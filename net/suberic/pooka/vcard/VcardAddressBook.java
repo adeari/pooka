@@ -48,6 +48,14 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   }
   
   /**
+   * Adds the given Vcard to the address book.
+   */
+  protected void addAddress(Vcard newCard) {
+    Vcard[] newList = new Vcard[orderedList.length + 1];
+    int insertLocation = java.utils.Arrays.binarySearch(newCard);
+  }
+  
+  /**
    * Sorts the list.
    */
   protected void sortList() {
@@ -99,7 +107,6 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   public InternetAddress[] match(String matchString) {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
-    System.err.println("got value " + value + "; orderedList.length = " + orderedList.length);
     if (value < 0) {
       return new InternetAddress[0];
     }
@@ -110,11 +117,13 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
       while (minimum > 0 && (orderedList[minimum - 1].compareTo(matchString) == 0))
 	minimum--;
 
+
       int maximum = value;
       while (maximum < orderedList.length -1 && (orderedList[maximum + 1].compareTo(matchString) == 0))
 	maximum++;
 
-      InternetAddress[] returnValue = new InternetAddress[minimum - maximum + 1];
+      InternetAddress[] returnValue = new InternetAddress[maximum - minimum + 1];
+
       for(int i = 0; i < returnValue.length; i++) {
 	returnValue[i] = orderedList[minimum + i].getAddress();
       }
@@ -156,7 +165,6 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   public InternetAddress getNextMatch(String matchString) {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
-    System.err.println("got value " + value + "; orderedList.length = " + orderedList.length);
     if (value < 0) {
       value = 0;
     }
@@ -175,7 +183,6 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   public InternetAddress getPreviousMatch(String matchString) {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
-    System.err.println("got value " + value + "; orderedList.length = " + orderedList.length);
     if (value < 0) {
       value = 0;
     }

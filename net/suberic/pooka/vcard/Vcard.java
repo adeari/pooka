@@ -22,17 +22,11 @@ public class Vcard implements Comparable {
   
   private InternetAddress address;
   
-  private String firstName;
-  
-  private String lastName;
-  
   /**
    * Creates a new Vcard from a BufferedReader.
    */
   protected Vcard(Properties newProps) {
     properties = newProps;
-    System.err.println("***** new vcard:");
-    properties.list(System.err);
   }
   
   /**
@@ -49,7 +43,6 @@ public class Vcard implements Comparable {
     try {
       if (address == null) {
 	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
-	System.err.println("made new internet address from " + properties.getProperty("email;internet") + ", " + properties.getProperty("fn"));
       }
       return address;
     } catch (java.io.UnsupportedEncodingException uee) {
@@ -64,26 +57,53 @@ public class Vcard implements Comparable {
     try {
       if (address == null) {
 	address = new InternetAddress(properties.getProperty("email;internet"), properties.getProperty("fn"));
-	System.err.println("made new internet address from " + properties.getProperty("email;internet") + ", " + properties.getProperty("fn"));
       }
       return address.getPersonal();
     } catch (java.io.UnsupportedEncodingException uee) {
       return null;
     }
   }
+
+  /**
+   * Gets the FirstName property associated with this Vcard.
+   */
+  public String getFirstName() {
+    String name = properties.getProperty("n");
+    if (name != null) {
+      int index = name.indexOf(";");
+      if (index > 0) 
+	return name.substring(index + 1);
+    }
+
+    return null;
+  }
+
+  /**
+   * Gets the LastName property associated with this Vcard.
+   */
+  public String getLastName() {
+    String name = properties.getProperty("n");
+    if (name != null) {
+      int index = name.indexOf(";");
+      if (index > 0) 
+	return name.substring(index);
+    }
+
+    return null;
+  }
   
   /**
    * Gets the user information, last name first.
    */
   public String getLastFirst() {
-    return lastName + ", " + firstName;
+    return getLastName() + ", " + getFirstName();
   }
   
   /**
    * Gets the user information, first name first.
    */
   public String getFirstLast() {
-    return firstName + " " + lastName;
+    return getFirstName() + " " + getLastName();
   }
     
   /**
@@ -113,8 +133,9 @@ public class Vcard implements Comparable {
       Vcard target = (Vcard) o;
       
       switch (sortingMethod) {
-      case (SORT_BY_ADDRESS):
-	return getAddress().toString().compareTo(target.getAddress().toString());
+      case (SORT_BY_ADDRESS): 
+	int returnValue = getAddress().toString().compareTo(target.getAddress().toString());
+	return returnValue;
       case (SORT_BY_LAST_NAME):
 	return getLastFirst().compareTo(target.getLastFirst());
       case (SORT_BY_FIRST_NAME):
@@ -131,24 +152,29 @@ public class Vcard implements Comparable {
       switch (sortingMethod) {
       case (SORT_BY_ADDRESS):
 	compareString = getAddress().toString();
+	break;
       case (SORT_BY_LAST_NAME):
 	compareString = getLastFirst();
+	break;
       case (SORT_BY_FIRST_NAME):
 	compareString = getFirstLast();
-	
+	break;
       }
       
       // see if the string to be matched is shorter; if so, match
       // with just that length.
-      
+
+
       int origSize = compareString.length();
       int matchSize = matchString.length();
       if (matchSize < origSize) {
-	return compareString.substring(0,matchSize).compareTo(matchString);
+	int returnValue =  compareString.substring(0,matchSize).compareTo(matchString);
+	return returnValue;
       } else {
-	return compareString.compareTo(matchString);
+	int returnValue =  compareString.compareTo(matchString);
+	return returnValue;
       }
-    } 
+    }
     
     return -1;
   }
@@ -174,7 +200,6 @@ public class Vcard implements Comparable {
 	}
 	else {
 	  newProps.put(current[0], current[1]);
-	  System.err.println("adding " + current[0] + ", " + current[1] + " to newProps.");
 	}
       } else {
 	return null;
@@ -209,10 +234,7 @@ public class Vcard implements Comparable {
    * Parses a name/value pair from an rfc2425 stream.
    */
   private static String getNextLine(BufferedReader reader) throws IOException {
-    //System.err.println("calling getNextLine()");
-    System.err.println("reader is ready.");
     String firstLine = reader.readLine();
-    System.err.println("got line " + firstLine);
     boolean isDone = false;
     if (firstLine != null) {
       while (! isDone) {
@@ -234,14 +256,12 @@ public class Vcard implements Comparable {
   }
   
   private static String[] parseLine(String firstLine) {
-    System.err.println("parsing line " + firstLine);
     String[] returnValue = new String[2];
     
     int dividerLoc = firstLine.indexOf(':');
     returnValue[0] = firstLine.substring(0, dividerLoc);
     returnValue[1] = firstLine.substring(dividerLoc + 1);
     
-    System.err.println("returning '" + returnValue[0] + "', '" + returnValue[1] + "'.");
     return returnValue;
   }
 }
