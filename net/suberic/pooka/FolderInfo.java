@@ -5,7 +5,7 @@ import javax.mail.event.*;
 import javax.swing.event.EventListenerList;
 import java.util.*;
 import net.suberic.pooka.gui.*;
-import net.suberic.pooka.thread.LoadMessageThread;
+import net.suberic.pooka.thread.*;
 import net.suberic.pooka.event.*;
 import net.suberic.util.ValueChangeListener;
 
@@ -39,8 +39,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private Vector columnNames;
 
     // GUI information.
-    private LoadMessageThread loaderThread;
     private FolderWindow folderWindow;
+
+    private LoadMessageThread loaderThread;
+    private FolderTracker folderTracker = null;
 
     private boolean loaded = false;
     private boolean available = true;
@@ -170,7 +172,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    */
 		    
-		    open=false;
+		    try {
+			closeFolder(false);
+		    } catch (Exception ex) {
+		    }
 		}
 		
 		public void disconnected(ConnectionEvent e) {
@@ -193,7 +198,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    */
 		    
-		    open=false;
+		    try {
+			closeFolder(false);
+		    } catch (Exception ex) {
+		    }
 		}
 	    });
 
@@ -544,6 +552,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    getFolderNode().getParentContainer().repaint();
 	    }
 	}
+
+	// if we got to this point, we should assume that the open worked.
+
+	if (getFolderTracker() == null) {
+	    FolderTracker tracker = new FolderTracker(this);
+	    this.setFolderTracker(tracker);
+	    tracker.start();
+	}
     }
 
     /**
@@ -579,12 +595,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public void closeFolder(boolean expunge) throws MessagingException {
 	if (isLoaded()) {
-	    if (!(folder.isOpen()))
-		return;
-	    else {
+	    if (folder.isOpen()) {
 		open=false;
 		folder.close(expunge);
 	    }
+	}
+
+	if (getFolderTracker() != null) {
+	    getFolderTracker().interrupt();
+	    setFolderTracker(null);
 	}
     }
     
@@ -688,6 +707,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public boolean hasUnread() {
 	return unread;
+    }
+
+    public FolderTracker getFolderTracker() {
+	return folderTracker;
+    }
+
+    public void setFolderTracker(FolderTracker newTracker) {
+	folderTracker = newTracker;
     }
 
     /**
