@@ -5,11 +5,12 @@
 	address field.
 	-- check to make sure that we get the correct ui factory for
 	each message window.
-	-- fix the size of the window.
 	-- make it so you can add to the address book from the selection
 		panel.
+	-- make the button actually be the right size.
 
-*) fix:  java.lang.NullPointerException
+*) probably happens when you add an address without a personal name.
+   fix:  java.lang.NullPointerException
 	at java.util.Hashtable.put(Hashtable.java:375)
 	at java.util.Properties.setProperty(Properties.java:97)
 	at net.suberic.pooka.vcard.Vcard.setPersonalName(Vcard.java:127)

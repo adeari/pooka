@@ -45,17 +45,16 @@ public class AddressBookSelectionPanel extends JPanel {
    */
   void configurePanel() {
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+    this.add(createFilterPanel());
+
     Box addressBox = new Box(BoxLayout.X_AXIS);
 
-    Box choiceBox = new Box(BoxLayout.Y_AXIS);
-    JPanel filterPanel = createFilterPanel();
     createAddressTable();
-    choiceBox.add(filterPanel);
 
     JScrollPane addressPane = new JScrollPane(addressTable);
-    addressPane.setPreferredSize(new java.awt.Dimension(200,200));
-    choiceBox.add(addressPane);
-    addressBox.add(choiceBox);
+    addressPane.setPreferredSize(new java.awt.Dimension(300,200));
+    addressBox.add(addressPane);
 
     JPanel selectionPanel = createSelectionPanel();
     addressBox.add(selectionPanel);
@@ -63,7 +62,7 @@ public class AddressBookSelectionPanel extends JPanel {
     createConfirmedTable();
 
     JScrollPane confirmedPane = new JScrollPane(confirmedTable);
-    confirmedPane.setPreferredSize(new java.awt.Dimension(200,200));
+    confirmedPane.setPreferredSize(new java.awt.Dimension(300,200));
     addressBox.add(confirmedPane);
 
     this.add(addressBox);
@@ -79,7 +78,7 @@ public class AddressBookSelectionPanel extends JPanel {
   JPanel createFilterPanel() {
     JPanel returnValue = new JPanel();
     filterField = new JTextField(20);
-    JButton filterButton = new JButton("Search");
+    JButton filterButton = new JButton(Pooka.getProperty("AddressBookEditor.title.Search", "Search"));
     filterButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  doFilter(filterField.getText());
@@ -99,6 +98,18 @@ public class AddressBookSelectionPanel extends JPanel {
     addressTable = new JTable(addressModel);
     addressTable.getColumnModel().getColumn(0).setPreferredWidth(100);
     addressTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+    addressTable.addMouseListener(new java.awt.event.MouseAdapter() {
+	public void mouseClicked(java.awt.event.MouseEvent e) {
+	  if (e.getClickCount() == 2) {
+	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
+	    if (rowIndex != -1) {
+	      addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+	      confirmSelectedAddresses();
+	    }
+	  }
+	}
+      });
+
     doFilter("");
   }
 
@@ -152,7 +163,7 @@ public class AddressBookSelectionPanel extends JPanel {
   Box createButtonBox() {
     Box returnValue = Box.createHorizontalBox();
 
-    JButton okButton = new JButton("Ok");
+    JButton okButton = new JButton(Pooka.getProperty("button.ok", "Ok"));
     okButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  copySelectionsToEntry();
@@ -162,7 +173,7 @@ public class AddressBookSelectionPanel extends JPanel {
     returnValue.add(okButton);
 
 
-    JButton cancelButton = new JButton("Cancel");
+    JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
     cancelButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  closePanel();
@@ -373,10 +384,10 @@ public class AddressBookSelectionPanel extends JPanel {
      */
     public String getColumnName(int col) {
       if (col == 0)
-	return "Name";
+	return Pooka.getProperty("AddressBookTable.personalName", "Name");
       
       if (col == 1)
-	return "Address";
+	return Pooka.getProperty("AddressBookTable.address", "Email Address");
 
       return "";
     } 

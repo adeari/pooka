@@ -484,15 +484,34 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     setText(newValue.toString());
   }
 
+  static java.util.HashMap buttonImageMap = new java.util.HashMap();
+
   /**
    * Creates a button that pulls up an editor dialog for addresses.
    */
-  public JButton createAddressButton() {
-    return new JButton(new AbstractAction() {
+  public JButton createAddressButton(int width, int height) {
+    java.awt.Dimension key = new java.awt.Dimension(width, height);
+    java.awt.Image defaultImage = (java.awt.Image) buttonImageMap.get(key);
+    if (defaultImage == null) {
+      java.net.URL url = this.getClass().getResource("images/User.gif");
+      ImageIcon addressIcon = new ImageIcon(url);
+      java.awt.Image addressImage = addressIcon.getImage();
+      defaultImage = addressImage.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+      addressIcon.setImage(defaultImage);
+      buttonImageMap.put(key, defaultImage);
+    }
+
+    ImageIcon addressIcon = new ImageIcon(defaultImage);
+    JButton returnValue = new JButton(addressIcon);
+    returnValue.addActionListener(new AbstractAction() {
 	public void actionPerformed(java.awt.event.ActionEvent e) {
 	  Pooka.getUIFactory().showAddressWindow(AddressEntryTextArea.this);
 	}
       });
+
+    returnValue.setToolTipText(Pooka.getProperty("AddressBookEditor.buttonText", "Open Address Book"));
+    returnValue.setSize(width, height);
+    return returnValue;
   }
 
   /**

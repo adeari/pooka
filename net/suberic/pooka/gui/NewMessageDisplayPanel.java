@@ -265,7 +265,10 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       
       inputRow.add(inputField);
       if (inputField instanceof AddressEntryTextArea) {
-	inputRow.add(((AddressEntryTextArea)inputField).createAddressButton());
+	//int height = inputField.getPreferredSize().height;
+	JButton addressButton = ((AddressEntryTextArea)inputField).createAddressButton(10, 10);
+	inputRow.add(Box.createHorizontalGlue());
+	inputRow.add(addressButton);
       }
       inputPanel.add(inputRow);
       
