@@ -69,4 +69,58 @@ public class MailUtilities {
 	return null;
 	
     }
+
+    /**
+     * This takes a String and words wraps it at length wrapLength, 
+     * using lineBreak to indicate line breaks.
+     */
+    public static String wrapText(String originalText, int wrapLength, char lineBreak) {
+	if (originalText == null || originalText.length() < wrapLength)
+	    return originalText;
+
+	StringBuffer wrappedText = new StringBuffer(originalText);
+
+	int lastSpace=-1;
+	char currentChar;
+	for (int caret = 0, lineLocation = 0; caret < wrappedText.length(); caret++, lineLocation++) {
+	    currentChar = wrappedText.charAt(caret);
+	    if (currentChar == lineBreak) {
+		lastSpace=-1;
+		lineLocation=0;
+	    } else if (Character.isWhitespace(currentChar)) {
+		lastSpace=caret;
+	    } 
+
+	    if (lineLocation >= wrapLength) {
+		if (lastSpace < 0) {
+		    // no spaces in the line.  truncate here.
+		    wrappedText.insert(caret, lineBreak);
+		    lineLocation = -1;
+		} else {
+		    // for now, let's just break after lastSpace.
+		    wrappedText.insert(lastSpace + 1, lineBreak);
+		    caret++;
+		    lineLocation = caret - lastSpace;
+		} 
+	    }
+	}
+	
+	return wrappedText.toString();
+    } 
+
+    /**
+     * A convenience method which wraps the given string using the
+     * length specified by Pooka.lineLength.
+     */
+    public static String wrapText(String originalText) {
+	int wrapLength;
+	try {
+	    String wrapLengthString = Pooka.getProperty("Pooka.lineLength");
+	    wrapLength = Integer.parseInt(wrapLengthString);
+	} catch (Exception e) {
+	    wrapLength = 72;
+	}
+
+	return wrapText(originalText, wrapLength, '\n');
+    }
 }

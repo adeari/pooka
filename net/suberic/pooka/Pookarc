@@ -17,6 +17,9 @@ Pooka.replyPrefix=>
 Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed
 
+Pooka.lineWrap=true
+Pooka.lineLength=72
+
 MenuBar=File:Edit:Mail:Window:Help
 
 MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit

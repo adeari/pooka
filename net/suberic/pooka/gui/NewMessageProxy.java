@@ -58,10 +58,18 @@ public class NewMessageProxy extends MessageProxy {
 		URLName urlName;
 		
 		urlName = getNewMessageWindow().populateMessageHeaders(getMessage());
+		String messageText;
+		if (Pooka.getProperty("lineWrap", "").equalsIgnoreCase("true"))
+		    messageText=net.suberic.pooka.MailUtilities.wrapText(getMessageWindow().getMessageText());
+		else
+		    messageText = getMessageWindow().getMessageText();
+
+		String messageContentType = getMessageWindow().getMessageContentType();
+
 		if (urlName != null) {
 		    if (attachments != null && attachments.size() > 0) {
 			MimeBodyPart mbp = new MimeBodyPart();
-			mbp.setContent(getMessageWindow().getMessageText(), getMessageWindow().getMessageContentType());
+			mbp.setContent(messageText, messageContentType);
 			MimeMultipart multipart = new MimeMultipart();
 			multipart.addBodyPart(mbp);
 			for (int i = 0; i < attachments.size(); i++) 
@@ -70,7 +78,7 @@ public class NewMessageProxy extends MessageProxy {
 			getMessage().setContent(multipart);
 			getMessage().saveChanges();
 		    } else {
-			getMessage().setContent(getMessageWindow().getMessageText(), getMessageWindow().getMessageContentType());
+			getMessage().setContent(messageText, messageContentType);
 		    }
 	       
 		    ((MessagePanel)getMessageWindow().getDesktopPane()).getMainPanel().getMailQueue().sendMessage(getMessage(), urlName);

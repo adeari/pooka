@@ -414,7 +414,8 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	    new CloseAction(),
 	    new CutAction(),
 	    new CopyAction(),
-	    new PasteAction()
+	    new PasteAction(),
+	    new TestAction()
 		};
     }
 
@@ -464,6 +465,19 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	    performTextAction((String)getValue(Action.NAME), e);
 	}
     }
+
+    class TestAction extends AbstractAction {
+	
+	TestAction() {
+	    super("test");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    System.out.println("wrapped text is:");
+	    System.out.println(net.suberic.pooka.MailUtilities.wrapText(getMessageText()));
+	}
+    }
+
 }
 
 
