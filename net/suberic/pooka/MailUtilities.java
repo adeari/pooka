@@ -123,12 +123,15 @@ public class MailUtilities {
 	    returnValue = new StringBuffer();
 
 	Vector attachments = MailUtilities.getInlineTextAttachments(m);
-	if (attachments != null && attachments.size() > 1) {
+	if (attachments != null && attachments.size() > 0) {
 	    for (int i = 0; i < attachments.size(); i++) {
 		try {
 		    Object content = ((MimeBodyPart)attachments.elementAt(i)).getContent();
 		    returnValue.append(separator);
-		    returnValue.append(content);
+		    if (content instanceof MimeMessage)
+			returnValue.append(getTextAndTextInlines((MimeMessage)content, separator));
+		    else
+			returnValue.append(content);
 		} catch (Exception e) {
 		    // if we get an exception getting the content, just
 		    // ignore the attachment.
