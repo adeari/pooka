@@ -448,7 +448,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  messageToInfoTable.put(newMsg, mi);
 	  uidToInfoTable.put(new Long(uid), mi);
 	  try {
-	    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+	    if (autoCache) {
+	      getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.CONTENT);
+	    } else {
+	      getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+	    }
 	  } catch (MessagingException me) {
 	    System.out.println("caught exception:  " + me);
 	    me.printStackTrace();

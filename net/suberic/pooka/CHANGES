@@ -1,3 +1,5 @@
+fixed disconnected imap autocaching. 
+
 caching messages when using disconnected imap no longer marks the messages
 as read.
 
