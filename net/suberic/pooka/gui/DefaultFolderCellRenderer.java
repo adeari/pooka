@@ -43,11 +43,11 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 	    Calendar current = Calendar.getInstance();
 	    current.set(Calendar.HOUR_OF_DAY, 0);
 	    current.set(Calendar.MINUTE, 0);
-	    if (current.before(displayDate)) {
+	    if (current.getTime().before(displayDate)) {
 		dateText = Pooka.getDateFormatter().todayFormat.format(displayDate);
 	    } else {
 		current.add(Calendar.DAY_OF_YEAR, (current.getMaximum(Calendar.DAY_OF_WEEK) - 1) * -1);
-		if (current.before(displayDate)) {
+		if (current.getTime().before(displayDate)) {
 		    dateText = Pooka.getDateFormatter().thisWeekFormat.format(displayDate);
 		} else {
 		    dateText = Pooka.getDateFormatter().shortFormat.format(displayDate);

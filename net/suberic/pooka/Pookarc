@@ -170,11 +170,11 @@ FolderTable.Attachments.icon=/net/suberic/pooka/gui/images/SmallPin.gif
 #FolderTable.Attachments.class=net.suberic.pooka.gui.AttachmentCellRenderer
 FolderTable.Attachments.size=10
 FolderTable.SentDate.value=Date
-FolderTable.SentDate.size=120
+FolderTable.SentDate.size=100
 FolderTable.From.value=From
-FolderTable.From.size=190
+FolderTable.From.size=200
 FolderTable.Subject.value=Subject
-FolderTable.Subject.size=195
+FolderTable.Subject.size=205
 FolderTable.2xClickAction=message-open
 FolderTable.UnreadStyle=BOLD
 
