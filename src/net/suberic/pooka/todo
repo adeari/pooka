@@ -1,6 +1,3 @@
-*) fix left and right arrows on read message so it doesn't scroll back up to
-	top.
-
 *) outgoing mailserver improvements:
 	*) network connections - come up with a way to autotest that doesn't
 		take lots of time.

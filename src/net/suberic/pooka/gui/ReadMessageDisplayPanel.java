@@ -131,6 +131,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     // add up and down arrow scrolling.
     KeyStroke upArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0);
     KeyStroke downArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0);
+    KeyStroke leftArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_LEFT, 0);
+    KeyStroke rightArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_RIGHT, 0);
 
     Action upArrowAction = new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
@@ -146,8 +148,26 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	}
       };
 
+    Action leftArrowAction = new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getHorizontalScrollBar();
+	  if (jsb != null)
+	    jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
+	}
+      };
+
+    Action rightArrowAction = new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = getCurrentScrollPane().getHorizontalScrollBar();
+	  if (jsb != null)
+	    jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
+	}
+      };
+
     String upArrowKey = "message-scroll-up";
     String downArrowKey = "message-scroll-down";
+    String leftArrowKey = "message-scroll-left";
+    String rightArrowKey = "message-scroll-right";
 
     // add for main panel.
 
@@ -159,6 +179,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
     newInputMap.put(downArrowStroke, downArrowKey);
     newActionMap.put(downArrowKey, downArrowAction);
+
+    newInputMap.put(leftArrowStroke, leftArrowKey);
+    newActionMap.put(leftArrowKey, leftArrowAction);
+
+    newInputMap.put(rightArrowStroke, rightArrowKey);
+    newActionMap.put(rightArrowKey, rightArrowAction);
 
     InputMap editorInputMap = editorPane.getInputMap();
     ActionMap editorActionMap = editorPane.getActionMap();
@@ -179,6 +205,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
     newInputMap.put(downArrowStroke, downArrowKey);
     newActionMap.put(downArrowKey, downArrowAction);
+
+    newInputMap.put(leftArrowStroke, leftArrowKey);
+    newActionMap.put(leftArrowKey, leftArrowAction);
+
+    newInputMap.put(rightArrowStroke, rightArrowKey);
+    newActionMap.put(rightArrowKey, rightArrowAction);
 
     InputMap otherEditorInputMap = otherEditorPane.getInputMap();
     ActionMap otherEditorActionMap = otherEditorPane.getActionMap();
