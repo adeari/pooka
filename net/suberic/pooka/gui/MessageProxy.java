@@ -980,6 +980,11 @@ public class MessageProxy {
   
   public void setMessageUI(MessageUI newValue) {
     msgWindow = newValue;
+    if (newValue == null) {
+      setHeaderMode(HEADERS_DEFAULT);
+  
+      setDisplayMode(getDefaultDisplayMode());
+    }
   }
   
   public MessageInfo getMessageInfo() {
