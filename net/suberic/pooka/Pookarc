@@ -253,7 +253,7 @@ NewMessageWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 NewMessageWindowToolbar.Detach.Action=window-detach
 NewMessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
 
-MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:DisplayStyle:HeaderStyle
+MessageWindowToolbar=Reply:ReplyAll:Forward:Delete:|:Copy:|:SaveAddress:|:Detach:|:Find:DisplayStyle:HeaderStyle
 MessageWindowToolbar.Reply.Action=message-reply
 MessageWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 MessageWindowToolbar.ReplyAll.Action=message-reply-all
@@ -268,6 +268,8 @@ MessageWindowToolbar.SaveAddress.Action=message-save-address
 MessageWindowToolbar.SaveAddress.Image=/org/javalobby/icons/20x20png/EditBook.png
 MessageWindowToolbar.Detach.Action=window-detach
 MessageWindowToolbar.Detach.Image=/org/javalobby/icons/20x20png/Object.png
+MessageWindowToolbar.Find.Action=message-find
+MessageWindowToolbar.Find.Image=/org/javalobby/icons/20x20png/Binocular.png
 MessageWindowToolbar.DisplayStyle.class=net.suberic.pooka.gui.DisplayStyleComboBox
 MessageWindowToolbar.DisplayStyle=Text:Html:Raw
 MessageWindowToolbar.DisplayStyle.Text.Action=file-open-textdisplay

@@ -208,20 +208,24 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	toolbar.unregisterKeyboardAction(aKeyStroke);
     }
 
-    //------- Actions ----------//
+  //------- Actions ----------//
+  
+  public Action[] getActions() {
+    
+    Action[] actionList;
+    
+    Action[] currentDefault = getDefaultActions();
+    
+    if (messageDisplay.getActions() != null) {
+      Action[] displayActions = messageDisplay.getActions();
+      actionList = TextAction.augmentList(displayActions, currentDefault);
+    } else {
+      actionList = currentDefault;
+    }    
 
-    public Action[] getActions() {
-	
-	Action[] actionList;
-
-	if (messageDisplay.getActions() != null) {
-	    actionList = TextAction.augmentList(messageDisplay.getActions(), getDefaultActions());
-	} else 
-	    actionList = getDefaultActions();
-
-	return actionList;
-    }
-
+    return actionList;
+  }
+  
 }
 
 

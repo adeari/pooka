@@ -1,3 +1,10 @@
+add a find in page feature for the Read Messages.
+
+fixed a problem with the focus not always returning to the correct component.
+
+030115 release
+--------------
+
 fixed lots of other problems in jdk 1.4, including incorrect sizing of some
 of the configuration dialogs, some times when focus wouldn't follow back from
 a deleted message, and....  some other stuff.  don't remember it all.

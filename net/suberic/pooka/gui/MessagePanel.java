@@ -776,6 +776,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   
   public Action[] getActions() {
     JInternalFrame cw = getCurrentWindow();
+
     if (cw != null) {
       Action[] windowActions = null;
       if (cw instanceof ActionContainer)

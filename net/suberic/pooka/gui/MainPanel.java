@@ -109,6 +109,13 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     
     focusManager = new PookaFocusManager();
 
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  // we never want focus.
+	  focusManager.passFocus();
+	}
+      });
+
     // set the initial currentUser
     refreshCurrentUser();
     
@@ -696,10 +703,34 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * Called when the focus changes.
      */
     public void propertyChange(java.beans.PropertyChangeEvent pce) {
-      refreshActiveMenus();
-      refreshCurrentUser();
+      // make sure that we're not doing anything stupid like saying that
+      // either the JFrame or nothing has the keyboard focus.
+      Object newValue = pce.getNewValue();
+      Object oldValue = pce.getOldValue();
+      // if seems like 
+      if ((newValue == null && oldValue == null) || newValue instanceof JFrame) {
+	passFocus();
+      } else {
+	
+	refreshActiveMenus();
+	refreshCurrentUser();
+      }
     }
     
+    /**
+     * Passes the focus to the correct subcomponent.
+     */
+    public void passFocus() {
+      if (lastStatus == CONTENT_LAST && contentPanel != null) {
+	if (contentPanel instanceof JComponent)
+	  ((JComponent)contentPanel).requestFocus();
+	else
+	  contentPanel.getUIComponent().requestFocus();
+      } else if (lastStatus == FOLDER_LAST && folderPanel != null) {
+	folderPanel.requestFocus();
+      }
+    }
+
     /**
      * Returns the last panel that had focus.
      */

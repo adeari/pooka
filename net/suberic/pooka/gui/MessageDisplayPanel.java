@@ -56,28 +56,46 @@ public abstract class MessageDisplayPanel extends JPanel {
    */
   
   public abstract void configureMessageDisplay() throws MessagingException;
-  
+
+  /**
+   * Shows a dialog that asks for a String (ok, actually a regexp) to
+   * search for, then searches for it.
+   */
+  public void searchMessage() {
+    String searchString = getMessageUI().showInputDialog(Pooka.getProperty("message.search", "Find what"), Pooka.getProperty("message.search.title", "Find"));
+    if (searchString != null && searchString.length() > 0) 
+      findRegexp(searchString);
+  }
+
+  /**
+   * Searches for the last-sought string.  If no search has been done, 
+   * calls searchMessage().
+   */
+  public void searchAgain() {
+    if (currentMatcher != null)
+      findNext();
+    else
+      searchMessage();
+  }
+
   /**
    * This finds the given regular expression in the displayed page.
    */
-  public void findRegexp(String regString) {
+  protected void findRegexp(String regString) {
     boolean matchSucceeded = doFindRegexp(regString);
-    System.out.println("matchSucceeded = " + matchSucceeded);
     if (matchSucceeded) {
       int start = currentMatcher.start();
       int end = currentMatcher.end();
       JTextPane currentPane = getCurrentEditorPane();
       currentPane.setCaretPosition(start);
-      System.out.println("moving caret position to " + start);
       currentPane.moveCaretPosition(end);
-      System.out.println("moving carent position to " + end);
     }
   }
 
   /**
    * This finds the given regular expression in the displayed page.
    */
-  public void findNext() {
+  protected void findNext() {
     boolean matchSucceeded = doFindNext();
     if (matchSucceeded) {
       int start = currentMatcher.start();

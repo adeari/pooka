@@ -1,18 +1,17 @@
+*) add a check for java version to make sure that you're running the 
+correct version of pooka for the jdk.
+
   *) printing in windows can leave control characters at the end of lines
 
 *) make there a build option for help only, so i can switch it in 
 	WebStart.
-
-*) add a check for java version to make sure that you're running the 
-correct version of pooka for the jdk.
 
 *) regexp? (add search/replace to editor)
   -- started.  todo:
 	*) add feature to NewMessage
 	*) add replace feature
 		-- check the caret location, too.
-	*) make it work the first time :)
-	*) make focus return to the editor when done
+	*) fix the focus on the find window
 	
 *) change the keybinding for the address book.  otherwise you get address book
 	entries while you're navigating the to field.

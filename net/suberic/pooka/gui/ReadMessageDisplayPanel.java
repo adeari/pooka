@@ -448,6 +448,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   
   //------- Actions ----------//
   
+  /**
+   * Returns this panel's actions.
+   */
   public Action[] getActions() {
     
     Action[] actionList = defaultActions;
@@ -456,24 +459,25 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       actionList = TextAction.augmentList(actionList, getMessageProxy().getActions());
     
     Action[] subActions = null;
-    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-    if (focusOwner != null) {
-
-      if (editorPane != null && SwingUtilities.isDescendingFrom(focusOwner, editorPane)) {
+    if (editorStatus == WITHOUT_ATTACHMENTS) {
+      if (editorPane != null) {
 	subActions = editorPane.getActions();
-      } else if (otherEditorPane != null && SwingUtilities.isDescendingFrom(focusOwner, otherEditorPane)) {
-	subActions = otherEditorPane.getActions();
-      } else if (attachmentPanel != null &&SwingUtilities.isDescendingFrom(focusOwner, attachmentPanel)) {
-
-	subActions = attachmentPanel.getActions();
-      }
+      } 
     } else {
-      // if nothing's focused, then use the editor pane's actions, if they
-      // exist.
-      if (editorPane != null)
-	subActions = editorPane.getActions();
+      // if we have an attachment pane, we need to check to see if the 
+      // attachment pane is selected or not.
+
+      Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+      if (focusOwner != null && attachmentPanel != null && SwingUtilities.isDescendingFrom(focusOwner, attachmentPanel)) {
+	subActions = attachmentPanel.getActions();
+      } else {
+	if (otherEditorPane != null) {
+	  subActions = otherEditorPane.getActions();
+	}
+      } 
 
     }
+    
     if (subActions != null)
       return TextAction.augmentList(actionList, subActions);
     else
@@ -504,9 +508,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      String searchString = getMessageUI().showInputDialog(Pooka.getProperty("message.search", "Find what"), Pooka.getProperty("message.search.title", "Find"));
-      if (searchString != null) 
-	findRegexp(searchString);
+      searchMessage();
     }
   }
 
@@ -519,7 +521,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      findNext();
+      searchAgain();
     }
   }
 
