@@ -19,11 +19,16 @@ the UserProfile only gets updated at startup.
 
 *) make the mailcap mappings for the attachments work properly.
 
+*) make the FolderPanel refresh properly when you open a Store.  generally
+fix the display there--make the little extension key not disappear.
+
 *) add Help->About Pooka.  :)
 
 
 after release
 -------------
+
+*) make MailUtilities handle nested attachments properly.
 
 *) fix the AttachmentPane right-click menu--it doesn't work right now.
 
