@@ -73,7 +73,15 @@ public class PopInboxFolderInfo extends FolderInfo {
     changeAdapter = new ChangeCache(new File(mailHome));
     
     try {
-      Session session = javax.mail.Session.getInstance(System.getProperties(), Pooka.defaultAuthenticator);
+      java.util.Properties props = new java.util.Properties(System.getProperties());
+      
+      if (Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
+	props.setProperty("mail.pop3.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
+	props.setProperty("mail.pop3.socketFactory.fallback", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.fallback", "false"));
+	props.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.port", "995"));
+      }
+
+      Session session = javax.mail.Session.getInstance(props, Pooka.defaultAuthenticator);
       
       if (Pooka.isDebug()) {
 	System.out.println("session.getProperty(mail.mbox.inbox) = " + session.getProperty("mail.mbox.inbox"));

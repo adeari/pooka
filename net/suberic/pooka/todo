@@ -1,20 +1,3 @@
-*) add pop3 ssl support.
-
-*) get rid of the Edit button for the Variable setting.  make it a separate
-	pane instead or something.
-	-- started.  todo:
-	*) add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
-
-*) queuing of outgoing mails
-	todo on this:
-	*)  add some sort of an administrative api to the NetworkConnection
-		so that the application and the admin tools (the bottom right
-		config) don't have the same restrictions (or lack thereof).
-		 -- somewhat started with the new test address api.
-	*) make it so there is some way for the NetworkConnection to detect
-		whether or not it's up.
-			-- started.  make sure it's enough.
-
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
 	-- make a disconnected icon.  -- red plus?
@@ -56,6 +39,33 @@ the filters, especially.
 
 *) search doesn't work properly for sent folders.
 
+*) fix:  JAVA STACK INFORMATION FOR THREADS LISTED ABOVE:
+------------------------------------------------
+Java Stack for "allen@localhost - ActionThread":
+==========
+	at com.sun.mail.imap.IMAPFolder.getMessageCount(IMAPFolder.java:965)
+	at net.suberic.pooka.FolderInfo.resetMessageCounts(FolderInfo.java:2048)	at net.suberic.pooka.UIDFolderInfo.runMessagesAdded(UIDFolderInfo.java:336)
+	at net.suberic.pooka.FolderInfo$4.actionPerformed(FolderInfo.java:1464)
+	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
+	- locked <43a6e018> (a java.lang.Object)
+Java Stack for "Search Thread":
+==========
+	at com.sun.mail.imap.IMAPFolder.lockFor(IMAPFolder.java:2139)
+	- waiting to lock <4608c330> (a com.sun.mail.imap.IMAPFolder)
+	at com.sun.mail.imap.IMAPFolder.appendMessages(IMAPFolder.java:1142)
+	- locked <4608e5f8> (a java.lang.Object)
+	at javax.mail.Folder.copyMessages(Folder.java:1082)
+	at com.sun.mail.imap.IMAPFolder.copyMessages(IMAPFolder.java:1192)
+	- locked <43ea2dd8> (a com.sun.mail.imap.IMAPFolder)
+	at net.suberic.pooka.FolderInfo.copyMessages(FolderInfo.java:1063)
+	at net.suberic.pooka.VirtualFolderInfo.copyMessages(VirtualFolderInfo.java:162)
+	at net.suberic.pooka.MultiMessageInfo.copyMessage(MultiMessageInfo.java:79)
+	at net.suberic.pooka.gui.MessageProxy.copyMessage(MessageProxy.java:584)	at net.suberic.pooka.gui.MessageProxy$CopyAction.actionPerformed(MessageProxy.java:1052)
+	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
+	- locked <43a2fa38> (a java.lang.Object)
+
+Found 1 deadlock.
+
 *) disconnected from store (like if the server goes down) doesn't result in 
 icons changing?  test.
 
@@ -84,6 +94,9 @@ preview:
 
 *)  add documentation and online help.
 
+
+*) editors:  add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
+
 *)  fix up the error messages, and make sure that they look ok.
 
 *)  ?? if network connection goes down, pooka hangs on exit.
@@ -95,6 +108,17 @@ preview:
 	-- the MailFileSystemView doesn't seem to work at all (!)
 	-- up and down arrows while composing new messages.
 	-- ssl doesn't work.
+
+*) queuing of outgoing mails
+	todo on this:
+	*)  add some sort of an administrative api to the NetworkConnection
+		so that the application and the admin tools (the bottom right
+		config) don't have the same restrictions (or lack thereof).
+		 -- somewhat started with the new test address api.
+	*) make it so there is some way for the NetworkConnection to detect
+		whether or not it's up.
+			-- started.  make sure it's enough.
+
 
 *) fix the network connection test so that it doesn't hang if the
 	network is up, but the test host is unreachable.

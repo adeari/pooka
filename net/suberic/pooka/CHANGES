@@ -1,3 +1,11 @@
+added a disconnected icon so that it looks different if you're browsing
+messages in connected vs. disconnected imap.
+
+updated the NewAccountPooka so that you can set a better variety of choices
+during setup.
+
+added ssl support for pop3 folders.
+
 added Add buttons to many of the list choices in the configuration editors.
 makes it a lot easier to add all of the items that you want in the correct
 order.
