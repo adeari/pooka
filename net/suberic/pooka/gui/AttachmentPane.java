@@ -15,6 +15,9 @@ import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import java.awt.*;
 
+//import com.ice.jni.dde.JNIDDE;
+//import com.ice.jni.registry.*;
+
 /**
  * This class basically creates a visual list of the parts of a 
  * MimeMessage.
@@ -345,7 +348,34 @@ public class AttachmentPane extends JPanel {
 	    }
 	  }
 	} else {
-	  openWith();
+	    /*
+	  if (isWindows()) {
+	    try {
+	      JNIDDE dde=new JNIDDE();
+
+	      String extension = ".tmp";
+	      String filename = dh.getName();
+	      int dotLoc = filename.lastIndexOf('.');
+	      if (dotLoc > 0) {
+		  extension = filename.substring(dotLoc);
+	      }
+	      File tmpFile = File.createTempFile("pooka_", extension);
+	      
+	      FileOutputStream fos = new FileOutputStream(tmpFile);
+	      dh.writeTo(fos);
+	      fos.close();
+
+	      tmpFile.deleteOnExit();
+
+	      JNIDDE.shellExecute("open", tmpFile.getAbsolutePath(), null, tmpFile.getAbsoluteFile().getParent(), JNIDDE.SW_SHOWNORMAL);
+	    } catch (Throwable e) {
+		System.err.println("got exception " + e);
+		e.printStackTrace();
+		openWith();
+	    }
+	  } else {
+	    */
+	    openWith();
 	}
       }
     }
@@ -509,7 +539,14 @@ public class AttachmentPane extends JPanel {
     thread.start();
     
   }
-  
+
+  /**
+   * Returns whether or not we're running on a Windows platform.
+   */
+  public boolean isWindows() {
+    return (System.getProperty("os.name").toLowerCase().indexOf("windows") > -1);
+  }
+
   /**
    * This removes the Attachment from the message.
    */

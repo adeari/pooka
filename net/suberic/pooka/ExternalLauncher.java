@@ -59,6 +59,7 @@ public class ExternalLauncher implements CommandObject, Runnable {
 
       FileOutputStream fos = new FileOutputStream(tmpFile);
       dh.writeTo(fos);
+      fos.close();
       
       String fileHandler = Pooka.getProperty("ExternalLauncher.fileHandler." + java.io.File.separator, null);
       String wrapper = Pooka.getProperty("ExternalLauncher.cmdWrapper." + java.io.File.separator, null);

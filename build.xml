@@ -17,8 +17,9 @@
   <property name="javahelp_dist_cp" value="${importdir}/jh_dist.jar"/>
   <property name="mbox_cp" value="${importdir}/mbox.jar"/>
   <property name="kunststoff_cp" value="${importdir}/kunststoff.jar"/>
+  <property name="icejni_cp" value="${importdir}/icejni.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${javahelp_cp}:${mbox_cp}:${kunststoff_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${javahelp_cp}:${mbox_cp}:${kunststoff_cp}:${icejni_cp}"/> 
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -51,12 +52,18 @@
         <include name="**/*"/>
       </fileset>
     </copy>
+    <copy todir="${builddir}/net/suberic/util/gui/images">
+      <fileset dir="${sourcedir}/suberic/util/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
     <copy todir="${builddir}/org/javalobby/icons/20x20png">
       <fileset dir="${iconsdir}/javalobby/icons/20x20png">
         <include name="**/*"/>
       </fileset>
     </copy>
     <copy file="${sourcedir}/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+    <copy file="${importdir}/ICE_JNIDDE.dll" todir="${builddir}"/>
     <copy todir="${builddir}/net/suberic/pooka/doc">
       <fileset dir="${sourcedir}/suberic/pooka/doc"/>
     </copy>
@@ -92,6 +99,7 @@
       <zipfileset src="${mail_cp}"/>
       <zipfileset src="${mbox_cp}"/>
       <zipfileset src="${kunststoff_cp}"/>
+      <zipfileset src="${icejni_cp}"/>
     </jar>
   </target>
 
