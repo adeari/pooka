@@ -882,6 +882,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			if (Pooka.isDebug())
 			    System.out.println("checking for existence of message.");
 			mi = getMessageInfo(removedMessages[i]);
+			if (mi.getMessageProxy() != null)
+			    mi.getMessageProxy().close();
+
 			if (mi != null) {
 			    if (Pooka.isDebug())
 				System.out.println("message exists--removing");
