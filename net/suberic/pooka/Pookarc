@@ -59,6 +59,7 @@ Pooka.displayHtmlAsDefault.propertyType=Boolean
 
 Pooka.openFoldersOnConnect=true
 Pooka.openFoldersOnConnect.propertyType=Boolean
+Pooka.openFoldersInBackground=true
 
 Pooka.openSavedFoldersOnStartup=true
 Pooka.openSavedFoldersOnStartup.propertyType=Boolean

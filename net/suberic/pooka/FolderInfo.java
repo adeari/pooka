@@ -465,7 +465,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   
   private void doOpenFolders(FolderInfo fi, int mode) {
-    if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
+    if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
       final FolderInfo current = fi;
       final int finalMode = mode;
       getFolderThread().addToQueue(new javax.swing.AbstractAction() {
