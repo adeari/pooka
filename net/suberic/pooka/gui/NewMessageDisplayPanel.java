@@ -558,7 +558,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     return (NewMessageUI) getMessageUI();
   }
 
-    //------- Actions ----------//
+  /**
+   * Shows the current display of the encryption status.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() { 
+    return null;
+  }
+
+   //------- Actions ----------//
 
     /**
      * performTextAction grabs the focused component on the MessageDisplayPanel

@@ -155,9 +155,6 @@ public class MessageProxy {
   // whether this should be displayed as html, text, or raw RFC822.
   int displayMode = getDefaultDisplayMode();
 
-  // the current display of the encryption status.
-  CryptoStatusDisplay mCryptoStatusDisplay = null;
-
   // the default actions for this MessageProxy.
   public Action[] defaultActions = null;
   
@@ -538,14 +535,16 @@ public class MessageProxy {
 	  encryptStatus = CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY;
 	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
 	}
-	
-	CryptoStatusDisplay csd = getCryptoStatusDisplay();
+
+	MessageUI ui = getMessageUI();
+	if (ui != null) {
+	  
+	  CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
+
 	if (csd != null)
 	  csd.cryptoUpdated(sigStatus, encryptStatus);
-
-	if (getMessageUI() != null) {
 	  try {
-	    getMessageUI().refreshDisplay();
+	    ui.refreshDisplay();
 	  } catch (MessagingException me) {
 	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
 	  }
@@ -568,10 +567,10 @@ public class MessageProxy {
 	int sigStatus = 0;
 	int encryptStatus = 0;
 
-	CryptoStatusDisplay csd = getCryptoStatusDisplay();
-	if (csd != null) {
-	  // sigStatus -= csd.getSignatureStatus();
-	  // encryptStatus = csd.getEncryptionStatus();
+	CryptoStatusDisplay csd = null;
+	MessageUI ui = getMessageUI();
+	if (ui != null) {
+	  csd = ui.getCryptoStatusDisplay();
 	}
 
 	try {
@@ -581,7 +580,6 @@ public class MessageProxy {
 	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
 	    } else {
 	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
-	      
 	    }
 	  } else {
 	    sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.NOT_SIGNED;
@@ -613,13 +611,6 @@ public class MessageProxy {
     if (info != null) {
       
     }
-  }
-
-  /**
-   * Returns the CryptoStatusDisplay for this MessageProxy, if any.
-   */
-  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
-    return mCryptoStatusDisplay;
   }
 
   /**

@@ -460,6 +460,12 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     return Pooka.getUIFactory().createProgressDialog(min, max, initialValue, title, content);
   }
 
+  /**
+   * Shows the current display of the encryption status.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
+    return getMessageDisplay().getCryptoStatusDisplay();
+  }
   
   public void setBusy(boolean newValue) {
     // no-op here.

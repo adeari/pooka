@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
 import net.suberic.util.swing.*;
+import net.suberic.pooka.gui.crypto.CryptoStatusDisplay;
 import javax.swing.plaf.metal.MetalTheme;
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -51,6 +52,28 @@ public class ReadMessageFrame extends MessageFrame {
     
     toolbar.setActive(this.getActions());
     
+    // check to see if there are any DisplayStyleComboBoxes
+    // or CryptoStatusDisplays in the toolbar
+    java.awt.Component[] toolbarComponents = toolbar.getComponents();
+    for (int i = 0; i < toolbarComponents.length; i++) {
+      if (toolbarComponents[i] instanceof DisplayStyleComboBox) {
+	DisplayStyleComboBox dscb = (DisplayStyleComboBox) toolbarComponents[i];
+	if (dscb.displayStyle)
+	  ((ReadMessageDisplayPanel)messageDisplay).setDisplayCombo(dscb);
+
+	if (dscb.headerStyle)
+	  ((ReadMessageDisplayPanel)messageDisplay).setHeaderCombo(dscb);
+
+	dscb.styleUpdated(getMessageProxy().getDisplayMode(), getMessageProxy().getHeaderMode());
+      } else if (toolbarComponents[i] instanceof CryptoStatusDisplay) {
+	CryptoStatusDisplay cryptoDisplay = (CryptoStatusDisplay) toolbarComponents[i];
+	((ReadMessageDisplayPanel)messageDisplay).setCryptoStatusDisplay(cryptoDisplay);
+	MessageCryptoInfo cryptoInfo = getMessageProxy().getMessageInfo().getCryptoInfo();
+	if (cryptoInfo != null)
+	  cryptoDisplay.cryptoUpdated(cryptoInfo);
+      }
+    }
+
     this.setLocation(source.getLocationOnScreen());
     
     configureInterfaceStyle();

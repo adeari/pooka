@@ -323,11 +323,11 @@ MessageWindowToolbar.Crypto.class=net.suberic.pooka.gui.crypto.CryptoButton
 MessageWindowToolbar.Crypto.notEncrypted.Image=/org/javalobby/icons/20x20png/Book.png
 MessageWindowToolbar.Crypto.uncheckedEncrypted.Image=/org/javalobby/icons/20x20png/Lock.png
 MessageWindowToolbar.Crypto.decryptedSuccessfully.Image=/org/javalobby/icons/20x20png/UnLock.png
-MessageWindowToolbar.Crypto.decryptedUnsuccessfully.Image=/org/javalobby/icons/20x20png/Lock.png
+MessageWindowToolbar.Crypto.decryptedUnsuccessfully.Image=/org/javalobby/icons/20x20png/Delete.png
 MessageWindowToolbar.Crypto.uncheckedSigned.Image=/org/javalobby/icons/20x20png/CheckAll.png
-MessageWindowToolbar.Crypto.signatureVerified.Image=/org/javalobby/icons/20x20png/Lock.png
-MessageWindowToolbar.Crypto.signatureBad.Image=/org/javalobby/icons/20x20png/UnLock.png
-MessageWindowToolbar.Crypto.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/UnLock.png
+MessageWindowToolbar.Crypto.signatureVerified.Image=/org/javalobby/icons/20x20png/TrafficGreen.png
+MessageWindowToolbar.Crypto.signatureBad.Image=/org/javalobby/icons/20x20png/Delete.png
+MessageWindowToolbar.Crypto.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/Delete.png
 
 FolderPanel.2xClickAction=file-open
 

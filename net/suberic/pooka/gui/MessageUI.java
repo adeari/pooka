@@ -24,4 +24,11 @@ public interface MessageUI extends UserProfileContainer, ErrorHandler, ActionCon
   public void setEnabled(boolean newValue);
 
   public void refreshDisplay() throws javax.mail.MessagingException;
+
+  /**
+   * Shows the current display of the encryption status.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay();
+
+
 }

@@ -219,8 +219,17 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
   /**
    * Updates the encryption information.
    */
+  public void cryptoUpdated(net.suberic.pooka.MessageCryptoInfo cryptoInfo) {
+
+  }
+
+  /**
+   * Updates the encryption information.
+   */
   public void cryptoUpdated(int newSignatureStatus, int newEncryptionStatus) {
     currentStatus = newEncryptionStatus;
+
+    System.err.println("currentStatus = " + currentStatus);
 
     if (currentStatus == NOT_ENCRYPTED) {
       setIcon(notEncryptedIcon);
@@ -241,6 +250,8 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
     } else {
       setIcon(notEncryptedIcon);
     }
+
+    repaint();
   }
 }
     

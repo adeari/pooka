@@ -1,4 +1,15 @@
 *) add pgp/gpg support.
+features:
+  show status:  encrypted/unchecked, unencrypted, not encrypted
+	        signed/unchecked, signed/failed, signed/checked, encrypted
+  pgp&smime encrypt, decrypt, sign, check sig, sign&encrypt
+  add keys from incoming emails
+  use default key (for signing, reading - default private; for sending, 
+		   default public by email address (?) -- also overridable,
+		   though.)
+  auto check sig
+  auto decrypt
+  auto encrypt
 bugs:
   -- started.  todo on api:
        	- key management
@@ -8,6 +19,7 @@ bugs:
 	- fix signature
 	- check signed vs. encrypted.
 -- todo on pooka
+	- no crypto status display in preview pane mode.
 	- check keys--they seem to not all work.  make sure that all 
 	  available keys work, and that only keys that work are available?
 	- check decryption.  doesn't seem to work.

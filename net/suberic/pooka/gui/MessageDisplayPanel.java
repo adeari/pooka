@@ -58,6 +58,12 @@ public abstract class MessageDisplayPanel extends JPanel {
   public abstract void configureMessageDisplay() throws MessagingException;
 
   /**
+   * Shows the current display of the encryption status.
+   */
+  public abstract net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay();
+
+
+  /**
    * Shows a dialog that asks for a String (ok, actually a regexp) to
    * search for, then searches for it.
    */
@@ -221,7 +227,7 @@ public abstract class MessageDisplayPanel extends JPanel {
       jep.setFont(f);
     
   }
-  
+
   /**
    * This sets the size of the MessageDisplayPanel to a reasonable
    * default value.

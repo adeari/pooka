@@ -65,8 +65,7 @@ public class MessageCryptoInfo {
   public boolean isSigned() throws MessagingException {
     EncryptionUtils utils = getEncryptionUtils();
     if (utils != null) {
-      // FIXME 
-      return true;
+      return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.SIGNED);
     } else
       return false;
   }
@@ -77,8 +76,7 @@ public class MessageCryptoInfo {
   public boolean isEncrypted() throws MessagingException {
     EncryptionUtils utils = getEncryptionUtils();
     if (utils != null) {
-      // FIXME
-      return true;
+      return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
     } else
       return false;
   }

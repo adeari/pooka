@@ -17,5 +17,10 @@ public interface CryptoStatusDisplay {
    */
   public void cryptoUpdated(int newSignatureStatus, int newEncryptionStatus);
 
+  /**
+   * Updates the encryption information.
+   */
+  public void cryptoUpdated(net.suberic.pooka.MessageCryptoInfo cryptoInfo);
+
 }
     

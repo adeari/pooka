@@ -28,7 +28,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   protected ConfigurableMenuBar menuBar;
   
   protected javax.swing.plaf.metal.MetalTheme currentTheme = null;
-  
+
   /**
    * Creates a MessageFrame from the given Message.
    */
@@ -270,6 +270,13 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
    */
   public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
     return new ProgressDialogImpl(min, max, initialValue, title, content);
+  }
+
+  /**
+   * Shows the current display of the encryption status.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
+    return getMessageDisplay().getCryptoStatusDisplay();
   }
 
 

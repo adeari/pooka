@@ -27,6 +27,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
   private DisplayStyleComboBox displayCombo = null;
   private DisplayStyleComboBox headerCombo = null;
+  private net.suberic.pooka.gui.crypto.CryptoStatusDisplay cryptoStatusDisplay = null;
 
   Action[] defaultActions = new Action[] {
     new AttachmentPanelAction(),
@@ -436,6 +437,19 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     headerCombo = dscb;
   }
 
+  /**
+   * Shows the current display of the encryption status.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
+    return cryptoStatusDisplay;
+  }
+
+  /**
+   * Sets the current display of the encryption status.
+   */
+  public void setCryptoStatusDisplay( net.suberic.pooka.gui.crypto.CryptoStatusDisplay newDisplay) {
+    cryptoStatusDisplay = newDisplay;
+  }
 
   /**
    * Returns the current EditorPane being used.

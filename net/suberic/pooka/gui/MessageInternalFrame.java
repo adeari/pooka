@@ -285,6 +285,15 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   }
 
   /**
+   * Shows the current display of the encryption status.
+   */
+  public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() {
+    return getMessageDisplay().getCryptoStatusDisplay();
+  }
+
+
+
+  /**
    * As specified by interface net.suberic.pooka.gui.MessageUI.
    * 
    * This implementation sets the cursor to either Cursor.WAIT_CURSOR
