@@ -88,6 +88,10 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
 	
 	if (vars.getProperty(menuID + "." + menuItemID + ".class", "") == "") {
 	
+	    if (vars.getProperty(menuID + "." + menuItemID, "") != "") {
+		return new ConfigurableMenu(menuID + "." + menuItemID, vars);
+	    } 
+
 	    JMenuItem mi;
 	    try {
 		mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
