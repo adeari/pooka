@@ -197,7 +197,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    tmpFolder = null;
 		} else {
 		    tmpParentFolder = parentFolder.getFolder();
-		    tmpFolder = tmpParentFolder.list(folderName);
+		    if (tmpParentFolder != null)
+			tmpFolder = tmpParentFolder.list(folderName);
+		    else
+			tmpFolder = null;
 		}
 	    }
 	    if (tmpFolder != null && tmpFolder.length > 0) {
