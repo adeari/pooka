@@ -1,16 +1,13 @@
+*) add support for running without any local files.
+	-- support for http: access?
+
+*) check:  if a folder realizes that it has become disconnected, it should
+	test to see if the store in general has disconnected.
+
 *) start up disconnected.  connect.  have filters.  get error:
    class javax.mail.MessagingException: Proxy.
         at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:357)
         at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:385)
-
-*) add support for running without any local files.
-   *) diskless pop support (?)
-   *) no caching imap
-   *) no address book
-   *) no .pooka directory
-
-*) check:  if a folder realizes that it has become disconnected, it should
-	test to see if the store in general has disconnected.
 
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together
@@ -29,11 +26,11 @@
 
 *) add "view pookarc"
 
+*) add console?
+
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
 	message.  read it.  disconnect there.  get a few new messages.
 	reconnect from original pooka.
-
-*) add console?
 
 ------
 

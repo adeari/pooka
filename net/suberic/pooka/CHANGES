@@ -1,3 +1,6 @@
+if a folder becomes disconnected, we now pre-emptively check the store to
+see if it's connected.
+
 030613 release
 --------------
 fixed a bug where reopening a pop folder could result in a StackOverflowError.

@@ -25,58 +25,72 @@ public class VariableBundle extends Object {
   private Hashtable VCListeners = new Hashtable();
   private Hashtable VCGlobListeners = new Hashtable();
     
-    public VariableBundle(InputStream propertiesFile, String resourceFile, VariableBundle newParentProperties) {
-	
-	writableProperties = new Properties();
-
-	if (resourceFile != null) 
-	    try {
-		resources = ResourceBundle.getBundle(resourceFile, Locale.getDefault());
-	    } catch (MissingResourceException mre) {
-		System.err.println("Error loading resource " + mre.getClassName() + mre.getKey() + ":  trying default locale.");
-		try {
-		    resources = ResourceBundle.getBundle(resourceFile, Locale.US);
-		} catch (MissingResourceException mreTwo){ 
-		    System.err.println("Unable to load default (US) resource bundle; exiting.");
-		    System.exit(1);
-		}
-	    }
-	else
-	    resources=null;
-	
-	properties = new Properties();
-
-	if (propertiesFile != null) 
-	    try {
-		properties.load(propertiesFile);
-	    } catch (java.io.IOException ioe) {
-		System.err.println(ioe.getMessage() + ":  " + propertiesFile);
-	    }
-	
-	parentProperties = newParentProperties;
-
-    }
-
+  public VariableBundle(InputStream propertiesFile, String resourceFile, VariableBundle newParentProperties) {
+    configure(propertiesFile, resourceFile, newParentProperties);
+  }
+  
   public VariableBundle(File propertiesFile, VariableBundle newParentProperties) throws java.io.FileNotFoundException {
-    this(new FileInputStream(propertiesFile), newParentProperties);
+    FileInputStream fis = new FileInputStream(propertiesFile);
+    configure(fis, null, newParentProperties);
+    try {
+      fis.close();
+    } catch (java.io.IOException ioe) {
+    }
     saveFile = propertiesFile;
     
   }
     
-    public VariableBundle(InputStream propertiesFile, String resourceFile) {
-	this(propertiesFile, resourceFile, null);
-    }
-
-    public VariableBundle(InputStream propertiesFile, VariableBundle newParentProperties) {
-	this(propertiesFile, null, newParentProperties);
-    }
-
+  public VariableBundle(InputStream propertiesFile, String resourceFile) {
+    this(propertiesFile, resourceFile, null);
+  }
+  
+  public VariableBundle(InputStream propertiesFile, VariableBundle newParentProperties) {
+    this(propertiesFile, null, newParentProperties);
+  }
+  
   public VariableBundle(Properties editableProperties, VariableBundle newParentProperties) {
     writableProperties = editableProperties;
     parentProperties = newParentProperties;
     properties = new Properties();
     resources = null;
   }
+
+  /**
+   * Configures the VariableBundle.
+   */
+  protected void configure(InputStream propertiesFile, String resourceFile, VariableBundle newParentProperties) {
+
+    writableProperties = new Properties();
+    
+    if (resourceFile != null) 
+      try {
+	resources = ResourceBundle.getBundle(resourceFile, Locale.getDefault());
+      } catch (MissingResourceException mre) {
+	System.err.println("Error loading resource " + mre.getClassName() + mre.getKey() + ":  trying default locale.");
+	try {
+	  resources = ResourceBundle.getBundle(resourceFile, Locale.US);
+	} catch (MissingResourceException mreTwo){ 
+	  System.err.println("Unable to load default (US) resource bundle; exiting.");
+	  System.exit(1);
+	}
+      }
+    else
+      resources=null;
+    
+    properties = new Properties();
+    
+    if (propertiesFile != null) 
+      try {
+	properties.load(propertiesFile);
+      } catch (java.io.IOException ioe) {
+	System.err.println(ioe.getMessage() + ":  " + propertiesFile);
+      }
+    
+    parentProperties = newParentProperties;
+    
+
+  }
+
   public String getProperty(String key, String defaultValue) {
     String returnValue;
     
@@ -352,216 +366,216 @@ public class VariableBundle extends Object {
     return outBuffer.toString();
   }
 
-    /*
-     * Converts unicodes to encoded &#92;uxxxx
-     * and writes out any of the characters in specialSaveChars
-     * with a preceding slash
-     *
-     * ripped directly from java.util.Properties; hope they don't mind.
-     */
-    private String saveConvert(String theString, boolean escapeSpace) {
-        int len = theString.length();
-        StringBuffer outBuffer = new StringBuffer(len*2);
-
-        for(int x=0; x<len; x++) {
-            char aChar = theString.charAt(x);
-            switch(aChar) {
-		case ' ':
-		    if (x == 0 || escapeSpace) 
-			outBuffer.append('\\');
-
-		    outBuffer.append(' ');
-		    break;
-                case '\\':outBuffer.append('\\'); outBuffer.append('\\');
-                          break;
-                case '\t':outBuffer.append('\\'); outBuffer.append('t');
-                          break;
-                case '\n':outBuffer.append('\\'); outBuffer.append('n');
-                          break;
-                case '\r':outBuffer.append('\\'); outBuffer.append('r');
-                          break;
-                case '\f':outBuffer.append('\\'); outBuffer.append('f');
-                          break;
-                default:
-                    if ((aChar < 0x0020) || (aChar > 0x007e)) {
-                        outBuffer.append('\\');
-                        outBuffer.append('u');
-                        outBuffer.append(toHex((aChar >> 12) & 0xF));
-                        outBuffer.append(toHex((aChar >>  8) & 0xF));
-                        outBuffer.append(toHex((aChar >>  4) & 0xF));
-                        outBuffer.append(toHex( aChar        & 0xF));
-                    } else {
-                        if (specialSaveChars.indexOf(aChar) != -1)
-                            outBuffer.append('\\');
-                        outBuffer.append(aChar);
-                    }
-            }
-        }
-        return outBuffer.toString();
-    }
-
-    /**
-     * Escapes whitespace in a string by putting a '\' in front of each
-     * whitespace character.
-     */
-    public String escapeWhiteSpace(String sourceString) {
-      /*
-	char[] origString = sourceString.toCharArray();
-	StringBuffer returnString = new StringBuffer();
-	for (int i = 0; i < origString.length; i++) {
-	    char currentChar = origString[i];
-	    if (Character.isWhitespace(currentChar) || '\\' == currentChar)
-	      returnString.append('\\');
-	      
-	    returnString.append(currentChar);
+  /*
+   * Converts unicodes to encoded &#92;uxxxx
+   * and writes out any of the characters in specialSaveChars
+   * with a preceding slash
+   *
+   * ripped directly from java.util.Properties; hope they don't mind.
+   */
+  private String saveConvert(String theString, boolean escapeSpace) {
+    int len = theString.length();
+    StringBuffer outBuffer = new StringBuffer(len*2);
+    
+    for(int x=0; x<len; x++) {
+      char aChar = theString.charAt(x);
+      switch(aChar) {
+      case ' ':
+	if (x == 0 || escapeSpace) 
+	  outBuffer.append('\\');
+	
+	outBuffer.append(' ');
+	break;
+      case '\\':outBuffer.append('\\'); outBuffer.append('\\');
+	break;
+      case '\t':outBuffer.append('\\'); outBuffer.append('t');
+	break;
+      case '\n':outBuffer.append('\\'); outBuffer.append('n');
+	break;
+      case '\r':outBuffer.append('\\'); outBuffer.append('r');
+	break;
+      case '\f':outBuffer.append('\\'); outBuffer.append('f');
+	break;
+      default:
+	if ((aChar < 0x0020) || (aChar > 0x007e)) {
+	  outBuffer.append('\\');
+	  outBuffer.append('u');
+	  outBuffer.append(toHex((aChar >> 12) & 0xF));
+	  outBuffer.append(toHex((aChar >>  8) & 0xF));
+	  outBuffer.append(toHex((aChar >>  4) & 0xF));
+	  outBuffer.append(toHex( aChar        & 0xF));
+	} else {
+	  if (specialSaveChars.indexOf(aChar) != -1)
+	    outBuffer.append('\\');
+	  outBuffer.append(aChar);
 	}
-
-	return returnString.toString();
-      */
-      return saveConvert(sourceString, true);
+      }
     }
-
+    return outBuffer.toString();
+  }
+  
+  /**
+   * Escapes whitespace in a string by putting a '\' in front of each
+   * whitespace character.
+   */
+  public String escapeWhiteSpace(String sourceString) {
+    /*
+      char[] origString = sourceString.toCharArray();
+      StringBuffer returnString = new StringBuffer();
+      for (int i = 0; i < origString.length; i++) {
+      char currentChar = origString[i];
+      if (Character.isWhitespace(currentChar) || '\\' == currentChar)
+      returnString.append('\\');
+      
+      returnString.append(currentChar);
+      }
+      
+      return returnString.toString();
+    */
+    return saveConvert(sourceString, true);
+  }
+  
   /**
    * resolves a whitespace-escaped string.
    */
   public String unEscapeString(String sourceString) {
     return loadConvert(sourceString);
   }
-
-    /**
-     * Clears the removeList.  This should generally be called after
-     * you do a writeProperties();
-     */
-    public void clearRemoveList() {
-	removeList.clear();
+  
+  /**
+   * Clears the removeList.  This should generally be called after
+   * you do a writeProperties();
+   */
+  public void clearRemoveList() {
+    removeList.clear();
+  }
+  
+  /**
+   * This removes the property from the currently VariableBundle.  This
+   * is different than setting the value to "" (or null) in that, if the
+   * property is removed, it is removed from the source property file.
+   */
+  public void removeProperty(String remProp) {
+    if (! propertyIsRemoved(remProp))
+      removeList.add(remProp);
+  }
+  
+  /**
+   * Removes a property from the removeList.  Only necessary if a property
+   * had been removed since the last save, and now has been set to a new
+   * value.  It's probably a good idea, though, to call this method any
+   * time a property has its value set.
+   */
+  public void unRemoveProperty(String unRemProp) {
+    for (int i = removeList.size() -1 ; i >= 0; i--) {
+      if (((String)removeList.elementAt(i)).equals(unRemProp))
+	removeList.removeElementAt(i);
     }
-
-    /**
-     * This removes the property from the currently VariableBundle.  This
-     * is different than setting the value to "" (or null) in that, if the
-     * property is removed, it is removed from the source property file.
-     */
-    public void removeProperty(String remProp) {
-	if (! propertyIsRemoved(remProp))
-	    removeList.add(remProp);
+  }
+  
+  /**
+   * Returns true if the property is in the removeList for this
+   * VariableBundle.
+   */
+  public boolean propertyIsRemoved(String prop) {
+    if (removeList.size() < 1)
+      return false;
+    
+    for (int i = 0; i < removeList.size(); i++) {
+      if (((String)removeList.elementAt(i)).equals(prop))
+	return true;
     }
-
-    /**
-     * Removes a property from the removeList.  Only necessary if a property
-     * had been removed since the last save, and now has been set to a new
-     * value.  It's probably a good idea, though, to call this method any
-     * time a property has its value set.
-     */
-    public void unRemoveProperty(String unRemProp) {
-	for (int i = removeList.size() -1 ; i >= 0; i--) {
-	    if (((String)removeList.elementAt(i)).equals(unRemProp))
-		removeList.removeElementAt(i);
-	}
-    }
-
-    /**
-     * Returns true if the property is in the removeList for this
-     * VariableBundle.
-     */
-    public boolean propertyIsRemoved(String prop) {
-	if (removeList.size() < 1)
-	    return false;
-	
-	for (int i = 0; i < removeList.size(); i++) {
-	    if (((String)removeList.elementAt(i)).equals(prop))
-		return true;
-	}
-
-	return false;
-    }
-
-    /**
-     * This notifies all registered listeners for changedValue that its
-     * value has changed.
-     */
-    public void fireValueChanged(String changedValue) {
-      // only notify each listener once.
-      Set notified = new HashSet();
-
-      Vector listeners = (Vector)VCListeners.get(changedValue);
-      if (listeners != null && listeners.size() > 0) {
-	for (int i=0; i < listeners.size(); i++) {
-	  ((ValueChangeListener)listeners.elementAt(i)).valueChanged(changedValue);
-	  notified.add(listeners.elementAt(i));
-	}
-      }	    
-
-      // now add the glob listeners.
-
-      Enumeration keys = VCGlobListeners.keys();
-      while (keys.hasMoreElements()) {
-	String currentPattern = (String) keys.nextElement();
-	if (changedValue.startsWith(currentPattern)) {
-	  Vector globListeners = (Vector) VCGlobListeners.get(currentPattern);
-	  if (globListeners != null && globListeners.size() > 0) {
-	    for (int i = 0; i < globListeners.size(); i++) {
-	      ValueChangeListener currentListener = ((ValueChangeListener)globListeners.elementAt(i));
-	      if (!notified.contains(currentListener)) {
-		currentListener.valueChanged(changedValue);
-		notified.add(currentListener);
-	      }
+    
+    return false;
+  }
+  
+  /**
+   * This notifies all registered listeners for changedValue that its
+   * value has changed.
+   */
+  public void fireValueChanged(String changedValue) {
+    // only notify each listener once.
+    Set notified = new HashSet();
+    
+    Vector listeners = (Vector)VCListeners.get(changedValue);
+    if (listeners != null && listeners.size() > 0) {
+      for (int i=0; i < listeners.size(); i++) {
+	((ValueChangeListener)listeners.elementAt(i)).valueChanged(changedValue);
+	notified.add(listeners.elementAt(i));
+      }
+    }	    
+    
+    // now add the glob listeners.
+    
+    Enumeration keys = VCGlobListeners.keys();
+    while (keys.hasMoreElements()) {
+      String currentPattern = (String) keys.nextElement();
+      if (changedValue.startsWith(currentPattern)) {
+	Vector globListeners = (Vector) VCGlobListeners.get(currentPattern);
+	if (globListeners != null && globListeners.size() > 0) {
+	  for (int i = 0; i < globListeners.size(); i++) {
+	    ValueChangeListener currentListener = ((ValueChangeListener)globListeners.elementAt(i));
+	    if (!notified.contains(currentListener)) {
+	      currentListener.valueChanged(changedValue);
+	      notified.add(currentListener);
 	    }
 	  }
 	}
       }
-
     }
-
-    /**
-     * This adds the ValueChangeListener to listen for changes in the 
-     * given property.
-     */
-    public void addValueChangeListener(ValueChangeListener vcl, String property) {
-      if (property.endsWith("*")) {
-	String startProperty = property.substring(0, property.length() - 1);
-	Vector listeners = (Vector)VCGlobListeners.get(startProperty);
-	if (listeners == null) {
-	  listeners = new Vector();
-	  listeners.add(vcl);
-	  VCGlobListeners.put(startProperty, listeners);
-	} else {
-	  if (!listeners.contains(vcl)) 
-	    listeners.add(vcl);
-	}
-
+    
+  }
+  
+  /**
+   * This adds the ValueChangeListener to listen for changes in the 
+   * given property.
+   */
+  public void addValueChangeListener(ValueChangeListener vcl, String property) {
+    if (property.endsWith("*")) {
+      String startProperty = property.substring(0, property.length() - 1);
+      Vector listeners = (Vector)VCGlobListeners.get(startProperty);
+      if (listeners == null) {
+	listeners = new Vector();
+	listeners.add(vcl);
+	VCGlobListeners.put(startProperty, listeners);
       } else {
-	Vector listeners = (Vector)VCListeners.get(property);
-	if (listeners == null) {
-	  listeners = new Vector();
+	if (!listeners.contains(vcl)) 
 	  listeners.add(vcl);
-	  VCListeners.put(property, listeners);
-	} else {
-	  if (!listeners.contains(vcl)) 
-	    listeners.add(vcl);
-	}
+      }
+      
+    } else {
+      Vector listeners = (Vector)VCListeners.get(property);
+      if (listeners == null) {
+	listeners = new Vector();
+	listeners.add(vcl);
+	VCListeners.put(property, listeners);
+      } else {
+	if (!listeners.contains(vcl)) 
+	  listeners.add(vcl);
       }
     }
-		
-    /**
-     * This removes the given ValueChangeListener for all the values that
-     * it's listening to.
-     */
-    public void removeValueChangeListener(ValueChangeListener vcl) {
-      Enumeration keys = VCListeners.keys();
-      Vector currentListenerList;
-      while (keys.hasMoreElements()) {
-	currentListenerList = (Vector)VCListeners.get(keys.nextElement());
-	while (currentListenerList.contains(vcl))
-	  currentListenerList.remove(vcl);
-      }
-
-      keys = VCGlobListeners.keys();
-      while (keys.hasMoreElements()) {
-	currentListenerList = (Vector)VCGlobListeners.get(keys.nextElement());
-	while (currentListenerList.contains(vcl))
-	  currentListenerList.remove(vcl);
-      }
+  }
+  
+  /**
+   * This removes the given ValueChangeListener for all the values that
+   * it's listening to.
+   */
+  public void removeValueChangeListener(ValueChangeListener vcl) {
+    Enumeration keys = VCListeners.keys();
+    Vector currentListenerList;
+    while (keys.hasMoreElements()) {
+      currentListenerList = (Vector)VCListeners.get(keys.nextElement());
+      while (currentListenerList.contains(vcl))
+	currentListenerList.remove(vcl);
     }
+    
+    keys = VCGlobListeners.keys();
+    while (keys.hasMoreElements()) {
+      currentListenerList = (Vector)VCGlobListeners.get(keys.nextElement());
+      while (currentListenerList.contains(vcl))
+	currentListenerList.remove(vcl);
+    }
+  }
 
   /**
    * Convert a nibble to a hex character
@@ -583,6 +597,20 @@ public class VariableBundle extends Object {
   private static final String specialSaveChars = "=: \t\r\n\f#!";
   
   private static final String whiteSpaceChars = " \t\r\n\f";
+
+  /**
+   * Returns the current saveFile.
+   */
+  public File getSaveFile() {
+    return saveFile;
+  }
+
+  /**
+   * Sets the save file.
+   */
+  public void setSaveFile(File newFile) {
+    saveFile = newFile;
+  }
 }
 
 

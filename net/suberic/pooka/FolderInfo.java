@@ -346,25 +346,35 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       fireConnectionEvent(e);
     }
     
-    public void disconnected(ConnectionEvent e) {
-      synchronized(this) {
-	if (Pooka.isDebug()) {
-	  System.out.println("Folder " + getFolderID() + " disconnected.");
-	  Thread.dumpStack();
-	}
-	
-	if (getFolderDisplayUI() != null) {
-	  if (status != CLOSED)
-	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
-	}
-	
-	if (status == CONNECTED) {
-	  setStatus(LOST_CONNECTION);
+  public void disconnected(ConnectionEvent e) {
+    synchronized(this) {
+      if (Pooka.isDebug()) {
+	System.out.println("Folder " + getFolderID() + " disconnected.");
+	Thread.dumpStack();
+      }
+
+      // check to see if the parent store is still open.
+      StoreInfo parentStoreInfo = getParentStore();
+      if (parentStoreInfo != null) {
+	Store realParentStore = parentStoreInfo.getStore();
+
+	if (realParentStore != null) {
+	  realParentStore.isConnected();
 	}
       }
-      fireConnectionEvent(e);
+      
+      if (getFolderDisplayUI() != null) {
+	if (status != CLOSED)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
+      }
+      
+      if (status == CONNECTED) {
+	setStatus(LOST_CONNECTION);
+      }
     }
-
+    fireConnectionEvent(e);
+  }
+  
 
    /**
      * Invoked when a Store/Folder/Transport is opened.
