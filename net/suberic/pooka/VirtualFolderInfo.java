@@ -255,9 +255,11 @@ public class VirtualFolderInfo extends FolderInfo {
     }
 
     public StoreInfo getParentStore() {
-
 	return null;
+    }
 
+    public String getFolderDisplayName() {
+	return Pooka.getProperty("title.searchResults", "Seach Results");
     }
 
     public String getFolderID() {

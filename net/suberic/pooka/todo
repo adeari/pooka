@@ -2,11 +2,8 @@ beta 1
 ---------------
 
 search: 
-add support for nested searches.
 add support for incoming message filter
 add support for message display filter
-fix display name of search window
-fix search window removal of deleted messages.
 
 *) check:  see how outgoing and incoming mail handle tab characters.
 	-- a little bit of a bug, but not too much.  should probably

@@ -90,8 +90,17 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    new ActionWrapper(new ExpungeAction(), displayedFolder.getFolderThread()),
 	    new NextMessageAction(),
 	    new PreviousMessageAction(),
-	    new GotoMessageAction()
+	    new GotoMessageAction(),
+	    new SearchAction()
 		};
+    }
+
+    /**
+     * Searches the underlying FolderInfo's messages for messages matching
+     * the search term.
+     */
+    public void searchFolder() {
+	getFolderInfo().showSearchFolder();
     }
 
     /**
@@ -454,6 +463,17 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	
         public void actionPerformed(ActionEvent e) {
 	    getFolderStatusBar().activateGotoDialog();
+	}
+    }
+
+    public class SearchAction extends AbstractAction {
+
+	SearchAction() {
+	    super("folder-search");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    searchFolder();
 	}
     }
 }
