@@ -143,8 +143,11 @@ public class MailUtilities {
 	      bundle.addAll(parseAttachments(mp));
 	    }
 	  }
-	} else {
+	} else if (m.getContent() instanceof Multipart) {
 	  bundle.addAll(parseAttachments((Multipart)m.getContent()));
+	} else {
+	  Attachment attachment = new Attachment((MimeMessage)m);
+	  bundle.getAttachments().add(attachment);
 	}
       } else if (contentType.startsWith("text")) {
 	Attachment attachment = new Attachment((MimeMessage)m);
@@ -217,9 +220,12 @@ public class MailUtilities {
 		bundle.addAll(parseAttachments(amp));
 	      }
 	    }
-	  } else {
+	  } else if (mbp.getContent() instanceof Multipart) {
 	    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
-	    }
+	  } else {
+	    Attachment attachment = new Attachment(mbp);
+	    bundle.getAttachments().add(attachment);
+	  }
 	} else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
 	  bundle.getAttachments().add(new Attachment(mbp));
 	  Object msgContent;
