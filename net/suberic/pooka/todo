@@ -20,12 +20,22 @@ have nothing new in your inbox because it hasn't been d/l'ed yet.
 
 *) incorrect number of messages/unread messages when in disconnected mode.
 
+*) check reading uncached messages; it should happen that if you try to
+read an uncached message twice in a row, you should get the same error
+message.
+
+*) get rid of the 'comparing new messages...' status message after you're
+	done!
+
+*) check to see what happens when we lose our connection before all of
+	the messages are loaded (esp. before the tableinfos are loaded)
+
+*) add a POOKA_HOME option.
+
 ---
 
 *) make it so the connection objects actually have a clue as to whether
 or not they're actually connected, instead of relying on the user.
-
-*) https:// url's don't get highlighted
 
 *) preview pane:  make it so the status bar is at the bottom, underneath
 	the readmessagedisplaypanel--or possibly on the status pane.

@@ -5,35 +5,58 @@ import javax.swing.*;
 import java.util.Vector;
 
 public class Pooka {
+
+  // globals
+
+  // the resources for Pooka
   static public net.suberic.util.VariableBundle resources;
-  static public String localrc;
-  static public DateFormatter dateFormatter;
+
+  // the startup/configuration file
+  static public String localrc = null;
+
+  // mail globals
+  static public javax.mail.Session defaultSession;
   static public javax.activation.CommandMap mailcap;
   static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
-  static public net.suberic.pooka.gui.MainPanel panel;
+  static public javax.mail.Authenticator defaultAuthenticator = null;
+
+  // the DateFormatter, which we cache for convenience.
+  static public DateFormatter dateFormatter;
+
+  // threads
+  static public net.suberic.util.thread.ActionThread searchThread = null;
+  static public net.suberic.pooka.thread.FolderTracker folderTracker;
+
+  // Pooka managers and factories
+  static public AddressBookManager addressBookManager = null;
+  static public StoreManager storeManager;
+  static public PookaUIFactory uiFactory;
   static public SearchTermManager searchManager;
   static public NetworkConnectionManager connectionManager;
   static public OutgoingMailServerManager outgoingMailManager;
 
-  static public javax.mail.Session defaultSession;
-  static public net.suberic.pooka.thread.FolderTracker folderTracker;
-  
-  static public StoreManager storeManager;
-  
-  static public PookaUIFactory uiFactory;
-  
-  static public boolean openFolders = true;
-  
-  static public javax.mail.Authenticator defaultAuthenticator = null;
-  
-  static public net.suberic.util.thread.ActionThread searchThread = null;
+  // the main Pooka panel.
+  static public net.suberic.pooka.gui.MainPanel panel;
 
-  static public AddressBookManager addressBookManager = null;
-  
+  // settings
+  static public boolean openFolders = true;
+  static public String pookaHome = null;
+
+  /**
+   * Runs Pooka.  Takes the following arguments:
+   *
+   * -nf 
+   * --noOpenSavedFolders    don't open saved folders on startup.
+   * 
+   * -rc <filename>
+   * --rcfile <filename>     use the given file as the pooka startup file.
+   */
   static public void main(String argv[]) {
     parseArgs(argv);
     
-    localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
+    // if localrc hasn't been set, use the user's home directory.
+    if (localrc == null)
+      localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
     
     try {
       resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka"));
@@ -46,13 +69,14 @@ public class Pooka {
     java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
 
     try {
-	UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
-    } catch (Exception e) { System.out.println("Cannot set look and feel..."); }
-
+      UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
+    } catch (Exception e) { System.out.println("Cannot set look and feel...");
+    }
+    
     addressBookManager = new AddressBookManager();
-
+    
     connectionManager = new NetworkConnectionManager();
-
+    
     outgoingMailManager = new OutgoingMailServerManager();
 
     dateFormatter = new DateFormatter();
@@ -154,26 +178,56 @@ public class Pooka {
       if (argv[i] != null) {
 	if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders"))
 	  openFolders = false;
+	
+	
+	if (argv[i].equals("-rc") || argv[i].equals("--rcfile")) {
+	  String filename = argv[++i];
+	  if (filename == null) {
+	    System.err.println("error:  no startup file specified.");
+	    System.err.println("Usage:  java net.suberic.pooka.Pooka [-rc <filename>]");
+	    System.exit(-1);
+	  }
+
+	  localrc = filename;
+	}
       }
     }
   }
   
+  /**
+   * Convenience method for getting Pooka configuration properties.  Calls
+   * getResources().getProperty(propName, defVal).
+   */
   static public String getProperty(String propName, String defVal) {
     return (resources.getProperty(propName, defVal));
   }
   
+  /**
+   * Convenience method for getting Pooka configuration properties.  Calls
+   * getResources().getProperty(propName).
+   */
   static public String getProperty(String propName) {
     return (resources.getProperty(propName));
   }
   
+  /**
+   * Convenience method for setting Pooka configuration properties.  Calls
+   * getResources().setProperty(propName, propValue).
+   */
   static public void setProperty(String propName, String propValue) {
     resources.setProperty(propName, propValue);
   }
   
+  /**
+   * Returns the VariableBundle which provides all of the Pooka resources.
+   */
   static public net.suberic.util.VariableBundle getResources() {
     return resources;
   }
   
+  /**
+   * Returns whether or not debug is enabled for this Pooka instance.
+   */
   static public boolean isDebug() {
     if (resources.getProperty("Pooka.debug").equals("true"))
       return true;
@@ -181,57 +235,111 @@ public class Pooka {
       return false;
   }
   
+  /**
+   * Returns the DateFormatter used by Pooka.
+   */
   static public DateFormatter getDateFormatter() {
     return dateFormatter;
   }
   
+  /**
+   * Returns the mailcap command map.  This is what is used to determine
+   * which external programs are used to handle files of various MIME
+   * types.
+   */
   static public javax.activation.CommandMap getMailcap() {
     return mailcap;
   }
   
+  /**
+   * Returns the Mime Types map.  This is used to map file extensions to
+   * MIME types.
+   */
   static public javax.activation.MimetypesFileTypeMap getMimeTypesMap() {
     return mimeTypesMap;
   }
   
+  /**
+   * Gets the default mail Session for Pooka.
+   */
   static public javax.mail.Session getDefaultSession() {
     return defaultSession;
   }
   
+  /**
+   * Gets the Folder Tracker thread.  This is the thread that monitors the
+   * individual folders and checks to make sure that they stay connected,
+   * checks for new email, etc.
+   */
   static public net.suberic.pooka.thread.FolderTracker getFolderTracker() {
     return folderTracker;
   }
   
+  /**
+   * Gets the Pooka Main Panel.  This is the root of the entire Pooka UI.
+   */
   static public MainPanel getMainPanel() {
     return panel;
   }
   
+  /**
+   * The Store Manager.  This tracks all of the Mail Stores that Pooka knows
+   * about.
+   */
   static public StoreManager getStoreManager() {
     return storeManager;
   }
   
+  /**
+   * The Search Manager.  This manages the Search Terms that Pooka knows 
+   * about, and also can be used to construct Search queries from sets
+   * of properties.
+   */
   static public SearchTermManager getSearchManager() {
     return searchManager;
   }
   
+  /**
+   * The UIFactory for Pooka.  This is used to create just about all of the
+   * graphical UI components for Pooka.  Usually this is either an instance
+   * of PookaDesktopPaneUIFactory or PookaPreviewPaneUIFactory, for the
+   * Desktop and Preview UI styles, respectively.
+   */
   static public PookaUIFactory getUIFactory() {
     return uiFactory;
   }
   
+  /**
+   * The Search Thread.  This is the thread that folder searches are done
+   * on.
+   */
   static public net.suberic.util.thread.ActionThread getSearchThread() {
     return searchThread;
   }
 
+  /**
+   * The Address Book Manager keeps track of all of the configured Address 
+   * Books.
+   */
   static public AddressBookManager getAddressBookManager() {
     return addressBookManager;
   }
 
+  /**
+   * The ConnectionManager tracks the configured Network Connections.
+   */
   static public NetworkConnectionManager getConnectionManager() {
     return connectionManager;
   }
 
+  /**
+   * The OutgoingMailManager tracks the various SMTP server that Pooka can
+   * use to send mail.
+   */
   static public OutgoingMailServerManager getOutgoingMailManager() {
     return outgoingMailManager;
   }
+
 }
 
 

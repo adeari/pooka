@@ -71,11 +71,7 @@ public class NewMessageProxy extends MessageProxy {
 	
 	String messageContentType = getNewMessageUI().getMessageContentType();
 	getNewMessageInfo().sendMessage(profile, headers, messageText, messageContentType);
-	try {
-	  getNewMessageInfo().saveToSentFolder(profile);
-	} catch (MessagingException me) {
-	  getMessageUI().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
-	}
+	getNewMessageInfo().saveToSentFolder(profile);
 	
       } catch (MessagingException me) {
 	getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);

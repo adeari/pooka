@@ -85,10 +85,29 @@ public class NewMessageInfo extends MessageInfo {
    * Saves the NewMessageInfo to the sentFolder associated with the 
    * given Profile, if any.
    */
-  public void saveToSentFolder(UserProfile profile) throws MessagingException {
-    if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
-      getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
-      profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
+  public void saveToSentFolder(UserProfile profile) {
+    final FolderInfo sentFolder = profile.getSentFolder();
+    if (sentFolder != null) {
+      try {
+	final Message newMessage = new MimeMessage((MimeMessage) getMessage());
+	
+	sentFolder.getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	      if (sentFolder.getFolder() != null) {
+		try {
+		  newMessage.setSentDate(java.util.Calendar.getInstance().getTime());
+		  sentFolder.getFolder().appendMessages(new Message[] {newMessage});
+		} catch (MessagingException me) {
+		  Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+		  
+		}
+	      }
+	    }
+	  }, sentFolder.getFolderThread()), new java.awt.event.ActionEvent(null, 1, "message-send"));
+      } catch (MessagingException me) {
+	Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+
+      }
     }
   }
 
