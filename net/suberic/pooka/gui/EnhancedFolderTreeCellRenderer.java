@@ -20,7 +20,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     Icon connectedStoreIcon;
     Icon disconnectedStoreIcon;
     Icon subfolderIcon;
-    
+    Icon connectedWithNewIcon;
 
     public EnhancedFolderTreeCellRenderer() {
 	super();
@@ -73,8 +73,6 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 		FolderNode node = (FolderNode)lastPath;
 
 		FolderInfo fi = node.getFolderInfo();
-		if ((! fi.isTrashFolder()) && (! fi.isSentFolder()) && fi.hasNewMessages())
-		    setText("* " + getText() + " *");
 		
 		if (isSpecial(node)) {
 		    setFontToSpecial();
@@ -90,7 +88,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 		    if (!((FolderNode)node).isLeaf()) {
 			setIconToSubfolder();
 		    } else if (folderInfo.isOpen()) {
-			setIconToOpen();
+			if ((! folderInfo.isTrashFolder()) && (! folderInfo.isSentFolder()) && folderInfo.hasNewMessages())
+			    setIconToOpenWithNew();
+			else
+			    setIconToOpen();
 		    } else if (!folderInfo.isAvailable()) {
 			setIconToUnavailable();
 		    } else {
@@ -132,6 +133,19 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    if (url != null) {
 		setConnectedIcon(new ImageIcon(url));
 		setIcon(getConnectedIcon());
+	    }
+	}
+    }
+
+    public void setIconToOpenWithNew() {
+	if (getConnectedWithNewIcon() != null)
+	    setIcon(getConnectedWithNewIcon());
+	else {
+	    // create the new Icon.
+	    java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.connectedIcon", "images/PlusNew.gif"));
+	    if (url != null) {
+		setConnectedWithNewIcon(new ImageIcon(url));
+		setIcon(getConnectedWithNewIcon());
 	    }
 	}
     }
@@ -194,6 +208,14 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 
     public void setConnectedIcon(Icon newIcon) {
 	connectedIcon = newIcon;
+    }
+
+    public Icon getConnectedWithNewIcon() {
+	return connectedWithNewIcon;
+    }
+
+    public void setConnectedWithNewIcon(Icon newIcon) {
+	connectedWithNewIcon = newIcon;
     }
 
     public Icon getDisconnectedIcon() {
