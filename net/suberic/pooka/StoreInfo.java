@@ -107,6 +107,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     try {
       Properties p = loadProperties();
       Session s = Session.getInstance(p, Pooka.defaultAuthenticator);
+      if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
+	s.setDebug(true);
+
       store = s.getStore(url);
       available=true;
     } catch (NoSuchProviderException nspe) {
@@ -370,13 +373,31 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   public void connectionStatusChanged(NetworkConnection connection, int newStatus) {
     if (newStatus == NetworkConnection.CONNECTED) {
       // we've connected.
-      
+      // we probably don't care.
+
     } else if (newStatus == NetworkConnection.DISCONNECTED) {
       // we're being disconnected.  close all the connections.
-	
+      try {
+	disconnectStore();
+      } catch (MessagingException me) {
+	if (Pooka.isDebug()) {
+	  System.out.println("Caught exception disconnecting Store " + getStoreID() + ":  " + me);
+	  me.printStackTrace();
+	}
+	// else ignore
+      }
+
     } else {
       // we've been cut off.  note it.
-
+      try {
+	disconnectStore();
+      } catch (MessagingException me) {
+	if (Pooka.isDebug()) {
+	  System.out.println("Caught exception disconnecting Store " + getStoreID() + ":  " + me);
+	  me.printStackTrace();
+	}
+	// else ignore
+      }
     }
   }
     /**
@@ -467,55 +488,66 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	    childFolder.subscribeFolder(subFolderName);
     }
     
-    /**
-     * This method connects the Store, and sets the StoreInfo to know that
-     * the Store should be connected.  You should use this method instead of
-     * calling getStore().connect(), because if you use this method, then
-     * the StoreInfo will try to keep the Store connected, and will try to
-     * reconnect the Store if it gets disconnected before 
-     * disconnectStore is called.
-     *
-     * This method also calls updateChildren() to load the children of 
-     * the Store, if the children vector has not been loaded yet.
-     */
-    public void connectStore() throws MessagingException {
-      if (store.isConnected()) {
-	connected=true;
-	return;
-      } else { 
-	try {
-            // Execute the precommand if there is one
-            String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
-            if (preCommand.length() > 0) {
-                try {
-                    Process p = Runtime.getRuntime().exec(preCommand);
-                    p.waitFor();
-                } catch (Exception ex)
-                {
-                    System.out.println("Could not run precommand:");
-                    ex.printStackTrace();
-                }
-            }
-            store.connect();
-	} catch (MessagingException me) {
-	  Exception e = me.getNextException();
-	  if (e != null && e instanceof java.io.InterruptedIOException) 
-	    store.connect();
-	  else
-	    throw me;
-	}
-	connected=true;
-	
-	if (useSubscribed && protocol.equalsIgnoreCase("imap")) {
-	  synchSubscribed();
-	}
+  /**
+   * This method connects the Store, and sets the StoreInfo to know that
+   * the Store should be connected.  You should use this method instead of
+   * calling getStore().connect(), because if you use this method, then
+   * the StoreInfo will try to keep the Store connected, and will try to
+   * reconnect the Store if it gets disconnected before 
+   * disconnectStore is called.
+   *
+   * This method also calls updateChildren() to load the children of 
+   * the Store, if the children vector has not been loaded yet.
+   */
+  public void connectStore() throws MessagingException {
+    if (store.isConnected()) {
+      connected=true;
+      return;
+    } else { 
+      try {
+	NetworkConnection currentConnection = getConnection();
+	if (currentConnection != null) {
+	  if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED)
+	    currentConnection.connect();
 
-	if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
-	  for (int i = 0; i < children.size(); i++)
-	    ((FolderInfo)children.elementAt(i)).openAllFolders(Folder.READ_WRITE);
+	  if (connection.getStatus() != NetworkConnection.CONNECTED) {
+	    throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
+	  }
+	  
+	  store.connect();
+	} else {
+	  // Execute the precommand if there is one
+	  String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
+	  if (preCommand.length() > 0) {
+	    try {
+	      Process p = Runtime.getRuntime().exec(preCommand);
+	      p.waitFor();
+	    } catch (Exception ex) {
+	      System.out.println("Could not run precommand:");
+	      ex.printStackTrace();
+	    }
+	  }
+	  store.connect();
+	}
+      } catch (MessagingException me) {
+	Exception e = me.getNextException();
+	if (e != null && e instanceof java.io.InterruptedIOException) 
+	  store.connect();
+	else
+	  throw me;
+      }
+      connected=true;
+      
+      if (useSubscribed && protocol.equalsIgnoreCase("imap")) {
+	synchSubscribed();
       }
       
+      if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true"))
+	for (int i = 0; i < children.size(); i++)
+	  ((FolderInfo)children.elementAt(i)).openAllFolders(Folder.READ_WRITE);
     }
+    
+  }
     
     /**
      * This method disconnects the Store.  If you connect to the Store using 

@@ -164,8 +164,8 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public int makeUnavailable() {
     if (status != UNAVAILABLE) {
-	status = UNAVAILABLE;
-	fireConnectionEvent();
+      status = UNAVAILABLE;
+      fireConnectionEvent();
     } 
     return status;
   }

@@ -5,7 +5,6 @@ next release:
 	*)  make it so you can manually send the messages in the mail queue.
 	*)  make it so the mail queue automatically flushes when you 
 		connect.
-	*)  make the mail stores pay attention to the Connection objects.
 	*)  make it fault tolerant so that if you still have the old
 		sendMailURL, things still work.
 	*)  fix the local mail store so that it doesn't necessarily put
@@ -14,7 +13,7 @@ next release:
 		to it.
 	*)  fix the threading.  sending messages is on the awt thread right	
 		now.
-
+	*)  make mbox stores ignore the NetworkConnection.
 
 *) make search give a popup window saying it's running.
 

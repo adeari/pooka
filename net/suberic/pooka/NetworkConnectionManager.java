@@ -98,7 +98,8 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
    * exists; otherwise, returns null.
    */
   public NetworkConnection getDefaultConnection() {
-    return (NetworkConnection) manager.getItem("_default");
+    String defaultName = Pooka.getProperty("Connection._default", "_default");
+    return (NetworkConnection) manager.getItem(defaultName);
   }
 
   /**
