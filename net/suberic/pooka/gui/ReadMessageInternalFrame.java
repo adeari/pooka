@@ -47,7 +47,6 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	msg = source.getMessageProxy();
 	toolbar = source.getToolbar();
 	keyBindings = source.getKeyBindings();
-	msg.setMessageUI(this);
 
 	try {
 	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
@@ -133,15 +132,16 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
   }
 
     public void detachWindow() {
-	ReadMessageFrame rmf = new ReadMessageFrame(this);
-
-	rmf.show();
-	try {
-	    this.setClosed(true);
-	} catch (java.beans.PropertyVetoException pve) {
-	}
+      ReadMessageFrame rmf = new ReadMessageFrame(this);
+      getMessageProxy().setMessageUI(rmf);
+      
+      rmf.show();
+      try {
+	this.setClosed(true);
+      } catch (java.beans.PropertyVetoException pve) {
+      }
     }
-
+  
     /**
      * Overrides JComponent.addNotify().
      *

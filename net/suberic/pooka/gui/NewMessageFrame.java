@@ -46,7 +46,6 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	msg = source.getMessageProxy();
 	toolbar = source.getToolbar();
 	keyBindings = source.getKeyBindings();
-	msg.setMessageUI(this);
 
 	this.getContentPane().add("North", toolbar);
 	this.getContentPane().add("Center", messageDisplay);
@@ -177,6 +176,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
             MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
             NewMessageInternalFrame nmif = new NewMessageInternalFrame(mp, this);
+	    getMessageProxy().setMessageUI(nmif);
             nmif.openMessageUI();
 	    this.setModified(false);
             this.dispose();

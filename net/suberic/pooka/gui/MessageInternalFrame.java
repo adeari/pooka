@@ -43,8 +43,6 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 
 	this.getContentPane().setLayout(new BorderLayout());
 
-	msg.setMessageUI(this);
-	
     }
 
     /**

@@ -6,6 +6,7 @@ import net.suberic.pooka.gui.search.*;
 import javax.swing.JScrollPane;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 /**
  * This is an implementation of PookaUIFactory which creates a single
@@ -51,7 +52,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 	    mui = new NewMessageFrame((NewMessageProxy) mp);
 	} else
 	    mui = new ReadMessageFrame(mp);
-	
+
+	mp.setMessageUI(mui);
 	return mui;
     }
 
@@ -229,14 +231,33 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
      * Shows a status message.
      */
     public void showStatusMessage(String newMessage) {
-	Pooka.getMainPanel().getInfoPanel().setMessage(newMessage);
+      final String msg = newMessage;
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
+	  }
+	};
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
+
     }
 
     /**
      * Clears the main status message panel.
      */
     public void clearStatus() {
-	Pooka.getMainPanel().getInfoPanel().clear();
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    Pooka.getMainPanel().getInfoPanel().clear();
+	  }
+	};
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
+      
     }
 
         /**

@@ -44,7 +44,6 @@ public class ReadMessageFrame extends MessageFrame {
 	msg = source.getMessageProxy();
 	toolbar = source.getToolbar();
 	keyBindings = source.getKeyBindings();
-	msg.setMessageUI(this);
 
 	try {
 	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
@@ -137,6 +136,7 @@ public class ReadMessageFrame extends MessageFrame {
 	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
 	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
 	    ReadMessageInternalFrame rmif = new ReadMessageInternalFrame(mp, this);
+	    getMessageProxy().setMessageUI(rmif);
 	    rmif.openMessageUI();
 	    this.dispose();
 	}

@@ -10,10 +10,6 @@
 	count, which sucks for performance.  improvements with new
 	caching system???
 
-*) check reading uncached messages; it should happen that if you try to
-read an uncached message twice in a row, you should get the same error
-message, instead of having a random empty 
-
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
 

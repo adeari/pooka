@@ -36,25 +36,26 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   public ThemeManager getPookaThemeManager() {
     return pookaThemeManager;
   }
-
-    /**
-     * Creates an appropriate MessageUI object for the given MessageProxy.
-     */
-    public MessageUI createMessageUI(MessageProxy mp) throws MessagingException {
-	// each MessageProxy can have exactly one MessageUI.
-	if (mp.getMessageUI() != null)
-	    return mp.getMessageUI();
-	
-	MessageUI mui;
-	if (mp instanceof NewMessageProxy) {
-	    mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
-	} else {
-	    mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
-	    ((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
-	}
-	return mui;
+  
+  /**
+   * Creates an appropriate MessageUI object for the given MessageProxy.
+   */
+  public MessageUI createMessageUI(MessageProxy mp) throws MessagingException {
+    // each MessageProxy can have exactly one MessageUI.
+    if (mp.getMessageUI() != null)
+      return mp.getMessageUI();
+    
+    MessageUI mui;
+    if (mp instanceof NewMessageProxy) {
+      mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
+    } else {
+      mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
+      ((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
     }
-
+    mp.setMessageUI(mui);
+    return mui;
+  }
+  
     /**
      * Creates an appropriate FolderDisplayUI object for the given
      * FolderInfo.

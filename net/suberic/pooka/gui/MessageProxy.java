@@ -516,8 +516,10 @@ public class MessageProxy {
    */
   public void openWindow() {
     try {
-      if (getMessageUI() == null)
-	setMessageUI(getPookaUIFactory().createMessageUI(this));
+      if (getMessageUI() == null) {
+	MessageUI newUI = getPookaUIFactory().createMessageUI(this);
+	setMessageUI(newUI);
+      }
       getMessageUI().openMessageUI();
       getMessageInfo().setSeen(true);
     } catch (MessagingException me) {

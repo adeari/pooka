@@ -45,7 +45,6 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	msg = source.getMessageProxy();
 	toolbar = source.getToolbar();
 	keyBindings = source.getKeyBindings();
-	msg.setMessageUI(this);
 
 	this.getContentPane().add("North", toolbar);
 	this.getContentPane().add("Center", messageDisplay);
@@ -178,6 +177,8 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
   public void detachWindow() {
     NewMessageFrame nmf = new NewMessageFrame(this);
     
+    getMessageProxy().setMessageUI(nmf);
+
     nmf.show();
     try {
       this.setClosed(true);

@@ -1,3 +1,6 @@
+fixed a problem where a second request for an invalid message would
+result in an empty window.
+
 fixed the status messages so that they should be cleared properly.
 
 fixed disconnected imap autocaching. 

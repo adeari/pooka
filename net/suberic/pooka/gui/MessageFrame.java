@@ -40,8 +40,6 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
       
       this.getContentPane().setLayout(new BorderLayout());
       
-      msg.setMessageUI(this);
-	
       java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
       if (standardUrl != null) {
 	ImageIcon standardIcon = new ImageIcon(standardUrl);
