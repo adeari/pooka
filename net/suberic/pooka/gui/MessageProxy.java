@@ -93,7 +93,19 @@ public class MessageProxy {
 	    tableInfo = new Vector();
 	    
 	    for(int j=0; j < columnCount; j++) {
-		tableInfo.addElement(getMessageProperty((String)(columnHeaders.elementAt(j)), message));
+		String propertyName = (String)columnHeaders.elementAt(j);
+		
+		if (propertyName.startsWith("FLAG")) 
+		    tableInfo.addElement(new Boolean(getMessageFlag((String)(columnHeaders.elementAt(j)), message)));
+		else if (propertyName.equals("attachments"))
+		    try {
+			tableInfo.addElement(new Boolean(message.getContentType().substring(0, 15).equalsIgnoreCase("multipart/mixed")));
+		    } catch (MessagingException me) {
+			tableInfo.addElement(new Boolean(false));
+		    }
+		else
+		    tableInfo.addElement(getMessageProperty((String)(columnHeaders.elementAt(j)), message));
+		
 	    }
 	    
 	    try {
@@ -115,12 +127,35 @@ public class MessageProxy {
     }
 
     /**
+     * This gets a Flag property from the Message.
+     */
+
+    public boolean getMessageFlag(String flagName, Message msg) {
+	try {
+	    if (flagName.equals("FLAG.ANSWERED") )
+		return msg.isSet(Flags.Flag.ANSWERED);
+	    else if (flagName.equals("FLAG.DELETED"))
+		return msg.isSet(Flags.Flag.DELETED);
+	    else if (flagName.equals("FLAG.DRAFT"))
+		return msg.isSet(Flags.Flag.DELETED);
+	    else if (flagName.equals("FLAG.FLAGGED"))
+		return msg.isSet(Flags.Flag.DELETED);
+	    else if (flagName.equals("FLAG.RECENT"))
+		return msg.isSet(Flags.Flag.DELETED);
+	    else if (flagName.equals("FLAG.SEEN"))
+		return msg.isSet(Flags.Flag.DELETED);
+	    else
+		return false;
+	} catch (MessagingException me) {
+	    return false;
+	}
+    }
+
+    /**
      * This gets a particular property (From, To, Date, Subject, or just
      * about any Email Header) from the Message.
      */
     public String getMessageProperty(String prop, Message msg) {
-	if (Pooka.isDebug())
-	    System.out.println("calling getMessageProperty with string " + prop);
 	try {
 	    if (prop.equals("From")) {
 		Address[] fromAddr = msg.getFrom();
@@ -358,8 +393,9 @@ public class MessageProxy {
 	book.append (printer, pf, count);
 	job.setPageable (book);
 	final PrinterJob externalJob = job;
+
 	if (job.printDialog ()) {
-	    Thread printThread = new Thread(new net.suberic.util.swing.RunnableAdapter() {
+	    Thread t = new Thread(new net.suberic.util.swing.RunnableAdapter() {
 		    public void run() {
 			try {
 			    externalJob.print ();
@@ -369,7 +405,7 @@ public class MessageProxy {
 			}
 		    }
 	    });
-	    printThread.start();
+	    t.start();
 	    
 	}
     }
@@ -601,6 +637,8 @@ public class MessageProxy {
 	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    printMessage();
 	    folderInfo.getFolderWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+	    if (getMessageWindow() != null)
+		getMessageWindow().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 	}
     }
 
