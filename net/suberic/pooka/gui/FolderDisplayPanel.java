@@ -80,18 +80,17 @@ public class FolderDisplayPanel extends JPanel {
 	    });
     }
 
-    /**
-     * Creates the JTable for the FolderInfo and adds it to the component.
-     */
-    public void addMessageTable() {
-	if (folderInfo != null) {
-	    createMessageTable();
-	    scrollPane.getViewport().add(messageTable);
-	    int lastUnread = selectFirstUnread();
-	    makeSelectionVisible(lastUnread);
-	}
-	    
+  /**
+   * Creates the JTable for the FolderInfo and adds it to the component.
+   */
+  public void addMessageTable() {
+    if (folderInfo != null) {
+      createMessageTable();
+      scrollPane.getViewport().add(messageTable);
+      selectFirstUnread();
     }
+    
+  }
 
     /**
      * This creates the messageTable.
@@ -389,172 +388,184 @@ public class FolderDisplayPanel extends JPanel {
 	
     }
     
-    /**
-     * This finds the first unread message (if any) and sets that message
-     * to selected, and returns that index.
-     */
-    public int selectFirstUnread() {
-	int firstUnread = getFolderInfo().getFirstUnreadMessage();
-	if (firstUnread < 0) {
-	    firstUnread = messageTable.getRowCount();
-	} else {
-	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
-	}
-	return firstUnread;
-    }
-
-    /**
-     * This scrolls the given row number to visible.
-     */
-    public void makeSelectionVisible(int rowNumber) {
-	messageTable.scrollRectToVisible(messageTable.getCellRect(rowNumber, 1, true));
-
-	// on 1.3, the window may not be validated yet when we first want
-	// to make the selection visible.  so we have a workaround.
-	if (!validated) {
-	    String javaVersion = System.getProperty("java.version");
-	    
-	    if (javaVersion.compareTo("1.3") >= 0) {
-		scrollToRowOnValidate = rowNumber;
+  /**
+   * This finds the first unread message (if any) and sets that message
+   * to selected, and returns that index.
+   */
+  public void selectFirstUnread() {
+    
+    // sigh.
+    getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent ae) {
+	  final int firstUnread = getFolderInfo().getFirstUnreadMessage();
+	  SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      int useFirstUnread = firstUnread;
+	      if (useFirstUnread < 0) {
+		useFirstUnread = messageTable.getRowCount();
+	      } else {
+		messageTable.setRowSelectionInterval(useFirstUnread, useFirstUnread);
+	      }
+	      makeSelectionVisible(useFirstUnread);
 	    }
+	  });
 	}
-    }
-
-    /**
-     * This overrides validate() to work around the fact that we may want
-     * to scroll the JTable before we've been validated, which doesn't work
-     * under 1.3.
-     */
-    public void validate() {
-	super.validate();
-	
-	if (! validated) {
-	    validated = true;
-	    if (scrollToRowOnValidate != -1) {
-		makeSelectionVisible(scrollToRowOnValidate);
-		scrollToRowOnValidate = -1;
-	    }
-	}
-    }
-
-
-    /**
-     * This selects the next message.  If no message is selected, then
-     * the first message is selected.
-     */
-    public int selectNextMessage() {
-      int selectedRow = messageTable.getSelectedRow();
-      int newRow = selectedRow + 1;
-      boolean done = false;
-      while (! done && newRow < messageTable.getRowCount() ) {
-	MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
-	try {
-	  if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
-	    newRow ++;
-	  } else {
-	    done = true;
-	  }
-	} catch (MessagingException me) {
-	  newRow ++;
-	}
-      }
+      }, new java.awt.event.ActionEvent(this, 0, "folder-select-first-unread"));
+    
+  }
+  
+  /**
+   * This scrolls the given row number to visible.
+   */
+  public void makeSelectionVisible(int rowNumber) {
+    messageTable.scrollRectToVisible(messageTable.getCellRect(rowNumber, 1, true));
+    
+    // on 1.3, the window may not be validated yet when we first want
+    // to make the selection visible.  so we have a workaround.
+    if (!validated) {
+      String javaVersion = System.getProperty("java.version");
       
-      return selectMessage(newRow);
+      if (javaVersion.compareTo("1.3") >= 0) {
+	scrollToRowOnValidate = rowNumber;
+      }
     }
+  }
+  
+  /**
+   * This overrides validate() to work around the fact that we may want
+   * to scroll the JTable before we've been validated, which doesn't work
+   * under 1.3.
+   */
+  public void validate() {
+    super.validate();
+    
+    if (! validated) {
+      validated = true;
+      if (scrollToRowOnValidate != -1) {
+	makeSelectionVisible(scrollToRowOnValidate);
+	scrollToRowOnValidate = -1;
+      }
+    }
+  }
 
-    /**
-     * This selects the previous message.  If no message is selected, then
-     * the last message is selected.
-     */
-    public int selectPreviousMessage() {
-	int[] rowsSelected = messageTable.getSelectedRows();
-	int selectedRow = 0;
-	if (rowsSelected.length > 0)
-	    selectedRow = rowsSelected[0];
-	else
-	    selectedRow = messageTable.getRowCount();
-	int newRow = selectedRow - 1;
-	boolean done = false;
-	while (! done && newRow >= 0 ) {
-	    MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
-	    try {
-		if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
-		    newRow--;
-		} else {
-		    done = true;
-		}
-	    } catch (MessagingException me) {
-		newRow--;
-	    }
+  
+  /**
+   * This selects the next message.  If no message is selected, then
+   * the first message is selected.
+   */
+  public int selectNextMessage() {
+    int selectedRow = messageTable.getSelectedRow();
+    int newRow = selectedRow + 1;
+    boolean done = false;
+    while (! done && newRow < messageTable.getRowCount() ) {
+      MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
+      try {
+	if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+	  newRow ++;
+	} else {
+	  done = true;
 	}
-	
-	return selectMessage(newRow);
-
+      } catch (MessagingException me) {
+	newRow ++;
+      }
     }
-
+    
+    return selectMessage(newRow);
+  }
+  
+  /**
+   * This selects the previous message.  If no message is selected, then
+   * the last message is selected.
+   */
+  public int selectPreviousMessage() {
+    int[] rowsSelected = messageTable.getSelectedRows();
+    int selectedRow = 0;
+    if (rowsSelected.length > 0)
+      selectedRow = rowsSelected[0];
+    else
+      selectedRow = messageTable.getRowCount();
+    int newRow = selectedRow - 1;
+    boolean done = false;
+    while (! done && newRow >= 0 ) {
+      MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
+      try {
+	if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+	  newRow--;
+	} else {
+	  done = true;
+	}
+      } catch (MessagingException me) {
+	newRow--;
+      }
+    }
+    
+    return selectMessage(newRow);
+    
+  }
+  
   /**
    * Selects all of the messages in the FolderTable.
    */
   public void selectAll() {
     messageTable.selectAll();
   }
-    
-    /**
-     * This selects the message at the given row, and also scrolls the
-     * MessageTable to make the given row visible.
-     *
-     * If the number entered is below the range of available messages, then
-     * the first message is selected.  If the number entered is above that
-     * range, then the last message is selected.  If the MessageTable 
-     * contains no messages, nothing happens.
-     *
-     * @return  the index of the newly selected row.
-     */
-    public int selectMessage(int messageNumber) {
-      int rowCount = messageTable.getRowCount();
+  
+  /**
+   * This selects the message at the given row, and also scrolls the
+   * MessageTable to make the given row visible.
+   *
+   * If the number entered is below the range of available messages, then
+   * the first message is selected.  If the number entered is above that
+   * range, then the last message is selected.  If the MessageTable 
+   * contains no messages, nothing happens.
+   *
+   * @return  the index of the newly selected row.
+   */
+  public int selectMessage(int messageNumber) {
+    int rowCount = messageTable.getRowCount();
       
-      if (rowCount > 0) {
-	int numberToSet = messageNumber;
-	
-	if (messageNumber < 0) {
-	  numberToSet = 0;
-	} else if (messageNumber >= rowCount) {
-	  numberToSet = rowCount - 1;
-	}
-	messageTable.setRowSelectionInterval(numberToSet, numberToSet);
-	makeSelectionVisible(numberToSet);
-	return numberToSet;
-      } else {
-	return -1;
+    if (rowCount > 0) {
+      int numberToSet = messageNumber;
+      
+      if (messageNumber < 0) {
+	numberToSet = 0;
+      } else if (messageNumber >= rowCount) {
+	numberToSet = rowCount - 1;
       }
+      messageTable.setRowSelectionInterval(numberToSet, numberToSet);
+      makeSelectionVisible(numberToSet);
+      return numberToSet;
+    } else {
+      return -1;
     }
-
-    /**
-     * This method takes the currently selected row(s) and returns the
-     * appropriate MessageProxy object.
-     *
-     * If no rows are selected, null is returned.
-     */
-    public MessageProxy getSelectedMessage() {
-	if (messageTable != null) {
-	    int rowsSelected = messageTable.getSelectedRowCount();
-	    
-	    if (rowsSelected == 1) 
-		return getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
-	    else if (rowsSelected < 1) 
-		return null;
-	    else {
-		int[] selectedRows = messageTable.getSelectedRows();
-		MessageProxy[] msgSelected= new MessageProxy[selectedRows.length];
-		for (int i = 0; i < selectedRows.length; i++) 
-		    msgSelected[i] = getFolderInfo().getMessageProxy(selectedRows[i]);
-		return new MultiMessageProxy(selectedRows, msgSelected, this.getFolderInfo());
-	    }
-	} else {
-	    return null;
-	}
+  }
+  
+  /**
+   * This method takes the currently selected row(s) and returns the
+   * appropriate MessageProxy object.
+   *
+   * If no rows are selected, null is returned.
+   */
+  public MessageProxy getSelectedMessage() {
+    if (messageTable != null) {
+      int rowsSelected = messageTable.getSelectedRowCount();
+      
+      if (rowsSelected == 1) 
+	return getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+      else if (rowsSelected < 1) 
+	return null;
+      else {
+	int[] selectedRows = messageTable.getSelectedRows();
+	MessageProxy[] msgSelected= new MessageProxy[selectedRows.length];
+	for (int i = 0; i < selectedRows.length; i++) 
+	  msgSelected[i] = getFolderInfo().getMessageProxy(selectedRows[i]);
+	return new MultiMessageProxy(selectedRows, msgSelected, this.getFolderInfo());
+      }
+    } else {
+      return null;
     }
-
+  }
+  
   /**
    * This updates the entry for the given message, if that message is 
    * visible.
@@ -565,127 +576,130 @@ public class FolderDisplayPanel extends JPanel {
       getFolderTableModel().fireTableRowsUpdated(row, row);
     }
   }
-
-    /**
-     * This resets the size to that of the parent component.
-     */
-    public void resize() {
-	this.setSize(getParent().getSize());
-    }
-
-    // Accessor methods.
-
-    public JTable getMessageTable() {
-	return messageTable;
-    }
-
-    /**
-     * This sets the FolderInfo.
-     */
-    public void setFolderInfo(FolderInfo newValue) {
-	folderInfo=newValue;
-    }
-
-    public FolderInfo getFolderInfo() {
-	return folderInfo;
-    }
-
-    public FolderTableModel getFolderTableModel() {
-	if (getFolderInfo() != null)
-	    return getFolderInfo().getFolderTableModel();
-	else
-	    return null;
-    }
-
-    /**
-     * gets the actions handled both by the FolderDisplayPanel and the 
-     * selected Message(s).
-     */
-
-    public class SelectionListener implements javax.swing.event.ListSelectionListener {
-	SelectionListener() {
-	}
-
-	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-	    Pooka.getMainPanel().refreshActiveMenus();
-	    getFolderInfo().setNewMessages(false);
-	    FolderNode fn = getFolderInfo().getFolderNode();
-	    if (fn != null)
-		fn.getParentContainer().repaint();
-	}
-    }
-
-    /**
-     * This registers the Keyboard action not only for the FolderDisplayPanel
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
-     *            String aCommand, KeyStroke aKeyStroke, int aCondition)
-     */
-
-    public void registerKeyboardAction(ActionListener anAction,
-       	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
-	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-
-	messageTable.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+  
+  /**
+   * This resets the size to that of the parent component.
+   */
+  public void resize() {
+    this.setSize(getParent().getSize());
+  }
+  
+  // Accessor methods.
+  
+  public JTable getMessageTable() {
+    return messageTable;
+  }
+  
+  /**
+   * This sets the FolderInfo.
+   */
+  public void setFolderInfo(FolderInfo newValue) {
+    folderInfo=newValue;
+  }
+  
+  public FolderInfo getFolderInfo() {
+    return folderInfo;
+  }
+  
+  /**
+   * Returns the FolderTableModel for this FolderDisplayPanel.
+   */
+  public FolderTableModel getFolderTableModel() {
+    if (getFolderInfo() != null)
+      return getFolderInfo().getFolderTableModel();
+    else
+      return null;
+  }
+  
+  /**
+   * gets the actions handled both by the FolderDisplayPanel and the 
+   * selected Message(s).
+   */
+  
+  public class SelectionListener implements javax.swing.event.ListSelectionListener {
+    SelectionListener() {
     }
     
-    /**
-     * This unregisters the Keyboard action not only for the FolderDisplayPanel
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
-     */
-
-    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
-	super.unregisterKeyboardAction(aKeyStroke);
-
-	messageTable.unregisterKeyboardAction(aKeyStroke);
+    public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+      Pooka.getMainPanel().refreshActiveMenus();
+      getFolderInfo().setNewMessages(false);
+      FolderNode fn = getFolderInfo().getFolderNode();
+      if (fn != null)
+	fn.getParentContainer().repaint();
     }
-
-    /**
-     * Returns whether or not this window is enabled.  This should be true
-     * just about all of the time.  The only time it won't be true is if
-     * the Folder is closed or disconnected, and the mail store isn't set
-     * up to work in disconnected mode.
-     */
-    public boolean isEnabled() {
-	return enabled;
-    }
-
-    /**
-     * This sets whether or not the window is enabled.  This should only
-     * be set to false when the Folder is no longer available.
-     */
-    public void setEnabled(boolean newValue) {
-	enabled = newValue;
-    }
-
-    public Action[] getActions() {
-	if (isEnabled()) {
-	    Action[] returnValue = null;
-	    MessageProxy m = getSelectedMessage();
-	    
-	    if (m != null) 
-		returnValue = m.getActions();
-	    
-	    if (folderInfo.getActions() != null) {
-		if (returnValue != null) {
-		    returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
-		} else {
-		    returnValue = folderInfo.getActions();
-		}
-	    }
-	    
-	    return returnValue;
+  }
+  
+  /**
+   * This registers the Keyboard action not only for the FolderDisplayPanel
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
+   *            String aCommand, KeyStroke aKeyStroke, int aCondition)
+   */
+  
+  public void registerKeyboardAction(ActionListener anAction,
+				     String aCommand, KeyStroke aKeyStroke, int aCondition) {
+    super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    
+    messageTable.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+  }
+  
+  /**
+   * This unregisters the Keyboard action not only for the FolderDisplayPanel
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+   */
+  
+  public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+    super.unregisterKeyboardAction(aKeyStroke);
+    
+    messageTable.unregisterKeyboardAction(aKeyStroke);
+  }
+  
+  /**
+   * Returns whether or not this window is enabled.  This should be true
+   * just about all of the time.  The only time it won't be true is if
+   * the Folder is closed or disconnected, and the mail store isn't set
+   * up to work in disconnected mode.
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+  
+  /**
+   * This sets whether or not the window is enabled.  This should only
+   * be set to false when the Folder is no longer available.
+   */
+  public void setEnabled(boolean newValue) {
+    enabled = newValue;
+  }
+  
+  public Action[] getActions() {
+    if (isEnabled()) {
+      Action[] returnValue = null;
+      MessageProxy m = getSelectedMessage();
+      
+      if (m != null) 
+	returnValue = m.getActions();
+      
+      if (folderInfo.getActions() != null) {
+	if (returnValue != null) {
+	  returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
 	} else {
-	    return null;
+	  returnValue = folderInfo.getActions();
 	}
+      }
+      
+      return returnValue;
+    } else {
+      return null;
     }
+  }
 }
 
 

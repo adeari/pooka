@@ -1,3 +1,6 @@
+fixed a bug where finding the first unread message was done on the 
+awt event thread instead of the FolderThread.
+
 added a TestAddress to the NetworkConnection object.  this way you can
 check to see whether or not the connection is up, instead of having to
 manually set it.
