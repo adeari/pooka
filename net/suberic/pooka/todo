@@ -31,12 +31,6 @@ frames and the folderPanel.  oh, and making it so you can get at the menus.
 to be fixed, but they certainly do.  -- done for the FolderWindow; need to
 	do it for the MessageWindow/NewMessageWindow (sizing).
 
-*) add the ability to keep track of which folders are to be opened on 
-startup.  also add a flag to the startup to override this, so that nothing
-gets opened on start for that session.  -- done; need to add flag.  also need
-to explore why, if the folderList is set to empty, you can't override it 
-without removing the entry from the file itself.
-
 *) bug:  fix what happens if you try sending out a bad email.  also, while
 	we're at it, make sure that the from: and smtp: information get 
 	updated live.
