@@ -9,6 +9,7 @@ public class Pooka {
     static public java.text.SimpleDateFormat dateFormatter;
     static public javax.activation.CommandMap mailcap;
     static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
+    static public net.suberic.pooka.gui.MainPanel panel;
 
     static public javax.mail.Session defaultSession;
 
@@ -37,7 +38,7 @@ public class Pooka {
 
 	frame.setBackground(Color.lightGray);
 	frame.getContentPane().setLayout(new BorderLayout());
-	MainPanel panel = new MainPanel(frame);
+	panel = new MainPanel(frame);
 	frame.getContentPane().add("North", panel.getMainToolbar());
 	frame.getContentPane().add("Center", panel);
 	frame.setJMenuBar(panel.getMainMenu());
@@ -87,6 +88,10 @@ public class Pooka {
 
     static public javax.mail.Session getDefaultSession() {
 	return defaultSession;
+    }
+
+    static public MainPanel getMainPanel() {
+	return panel;
     }
 }
 
