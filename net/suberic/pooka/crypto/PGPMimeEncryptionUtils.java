@@ -114,7 +114,9 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     throws EncryptionException, MessagingException {
 
     try {
-      MimeMultipart mm = new MultipartEncrypted("encrypted");
+      ContentType cType = new ContentType("multipart/encrypted");
+      cType.setParameter("protocol", "application/pgp-encrypted");
+      MimeMultipart mm = new MultipartEncrypted(cType);
       
       MimeBodyPart idPart = new MimeBodyPart();
       DataSource ds = new ByteArrayDataSource(new String("Version: 1").getBytes(), "pgpapp", "application/pgp-encrypted");
@@ -208,10 +210,21 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
    */
   public BodyPart signBodyPart(BodyPart p, EncryptionKey key)
     throws EncryptionException, MessagingException, IOException {
-    MimeMultipart mpart = new MimeMultipart("signed");
 
-    InputStream is = p.getInputStream();
+    ContentType ct = new ContentType("multipart/signed");
+    ct.setParameter("protocol", "application/pgp-signature");
+    ct.setParameter("micalg", "pgp-sha1");
+    MimeMultipart mpart = new MultipartEncrypted(ct);
 
+    System.out.println("part 1 is " );
+    p.writeTo(System.out);
+    System.out.println("done part 1" );
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    p.writeTo(baos);
+
+    InputStream is = new ByteArrayInputStream(baos.toByteArray());
+    
     byte[] signature = sign(is, key);
     MimeBodyPart sigPart = new MimeBodyPart();
 
@@ -250,12 +263,23 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
       signedMessage.addHeaderLine((String) enum.nextElement());
     }
 
-    InputStream is = msg.getInputStream();
-    MimeBodyPart mbp = new MimeBodyPart(is);
+    Object o = msg.getContent();
     
+    UpdatableMBP mbp = new UpdatableMBP();
+    mbp.setContent(o, msg.getContentType());
+    mbp.updateMyHeaders();
+
+    /*
+      InputStream is = msg.getRawInputStream();
+      
+      UpdatableMBP mbp = new UpdatableMBP(is);
+      mbp.updateMyHeaders();
+    */
+
     BodyPart signedPart = signBodyPart(mbp, key);
 
-    signedMessage.setContent(signedPart, signedPart.getContentType());
+    signedMessage.setContent((Multipart)signedPart.getContent());
+    //signedMessage.setContent((Multipart)signedPart.getContent(), "multipart/signed");
 
     return signedMessage;
   }

@@ -22,7 +22,7 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
 
     try {
       File outFile = writeStreamToFile(encryptedStream);
-      outFile.deleteOnExit();
+      //outFile.deleteOnExit();
       
       Process p = Runtime.getRuntime().exec("gpg --passphrase-fd 0 -d " + outFile);
 
@@ -89,7 +89,7 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
       }
 
       File inFile = new File(outFile.getAbsolutePath() + ".asc");
-      inFile.deleteOnExit();
+      //inFile.deleteOnExit();
       InputStream is = new FileInputStream(inFile);
       
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -119,6 +119,54 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
   public byte[] sign(InputStream rawStream, EncryptionKey key)
     throws EncryptionException {
     
+    GPGEncryptionKey gpgKey = (GPGEncryptionKey) key;
+    
+    String alias = gpgKey.getAlias();
+    String passphrase = gpgKey.getPassphrase();
+
+    try {
+      File outFile = writeStreamToFile(rawStream);
+
+      Process p = Runtime.getRuntime().exec("gpg -a -r " + alias + " --passphrase-fd 0 -b " + outFile);
+
+      // we probably need to write the passphrase.
+
+      OutputStream os = p.getOutputStream();
+
+      BufferedWriter processWriter = new BufferedWriter(new OutputStreamWriter(os));
+
+      processWriter.write(passphrase);
+      processWriter.newLine();
+      processWriter.flush();
+      processWriter.close();
+
+      try {
+	p.waitFor();
+      } catch (InterruptedException ie) {
+      }
+
+      File inFile = new File(outFile.getAbsolutePath() + ".asc");
+      //inFile.deleteOnExit();
+      InputStream is = new FileInputStream(inFile);
+      
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+      byte[] bytesRead = new byte[256];
+      int numRead = is.read(bytesRead);
+      
+      while (numRead > -1) {
+	baos.write(bytesRead, 0, numRead);
+	numRead = is.read(bytesRead);
+      }
+
+      System.out.println("read:  ");
+      System.out.println(new String(baos.toByteArray()));
+      return baos.toByteArray();
+      
+    } catch (java.io.IOException ioe) {
+      ioe.printStackTrace();
+      throw new EncryptionException(ioe.getMessage());
+    }
   }
 
   /**
@@ -135,7 +183,7 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
    */
   File writeStreamToFile(InputStream encryptedStream) throws IOException {
     File tmpFile = File.createTempFile("gpg", ".txt");
-    tmpFile.deleteOnExit();
+    //tmpFile.deleteOnExit();
     FileOutputStream fos = new FileOutputStream(tmpFile);
 
     byte[] bytesRead = new byte[256];

@@ -60,6 +60,8 @@ public class NewMessageInfo extends MessageInfo {
       getMessage().setContent(messageText, messageContentType);
     }
     
+    getMessage().setSentDate(new java.util.Date(System.currentTimeMillis()));
+
     boolean sent = false;
     if (profile != null) {
       OutgoingMailServer mailServer = profile.getMailServer();

@@ -30,6 +30,8 @@ public class GPGSendTest {
       Message encryptedMessage = cryptoUtils.encryptMessage(s, rawMessage, key);
 
       encryptedMessage.writeTo(System.out);
+
+      encryptedMessage.setDisposition("inline");
       Transport.send(encryptedMessage);
 
       System.out.println("message sent!");
