@@ -114,11 +114,20 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	getFolderInfo().addMessageChangedListener(getStatusBar());
 	getFolderInfo().addMessageCountListener(new MessageCountAdapter() {
 		public void messagesRemoved(MessageCountEvent e) {
+		    //		    net.suberic.util.swing.RunnableAdapter updateAdapter = new net.suberic.util.swing.RunnableAdapter() {
+		    Runnable updateAdapter = new Runnable() {
+			    public void run() {
 		    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
 		    if (toolbar != null)
 			toolbar.setActive(getActions());
 		    if (keyBindings != null)
 			keyBindings.setActive(getActions());
+			    }
+			};
+		    if (SwingUtilities.isEventDispatchThread())
+			updateAdapter.run();
+		    else
+			SwingUtilities.invokeLater(updateAdapter);
 		}
 	    });
 		    
