@@ -1,16 +1,3 @@
-*) outgoing mailserver improvements:
-	*) network connections - come up with a way to autotest that doesn't
-		take lots of time.
-	*) sending mail should try to autodetect mailserver to use
-		*) each server has a connection list, or 'any'
-		*) each user has a connection list, or 'any'
-		*) each server for the user checks the connections in order.
-		*) try to use the first available server
-	*) on failure to send
-		*) show error first.  save to outbox default?  work offine?
-		*) offer to save to outbox if available
-	*) offline setting???
-
 *) -- windows --
   *) support windows registry attachment associations.
 	-- check icemail
@@ -78,6 +65,19 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
         at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
 
 *) ?? change reply-all binding?
+
+*) outgoing mailserver improvements:
+	*) network connections - come up with a way to autotest that doesn't
+		take lots of time.
+	*) sending mail should try to autodetect mailserver to use
+		*) each server has a connection list, or 'any'
+		*) each user has a connection list, or 'any'
+		*) each server for the user checks the connections in order.
+		*) try to use the first available server
+	*) on failure to send
+		*) show error first.  save to outbox default?  work offine?
+		*) offer to save to outbox if available
+	*) offline setting???
 
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.

@@ -5,11 +5,13 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-
 import javax.activation.*;
 
 import net.suberic.pooka.*;
 import net.suberic.util.swing.*;
+
+import com.ice.jni.dde.JNIDDE;
+import com.ice.jni.registry.*;
 
 /**
  * Handles opening, saving, etc. attachments.
@@ -134,40 +136,37 @@ public class AttachmentHandler {
 	  } else {
 	    openWith(pAttachment);
 	  }
-	} else {
-	    /*
-	  if (isWindows()) {
-	    try {
-	      JNIDDE dde=new JNIDDE();
-
-	      String extension = ".tmp";
-	      String filename = dh.getName();
-	      int dotLoc = filename.lastIndexOf('.');
-	      if (dotLoc > 0) {
-		  extension = filename.substring(dotLoc);
-	      }
-	      File tmpFile = File.createTempFile("pooka_", extension);
-	      
-	      FileOutputStream fos = new FileOutputStream(tmpFile);
-	      dh.writeTo(fos);
-	      fos.close();
-
-	      tmpFile.deleteOnExit();
-
-	      JNIDDE.shellExecute("open", tmpFile.getAbsolutePath(), null, tmpFile.getAbsoluteFile().getParent(), JNIDDE.SW_SHOWNORMAL);
-	    } catch (Throwable e) {
-		System.err.println("got exception " + e);
-		e.printStackTrace();
-		openWith(pAttachment);
+	} else if (isWindows()) {
+	  try {
+	    JNIDDE dde=new JNIDDE();
+	    
+	    String extension = ".tmp";
+	    String filename = dh.getName();
+	    int dotLoc = filename.lastIndexOf('.');
+	    if (dotLoc > 0) {
+	      extension = filename.substring(dotLoc);
 	    }
-	  } else {
-	    */
+	    File tmpFile = File.createTempFile("pooka_", extension);
+	    
+	    FileOutputStream fos = new FileOutputStream(tmpFile);
+	    dh.writeTo(fos);
+	    fos.close();
+	    
+	    tmpFile.deleteOnExit();
+	    
+	    JNIDDE.shellExecute("open", tmpFile.getAbsolutePath(), null, tmpFile.getAbsoluteFile().getParent(), JNIDDE.SW_SHOWNORMAL);
+	  } catch (Throwable e) {
+	    System.err.println("got exception " + e);
+	    e.printStackTrace();
 	    openWith(pAttachment);
+	  }
+	} else {
+	  openWith(pAttachment);
 	}
       }
     }
   }
-
+  
   /**
    * Returns whether or not we're running on a Windows platform.
    */
