@@ -504,7 +504,7 @@ UserProfile.editableFields.editor.uiConfig.scopeRoot=UserProfile.editableFields.
 UserProfile.editableFields.editor.uiConfig=theme
 UserProfile.editableFields.uiConfig.theme.propertyType=List
 UserProfile.editableFields.uiConfig.theme.allowedValues=Pooka.theme
-UserProfile.editableFields.uiConfig.theme._includeAddButton
+UserProfile.editableFields.uiConfig.theme._includeAddButton=true
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
@@ -512,7 +512,7 @@ UserProfile.editableFields.sentFolder.onlySubscribed=true
 
 UserProfile.editableFields.mailServer.propertyType=List
 UserProfile.editableFields.mailServer.allowedValues=OutgoingServer
-UserProfile.editableFields.mailServer._includeAddButton
+UserProfile.editableFields.mailServer._includeAddButton=true
 
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
@@ -746,7 +746,8 @@ Store.editableFields.leaveMessagesOnServer=false
 Store.editableFields.deleteOnServerOnLocalDelete.propertyType=Boolean
 Store.editableFields.deleteOnServerOnLocalDelete=false
 Store.editableFields.inboxLocation=/var/spool/mail/username
-Store.editableFields.mailDirectory.propertyType=File
+Store.editableFields.inboxLocation.propertyType=File
+Store.editableFields.mailDirectory.propertyType=Directory
 Store.editableFields.mailDirectory=Pooka.cacheDirectory
 
 Store.trashFolder.namePrefix=Store.

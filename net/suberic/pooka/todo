@@ -6,11 +6,9 @@
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.
 	-- started.  todo:
-	*) Variable:  default is wrong - should be disabled default.
-	*) FolderSelPane doesn't work. also, entryfield isn't disabled.
-	*) add listeners:  intFilter, enabledIfOtherFilter.
-	*) enable Add Button for lists.
-	*) tabbedfield isn't disabled.
+	*) FolderSelPane doesn't work. 
+	*) address book editor doesn't work.
+	*) add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
 
 *) queuing of outgoing mails
 	todo on this:

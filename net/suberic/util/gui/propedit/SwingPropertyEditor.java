@@ -280,4 +280,19 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
       pep.resizeEditor();
     }
   }
+
+  /**
+   * Adds the appropriate listeners.
+   */
+  public void addDefaultListeners() {
+    List propertyListenerList = manager.getPropertyAsList(editorTemplate + "._listeners", "");
+    java.util.Iterator it = propertyListenerList.iterator();
+    while (it.hasNext()) {
+      String current = (String)it.next();
+      PropertyEditorListener pel = manager.createListener(current);
+      if (pel != null) {
+	addPropertyEditorListener(pel);
+      }
+    }
+  }
 }

@@ -12,8 +12,9 @@ public class ListEditorPane extends SwingPropertyEditor {
   int originalIndex;
   JLabel label;
   JComboBox inputField;
+  JButton addButton;
   HashMap labelToValueMap = new HashMap();
-  int currentIndex;
+  int currentIndex = -1;
 
   /**
    * @param propertyName The property to be edited.  
@@ -38,7 +39,7 @@ public class ListEditorPane extends SwingPropertyEditor {
     inputBox.add(inputField);
     inputBox.add(Box.createGlue());
     if (manager.getProperty(editorTemplate + "._includeAddButton", "false").equalsIgnoreCase("true")) {
-      JButton addButton = createAddButton();
+      addButton = createAddButton();
       inputBox.add(addButton);
     }
 
@@ -241,8 +242,11 @@ public class ListEditorPane extends SwingPropertyEditor {
   public void setEnabled(boolean newValue) {
     if (inputField != null) {
       inputField.setEnabled(newValue);
-      enabled=newValue;
     }
+    if (addButton != null) {
+      addButton.setEnabled(newValue);
+    }
+    enabled=newValue;
   }
 
   /**

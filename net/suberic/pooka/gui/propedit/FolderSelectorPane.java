@@ -196,11 +196,14 @@ public class FolderSelectorPane extends SwingPropertyEditor {
       System.out.println("calling fsp.setEnabled(" + newValue + ")");
     if (inputButton != null) {
       inputButton.setEnabled(newValue);
-      enabled=newValue;
-      if (Pooka.isDebug())
-	System.out.println("set enabled to " + newValue);
-      
     }
+    if (valueDisplay != null) {
+      valueDisplay.setEnabled(newValue);
+    }
+    if (Pooka.isDebug())
+      System.out.println("set enabled to " + newValue);
+    
+    enabled=newValue;
   }
   
 }

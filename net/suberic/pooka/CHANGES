@@ -1,3 +1,7 @@
+added Add buttons to many of the list choices in the configuration editors.
+makes it a lot easier to add all of the items that you want in the correct
+order.
+
 made the VariableEditorPane change within the editor instead of 
 popping up a new window.
 
