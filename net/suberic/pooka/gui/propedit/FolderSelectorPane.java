@@ -17,7 +17,6 @@ public class FolderSelectorPane extends SwingPropertyEditor {
   JLabel label;
   JTextField valueDisplay;
   JButton inputButton;
-  VariableBundle sourceBundle;
   //boolean enabled;
   
   /**
@@ -68,7 +67,7 @@ public class FolderSelectorPane extends SwingPropertyEditor {
     if (Pooka.isDebug())
       System.out.println("creating an input button.");
     try {
-      java.net.URL url = this.getClass().getResource(sourceBundle.getProperty("FolderSelectorPane.inputButton.image", "images/More.gif"));
+      java.net.URL url = this.getClass().getResource(manager.getProperty("FolderSelectorPane.inputButton.image", "images/More.gif"));
       if (url != null) {
 	if (Pooka.isDebug())
 	  System.out.println("url isn't null.");
@@ -145,15 +144,15 @@ public class FolderSelectorPane extends SwingPropertyEditor {
   public FileSystemView createFileSystemView() {
     
     FileSystemView returnValue = null;
-    boolean justSubscribed = sourceBundle.getProperty(editorTemplate + ".onlySubscribed", "false").equalsIgnoreCase("true");
-    if (sourceBundle.getProperty(editorTemplate + ".selectionRoot", "allStores").equals("allStores")) {
+    boolean justSubscribed = manager.getProperty(editorTemplate + ".onlySubscribed", "false").equalsIgnoreCase("true");
+    if (manager.getProperty(editorTemplate + ".selectionRoot", "allStores").equals("allStores")) {
       if (justSubscribed) 
 	returnValue = new PookaFileSystemView();
       else 
 	returnValue = new MailFileSystemView();
     } else {
-      int prefixSize = sourceBundle.getProperty(editorTemplate + ".namePrefix", "Store.").length();
-      int suffixSize = sourceBundle.getProperty(editorTemplate + ".nameSuffix", "trashFolder").length();
+      int prefixSize = manager.getProperty(editorTemplate + ".namePrefix", "Store.").length();
+      int suffixSize = manager.getProperty(editorTemplate + ".nameSuffix", "trashFolder").length();
       String currentStoreName = property.substring(prefixSize, property.length() - suffixSize);
       net.suberic.pooka.StoreInfo currentStore = Pooka.getStoreManager().getStoreInfo(currentStoreName);
       if (currentStore != null) {
@@ -173,7 +172,7 @@ public class FolderSelectorPane extends SwingPropertyEditor {
     if (Pooka.isDebug())
       System.out.println("calling fsp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
     if (isEnabled() && isChanged())
-      sourceBundle.setProperty(property, (String)valueDisplay.getText());
+      manager.setProperty(property, (String)valueDisplay.getText());
   }
   
   public java.util.Properties getValue() {

@@ -39,20 +39,19 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default. 
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
-    System.err.println("creating tep for " + propertyName + ", template " + template);
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
     originalValue = manager.getProperty(property, "");
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-
+    
     if (debug) {
       System.out.println("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
     }
-
+    
     enabled=isEnabled;
-
+    
     templateScoped = manager.getProperty(editorTemplate + ".templateScoped", "false").equalsIgnoreCase("true");
     propertyScoped = manager.getProperty(editorTemplate + ".propertyScoped", "false").equalsIgnoreCase("true");
 
@@ -77,6 +76,8 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     }
 
     this.add(tabbedPane);
+
+    manager.registerPropertyEditor(property, this);
   }
 
   /**
@@ -89,37 +90,38 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     
     for (int i = 0; i < propsToEdit.size(); i++) {
       String currentProperty = editorTemplate + "." + (String)propsToEdit.get(i);
-      
+
       if (debug) {
-	System.err.println("getting editor for " + currentProperty);
-	if (propertyScoped) {
-	  if (manager.getProperty(currentProperty + ".addSubProperty", "false").equalsIgnoreCase("true")) {
-	    if (debug) {
-	      System.err.println("TEP:  addSubProperty = true; getting editor for " + property + "." + propsToEdit.get(i) + "," + currentProperty);
-	    }
-	    currentEditor = createEditorPane(property + "." + (String) propsToEdit.get(i), currentProperty);
-	  } else {
-	    if (debug) {
-	      System.err.println("TWP:  addSubProperty = false.  getting editor for " + property + ", " + currentProperty);
-	    }
-	    currentEditor = createEditorPane(property, currentProperty);
+	System.out.println("getting editor for " + currentProperty);
+      }
+      
+      if (propertyScoped) {
+	if (manager.getProperty(currentProperty + ".addSubProperty", "false").equalsIgnoreCase("true")) {
+	  if (debug) {
+	    System.out.println("TEP:  addSubProperty = true; getting editor for " + property + "." + propsToEdit.get(i) + "," + currentProperty);
 	  }
+	  currentEditor = createEditorPane(property + "." + (String) propsToEdit.get(i), currentProperty);
 	} else {
 	  if (debug) {
-	    System.err.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
+	    System.out.println("TWP:  addSubProperty = false.  getting editor for " + property + ", " + currentProperty);
 	  }
-	  currentEditor = createEditorPane(currentProperty, currentProperty);
+	  currentEditor = createEditorPane(property, currentProperty);
 	}
-	
+      } else {
 	if (debug) {
-	  System.out.println("adding " + currentEditor);
-	  System.out.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+	  System.out.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
 	}
-	editorList.add(currentEditor);
-	tabbedPane.add(manager.getProperty(currentProperty + ".label", currentProperty), currentEditor);
+	currentEditor = createEditorPane(currentProperty, currentProperty);
       }
+      
+      if (debug) {
+	System.out.println("adding " + currentEditor);
+	System.out.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+      }
+      editorList.add(currentEditor);
+      tabbedPane.add(manager.getProperty(currentProperty + ".label", currentProperty), currentEditor);
     }
-
+    
     return editorList;
   }
     
@@ -128,9 +130,8 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * Creates an editor pane for a group of values.
    */
   private SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    CompositeEditorPane cep = new CompositeEditorPane();
-    cep.configureEditor(subProperty, subTemplate, manager, true);
-    return cep;
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
+
   }
   
 }

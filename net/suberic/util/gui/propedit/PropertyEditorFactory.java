@@ -48,11 +48,11 @@ public class PropertyEditorFactory {
 	    typeToClassMap.put(currentType, currentClass);
 	  }
 	} catch (Exception e) {
-	  System.err.println("error registering class for property type " + currentType + ":  " + e);
+	  System.out.println("error registering class for property type " + currentType + ":  " + e);
 	}
       }
     } catch (Exception e) {
-      System.err.println("caught exception initializing PropertyEditorFactory:  " + e);
+      System.out.println("caught exception initializing PropertyEditorFactory:  " + e);
       e.printStackTrace();
     }
   }
@@ -155,6 +155,13 @@ public class PropertyEditorFactory {
    */
   public PropertyEditorUI createEditor(String property, String editorTemplate, PropertyEditorManager mgr, boolean enabled) {
     String type = sourceBundle.getProperty(editorTemplate + ".propertyType", "");
+    return createEditor(property, editorTemplate, type, mgr, enabled);
+  }
+  /**
+   * Creates an appropriate PropertyEditorUI for the given property and
+   * editorTemplate, using the given PropertyEditorManager.
+   */
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String type, PropertyEditorManager mgr, boolean enabled) {
 
     Class editorClass = (Class) typeToClassMap.get(type);
     if (editorClass == null) {

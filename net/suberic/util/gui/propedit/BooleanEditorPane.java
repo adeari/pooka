@@ -23,7 +23,9 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
     
     property=propertyName;
+    editorTemplate=template;
     manager=newManager;
+
     originalValue = manager.getProperty(property, manager.getProperty(template, "false"));
     originalBoolean = originalValue.equalsIgnoreCase("true");
 
@@ -57,6 +59,8 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     
     labelComponent = label;
     valueComponent = inputField;
+
+    manager.registerPropertyEditor(property, this);
   }
 
   /**

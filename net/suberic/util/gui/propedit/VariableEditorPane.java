@@ -36,6 +36,8 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     
     enabled=isEnabled;
     
+    editors = new Vector();
+
     String remove = manager.getProperty(editorTemplate + ".removeString", "");
     if (! remove.equals(""))
       property = property.substring(0, property.lastIndexOf(remove));
@@ -62,13 +64,25 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
     String currentValue = manager.getProperty(keyProperty, "");
     showPanel(currentValue);
+
+    manager.registerPropertyEditor(property, this);
   }
   
   /**
    * This shows the editor window for the configured value.
    */
   public void showPanel(String selectedId) {
-    CardLayout layout = (CardLayout)this.getLayout();
+    boolean enableMe = true;
+    if (selectedId == null || selectedId.equals("")) {
+      enableMe = false;
+      // check to see the default.
+      String possibleDefault = manager.getProperty(editorTemplate, "");
+      if (idToEditorMap.get(possibleDefault) != null) {
+	selectedId = possibleDefault;
+      }
+    }
+
+    CardLayout layout = (CardLayout)valueComponent.getLayout();
 
     Object newSelected = idToEditorMap.get(selectedId);
     if (newSelected == null) {
@@ -79,10 +93,11 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
       idToEditorMap.put(selectedId, spe);
       editors.add(spe);
       
-      this.add(selectedId, spe);
+      spe.setEnabled(enableMe && enabled);
+      valueComponent.add(selectedId, spe);
       
     }
-    layout.show(this, selectedId);
+    layout.show(valueComponent, selectedId);
   }    
  
   /**

@@ -119,6 +119,8 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     labelComponent = optionBox;
     
     this.setEnabled(isEnabled);
+
+    manager.registerPropertyEditor(property, this);
   }
   
   /**
@@ -170,9 +172,9 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     
     int i = itemList.size();
     
-    rootProp = new String(property + ".default");
+    rootProp = new String(property + "._default");
     
-    SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate + ".editableFields");
+    SwingPropertyEditor pep =  createEditorPane(rootProp, editorTemplate + ".editableFields");
     pep.setEnabled(false);
     
     if (original == true) {
@@ -252,16 +254,15 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       Object newSelected = currentPanels.get(selectedId);
       if (newSelected == null) {
 	String rootProp = new String(property + "." + selectedId);
-	
-	CompositeEditorPane pep = new CompositeEditorPane();
-	System.err.println("created pep for property " + rootProp + ", editorTempalte " + editorTemplate + ".editableFields");
-	pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
+	SwingPropertyEditor sep = createEditorPane(rootProp, editorTemplate + ".editableFields");
+	//CompositeEditorPane pep = new CompositeEditorPane();
+	//pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
 
 	// save reference to new pane in hash table
-	currentPanels.put(selectedId, pep);
-	editors.add(pep);
+	currentPanels.put(selectedId, sep);
+	editors.add(sep);
 	
-	entryPanel.add(selectedId, pep);
+	entryPanel.add(selectedId, sep);
 	
       }
       entryLayout.show(entryPanel, selectedId);
@@ -284,7 +285,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
       String rootProp = new String(property + "." + newValueName);
       
-      SwingPropertyEditor pep = (SwingPropertyEditor) manager.createEditor(rootProp, editorTemplate);
+      SwingPropertyEditor pep = createEditorPane(rootProp, editorTemplate + ".editableFields");
       
       optionListModel.addElement(newValueName);
       
@@ -388,6 +389,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     if (newName != null) {
       CompositeEditorPane oldPane = (CompositeEditorPane)currentPanels.get(oldName);
       if (oldPane != null) {
+      
 	String rootProp =new String(property.concat("." + newName));
 	
 	CompositeEditorPane pep = new CompositeEditorPane(manager, rootProp, editorTemplate);;
@@ -501,6 +503,16 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    */
   public JPanel getEntryPanel() {
     return entryPanel;
+  }
+
+  /**
+   * Creates an editor.
+   */
+  public SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
+    //CompositeEditorPane pep = new CompositeEditorPane();
+    //pep.configureEditor(rootProp, editorTemplate + ".editableFields", manager, true);
+    
   }
 }
 

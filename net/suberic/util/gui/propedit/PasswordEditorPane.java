@@ -56,6 +56,8 @@ public class PasswordEditorPane extends StringEditorPane {
     
     labelComponent = label;
     valueComponent = inputField;
+
+    manager.registerPropertyEditor(property, this);
   }
   
   /**

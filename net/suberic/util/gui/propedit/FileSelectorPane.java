@@ -61,6 +61,7 @@ public class FileSelectorPane extends SwingPropertyEditor {
     
     this.setEnabled(isEnabled);
     
+    manager.registerPropertyEditor(property, this);
   }
   
   /**

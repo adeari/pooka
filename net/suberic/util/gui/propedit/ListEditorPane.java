@@ -50,6 +50,7 @@ public class ListEditorPane extends SwingPropertyEditor {
     valueComponent = inputBox;
     //valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
     //valueComponent.add(inputField);
+    manager.registerPropertyEditor(property, this);
   }
   
 

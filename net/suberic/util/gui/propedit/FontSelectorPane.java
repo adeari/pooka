@@ -79,6 +79,7 @@ public class FontSelectorPane extends SwingPropertyEditor {
     
     this.setEnabled(isEnabled);
     
+    manager.registerPropertyEditor(property, this);
   }
   
   /**

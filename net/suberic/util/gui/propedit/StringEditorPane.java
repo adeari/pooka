@@ -56,6 +56,8 @@ public class StringEditorPane extends SwingPropertyEditor {
     
     labelComponent = label;
     valueComponent = inputField;
+
+    manager.registerPropertyEditor(property, this);
   }
   
   /**

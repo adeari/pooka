@@ -174,6 +174,8 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     
     this.add(contentPanel);
     alignEditorSizes();
+
+    manager.registerPropertyEditor(property, this);
   }
   
   /**

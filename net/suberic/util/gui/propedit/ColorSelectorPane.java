@@ -22,7 +22,6 @@ public class ColorSelectorPane extends SwingPropertyEditor {
 
   JLabel label;
   JButton inputButton;
-  PropertyEditorManager manager;
 
   int originalRgb = -1;
   Color currentColor;
@@ -81,6 +80,7 @@ public class ColorSelectorPane extends SwingPropertyEditor {
 
     this.setEnabled(isEnabled);
     
+    manager.registerPropertyEditor(property, this);
   }
   
   /**
