@@ -1,27 +1,34 @@
 alpha 2
 ----------
 
-*) enable voice control
-
 *)  add a way to edit the mailcap file.  this should be doable both from
 a menu option and from the 'open with' dialog.
 
-*)  make the windows detachable.
-
 *) create a Trash folder.
+
+*) create a Sent folder.
+
+*) fix the signature
 
 *) add new/unread/urgent/etc flags to the FolderTable.
 	somewhat done.  left todo:
-	1)  make the recent/new one work --??
+	1)  make the BooleanIcon implement Comparable
+	2)  generalize BooleanIcon so that you can do one dot for 'new and
+	unread', another for 'not new but unread', and an empty space for
+	'read'.
+	3)  fix the open folders twice on startup bug.
 
 *) fix tab navigation in the compose pane.
 
+?????? alpha 2 or not ??????
+----------------------------
+
+*) enable voice control
+
+*)  make the windows detachable.
+
 after alpha 2
 ----------------
-
-*)  make a sent folder.
-
-*)  fix the signature.
 
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
