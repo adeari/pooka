@@ -17,51 +17,77 @@ import net.suberic.util.VariableBundle;
  * TabbedList.tabThree=prop7:prop8:prop9
  *
  */
-public class TabbedEditorPane extends DefaultPropertyEditor implements PropertyEditorUI {
+public class TabbedEditorPane extends DefaultPropertyEditor {
     Vector editors;
     PropertyEditorFactory factory;
 
-    
+    String property;
+    String template;
+    JTabbedPane tabbedPane;
+    VariableBundle sourceBundle;
+
+    public TabbedEditorPane(String newProperty, String newTemplate, PropertyEditorFactory newFactory) {
+	configureEditor(newFactory, newProperty, newTemplate, factory.getBundle(), true);
+    }
+
     /**
      * This configures this editor with the following values.
      */
-    public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+    public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String templateType, VariableBundle bundle, boolean isEnabled) {
+
+	property=propertyName;
+	template=templateType;
 	factory = newFactory;
+	sourceBundle = bundle;
 
-	DefaultPropertyEditor currentEditor;
+	tabbedPane = new JTabbedPane();
 
+	// first, get the strings that we're going to edit.
+
+	Vector propsToEdit = factory.getBundle().getPropertyAsVector(template, "");
+
+	JComponent currentEditor;
+	
 	editors = new Vector();
 
-	for (int i = 0; i < properties.size(); i++) {
-	    currentEditor =
-              factory.createEditor((String)properties.elementAt(i), (String)templateTypes.elementAt(i));
+	for (int i = 0; i < propsToEdit.size(); i++) {
+	    String currentProperty = template + "." + (String)propsToEdit.elementAt(i);
+	    currentEditor = createEditorPane(propertyName, currentProperty);
 	    editors.add(currentEditor);
-	    this.add(currentEditor);
+	    tabbedPane.add(factory.getBundle().getProperty(currentProperty + ".label", currentProperty), currentEditor);
 	}
     }
 
-    public void configureEditor(String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
-	configureEditor(newProperty, templateType, bundle, isEnabled);
-    }
-
-    public void configureEditor(String newProperty, VariableBundle bundle, boolean isEnabled) {
-	configureEditor(newProperty, newProperty, bundle, isEnabled);
-    }
-
-    public void configureEditor(String newProperty, VariableBundle bundle) {
-	configureEditor(newProperty, newProperty, bundle, true);
-    }
-
     /**
-     * This creates a PropertyEditor for the given set of properties.
+     * Creates an editor pane for a group of values.
      */
-    public DefaultPropertyEditor createPanel(String rootProperty, String subProperty, String templateRoot, String templateSub) {
-	String propertyName = rootProperty + "." + subProperty;
-	String templateName = templateRoot + "." + templateSub;
-	VariableBundle vb = factory.getBundle();
-	return new PropertyEditorPane(factory, vb.getPropertyAsVector(propertyName, ""), vb.getPropertyAsVector(templateName, ""), null);
+    private JComponent createEditorPane(String subProperty, String subTemplate) {
+	return new PropertyEditorPanel();
     }
 
+
+    public void setValue() {
+	if (isEnabled()) {
+	    for (int i = 0; i < editors.size() ; i++) {
+		((PropertyEditorUI) editors.elementAt(i)).setValue();
+	    }
+	}
+    }
+
+    public void resetDefaultValue() {
+	if (isEnabled()) {
+	    for (int i = 0; i < editors.size() ; i++) {
+		((PropertyEditorUI) editors.elementAt(i)).resetDefaultValue();
+	    }
+	}
+    }
+
+    public void setEnabled(boolean newValue) {
+	for (int i = 0; i < editors.size() ; i++) {
+	    ((PropertyEditorUI) editors.elementAt(i)).setEnabled(newValue);
+	    enabled=newValue;
+	}
+    }
 }
     
 
