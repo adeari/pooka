@@ -493,7 +493,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     java.awt.Dimension key = new java.awt.Dimension(width, height);
     java.awt.Image defaultImage = (java.awt.Image) buttonImageMap.get(key);
     if (defaultImage == null) {
-      java.net.URL url = this.getClass().getResource("images/User.gif");
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("AddressBook.button.image", "images/User.gif"));
       ImageIcon addressIcon = new ImageIcon(url);
       java.awt.Image addressImage = addressIcon.getImage();
       defaultImage = addressImage.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);

@@ -498,7 +498,7 @@ UserProfile.editableFields.editor.user.scoped=true
 UserProfile.editableFields.editor.user.scopeRoot=UserProfile.editableFields
 UserProfile.editableFields.editor.user.propertyType=Composite
 
-UserProfile.editableFields.editor.config=signatureFile:sentFolder:mailServer
+UserProfile.editableFields.editor.config=defaultDomain:signatureFile:sentFolder:mailServer
 UserProfile.editableFields.editor.config.scoped=true
 UserProfile.editableFields.editor.config.scopeRoot=UserProfile.editableFields
 UserProfile.editableFields.editor.config.propertyType=Composite
@@ -845,6 +845,8 @@ FolderTree.closedFolderIcon=images/Minus.gif
 FolderTree.unavailableIcon=images/Delete.gif
 FolderTree.connectedStoreIcon=images/mailbox.gif
 FolderTree.disconnectedStoreIcon=images/mailbox.gif
+
+AddressBook.button.image=images/User.gif
 
 NewAccountPooka.firstPanel=userName:fullName:password:serverName:protocol:smtpServer
 NewAccountPooka.firstPanel.propertyType=Composite
