@@ -29,6 +29,9 @@ Pooka.openSavedFoldersOnStartup=true
 Pooka.saveOpenFoldersOnExit=true
 Pooka.saveFolderWindowLocationsOnExit=true
 
+Pooka.newMessage.autoAddSignature=true
+Pooka.newMessage.signatureBeforeCopiedMessage=true
+
 MenuBar=File:Edit:Mail:Window:Help
 
 MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:EmptyTrash:Exit

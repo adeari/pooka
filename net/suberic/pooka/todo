@@ -7,27 +7,14 @@ a menu option and from the 'open with' dialog.
 *)  get JFileChooser to work with the mail stores.  sort of done; still
 	need to deal with disconnection issues and return value issues.
 
-*) create a Trash folder.  done.  
-	make it so it doesn't get new message notification.
-
-*) create a Sent folder.  done.
-	need to add ui as above
-	need to fix display (sent date is too big.)
-	need to fix sent date--right now, it isn't being set.
-	need to check to see when messages are actually received there.
-
 *) fix the signature
 
 *) the update feature doesn't show up for INBOX (or maybe just doesn't show
 up for top-level folders?).
 
-*) fix marc's ClassCastException.
-
 *) add a way to notify users of 'new' messages. -- sort of done.  need to make
 	it nicer, maybe listing new messages on the title, and use italics
 	or something other than * * in the folderPanel.
-	-- also, as above, make sure these things don't show for the sent and
-	trash folders.
 	-- also, check the update times for the selections of windows; i think
 	that the FolderNodes aren't being redrawn on time.
 

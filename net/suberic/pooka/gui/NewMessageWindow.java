@@ -198,6 +198,10 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	return inputPanel;
     }
 
+    /**
+     * This creates a new JTextPane for the main text part of the new 
+     * message.  It will also include the current text of the message.
+     */
     public JTextPane createMessagePanel(MessageProxy aMsg) {
 	JTextPane retval = new JTextPane();
 	retval.setEditorKit(new MailEditorKit());
@@ -211,9 +215,28 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	if (origText != null && origText.length() > 0) 
 	    retval.setText(origText);
 	
+	if (Pooka.getProperty("Pooka.newMessage.autoAddSignature", "false").equalsIgnoreCase("true")) {
+	    addSignature();
+	}
+
 	// bodyInputPane.setContentType("text");
 	return retval;
 
+    }
+
+    /**
+     * This adds the current user's signature to the message at the current
+     * location of the cursor.
+     */
+    public void addSignature() {
+	String sig = getSelectedProfile().getSignature();
+	if (sig != null) {
+	    try {
+		editorPane.getDocument().insertString(editorPane.getCaretPosition(), sig, null);
+	    } catch (javax.swing.text.BadLocationException ble) {
+		;
+	    }
+	}
     }
 
     /**
