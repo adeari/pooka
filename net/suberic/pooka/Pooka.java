@@ -100,6 +100,8 @@ public class Pooka {
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
         frame.show();
 	
+	uiFactory.setShowing(true);
+
 	if (getProperty("Store", "").equals("")) {
 	    if (panel.getContentPanel() instanceof MessagePanel) {
 		NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());

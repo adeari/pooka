@@ -78,7 +78,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
 	else
 	    defaultLabel = property.substring(dotIndex+1);
 
-	label = new JLabel(sourceBundle.getProperty(property + ".label", defaultLabel));
+	label = new JLabel(sourceBundle.getProperty(newTemplate + ".label", defaultLabel));
 
 	// create the current list of options
 

@@ -204,6 +204,7 @@ public class SearchTermManager {
 	SearchTerm term = null;
 	try {
 	    String className = Pooka.getProperty(searchProperty + ".class", "");
+	    System.out.println("searchProperty is " + searchProperty + "; className is " + className);
 	    Class stClass = Class.forName(className);
 	    
 	    // ****** Create a StringTerm.

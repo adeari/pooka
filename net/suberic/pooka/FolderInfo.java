@@ -1415,15 +1415,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
-     * This takes the FolderProperty.filters property and uses it to populate
+     * This takes the FolderProperty.backendFilters and 
+     * FolderProperty.displayFilters properties and uses them to populate
      * the backendMessageFilters and displayMessageFilters arrays.
      */
     public void createFilters() {
-	Vector backendFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters.backend", "");
+	Vector backendFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".backendFilters", "");
 	if (backendFilterNames != null && backendFilterNames.size() > 0) {
 	    backendFilters = new BackendMessageFilter[backendFilterNames.size()];
 	    for (int i = 0; i < backendFilterNames.size(); i++) {
-		backendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".filters.backend." + (String) backendFilterNames.elementAt(i));
+		System.out.println("creating filter from " + getFolderProperty() + ".backendFitlers." + (String) backendFilterNames.elementAt(i));
+		backendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
 	    }
 	}
 
@@ -1434,9 +1436,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
 	}
 
-	Vector displayFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters.display", "");
+	Vector displayFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".displayFilters", "");
 	for (int i = 0; i < displayFilterNames.size(); i++) {
-	    foundFilters.add(new MessageFilter(getFolderProperty() + ".filters.display." + (String) displayFilterNames.elementAt(i)));
+	    foundFilters.add(new MessageFilter(getFolderProperty() + ".displayFilters." + (String) displayFilterNames.elementAt(i)));
 	}
 
 	displayFilters = new MessageFilter[foundFilters.size()];

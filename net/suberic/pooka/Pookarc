@@ -383,15 +383,36 @@ UserProfile.editableFields.sentFolder.selectionRoot=allStores
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
 
-Folder.editableFields.scoped=true
-Folder.editableFields.propertyType=Composite
-Folder.editableFields=filters:defaultProfile:useTrashFolder
+Folder.editableFields.propertyType=Tabbed
+Folder.editableFields.propertyScoped=true
+Folder.editableFields.templateScoped=true
+Folder.editableFields=config:display:backend
+Folder.editableFields.config=defaultProfile:useTrashFolder
+Folder.editableFields.config.scoped=true
+Folder.editableFields.config.scopeRoot=Folder.editableFields
 
-Folder.editableFields.filters.propertyType=Multi
-Folder.editableFields.filters.editableFields.scoped=true
-Folder.editableFields.filters.editableFields=searchTerm:action
-Folder.editableFields.filters.editableFields.searchTerm.propertyType=SearchTerm
-Folder.editableFields.filters.editableFields.action.propertyType=Filter
+Folder.editableFields.display=displayFilters
+Folder.editableFields.display.scoped=true
+Folder.editableFields.display.scopeRoot=Folder.editableFields
+Folder.editableFields.displayFilters.propertyType=Multi
+Folder.editableFields.displayFilters.scoped=true
+Folder.editableFields.displayFilters.editableFields.scoped=true
+Folder.editableFields.displayFilters.editableFields=searchTerm:action
+Folder.editableFields.displayFilters.editableFields.searchTerm.propertyType=SearchTerm
+Folder.editableFields.displayFilters.editableFields.action.propertyType=Filter
+Folder.editableFields.displayFilters.editableFields.action.filterType=display
+
+Folder.editableFields.backend=backendFilters
+Folder.editableFields.backend.scoped=true
+Folder.editableFields.backend.scopeRoot=Folder.editableFields
+Folder.editableFields.backendFilters.propertyType=Multi
+Folder.editableFields.backendFilters.scoped=true
+Folder.editableFields.backendFilters.scopeRoot=Folder.editableFields
+Folder.editableFields.backendFilters.editableFields.scoped=true
+Folder.editableFields.backendFilters.editableFields=searchTerm:action
+Folder.editableFields.backendFilters.editableFields.searchTerm.propertyType=SearchTerm
+Folder.editableFields.backendFilters.editableFields.action.propertyType=Filter
+Folder.editableFields.backendFilters.editableFields.action.filterType=backend
 
 Folder.editableFields.defaultProfile.propertyType=List
 Folder.editableFields.defaultProfile.allowedValues=UserProfile

@@ -91,6 +91,11 @@ public interface PookaUIFactory extends ErrorHandler {
      * Shows a SearchForm with the given FolderInfos selected.  The allowed
      * values will be the list of all available Folders.
      */
-    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders); 
+    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders);
 
+    /**
+     * This tells the factory whether or not its ui components are showing
+     * yet or not.
+     */
+    public void setShowing(boolean newValue);
 }

@@ -53,7 +53,8 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
 
 	// first, get the strings that we're going to edit.
 
-	Vector propsToEdit = factory.getBundle().getPropertyAsVector(template, "");
+	//System.out.println("creating prop from " + template + "=" + bundle.getProperty(template, ""));
+	Vector propsToEdit = bundle.getPropertyAsVector(template, "");
 
 	DefaultPropertyEditor currentEditor;
 	

@@ -61,16 +61,20 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	enabled=isEnabled;
 
 	scoped = bundle.getProperty(template + ".scoped", "false").equalsIgnoreCase("true");
+	//System.out.println("bundle.getProperty (" + template + ".scoped) = " +  bundle.getProperty(template + ".scoped", "false") + " = " + scoped);
 
 	Vector properties = new Vector();
 	Vector templates = new Vector();
 
 	if (scoped) {
 	    String scopeRoot = bundle.getProperty(template + ".scopeRoot", template);
+	    //System.out.println("scopeRoot is " + scopeRoot);
 	    Vector templateNames = bundle.getPropertyAsVector(template, "");
+	    //System.out.println("templateNames = getProp(" + template + ") = " + bundle.getProperty(template, ""));
 	    for (int i = 0; i < templateNames.size() ; i++) {
 		properties.add(property + "." + (String) templateNames.elementAt(i));
 		templates.add(scopeRoot + "." + (String) templateNames.elementAt(i));
+		//System.out.println("adding " + (String) templateNames.elementAt(i) + ", template " + (String) templateNames.elementAt(i));
 	    }
 	} else {
 	    properties = bundle.getPropertyAsVector(property, "");

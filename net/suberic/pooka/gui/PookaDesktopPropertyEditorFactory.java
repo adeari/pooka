@@ -22,6 +22,7 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
      */
     public DefaultPropertyEditor createEditor(String property) {
 	String test = getBundle().getProperty(property + ".propertyType", "");
+	//System.out.println("creating editor for " + property + "; test = " + test);
 	if (test.equalsIgnoreCase("Folder"))
 	    return createFolderEditor(property);
 	else if (test.equalsIgnoreCase("Filter"))
@@ -44,6 +45,7 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
      */
     public DefaultPropertyEditor createEditor(String property, String typeTemplate) {
 	String test = getBundle().getProperty(typeTemplate + ".propertyType", "");
+	//System.out.println("creating editor for " + property + ", template " + typeTemplate + "; test = " + test);
 	if (test.equals("Folder"))
 	    return createFolderEditor(property, typeTemplate);
 	else if (test.equalsIgnoreCase("Filter"))

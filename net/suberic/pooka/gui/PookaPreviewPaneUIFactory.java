@@ -18,6 +18,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     PreviewContentPanel contentPanel = null;
     PropertyEditorFactory editorFactory = null;
 
+    public boolean showing = false;
+
     /**
      * Constructor.
      */
@@ -262,5 +264,13 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
      */
     public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
 	showSearchForm(selectedFolders, null);
+    }
+
+    /**
+     * This tells the factory whether or not its ui components are showing
+     * yet or not.
+     */
+    public void setShowing(boolean newValue) {
+	showing=newValue;
     }
 }

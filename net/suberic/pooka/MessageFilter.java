@@ -26,6 +26,7 @@ public class MessageFilter {
      *
      */
     public MessageFilter(String sourceProperty) {
+	System.out.println("property is " + sourceProperty);
 	try {
 	    searchTerm = Pooka.getSearchManager().generateSearchTermFromProperty(sourceProperty);
 	

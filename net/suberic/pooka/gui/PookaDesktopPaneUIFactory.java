@@ -15,6 +15,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    
     MessagePanel messagePanel = null;
     PropertyEditorFactory editorFactory = null;
+
+    public boolean showing = false;
     
     /**
      * Constructor.
@@ -171,7 +173,11 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
      * This shows an Error Message window.
      */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	if (showing)
+	    JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	else
+	    System.out.println(errorMessage);
+	
     }
 
     /**
@@ -270,4 +276,12 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
 	showSearchForm(selectedFolders, null);
     } 
+
+    /**
+     * This tells the factory whether or not its ui components are showing
+     * yet or not.
+     */
+    public void setShowing(boolean newValue) {
+	showing=newValue;
+    }
 }
