@@ -36,6 +36,10 @@ public class PasswordEditorPane extends DefaultPropertyEditor {
 	this.add(label);
 	this.add(inputField);
 	this.setEnabled(isEnabled);
+
+	labelComponent = label;
+	valueComponent = inputField;
+	    
     }
 
     public PasswordEditorPane(String newProperty, VariableBundle bundle) {

@@ -31,6 +31,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     public CompositeEditorPane(PropertyEditorFactory newFactory, String 
 			       newProperty, String newTemplate) {
 	super(BoxLayout.Y_AXIS);
+	System.out.println("creating a new CompositeEditorPane.");
 	configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), true);
         
     }
@@ -72,7 +73,47 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	    editors.add(currentEditor);
 	    this.add(currentEditor);
 	}
+
+	System.out.println("aligning editor sizes.");
+	alignEditorSizes();
     }
+
+    /**
+     * This should even out the various editors on the panel.
+     */
+    public void alignEditorSizes() {
+	int labelWidth = 0;
+	int valueWidth = 0;
+	int totalWidth = 0;
+	for (int i = 0; i <  editors.size(); i++) {
+	    labelWidth = Math.max(labelWidth, ((DefaultPropertyEditor)editors.elementAt(i)).getMinimumLabelSize().width);
+	    valueWidth = Math.max(valueWidth, ((DefaultPropertyEditor)editors.elementAt(i)).getMinimumValueSize().width);
+	    totalWidth = Math.max(totalWidth, ((DefaultPropertyEditor)editors.elementAt(i)).getMinimumTotalSize().width);
+	}
+
+	System.out.println("attempting to set all sizes to label width = " + labelWidth + ", valueWidth = " + valueWidth);
+
+	if (totalWidth > labelWidth + valueWidth) {
+	    int difference = totalWidth - labelWidth - valueWidth;
+	    labelWidth = labelWidth + (difference / 2);
+	    valueWidth = totalWidth - labelWidth;
+	}
+
+	for (int i = 0; i < editors.size(); i++) {
+	    ((DefaultPropertyEditor) editors.elementAt(i)).setWidths(labelWidth, valueWidth);
+	}
+	    
+    }
+
+    /**
+     * just for fun.
+     */
+    /*
+    public void addNotify() {
+	super.addNotify();
+	alignEditorSizes();
+    }
+    */
 
     public void setValue() {
 	if (isEnabled()) {

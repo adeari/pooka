@@ -10,6 +10,7 @@ public class BooleanEditorPane extends DefaultPropertyEditor {
     String property;
     boolean originalValue;
     JCheckBox inputField;
+    JLabel label;
     VariableBundle sourceBundle;
 
     public BooleanEditorPane() {
@@ -41,12 +42,17 @@ public class BooleanEditorPane extends DefaultPropertyEditor {
 	else
 	    defaultLabel = property.substring(dotIndex+1);
 	
-	inputField = new JCheckBox(sourceBundle.getProperty(property + ".label", defaultLabel));
+	inputField = new JCheckBox();
+	label = new JLabel(sourceBundle.getProperty(property + ".label", defaultLabel));
 	
 	inputField.setSelected(originalValue);
 
+	this.add(label);
 	this.add(inputField);
 	this.setEnabled(isEnabled);
+
+	labelComponent = label;
+	valueComponent = inputField;
     }
 
     /**

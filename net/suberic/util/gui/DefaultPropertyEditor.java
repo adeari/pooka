@@ -82,26 +82,32 @@ public abstract class DefaultPropertyEditor extends Box implements PropertyEdito
      * Gets the minimum size for the labelComponent.
      */
     public Dimension getMinimumLabelSize() {
-	if (labelComponent != null) 
+	if (labelComponent != null) {
+	    System.out.println("label:  minimum size is " + labelComponent.getMinimumSize() + ", prefSize is " + labelComponent.getPreferredSize() + ", size is " + labelComponent.getSize()); 
 	    return labelComponent.getMinimumSize();
-	else
+	} else {
+	    System.out.println("label is null.");
 	    return new Dimension(0,0);
+	}
     }
 
     /**
      * Gets the minimum size for the valueComponent.
      */
     public Dimension getMinimumValueSize() {
-	if (valueComponent != null) 
+	if (valueComponent != null) {
+	    System.out.println("value:  minimum size is " + valueComponent.getMinimumSize() + ", prefSize is " + valueComponent.getPreferredSize() + ", size is " + valueComponent.getSize()); 
 	    return valueComponent.getMinimumSize();
-	else
+	} else {
+	    System.out.println("value is null.");
 	    return new Dimension(0,0);
+	}
     }
 
     /**
      * Returns the calculated minimum size for this component.
      */
-    public Dimension getTotalMinimumSize() {
+    public Dimension getMinimumTotalSize() {
 	return this.getMinimumSize();
     }
 
@@ -113,5 +119,25 @@ public abstract class DefaultPropertyEditor extends Box implements PropertyEdito
 	    labelComponent.setSize(labelSize);
 	if (valueComponent != null)
 	    valueComponent.setSize(valueSize);
+    }
+
+    /**
+     * Sets the widths for the label component and the value component.
+     */
+    public void setWidths(int labelWidth, int valueWidth) {
+	if (labelComponent != null)
+	    labelComponent.setSize(new Dimension(labelWidth, labelComponent.getSize().height));
+	if (valueComponent != null)
+	    valueComponent.setSize(new Dimension(valueWidth, valueComponent.getSize().height));
+    }
+
+    /**
+     * Sets the heights for the label component and the value component.
+     */
+    public void setHeights(int labelHeight, int valueHeight) {
+	if (labelComponent != null)
+	    labelComponent.setSize(new Dimension(labelComponent.getSize().width, labelHeight));
+	if (valueComponent != null)
+	    valueComponent.setSize(new Dimension(valueComponent.getSize().width, valueHeight));
     }
 }

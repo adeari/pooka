@@ -28,9 +28,13 @@ public class StringEditorPane extends DefaultPropertyEditor {
 
 	label = new JLabel(sourceBundle.getProperty(property + ".label", defaultLabel));
 	inputField = new JTextField(originalValue);
+	inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
 	this.add(label);
 	this.add(inputField);
 	this.setEnabled(isEnabled);
+
+	labelComponent = label;
+	valueComponent = inputField;
     }
 
     public StringEditorPane(String newProperty, VariableBundle bundle) {

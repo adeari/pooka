@@ -34,7 +34,7 @@ public class PropertyEditorFactory {
     public Container createEditorWindow(String title, Vector properties) {
 	JFrame jf = new JFrame(title);
 	jf.getContentPane().add(new PropertyEditorPane(this, properties, jf));
-	jf.setSize(100,100);
+	jf.setSize(200,200);
 	jf.pack();
 	return jf;
     }
