@@ -4,6 +4,8 @@ header.
 *) fix incorrect display of unread messages (?) -- could have to do with
 	delete filter???
 
+*) add a place in preferences to enabled debug.
+
 *) add drag and drop
 	*) include message
 	*) move message

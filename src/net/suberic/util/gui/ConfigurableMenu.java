@@ -80,6 +80,7 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
     if (!keyBinding.equals("")) {
       this.setMnemonic(keyBinding.charAt(0));
     }
+
   }
   
   /**
@@ -121,6 +122,11 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
       if (!keyBinding.equals(""))
 	mi.setMnemonic(keyBinding.charAt(0));
       
+      String accelBinding = vars.getProperty(menuID + "." + menuItemID + ".Accelerator", "");
+      if (!accelBinding.equals("")) {
+	mi.setAccelerator(KeyStroke.getKeyStroke(accelBinding));
+      }
+
       return mi;
     } else {
       // this means that we have a submenu.
