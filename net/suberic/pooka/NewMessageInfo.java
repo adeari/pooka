@@ -120,7 +120,11 @@ public class NewMessageInfo extends MessageInfo {
 	mbp.setDescription(f.getName());
 	    
 	mbp.setDataHandler( dh );
-	
+
+	String type = dh.getContentType();
+
+	mbp.setHeader("Content-Type", type);
+
 	addAttachment(new MBPAttachment(mbp));
     }
 

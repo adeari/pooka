@@ -2,8 +2,6 @@ beta 1
 ---------------
 
 search: 
-add support for incoming message filter
-add support for message display filter
 filter editor:  fix the color button size.  
 	add a filter editor for delete, move, and font.
 	
@@ -11,14 +9,9 @@ error:  filterfoldercellrenderer has problems with search forms.
 
 *) caching messages marks them as read.
 
-*) make it so Disconnected IMAP actually works if you're disconnected.  :)
-this means that we need to change the way that stores are loaded and 
-connected.
+*) no way to cache messages as they come in.
 
-
-
-
-
+*) no way to connect to all of your subscribed folders.
 
 ---------------
 
@@ -34,6 +27,8 @@ last time you ran the client and this time) aren't marked as recent--only
 ones that come in while you're already connected are labelled like that.
 
 *) add address book and alias support -- jph
+
+*) incorrect number of messages/unread messages when in disconnected mode.
 
 --
 
@@ -57,17 +52,6 @@ general ui
 ----------
 *) add undo/redo support
 
-searching
----------
-*) add something to search through all messages in the folder.
-
-*) add support for mail filters.
-	to be supported:
-	match:  header, subject, date, flags
-	match type:  (not) contains, is, begins with, ends with, is before,
-	 	     is after
-	actions:  move to folder, change priority, delete, mark read
-
 *) add a search and replace for the message editors.
 
 other
@@ -80,11 +64,6 @@ the message.
 
 *) have it change its icon if you get new messages, in addition to changing
 the title bar.
-
-*) make it so you can remove the notification for certain folders if they
-get messages.  so if you have certain folders that you care about, then you'll
-get notification, and if the other folders get messages, it won't do the
-new message notification.
 
 *) bug:  if you go into the multi configuration editors and it's empty, you
 should more or less be forced to create a new entity.  otherwise you'll start
