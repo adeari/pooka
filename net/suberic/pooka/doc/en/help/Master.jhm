@@ -5,7 +5,7 @@
 
 <map version="1.0">
 	<mapID target="pooka.intro" url="pooka/intro.html" />
-	<mapID target="gpl" url="pooka/gpl.html" />
+	<mapID target="gpl" url="pooka/copying.html" />
 	<mapID target="pooka.starting" url="pooka/starting.html" />
 	<mapID target="reading.intro" url="pooka/reading.html" />
 	<mapID target="composing.intro" url="pooka/composing.html" />
