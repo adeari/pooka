@@ -252,7 +252,7 @@ public class MessageProxy {
     protected void populateReply(MimeMessage mMsg) 
 	throws MessagingException {
 	String textPart = MailUtilities.getTextPart(message);
-	UserProfile up = UserProfile.getDefaultProfile(message);
+	UserProfile up = UserProfile.getDefaultProfile(this);
 
 	String parsedText;
 	String replyPrefix;

@@ -185,7 +185,7 @@ public class MessageWindow extends JInternalFrame {
 	inputRow.add(userProfileLabel);
 	inputRow.add(profileCombo);
 	
-	profileCombo.setSelectedItem(UserProfile.getDefaultProfile(aMsg.getMessage()));
+	profileCombo.setSelectedItem(UserProfile.getDefaultProfile());
 	proptDict.put("UserProfile", profileCombo);
 
 	inputPanel.add(inputRow);

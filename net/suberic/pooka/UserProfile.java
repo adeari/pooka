@@ -112,45 +112,19 @@ public class UserProfile extends Object {
 	return null;
     }
 
-    static public UserProfile getDefaultProfile(Message msg) {
-	if (msg.getFolder() != null)
-	    return UserProfile.getDefaultProfile(msg.getFolder());
+    static public UserProfile getDefaultProfile(net.suberic.pooka.gui.MessageProxy msg) {
+	if (msg.getFolderInfo() != null)
+	    return UserProfile.getDefaultProfile(msg.getFolderInfo());
 	else
 	    return UserProfile.getDefaultProfile();
     }
 
-    static public UserProfile getDefaultProfile(Folder fdr) {
-	// get the full name of the folder
-	String folderName = fdr.getFullName();
-	System.out.println("folderName is " + folderName);
-	
-	String defaultProfileName = Pooka.getProperty("Store." + folderName + ".defaultProfile", "");
-	if (! defaultProfileName.equals("")) {
-	    // we got one.  have to make sure it's valid.
-	    UserProfile tmpProfile = UserProfile.getProfile(defaultProfileName);
-	    if (tmpProfile != null)
-		return tmpProfile;
-	    
-	}   
-	// no such animal.  try the level above
-	
-	try {
-	    if (fdr.getParent() != null)
-		return UserProfile.getDefaultProfile(fdr.getParent());
-	    else
-		return UserProfile.getDefaultProfile(fdr.getStore());
-	} catch (MessagingException me) {
-	}
-
-	return null;
+    static public UserProfile getDefaultProfile(FolderInfo fdr) {
+	return fdr.getDefaultProfile();
     }
 
-    static public UserProfile getDefaultProfile(Store store) {
-	String storeName = store.getURLName().toString();
-
-	System.out.println("Store name is " + storeName);
-
-	return null;
+    static public UserProfile getDefaultProfile(StoreInfo store) {
+	return store.getDefaultProfile();
     }
 
     static public UserProfile getDefaultProfile() {

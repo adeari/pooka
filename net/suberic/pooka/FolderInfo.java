@@ -44,12 +44,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
     private boolean open;
     private boolean available;
 
+    private FolderInfo parentFolder = null;
+    private StoreInfo parentStore = null;
+    private UserProfile defaultProfile = null;
+
     /**
      * Creates a new FolderInfo from a parent FolderInfo and a Folder 
      * name.
      */
     
     public FolderInfo(FolderInfo parent, String fname) {
+	parentFolder = parent;
 	setFolderID(parent.getFolderID() + "." + fname);
 	folderName = fname;
 	
@@ -80,6 +85,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
      */
     
     public FolderInfo(StoreInfo parent, String fname) {
+	parentStore = parent;
 	setFolderID(parent.getStoreID() + "." + fname);
 	folderName = fname;
 	
@@ -112,7 +118,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 	folder.addMessageCountListener(this);
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
-	
+	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
+
 	folder.addConnectionListener(new ConnectionAdapter() { 
 		public void closed(ConnectionEvent e) {
 		    if (Pooka.isDebug())
@@ -357,6 +364,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 	    if (folderNode != null) {
 		((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
 	    }
+	} else if (changedValue.equals(getFolderProperty() + ".defaultProfile")) {
+	    if (Pooka.getProperty(changedValue, "").equals(""))
+		defaultProfile = null;
+	    else 
+		defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
 	}
     }
 
@@ -579,5 +591,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener {
 
     public void setFolderWindow(FolderWindow newValue) {
 	folderWindow = newValue;
+    }
+
+    public UserProfile getDefaultProfile() {
+	if (defaultProfile != null)
+	    return defaultProfile;
+	else if (parentFolder != null)
+	    return parentFolder.getDefaultProfile();
+	else if (parentStore != null)
+	    return parentStore.getDefaultProfile();
+	else
+	    // sigh.
+	    return UserProfile.getDefaultProfile();
     }
 }
