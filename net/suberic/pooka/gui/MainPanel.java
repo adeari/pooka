@@ -70,12 +70,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
 	// set the default active menus.
-	mainMenu.setActive(getActions());
-	mainToolbar.setActive(getActions());
-	keyBindings.setActive(getActions());
+	// actually, don't do this here--let Pooka do it.  this is because
+	// the MenuBar hasn't actually been set yet.
+	//mainMenu.setActive(getActions());
+	//mainToolbar.setActive(getActions());
+	//keyBindings.setActive(getActions());
 	
 	// set the initial currentUser
 	refreshCurrentUser();
+
+	// if openSavedFoldersOnStartup is set to true, then open all the
+	// saved folders.
     }
 
     /**
@@ -106,13 +111,20 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * This selects the menu with the key accelerator that matches the
      * character 'key'.
      */
+    /*
+      //doesn't seem to be necessary.
     public void selectMenu(char key) {
+	System.out.println("looking for mnemonic that matches " + key + "(" + (int)key + ")");
 	for (int i = 0; i < mainMenu.getMenuCount(); i++) {
 	    JMenu m = mainMenu.getMenu(i);
+	    if (m != null)
+		System.out.println("m.getMnemonic = " + m.getMnemonic());
+
 	    if (m != null && m.getMnemonic() == (int)key)
 		m.setSelected(true);
 	}
     }
+    */
 
     /**
      * This method shows a help screen.  At the moment, it just takes the
@@ -147,7 +159,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * Also called when the selected message in a FolderWindow is changed.
      */
 
-    protected void refreshActiveMenus(JMenuBar menuBar) {
+    public void refreshActiveMenus() {
 	mainMenu.setActive(getActions());
 	mainToolbar.setActive(getActions());
 	keyBindings.setActive(getActions());
@@ -196,6 +208,21 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     public UserProfile getCurrentUser() {
 	return currentUser;
+    }
+    
+    /**
+     * This exits Pooka.
+     */
+    
+    public void exitPooka(int exitValue) {
+	if (messagePanel.isSavingWindowLocations())
+	    messagePanel.saveWindowLocations();
+	if (messagePanel.isSavingOpenFolders())
+	    messagePanel.saveOpenFolders();
+	
+	Pooka.resources.saveProperties(new File(Pooka.localrc));
+	System.exit(exitValue);
+
     }
 
     // Accessor methods.
@@ -279,12 +306,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new HelpLicenseAction(),
 	new SelectMessagePanelAction(),
 	new SelectFolderPanelAction(),
-	new NewMessageAction(),
-	new SelectMenuAction("select-menu-F"),
-	new SelectMenuAction("select-menu-E"),
-	new SelectMenuAction("select-menu-M"),
-	new SelectMenuAction("select-menu-W"),
-	new SelectMenuAction("select-menu-H")
+	new NewMessageAction()
+	    //new SelectMenuAction("select-menu-F"),
+	    //new SelectMenuAction("select-menu-E"),
+	    //new SelectMenuAction("select-menu-M"),
+	    //new SelectMenuAction("select-menu-W"),
+	    //new SelectMenuAction("select-menu-H")
     };
 
 
@@ -300,8 +327,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
         public void actionPerformed(ActionEvent e) {
-	    Pooka.resources.saveProperties(new File(Pooka.localrc));
-	    System.exit(0);
+	    exitPooka(0);
 	}
     }
 
@@ -426,6 +452,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     }
 
+    /*
+      // this doesn't appear to be necessary.
     public class SelectMenuAction extends AbstractAction {
 	SelectMenuAction() {
 	    super("menu-select");
@@ -436,10 +464,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    selectMenu(e.getActionCommand().charAt(e.getActionCommand().length() -1));
+	    	    System.out.println("performing Action " + e.getActionCommand());
+	    //	    selectMenu(e.getActionCommand().charAt(e.getActionCommand().length() -1));
 	}
 
     }
+    */
 
 
 }
