@@ -20,8 +20,11 @@ public class UserProfile extends Object implements ValueChangeListener {
   public boolean signatureFirst = true;
   private SignatureGenerator sigGenerator;
   private AddressBook addressBook;
-  private String encryptionKeyId;
+
+  private String smimeEncryptionKeyId;
+  private String pgpEncryptionKeyId;
   private boolean signAsDefault = false;
+  private String cryptoDefaultType = "PGP";
   
   private Vector excludeAddresses;
   
@@ -84,9 +87,17 @@ public class UserProfile extends Object implements ValueChangeListener {
       excludeAddresses.addAll(excludeProp);
     }
 
-    encryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".defaultEncryptionKeyId", "");
+    pgpEncryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".pgpKey", "");
 
-    signAsDefault = mainProperties.getProperty("UserProfile." + name + ".signAsDefault", "").equalsIgnoreCase("true");
+    smimeEncryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".smimeKey", "");
+
+    signAsDefault = (! mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("manual"));
+
+    if (! signAsDefault) {
+      if ( mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("smime")) {
+	cryptoDefaultType="SMIME";
+      }
+    }
 
     String addressBookId = mainProperties.getProperty("UserProfile." + name + ".addressBook", "");
     if (!addressBookId.equals("")) {
@@ -480,10 +491,22 @@ public class UserProfile extends Object implements ValueChangeListener {
    * Returns the default encryption key for this profile, if any.
    */
   public java.security.Key getEncryptionKey() {
-    if (encryptionKeyId != null && encryptionKeyId.length() > 0) {
+    return getEncryptionKey(cryptoDefaultType);
+  }
+
+  /**
+   * Returns the default encryption key for this profile, if any.
+   */
+  public java.security.Key getEncryptionKey(String type) {
+    String keyAlias = pgpEncryptionKeyId;
+    if (type.equalsIgnoreCase(net.suberic.crypto.EncryptionManager.SMIME)) {
+      keyAlias = smimeEncryptionKeyId;
+    }
+
+    if (keyAlias != null && keyAlias.length() > 0) {
       try {
-	if (Pooka.getCryptoManager().privateKeyAliases().contains(encryptionKeyId)) {
-	  java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(encryptionKeyId);
+	if (Pooka.getCryptoManager().privateKeyAliases(type).contains(keyAlias)) {
+	  java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
 
 	  return returnValue;
 	}
@@ -491,9 +514,11 @@ public class UserProfile extends Object implements ValueChangeListener {
 	ee.printStackTrace();
       }
       // FIXME
-      System.err.println("unable to find private key " + encryptionKeyId);
+      System.err.println("unable to find private key " + keyAlias);
       return null;
     }
+    
+    System.err.println("no default key.");
 
     return null;
   }

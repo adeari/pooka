@@ -330,6 +330,7 @@ public class NewMessageInfo extends MessageInfo {
    * Attaches an encryption key to this message.
    */
   public synchronized void attachEncryptionKey(Key key) {
+    // doesn't handle case where key is added twice.
     if (mAttachKeys == null) {
       mAttachKeys = new Key[] { key };
     } else {
@@ -337,6 +338,36 @@ public class NewMessageInfo extends MessageInfo {
       System.arraycopy(mAttachKeys, 0, newKeys, 0, mAttachKeys.length);
       newKeys[mAttachKeys.length] = key;
       mAttachKeys = newKeys;
+    }
+  }
+
+  /**
+   * Attaches an encryption key to this message.
+   */
+  public synchronized void removeEncryptionKey(Key key) {
+    if (mAttachKeys == null) {
+      return;
+    } else {
+      // doesn't handle case where key is added twice.
+      int removeIndex = -1;
+      for (int i = 0; i < mAttachKeys.length; i++) {
+	if (mAttachKeys[i] == key) {
+	  removeIndex = i;
+	}
+      }
+
+      if (removeIndex > -1) {
+	if (mAttachKeys.length == 1)
+	  mAttachKeys = null;
+	else {
+	  Key[] newKeys = new Key[mAttachKeys.length - 1];
+	  System.arraycopy(mAttachKeys, 0, newKeys, 0, removeIndex);
+	  if (removeIndex < mAttachKeys.length - 1) {
+	    System.arraycopy(mAttachKeys, removeIndex + 1, newKeys, removeIndex, mAttachKeys.length - removeIndex - 1);
+	  }
+	  mAttachKeys = newKeys;
+	}
+      }
     }
   }
 

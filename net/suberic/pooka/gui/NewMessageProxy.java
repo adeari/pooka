@@ -307,11 +307,11 @@ public class NewMessageProxy extends MessageProxy {
     new AttachAction(),
     new SaveDraftAction(),
     new EncryptAction(),
-    new SelectEncryptionKeyAction(),
     new ClearEncryptAction(),
+    new SelectEncryptionKeyAction(),
     new SignAction(),
-    new SelectSignatureKeyAction(),
     new ClearSignAction(),
+    new SelectSignatureKeyAction(),
     new AttachKeyAction(),
     new RemoveKeyAction()
       };
@@ -365,11 +365,19 @@ public class NewMessageProxy extends MessageProxy {
     }
     
     public void actionPerformed(ActionEvent e) {
-      getNewMessageInfo().setEncryptMessage(NewMessageInfo.CRYPTO_YES);
-      if (getNewMessageInfo().getEncryptionKey() == null) {
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageInfo.CRYPTO_YES);
+      }
+      
+      if (getNewMessageInfo().getEncryptionKey() == null && getNewMessageUI().getSelectedProfile().getEncryptionKey() == null) {
 	try {
 	  java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
-	  getNewMessageInfo().setEncryptionKey(cryptKey);
+	  if (cryptKey != null) {
+	    if (csd instanceof NewMessageCryptoDisplay) {
+	      ((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
+	    }
+	  }
 	} catch (Exception ex) {
 	  getMessageUI().showError(ex.getMessage(), ex);
 	}
@@ -383,29 +391,39 @@ public class NewMessageProxy extends MessageProxy {
     }
     
     public void actionPerformed(ActionEvent e) {
-      getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_YES);
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageInfo.CRYPTO_YES);
+      }
+      
       if (getNewMessageInfo().getSignatureKey() == null && (getDefaultProfile() == null || getDefaultProfile().getEncryptionKey() == null)) {
 	try {
 	  java.security.Key signKey = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."), Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"));
-	  getNewMessageInfo().setSignatureKey(signKey);
+	  if (csd instanceof NewMessageCryptoDisplay) {
+	    ((NewMessageCryptoDisplay) csd).setSignatureKey(signKey);
+	  }
 	} catch (Exception ex) {
 	  getMessageUI().showError(ex.getMessage(), ex);
 	}
+	
       }
     }
   }
-
+  
   class SelectSignatureKeyAction extends AbstractAction {
     SelectSignatureKeyAction() {
       super("message-select-sig-key");
     }
     
     public void actionPerformed(ActionEvent e) {
-      //getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_YES);
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageInfo.CRYPTO_YES);
+      }
+      
       try {
 	java.security.Key signKey = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."), Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"));
 	if (signKey != null) {
-	  CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
 	  if (csd instanceof NewMessageCryptoDisplay) {
 	    ((NewMessageCryptoDisplay) csd).setSignatureKey(signKey);
 	  }
@@ -415,17 +433,21 @@ public class NewMessageProxy extends MessageProxy {
       }
     }
   }
-
+  
   class SelectEncryptionKeyAction extends AbstractAction {
     SelectEncryptionKeyAction() {
       super("message-select-crypt-key");
     }
     
     public void actionPerformed(ActionEvent e) {
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageInfo.CRYPTO_YES);
+      }
+      
       try {
 	java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
 	if (cryptKey != null) {
-	  CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
 	  if (csd instanceof NewMessageCryptoDisplay) {
 	    ((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
 	  }
@@ -435,42 +457,30 @@ public class NewMessageProxy extends MessageProxy {
       }
     }
   }
-
+  
   class ClearEncryptAction extends AbstractAction {
     ClearEncryptAction() {
       super("message-clear-encrypt");
     }
     
     public void actionPerformed(ActionEvent e) {
-      /*
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
-      }
-      */
-      //getNewMessageInfo().setEncryptMessage(NewMessageInfo.CRYPTO_NO);
-      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
-      if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
+	((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageInfo.CRYPTO_NO);	((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
       }
     }
   }
-
+  
   class ClearSignAction extends AbstractAction {
     ClearSignAction() {
       super("message-clear-signature");
     }
     
     public void actionPerformed(ActionEvent e) {
-      /*
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      
       if (csd instanceof NewMessageCryptoDisplay) {
-	((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
-      }
-      */
-      getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_NO);
-      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
-      if (csd instanceof NewMessageCryptoDisplay) {
+	((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageInfo.CRYPTO_NO);
 	((NewMessageCryptoDisplay) csd).setSignatureKey(null);
       }
     }
@@ -482,11 +492,15 @@ public class NewMessageProxy extends MessageProxy {
     }
     
     public void actionPerformed(ActionEvent e) {
-      try {
-	java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
-	getNewMessageInfo().attachEncryptionKey(cryptKey);
-      } catch (Exception ex) {
-	getMessageUI().showError(ex.getMessage(), ex);
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      
+      if (csd instanceof NewMessageCryptoDisplay) {
+	try {
+	  java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
+	  ((NewMessageCryptoDisplay) csd).attachEncryptionKey(cryptKey);
+	} catch (Exception ex) {
+	  getMessageUI().showError(ex.getMessage(), ex);
+	}
       }
     }
   }
@@ -497,16 +511,20 @@ public class NewMessageProxy extends MessageProxy {
     }
     
     public void actionPerformed(ActionEvent e) {
-      try {
-	java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"));
-	getNewMessageInfo().attachEncryptionKey(cryptKey);
-      } catch (Exception ex) {
-	getMessageUI().showError(ex.getMessage(), ex);
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+      
+      if (csd instanceof NewMessageCryptoDisplay) {
+	try {
+	  java.security.Key cryptKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forRemove", "Select key to remove from message."), Pooka.getProperty("Pooka.crypto.publicKey.title", "Remove public key"));
+	  ((NewMessageCryptoDisplay) csd).removeEncryptionKey(cryptKey);
+	} catch (Exception ex) {
+	  getMessageUI().showError(ex.getMessage(), ex);
+	}
       }
     }
   }
-  
-}
+    
+  }
 
 
 

@@ -21,6 +21,7 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
   JList mAttachKeysList = null;
 
   NewMessageProxy proxy = null;
+
   /**
    * A JPanel that shows the encryption status of this message.
    */
@@ -181,6 +182,34 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
   public void setSignatureKey(Key pSignatureKey) {
     proxy.getNewMessageInfo().setSignatureKey(pSignatureKey);
     updateSignatureButton();
+  }
+
+  /**
+   * Sets whether we're going to encrypt or not.
+   */
+  public void setEncryptMessage(int encryptValue) {
+    proxy.getNewMessageInfo().setEncryptMessage(encryptValue);
+  }
+
+  /**
+   * Sets whether we're going to sign or not.
+   */
+  public void setSignMessage(int signValue) {
+    proxy.getNewMessageInfo().setSignMessage(signValue);
+  }
+
+  /**
+   * Attaches an encryption key.
+   */
+  public void attachEncryptionKey(Key cryptKey) {
+    proxy.getNewMessageInfo().attachEncryptionKey(cryptKey);
+  }
+
+  /**
+   * Removes an encryption key.
+   */
+  public void removeEncryptionKey(Key cryptKey) {
+    proxy.getNewMessageInfo().removeEncryptionKey(cryptKey);
   }
 
   /**
