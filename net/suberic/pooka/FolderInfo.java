@@ -2,6 +2,7 @@ package net.suberic.pooka;
 
 import javax.mail.*;
 import javax.mail.event.*;
+import javax.mail.search.*;
 import javax.swing.event.EventListenerList;
 import java.util.*;
 import javax.swing.AbstractAction;
@@ -654,8 +655,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	} else {
 	  String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
 	  colvals.addElement(value);
-	  fp.add(value);
-	}
+	  String fpValue = Pooka.getProperty(tableType + "." + tmp + ".profileItems", value);
+	  fp.add(fpValue);
+ 	}
 	
 	colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
 	colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
@@ -664,7 +666,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       setColumnValues(colvals);
       setColumnSizes(colsizes);
     }
-    
+
+    // if we've already loaded the filters, then add those in, too.
+    if (filterHeaders != null) {
+      for (int i = 0; i < filterHeaders.size(); i++) {
+	fp.add((String) filterHeaders.get(i));
+      }
+    }
+
     return fp;
   }
   
@@ -1758,151 +1767,209 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   protected String getDefaultDisplayFiltersResource() {
     return "FolderInfo.defaultDisplayFilters";
   }
+  
+  List filterHeaders = null;
 
-    /**
-     * This takes the FolderProperty.backendFilters and 
-     * FolderProperty.displayFilters properties and uses them to populate
-     * the backendMessageFilters and displayMessageFilters arrays.
-     */
-    public void createFilters() {
-	BackendMessageFilter[] tmpBackendFilters = null;
-	MessageFilter[] tmpDisplayFilters = null;
-	Vector backendFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".backendFilters", "");
-
-	if (backendFilterNames != null && backendFilterNames.size() > 0) {
-
-	    tmpBackendFilters = new BackendMessageFilter[backendFilterNames.size()];
-	    for (int i = 0; i < backendFilterNames.size(); i++) {
-		System.out.println("creating filter from " + getFolderProperty() + ".backendFitlers." + (String) backendFilterNames.elementAt(i));
-		tmpBackendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
-	    }
-
-	    backendFilters = tmpBackendFilters;
-	}
-
-	Vector foundFilters = new Vector();
-	Vector defaultFilterNames = Pooka.getResources().getPropertyAsVector(getDefaultDisplayFiltersResource(), "");
-	
-	for (int i = 0; i < defaultFilterNames.size(); i++) {
-	  foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
-	}
-
-	Vector displayFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".displayFilters", "");
-	for (int i = 0; i < displayFilterNames.size(); i++) {
-	    foundFilters.add(new MessageFilter(getFolderProperty() + ".displayFilters." + (String) displayFilterNames.elementAt(i)));
-	}
-
-	tmpDisplayFilters = new MessageFilter[foundFilters.size()];
-	for (int i = 0; i < foundFilters.size(); i++)
-	    tmpDisplayFilters[i] = (MessageFilter) foundFilters.elementAt(i);
-
-	displayFilters = tmpDisplayFilters;
+  /**
+   * This takes the FolderProperty.backendFilters and 
+   * FolderProperty.displayFilters properties and uses them to populate
+   * the backendMessageFilters and displayMessageFilters arrays.
+   */
+  public void createFilters() {
+    BackendMessageFilter[] tmpBackendFilters = null;
+    MessageFilter[] tmpDisplayFilters = null;
+    Vector backendFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".backendFilters", "");
+    
+    if (backendFilterNames != null && backendFilterNames.size() > 0) {
+      
+      tmpBackendFilters = new BackendMessageFilter[backendFilterNames.size()];
+      for (int i = 0; i < backendFilterNames.size(); i++) {
+	System.out.println("creating filter from " + getFolderProperty() + ".backendFitlers." + (String) backendFilterNames.elementAt(i));
+	tmpBackendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
+      }
+      
+      backendFilters = tmpBackendFilters;
     }
     
-    /**
-     * This applies each MessageFilter in filters array on the given 
-     * MessageInfo objects.
-     *
-     * @return a Vector containing the removed MessageInfo objects.
-     */
-    public Vector applyFilters(Vector messages) {
-	Vector notRemovedYet = new Vector(messages);
-	Vector removed = new Vector();
-	if (backendFilters != null) 
-	    for (int i = 0; i < backendFilters.length; i++) {
-		if (backendFilters[i] != null) {
-		    Vector justRemoved = backendFilters[i].filterMessages(notRemovedYet);
-		    removed.addAll(justRemoved);
-		    notRemovedYet.removeAll(justRemoved);
-		}
+    Vector foundFilters = new Vector();
+    Vector defaultFilterNames = Pooka.getResources().getPropertyAsVector(getDefaultDisplayFiltersResource(), "");
+    
+    for (int i = 0; i < defaultFilterNames.size(); i++) {
+      foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
+    }
+    
+    Vector displayFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".displayFilters", "");
+    for (int i = 0; i < displayFilterNames.size(); i++) {
+      foundFilters.add(new MessageFilter(getFolderProperty() + ".displayFilters." + (String) displayFilterNames.elementAt(i)));
+    }
+    
+    tmpDisplayFilters = new MessageFilter[foundFilters.size()];
+    for (int i = 0; i < foundFilters.size(); i++)
+      tmpDisplayFilters[i] = (MessageFilter) foundFilters.elementAt(i);
+    
+    displayFilters = tmpDisplayFilters;
+
+    filterHeaders = new LinkedList();
+    // update the fetch profile with the headers from the display filters.
+    for (int i = 0; i < tmpDisplayFilters.length; i++) {
+      javax.mail.search.SearchTerm filterTerm = tmpDisplayFilters[i].getSearchTerm();
+      if (filterTerm != null) {
+	List headers = getHeaders(filterTerm);
+	filterHeaders.addAll(headers);
+      }
+    }
+
+    if (fetchProfile != null) {
+      for (int i = 0; i < filterHeaders.size(); i++) {
+	fetchProfile.add((String) filterHeaders.get(i));
+      }
+    }
+  }
+
+  /**
+   * Gets all of the header strings for the given search term.
+   */
+  private List getHeaders(SearchTerm term) {
+    List returnValue = new LinkedList();
+    if (term instanceof HeaderTerm) {
+      String headerName = ((HeaderTerm) term).getHeaderName();
+      returnValue.add(headerName);
+    } else if (term instanceof AndTerm) {
+      SearchTerm[] terms = ((AndTerm)term).getTerms();
+      for (int i = 0; i < terms.length; i++) {
+	returnValue.addAll(getHeaders(terms[i]));
+      }
+    } else if (term instanceof OrTerm) {
+      SearchTerm[] terms = ((OrTerm)term).getTerms();
+      for (int i = 0; i < terms.length; i++) {
+	returnValue.addAll(getHeaders(terms[i]));
+      }
+    } else if (term instanceof NotTerm) {
+      SearchTerm otherTerm = ((NotTerm)term).getTerm();
+      returnValue.addAll(getHeaders(otherTerm));
+    } else if (term instanceof FromTerm || term instanceof FromStringTerm) {
+      returnValue.add("From");
+    } else if (term instanceof RecipientTerm || term instanceof RecipientStringTerm) {
+      Message.RecipientType type;
+      if (term instanceof RecipientTerm)
+	type = ((RecipientTerm) term).getRecipientType();
+      else
+	type = ((RecipientStringTerm) term).getRecipientType();
+      if (type == Message.RecipientType.TO)
+	returnValue.add("To");
+      else if (type == Message.RecipientType.CC)
+	returnValue.add("Cc");
+      else if (type == Message.RecipientType.BCC)
+	returnValue.add("Bcc");
+    }
+
+    return returnValue;
+  }
+  
+  /**
+   * This applies each MessageFilter in filters array on the given 
+   * MessageInfo objects.
+   *
+   * @return a Vector containing the removed MessageInfo objects.
+   */
+  public Vector applyFilters(Vector messages) {
+    Vector notRemovedYet = new Vector(messages);
+    Vector removed = new Vector();
+    if (backendFilters != null) 
+      for (int i = 0; i < backendFilters.length; i++) {
+	if (backendFilters[i] != null) {
+	  Vector justRemoved = backendFilters[i].filterMessages(notRemovedYet);
+	  removed.addAll(justRemoved);
+	  notRemovedYet.removeAll(justRemoved);
 	}
-	
-	return removed;
-    }
-
-    // Accessor methods.
-
-    public Action[] getActions() {
-	return defaultActions;
-    }
-
-    public Folder getFolder() {
-	return folder;
-    }
-
+      }
+    
+    return removed;
+  }
+  
+  // Accessor methods.
+  
+  public Action[] getActions() {
+    return defaultActions;
+  }
+  
+  public Folder getFolder() {
+    return folder;
+  }
+  
   protected void setFolder(Folder newValue) {
     folder=newValue;
   }
+  
+  /**
+   * This returns the FolderID, such as "myStore.INBOX".
+   */
+  public String getFolderID() {
+    return folderID;
+  }
+  
+  /**
+   * This sets the folderID.
+   */
+  private void setFolderID(String newValue) {
+    folderID=newValue;
+  }
+  
+  /**
+   * This returns the simple folderName, such as "INBOX".
+   */
+  public String getFolderName() {
+    return mFolderName;
+  }
+  
+  /**
+   * This returns the folder display name, usually the FolderName plus
+   * the store id.
+   */
+  public String getFolderDisplayName() {
+    return mFolderName + " - " + getParentStore().getStoreID();
+  }
+  
+  /**
+   * This returns the property which defines this FolderNode, such as
+   * "Store.myStore.INBOX".
+   */
+  public String getFolderProperty() {
+    return "Store." + getFolderID();
+  }
+  
+  public Vector getChildren() {
+    return children;
+  }
+  
+  public FolderNode getFolderNode() {
+    return folderNode;
+  }
+  
+  public void setFolderNode(FolderNode newValue) {
+    folderNode = newValue;
+  }
+  
+  public FolderTableModel getFolderTableModel() {
+    return folderTableModel;
+  }
+  
+  public void setFolderTableModel(FolderTableModel newValue) {
+    folderTableModel = newValue;
+  }
 
-    /**
-     * This returns the FolderID, such as "myStore.INBOX".
-     */
-    public String getFolderID() {
-	return folderID;
-    }
-
-    /**
-     * This sets the folderID.
-     */
-    private void setFolderID(String newValue) {
-	folderID=newValue;
-    }
-
-    /**
-     * This returns the simple folderName, such as "INBOX".
-     */
-    public String getFolderName() {
-	return mFolderName;
-    }
-
-    /**
-     * This returns the folder display name, usually the FolderName plus
-     * the store id.
-     */
-    public String getFolderDisplayName() {
-	return mFolderName + " - " + getParentStore().getStoreID();
-    }
-
-    /**
-     * This returns the property which defines this FolderNode, such as
-     * "Store.myStore.INBOX".
-     */
-    public String getFolderProperty() {
-	return "Store." + getFolderID();
-    }
-
-    public Vector getChildren() {
-	return children;
-    }
-
-    public FolderNode getFolderNode() {
-	return folderNode;
-    }
-
-    public void setFolderNode(FolderNode newValue) {
-	folderNode = newValue;
-    }
-
-    public FolderTableModel getFolderTableModel() {
-	return folderTableModel;
-    }
-
-    public void setFolderTableModel(FolderTableModel newValue) {
-	folderTableModel = newValue;
-    }
-
-    public Vector getColumnValues() {
-	return columnValues;
-    }
-
-    public void setColumnValues(Vector newValue) {
-	columnValues = newValue;
-    }
-
-    public Vector getColumnNames() {
-	return columnNames;
-    }
-
+  public Vector getColumnValues() {
+    return columnValues;
+  }
+  
+  public void setColumnValues(Vector newValue) {
+    columnValues = newValue;
+  }
+  
+  public Vector getColumnNames() {
+    return columnNames;
+  }
+  
     public void setColumnNames(Vector newValue) {
 	columnNames = newValue;
     }

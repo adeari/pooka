@@ -270,7 +270,7 @@ FolderPanel.2xClickAction=file-open
 
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 #FolderTable=New:SentDate:From:Subject
-FolderTable=MsgNumber:Status:SentDate:From:Subject
+FolderTable=MsgNumber:Status:Attachments:SentDate:From:Subject
 FolderTable.MsgNumber.size=30
 FolderTable.MsgNumber.type=RowCounter
 FolderTable.Status.type=Multi
@@ -296,6 +296,7 @@ FolderTable.New.justUnseenIcon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
 FolderTable.New.recentAndUnseenIcon=/net/suberic/pooka/gui/images/SmallRedCircle.gif
 FolderTable.New.size=15
 FolderTable.Attachments.value=attachments
+FolderTable.Attachments.profileItems=Content-Type
 FolderTable.Attachments.icon=/net/suberic/pooka/gui/images/SmallPin.gif
 #FolderTable.Attachments.class=net.suberic.pooka.gui.AttachmentCellRenderer
 FolderTable.Attachments.size=10

@@ -56,125 +56,125 @@ public class MessageInfo {
 	*/
     }
 
-    /**
-     * This loads the Attachment information into the attachments vector.
-     */
-
-    public void loadAttachmentInfo() throws MessagingException {
-	attachments = MailUtilities.parseAttachments(getMessage());
-	
-	attachmentsLoaded = true;
-    }
-
-    /**
-     * This gets a Flag property from the Message.
-     */
-
-    public boolean flagIsSet(String flagName) throws MessagingException {
-
-	if (flagName.equals("FLAG.ANSWERED") )
-	    return getMessage().isSet(Flags.Flag.ANSWERED);
-	else if (flagName.equals("FLAG.DELETED"))
-	    return getMessage().isSet(Flags.Flag.DELETED);
-	else if (flagName.equals("FLAG.DRAFT"))
-	    return getMessage().isSet(Flags.Flag.DRAFT);
-	else if (flagName.equals("FLAG.FLAGGED"))
-	    return getMessage().isSet(Flags.Flag.FLAGGED);
-	else if (flagName.equals("FLAG.RECENT"))
-	    return getMessage().isSet(Flags.Flag.RECENT);
-	else if (flagName.equals("FLAG.SEEN"))
-	    return getMessage().isSet(Flags.Flag.SEEN);
-	
-	return false;
-    }
-
-    /**
-     * This gets the Flags object for the wrapped Message.
-     */
-    public Flags getFlags() throws MessagingException {
-	return getMessage().getFlags();
-    }
-
-    /**
-     * Refreshes the flags object.
-     */
-    public void refreshFlags() throws MessagingException {
-      getFolderInfo().refreshFlags(this);
-    }
+  /**
+   * This loads the Attachment information into the attachments vector.
+   */
+  
+  public void loadAttachmentInfo() throws MessagingException {
+    attachments = MailUtilities.parseAttachments(getMessage());
     
-    /**
-     * Refreshes the Headers object.
-     */
-    public void refreshHeaders() throws MessagingException {
-      getFolderInfo().refreshHeaders(this);
-    }
+    attachmentsLoaded = true;
+  }
 
-    /**
-     * This gets a particular property (From, To, Date, Subject, or just
-     * about any Email Header) from the Message.
-     */
-    public Object getMessageProperty(String prop) throws MessagingException {
-	Message msg = getMessage();
-	if (prop.equals("From")) {
-	    Address[] fromAddr = msg.getFrom();
-	    return MailUtilities.decodeAddressString(fromAddr);
-	} else if (prop.equalsIgnoreCase("receivedDate")) {
-	    return msg.getReceivedDate();
-	} else if (prop.equalsIgnoreCase("recipients")) {
-	    return msg.getAllRecipients();
-	} else if (prop.equalsIgnoreCase("to")) {
-	    return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.TO));
-	} else if (prop.equalsIgnoreCase("cc")) {
-	    return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.CC));
-	} else if (prop.equalsIgnoreCase("bcc")) {
-	    return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.BCC));
-	} else if (prop.equalsIgnoreCase("Date")) {
-	    return msg.getSentDate();
-	} else if (prop.equalsIgnoreCase("Subject")) {
-	    return MailUtilities.decodeText(msg.getSubject());
-	} 
-	
-	if (msg instanceof MimeMessage) {
-	  String hdrVal = ((MimeMessage)msg).getHeader(prop, ",");
-	  if (hdrVal != null && hdrVal.length() > 0)
-	    return MailUtilities.decodeText(hdrVal);
+  /**
+   * This gets a Flag property from the Message.
+   */
+  
+  public boolean flagIsSet(String flagName) throws MessagingException {
+    
+    if (flagName.equals("FLAG.ANSWERED") )
+      return getMessage().isSet(Flags.Flag.ANSWERED);
+    else if (flagName.equals("FLAG.DELETED"))
+      return getMessage().isSet(Flags.Flag.DELETED);
+    else if (flagName.equals("FLAG.DRAFT"))
+      return getMessage().isSet(Flags.Flag.DRAFT);
+    else if (flagName.equals("FLAG.FLAGGED"))
+      return getMessage().isSet(Flags.Flag.FLAGGED);
+    else if (flagName.equals("FLAG.RECENT"))
+      return getMessage().isSet(Flags.Flag.RECENT);
+    else if (flagName.equals("FLAG.SEEN"))
+      return getMessage().isSet(Flags.Flag.SEEN);
+    
+    return false;
+  }
+  
+  /**
+   * This gets the Flags object for the wrapped Message.
+   */
+  public Flags getFlags() throws MessagingException {
+    return getMessage().getFlags();
+  }
+  
+  /**
+   * Refreshes the flags object.
+   */
+  public void refreshFlags() throws MessagingException {
+    getFolderInfo().refreshFlags(this);
+  }
+  
+  /**
+   * Refreshes the Headers object.
+   */
+  public void refreshHeaders() throws MessagingException {
+    getFolderInfo().refreshHeaders(this);
+  }
+  
+  /**
+   * This gets a particular property (From, To, Date, Subject, or just
+   * about any Email Header) from the Message.
+   */
+  public Object getMessageProperty(String prop) throws MessagingException {
+    Message msg = getMessage();
+    if (prop.equals("From")) {
+      Address[] fromAddr = msg.getFrom();
+      return MailUtilities.decodeAddressString(fromAddr);
+    } else if (prop.equalsIgnoreCase("receivedDate")) {
+      return msg.getReceivedDate();
+    } else if (prop.equalsIgnoreCase("recipients")) {
+      return msg.getAllRecipients();
+    } else if (prop.equalsIgnoreCase("to")) {
+      return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.TO));
+    } else if (prop.equalsIgnoreCase("cc")) {
+      return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.CC));
+    } else if (prop.equalsIgnoreCase("bcc")) {
+      return MailUtilities.decodeAddressString(msg.getRecipients(Message.RecipientType.BCC));
+    } else if (prop.equalsIgnoreCase("Date")) {
+      return msg.getSentDate();
+    } else if (prop.equalsIgnoreCase("Subject")) {
+      return MailUtilities.decodeText(msg.getSubject());
+    } 
+    
+    if (msg instanceof MimeMessage) {
+      String hdrVal = ((MimeMessage)msg).getHeader(prop, ",");
+      if (hdrVal != null && hdrVal.length() > 0)
+	return MailUtilities.decodeText(hdrVal);
+    }
+    return "";
+  }
+  
+  /**
+   * Gets the Content and inline text content for the Message.
+   */
+  public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+    try {
+      if (!hasLoadedAttachments()) 
+	loadAttachmentInfo();
+      return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+    } catch (FolderClosedException fce) {
+      try {
+	if (getFolderInfo().shouldBeConnected()) {
+	  getFolderInfo().openFolder(Folder.READ_WRITE);
+	  loadAttachmentInfo();
+	  return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+	} else {
+	  throw fce;
 	}
-	return "";
+      } catch (java.io.IOException ioe) {
+	throw new MessagingException(ioe.getMessage()); 
+      }
+    } catch (java.io.IOException ioe) {
+      ioe.printStackTrace();
+      throw new MessagingException(ioe.getMessage()); 
     }
-
-    /**
-     * Gets the Content and inline text content for the Message.
-     */
-    public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
-	try {
-	    if (!hasLoadedAttachments()) 
-		loadAttachmentInfo();
-	    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} catch (FolderClosedException fce) {
-	    try {
-		if (getFolderInfo().shouldBeConnected()) {
-		    getFolderInfo().openFolder(Folder.READ_WRITE);
-		    loadAttachmentInfo();
-		    return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
-		} else {
-		    throw fce;
-		}
-	    } catch (java.io.IOException ioe) {
-		throw new MessagingException(ioe.getMessage()); 
-	    }
-	} catch (java.io.IOException ioe) {
-	    ioe.printStackTrace();
-	    throw new MessagingException(ioe.getMessage()); 
-	}
-    }
-
-    /**
-     * Gets the Content and inline text content for the Message.
-     */
-    public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
-	return getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
-    }
-
+  }
+  
+  /**
+   * Gets the Content and inline text content for the Message.
+   */
+  public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+    return getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+  }
+  
     /**
      * Gets the Content and inline text content for the Message.
      */
@@ -743,29 +743,43 @@ public class MessageInfo {
     return loaded;
   }
 
-    /**
-     * This sets the loaded value for the MessageProxy to false.   This 
-     * should be called only if the TableInfo of the Message has been 
-     * changed and needs to be reloaded.
-     */
-    public void unloadTableInfo() {
-	loaded=false;
-    }
+  /**
+   * This sets the loaded value for the MessageProxy to false.   This 
+   * should be called only if the TableInfo of the Message has been 
+   * changed and needs to be reloaded.
+   */
+  public void unloadTableInfo() {
+    loaded=false;
+  }
 
-    public boolean hasLoadedAttachments() {
-	return attachmentsLoaded;
-    }
+  public boolean hasLoadedAttachments() {
+    return attachmentsLoaded;
+  }
+  
+  boolean mHasAttachments = false;
+  boolean mHasCheckedAttachments = false;
 
-    public boolean hasAttachments() throws MessagingException {
-	if (!hasLoadedAttachments())
-	    loadAttachmentInfo();
-
+  /**
+   * Returns whether or not this message has attachments.
+   */
+  public boolean hasAttachments() throws MessagingException {
+    if (mHasCheckedAttachments) {
+      return mHasAttachments;
+    } else {
+      if (hasLoadedAttachments()) {
 	if (getAttachments() != null && getAttachments().size() > 0)
-	    return true;
-	else
-	    return false;
+	  mHasAttachments = true;
+      } else {
+	javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
+	if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
+	  mHasAttachments = true;
+	}
+      }
+      mHasCheckedAttachments = true;
+      return mHasAttachments;
     }
-
+  }
+  
     /**
      * Returns the attachments for this MessageInfo.  If the attachments
      * have not yet been loaded, attempts to load the attachments.

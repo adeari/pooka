@@ -1,19 +1,14 @@
 *) threading of attachment actions.
 
-*) document keybindings
-	-- keybindings for address book
-	-- keybindings for saving attachments.
-	-- keybindings for opening folders.
-	-- keybindings for detachwindow
+*) address book:  make it so you can bring up your address book while 
+	addressing messages, and pull choices from there into your
+	address field.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
 	the readmessagedisplaypanel--or possibly on the status pane.
 	-- maybe change the toolbars so there's only 1?
 	-- ?? make it so you can compose messages in the main window ??
-
-*) NPE -- is that from switching from preview to desktop?
-	-- check window menu from switching preview to desktop.
 
 	-- search --
 
@@ -51,6 +46,17 @@ Java Stack for "Search Thread":
 
 Found 1 deadlock.
 
+-------
+
+*) document keybindings
+	-- keybindings for address book
+	-- keybindings for saving attachments.
+	-- keybindings for opening folders.
+	-- keybindings for detachwindow
+
+*) NPE -- is that from switching from preview to desktop?
+	-- check window menu from switching preview to desktop.
+
 *) disconnected from store (like if the server goes down) doesn't result in 
 icons changing?  test.
 
@@ -72,12 +78,6 @@ preview:
 	     it read. -- ?? test.  seems to work.
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store. -- get testcase?
-
-*) address book:  make it so you can bring up your address book while 
-	addressing messages, and pull choices from there into your
-	address field.
-
-*) attachments available from message list (by default)
 
 *)  add documentation and online help.
 
@@ -120,6 +120,9 @@ preview:
 *) add 'filter by message'
 
 *) add icons for connecting to folder/store
+
+*) attachments available from message list (like actually being able to
+	click on and view/save without opening the message).
 
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.MessageInfo.remove(Unknown Source)
