@@ -153,4 +153,12 @@ public interface MessageCache {
      * Returns whether a given uid exists fully in the cache or not.
      */
     public boolean isFullyCached(long uid);
+
+    /**
+     * Searches all of the cached messages and returns those which match
+     * the given SearchTerm.
+     */
+    public MessageInfo[] search(javax.mail.search.SearchTerm term) throws
+    javax.mail.MessagingException;
+
 }

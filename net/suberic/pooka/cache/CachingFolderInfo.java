@@ -637,6 +637,23 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
 
     /**
+     * Searches for messages in this folder which match the given
+     * SearchTerm.
+     *
+     * Basically wraps the call to Folder.search(), and then wraps the
+     * returned Message objects as MessageInfos.
+     */
+    public MessageInfo[] search(javax.mail.search.SearchTerm term) 
+    throws MessagingException {
+	if (isConnected()) {
+	    return super.search(term);
+	} else {
+	    return getCache().search(term);
+	}
+    }
+
+
+    /**
      * Returns whether or not a given message is fully cached.
      */
     public boolean isCached(long uid) {

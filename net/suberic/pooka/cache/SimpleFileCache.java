@@ -782,6 +782,29 @@ public class SimpleFileCache implements MessageCache {
     public ChangeCache getChangeAdapter() {
 	return changes;
     }
+
+    /**
+     * Searches all of the cached messages and returns those which match
+     * the given SearchTerm.
+     */
+    public MessageInfo[] search(javax.mail.search.SearchTerm term) throws
+    javax.mail.MessagingException {
+	Vector matches = new Vector();
+	
+	for (int i = 0; i < cachedMessages.size(); i++) {
+	    MessageInfo info = getFolderInfo().getMessageInfoByUid(((Long)cachedMessages.elementAt(i)).longValue());
+	    Message m = info.getMessage();
+	    if (term.match(m))
+		matches.add(info);
+	}
+	
+	MessageInfo[] returnValue = new MessageInfo[matches.size()];
+	for (int i = 0; i < matches.size(); i++) {
+	    returnValue[i] = (MessageInfo) matches.elementAt(i);
+	}
+
+	return returnValue;
+    }
 }
 
 
