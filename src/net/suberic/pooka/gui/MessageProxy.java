@@ -890,26 +890,39 @@ public class MessageProxy {
     }
     
     if (addresses != null) {
-      final Address[] final_addresses = addresses;
-      
-      ActionThread folderThread = getMessageInfo().getFolderInfo().getFolderThread();
-      folderThread.addToQueue(new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent ae) {
-	    try {
-	      getMessageInfo().bounceMessage(final_addresses);
-	    } catch (javax.mail.MessagingException me) {
-	      final MessagingException final_me = me;
-	      SwingUtilities.invokeLater(new Runnable() {
+      bounceMessage(addresses, false);
+    }
+  }
+
+  /**
+   * Bounces the message.  Passes on the actual work of bouncing the
+   * message to the underlying MessageInfo, but handles the job of
+   * showing any errors, if they happen.
+   */
+  public void bounceMessage(Address[] addresses, boolean deleteOnSuccess) {
+    final Address[] final_addresses = addresses;
+    final boolean final_delete = deleteOnSuccess;
+
+    ActionThread folderThread = getMessageInfo().getFolderInfo().getFolderThread();
+    folderThread.addToQueue(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent ae) {
+	  try {
+	    getMessageInfo().bounceMessage(final_addresses);
+	    if (final_delete)
+	      deleteMessage(false);
+
+	  } catch (javax.mail.MessagingException me) {
+	    final MessagingException final_me = me;
+	    SwingUtilities.invokeLater(new Runnable() {
 		public void run() { 
 		  showError(Pooka.getProperty("error.bounceMessage.error", "Error bouncing Message"), final_me);
 		}
-		});
-	    }
+	      });
 	  }
-	}, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
-    }
-    }
-
+	}
+      }, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
+  }
+  
   /**
    * Deletes the Message from the current Folder.  If a Trash folder is
    * set, this method moves the message into the Trash folder.  If no

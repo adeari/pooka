@@ -8,9 +8,6 @@ import java.util.Properties;
  * This is a class that lets you choose your filter actions.
  */
 public class FlagFilterEditor extends FilterEditor {
-  String originalFlagName;
-  String originalFlagValue;
-  
   JComboBox flagBox;
   JComboBox trueFalseBox;
   

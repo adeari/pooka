@@ -1115,13 +1115,15 @@ Search.operations.True=equals
 Search.operations.False=notEquals
 Search.operations.NotContains=not
 
-FolderFilters.backend=MoveFilter:DeleteFilter:FlagFilter
+FolderFilters.backend=MoveFilter:DeleteFilter:FlagFilter:BounceFilter
 FolderFilters.backend.MoveFilter.class=net.suberic.pooka.filter.MoveFilterAction
 FolderFilters.backend.MoveFilter.editorClass=net.suberic.pooka.gui.filter.MoveFilterEditor
 FolderFilters.backend.DeleteFilter.class=net.suberic.pooka.filter.DeleteFilterAction
 FolderFilters.backend.DeleteFilter.editorClass=net.suberic.pooka.gui.filter.DeleteFilterEditor
 FolderFilters.backend.FlagFilter.class=net.suberic.pooka.filter.FlagFilterAction
 FolderFilters.backend.FlagFilter.editorClass=net.suberic.pooka.gui.filter.FlagFilterEditor
+FolderFilters.backend.BounceFilter.class=net.suberic.pooka.filter.BounceFilterAction
+FolderFilters.backend.BounceFilter.editorClass=net.suberic.pooka.gui.filter.BounceFilterEditor
 
 FolderFilters.display=ColorFilter:FontFilter
 FolderFilters.display.ColorFilter.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
