@@ -1,3 +1,5 @@
+added a splashscreen on startup.
+
 optimized the loading of new messages a bit so that we only do one fetch.
 
 messages without CC or BCC entries no longer send a blank cc or bcc line

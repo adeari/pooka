@@ -39,6 +39,15 @@ Pooka.searchFolderDisplay.vsize=100
 Pooka.addressBookEditor.hsize=300
 Pooka.addressBookEditor.vsize=100
 
+Pooka.startup.ssl.weight=12
+Pooka.startup.addressBook.weight=1
+Pooka.startup.profiles.weight=5
+Pooka.startup.crypto.weight=11
+Pooka.startup.help.weight=8
+Pooka.startup.mailboxInfo.weight=9
+Pooka.startup.configuringWindow=18
+Pooka.startup.starting.weight=29
+
 Pooka.replyPrefix=>
 Pooka.forwardPrefix=>
 Pooka.forwardStyle=prefixed

@@ -1,5 +1,3 @@
-*) do startup screen (?)
-
 *) add drag and drop
    *) FIX THREADING!!! -- just try doing a big copy into a folder with a 
 	paste operation!!!
@@ -9,17 +7,16 @@
      *) fix file export for attachments
      *) test with desktop/external apps.
 
-*) make status icon for store itself.
-	behavior:
-	normal icon if not opened (?)
-
+-----
 *) test w/gnu javamail -- ???
 *) test w/javamail 1.3.2.
 
------
 *) add a real debug system.
 
 *) separate out ui interfaces from swing implementations.
+
+*) add a way to specify caching scheme per folder, so we can avoid autocaching
+	of messages in spam and/or sent folders.
 
 *) add support for running without any local files.
 	-- support for http: access?

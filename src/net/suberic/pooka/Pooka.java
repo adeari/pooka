@@ -85,7 +85,7 @@ public class Pooka {
       System.exit(-1);
     }
 
-    startup.setStatus("Loading SSL Settings...");
+    startup.setStatus("Pooka.startup.ssl");
     updateTime("loading ssl");
     StoreManager.setupSSL();
     updateTime("ssl loaded.");
@@ -96,7 +96,7 @@ public class Pooka {
     }
     
     updateTime("set looknfeel");
-    startup.setStatus("Loading Address Book...");
+    startup.setStatus("Pooka.startup.addressBook");
     addressBookManager = new AddressBookManager();
     updateTime("loaded address book");
     
@@ -108,7 +108,7 @@ public class Pooka {
 
     dateFormatter = new DateFormatter();
 
-    startup.setStatus("Creating Profiles...");
+    startup.setStatus("Pooka.startup.profiles");
     UserProfile.createProfiles(resources);
     updateTime("created profiles");
     
@@ -140,7 +140,7 @@ public class Pooka {
     javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
     updateTime("set command/file maps");
 
-    startup.setStatus("Loading Encryption Manager...");
+    startup.setStatus("Pooka.startup.crypto");
     cryptoManager = new PookaEncryptionManager(resources, "EncryptionManager");
     updateTime("loaded encryption manager");
 
@@ -181,7 +181,7 @@ public class Pooka {
     
     updateTime("created resource listeners");
     // set up help
-    startup.setStatus("Configuring Help...");
+    startup.setStatus("Pooka.startup.help");
     try {
       ClassLoader cl = new Pooka().getClass().getClassLoader();
       java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
@@ -204,7 +204,7 @@ public class Pooka {
       defaultSession.setDebug(true);
 
     updateTime("created session.");    
-    startup.setStatus("Loading Mailbox Information...");
+    startup.setStatus("Pooka.startup.mailboxInfo");
     storeManager = new StoreManager();
     updateTime("created store manager.");
     
@@ -214,7 +214,7 @@ public class Pooka {
     
     final JFrame finalFrame = frame;
 
-    startup.setStatus("Starting Pooka...");
+    startup.setStatus("Pooka.startup.configuringWindow");
     // do all of this on the awt event thread.
     Runnable createPookaUI = new Runnable() {
 	public void run() {
@@ -222,9 +222,14 @@ public class Pooka {
 	  finalFrame.getContentPane().setLayout(new BorderLayout());
 	  panel = new MainPanel(finalFrame);
 	  finalFrame.getContentPane().add("Center", panel);
+
 	  updateTime("created main panel");
+	  startup.setStatus("Pooka.startup.starting");
+
 	  panel.configureMainPanel();
+
 	  updateTime("configured main panel");
+
 	  finalFrame.getContentPane().add("North", panel.getMainToolbar());
 	  finalFrame.setJMenuBar(panel.getMainMenu());
 	  finalFrame.getContentPane().add("South", panel.getInfoPanel());

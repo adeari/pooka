@@ -38,7 +38,7 @@ public class PookaStartup {
 
     mStatusField = new JLabel("Loading Pooka...", SwingConstants.CENTER);
 
-    mProgressBar = new JProgressBar(0, 10);
+    mProgressBar = new JProgressBar(0, 100);
 
     Box progressBox = Box.createVerticalBox();
     progressBox.add(mStatusField);
@@ -76,10 +76,22 @@ public class PookaStartup {
     final String fStatus = pStatus;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  mStatusField.setText(Pooka.getProperty(fStatus, fStatus));
+	  String text = Pooka.getProperty(fStatus + ".label", fStatus);
+	  int weight = 10;
+	  try {
+	    weight = Integer.parseInt(Pooka.getProperty(fStatus + ".weight", "10"));
+	  } catch (NumberFormatException nfe) {
+	  }
+	  mStatusField.setText(text);
 	  mStatusField.repaint();
-
-	  mProgressBar.setValue(mProgressBar.getValue() + 1);
+	  
+	  try {
+	    mProgressBar.setValue(mProgressBar.getValue() + weight);
+	  } catch (Exception e) {
+	    // if we get an error setting the value, just set to 
+	    // indeterminate.
+	    mProgressBar.setIndeterminate(true);
+	  }
 	}
       };
 
