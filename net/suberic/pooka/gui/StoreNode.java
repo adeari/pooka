@@ -291,7 +291,7 @@ public class StoreNode extends MailTreeNode {
 
 	    JInternalFrame jif = new JInternalFrame();
 	    
-	    SearchForm sf = new SearchForm(new StoreInfo[] { getStoreInfo() }, false);
+	    SearchForm sf = new SearchForm(new StoreInfo[] { getStoreInfo() });
 	    int returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
 	    if (returnValue == JOptionPane.OK_OPTION) {
 		System.out.println("got ok option.");

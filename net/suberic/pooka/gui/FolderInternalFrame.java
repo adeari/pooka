@@ -169,7 +169,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * the search term.
      */
     public void searchFolder() {
-	SearchForm sf = new SearchForm(new FolderInfo[] { getFolderInfo() }, false);
+	SearchForm sf = new SearchForm(new FolderInfo[] { getFolderInfo() });
 	int returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
 	if (returnValue == JOptionPane.OK_OPTION) {
 	    final Vector selectedFolders = sf.getSelectedFolders();

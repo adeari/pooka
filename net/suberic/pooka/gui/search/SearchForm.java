@@ -11,13 +11,13 @@ public class SearchForm extends JPanel {
 	this.populatePanel();
     }
 
-    public SearchForm(FolderInfo[] selectedFolders, boolean editable) {
-	folderPanel = new SearchFolderPanel(selectedFolders, editable);
+    public SearchForm(FolderInfo[] selectedFolders) {
+	folderPanel = new SearchFolderPanel(selectedFolders);
 	populatePanel();
     }
 
-    public SearchForm(StoreInfo[] selectedStores, boolean editable) {
-	folderPanel = new SearchFolderPanel(selectedStores, editable);
+    public SearchForm(StoreInfo[] selectedStores) {
+	folderPanel = new SearchFolderPanel(selectedStores);
 	populatePanel();
     }
 
