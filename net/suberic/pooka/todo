@@ -33,12 +33,11 @@
   *) key management
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
-	  - make sure you can reenter key passwords if you enter it incorrectly
-	    the first time.
   *) fix threading on encryption actions.
      *) !!! we're parsing each message on load now. !!!
   *) add keybindings for encryption/decryption.
   *) fix startup errors if no encryption configured.
+  *) add documentation
 
 *) classcastexception?
 java.lang.ClassCastException
@@ -57,32 +56,14 @@ javax.mail.internet.ParseException
         at net.suberic.pooka.MessageInfo.hasEncryption(MessageInfo.java:891)
 
 
-*) fix error in encoded stream problem.
-	-- just better error (?)  or maybe print out as far as it goes.
-	-- see pooka_problems from plc
-
 *) arrow keys on read messages should scroll the window.
 
-*) bounce messages
-
-*) new message notification showing up in title bar, but not until you click
-	on the folder in folder display? (jdk 1.4.1).
-
-*) filtering multiple message should show a status.
-
-*) add support for running without any local files.
-	-- support for http: access?
-	    -- fix variable bundle to make sure that we close the stream
-	    -- better error messages
-	    -- test .htaccess connection.
+*) ?? ^D message, hit return for next message, get an error?
 
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.
 	-- see what happens when the network goes down and then we try to
 	check folder/store connection again.
-
-*) add ability for ui components to be enabled/disabled programmatically.
-	- both for adding to menus/tables and enabling/disabling options.
 
 *) some case(s) in which we're not generating the attachment bundle 
 	correctly?  one instance is how we're handling multipart/alternative
@@ -91,8 +72,6 @@ javax.mail.internet.ParseException
 
 *) still an error in connecting, disconnecting, getting a new messages/deleting
 	old messages, reconnecting.
-
-*) html with text attachment should show text attachment at the end. (??)
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5
@@ -114,11 +93,31 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
         at net.suberic.pooka.StoreInfo$2.actionPerformed(StoreInfo.java:717)
         at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
 
-*) ?? ^D message, hit return for next message, get an error?
+-----
 
 *) new message count in icon
 
------
+*) add ability for ui components to be enabled/disabled programmatically.
+	- both for adding to menus/tables and enabling/disabling options.
+
+*) add support for running without any local files.
+	-- support for http: access?
+	    -- fix variable bundle to make sure that we close the stream
+	    -- better error messages
+	    -- test .htaccess connection.
+
+*) new message notification showing up in title bar, but not until you click
+	on the folder in folder display? (jdk 1.4.1).
+
+*) bounce messages
+
+*) filtering multiple message should show a status.
+
+*) fix error in encoded stream problem.
+	-- just better error (?)  or maybe print out as far as it goes.
+	-- see pooka_problems from plc
+
+*) html with text attachment should show text attachment at the end. (??)
 
 *) add drag and drop
 	*) include message
