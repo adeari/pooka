@@ -150,8 +150,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	folder.addConnectionListener(new ConnectionAdapter() { 
 		public void closed(ConnectionEvent e) {
-		    if (Pooka.isDebug())
+		    if (Pooka.isDebug()) {
 			System.out.println("Folder " + getFolderID() + " closed.");
+			Thread.dumpStack();
+		    }
+
+		    /* let's try getting rid of this.  i don't think it
+		       works, anyway.
+
 		    if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
@@ -162,11 +168,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    System.out.println("Folder " + getFolderID() + " closed and unable to reopen:  " + me.getMessage());
 			}
 		    }
+		    */
+		    
+		    open=false;
 		}
 		
 		public void disconnected(ConnectionEvent e) {
-		    if (Pooka.isDebug())
+		    if (Pooka.isDebug()) {
 			System.out.println("Folder " + getFolderID() + " disconnected.");
+			Thread.dumpStack();
+		    }
+
+		    /* let's try getting rid of this.  i don't think it
+		       works, anyway.
 		    if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
@@ -177,6 +191,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			    System.out.println("Folder " + getFolderID() + " disconnected and unable to reconnect:  " + me.getMessage());
 			}
 		    }
+		    */
+		    
+		    open=false;
 		}
 	    });
 
