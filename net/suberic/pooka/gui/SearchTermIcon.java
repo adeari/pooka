@@ -47,6 +47,17 @@ public class SearchTermIcon implements TableCellIcon {
     }
 
     /**
+     * Compares this SearchTermIcon to another SearchTermIcon.
+     */
+    public boolean equals(Object o) {
+      if (o instanceof SearchTermIcon) {
+	return (this.compareTo(o) == 0);
+      }
+
+      return false;
+    }
+
+    /**
      * Returns the integer value for this Icon.
      */
     public int getIntValue() {

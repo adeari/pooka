@@ -733,24 +733,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
      }
 
-    /**
-     * Refreshes all the MessageInfo objects by the UID, if any.
-     */
-    /*
-    public void refreshAllMessages() {
-	if (folder instanceof UIDFolder) {
-	    UIDFolder uidFolder = (UIDFolder) folder;
-	    Hashtable newMessageToInfoTable = new Hashtable();
-	    Enumeration keys = messageToInfoTable.keys(); 
-	    while (keys.hasMoreElements()) {
-		MessageInfo proxy = (MessageInfo) messageToInfoTable.get(keys.nextElement());
-		Message m = proxy.refreshMessage();
-		if (m != null)
-		    newMessageToInfoTable.put(m, proxy);
-	    }
-	}	
-    }
-    */
+  /**
+   * Refreshes the headers for the given MessageInfo.
+   */
+  public void refreshHeaders(MessageInfo mi) throws MessagingException {
+    // no-op for default; only really used by UIDFolderInfos.
+  }
+
+  /**
+   * Refreshes the flags for the given MessageInfo.
+   */
+  public void refreshFlags(MessageInfo mi) throws MessagingException {
+    // no-op for default; only really used by UIDFolderInfos.
+  }
+
 
     /**
      * This just checks to see if we can get a NewMessageCount from the
@@ -1456,7 +1452,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * 
      * As defined by java.mail.MessageChangedListener.
      */
-
     public void messageChanged(MessageChangedEvent e) {
 	// blech.  we really have to do this on the action thread.
 	

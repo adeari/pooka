@@ -99,14 +99,14 @@ public class MessageInfo {
      * Refreshes the flags object.
      */
     public void refreshFlags() throws MessagingException {
-	// this is a no-op for this implementation
+      getFolderInfo().refreshFlags(this);
     }
     
     /**
      * Refreshes the Headers object.
      */
     public void refreshHeaders() throws MessagingException {
-	// this is a no-op for this implementation
+      getFolderInfo().refreshHeaders(this);
     }
 
     /**
@@ -720,56 +720,41 @@ public class MessageInfo {
 	return message;
     }
 
-    
-    /**
-     * Refreshes the message using the underlying UID.
-     */
-    /*
-    public Message refreshMessage() {
-	Folder sourceFolder = getFolderInfo().getFolder();
-	if (sourceFolder != null && sourceFolder instanceof UIDFolder) {
-	    UIDFolder uidFolder = (UIDFolder)sourceFolder;
-	    try {
-		if (uidFolder.getUIDValidity() == uidValidity) {
-		    message = uidFolder.getMessageByUID(uid);
-		    return message;
-		}
-	    } catch (MessagingException me) {
+  /**
+   * Returns the FolderInfo to which this message belongs.
+   */
+  public FolderInfo getFolderInfo() {
+    return folderInfo;
+  }
 
-	    }
-	}
-	return null;
+  /**
+   * Convenience method.  Returns whether or not that message has been
+   * seen.
+   */
+  public boolean isSeen() {
+    try {
+      return flagIsSet("FLAG.SEEN");
+    } catch (MessagingException me) {
+      return true;
     }
-    */
+  }
 
-    public FolderInfo getFolderInfo() {
-	return folderInfo;
+  /**
+   * Sets the seen parameter to the newValue.  This basically calls
+   * setFlag(Flags.Flag.SEEN, newValue) on the wrapped Message.
+   */
+  public void setSeen(boolean newValue) throws MessagingException {
+    boolean seen = isSeen();
+    if (newValue != seen) {
+      Message m = getRealMessage();
+      m.setFlag(Flags.Flag.SEEN, newValue);
+      getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
     }
-
-    public boolean isSeen() {
-      try {
-	return flagIsSet("FLAG.SEEN");
-      } catch (MessagingException me) {
-	return true;
-      }
-    }
-
-    /**
-     * Sets the seen parameter to the newValue.  This basically calls
-     * setFlag(Flags.Flag.SEEN, newValue) on the wrapped Message.
-     */
-    public void setSeen(boolean newValue) throws MessagingException {
-      boolean seen = isSeen();
-      if (newValue != seen) {
-	Message m = getRealMessage();
-	m.setFlag(Flags.Flag.SEEN, newValue);
-	getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
-      }
-    }
-
-    public boolean isLoaded() {
-	return loaded;
-    }
+  }
+  
+  public boolean isLoaded() {
+    return loaded;
+  }
 
     /**
      * This sets the loaded value for the MessageProxy to false.   This 

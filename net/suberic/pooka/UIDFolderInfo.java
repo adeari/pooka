@@ -174,7 +174,7 @@ public class UIDFolderInfo extends FolderInfo {
       if (getFolderDisplayUI() != null)
 	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
       
-      unloadAllMessages();
+      folderTableModel = null;
       loadAllMessages();
       if (getFolderDisplayUI() != null)
 	getFolderDisplayUI().resetFolderTableModel(folderTableModel);
@@ -186,8 +186,8 @@ public class UIDFolderInfo extends FolderInfo {
       if (getFolderDisplayUI() != null)
 	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
       FetchProfile fp = new FetchProfile();
-      fp.add(FetchProfile.Item.ENVELOPE);
-      fp.add(FetchProfile.Item.FLAGS);
+      //fp.add(FetchProfile.Item.ENVELOPE);
+      //fp.add(FetchProfile.Item.FLAGS);
       fp.add(UIDFolder.FetchProfileItem.UID);
       Message[] messages = getFolder().getMessages();
       getFolder().fetch(messages, fp);
@@ -275,13 +275,19 @@ public class UIDFolderInfo extends FolderInfo {
     }
 
     protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
-	for (int i = 0; i < messages.length; i++) {
-	    MessageChangedEvent mce = new MessageChangedEvent(getFolder(), MessageChangedEvent.FLAGS_CHANGED, messages[i]);
-	    fireMessageChangedEvent(mce);
-	}
-	
+      // sigh
+      
+      Vector proxies = new Vector();
+      for (int i = 0; i < messages.length; i++) {
+	MessageProxy mp = getMessageInfo(messages[i]).getMessageProxy();
+	mp.setRefresh(true);
+	proxies.add(mp);
+      }
+      
+      loaderThread.loadMessages(proxies);
+      
     }
-
+  
     
     protected void runMessagesAdded(MessageCountEvent mce)  {
 	if (folderTableModel != null) {
@@ -461,6 +467,23 @@ public class UIDFolderInfo extends FolderInfo {
 		folderNode.loadChildren();
 	}
     }
+
+  /**
+   * Fetches the information for the given messages using the given
+   * FetchProfile.
+   */
+  public void fetch(Message[] messages, FetchProfile profile) throws MessagingException  {
+    // check the messages first; make sure we're just fetching 'real'
+    // messages.
+    Message[] realMsgs = new Message[messages.length];
+    for (int i = 0; i < messages.length; i++) {
+      if (messages[i] instanceof UIDMimeMessage)
+	realMsgs[i] = ((UIDMimeMessage)messages[i]).getMessage();
+      else
+	realMsgs[i] = messages[i];
+    }
+    getFolder().fetch(messages, profile);
+  }
 
     /**
      * Unloads all messages.  This should be run if ever the current message

@@ -116,6 +116,9 @@ public class MessageProxy {
   
   // if the tableInfo has been loaded yet.
   boolean loaded = false;
+
+  // if the tableInfo needs to be refreshed.
+  boolean refresh = false;
   
   // if the display filters have been run
   boolean filtersMatched = false;
@@ -173,6 +176,13 @@ public class MessageProxy {
     }
     
     /**
+     * Override to compare underlying values.
+     */
+    public boolean equals(Object o) {
+      return (compareTo(o) == 0);
+    }
+    
+    /**
      * toString() just returns the original subject.
      */
     public String toString() {
@@ -216,6 +226,13 @@ public class MessageProxy {
 	return sortingAddress.compareTo(((AddressLine)o).sortingAddress);
       } else
 	return sortingAddress.compareToIgnoreCase(o.toString());
+    }
+
+    /**
+     * Override to compare underlying values.
+     */
+    public boolean equals(Object o) {
+      return (compareTo(o) == 0);
     }
     
     /**
@@ -282,52 +299,132 @@ public class MessageProxy {
   public synchronized void loadTableInfo() {
     if (!loaded) {
       try {
-	int columnCount = columnHeaders.size();
-	
-	tableInfo = new Vector();
-	
-	for(int j=0; j < columnCount; j++) {
-	  Object newProperty = columnHeaders.elementAt(j);
-	  if (newProperty instanceof String) {
-	    String propertyName = (String)newProperty;
-	    
-	    if (propertyName.startsWith("FLAG")) 
-	      tableInfo.addElement(getMessageFlag(propertyName));
-	    else if (propertyName.equals("attachments"))
-	      tableInfo.addElement(new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
-	    else if (propertyName.equalsIgnoreCase("subject")) 
-	      tableInfo.addElement(new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
-	    else if (propertyName.equalsIgnoreCase("from")) 
-	      tableInfo.addElement(new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
-	    else
-	      tableInfo.addElement(getMessageInfo().getMessageProperty(propertyName));
-	  } else if (newProperty instanceof SearchTermIconManager) {
-	    SearchTermIconManager stm = (SearchTermIconManager) newProperty;
-	    tableInfo.addElement(new SearchTermIcon(stm, this));
-	  } else if (newProperty instanceof RowCounter) {
-	    tableInfo.addElement(newProperty);
-	  }
-	}
+	tableInfo = createTableInfo();
 	
 	getMessageInfo().isSeen();
 	
 	loaded=true;
-
+	
 	// notify the JTable that this proxy has loaded.
 	MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
-
+	
 	FolderInfo fi = getFolderInfo();
 	if (fi != null) {
 	  fi.fireMessageChangedEvent(mce);
 	}
 
       } catch (MessagingException me) {
+	System.err.println("caught exception loading message:  " + me);
+	me.printStackTrace();
       }
     }
     
     matchFilters();
     
-  }	
+  } 
+
+  /**
+   * Refreshes the MessageProxy by reloading the information for the
+   * MessageInfo, and then updating the FolderTableInfo if necessary.
+   */
+  public void refreshMessage() {
+    if (needsRefresh()) {
+      try {
+	
+	// first, tag this so we won't need to be refereshed again.
+	
+	refresh = false;
+
+	// second, refresh the MessageInfo itself.
+
+	getMessageInfo().refreshFlags();
+	
+	// third, compare.
+
+	Vector newTableInfo = createTableInfo();
+	
+	// check to see if anything has actually changed
+	boolean hasChanged = (tableInfo == null);
+	for (int i = 0; hasChanged != true && i < newTableInfo.size(); i++) {
+	  Object newValue = newTableInfo.get(i);
+	  Object oldValue = tableInfo.get(i);
+	  if (! newValue.equals(oldValue)) {
+	    hasChanged = true;
+	  }
+	}
+
+	// check for the matching filters, also.
+	DisplayFilter[] newMatchingFilters = doFilterMatch();
+	if (newMatchingFilters == null) {
+	  if (matchingFilters != null)
+	    hasChanged = true;
+	} else if (matchingFilters == null) {
+	  hasChanged = true;
+	} else if (matchingFilters.length != newMatchingFilters.length) {
+	  hasChanged = true;
+	} else {
+	  for (int i = 0; hasChanged != true && i < newMatchingFilters.length; i++) {
+	    DisplayFilter newValue = newMatchingFilters[i];
+	    DisplayFilter oldValue = matchingFilters[i];
+	    if (newValue != oldValue) {
+	      hasChanged = true;
+	    }
+	  }
+	}
+	
+	if (hasChanged) {
+	  tableInfo = newTableInfo;
+	  matchingFilters = newMatchingFilters;
+	  
+	  // notify the JTable that this proxy has loaded.
+	  MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
+	  
+	  FolderInfo fi = getFolderInfo();
+	  if (fi != null) {
+	    fi.fireMessageChangedEvent(mce);
+	  }
+	}
+      } catch (MessagingException me) {
+	System.err.println("caught exception refreshing message:  " + me);
+	me.printStackTrace();
+      }
+    }
+
+  }
+
+  /**
+   * Creates a TableInfo Vector.
+   */
+  protected Vector createTableInfo() throws MessagingException {
+    int columnCount = columnHeaders.size();
+    
+    Vector returnValue = new Vector();
+    
+    for(int j=0; j < columnCount; j++) {
+      Object newProperty = columnHeaders.elementAt(j);
+      if (newProperty instanceof String) {
+	String propertyName = (String)newProperty;
+	
+	if (propertyName.startsWith("FLAG")) 
+	  returnValue.addElement(getMessageFlag(propertyName));
+	else if (propertyName.equals("attachments"))
+	  returnValue.addElement(new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
+	else if (propertyName.equalsIgnoreCase("subject")) 
+	  returnValue.addElement(new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
+	else if (propertyName.equalsIgnoreCase("from")) 
+	  returnValue.addElement(new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
+	else
+	  returnValue.addElement(getMessageInfo().getMessageProperty(propertyName));
+      } else if (newProperty instanceof SearchTermIconManager) {
+	SearchTermIconManager stm = (SearchTermIconManager) newProperty;
+	returnValue.addElement(new SearchTermIcon(stm, this));
+      } else if (newProperty instanceof RowCounter) {
+	returnValue.addElement(newProperty);
+      }
+    }
+
+    return returnValue;
+  }
 
   /**
    * This matches the FolderInfo's display filters.
@@ -336,24 +433,33 @@ public class MessageProxy {
     if (! filtersMatched ) {
       // match the given filters for the FolderInfo.
       
-      MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
-      if (folderFilters != null) {
-	Vector tmpMatches = new Vector();
-	for (int i = 0; i < folderFilters.length; i++) {
-	  if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
-	    tmpMatches.add(folderFilters[i].getAction());
-	}
-	
-	matchingFilters = new DisplayFilter[tmpMatches.size()];
-	for (int i = 0; i < tmpMatches.size(); i++) {
-	  //System.out.println("adding a matching filter.");
-	  matchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
-	}
+      matchingFilters = doFilterMatch();
+
+      filtersMatched = true;
+    }
+  }
+
+  /**
+   * This returns a list of matching filters, or null if there are no
+   * filters.
+   */
+  private DisplayFilter[] doFilterMatch() {
+    MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
+    if (folderFilters != null) {
+      Vector tmpMatches = new Vector();
+      for (int i = 0; i < folderFilters.length; i++) {
+	if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
+	  tmpMatches.add(folderFilters[i].getAction());
       }
       
-      filtersMatched=true;
+      DisplayFilter[] newMatchingFilters = new DisplayFilter[tmpMatches.size()];
+      for (int i = 0; i < tmpMatches.size(); i++) {
+	newMatchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
+      }
+      return newMatchingFilters;
     }
-    
+
+    return null;
   }
   
   /**
@@ -719,6 +825,22 @@ public class MessageProxy {
     return loaded;
   }
   
+  /**
+   * Returns whether or not this MessageProxy should refresh its display
+   * information.
+   */
+  public boolean needsRefresh() {
+    return refresh;
+  }
+
+  /**
+   * Notifies this MessageProxy whether or not this MessageProxy needs to 
+   * refresh its display information.
+   */
+  public void setRefresh(boolean newValue) {
+    refresh = newValue;
+  }
+
   /**
    * This sets the loaded value for the MessageProxy to false.   This 
    * should be called only if the TableInfo of the Message has been 

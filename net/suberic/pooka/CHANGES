@@ -1,3 +1,7 @@
+made some implementation changes to the way that disconnected imap folders
+are loaded.  this should result in a fairly substantial performace increase
+for large folders.
+
 moved saving emails to a sent folder from the AWTEvent thread to the 
 appropriate FolderThread.
 

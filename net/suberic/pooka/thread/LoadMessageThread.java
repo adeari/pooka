@@ -121,7 +121,10 @@ public class LoadMessageThread extends Thread {
 	}
 
 	try {
-	  mp.loadTableInfo();
+	  if (! mp.isLoaded())
+	    mp.loadTableInfo();
+	  else if (mp.needsRefresh())
+	    mp.refreshMessage();
 	} catch (Exception e) {
 	  e.printStackTrace();
 	}

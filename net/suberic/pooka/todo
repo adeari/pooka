@@ -6,8 +6,7 @@
 
 *) no way to cache messages as they come in.
 
-*) make disconnected imap use LoadMessageTracker.
-	make disconnected imap not show messages that aren't there!
+*) new messages seem to be loaded last.
 
 *) in general, make reconnecting/resynching (with disconnected imap or
 	with the uid system) use the LoadMessageThread.  also make the
