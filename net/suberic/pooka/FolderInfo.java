@@ -30,6 +30,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // folder is available, but only should be accessed during the checkFolder
     // phase.
+
     public static int PASSIVE = 10;
 
     // folder is running in disconnected mode; only act on the cached 
@@ -118,6 +119,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	createFilters();
 
 	resetDefaultActions();
+	
+	
     }
 
 
@@ -142,63 +145,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
     
     /**
-     * This resets the defaultActions.  Useful when this goes to and from
-     * being a trashFolder, since only trash folders have emptyTrash
-     * actions.
-     */
-    public void resetDefaultActions() {
-	if (isTrashFolder())
-	    defaultActions = new Action[] {
-		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-		new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread())
-		    
-		    };
-	else
-	    defaultActions = new Action[] {
-		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread())
-		    };
-    }
-
-
-    /**
-     * This takes the FolderProperty.filters property and uses it to populate
-     * the messageFilters array.
-     */
-    public void createFilters() {
-	Vector filterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters", "");
-	if (filterNames != null && filterNames.size() > 0) {
-	    filters = new MessageFilter[filterNames.size()];
-	    for (int i = 0; i < filterNames.size(); i++) {
-		filters[i] = new MessageFilter(getFolderProperty() + ".filters." + (String) filterNames.elementAt(i));
-	    }
-	}
-    }
-
-    /**
-     * This applies each MessageFilter in filters array on the given 
-     * MessageInfo objects.
-     *
-     * @return a Vector containing the removed MessageInfo objects.
-     */
-    public Vector applyFilters(Vector messages) {
-	Vector notRemovedYet = new Vector(messages);
-	Vector removed = new Vector();
-	if (filters != null) 
-	    for (int i = 0; i < filters.length; i++) {
-		if (filters[i] != null) {
-		    Vector justRemoved = filters[i].filterMessages(notRemovedYet);
-		    removed.addAll(justRemoved);
-		    notRemovedYet.removeAll(justRemoved);
-		}
-	}
-	
-	return removed;
-    }
-
-    /**
      * This actually loads up the Folder object itself.  This is used so 
      * that we can have a FolderInfo even if we're not connected to the
      * parent Store.
+     *
+     * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
+     * Once the parent store is connected, we can try to load the folder.  
+     * If the load is successful, we go to a CLOSED state.  If it isn't,
+     * then we can either return to NOT_LOADED, or INVALID.
      */
     public void loadFolder() {
 	if (Pooka.isDebug())
@@ -300,38 +254,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    if (Pooka.isDebug()) {
 			System.out.println("Folder " + getFolderID() + " closed:  " + e);
 		    }
-		    
-		    /*
-		    if (open == true) {
-			try {
-			    Store store = getFolder().getStore();
-			    if (!(store.isConnected()))
-				store.connect();
-			    openFolder(Folder.READ_WRITE);
-			    //refreshAllMessages();
-			} catch (MessagingException me) {
-			    System.out.println("Folder " + getFolderID() + " closed and unable to reopen:  " + me.getMessage());
-			    try {
-				closeFolder(false);
-			    } catch (Exception ex) {
-			    System.out.println("Failure marking FolderInfo " + getFolderID() + " as closed.");
-			    }
-			}
-		    }
-		    
 
-		    try {
-			closeFolder(false);
-		    } catch (Exception ex) {
-			if (Pooka.isDebug())
-			    System.out.println("Failure marking FolderInfo " + getFolderID() + " as closed:  " + ex.getMessage());
-		    }
-		    
-		    */
-
+		    // if we've already 
 		    if (status == CONNECTED) {
 			setStatus(LOST_CONNECTION);
 		    }
+
+		    fireConnectionEvent(e);
 		}
 		
 		public void disconnected(ConnectionEvent e) {
@@ -340,35 +269,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			Thread.dumpStack();
 		    }
 		    
-		    /*
-		    if (open == true) {
-			try {
-			    Store store = getFolder().getStore();
-			    if (!(store.isConnected()))
-				store.connect();
-			    openFolder(Folder.READ_WRITE);
-			    //refreshAllMessages();
-			} catch (MessagingException me) {
-			    System.out.println("Folder " + getFolderID() + " disconnected and unable to reconnect:  " + me.getMessage());
-			    try {
-				closeFolder(false);
-			    } catch (Exception ex) {
-			    System.out.println("Failure marking FolderInfo " + getFolderID() + " as closed.");
-
-			    }
-			}
-		    }
-
-		    try {
-			closeFolder(false);
-		    } catch (MessagingException me) {
-			if (Pooka.isDebug())
-			    System.out.println("Failure marking FolderInfo " + getFolderID() + " as closed:  " + me.getMessage());
-		    }
-		    */
 		    if (status == CONNECTED) {
 			setStatus(LOST_CONNECTION);
 		    }
+		    fireConnectionEvent(e);
 		    
 		}
 	    });
@@ -377,8 +281,145 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (!defProfile.equals(""))
 	    defaultProfile = UserProfile.getProfile(defProfile);
 
+	// if we got to this point, we should assume that the open worked.
+
+	if (getFolderTracker() == null) {
+	    FolderTracker tracker = Pooka.getFolderTracker();
+	    tracker.addFolder(this);
+	    this.setFolderTracker(tracker);
+	}
     }
     
+    /**
+     * This method opens the Folder, and sets the FolderInfo to know that
+     * the Folder should be open.  You should use this method instead of
+     * calling getFolder().open(), because if you use this method, then
+     * the FolderInfo will try to keep the Folder open, and will try to
+     * reopen the Folder if it gets closed before closeFolder is called.
+     *
+     * This method can also be used to reset the mode of an already 
+     * opened folder.
+     */
+    public void openFolder(int mode) throws MessagingException {
+
+	if (! isLoaded())
+	    loadFolder();
+	
+	if (!getParentStore().isConnected())
+	    getParentStore().connectStore();
+
+	if (isLoaded() && isAvailable()) {
+	    if (folder.isOpen()) {
+		if (folder.getMode() == mode)
+		    return;
+		else { 
+		    closeFolder(false);
+		    openFolder(mode);
+		}
+	    } else {
+		folder.open(mode);
+		updateFolderOpenStatus(true);
+		resetMessageCounts();
+		if (getFolderNode() != null)
+		    getFolderNode().getParentContainer().repaint();
+	    }
+	}
+
+    }
+
+    /**
+     * Actually records that the folde has been opened or closed.  
+     * This is separated out so that subclasses can override it more
+     * easily.
+     */
+    protected void updateFolderOpenStatus(boolean isNowOpen) {
+	if (isNowOpen) {
+	    setStatus(CONNECTED);
+	} else {
+	    setStatus(CLOSED);
+	}
+    }
+
+    /**
+     * This method calls openFolder() on this FolderInfo, and then, if
+     * this FolderInfo has any children, calls openFolder() on them,
+     * also.  
+     * 
+     * This is usually called by StoreInfo.connectStore() if 
+     * Pooka.openFoldersOnConnect is set to true.
+     */
+
+    public void openAllFolders(int mode) {
+	try {
+	    openFolder(mode);
+	} catch (MessagingException me) {
+	}
+
+	if (children != null)
+	    for (int i = 0; i < children.size(); i++) 
+		try {
+		    ((FolderInfo)children.elementAt(i)).openFolder(mode);
+		} catch (MessagingException me) {
+		}
+    }
+    
+    /**
+     * This method closes the Folder.  If you open the Folder using 
+     * openFolder (which you should), then you should use this method
+     * instead of calling getFolder.close().  If you don't, then the
+     * FolderInfo will try to reopen the folder.
+     */
+    public void closeFolder(boolean expunge) throws MessagingException {
+
+	unloadAllMessages();
+
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().setEnabled(false);
+
+	setFolderDisplayUI(null);
+
+	if (getFolderTracker() != null) {
+	    getFolderTracker().removeFolder(this);
+	    setFolderTracker(null);
+	}
+
+	if (isLoaded() && isAvailable()) {
+	    setStatus(CLOSED);
+	    try {
+		folder.close(expunge);
+	    } catch (java.lang.IllegalStateException ise) {
+		throw new MessagingException(ise.getMessage(), ise);
+	    }
+	}
+
+    }
+
+    /**
+     * This closes the curernt Folder as well as all subfolders.
+     */
+    public void closeAllFolders(boolean expunge) throws MessagingException {
+	MessagingException otherException = null;
+	Vector folders = getChildren();
+	if (folders != null) {
+	    for (int i = 0; i < folders.size(); i++) {
+		try {
+		    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
+		} catch (MessagingException me) {
+		    if (otherException == null)
+			otherException = me;
+		} catch (Exception e) {
+		    MessagingException newMe = new MessagingException (e.getMessage(), e);
+		    if (otherException == null)
+			otherException = newMe;
+		}
+	    }
+	}  
+	
+	closeFolder(expunge);
+
+	if (otherException != null)
+	    throw otherException;
+    }
 
     /**
      * Loads the column names and sizes.
@@ -676,16 +717,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return null;
     }
 
-
-
-    /**
-     * Creates the column values from the FolderTable property.
-     */
-    public Vector createColumnValues() {
-
-	return columnValues;
-    }
-    
     /**
      * creates the loader thread.
      */
@@ -761,6 +792,33 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		if (Pooka.isDebug())
 		    System.out.println("check.  running messageChanged on listener.");
 		((MessageChangedListener)listeners[i+1]).messageChanged(mce);
+	    }              
+	}
+    }  
+
+    /**
+     * This handles the distributions of any Connection events.
+     *
+     * As defined in interface net.suberic.pooka.event.MessageLoadedListener.
+     */
+
+    public void fireConnectionEvent(ConnectionEvent e) {
+	// from the EventListenerList javadoc, including comments.
+
+	if (Pooka.isDebug())
+	    System.out.println("firing connection event.");
+	// Guaranteed to return a non-null array
+	Object[] listeners = messageChangedListeners.getListenerList();
+	// Process the listeners last to first, notifying
+	// those that are interested in this event
+	for (int i = listeners.length-2; i>=0; i-=2) {
+	    if (Pooka.isDebug())
+		System.out.println("listeners[" + i + "] is " + listeners[i] );
+	    if (listeners[i]==ConnectionListener.class) {
+		if (Pooka.isDebug())
+		    System.out.println("check.  it's a connection listener.");
+		ConnectionListener listener = (ConnectionListener) listeners[i+1];
+		if (
 	    }              
 	}
     }  
@@ -844,6 +902,36 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
+     * Remove the given String from the folderList property.  
+     *
+     * Note that because this is also a ValueChangeListener to the
+     * folderList property, this will also result in the FolderInfo being
+     * removed from the children Vector.
+     */
+    void removeFromFolderList(String removeFolderName) {
+	Vector folderNames = Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".folderList", "");
+	
+	boolean first = true;
+	StringBuffer newValue = new StringBuffer();
+	String folderName;
+
+	for (int i = 0; i < folderNames.size(); i++) {
+	    folderName = (String) folderNames.elementAt(i);
+
+	    if (! folderName.equals(removeFolderName)) {
+		if (!first)
+		    newValue.append(":");
+		
+		newValue.append(folderName);
+		first = false;
+	    }
+	    
+	}
+	
+	Pooka.setProperty(getFolderProperty() + ".folderList", newValue.toString());
+    }
+
+    /**
      * This unsubscribes this FolderInfo and all of its children, if 
      * applicable.
      *
@@ -914,33 +1002,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
-     * Remove the given String from the folderList property.  
-     *
-     * Note that because this is also a ValueChangeListener to the
-     * folderList property, this will also result in the FolderInfo being
-     * removed from the children Vector.
+     * This resets the defaultActions.  Useful when this goes to and from
+     * being a trashFolder, since only trash folders have emptyTrash
+     * actions.
      */
-    void removeFromFolderList(String removeFolderName) {
-	Vector folderNames = Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".folderList", "");
-	
-	boolean first = true;
-	StringBuffer newValue = new StringBuffer();
-	String folderName;
-
-	for (int i = 0; i < folderNames.size(); i++) {
-	    folderName = (String) folderNames.elementAt(i);
-
-	    if (! folderName.equals(removeFolderName)) {
-		if (!first)
-		    newValue.append(":");
-		
-		newValue.append(folderName);
-		first = false;
-	    }
-	    
-	}
-	
-	Pooka.setProperty(getFolderProperty() + ".folderList", newValue.toString());
+    public void resetDefaultActions() {
+	if (isTrashFolder())
+	    defaultActions = new Action[] {
+		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+		new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread())
+		    
+		    };
+	else
+	    defaultActions = new Action[] {
+		new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread())
+		    };
     }
 
     // semi-accessor methods.
@@ -1094,10 +1170,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
     }
 
-    /**
-     * Actually runs the meat of the messagesChanged method.  Removed so 
-     * that it's easier for classes to override this method.
-     */
+
     protected void runMessageChanged(MessageChangedEvent mce) {
 	
 	// if the message is getting deleted, then we don't
@@ -1127,118 +1200,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 
     /**
-     * This method opens the Folder, and sets the FolderInfo to know that
-     * the Folder should be open.  You should use this method instead of
-     * calling getFolder().open(), because if you use this method, then
-     * the FolderInfo will try to keep the Folder open, and will try to
-     * reopen the Folder if it gets closed before closeFolder is called.
-     *
-     * This method can also be used to reset the mode of an already 
-     * opened folder.
-     */
-    public void openFolder(int mode) throws MessagingException {
-
-	if (! isLoaded())
-	    loadFolder();
-	
-	if (!getParentStore().isConnected())
-	    getParentStore().connectStore();
-
-	if (isLoaded() && isAvailable()) {
-	    if (folder.isOpen()) {
-		if (folder.getMode() == mode)
-		    return;
-		else { 
-		    closeFolder(false);
-		    openFolder(mode);
-		}
-	    } else {
-		folder.open(mode);
-		updateFolderOpenStatus(true);
-		resetMessageCounts();
-		if (getFolderNode() != null)
-		    getFolderNode().getParentContainer().repaint();
-	    }
-	}
-
-	// if we got to this point, we should assume that the open worked.
-
-	if (getFolderTracker() == null) {
-	    FolderTracker tracker = Pooka.getFolderTracker();
-	    tracker.addFolder(this);
-	    this.setFolderTracker(tracker);
-	}
-    }
-
-    /**
-     * This updates the folder information if the folder has just been
-     * opened or closed.  Again, this is mainly to make it easier for
-     * subclasses to override functionality.
-     */
-    protected void updateFolderOpenStatus(boolean isNowOpen) {
-	if (isNowOpen) {
-	    setStatus(CONNECTED);
-	} else {
-	    setStatus(CLOSED);
-	}
-    }
-
-    /**
-     * Opens the folder into its preferred state.
-     */
-    public void openToPreferredState() throws MessagingException {
-	if (! isLoaded())
-	    loadFolder();
-	
-	loadPreferredState();
-	
-	if (preferred_state < CLOSED)
-	    openFolder(Folder.READ_WRITE);
-
-    }
-
-    /**
-     * Sets the preferred state of the folder.
-     */
-    public void loadPreferredState() {
-	String state = Pooka.getProperty(getFolderProperty() + ".preferredState", "connected");
-	if (state.equalsIgnoreCase("connected"))
-	    preferred_state = CONNECTED;
-	else if (state.equalsIgnoreCase("passive"))
-	    preferred_state = PASSIVE;
-	else if (state.equalsIgnoreCase("disconnected"))
-	    preferred_state = DISCONNECTED;
-	else if (state.equalsIgnoreCase("CLOSED"))
-	    preferred_state = CLOSED;
-	else
-	    preferred_state = CONNECTED;
-    }
-
-    /**
-     * This method calls openFolder() on this FolderInfo, and then, if
-     * this FolderInfo has any children, calls openFolder() on them,
-     * also.  
-     * 
-     * This is usually called by StoreInfo.connectStore() if 
-     * Pooka.openFoldersOnConnect is set to true.
-     */
-
-    public void openAllFolders() {
-	try {
-	    openToPreferredState();
-	} catch (MessagingException me) {
-	}
-
-	if (children != null)
-	    for (int i = 0; i < children.size(); i++) 
-		try {
-		    ((FolderInfo)children.elementAt(i)).openToPreferredState();
-		} catch (MessagingException me) {
-		}
-	
-    }
-
-    /**
      * Searches for messages in this folder which match the given
      * SearchTerm.
      *
@@ -1254,63 +1215,40 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
-     * This method closes the Folder.  If you open the Folder using 
-     * openFolder (which you should), then you should use this method
-     * instead of calling getFolder.close().  If you don't, then the
-     * FolderInfo will try to reopen the folder.
+     * This takes the FolderProperty.filters property and uses it to populate
+     * the messageFilters array.
      */
-    public void closeFolder(boolean expunge) throws MessagingException {
-
-	unloadAllMessages();
-
-	if (getFolderDisplayUI() != null)
-	    getFolderDisplayUI().setEnabled(false);
-
-	setFolderDisplayUI(null);
-
-	if (getFolderTracker() != null) {
-	    getFolderTracker().removeFolder(this);
-	    setFolderTracker(null);
-	}
-
-	if (isLoaded() && isAvailable()) {
-	    setStatus(CLOSED);
-	    try {
-		folder.close(expunge);
-	    } catch (java.lang.IllegalStateException ise) {
-		throw new MessagingException(ise.getMessage(), ise);
+    public void createFilters() {
+	Vector filterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters", "");
+	if (filterNames != null && filterNames.size() > 0) {
+	    filters = new MessageFilter[filterNames.size()];
+	    for (int i = 0; i < filterNames.size(); i++) {
+		filters[i] = new MessageFilter(getFolderProperty() + ".filters." + (String) filterNames.elementAt(i));
 	    }
 	}
-
     }
 
     /**
-     * This closes the curernt Folder as well as all subfolders.
+     * This applies each MessageFilter in filters array on the given 
+     * MessageInfo objects.
+     *
+     * @return a Vector containing the removed MessageInfo objects.
      */
-    public void closeAllFolders(boolean expunge) throws MessagingException {
-	MessagingException otherException = null;
-	Vector folders = getChildren();
-	if (folders != null) {
-	    for (int i = 0; i < folders.size(); i++) {
-		try {
-		    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
-		} catch (MessagingException me) {
-		    if (otherException == null)
-			otherException = me;
-		} catch (Exception e) {
-		    MessagingException newMe = new MessagingException (e.getMessage(), e);
-		    if (otherException == null)
-			otherException = newMe;
+    public Vector applyFilters(Vector messages) {
+	Vector notRemovedYet = new Vector(messages);
+	Vector removed = new Vector();
+	if (filters != null) 
+	    for (int i = 0; i < filters.length; i++) {
+		if (filters[i] != null) {
+		    Vector justRemoved = filters[i].filterMessages(notRemovedYet);
+		    removed.addAll(justRemoved);
+		    notRemovedYet.removeAll(justRemoved);
 		}
-	    }
-	}  
+	}
 	
-	closeFolder(expunge);
-
-	if (otherException != null)
-	    throw otherException;
+	return removed;
     }
-    
+
     // Accessor methods.
 
     public Action[] getActions() {
