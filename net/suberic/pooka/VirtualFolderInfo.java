@@ -20,7 +20,6 @@ import net.suberic.util.thread.ActionThread;
 public class VirtualFolderInfo extends FolderInfo {
     FolderInfo[] parents;
     MessageInfo[] originalMessages;
-    ActionThread folderThread;
 
     /**
      * Creates a new VirtualFolderInfo from the list of messageInfos,
@@ -51,9 +50,6 @@ public class VirtualFolderInfo extends FolderInfo {
 	    parents[i].addMessageChangedListener(this);
 	}
 
-	folderThread = new ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread "));
-
-	folderThread.start();
 	loadAllMessages();
     }
 
@@ -65,8 +61,6 @@ public class VirtualFolderInfo extends FolderInfo {
 	    parents[i].removeMessageCountListener(this);
 	    parents[i].removeMessageChangedListener(this);
 	}
-
-	folderThread.setStop(true);
     }
 
     /**
@@ -199,15 +193,25 @@ public class VirtualFolderInfo extends FolderInfo {
     throws MessagingException {
 	Vector matches = new Vector();
 	for (int i = 0; i < getFolderTableModel().getRowCount(); i++) {
-	    MessageInfo currentInfo = (MessageInfo) ((MessageProxy) getFolderTableModel().getValueAt(i, 0)).getMessageInfo();
-	    if (term.match(currentInfo.getMessage()))
+	    MessageInfo currentInfo = getFolderTableModel().getMessageProxy(i).getMessageInfo();
+	    if (term.match(currentInfo.getMessage())) {
 		matches.add(currentInfo);
+	    }
 	}
 	MessageInfo returnValue[] = new MessageInfo[matches.size()];
 	for (int i = 0; i < matches.size(); i++) {
 	    returnValue[i] = (MessageInfo) matches.elementAt(i);
 	}
 	return returnValue;
+    }
+
+    /**
+     * This puts up the gui for the Search.
+     */
+    public void showSearchFolder() {
+	Vector allowedValues = new Vector();
+	allowedValues.add(this);
+	Pooka.getUIFactory().showSearchForm(new FolderInfo[] { this }, allowedValues);
     }
 
     protected void removeFromListeners(FolderDisplayUI display) {
@@ -247,7 +251,7 @@ public class VirtualFolderInfo extends FolderInfo {
     }
 
     public ActionThread getFolderThread() {
-	return folderThread;
+	return Pooka.getSearchThread();
     }
 
     public StoreInfo getParentStore() {

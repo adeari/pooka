@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.Dimension;
 import java.util.Vector;
+import java.util.HashMap;
 
 /**
  * This is a panel which allows you to choose which folders you will
@@ -14,6 +15,7 @@ public class SearchFolderPanel extends JPanel {
     Vector selected = new Vector();
     boolean isEditable = true;
     JList folderListSelector;
+    java.util.HashMap labelToFolderMap;
 
     /**
      * Create a SearchFolderPanel with no folders selected.  By default, this
@@ -91,8 +93,12 @@ public class SearchFolderPanel extends JPanel {
      */
     public void createDynamicPanel(Vector folderList, Vector allowedValues) {
 	Vector folderNameList = new Vector();
+	labelToFolderMap = new java.util.HashMap();
 	for (int i = 0; i < allowedValues.size(); i++) {
-	    folderNameList.add(((FolderInfo) allowedValues.elementAt(i)).getFolderID());
+	    FolderInfo folder = (FolderInfo) allowedValues.elementAt(i);
+	    String name = folder.getFolderID();
+	    folderNameList.add(name);
+	    labelToFolderMap.put(name, folder);
 	}
 
 	folderListSelector = new JList(folderNameList);
@@ -134,7 +140,7 @@ public class SearchFolderPanel extends JPanel {
 	    Object[] selectedValues = folderListSelector.getSelectedValues();
 	    for (int i = 0; i < selectedValues.length; i++) {
 		String currentSelection = (String) selectedValues[i];
-		FolderInfo currentFolder = Pooka.getStoreManager().getFolderById(currentSelection);
+		FolderInfo currentFolder = (FolderInfo) labelToFolderMap.get(currentSelection);
 		returnValue.add(currentFolder);
 	    }
 

@@ -7,7 +7,9 @@ import java.util.Vector;
 import java.text.DateFormat;
 
 /**
- * This class generates SearchTerms from 
+ * This class generates SearchTerms from properties in the Pooka 
+ * VariableBundle.  It also will give out a list of property labels and 
+ * then will translate those labels and/or properties into SearchTerms.
  */
 public class SearchTermManager {
 

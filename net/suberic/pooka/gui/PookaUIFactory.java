@@ -80,4 +80,17 @@ public interface PookaUIFactory extends ErrorHandler {
      * Clears the main status message panel.
      */
     public void clearStatus();
+
+    /**
+     * Shows a SearchForm with the given FolderInfos selected from the list
+     * of the given allowedValues.
+     */
+    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues); 
+
+    /**
+     * Shows a SearchForm with the given FolderInfos selected.  The allowed
+     * values will be the list of all available Folders.
+     */
+    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders); 
+
 }

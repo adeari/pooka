@@ -21,6 +21,16 @@ public class SearchForm extends JPanel {
 	populatePanel();
     }
 
+    public SearchForm(FolderInfo[] selectedFolders, Vector allowedValues) {
+	folderPanel = new SearchFolderPanel(selectedFolders, allowedValues);
+	populatePanel();
+    }
+
+    public SearchForm(StoreInfo[] selectedStores, Vector allowedValues) {
+	folderPanel = new SearchFolderPanel(selectedStores, allowedValues);
+	populatePanel();
+    }
+
     /**
      * Populates the SearchForm.
      */

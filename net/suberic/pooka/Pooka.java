@@ -24,6 +24,8 @@ public class Pooka {
 
     static public javax.mail.Authenticator defaultAuthenticator = null;
 
+    static public net.suberic.util.thread.ActionThread searchThread = null;
+
     static public void main(String argv[]) {
 	parseArgs(argv);
 
@@ -45,6 +47,9 @@ public class Pooka {
 	mailcap = new FullMailcapCommandMap();
 	folderTracker = new net.suberic.pooka.thread.FolderTracker();
 	folderTracker.start();
+
+	searchThread = new net.suberic.util.thread.ActionThread(getProperty("thread.searchThread", "Search Thread "));
+	searchThread.start();
 
 	javax.activation.CommandMap.setDefaultCommandMap(mailcap);
 	javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
@@ -179,6 +184,10 @@ public class Pooka {
 
     static public PookaUIFactory getUIFactory() {
 	return uiFactory;
+    }
+    
+    static public net.suberic.util.thread.ActionThread getSearchThread() {
+	return searchThread;
     }
 }
 

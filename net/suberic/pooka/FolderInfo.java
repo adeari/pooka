@@ -1314,6 +1314,75 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	fireMessageChangedEvent(mce);
     }
 
+    /**
+     * This puts up the gui for the Search.
+     */
+    public void showSearchFolder() {
+	Pooka.getUIFactory().showSearchForm(new FolderInfo[] { this });
+    }
+
+    /**
+     * This is a static calls which searches the given FolderInfo objects,
+     * collects the results into a VirtualFolderInfo, and then displays
+     * the results of the search in the UI.
+     */
+    public static void searchFolders(Vector folderList, javax.mail.search.SearchTerm term) {
+	final javax.mail.search.SearchTerm searchTerm = term;
+	final Vector selectedFolders = folderList;
+
+	Pooka.getSearchThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    Vector matchingValues = new Vector();
+		    if (Pooka.isDebug()) 
+			System.out.println("init:  matchingValues.size() = " + matchingValues.size());
+		    for (int i = 0; i < selectedFolders.size(); i++) {
+			if (Pooka.isDebug())
+			    System.out.println("trying selected folder number " + i);
+			    try {
+				net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
+				if (Pooka.isDebug())
+				    System.out.println("matches.length = " + matches.length);
+				for (int j = 0; j < matches.length; j++) {
+				    matchingValues.add(matches[j]);
+				    if (Pooka.isDebug())
+					System.out.println("adding " + matches[j] + " to matchingValues.");
+				}
+				
+			    } catch (MessagingException me) {
+				System.out.println("caught exception " + me);
+			    }
+		    }
+		    
+		    if (Pooka.isDebug())
+			System.out.println("got " + matchingValues.size() + " matches.");
+		    
+		    FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
+		    for (int i = 0; i < selectedFolders.size(); i++) {
+			parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
+		    }
+		    
+		    MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
+		    for (int i = 0; i < matchingValues.size(); i++) {
+			if (Pooka.isDebug())
+			    System.out.println("matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
+			matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
+		    }
+			
+		    final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
+		    
+		    Runnable runMe = new Runnable() {
+			    public void run() {
+				FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
+				fdui.openFolderDisplay();
+			    }
+			};
+		    
+		    javax.swing.SwingUtilities.invokeLater(runMe);
+		    
+		}
+	    }, Pooka.getSearchThread()), new java.awt.event.ActionEvent(FolderInfo.class, 1, "search"));
+	
+    }
 
     /**
      * Searches for messages in this folder which match the given

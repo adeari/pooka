@@ -169,6 +169,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * the search term.
      */
     public void searchFolder() {
+	getFolderInfo().showSearchFolder();
+	/*
 	SearchForm sf = new SearchForm(new FolderInfo[] { getFolderInfo() });
 	boolean ok = false;
 	int returnValue = -1;
@@ -249,6 +251,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 		}, getFolderInfo().getFolderThread()), new java.awt.event.ActionEvent(this, 1, "search"));
 	    
 	}
+	*/
     }
 
     /**
