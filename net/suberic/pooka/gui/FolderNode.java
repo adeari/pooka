@@ -227,7 +227,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	public void actionPerformed(ActionEvent e) {
 	    try {
 		if (!getFolderInfo().isOpen())
-		    getFolderInfo().openFolder(Folder.READ_ONLY);
+		    getFolderInfo().openFolder(Folder.READ_WRITE);
 
 		if (getFolderInfo().isOpen()) {
 		    if ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0)

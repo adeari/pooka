@@ -361,6 +361,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void fireMessageChangedEvent(MessageChangedEvent mce) {
 	// from the EventListenerList javadoc, including comments.
 
+	resetUnread();
+
 	if (Pooka.isDebug())
 	    System.out.println("firing message changed event.");
 	// Guaranteed to return a non-null array
@@ -652,6 +654,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    unread = (getFolder().getUnreadMessageCount() > 0);
 	} catch (MessagingException me) {
 	    unread = false;
+	}
+	if (getFolderNode() != null) {
+	    
 	}
     }
 

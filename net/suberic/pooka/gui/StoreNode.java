@@ -99,6 +99,10 @@ public class StoreNode extends MailTreeNode {
 	    return null;
     }
 
+    public StoreInfo getStoreInfo() {
+	return store;
+    }
+
     /**
      * We override toString() so we can display the store URLName
      * without the password.

@@ -73,7 +73,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	    FolderNode node = (FolderNode)tp.getLastPathComponent();
 	    
 	    if (isSpecial(node)) {
-		setFontToSpecial(node);
+		setFontToSpecial();
 	    } else {
 		setFontToDefault();
 	    }
@@ -113,7 +113,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
     }
 
-    public void setFontToSpecial(MailTreeNode mtn) {
+    public void setFontToSpecial() {
 	if (getSpecialFont() != null) {
 	    setFont(getSpecialFont());
 	} else {
