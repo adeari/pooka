@@ -28,7 +28,8 @@ public class StoreNode extends MailTreeNode {
 	defaultActions = new Action[] {
 	    new ActionWrapper(new OpenAction(), getStoreInfo().getStoreThread()),
 	    new ActionWrapper(new SubscribeAction(), getStoreInfo().getStoreThread()),
-	    new ActionWrapper(new TestAction(), getStoreInfo().getStoreThread())
+	    new ActionWrapper(new TestAction(), getStoreInfo().getStoreThread()),
+	    new ActionWrapper(new DisconnectAction(), getStoreInfo().getStoreThread())
 		};
 	
     }
@@ -211,6 +212,21 @@ public class StoreNode extends MailTreeNode {
 	    try {
 		jif.setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) { }
+	}
+    }
+
+    class DisconnectAction extends AbstractAction {
+	
+        DisconnectAction() {
+            super("file-close");
+        }
+	
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+	    try {
+		getStoreInfo().disconnectStore();
+	    } catch (Exception ex) {
+		System.out.println("caught exception:  " + ex.getMessage());
+	    }
 	}
     }
     

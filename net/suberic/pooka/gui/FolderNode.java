@@ -37,6 +37,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	
 	defaultActions = new Action[] {
 	    new ActionWrapper(new OpenAction(), folderInfo.getParentStore().getStoreThread()),
+	    new CloseAction(),
 	    new UnsubscribeAction()
 		};
 
@@ -327,6 +328,22 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    unsubscribeFolder();
 	}
 
+    }
+
+    class CloseAction extends AbstractAction {
+
+	CloseAction() {
+	    super("folder-close");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    try {
+		getFolderInfo().closeFolder(false);
+	    } catch (Exception ex) {
+		System.out.println("caught exception:  " + ex.getMessage());
+	    }
+	}
+	
     }
 }
 
