@@ -482,6 +482,21 @@ public class FolderFileWrapper extends File {
 	  if (Pooka.isDebug())
 	    System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
 	  Folder[] childList = folder.list();
+
+	  if (parent == null) {
+	    // add for namespaces.
+	    try {
+	      Folder[] namespaces = folder.getStore().getSharedNamespaces();
+	      if (namespaces != null && namespaces.length > 0) {
+		Folder[] newChildList = new Folder[childList.length + namespaces.length];
+		System.arraycopy(namespaces, 0, newChildList, 0, namespaces.length);
+		System.arraycopy(childList, 0, newChildList, namespaces.length, childList.length);
+		childList = newChildList;
+	      }
+	    } catch (Exception e) {
+	      // FIXME do nothing for now.
+	    }
+	  }
 	  if (Pooka.isDebug())
 	    System.out.println(Thread.currentThread().getName() + ":  folder.list() returned " + childList + "; creating new folderFileWrapper.");
 	  

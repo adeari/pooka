@@ -232,17 +232,31 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (Pooka.isDebug())
 	  System.out.println("got " + tmpParentFolder + " as Default Folder for store.");
 	tmpFolder = tmpParentFolder.list(mFolderName);
+
+	if (tmpFolder == null || tmpFolder.length == 0) {
+	  // check to see if this is a shared folder.
+
+	  try {
+	    if (Pooka.isDebug())
+	      System.out.println("folder " + getFolderID() + " returned null; checking to see if it's a shared folder.");
+
+	    Folder[] sharedFolders = store.getSharedNamespaces();
+	    
+	    if (sharedFolders != null && sharedFolders.length > 0) {
+	      for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
+		if (sharedFolders[i].getName().equalsIgnoreCase(mFolderName)) {
+		  tmpFolder = new Folder[1];
+		  tmpFolder[0] =  sharedFolders[i] ;
+		}
+	      }
+	    }
+	  } catch (Exception e) {
+	    // if we get a not supported exception or some such here,
+	    // just ignore it.
+	  }
+	}
 	if (Pooka.isDebug())
 	  System.out.println("got " + tmpFolder + " as Folder for folder " + getFolderID() + ".");
-	/*
-	  } catch (MessagingException me) {
-	  if (Pooka.isDebug()) {
-	  System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
-	  me.printStackTrace();
-	  }
-	  tmpFolder =null;
-	  }
-	*/
 	
       } else {
 	if (!parentFolder.isLoaded())

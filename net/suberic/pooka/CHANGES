@@ -1,3 +1,5 @@
+added support for IMAP shared folders.
+
 fixed the StoreInfo so that we now properly use the custom port for
 IMAP/SSL.
 

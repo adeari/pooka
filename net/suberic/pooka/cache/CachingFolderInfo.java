@@ -79,6 +79,30 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    Store store = getParentStore().getStore();
 	    tmpParentFolder = store.getDefaultFolder();
 	    tmpFolder = tmpParentFolder.list(getFolderName());
+
+	    if (tmpFolder == null || tmpFolder.length == 0) {
+	      // check to see if this is a shared folder.
+	      
+	      try {
+		if (Pooka.isDebug())
+		  System.out.println("folder " + getFolderID() + " returned null; checking to see if it's a shared folder.");
+		
+		Folder[] sharedFolders = store.getSharedNamespaces();
+		
+		if (sharedFolders != null && sharedFolders.length > 0) {
+		  for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
+		    if (sharedFolders[i].getName().equalsIgnoreCase(getFolderName())) {
+		      tmpFolder = new Folder[1];
+		      tmpFolder[0] =  sharedFolders[i] ;
+		    }
+		  }
+		}
+	      } catch (Exception e) {
+		// if we get a not supported exception or some such here,
+		// just ignore it.
+	      }
+	    }
+	    
 	  } catch (MessagingException me) {
 	    if (Pooka.isDebug()) {
 	      System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
