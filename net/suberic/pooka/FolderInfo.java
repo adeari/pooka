@@ -342,9 +342,30 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	    while (tokens.hasMoreElements()) {
 		tmp = (String)tokens.nextElement();
-		String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
-		colvals.addElement(value);
-		fp.add(value);
+		String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
+		if (type.equalsIgnoreCase("Multi")) {
+		    SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
+		    colvals.addElement(stm);
+		    Vector toFetch = Pooka.getResources().getPropertyAsVector(tableType + "." + tmp + ".profileItems", "");
+		    if (toFetch != null) {
+			for (int z = 0; z < toFetch.size(); z++) {
+			    String profileDef = (String) toFetch.elementAt(z);
+			    if (profileDef.equalsIgnoreCase("Flags"))
+				fp.add(FetchProfile.Item.FLAGS);
+			    else if (profileDef.equalsIgnoreCase("Envelope"))
+				fp.add(FetchProfile.Item.ENVELOPE);
+			    else if (profileDef.equalsIgnoreCase("Content_Info"))
+				fp.add(FetchProfile.Item.CONTENT_INFO);
+			    else
+				fp.add(profileDef);
+			}
+		    }
+		} else {
+		    String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
+		    colvals.addElement(value);
+		    fp.add(value);
+		}
+
 		colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
 		colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
 	    }	    

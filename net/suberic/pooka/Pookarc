@@ -13,6 +13,8 @@ Pooka.guiType=Desktop
 Pooka.guiType.propertyType=List
 Pooka.guiType.allowedValues=Desktop:Preview
 
+Pooka.useTrashFolder=true
+
 Pooka.folderPanel.hsize=180
 Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600
@@ -187,8 +189,17 @@ FolderPanel.2xClickAction=file-open
 
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 FolderTable=New:SentDate:From:Subject
-FolderTable.Status.tag=SEEN
+#FolderTable=Status:SentDate:From:Subject
+FolderTable.Status.type=Multi
 FolderTable.Status.size=15
+FolderTable.Status.value=Deleted:New:Answered
+FolderTable.Status.Deleted.searchTerm=Search.searchTerms.Deleted
+FolderTable.Status.Deleted.icon=/net/suberic/pooka/gui/images/SmallRedCircle.gif
+FolderTable.Status.New.searchTerm=Search.searchTerms.Seen
+FolderTable.Status.New.icon=/net/suberic/pooka/gui/images/SmallGreenCircle.gif
+FolderTable.Status.Answered.searchTerm=Search.searchTerms.Answered
+FolderTable.Status.Answered.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
+FolderTable.Status.profileItems=Flags
 FolderTable.Flagged.value=FLAG.FLAGGED
 FolderTable.Flagged.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
 FolderTable.Flagged.size=15
@@ -372,7 +383,7 @@ FolderSelectorPane.inputButton.image=images/More.gif
 Search.searchTerms=Answered:Deleted:Draft:Flagged:Recent:Seen:From:To:CC:ToOrCC:Body:Subject
 Search.searchTerms.Answered.class=javax.mail.search.FlagTerm
 Search.searchTerms.Answered.flag=answered
-search.searchTerms.Deleted.class=javax.mail.search.FlagTerm
+Search.searchTerms.Deleted.class=javax.mail.search.FlagTerm
 Search.searchTerms.Deleted.flag=deleted
 Search.searchTerms.Draft.class=javax.mail.search.FlagTerm
 Search.searchTerms.Draft.flag=draft

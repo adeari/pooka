@@ -12,13 +12,13 @@ import javax.mail.Message;
 public class SearchTermIcon implements TableCellIcon {
 
     SearchTermIconManager manager;
-    Message message;
+    MessageProxy message;
     int value = -1;
 
-    public SearchTermIcon(SearchTermIconManager newManager, Message newMessage) {
+    public SearchTermIcon(SearchTermIconManager newManager, MessageProxy newMessage) {
 	manager = newManager;
 	message = newMessage;
-	value = manager.getValue(message);
+	value = manager.getValue(message.getMessageInfo().getMessage());
     }
 
     /**

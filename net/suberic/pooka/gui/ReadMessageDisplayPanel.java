@@ -132,7 +132,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		double paneHeight = splitPane.getSize().getHeight();
 		if (paneHeight <= 0)
 		    paneHeight = splitPane.getPreferredSize().getHeight();
-		//splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
+		splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
 	    } else {
 		splitPane.setDividerLocation(400);
 	    }
@@ -216,7 +216,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    this.setPreferredSize(prefSize);
 	    if (splitPane != null && attachmentPanel != null) {
 		splitPane.setPreferredSize(prefSize);
-		splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+		double paneHeight = splitPane.getSize().getHeight();
+		if (paneHeight <= 0)
+		    paneHeight = splitPane.getPreferredSize().getHeight();
+		splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
 	    }
 	} else {
 	this.setSize(prefSize);

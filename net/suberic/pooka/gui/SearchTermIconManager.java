@@ -40,12 +40,12 @@ public class SearchTermIconManager {
 	Vector iconVector = new Vector();
 	Vector termVector = new Vector(); 
 
-	Vector items = Pooka.getResources().getPropertyAsVector(property, "");
+	Vector items = Pooka.getResources().getPropertyAsVector(property + ".value", "");
 	for (int i = 0; i < items.size(); i++) {
 	    String subProperty = property + "." + (String) items.elementAt(i);
 	    Component currentIcon = loadImage(Pooka.getProperty(subProperty + ".icon", ""));
 	    if (currentIcon != null) {
-		SearchTerm currentTerm = createSearchTerm(subProperty + ".searchTerm" , manager); 
+		SearchTerm currentTerm = createSearchTerm(subProperty , manager); 
 		if (currentTerm != null) {
 		    iconVector.add(currentIcon);
 		    termVector.add(currentTerm);
@@ -92,7 +92,7 @@ public class SearchTermIconManager {
      * Creates an appropriate SearchTerm from the given property.
      */
     public SearchTerm createSearchTerm(String propertyName, SearchTermManager manager) {
-	return manager.generateSearchTerm(propertyName + ".search", propertyName + ".operation", Pooka.getProperty(propertyName + ".value", ""));
+	return manager.generateSearchTerm(Pooka.getProperty(propertyName + ".searchTerm", ""), Pooka.getProperty(propertyName + ".operation", ""), Pooka.getProperty(propertyName + ".value", ""));
     }
 
     /**

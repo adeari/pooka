@@ -5,6 +5,7 @@ immediate todo:
 
 	1)  fix the window sizing (at least on 1.2.2 and 1.3 on linux, using
 	both desktop and prevew settings.)
+	 -- done for 1.2.2; don't have 1.3 on here.
 
 	2)  add the delete ui and make it actually controllable by a checkbox.
 

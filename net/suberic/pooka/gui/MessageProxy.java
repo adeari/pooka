@@ -135,18 +135,25 @@ public class MessageProxy {
 		tableInfo = new Vector();
 		
 		for(int j=0; j < columnCount; j++) {
-		    String propertyName = (String)columnHeaders.elementAt(j);
-		    
-		    if (propertyName.startsWith("FLAG")) 
-			tableInfo.addElement(getMessageFlag((String)(columnHeaders.elementAt(j))));
-		    else if (propertyName.equals("attachments"))
-			tableInfo.addElement(new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
-		    else
-			tableInfo.addElement(getMessageInfo().getMessageProperty((String)(columnHeaders.elementAt(j))));
+		    Object newProperty = columnHeaders.elementAt(j);
+		    if (newProperty instanceof String) {
+			String propertyName = (String)newProperty;
+			
+			if (propertyName.startsWith("FLAG")) 
+			    tableInfo.addElement(getMessageFlag(propertyName));
+			else if (propertyName.equals("attachments"))
+			    tableInfo.addElement(new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
+			else
+			    tableInfo.addElement(getMessageInfo().getMessageProperty(propertyName));
+		    } else if (newProperty instanceof SearchTermIconManager) {
+			SearchTermIconManager stm = (SearchTermIconManager) newProperty;
+			tableInfo.addElement(new SearchTermIcon(stm, this));
+		    }
 		}
 		
 		getMessageInfo().isSeen();
-	    loaded=true;
+	    
+		loaded=true;
 	    } catch (MessagingException me) {
 	    }
 	}
