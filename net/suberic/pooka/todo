@@ -16,6 +16,8 @@
 
 *) check disconnection/reconnection on network removal/restoral.
 
+*) default domain for outgoing addresses.
+
 -------
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
@@ -170,6 +172,8 @@ say, like reacting to a mailto: link.
 
 *) each loading we also recache the flags no matter what.  this is probably
 not very efficient.
+
+*) reply to an email from you should go to the recipient.
 
 ---
 

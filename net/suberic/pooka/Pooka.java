@@ -59,9 +59,24 @@ public class Pooka {
       localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
     
     try {
-      resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka"));
+      ClassLoader cl = new Pooka().getClass().getClassLoader();
+      java.net.URL url;
+      if (cl == null) {
+	url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
+      } else {
+	url = cl.getResource("net/suberic/pooka/Pookarc");
+      }
+      if (url == null) {
+	//sigh
+	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
+      }
+      java.io.InputStream is = url.openStream();
+      resources = new net.suberic.util.VariableBundle(new java.io.File(localrc), new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka"));
     } catch (Exception e) {
-      resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
+      System.err.println("caught exception:  " + e);
+      e.printStackTrace();
+
+      //resources = new net.suberic.util.VariableBundle(new Object().getClass().getClassLoader().getResource("/net/suberic/pooka/Pookarc").openStream(), "net.suberic.pooka.Pooka");
     }
 
     // set up the SSL socket factory.
@@ -309,7 +324,7 @@ public class Pooka {
    * Returns whether or not debug is enabled for this Pooka instance.
    */
   static public boolean isDebug() {
-    if (resources.getProperty("Pooka.debug").equals("true"))
+    if (resources.getProperty("Pooka.debug", "true").equals("true"))
       return true;
     else
       return false;
