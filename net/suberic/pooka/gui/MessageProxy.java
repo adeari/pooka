@@ -520,7 +520,12 @@ public class MessageProxy {
 	MessageUI newUI = getPookaUIFactory().createMessageUI(this);
 	setMessageUI(newUI);
       }
-      getMessageUI().openMessageUI();
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    getMessageUI().openMessageUI();
+	  }
+	});
+
       getMessageInfo().setSeen(true);
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
@@ -538,11 +543,16 @@ public class MessageProxy {
       NewMessageInfo nmi = new NewMessageInfo(newMessage);
       NewMessageProxy nmp = new NewMessageProxy(nmi);
       
-      MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
+      final MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
 
       nmp.matchUserProfile();
 
-      nmu.openMessageUI();
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    nmu.openMessageUI();
+	  }
+	});
+      
 
       if (removeProxy) 
 	deleteMessage();
@@ -590,10 +600,15 @@ public class MessageProxy {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateReply(replyAll, withAttachments));
-      MessageUI nmui = null;
+      final MessageUI nmui = getPookaUIFactory().createMessageUI(nmp, this.getMessageUI());
+
       // if this has a messageui up, then make the reply 
-      nmui = getPookaUIFactory().createMessageUI(nmp, this.getMessageUI());
-      nmui.openMessageUI();
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    nmui.openMessageUI();
+	  }
+	});
+      
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
     }
@@ -621,8 +636,12 @@ public class MessageProxy {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateForward(withAttachments, method));
-      MessageUI nmui = getPookaUIFactory().createMessageUI(nmp, getMessageUI());
-      nmui.openMessageUI();
+      final MessageUI nmui = getPookaUIFactory().createMessageUI(nmp, getMessageUI());
+      SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  nmui.openMessageUI();
+	}
+	});
       
     } catch (MessagingException me) {
       if (getMessageUI() != null)
@@ -653,15 +672,29 @@ public class MessageProxy {
       this.close();
     } catch (MessagingException me) {
       if (me instanceof NoTrashFolderException) {
-	if (getMessageUI().showConfirmDialog(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION)
-	  try {
-	    getMessageInfo().remove(autoExpunge);
-	    this.close();
-	  } catch (MessagingException mex) {
-	    showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mex);
-	  }
+	final boolean finalAutoExpunge = autoExpunge;
+	try {
+	  SwingUtilities.invokeAndWait(new Runnable() {
+	      public void run() {
+		try {
+		  if (getMessageUI().showConfirmDialog(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+		    getMessageInfo().remove(finalAutoExpunge);
+		    close();
+		  }
+		} catch (MessagingException mex) {
+		  showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mex);
+		}
+	      }
+	    });
+	} catch (Exception e) {
+	}
       } else {
-	showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", me);
+	final Exception mEx = me;
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mEx);
+	    }
+	  });
       }
     }
   }

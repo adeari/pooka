@@ -147,7 +147,11 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * This should be called every time the selected message changes.
    */
   public void selectedMessageChanged() {
-    refreshCurrentMessage();
+    if (getAutoPreview()) {
+      refreshCurrentMessage();
+    } else {
+      clearCurrentMessage();
+    }
     refreshActiveMenus();
     refreshCurrentUser();
   }
@@ -174,6 +178,18 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 	    },  new java.awt.event.ActionEvent(this, 0, "message-refresh"));
 	}
       }
+    }
+  }
+
+  /**
+   * This clears the currently previewed message.
+   */
+  public void clearCurrentMessage() {
+    messageDisplay.setMessageUI(null);
+    try {
+      messageDisplay.resetEditorText();
+    } catch (Exception e) {
+      // we've set it to null, so shouldn't happen.
     }
   }
 
@@ -350,6 +366,10 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     // no-op here.
   }
 
+  public boolean getAutoPreview() {
+    return (Pooka.getProperty("Pooka.autoPreview", "true").equalsIgnoreCase("true"));
+  }
+
   /**
    * This shows an Confirm Dialog window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -501,6 +521,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
       selectMessageDisplay();
     }
   }
+
   
 
 }

@@ -72,7 +72,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    new NextUnreadMessageAction(),
 	    new GotoMessageAction(),
 	    new SearchAction(),
-	    new SelectAllAction()
+	    new SelectAllAction(),
+	    new PreviewMessageAction()
 		};
 
 	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
@@ -113,7 +114,8 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    new PreviousMessageAction(),
 	    new GotoMessageAction(),
 	    new SearchAction(),
-	    new SelectAllAction()
+	    new SelectAllAction(),
+	    new PreviewMessageAction()
 		};
 	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
 	
@@ -273,10 +275,21 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
    * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
    */
   public void setBusy(boolean newValue) {
-    if (newValue)
-      this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    else
-      this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    final boolean newV = newValue;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  if (newV)
+	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	  else
+	    setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+      };
+
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else 
+      SwingUtilities.invokeLater(runMe);
+
   }
   
   /**
@@ -580,5 +593,17 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
       getFolderDisplay().selectAll();
     }
   }
+
+  public class PreviewMessageAction extends AbstractAction {
+    PreviewMessageAction() {
+      super("message-preview");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.err.println("message-preview");
+      contentPanel.refreshCurrentMessage();
+    }
+  }
+
 }
 

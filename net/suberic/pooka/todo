@@ -8,12 +8,32 @@
 *) preview pane: 
 	-- make it so it doesn't automatically display the first new message.
 	  -- make that an option
-	  -- add a keybinding for 'go to next unread message'
+	idea:
+	  selection at startup:  
+		either scroll to and select or just scroll to
+	  action on selection:  
+		either display automatically or display on click.
 
 *) fix the launcher (specifically the html launcher, but maybe all of them)
 to use "'s correctly.
 
 *) fix reverse sorting.
+
+error:  subscribe to folder in disconnected mode, then open it.  got
+	the following error:
+
+ java.lang.NullPointerException
+	at net.suberic.pooka.cache.CachingFolderInfo.fetch(CachingFolderInfo.java:327)
+	at net.suberic.pooka.FolderInfo.loadMessageTableInfos(FolderInfo.java:755)
+	at net.suberic.pooka.cache.CachingFolderInfo.loadAllMessages(CachingFolderInfo.java:284)
+	at net.suberic.pooka.gui.FolderNode$OpenAction.actionPerformed(FolderNode.java:364)
+	at net.suberic.util.thread.ActionThread.run(ActionThread.java(Compiled Code))
+java.lang.NullPointerException
+	at net.suberic.pooka.cache.CachingFolderInfo.synchronizeCache(CachingFolderInfo.java:485)
+	at net.suberic.pooka.cache.CachingFolderInfo.loadAllMessages(CachingFolderInfo.java:238)
+	at net.suberic.pooka.gui.FolderNode$OpenAction.actionPerformed(FolderNode.java:364)
+	at net.suberic.util.thread.ActionThread.run(ActionThread.java(Compiled Code))
+
 --------
 
 *) document keybindings
