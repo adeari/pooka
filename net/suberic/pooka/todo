@@ -1,3 +1,18 @@
+*) finish support for switching display style and headers.  
+  ...actually, make a subclass of JButton that's a ConfigurableUI.  have
+	the button action be to popup a window.  do it that way.
+	--also have the MessageProxy have a link to it.  go ahead and
+	  make it so setting the actions in the ConfigurableUI will
+	  transfer the 
+  -- make the button have reasonable images
+  -- make button the correct size
+  -- make a subclass that dynamically handles updates.
+  *)   fix containsHtml() to make it so we actually detect nested 
+	multipart/alternative messages - i.e. mpart/mixed containing a 
+	mpart/alternative (containing a text and an html) and an attachment.
+  *)   fix full headers display for html.
+
+
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
 	topics:
@@ -27,6 +42,20 @@
 	WebStart.
 
 *) fix up the error messages, and make sure that they look ok.
+
+*) fix:
+        at com.sun.mail.imap.IMAPFolder.getMessageByUID(IMAPFolder.java:1479)
+        at net.suberic.pooka.UIDFolderInfo.getRealMessageById(UIDFolderInfo.java:588)
+        at net.suberic.pooka.UIDMimeMessage.getMessage(UIDMimeMessage.java:521)
+        at net.suberic.pooka.UIDMimeMessage.getFlags(UIDMimeMessage.java:378)
+        at net.suberic.pooka.MessageInfo.getFlags(MessageInfo.java:87)
+        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:532)
+        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:512)
+        at net.suberic.pooka.gui.FolderDisplayPanel.selectNextMessage(FolderDisplayPanel.java:485)
+        at net.suberic.pooka.gui.FolderInternalFrame.selectNextMessage(FolderInternalFrame.java:316)
+        at net.suberic.pooka.gui.FolderDisplayPanel$7.actionPerformed(FolderDisplayPanel.java:372)
+        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:2372)
+
 
 *) -- windows --
   *) support windows registry attachment associations.
@@ -129,16 +158,6 @@ preview:
 
 *) forward to all.
  
-*) finish support for switching display style and headers.  
-  ...actually, make a subclass of JButton that's a ConfigurableUI.  have
-	the button action be to popup a window.  do it that way.
-	--also have the MessageProxy have a link to it.  go ahead and
-	  make it so setting the actions in the ConfigurableUI will
-	  transfer the 
-  -- make the button have reasonable images
-  -- make button the correct size
-  -- make a subclass that dynamically handles updates.
-  
 *) fix the network connection test so that it doesn't hang if the
 	network is up, but the test host is unreachable.
 

@@ -1,3 +1,6 @@
+fixed a bug where multipart/alternative messages with additional attachments
+weren't getting parsed properly.
+
 added a way to view emails either with full headers or as raw rfc822
 streams.
 

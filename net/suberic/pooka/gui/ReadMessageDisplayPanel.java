@@ -164,6 +164,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       // figure out html vs. text
       if (Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true")) {
 	System.err.println("we do display html...");
+	System.err.println("isHtml()?  " + getMessageProxy().getMessageInfo().isHtml() + "; containsHtml()? " +  getMessageProxy().getMessageInfo().isHtml() + "; msgDisplayMode = " + msgDisplayMode);
 	if (getMessageProxy().getMessageInfo().isHtml()) {
 	  System.err.println("and the message is html.");
 	  if (msgDisplayMode > MessageProxy.TEXT_ONLY) 
