@@ -1292,9 +1292,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public MessageInfo[] search(javax.mail.search.SearchTerm term) 
     throws MessagingException {
-	Message[] returnValue = folder.search(term);
+	Message[] matchingMessages = folder.search(term);
+	MessageInfo returnValue[] = new MessageInfo[matchingMessages.length];
+	for (int i = 0; i < matchingMessages.length; i++) {
+	    returnValue[i] = (MessageInfo) messageToInfoTable.get(matchingMessages[i]);
+	}
 	System.out.println("got " + returnValue.length + " results.");
-	return null;
+	return returnValue;
 
     }
 
