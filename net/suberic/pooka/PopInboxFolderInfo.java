@@ -265,27 +265,28 @@ public class PopInboxFolderInfo extends FolderInfo {
    * <p>Overrides FolderInfo.fireMessageChangedEvent().</p>
    */
   public void fireMessageChangedEvent(MessageChangedEvent mce) {
-    /*
-    try {
-      if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
-	
-	MessageInfo mi = getMessageInfo(mce.getMessage());
-	MessageProxy mp = mi.getMessageProxy();
-	if (mp != null) {
-	  if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED) {
-	    mi.refreshFlags();
-	  } else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED) {
-	    mi.refreshHeaders();
+    // if this is just from the TableInfo reloading, skip it.
+    if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
+      try {
+	if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+	  
+	  MessageInfo mi = getMessageInfo(mce.getMessage());
+	  MessageProxy mp = mi.getMessageProxy();
+	  if (mp != null) {
+	    if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED) {
+	      mi.refreshFlags();
+	    } else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED) {
+	      mi.refreshHeaders();
+	    }
+	    mp.unloadTableInfo();
+	    mp.loadTableInfo();
 	  }
-	  mp.unloadTableInfo();
-	  mp.loadTableInfo();
 	}
+      } catch (MessagingException me) {
+	// if we catch a MessagingException, it just means
+	// that the message has already been expunged.
       }
-    } catch (MessagingException me) {
-      // if we catch a MessagingException, it just means
-      // that the message has already been expunged.
     }
-    */
     
     super.fireMessageChangedEvent(mce);
     

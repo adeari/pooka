@@ -314,7 +314,7 @@ public class MessageProxy {
 	loaded=true;
 
 	// notify the JTable that this proxy has loaded.
-	MessageChangedEvent mce = new MessageChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
+	MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
 
 	FolderInfo fi = getFolderInfo();
 	if (fi != null) {
