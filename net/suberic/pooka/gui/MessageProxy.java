@@ -1010,11 +1010,25 @@ public class MessageProxy {
 	fw.setBusy(true);;
 	
       try {
-	AddressBook book = getDefaultProfile().getAddressBook();
+	UserProfile defaultProfile = getDefaultProfile();
+	AddressBook book = null;
+
+	if (defaultProfile != null) {
+	  book = defaultProfile.getAddressBook();
+	}
+
+	if (book == null) {	  
+	  // get the default Address Book.
+	  book = Pooka.getAddressBookManager().getDefault();
+	}
 	if (book != null)
 	  getMessageInfo().addAddress(book, true);
 	else {
-	  getMessageUI().showError(Pooka.getProperty("error.noAddressBook", "No Address Book for UserProfile ") + getDefaultProfile().getName());
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		getMessageUI().showError(Pooka.getProperty("error.noAddressBook", "No Address Book set as default."));
+	      }
+	    });
 	}
       } catch (MessagingException me) {
 	showError(me.getMessage(), me);

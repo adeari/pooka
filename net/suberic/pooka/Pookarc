@@ -407,6 +407,9 @@ UserProfile.editableFields.sentFolder.selectionRoot=allStores
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
 
+AddressBook._default.propertyType=List
+AddressBook._default.allowedValues=AddressBook
+
 AddressBook.propertyType=Multi
 AddressBook.editableFields=editor
 AddressBook.editableFields.scoped=true

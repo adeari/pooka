@@ -73,6 +73,8 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     popupMenu = new ConfigurablePopupMenu();
     popupMenu.configureComponent("AddressBookEditor.popupMenu", bundle);
     popupMenu.setActive(getActions());
+
+    this.setEnabled(isEnabled);
   }
 
   /**
@@ -237,11 +239,13 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
 
   public void setValue() {
-    try {
-      book.saveAddressBook();
-    } catch (Exception e) {
-      Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
-      e.printStackTrace();
+    if (book != null) {
+      try {
+	book.saveAddressBook();
+      } catch (Exception e) {
+	Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
+	e.printStackTrace();
+      }
     }
   }
   
@@ -264,12 +268,16 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   }
 
   public void setEnabled(boolean newValue) {
-    enabled = newValue;
-    searchButton.setEnabled(newValue);
-    addButton.setEnabled(newValue);
-    editButton.setEnabled(newValue);
-    deleteButton.setEnabled(newValue);
-    searchEntryField.setEnabled(newValue);
+    if (book != null)
+      enabled = newValue;
+    else
+      enabled = false;
+
+    searchButton.setEnabled(enabled);
+    addButton.setEnabled(enabled);
+    editButton.setEnabled(enabled);
+    deleteButton.setEnabled(enabled);
+    searchEntryField.setEnabled(enabled);
   }
 
 

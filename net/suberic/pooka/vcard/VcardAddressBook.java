@@ -53,13 +53,16 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    */
   public void loadAddressBook() throws java.text.ParseException, java.io.IOException {
     File f = new File(fileName);
+
     if (f.exists()) {
       BufferedReader reader = new BufferedReader(new FileReader(f));
       for(Vcard newCard = Vcard.parse(reader); newCard != null; newCard = Vcard.parse(reader)) {
 	insertIntoList(newCard);
-      }
+      } 
+    } else {
+      f.createNewFile();
     }
-    
+
     sortList();
   }
   

@@ -418,6 +418,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       
       Vector valuesToEdit = new Vector();
       valuesToEdit.add("AddressBook");
+      valuesToEdit.add("AddressBook._default");
       Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.addressBook", "Address Book Editor"), valuesToEdit);
     }
   }

@@ -272,6 +272,19 @@ public class AddressBookManager implements ValueChangeListener {
     
     Pooka.setProperty("AddressBook", newValue.toString());
   }
+
+  /**
+   * Gets the default Address Book, if there is one.
+   */
+  public AddressBook getDefault() {
+    String defaultName = Pooka.getProperty("AddressBook._default", "");
+    if (! defaultName.equals("")) {
+      AddressBook defaultBook = getAddressBook(defaultName);
+      return defaultBook;
+    } else
+      return null;
+    
+  }
   
     
 }
