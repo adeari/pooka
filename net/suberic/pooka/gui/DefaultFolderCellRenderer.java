@@ -66,18 +66,11 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 	}
 
 
-	boolean goodTable = false;
 	FolderTableModel ftm = null;
 
 	if (table.getModel() instanceof FolderTableModel) {
 	    ftm = (FolderTableModel) table.getModel();
-	    goodTable = true;
-	} else if (table.getModel() instanceof contrib.TableSorter && ((contrib.TableSorter)table.getModel()).getModel() instanceof FolderTableModel) {
-	    ftm = (FolderTableModel)((contrib.TableSorter)table.getModel()).getModel();
-	    goodTable = true;
-	}
-	 
-	if (goodTable) {
+
 	    if (!(ftm.getMessageProxy(row).isSeen())) {
 		if (getUnreadFont() != null) {
 		    returnValue.setFont(getUnreadFont());
