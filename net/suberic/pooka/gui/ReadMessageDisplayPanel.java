@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
+import net.suberic.util.swing.HyperlinkMouseHandler;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -54,6 +55,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     public void configureMessageDisplay() throws MessagingException {
 	editorPane = new JTextPane();
 	editorPane.setEditable(false);
+	editorPane.addHyperlinkListener(new HyperlinkDispatcher());
+	HyperlinkMouseHandler hmh = new HyperlinkMouseHandler(Integer.parseInt(Pooka.getProperty("Pooka.lineLength", "80")));
+	editorPane.addMouseListener(hmh);
+	editorPane.addMouseMotionListener(hmh);
+
 	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	setDefaultFont(editorPane);
@@ -62,6 +68,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
 	otherEditorPane = new JTextPane();
 	otherEditorPane.setEditable(false);
+	otherEditorPane.addHyperlinkListener(new HyperlinkDispatcher());
+	otherEditorPane.addMouseListener(hmh);
+	otherEditorPane.addMouseMotionListener(hmh);
 	otherScrollPane = new JScrollPane(otherEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
 	setDefaultFont(otherEditorPane);

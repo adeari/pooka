@@ -375,6 +375,10 @@ Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatu
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v
 
+Pooka.urlHandler=netscape %s
+# for other unices
+# Pooka.urlHandler=netscape -r (openURL(%s))
+
 FolderTree.readStyle=PLAIN
 FolderTree.unreadStyle=BOLD
 FolderTree.connectedIcon=images/Plus.gif

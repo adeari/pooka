@@ -100,7 +100,7 @@ public class ExternalLauncher implements CommandObject, Runnable {
      * This method subsitutes all occurances of key with value in String
      * original.
      */
-    public String substituteString(String original, String key, String value) {
+    public static String substituteString(String original, String key, String value) {
 	// you know, i'm already doing this for the replyIntro; maybe i
 	// should generalize these both a bit...
 
