@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
+import net.suberic.util.swing.EntryTextArea;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -164,7 +165,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
 	String currentHeader = null;
 	JLabel hdrLabel = null;
-	JTextArea inputField = null;
+	EntryTextArea inputField = null;
 
 	while (tokens.hasMoreTokens()) {
 	    inputRow = new Box(BoxLayout.X_AXIS);
@@ -176,12 +177,12 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	    if (aMsg.getMessage() instanceof MimeMessage) {
 		MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
 		try {
-		    inputField = new JTextArea(mMsg.getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+		    inputField = new net.suberic.util.swing.EntryTextArea(mMsg.getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 		} catch (MessagingException me) {
-		    inputField = new JTextArea(1, 30);
+		    inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 		}
 	    } else {
-		inputField = new JTextArea(1, 30);
+		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	    }
 	    inputField.setLineWrap(true);
 	    inputField.setWrapStyleWord(true);
@@ -236,7 +237,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 		    urlName = new URLName(up.getMailProperties().getProperty("sendMailURL", "smtp://localhost/"));
 		} else {
 		    String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
-		    String value = ((JTextArea)(inputTable.get(key))).getText();
+		    String value = ((EntryTextArea)(inputTable.get(key))).getText();
 		    mMsg.setHeader(header, value);
 		}
 	    }
