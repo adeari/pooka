@@ -13,18 +13,18 @@ import net.suberic.pooka.SearchTermManager;
  */
 public class SearchEntryForm implements java.awt.event.ItemListener {
     // ui objects
-    private JPanel panel;
+    private Box panel;
     private JComboBox searchFieldCombo;
     private JPanel selectionPanel; 
 
-    private JPanel stringMatchPanel;
+    private Box stringMatchPanel;
     private JComboBox operationCombo;
     private JTextField textField;
 
-    private JPanel booleanPanel;
+    private Box booleanPanel;
     private JComboBox booleanValueCombo;
 
-    private JPanel datePanel;
+    private Box datePanel;
     private JComboBox dateComparisonCombo;
     private JTextField dateField;
     private java.awt.CardLayout layout;
@@ -37,7 +37,7 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
      */
     public SearchEntryForm(SearchTermManager newManager) { 
 	manager = newManager;
-	panel = new JPanel();
+	panel = new Box(BoxLayout.X_AXIS);
 
 	searchFieldCombo = new JComboBox(manager.getTermLabels());
 
@@ -54,32 +54,34 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
 
 	panel.add(searchFieldCombo);
 	panel.add(selectionPanel);
+
     }
 
     /**
      * Creates all of the selection panels.
      */
     public void createPanels() {
-	stringMatchPanel = new JPanel();
+	stringMatchPanel = new Box(BoxLayout.X_AXIS);
 	Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
 	operationCombo = new JComboBox(operationFields);
-	textField = new JTextField(20);
-	
+	textField = new JTextField(40);
+	textField.setMaximumSize(new java.awt.Dimension(1000, textField.getPreferredSize().height));
+
 	stringMatchPanel.add(operationCombo);
 	stringMatchPanel.add(textField);
 
-	booleanPanel = new JPanel();
-	booleanPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+	booleanPanel = new Box(BoxLayout.X_AXIS);
 	Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
 	booleanValueCombo = new JComboBox(booleanFields);
 	booleanPanel.add(booleanValueCombo);
 
-	datePanel = new JPanel();
-	datePanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
+	datePanel = new Box(BoxLayout.X_AXIS);
 
 	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
 	dateComparisonCombo = new JComboBox(dateFields);
 	dateField = new JTextField(20);
+	dateField.setMaximumSize(new java.awt.Dimension(1000, dateField.getPreferredSize().height));
+
 	JLabel dateFormatLabel = new JLabel(Pooka.getProperty("Search.dateFormat", "mm/dd/yyyy"));
 	datePanel.add(dateComparisonCombo);
 	datePanel.add(dateField);
@@ -87,14 +89,14 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
     }
 
     /**
-     * Returns the JPanel which shows the SearchEntryForm.
+     * Returns the Box which shows the SearchEntryForm.
      */ 
-    public JPanel getPanel() {
+    public Box getPanel() {
 	return panel;
     }
 
     /**
-     * This generates a SearchTerm from the information on the JPanel, and
+     * This generates a SearchTerm from the information on the Box, and
      * returns that value.
      */
     public SearchTerm generateSearchTerm() throws java.text.ParseException {

@@ -37,7 +37,7 @@ public class SearchEntryPanel extends JPanel {
 	}
     }
 
-    class SearchConnector extends JPanel {
+    class SearchConnector {
 	
 	JComboBox list;
 	SearchConnector(int newType) {
@@ -45,17 +45,21 @@ public class SearchEntryPanel extends JPanel {
 	    choices[0] = AND_LABEL;
 	    choices[1] = OR_LABEL;
 	    list = new JComboBox(choices);
-
-	    if (newType < 2)
+	    
+	    if (newType < 2) {
+		
 		list.setSelectedIndex(newType);
-	    else
+	    } else
 		list.setSelectedIndex(0);
-
-	    this.add(list);
+	    
 	}
-
+	
 	public int getType() {
 	    return list.getSelectedIndex();
+	}
+
+	public JComboBox getCombo() {
+	    return list;
 	}
     }
 
@@ -74,7 +78,7 @@ public class SearchEntryPanel extends JPanel {
     public void populatePanel() {
 	this.setLayout(new java.awt.BorderLayout());
 	entryPanel = new JPanel();
-	entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
+	entryPanel.setLayout(new BoxLayout(entryPanel,BoxLayout.Y_AXIS));
 
 	addSearchEntryForm(FIRST);
 
@@ -82,7 +86,7 @@ public class SearchEntryPanel extends JPanel {
 
 	entryScrollPane = new JScrollPane(entryPanel);
 	int defaultHeight = entryPanel.getPreferredSize().height;
-	entryScrollPane.setPreferredSize(new java.awt.Dimension(entryPanel.getPreferredSize().width + 15, defaultHeight * 3));
+	entryScrollPane.setPreferredSize(new java.awt.Dimension(entryPanel.getPreferredSize().width + 15, defaultHeight * 5));
 
 	this.add(conditionPanel, java.awt.BorderLayout.SOUTH);
 	this.add(entryScrollPane, java.awt.BorderLayout.CENTER);
@@ -120,23 +124,39 @@ public class SearchEntryPanel extends JPanel {
     public void addSearchEntryForm(int type) {
 	if (type == FIRST) {
 	    SearchEntryForm sef = new SearchEntryForm(manager);
+	    SearchConnector sc = new SearchConnector(AND);
+	    //java.awt.Component blankPanel = Box.createRigidArea(sc.getCombo().getPreferredSize());
+	    //blankPanel.setSize(sc.getCombo().getSize());
+	    //blankPanel.setPreferredSize(sc.getCombo().getPreferredSize());
+	    Box fullPanel = new Box(BoxLayout.X_AXIS);
 	    searchTerms.add(new SearchEntryPair(sef, AND));
-	    entryPanel.add(sef.getPanel());
+	    //fullPanel.add(blankPanel);
+	    fullPanel.add(sef.getPanel());
+	    entryPanel.add(fullPanel);
 	} else {
 	    SearchEntryForm sef = new SearchEntryForm(manager);
-	    SearchEntryPair pair = new SearchEntryPair(sef, AND);
+	    SearchEntryPair pair = new SearchEntryPair(sef, type);
 	    searchTerms.add(pair);
 
 	    JPanel newSearchPanel = new JPanel();
-	    newSearchPanel.add(pair.connector);
+	    newSearchPanel.add(pair.connector.getCombo());
 	    newSearchPanel.add(sef.getPanel());
 	    entryPanel.add(newSearchPanel);
-	    //entryPanel.add(pair.connector);
+	    //entryPanel.add(pair.connector.getCombo());
 	    //entryPanel.add(sef.getPanel());
 
 	    entryPanel.revalidate();
-	    //entryPanel.repaint();
+	    Runnable runMe = new Runnable() {
+		    public void run() {
+			JScrollBar vsb = entryScrollPane.getVerticalScrollBar();
+			vsb.setValue(vsb.getMaximum());
+			//entryPanel.repaint();
+		    }
+		};
+
+	    SwingUtilities.invokeLater(runMe);
 	}
+
     }
 
     /**
