@@ -87,7 +87,7 @@ public class MessageCryptoInfo {
    * Returns whether or not the signature is valid.  If <code>recheck</code>
    * is set to <code>true</code>, then checks again with the latest keys.
    */
-  public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException {
+  public boolean checkSignature(java.security.Key key, boolean recheck) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     if (recheck || ! hasCheckedSignature()) {
       EncryptionUtils cryptoUtils = net.suberic.crypto.EncryptionManager.getEncryptionUtils((MimeMessage) msgInfo.getMessage());
       mSignatureValid =  cryptoUtils.checkSignature((MimeMessage)msgInfo.getMessage(), key);
@@ -101,7 +101,7 @@ public class MessageCryptoInfo {
    * Tries to decrypt the message using the given Key.
    */
   public boolean decryptMessage(java.security.Key key, boolean recheck) 
-  throws MessagingException, java.io.IOException {
+  throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     synchronized(this) {
       if (mCheckedDecryption && ! recheck) {
 	return mDecryptSuccessful;

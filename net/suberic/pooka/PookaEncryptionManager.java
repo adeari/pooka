@@ -88,26 +88,20 @@ public class PookaEncryptionManager {
    */
   public Key getPrivateKey(String alias) {
 
+    try {
     if (pgpKeyMgr != null || smimeKeyMgr != null) {
       char[] password = getPasswordForAlias(alias, false);
-    }
-    if (pgpKeyMgr != null) {
+      
       try {
-	return mgr.getPrivateKey(alias, password);
+	return pgpKeyMgr.getPrivateKey(alias, password);
       } catch (java.security.KeyStoreException kse) {
-
+	
       }
+      
     }
-
-    EncryptionKeyManager mgr = getKeyManager();
-    if (mgr != null) {
-      try {
-	char[] password = getPasswordForAlias(alias, false);
-	return mgr.getPrivateKey(alias, password);
-      } catch (java.security.KeyStoreException kse) {
-      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
-
     return null;
   }
 
@@ -130,14 +124,21 @@ public class PookaEncryptionManager {
    * Returns the Private key for the given alias.
    */
   public Key getPublicKey(String alias) {
-    EncryptionKeyManager mgr = getKeyManager();
-    if (mgr != null) {
+    try {
+    if (pgpKeyMgr != null || smimeKeyMgr != null) {
+      char[] password = getPasswordForAlias(alias, false);
+      
       try {
-	return mgr.getPublicKey(alias);
+	return pgpKeyMgr.getPublicKey(alias);
       } catch (java.security.KeyStoreException kse) {
+	
       }
+      
+    } 
+        } catch (Exception e) {
+      e.printStackTrace();
     }
-    
+
     return null;
   }
 
@@ -146,10 +147,6 @@ public class PookaEncryptionManager {
    */
   public Key[] getPublicKeys(String address) {
 
-    EncryptionKeyManager mgr = getKeyManager();
-    if (mgr != null) {
-      
-    }
 
     return null;
   }
@@ -158,7 +155,7 @@ public class PookaEncryptionManager {
    * Encrypts to given message.  Actually checks all of the recipients
    * configured to see if we have a key for each one.
    */
-  public MimeMessage encryptMessage(MimeMessage mMsg) {
+  public MimeMessage encryptMessage(MimeMessage mMsg) throws MessagingException {
     
     // if we don't have a key, see if we can get a default.
     Key key = null;
@@ -184,9 +181,14 @@ public class PookaEncryptionManager {
   public MimeMessage encryptMessage(MimeMessage mMsg, Key key)
     throws MessagingException  {
     if (key != null) {
-      return EncryptionManager.getEncryptionUtils(mMsg).encryptMessage(Pooka.getDefaultSession(), mMsg, key);
-    } else
-      return mMsg;
+      try {
+	return EncryptionManager.getEncryptionUtils(mMsg).encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+      } catch (Exception e) {
+	e.printStackTrace();
+      }
+
+    }
+    return mMsg;
   }
 
   /**
@@ -201,11 +203,17 @@ public class PookaEncryptionManager {
     if (key == null) {
       // get user input.
     }
-    
+
+    try {
     if (key != null)
       return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
     else
       return mMsg;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return null;
+    }
+
   }
 
 }

@@ -72,7 +72,7 @@ public class CryptoAttachment extends Attachment {
    * Tries to decrypt this Attachment.
    */
   public BodyPart decryptAttachment(EncryptionUtils utils, Key key)
-    throws MessagingException, java.io.IOException {
+    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
