@@ -5,6 +5,7 @@ import java.util.StringTokenizer;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.IOException;
@@ -192,10 +193,10 @@ public class MailUtilities {
   }
   
   /**
-   * This method takes a given character array and returns the offset
+   * This method takes a given String offset and returns the offset
    * position at which a line break should occur.
    *
-   * If no break is necessary, the <code>finish</code> value is returned.
+   * If no break is necessary, the full buffer length is returned.
    * 
    */
   public static int getBreakOffset(String buffer, int breakLength, int tabSize) {
@@ -226,8 +227,15 @@ public class MailUtilities {
 	if (breakLocation < buffer.length()) {
 	  // check to see if the next character is a line feed of some sort.
 	  char nextChar = buffer.charAt(breakLocation);
-	  if (nextChar == '\n' || nextChar == 'r')
+	  if (nextChar == '\n')
 	    breakLocation ++;
+	  else if (nextChar == '\r') {
+	    if (breakLocation + 1<  buffer.length() && buffer.charAt(breakLocation + 1) == '\n') {
+	      breakLocation +=2;
+	    } else {
+	      breakLocation ++;
+	    }
+	  }
 	}
       } 
     }
@@ -239,52 +247,138 @@ public class MailUtilities {
   }
   
   /**
-   * This takes a String and word wraps it at length wrapLength.
+   * This takes a String and word wraps it at length wrapLength.  It also will
+   * convert any alternative linebreaks (LF, CR, or CRLF) to the 
+   * <code>newLine</code> given.
    */
-  public static String wrapText(String originalText, int wrapLength, String lineBreak, int tabSize) {
+  public static String wrapText(String originalText, int wrapLength, String newLine, int tabSize) {
     if (originalText == null)
       return null;
     
-    StringBuffer wrappedText = new StringBuffer(originalText);
+    Logger.getLogger("Pooka.debug").finest("calling wrapText with wrapLength=" + wrapLength + " on:");
+    Logger.getLogger("Pooka.debug").finest("--- begin text ---");
+    Logger.getLogger("Pooka.debug").finest(originalText);
+    Logger.getLogger("Pooka.debug").finest("--- end text ---");
+    Logger.getLogger("Pooka.debug").finest("");
+
+    StringBuffer wrappedText = new StringBuffer();
     
-    int nextReal = -1;
-    int lastReal = -1;
-    int newBreak = -1;
-    while (nextReal < wrappedText.length()) {
-      nextReal= indexOf(wrappedText, lineBreak, lastReal +1);
-      if (nextReal == -1)
-	nextReal = wrappedText.length();
-      while ( newBreak < nextReal ) {
-	newBreak = getBreakOffset(wrappedText.substring(lastReal +1, nextReal), wrapLength, tabSize) + lastReal + 1;
-	if (newBreak < nextReal) {
-	  wrappedText.insert(newBreak, lineBreak); 
-	  nextReal++;
-	  lastReal = newBreak + 1;
-	} else {
-	  lastReal = nextReal;
-	  newBreak = nextReal;
-	}
+    // so the idea is that we'll get each entry denoted by a line break
+    // and then add soft breaks into there.
+    int currentStart = 0;
+    int nextHardBreak = nextNewLine(originalText, currentStart);
+    while (nextHardBreak != -1) {
+      // get the current string with a newline at the end.
+      String currentString = getSubstringWithNewLine(originalText, currentStart, nextHardBreak, newLine);
+
+      Logger.getLogger("Pooka.debug").finest("current string:");
+      Logger.getLogger("Pooka.debug").finest("--- begin current string ---");
+      Logger.getLogger("Pooka.debug").finest(currentString);
+      Logger.getLogger("Pooka.debug").finest("--- end current string ---");
+      Logger.getLogger("Pooka.debug").finest("");
+      
+      int nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
+      while (nextSoftBreak < currentString.length()) {
+	wrappedText.append(currentString.substring(0, nextSoftBreak));
+	wrappedText.append(newLine);
+
+	Logger.getLogger("Pooka.debug").finest("appending '" + currentString.substring(0, nextSoftBreak) + "', plus newline.");
+
+	currentString = currentString.substring(nextSoftBreak);
+	Logger.getLogger("Pooka.debug").finest("in loop:  new current string:");
+	Logger.getLogger("Pooka.debug").finest("--- begin current string ---");
+	Logger.getLogger("Pooka.debug").finest(currentString);
+	Logger.getLogger("Pooka.debug").finest("--- end current string ---");
+	Logger.getLogger("Pooka.debug").finest("");
+      
+	nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
+	Logger.getLogger("Pooka.debug").finest("nextSoftBreak=" + nextSoftBreak);
       }
+      Logger.getLogger("Pooka.debug").finest("appending '" + currentString + "', which should include newline.");
+      wrappedText.append(currentString);
+      
+      // get the next string including the newline.
+      currentStart = afterNewLine(originalText, nextHardBreak);
+      nextHardBreak= nextNewLine(originalText, currentStart);
+      Logger.getLogger("Pooka.debug").finest("new currentStart = " + currentStart + ", nextHardBreak = " + nextHardBreak);
     }
-    
+	   
     return wrappedText.toString();
   } 
   
-    
   /**
-   * This just acts as an indexOf on a StringBuffer.
+   * Returns the next new line.
    */
-  public static int indexOf(StringBuffer buffer, String toFind, int start) {
-    /*
-    for (int i = start; i < buffer.length(); i++) {
-      if (toFind == buffer.charAt(i))
-	return i;
-    }
-    
-    return -1;
-    */
+  public static int nextNewLine(String text, int start) {
+    if (start >= text.length())
+      return -1;
 
-    return buffer.indexOf(toFind, start);
+    // go through each character, looking for \r or \n
+    int foundIndex = -1;
+    for (int i = start; foundIndex == -1 && i < text.length(); i++) {
+      char current = text.charAt(i);
+      if (current == '\r') {
+	if (i + 1 < text.length() && text.charAt(i+1) == '\n')
+	  foundIndex = i+1;
+	else
+	  foundIndex = i;
+      } else if (current == '\n') {
+	foundIndex = i;
+      }
+    }
+
+    if (foundIndex == -1) {
+      return text.length();
+    } else {
+      return foundIndex;
+    }
+  }
+
+  /**
+   * Returns the position after the newline indicated by index.  If
+   * that's the end of the string, or an invalid index is given, returns
+   * an index equal to the length of text (i.e. one more than the last
+   * valid index in text).
+   */
+  public static int afterNewLine(String text, int index) {
+    // if index is invalid, or if index is the last character in the 
+    // string, return 
+    if (index < 0 || index >= text.length() || index == text.length() -1)
+      return text.length();
+
+    char newLineChar = text.charAt(index);
+    if (newLineChar == '\r' && text.charAt(index + 1) == '\n')
+      return index + 2;
+    else
+      return index + 1;
+  }
+
+  /**
+   * Gets the indicated substring with the given newline.
+   */
+  public static String getSubstringWithNewLine(String originalText, int start, int end, String newLine) {
+    String origSubString = originalText.substring(start,end);
+    Logger.getLogger("Pooka.debug").finest("getSubStringWtihNewLine:  origSubString='" + origSubString + "'");
+
+    if (origSubString.endsWith("\r\n")) {
+      if (newLine.equals("\r\n"))
+	return origSubString;
+      else {
+	return origSubString.substring(0, origSubString.length() - 2) + newLine;
+      }
+    } else if (origSubString.endsWith("\n")) {
+      if (newLine.equals("\n"))
+	return origSubString;
+      else 
+	return origSubString.substring(0, origSubString.length() - 1) + newLine;
+    } else if (origSubString.endsWith("\r")) {
+      if (newLine.equals("\r"))
+	return origSubString;
+      else 
+	return origSubString.substring(0, origSubString.length() - 1) + newLine;
+    } else {
+      return origSubString + newLine;
+    }
   }
 
   /**
@@ -328,6 +422,7 @@ public class MailUtilities {
     }
     return retVal.toString();
   }
+
 }
 
 
