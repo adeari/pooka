@@ -21,7 +21,22 @@ public class Attachment {
     public Attachment(MimeBodyPart mbp) throws MessagingException {
 	handler = mbp.getDataHandler();
 	name = mbp.getFileName();
-	mimeType = new ContentType(mbp.getContentType());
+	String type = mbp.getContentType();
+	try {
+	    mimeType = new ContentType(type);
+	} catch (ParseException pe) {
+	    if (type.equalsIgnoreCase("text"))
+		mimeType = new ContentType("text/plain");
+	    else if (type.length() > 0 && type.indexOf('/') == -1) {
+		try {
+		    mimeType = new ContentType(type + "/plain");
+		} catch (ParseException petwo) {
+		    // fall back to text/plain.
+		    mimeType = new ContentType("text/plain");
+		}
+		
+	    }
+	}
 	size = mbp.getSize();
 	encoding = mbp.getEncoding();
     }
@@ -33,7 +48,22 @@ public class Attachment {
     public Attachment(MimeBodyPart mbp, MimePart headerSource) throws MessagingException {
 	handler = mbp.getDataHandler();
 	name = mbp.getFileName();
-	mimeType = new ContentType(mbp.getContentType());
+	String type = mbp.getContentType();
+	try {
+	    mimeType = new ContentType(type);
+	} catch (ParseException pe) {
+	    if (type.equalsIgnoreCase("text"))
+		mimeType = new ContentType("text/plain");
+	    else if (type.length() > 0 && type.indexOf('/') == -1) {
+		try {
+		    mimeType = new ContentType(type + "/plain");
+		} catch (ParseException petwo) {
+		    // fall back to text/plain.
+		    mimeType = new ContentType("text/plain");
+		}
+		
+	    }
+	}
 	size = mbp.getSize();
 	encoding = mbp.getEncoding();
 	headers = parseHeaders(headerSource.getAllHeaders());
@@ -49,7 +79,22 @@ public class Attachment {
     public Attachment(MimeMessage msg) throws MessagingException {
 	handler = msg.getDataHandler();
 	name = Pooka.getProperty("message.unknownMessage", "Message Text");
-	mimeType  = new ContentType(msg.getContentType());
+	String type = msg.getContentType();
+	try {
+	    mimeType = new ContentType(type);
+	} catch (ParseException pe) {
+	    if (type.equalsIgnoreCase("text"))
+		mimeType = new ContentType("text/plain");
+	    else if (type.length() > 0 && type.indexOf('/') == -1) {
+		try {
+		    mimeType = new ContentType(type + "/plain");
+		} catch (ParseException petwo) {
+		    // fall back to text/plain.
+		    mimeType = new ContentType("text/plain");
+		}
+		
+	    }
+	}
 	size = msg.getSize();
 	encoding = msg.getEncoding();
     }
