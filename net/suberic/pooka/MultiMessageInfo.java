@@ -7,7 +7,6 @@ import javax.mail.*;
 public class MultiMessageInfo extends MessageInfo {
 
     MessageInfo[] messages;
-    FolderInfo sourceFolder;
 
     /**
      * Creates a new MultiMessageInfo for the given newMessageInfos.
@@ -23,7 +22,7 @@ public class MultiMessageInfo extends MessageInfo {
      */
     public MultiMessageInfo(MessageInfo[] newMessageInfos, FolderInfo newFolder) {
 	messages = newMessageInfos;
-	sourceFolder = newFolder;
+	folderInfo = newFolder;
     }
 
 
@@ -61,11 +60,11 @@ public class MultiMessageInfo extends MessageInfo {
      * Moves the Message into the target Folder.
      */
     public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
-	if (sourceFolder != null) {
-	    sourceFolder.copyMessages(messages, targetFolder);
-	    sourceFolder.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
+	if (folderInfo != null) {
+	    folderInfo.copyMessages(messages, targetFolder);
+	    folderInfo.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
 	    if (expunge)
-		sourceFolder.expunge();
+		folderInfo.expunge();
 	} else {
 	    for (int i = 0; i < messages.length; i++)
 		messages[i].moveMessage(targetFolder, expunge);
@@ -76,9 +75,9 @@ public class MultiMessageInfo extends MessageInfo {
      * deletes all the messages in the MultiMessageInfo.
      */
     public void deleteMessage(boolean expunge) throws MessagingException {
-	if (sourceFolder != null) {
-	    FolderInfo trashFolder = sourceFolder.getTrashFolder();
-	    if ((sourceFolder.useTrashFolder()) && (trashFolder != null) && (trashFolder != sourceFolder)) {
+	if (folderInfo != null) {
+	    FolderInfo trashFolder = folderInfo.getTrashFolder();
+	    if ((folderInfo.useTrashFolder()) && (trashFolder != null) && (trashFolder != folderInfo)) {
 		try {
 		    moveMessage(trashFolder, expunge);
 		} catch (MessagingException me) {
@@ -105,16 +104,31 @@ public class MultiMessageInfo extends MessageInfo {
      * to remove().
      */
     public void remove(boolean autoExpunge) throws MessagingException {
-	if (sourceFolder != null) {
-	    sourceFolder.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
+	if (folderInfo != null) {
+	    folderInfo.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
 	    if (autoExpunge)
-		sourceFolder.expunge();
+		folderInfo.expunge();
 	} else {
 	    for (int i = 0; i < messages.length; i++)
 		messages[i].remove(autoExpunge);
 	}
 	
     }
+
+    /**
+     * This returns the MessageInfo at the given index.
+     */
+    public MessageInfo getMessageInfo(int index) {
+	return messages[index];
+    }
+
+    /**
+     * This returns the number of Messages wrapped by the MultiMessageInfo.
+     */
+    public int getMessageCount() {
+	return messages.length;
+    }
+
 }
 
 

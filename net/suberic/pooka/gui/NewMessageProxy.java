@@ -74,6 +74,7 @@ public class NewMessageProxy extends MessageProxy {
 		String messageContentType = getMessageWindow().getMessageContentType();
 
 		if (urlName != null) {
+		    Vector attachments = getAttachments();
 		    if (attachments != null && attachments.size() > 0) {
 			MimeBodyPart mbp = new MimeBodyPart();
 			mbp.setContent(messageText, messageContentType);
@@ -163,10 +164,14 @@ public class NewMessageProxy extends MessageProxy {
 	    
 	    mbp.setDataHandler( dh );
 	    
-	    if (attachments == null)
+	    Vector attachments = getAttachments();
+	    
+	    if (attachments == null) 
 		attachments = new Vector();
 	    
 	    attachments.add(mbp);
+	    
+	    messageInfo.setAttachments(attachments);
 	    
 	    getNewMessageWindow().attachmentAdded(attachments.size() -1);
 	} catch (Exception e) {

@@ -314,10 +314,10 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	else if (rowsSelected < 1) 
 	    return null;
 	else {
-	    Vector msgSelected= new Vector();
 	    int[] selectedRows = messageTable.getSelectedRows();
+	    MessageProxy[] msgSelected= new MessageProxy[selectedRows.length];
 	    for (int i = 0; i < selectedRows.length; i++) 
-		msgSelected.add(getFolderInfo().getMessageInfo(selectedRows[i]).getMessageProxy());
+		msgSelected[i] = getFolderInfo().getMessageInfo(selectedRows[i]).getMessageProxy();
 	    return new MultiMessageProxy(selectedRows, msgSelected, this);
 	}
     }

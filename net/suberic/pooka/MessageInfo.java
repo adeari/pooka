@@ -46,7 +46,7 @@ public class MessageInfo {
      * This loads the Attachment information into the attachments vector.
      */
 
-    public void loadAttachmentInfo() {
+    public void loadAttachmentInfo() throws MessagingException {
 	attachments = MailUtilities.getAttachments(getMessage(), false);
     }
 
@@ -409,8 +409,18 @@ public class MessageInfo {
 	return false;
     }
 
-    public Vector getAttachments() {
-	return attachments;
+    /**
+     * Returns the attachments for this MessageInfo.  If the attachments
+     * have not yet been loaded, attempts to load the attachments.
+     */
+    public Vector getAttachments() throws MessagingException {
+	if (hasLoadedAttachments())
+	    return attachments;
+	else {
+	    loadAttachmentInfo();
+	    return attachments;
+	}
+	    
     }
 
     public MessageProxy getMessageProxy() {

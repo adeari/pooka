@@ -30,51 +30,53 @@ public class ReadMessageWindow extends MessageWindow {
     public ReadMessageWindow(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
 	super(newParentContainer, newMsgProxy);
 
-	configureMessageWindow();
+	    configureMessageWindow();
     }
     
     protected void configureMessageWindow() {
 	try {
-	    this.setTitle(msg.getMessage().getSubject());
-	} catch (MessagingException me) {
-	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.noSubject", "<no subject>"));
-	}
-
-	editorPane = createMessagePanel(msg);
-	editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
-	
-	toolbar.setActive(this.getActions());
-	this.getContentPane().add("North", toolbar);
-
-	if (!getMessageProxy().hasLoadedAttachments())
-	    getMessageProxy().loadAttachmentInfo();
-
-	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
-	    attachmentPanel = new AttachmentPane(msg);
-	    attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-
-	    splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	    try {
+		this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+	    } catch (MessagingException me) {
+		this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.noSubject", "<no subject>"));
+	    }
 	    
-	    splitPane.setTopComponent(editorScrollPane);
-	    splitPane.setBottomComponent(attachmentScrollPane);
-	    this.getContentPane().add("Center", splitPane);
-	} else {
-	    this.getContentPane().add("Center", editorScrollPane);
-	}
-
-	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
-	keyBindings.setActive(getActions());
-
-	editorPane.addMouseListener(new MouseAdapter() {
+	    editorPane = createMessagePanel(msg);
+	    editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	    
+	    toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
+	    
+	    toolbar.setActive(this.getActions());
+	    this.getContentPane().add("North", toolbar);
+	    
+	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
+		attachmentPanel = new AttachmentPane(msg);
+		attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		
-		public void mousePressed(MouseEvent e) {
-		    if (SwingUtilities.isRightMouseButton(e)) {
-			showPopupMenu(editorPane, e);
+		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+		
+		splitPane.setTopComponent(editorScrollPane);
+		splitPane.setBottomComponent(attachmentScrollPane);
+		this.getContentPane().add("Center", splitPane);
+	    } else {
+		this.getContentPane().add("Center", editorScrollPane);
+	    }
+
+	    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+	    keyBindings.setActive(getActions());
+	    
+	    editorPane.addMouseListener(new MouseAdapter() {
+		    
+		    public void mousePressed(MouseEvent e) {
+			if (SwingUtilities.isRightMouseButton(e)) {
+			    showPopupMenu(editorPane, e);
+			}
 		    }
-		}
-	    });
+		});
+	} catch (MessagingException me) {
+	    showError(Pooka.getProperty("error.MessageWindow.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageWindow.errorLoadingMessage.title", "Error loading message."));
+	}
+	
     }
 
     /**
@@ -108,34 +110,28 @@ public class ReadMessageWindow extends MessageWindow {
      * together.
      */
 
-    public JTextPane createMessagePanel(MessageProxy aMsg) {
+    public JTextPane createMessagePanel(MessageProxy aMsg) throws MessagingException {
 	JTextPane retval = new JTextPane();
 
 	setDefaultFont(retval);
 
 	StringBuffer messageText = new StringBuffer();
 	
-	if (aMsg.getMessage() instanceof javax.mail.internet.MimeMessage) {
-	    javax.mail.internet.MimeMessage mMsg = (javax.mail.internet.MimeMessage) aMsg.getMessage();
-
-	    //	    messageText.append(MailUtilities.getHeaderInformation(mMsg, showFullHeaders()));
-
-	    String content = null;
-	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true"))
-		content = net.suberic.pooka.MailUtilities.getTextAndTextInlines(mMsg, Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
-	    else
-		content = net.suberic.pooka.MailUtilities.getTextPart(mMsg, showFullHeaders(), true);
-
-	    if (content != null) {
-		messageText.append(content);
-		retval.setEditable(false);
-		retval.setText(messageText.toString());
-	    } 
-	 
-	    return retval;
-
-	} else
-	    return new JTextPane();
+	
+	String content = null;
+	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true"))
+	    content = net.suberic.pooka.MailUtilities.getTextAndTextInlines(getMessageProxy().getMessageInfo().getMessage(), Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
+	else
+	    content = net.suberic.pooka.MailUtilities.getTextPart(getMessageProxy().getMessageInfo().getMessage(), showFullHeaders(), true);
+	
+	if (content != null) {
+	    messageText.append(content);
+	    retval.setEditable(false);
+	    retval.setText(messageText.toString());
+	} 
+	
+	return retval;
+	
     }
 		    
     public boolean showFullHeaders() {

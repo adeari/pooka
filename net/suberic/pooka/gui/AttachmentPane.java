@@ -37,10 +37,11 @@ public class AttachmentPane extends JPanel {
 	}
 
 	public int getRowCount() {
-	    if (msg.getAttachments() != null)
+	    try {
 		return msg.getAttachments().size();
-	    else
+	    } catch (MessagingException me) {
 		return 0;
+	    }
 	}
 
 	/**
@@ -55,29 +56,35 @@ public class AttachmentPane extends JPanel {
 	 * This gets the displayed value for each column in the table.
 	 */
 	public Object getValueAt(int row, int column) {
-	    Vector v = msg.getAttachments();
-	    if (v != null && row < v.size()) {
-		if (column == 0)
-		    try {
-			String name = (((MimeBodyPart)v.elementAt(row)).getFileName()); 
-			if (name != null)
-			    return name;
-			else
+	    Vector v = null;
+	    try {
+		v = msg.getAttachments();
+		
+		if (v != null && row < v.size()) {
+		    if (column == 0)
+			try {
+			    String name = (((MimeBodyPart)v.elementAt(row)).getFileName()); 
+			    if (name != null)
+				return name;
+			    else
+				return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
+			} catch (MessagingException me) {
 			    return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
-		    } catch (MessagingException me) {
-			return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
-		    }
-		else if (column == 1)
-		    try {
-			String contentType = (((MimeBodyPart)v.elementAt(row)).getContentType());    
-			if (contentType.indexOf(';') != -1)
-			    contentType = contentType.substring(0, contentType.indexOf(';'));			
-			return contentType;
-		    } catch (MessagingException me) {
-			return Pooka.getProperty("AttachmentPane.error.FileTypeUnavailable", "Unavailable");
-		    }
+			}
+		    else if (column == 1)
+			try {
+			    String contentType = (((MimeBodyPart)v.elementAt(row)).getContentType());    
+			    if (contentType.indexOf(';') != -1)
+				contentType = contentType.substring(0, contentType.indexOf(';'));			
+			    return contentType;
+			} catch (MessagingException me) {
+			    return Pooka.getProperty("AttachmentPane.error.FileTypeUnavailable", "Unavailable");
+			}
+		}
+	    } catch (MessagingException me) {
 	    }
 	    // if it's not a valid request, just return null.
+	    
 	    return null;
 	}
 
@@ -87,10 +94,13 @@ public class AttachmentPane extends JPanel {
 	 * Returns null if there is no entry at that row.
 	 */
 	public MimeBodyPart getPartAtRow(int row) {
-	    if (row < msg.getAttachments().size())
-		return (MimeBodyPart)msg.getAttachments().elementAt(row);
-	    else
-		return null;
+	    try {
+		if (row < msg.getAttachments().size())
+		    return (MimeBodyPart)msg.getAttachments().elementAt(row);
+	    } catch (MessagingException me) {
+	    }
+
+	    return null;
 	}
 
 	public String getColumnName(int columnIndex) {
