@@ -2,14 +2,10 @@ beta 1
 ---------------
 
 *) add address book/ldap support.
-	1)  make it so the empty string doesn't match anything
-	2)  make it so entry navigation makes sense--you should be able
-	    to accept the completion without hitting right arrow.
-	3)  make sure the matches go with the entry--i.e. if you match the
+	1)  make sure the matches go with the entry--i.e. if you match the
 	    actual address, have the actual address appear first.
-	4)  make <no matching addresses> show up correctly.
-	5)  make it test for valid email addresses
-	6)  make it add an extension to incomplete and unmatched addresses
+	2)  make it test for valid email addresses
+	3)  make it add an extension to incomplete and unmatched addresses
 	    (i.e. change allen to allen@atg.com)
 
 
