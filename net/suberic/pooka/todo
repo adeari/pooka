@@ -6,8 +6,6 @@ top todo:
 
 *) add pgp/gpg support.
 
-*) select all/all messages
-
 *)  check on file->exit to make sure that there are no unsent messages,
 and give an option on what you want to do with each one if there are any.
 
@@ -25,6 +23,9 @@ changing the title bar.
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
 possible folders, nor just the ones that are open.
+
+*) fix the header information display when we read html messages.  i think
+that there are cases where it doesn't display properly.
 
 	-- search --
 
@@ -91,8 +92,6 @@ error:  filterfoldercellrenderer has problems with search forms.
 		pane divider, then it reverts to its original state when you
 		detach/attach the window.
 
-*) add undo/redo support
-
 *) add a search and replace for the message editors.
 
 *) expand an unopened store in the folder tree that has folders and
@@ -115,6 +114,9 @@ have nothing new in your inbox because it hasn't been d/l'ed yet.
 *) some messages aren't parsed properly by the mbox provider.
 *) the mbox provider isn't safe for mailboxes that are edited by
 	     other processes.
+
+*) bug:  the ReadMessageDisplayPanel always uses both EditorPanes.  this is
+	probably extremely inefficient.  
 
 *) fix the window size--it's possible that if you change the foldertable
 size and the desktop pane size, but not the main window size, your main

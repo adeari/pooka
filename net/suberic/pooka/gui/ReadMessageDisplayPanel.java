@@ -231,8 +231,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	} catch (Exception e) {
 	  // if we can't show the html, just set the type as text/plain.
 
-	  editorPane.setContentType("text/plain");
-	  otherEditorPane.setContentType("text/plain");
+	  // oops--can't do it that way.  :)
+	  //editorPane.setContentType("text/plain");
+	  //otherEditorPane.setContentType("text/plain");
+
+	  editorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
+	  otherEditorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
 
 	  editorPane.setEditable(false);
 	  editorPane.setText(messageText.toString());
