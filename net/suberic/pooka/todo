@@ -1,3 +1,11 @@
+*) finish support for headers.  
+  -- make the button have reasonable images
+  -- make button the correct size
+  -- make a subclass that dynamically handles updates.
+
+*) make sure i can make javahelp work properly. -- specifically, make
+	sure that we can include it in the jar file.
+
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
 	topics:
@@ -30,9 +38,8 @@
 	correct extension.  otherwise, the app (like word) won't recognize
 	it as the correct filetype.
 
-*) add support for viewing messages as raw (rfc822 format).
-
 *) check for memory leaks
+ -- especially w/preview pane mode?
 
 -----
 
@@ -100,7 +107,7 @@ preview:
 
 *) threading of attachment actions.
 
-+++++++
+++++++++++++++++++
 
 *) add support for jdk1.4
 	-- tabbing between the address components for New Messages

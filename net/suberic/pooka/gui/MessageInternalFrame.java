@@ -286,6 +286,15 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     else
       this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   }
+
+  /**
+   * Refreshes the display.
+   */
+  public void refreshDisplay() throws MessagingException {
+    if (messageDisplay instanceof ReadMessageDisplayPanel)
+      ((ReadMessageDisplayPanel)messageDisplay).resetEditorText();
+  }
+
   
   /**
    * As specified by interface net.suberic.pooka.UserProfileContainer.

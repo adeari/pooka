@@ -169,7 +169,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 	      public void actionPerformed(java.awt.event.ActionEvent ae) {
 		messageDisplay.setMessageUI(PreviewContentPanel.this);
 		try {
-		  messageDisplay.resetEditorText();
+		  refreshDisplay();
 		  if (mp != null && mp.getMessageInfo() != null)
 		    mp.getMessageInfo().setSeen(true);
 		} catch (javax.mail.MessagingException me) {
@@ -188,7 +188,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void clearCurrentMessage() {
     messageDisplay.setMessageUI(null);
     try {
-      messageDisplay.resetEditorText();
+      refreshDisplay();
     } catch (Exception e) {
       // we've set it to null, so shouldn't happen.
     }
@@ -373,6 +373,13 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   
   public void setEnabled(boolean newValue) {
     // no-op here.
+  }
+
+  /**
+   * Refreshes the display.
+   */
+  public void refreshDisplay() throws javax.mail.MessagingException {
+    messageDisplay.resetEditorText();
   }
   
   public boolean getAutoPreview() {

@@ -135,7 +135,10 @@ public class MessageProxy {
   
   // The Window associated with this MessageProxy.
   MessageUI msgWindow;
-  
+
+  // the display mode for this MessageProxy.
+  int displayMode = ReadMessageDisplayPanel.HEADERS_DEFAULT;
+
   public Action[] defaultActions;
   
   /**
@@ -266,6 +269,9 @@ public class MessageProxy {
     
     defaultActions = new Action[] {
       new ActionWrapper(new OpenAction(), folderThread),
+      new ActionWrapper(new OpenDefaultDisplayAction(), folderThread),
+      new ActionWrapper(new OpenFullDisplayAction(), folderThread),
+      new ActionWrapper(new OpenRawDisplayAction(), folderThread),
       new ActionWrapper(new DefaultOpenAction(), folderThread),
       new ActionWrapper(new MoveAction(), folderThread),
       new ActionWrapper(new CopyAction(), folderThread),
@@ -528,11 +534,36 @@ public class MessageProxy {
    * this opens a MessageUI for this Message.
    */
   public void openWindow() {
+    openWindow(-1);
+  }
+
+  /**
+   * this opens a MessageUI for this Message.
+   */
+  public void openWindow(int newDisplayMode) {
+
+    boolean changeDisplayMode = false;
+
     try {
       if (getMessageUI() == null) {
+	if (newDisplayMode >= 0)
+	  setDisplayMode(newDisplayMode);
+	else
+	  setDisplayMode(ReadMessageDisplayPanel.HEADERS_DEFAULT);
+
 	MessageUI newUI = Pooka.getUIFactory().createMessageUI(this);
 	setMessageUI(newUI);
+      } else if (newDisplayMode >= 0 && newDisplayMode != getDisplayMode()) {
+	changeDisplayMode = true;
       }
+      
+      if (newDisplayMode >= 0)
+	setDisplayMode(newDisplayMode);
+
+      if (changeDisplayMode) { 
+	getMessageUI().refreshDisplay();
+      }
+
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    getMessageUI().openMessageUI();
@@ -945,7 +976,24 @@ public class MessageProxy {
   public MessageInfo getMessageInfo() {
     return messageInfo;
   }
-  
+
+  /**
+   * Returns the current displayMode.  Valid values are the following
+   * constants on ReadMessageDisplayPanel:
+   *   HEADERS_DEFAULT, HEADERS_FULL, and RFC822_STYLE.
+   */
+  public int getDisplayMode() {
+    return displayMode;
+  }
+  /**
+   * Sets the displayMode.  Note that you will still need to calls something
+   * like ReadMessageDisplayPanel.resetEditorText() in order to have the
+   * change take effect.
+   */
+  public void setDisplayMode(int newDisplayMode) {
+    displayMode = newDisplayMode;
+  }
+
   public FolderDisplayUI getFolderDisplayUI() {
     FolderInfo fi = getMessageInfo().getFolderInfo();
     if (fi != null)
@@ -980,18 +1028,47 @@ public class MessageProxy {
   }
   
   public class OpenAction extends AbstractAction {
+    protected int displayModeValue;
+    
     OpenAction() {
       super("file-open");
     }
-    
+
+    OpenAction(String id) {
+      super(id);
+    }
+
     public void actionPerformed(java.awt.event.ActionEvent e) {
       
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
 	fw.setBusy(true);;
-      openWindow();
+      openWindow(displayModeValue);
       if (fw != null)
 	fw.setBusy(false);
+    }
+  }
+
+  public class OpenDefaultDisplayAction extends OpenAction {
+
+    OpenDefaultDisplayAction() {
+      super("file-open-defaultdisplay");
+      displayModeValue = ReadMessageDisplayPanel.HEADERS_DEFAULT;
+    }
+  }
+
+  public class OpenFullDisplayAction extends OpenAction {
+
+    OpenFullDisplayAction() {
+      super("file-open-fulldisplay");
+      displayModeValue = ReadMessageDisplayPanel.HEADERS_FULL;
+    }
+  }
+
+  public class OpenRawDisplayAction extends OpenAction {
+    OpenRawDisplayAction() {
+      super("file-open-rawdisplay");
+      displayModeValue = ReadMessageDisplayPanel.RFC822_STYLE;
     }
   }
   

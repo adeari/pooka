@@ -22,5 +22,6 @@ public interface MessageUI extends UserProfileContainer, ErrorHandler, ActionCon
   public void setBusy(boolean newValue);
   
   public void setEnabled(boolean newValue);
-  
+
+  public void refreshDisplay() throws javax.mail.MessagingException;
 }

@@ -285,6 +285,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     else
       this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
   }
+
+  /**
+   * Refreshes the display.
+   */
+  public void refreshDisplay() throws MessagingException {
+    if (messageDisplay instanceof ReadMessageDisplayPanel)
+      ((ReadMessageDisplayPanel)messageDisplay).resetEditorText();
+  }
   
   /**
    * As specified by interface net.suberic.pooka.UserProfileContainer.

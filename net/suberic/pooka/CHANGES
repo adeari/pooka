@@ -1,3 +1,6 @@
+added a way to view emails either with full headers or as raw rfc822
+streams.
+
 added (limited) online help.
 
 fixed a NPE that could happen if you tried to delete a message that was in

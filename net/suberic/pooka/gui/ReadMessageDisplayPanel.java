@@ -29,8 +29,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   
   private String editorStatus = WITHOUT_ATTACHMENTS;
   
-  int displayMode = ReadMessageDisplayPanel.HEADERS_DEFAULT;
-
   Action[] defaultActions = new Action[] {
     new AttachmentPanelAction(),
     new EditorPanelAction(),
@@ -169,7 +167,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
       if ((Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().isHtml()) || (Pooka.getProperty("Pooka.displayHtmlAsDefault", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().containsHtml())) {
 	
-	if (displayMode == RFC822_STYLE) {
+	if (getMessageProxy().getDisplayMode() == RFC822_STYLE) {
 	  content = getMessageProxy().getMessageInfo().getRawText();
 	} else if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
 	  content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
@@ -181,7 +179,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	
       } else {
 	
-	if (displayMode == RFC822_STYLE) {
+	if (getMessageProxy().getDisplayMode() == RFC822_STYLE) {
 	  content = getMessageProxy().getMessageInfo().getRawText();
 	} else if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
 	  // Is there only an HTML part?  Regardless, we will still display it as text.
@@ -294,7 +292,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   }
   
   public boolean showFullHeaders() {
-    return (displayMode == HEADERS_FULL);
+    if (getMessageProxy() != null)
+      return (getMessageProxy().getDisplayMode() == HEADERS_FULL);
+    else
+      return false;
   }
   
   /**
@@ -463,17 +464,20 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
 
     public void actionPerformed(ActionEvent e) {
-      if (displayMode != newDisplayMode) {
-	displayMode = newDisplayMode;
-	try {
-	  resetEditorText();
-	} catch (MessagingException me) {
-	  final Exception finalE = me;
-	  SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		msgUI.showError("Error changing display", finalE);
-	      }
-	    });
+      MessageProxy mp = getMessageProxy();
+      if (mp != null) {
+	if (mp.getDisplayMode() != newDisplayMode) {
+	  mp.setDisplayMode(newDisplayMode);
+	  try {
+	    resetEditorText();
+	  } catch (MessagingException me) {
+	    final Exception finalE = me;
+	    SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		  msgUI.showError("Error changing display", finalE);
+		}
+	      });
+	  }
 	}
       }
     }
