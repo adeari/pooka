@@ -77,6 +77,9 @@ public class FolderDisplayPanel extends JPanel {
 	  }
 	}
       });
+
+    Pooka.getHelpBroker().enableHelpKey(this, "ui.folderWindow", Pooka.getHelpBroker().getHelpSet());
+
   }
   
   /**
@@ -753,8 +756,9 @@ public class FolderDisplayPanel extends JPanel {
   public void registerKeyboardAction(ActionListener anAction,
 				     String aCommand, KeyStroke aKeyStroke, int aCondition) {
     super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-    
-    messageTable.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+
+    if (messageTable != null)
+      messageTable.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
   }
   
   /**

@@ -116,6 +116,8 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 		    folderTree.requestFocus();
 		}
 	    });
+    
+    Pooka.getHelpBroker().enableHelpKey(this, "ui.folderPanel", Pooka.getHelpBroker().getHelpSet());
 
 	this.configureInterfaceStyle();
     }

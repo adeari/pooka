@@ -77,12 +77,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
     keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
     
-    // set the default active menus.
-    // actually, don't do this here--let Pooka do it.  this is because
-    // the MenuBar hasn't actually been set yet.
-    //mainMenu.setActive(getActions());
-    //mainToolbar.setActive(getActions());
-    //keyBindings.setActive(getActions());
+    Pooka.getHelpBroker().enableHelpKey(this, "pooka.intro", Pooka.getHelpBroker().getHelpSet());
     
     java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
     if (standardUrl != null) {

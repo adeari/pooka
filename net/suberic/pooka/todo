@@ -22,6 +22,14 @@
 
 *) fix up the error messages, and make sure that they look ok.
 
+*) fix:java.lang.NullPointerException
+	at net.suberic.pooka.MessageInfo.remove(MessageInfo.java:389)
+	at net.suberic.pooka.MessageInfo.deleteMessage(MessageInfo.java:358)
+	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:684)
+	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:766)
+	at net.suberic.pooka.gui.MessageProxy$DeleteAction.actionPerformed(MessageProxy.java:1167)
+	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
+
 *) support windows registry attachment associations.
 	-- check icemail
 
@@ -139,18 +147,6 @@ preview:
 *) sent folders, outboxes, etc. should be configured without requiring a
 	restart.  also, should be able to change store protcol/connection
 	info without restarting.
-
-*) fix:java.lang.NullPointerException
-	at net.suberic.pooka.MessageInfo.remove(Unknown Source)
-	at net.suberic.pooka.MessageInfo.deleteMessage(Unknown Source)
-java.lang.NullPointerException
-	at net.suberic.pooka.MessageInfo.remove(MessageInfo.java:389)
-	at net.suberic.pooka.MessageInfo.deleteMessage(MessageInfo.java:358)
-	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:673)
-	at net.suberic.pooka.gui.MessageProxy.deleteMessage(MessageProxy.java:755)
-	at net.suberic.pooka.gui.MessageProxy$DeleteAction.actionPerformed(MessageProxy.java:1173)
-	at net.suberic.util.thread.ActionThread.run(ActionThread.java:72)
-
 
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.FolderInfo.getTrashFolder(Unknown Source)
