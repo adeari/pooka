@@ -3,6 +3,7 @@ top todo:
 *) add color and font support
 	begun.  todo:
 	*) Folder -- read messages need to honor the font and font color.
+	   -- done?  check font color.
 	*) The font for new messages doesn't update using the themes.
 	   -- somewhat fixed, though there are still cases where it doesn't
 		work, as well as a problem with not resizing the window.
@@ -21,8 +22,6 @@ other words, we want everything that appears in the FolderTree, not all
 possible folders, nor just the ones that are open.
 
 *) fix the 'save draft?' messages under jdk1.2.
-
-*) fix the LookAndFeel support.
 
 (windows)
 

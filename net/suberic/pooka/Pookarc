@@ -748,7 +748,7 @@ Pooka.messagePanel.theme.allowedValues=Pooka.theme
 Pooka.folderPanel.theme.propertyType=List
 Pooka.folderPanel.theme.allowedValues=Pooka.theme
 
-Pooka.theme=default:black
+Pooka.theme=default
 Pooka.theme.propertyType=Multi
 Pooka.theme.editableFields=primary1:primary2:primary3:secondary1:secondary2:secondary3:black:white:controlFont:systemFont:userFont:smallFont:monospacedFont
 Pooka.theme.editableFields.scoped=true
@@ -781,7 +781,11 @@ Pooka.theme.editableFields.monospacedFont.propertyType=Font
 Pooka.theme.editableFields.monospacedFont._enabledBox=true
 
 Pooka.looknfeel.propertyType=List
-Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunstoff
+Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunststoff
+Pooka.looknfeel.listMapping.Metal.value=javax.swing.plaf.metal.MetalLookAndFeel
+Pooka.looknfeel.listMapping.Motif.value=com.sun.java.swing.plaf.motif.MotifLookAndFeel
+Pooka.looknfeel.listMapping.Windows.value=com.sun.java.swing.plaf.windows.WindowsLookAndFeel
+Pooka.looknfeel.listMapping.Kunststoff.value=com.incors.plaf.kunststoff.KunststoffLookAndFeel
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v

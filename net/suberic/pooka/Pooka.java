@@ -92,6 +92,16 @@ public class Pooka {
 	  }
 	}
       }, "Pooka.guiType");
+
+    resources.addValueChangeListener(new net.suberic.util.ValueChangeListener() {
+	public void valueChanged(String changedValue) {
+	  try {
+	    UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
+	    javax.swing.SwingUtilities.updateComponentTreeUI(javax.swing.SwingUtilities.windowForComponent(getMainPanel()));
+	  } catch (Exception e) { 
+	    System.out.println("Cannot set look and feel..."); }
+	}
+      }, "Pooka.looknfeel");
     
     JFrame frame = new JFrame("Pooka");
     defaultAuthenticator = new SimpleAuthenticator(frame);
