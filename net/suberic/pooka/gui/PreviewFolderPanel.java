@@ -367,20 +367,24 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	getFolderStatusBar().messagesAdded(e);
     }
 
-    public void messagesRemoved(MessageCountEvent e) { 
-	getFolderStatusBar().messagesRemoved(e);
-	getFolderDisplay().moveSelectionOnRemoval(e);
-	Runnable updateAdapter = new Runnable() {
-		public void run() {
-		    Pooka.getMainPanel().refreshActiveMenus();
-		}
-	    };
-	if (SwingUtilities.isEventDispatchThread())
-	    updateAdapter.run();
-	else
-	    SwingUtilities.invokeLater(updateAdapter);
-	
-    }
+  /**
+   * Called in response to a messagesRemoved event.  Should always be 
+   * called on the parent FolderThread.
+   */
+  public void messagesRemoved(MessageCountEvent e) { 
+    getFolderStatusBar().messagesRemoved(e);
+
+    Runnable updateAdapter = new Runnable() {
+	public void run() {
+	  Pooka.getMainPanel().refreshActiveMenus();
+	}
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      updateAdapter.run();
+    else
+      SwingUtilities.invokeLater(updateAdapter);
+    
+  }
 
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
@@ -402,9 +406,13 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	}
     }
 
-    public void removeRows(java.util.Vector removedProxies) {
-	getFolderDisplay().removeRows(removedProxies);
-    }
+  /**
+   * Calls getFolderDisplay().removeRows(removedProxies).
+   * This is the preferred way to remove rows from the FolderTableModel.
+   */
+  public void removeRows(java.util.Vector removedProxies) {
+    getFolderDisplay().removeRows(removedProxies);
+  }
 
     /**
      * Gets the folderStatusBar.

@@ -12,73 +12,63 @@ import java.awt.event.ActionEvent;
  * unread messages in a folder, etc.
  */
 public class FolderStatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
-    FolderInfo folderInfo;
-    JLabel folderLabel;
-    JLabel messageCount;
-    JPanel loaderPanel;
-    JPanel gotoPanel;
-    JTextField gotoInputField;
-    LoadMessageTracker tracker = null;
+  FolderInfo folderInfo;
+  JLabel folderLabel;
+  JLabel messageCount;
+  JPanel loaderPanel;
+  JPanel gotoPanel;
+  JTextField gotoInputField;
+  LoadMessageTracker tracker = null;
+  
+  public FolderStatusBar(FolderInfo newFolder) {
+    folderInfo = newFolder;
+    folderLabel = new JLabel(getFolderInfo().getFolderName());
+    messageCount = new JLabel();
+    updateMessageCount();
+    loaderPanel = new JPanel();
     
-    public FolderStatusBar(FolderInfo newFolder) {
-	folderInfo = newFolder;
-	folderLabel = new JLabel(getFolderInfo().getFolderName());
-	messageCount = new JLabel();
-	updateMessageCount();
-	loaderPanel = new JPanel();
+    gotoPanel = new JPanel();
+    gotoPanel.add(new JLabel(Pooka.getProperty("FolderStatusBar.goto", "Goto Message")));
+    gotoInputField = new JTextField(5);
+    gotoInputField.addActionListener(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  try {
+	    int msgNum = Integer.parseInt(e.getActionCommand());
+	    if (getFolderInfo() != null) {
+	      FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+	      fdui.selectMessage(msgNum - 1);
+	    }
+	  } catch (NumberFormatException nfe) {
+	    
+	  }
+	  gotoInputField.selectAll();
+	}
+      });
+    
+    gotoInputField.registerKeyboardAction(new ActionListener() {
+	public void actionPerformed(ActionEvent e) {
+	  FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+	  if (fdui != null) {
+	    int nextMessage = fdui.selectNextMessage();
+	    gotoInputField.setText(Integer.toString(nextMessage));
+	    gotoInputField.selectAll();
+	  }
+	}
+      }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
+    
+	gotoInputField.registerKeyboardAction(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
+	      FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
+	      if (fdui != null) {
+		int previousMessage = fdui.selectPreviousMessage();
+		gotoInputField.setText(Integer.toString(previousMessage));
+		gotoInputField.selectAll();
+	      }
+	    }
+	  }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
 	
-	gotoPanel = new JPanel();
-	gotoPanel.add(new JLabel(Pooka.getProperty("FolderStatusBar.goto", "Goto Message")));
-	gotoInputField = new JTextField(5);
-	gotoInputField.addActionListener(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    try {
-			int msgNum = Integer.parseInt(e.getActionCommand());
-			if (getFolderInfo() != null) {
-			    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
-			    fdui.selectMessage(msgNum - 1);
-			}
-		    } catch (NumberFormatException nfe) {
-			
-		    }
-		    gotoInputField.selectAll();
-		}
-	    });
-
-	gotoInputField.registerKeyboardAction(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
-		    if (fdui != null) {
-			int nextMessage = fdui.selectNextMessage();
-			gotoInputField.setText(Integer.toString(nextMessage));
-			gotoInputField.selectAll();
-		    }
-		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_DOWN, 0),  JComponent.WHEN_FOCUSED);
-
-	gotoInputField.registerKeyboardAction(new ActionListener() {
-		public void actionPerformed(ActionEvent e) {
-		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
-		    if (fdui != null) {
-			int previousMessage = fdui.selectPreviousMessage();
-			gotoInputField.setText(Integer.toString(previousMessage));
-			gotoInputField.selectAll();
-		    }
-		}
-	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_UP, 0),  JComponent.WHEN_FOCUSED);
-
 	gotoPanel.add(gotoInputField);
-
-	/*
-	this.setLayout(new FlowLayout(FlowLayout.LEFT));
-	this.add(folderLabel);
-	this.add(new JSeparator(SwingConstants.VERTICAL));
-	this.add(messageCount);
-	this.add(new JSeparator(SwingConstants.VERTICAL));
-	this.add(loaderPanel);
-	this.add(gotoPanel);
-	*/
-
+	
 	java.awt.GridBagConstraints constraints = new java.awt.GridBagConstraints();
 	java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
 	constraints.weightx = 0.0;
@@ -118,11 +108,23 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
     public void messagesAdded(MessageCountEvent e) {
 	updateMessageCount();
     }
-    
-    public void messagesRemoved(MessageCountEvent e) {
-	updateMessageCount();
-    }
-    
+  
+  /**
+   * Called when messages are removed from the monitored folder.
+   *
+   * Calls updateMessageCount().
+   *
+   * May be called from any thread.
+   */
+  public void messagesRemoved(MessageCountEvent e) {
+    updateMessageCount();
+  }
+  
+  /**
+   * Updates the message count display on this FolderStatusBar.
+   *
+   * May be called from any thread.
+   */
   public void updateMessageCount() {
     SwingUtilities.invokeLater(new Runnable() {
 	public void run() {
@@ -130,30 +132,30 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
 	}
       });
     
-    }
-
-    /**
-     * Activates the Goto Message dialog.  In this case, the method has
-     * the JTextField with the 'Goto Message' label request focus.
-     */
-    public void activateGotoDialog() {
-	gotoInputField.selectAll();
-	gotoInputField.requestFocus();
-    }
-
-    public FolderInfo getFolderInfo() {
-	return folderInfo;
-    }
-
-    public JPanel getLoaderPanel() {
-	return loaderPanel;
-    }
-
-    public LoadMessageTracker getTracker() {
-	return tracker;
-    }
-
-    public void setTracker(LoadMessageTracker newTracker) {
-	tracker = newTracker;
-    }
+  }
+  
+  /**
+   * Activates the Goto Message dialog.  In this case, the method has
+   * the JTextField with the 'Goto Message' label request focus.
+   */
+  public void activateGotoDialog() {
+    gotoInputField.selectAll();
+    gotoInputField.requestFocus();
+  }
+  
+  public FolderInfo getFolderInfo() {
+    return folderInfo;
+  }
+  
+  public JPanel getLoaderPanel() {
+    return loaderPanel;
+  }
+  
+  public LoadMessageTracker getTracker() {
+    return tracker;
+  }
+  
+  public void setTracker(LoadMessageTracker newTracker) {
+    tracker = newTracker;
+  }
 } // end class FolderFolderStatusBar

@@ -639,6 +639,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
   }
   
+ /**
+   * This does the real work when messages are removed.
+   *
+   * This method should always be run on the FolderThread.
+   */
   protected void runMessagesRemoved(MessageCountEvent mce) {
     Message[] removedMessages = mce.getMessages();
     Message[] removedCachingMessages = new Message[removedMessages.length];
@@ -699,17 +704,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
     
     MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), removedCachingMessages);
-
-
+    
+    
     if (getFolderDisplayUI() != null) {
       if (removedProxies.size() > 0) {
-	final Vector finRemoved = removedProxies;
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      getFolderDisplayUI().removeRows(finRemoved);
-	    }
-	  });
-	
+	getFolderDisplayUI().removeRows(removedProxies);
       }
       resetMessageCounts();
       fireMessageCountEvent(newMce);

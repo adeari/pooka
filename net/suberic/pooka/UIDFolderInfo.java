@@ -342,6 +342,9 @@ public class UIDFolderInfo extends FolderInfo {
     
   }
 
+  /**
+   * This does the real work when messages are removed.
+   */
   protected void runMessagesRemoved(MessageCountEvent mce) {
     if (Pooka.isDebug())
       System.out.println("running MessagesRemoved on " + getFolderID());
@@ -382,10 +385,17 @@ public class UIDFolderInfo extends FolderInfo {
 	}
       }
       newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), uidRemovedMessages);
-      if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().removeRows(removedProxies);
-      resetMessageCounts();
-      fireMessageCountEvent(newMce);
+      if (getFolderDisplayUI() != null) {
+	if (removedProxies.size() > 0)
+	  getFolderDisplayUI().removeRows(removedProxies);
+	resetMessageCounts();
+	fireMessageCountEvent(newMce);
+      } else {
+	resetMessageCounts();
+	fireMessageCountEvent(newMce);
+	if (removedProxies.size() > 0)
+	  getFolderTableModel().removeRows(removedProxies);
+      }
     } else {
       resetMessageCounts();
       fireMessageCountEvent(mce);

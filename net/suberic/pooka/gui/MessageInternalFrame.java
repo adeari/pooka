@@ -133,10 +133,10 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * This closes the MessageInternalFrame.
      */
     public void closeMessageUI() {
-	try {
-	    this.setClosed(true);
-	} catch (java.beans.PropertyVetoException e) {
-	}
+      try {
+	this.setClosed(true);
+      } catch (java.beans.PropertyVetoException e) {
+      }
     }
 
     /**

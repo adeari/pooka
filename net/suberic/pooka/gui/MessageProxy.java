@@ -689,8 +689,16 @@ public class MessageProxy {
    * if any, is closed.
    */
   public void close() {
-    if (getMessageUI() != null)
-      getMessageUI().closeMessageUI();
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  if (getMessageUI() != null)
+	    getMessageUI().closeMessageUI();
+	}
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
   }
   
   /**

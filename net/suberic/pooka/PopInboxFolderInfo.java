@@ -220,6 +220,11 @@ public class PopInboxFolderInfo extends FolderInfo {
   
   }
   
+  /**
+   * This does the real work when messages are removed.
+   *
+   * This method should always be run on the FolderThread.
+   */
   protected void runMessagesRemoved(MessageCountEvent mce) {
     if (folderTableModel != null) {
       Message[] removedMessages = mce.getMessages();
@@ -255,10 +260,21 @@ public class PopInboxFolderInfo extends FolderInfo {
 	  messageToInfoTable.remove(mi);
 	}
       }
-      getFolderTableModel().removeRows(removedProxies);
+      if (getFolderDisplayUI() != null) {
+	if (removedProxies.size() > 0)
+	  getFolderDisplayUI().removeRows(removedProxies);
+	resetMessageCounts();
+	fireMessageCountEvent(mce);
+      } else {
+	resetMessageCounts();
+	fireMessageCountEvent(mce);
+	if (removedProxies.size() > 0)
+	  getFolderTableModel().removeRows(removedProxies);
+      }
+    } else {
+      resetMessageCounts();
+      fireMessageCountEvent(mce);
     }
-    resetMessageCounts();
-    fireMessageCountEvent(mce);
   }
 
   /**

@@ -148,6 +148,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void refreshCurrentMessage() {
     if (current != null) {
       MessageProxy mp = current.getFolderDisplay().getSelectedMessage();
+      System.err.println("selectedmessage is " + mp);
       if (! (mp instanceof MultiMessageProxy)) {
 	messageDisplay.setMessageUI(this);
 	try {

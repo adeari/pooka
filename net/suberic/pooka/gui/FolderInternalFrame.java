@@ -551,20 +551,20 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     }
 
     // MessageCountListener
-    /**
-     *
-     */
-    public void messagesAdded(MessageCountEvent e) {
-	getFolderStatusBar().messagesAdded(e);
-    }
-
   /**
-   * handles removed messages.
+   *
+   */
+  public void messagesAdded(MessageCountEvent e) {
+    getFolderStatusBar().messagesAdded(e);
+  }
+  
+  /**
+   * Called in response to a messagesRemoved event.  Should always be 
+   * called on the parent FolderThread.
    */
   public void messagesRemoved(MessageCountEvent e) { 
     getFolderStatusBar().messagesRemoved(e);
-    getFolderDisplay().moveSelectionOnRemoval(e);
-
+    
     Runnable updateAdapter = new Runnable() {
 	public void run() {
 	  getMessagePanel().getMainPanel().refreshActiveMenus();
@@ -624,36 +624,40 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
     }
 
-    /**
-     * This checks to see if the message which has been removed is 
-     * currently selected.  If so, we unselect it and select the next
-     * row.
-     */
-    private void moveSelectionOnRemoval(MessageCountEvent e) {
-	MessageProxy selectedProxy = getSelectedMessage();
-	Message[] removedMsgs = e.getMessages();
-	if (selectedProxy != null)  {
-	    boolean found = false;
-	    Message currentMsg = selectedProxy.getMessageInfo().getMessage();
-	    for (int i = 0; (found == false && i < removedMsgs.length); i++) {
-		if (currentMsg.equals(removedMsgs[i])) {
-		    found = true;
-		}
-	    }
-	    
-	    if (found) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-			    selectNextMessage();
-			}
-		    });
-	    }
+  /**
+   * This checks to see if the message which has been removed is 
+   * currently selected.  If so, we unselect it and select the next
+   * row.
+   */
+  private void moveSelectionOnRemoval(MessageCountEvent e) {
+    MessageProxy selectedProxy = getSelectedMessage();
+    Message[] removedMsgs = e.getMessages();
+    if (selectedProxy != null)  {
+      boolean found = false;
+      Message currentMsg = selectedProxy.getMessageInfo().getMessage();
+      for (int i = 0; (found == false && i < removedMsgs.length); i++) {
+	if (currentMsg.equals(removedMsgs[i])) {
+	  found = true;
 	}
+      }
+      
+      if (found) {
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      selectNextMessage();
+	    }
+	  });
+      }
     }
-
-    public void removeRows(java.util.Vector removedProxies) {
-	getFolderDisplay().removeRows(removedProxies);
-    }
+  }
+  
+  /**
+   * Calls getFolderDisplay().removeRows(removedProxies).
+   * This is the preferred way to remove rows from the FolderTableModel.
+   */
+  public void removeRows(java.util.Vector removedProxies) {
+    getFolderDisplay().removeRows(removedProxies);
+  }
 
     /**
      * Gets the Actions for this component.

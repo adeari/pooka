@@ -124,7 +124,6 @@ public class FolderTableModel extends AbstractTableModel {
 	  try {
 	    SwingUtilities.invokeAndWait(new RunnableAdapter() {
 		public void run() {
-		  
 		  fireTableRowsInserted(firstRow, lastRow);
 		}
 	      });
@@ -132,7 +131,6 @@ public class FolderTableModel extends AbstractTableModel {
 	  }
 	else 
 	  fireTableRowsInserted(firstRow, lastRow);
-	
 	
       } else if (addOrRem == FolderTableModel.REMOVE_MESSAGES) {
 	for (int i = 0; i < changedMsg.size() ; i++) {
@@ -144,7 +142,6 @@ public class FolderTableModel extends AbstractTableModel {
 	      try {
 		SwingUtilities.invokeAndWait(new RunnableAdapter() {
 		    public void run() {
-		      
 		      fireTableRowsDeleted(rowNumber, rowNumber);
 		    }
 		  });

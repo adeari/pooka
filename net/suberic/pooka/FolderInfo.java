@@ -1284,173 +1284,173 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	eventListeners.remove(MessageCountListener.class, oldListener);
     }
 
-    public void fireMessageCountEvent(MessageCountEvent mce) {
-
-	if (Pooka.isDebug())
-	    System.out.println("firing MessageCountEvent on " + getFolderID());
-
-	// from the EventListenerList javadoc, including comments.
-
-	// Guaranteed to return a non-null array
-	Object[] listeners = eventListeners.getListenerList();
-	// Process the listeners last to first, notifying
-	// those that are interested in this event
-
-	if (mce.getType() == MessageCountEvent.ADDED) {
-	    for (int i = listeners.length-2; i>=0; i-=2) {
-		if (Pooka.isDebug())
-		    System.out.println("listeners[" + i + "] is " + listeners[i] );
-		if (listeners[i]==MessageCountListener.class) {
-		    if (Pooka.isDebug())
-			System.out.println("check.  running messagesAdded on listener.");
-		    
-		    ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
-		}              
-	    }
-	} else if (mce.getType() == MessageCountEvent.REMOVED) {
-	    for (int i = listeners.length-2; i>=0; i-=2) {
-		if (Pooka.isDebug())
-		    System.out.println("listeners[" + i + "] is " + listeners[i] );
-		if (listeners[i]==MessageCountListener.class) {
-		    if (Pooka.isDebug())
-			System.out.println("check.  running messagesRemoved on listener " + listeners[i+1] );
-		    
-		    ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
-		}              
-	    }
-
-	}
-    }
-	
-    public void addMessageChangedListener(MessageChangedListener newListener) {
-	eventListeners.add(MessageChangedListener.class, newListener);
-    }
-
-    public void removeMessageChangedListener(MessageChangedListener oldListener) {
-	eventListeners.remove(MessageChangedListener.class, oldListener);
-    }
-
-    // as defined in javax.mail.event.MessageCountListener
-
-    public void messagesAdded(MessageCountEvent e) {
-	if (Pooka.isDebug())
-	    System.out.println("Messages added.");
-
-	if (Thread.currentThread() == getFolderThread() )
-	    runMessagesAdded(e);
-	else 
-	    getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-		    
-		    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-			runMessagesAdded((MessageCountEvent)actionEvent.getSource());
-		    }
-		}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
-	
-    }
+  public void fireMessageCountEvent(MessageCountEvent mce) {
     
-    protected void runMessagesAdded(MessageCountEvent mce) {
-	if (folderTableModel != null) {
-	    Message[] addedMessages = mce.getMessages();
-
-	    MessageInfo mp;
-	    Vector addedProxies = new Vector();
-	    for (int i = 0; i < addedMessages.length; i++) {
-		mp = new MessageInfo(addedMessages[i], FolderInfo.this);
-		addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		messageToInfoTable.put(addedMessages[i], mp);
-	    }
-	    addedProxies.removeAll(applyFilters(addedProxies));
-	    if (addedProxies.size() > 0) {
-		getFolderTableModel().addRows(addedProxies);
-		setNewMessages(true);
-		resetMessageCounts();
-
-		// notify the message loaded thread.
-		MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-		loaderThread.loadMessages(addedArray);
-
-		fireMessageCountEvent(mce);
-	    }
-	}
-		
-    }
-
-    /**
-     * As defined in javax.mail.MessageCountListener.
-     *
-     * This runs when we get a notification that messages have been
-     * removed from the mail server.
-     *
-     * This implementation just moves the handling of the event to the
-     * FolderThread, where it runs runMessagesRemoved().
-     */
-    public void messagesRemoved(MessageCountEvent e) {
-	if (Pooka.isDebug())
-	    System.out.println("Messages Removed.");
-
-	if (Thread.currentThread() == getFolderThread() )
-	    runMessagesRemoved(e);
-	else 
-	    getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-		    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-			runMessagesRemoved((MessageCountEvent)actionEvent.getSource());
-		    }
-		}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "messages-removed"));
-    }
+    if (Pooka.isDebug())
+      System.out.println("firing MessageCountEvent on " + getFolderID());
     
-    /**
-     * This does the real work when messages are removed.  This can be
-     * overridden by subclasses.
-     */
-    protected void runMessagesRemoved(MessageCountEvent mce) {
+    // from the EventListenerList javadoc, including comments.
+    
+    // Guaranteed to return a non-null array
+    Object[] listeners = eventListeners.getListenerList();
+    // Process the listeners last to first, notifying
+    // those that are interested in this event
+    
+    if (mce.getType() == MessageCountEvent.ADDED) {
+      for (int i = listeners.length-2; i>=0; i-=2) {
 	if (Pooka.isDebug())
-	    System.out.println("running MessagesRemoved on " + getFolderID());
-
-	if (folderTableModel != null) {
-	    Message[] removedMessages = mce.getMessages();
-	    if (Pooka.isDebug())
-		System.out.println("removedMessages was of size " + removedMessages.length);
-	    MessageInfo mi;
-	    Vector removedProxies=new Vector();
-
-	    if (Pooka.isDebug()) {
-		System.out.println("message in info table:");
-		Enumeration keys = messageToInfoTable.keys();
-		while (keys.hasMoreElements())
-		    System.out.println(keys.nextElement());
-	    }
-
-	    for (int i = 0; i < removedMessages.length; i++) {
-		if (Pooka.isDebug())
-		    System.out.println("checking for existence of message " + removedMessages[i]);
-		mi = getMessageInfo(removedMessages[i]);
-		if (mi != null) {
-		    if (mi.getMessageProxy() != null)
-			mi.getMessageProxy().close();
+	  System.out.println("listeners[" + i + "] is " + listeners[i] );
+	if (listeners[i]==MessageCountListener.class) {
+	  if (Pooka.isDebug())
+	    System.out.println("check.  running messagesAdded on listener.");
+	  
+	  ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
+	}              
+      }
+    } else if (mce.getType() == MessageCountEvent.REMOVED) {
+      for (int i = listeners.length-2; i>=0; i-=2) {
+	if (Pooka.isDebug())
+	  System.out.println("listeners[" + i + "] is " + listeners[i] );
+	if (listeners[i]==MessageCountListener.class) {
+	  if (Pooka.isDebug())
+	    System.out.println("check.  running messagesRemoved on listener " + listeners[i+1] );
+	  
+	  ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
+	}              
+      }
+      
+    }
+  }
+  
+  public void addMessageChangedListener(MessageChangedListener newListener) {
+    eventListeners.add(MessageChangedListener.class, newListener);
+  }
+  
+  public void removeMessageChangedListener(MessageChangedListener oldListener) {
+    eventListeners.remove(MessageChangedListener.class, oldListener);
+  }
+  
+  // as defined in javax.mail.event.MessageCountListener
+  
+  public void messagesAdded(MessageCountEvent e) {
+    if (Pooka.isDebug())
+      System.out.println("Messages added.");
+    
+    if (Thread.currentThread() == getFolderThread() )
+      runMessagesAdded(e);
+    else 
+	    getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 		
-		    if (Pooka.isDebug())
-			System.out.println("message exists--removing");
-		    removedProxies.add(mi.getMessageProxy());
-		    messageToInfoTable.remove(removedMessages[i]);
+		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		  runMessagesAdded((MessageCountEvent)actionEvent.getSource());
 		}
-	    }
-	    if (getFolderDisplayUI() != null) {
-	      if (removedProxies.size() > 0) 
-		getFolderDisplayUI().removeRows(removedProxies);
-	      resetMessageCounts();
-	      fireMessageCountEvent(mce);
-	    } else {
-	      resetMessageCounts();
-	      fireMessageCountEvent(mce);
-	      if (removedProxies.size() > 0)
-		getFolderTableModel().removeRows(removedProxies);
-	    }
-	} else {
-	    resetMessageCounts();
-	    fireMessageCountEvent(mce);
-	}
+	      }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
+	
+  }
+  
+  protected void runMessagesAdded(MessageCountEvent mce) {
+    if (folderTableModel != null) {
+      Message[] addedMessages = mce.getMessages();
+      
+      MessageInfo mp;
+      Vector addedProxies = new Vector();
+      for (int i = 0; i < addedMessages.length; i++) {
+	mp = new MessageInfo(addedMessages[i], FolderInfo.this);
+	addedProxies.add(new MessageProxy(getColumnValues(), mp));
+	messageToInfoTable.put(addedMessages[i], mp);
+      }
+      addedProxies.removeAll(applyFilters(addedProxies));
+      if (addedProxies.size() > 0) {
+	getFolderTableModel().addRows(addedProxies);
+	setNewMessages(true);
+	resetMessageCounts();
+	
+	// notify the message loaded thread.
+	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
+	loaderThread.loadMessages(addedArray);
+	
+	fireMessageCountEvent(mce);
+      }
     }
     
+  }
+  
+  /**
+   * As defined in javax.mail.MessageCountListener.
+   *
+   * This runs when we get a notification that messages have been
+   * removed from the mail server.
+   *
+   * This implementation just moves the handling of the event to the
+   * FolderThread, where it runs runMessagesRemoved().
+   */
+  public void messagesRemoved(MessageCountEvent e) {
+    if (Pooka.isDebug())
+      System.out.println("Messages Removed.");
+    
+    if (Thread.currentThread() == getFolderThread() )
+      runMessagesRemoved(e);
+    else 
+      getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	    runMessagesRemoved((MessageCountEvent)actionEvent.getSource());
+	  }
+	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "messages-removed"));
+  }
+  
+  /**
+   * This does the real work when messages are removed.  This can be
+   * overridden by subclasses.
+   */
+  protected void runMessagesRemoved(MessageCountEvent mce) {
+    if (Pooka.isDebug())
+      System.out.println("running MessagesRemoved on " + getFolderID());
+    
+    if (folderTableModel != null) {
+      Message[] removedMessages = mce.getMessages();
+      if (Pooka.isDebug())
+	System.out.println("removedMessages was of size " + removedMessages.length);
+      MessageInfo mi;
+      Vector removedProxies=new Vector();
+      
+      if (Pooka.isDebug()) {
+	System.out.println("message in info table:");
+	Enumeration keys = messageToInfoTable.keys();
+	while (keys.hasMoreElements())
+	  System.out.println(keys.nextElement());
+      }
+      
+      for (int i = 0; i < removedMessages.length; i++) {
+	if (Pooka.isDebug())
+	  System.out.println("checking for existence of message " + removedMessages[i]);
+	mi = getMessageInfo(removedMessages[i]);
+	if (mi != null) {
+	  if (mi.getMessageProxy() != null)
+	    mi.getMessageProxy().close();
+	  
+	  if (Pooka.isDebug())
+	    System.out.println("message exists--removing");
+	  removedProxies.add(mi.getMessageProxy());
+	  messageToInfoTable.remove(removedMessages[i]);
+	}
+      }
+      if (getFolderDisplayUI() != null) {
+	if (removedProxies.size() > 0) 
+	  getFolderDisplayUI().removeRows(removedProxies);
+	resetMessageCounts();
+	fireMessageCountEvent(mce);
+      } else {
+	resetMessageCounts();
+	fireMessageCountEvent(mce);
+	if (removedProxies.size() > 0)
+	  getFolderTableModel().removeRows(removedProxies);
+      }
+    } else {
+      resetMessageCounts();
+      fireMessageCountEvent(mce);
+    }
+  }
+  
     /**
      * This updates the TableInfo on the changed messages.
      * 
