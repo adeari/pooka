@@ -429,8 +429,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     NewMessageCryptoDisplay nmcd = new NewMessageCryptoDisplay(getNewMessageProxy());
     cryptoDisplay = nmcd;
 
+    cryptoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    cryptoPanel.setSize(headerPanel.getSize());
+
+    ((JPanel)cryptoPanel).setBorder(BorderFactory.createEtchedBorder());
+
     cryptoPanel.add(nmcd);
     
+    /*
     NewMessageUI nmui = getNewMessageUI();
     if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
       try {
@@ -439,6 +445,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	System.err.println("error setting theme:  " + e);
       }
     }
+    */
 
     tabbedPane.add(Pooka.getProperty("MessageWindow.EncryptionTab", "Encryption"), cryptoPanel);
   }

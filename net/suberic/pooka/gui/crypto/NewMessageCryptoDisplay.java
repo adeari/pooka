@@ -29,9 +29,7 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
 
     proxy = nmp;
 
-    this.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-    Box contentBox = Box.createVerticalBox();
+    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
     Box cryptoBox = new Box(BoxLayout.Y_AXIS);
     Box cryptoLabelBox = new Box(BoxLayout.X_AXIS);
@@ -75,10 +73,9 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
     signatureButtonBox.add(Box.createHorizontalGlue());
     signatureBox.add(signatureButtonBox);
     
-    contentBox.add(cryptoBox);
-    contentBox.add(signatureBox);
-    
-    this.add(contentBox);
+    this.add(cryptoBox);
+    this.add(signatureBox);
+
   }
 
   /**
