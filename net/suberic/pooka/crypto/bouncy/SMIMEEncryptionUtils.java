@@ -3,11 +3,16 @@ package net.suberic.pooka.crypto.bouncy;
 import net.suberic.pooka.*;
 import net.suberic.pooka.crypto.*;
 
+import java.io.*;
+import java.security.*;
+import java.security.cert.*;
+import java.util.*;
+
 import javax.mail.*;
 import javax.mail.internet.*;
-import java.io.*;
 
 import org.bouncycastle.mail.smime.*;
+import org.bouncycastle.cms.*;
 
 /**
  * Utilities for encrypting/decrypting messages.
@@ -26,10 +31,27 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
       encryptedMessage.addHeaderLine((String) enum.nextElement());
     }
 
-    //encryptedMessage.setContent(msg.getContent(), msg.getContentType());
-    //encryptedMessage.saveChanges();
+    try {
+      SMIMEEnvelopedGenerator  gen = new SMIMEEnvelopedGenerator();
+      
+      BouncySMIMEEncryptionKey bKey = (BouncySMIMEEncryptionKey) key;
+      
+      gen.addKeyTransRecipient(bKey.getCertificate());
+      
+      MimeBodyPart mp = gen.generate(msg, SMIMEEnvelopedGenerator.RC2_CBC, "BC");
+      
+      encryptedMessage.setContent(mp, mp.getContentType());
+      encryptedMessage.saveChanges();
 
-    return null;
+      return encryptedMessage;
+    } catch (java.security.NoSuchAlgorithmException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (java.security.NoSuchProviderException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (org.bouncycastle.mail.smime.SMIMEException sme) {
+      throw new MessagingException(sme.getMessage());
+    }
+    
   }
 
   /**
@@ -62,7 +84,41 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    */
   public  javax.mail.internet.MimeMessage decryptMessage(Session s, javax.mail.internet.MimeMessage msg, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException {
-    return null;
+    try {
+      BouncySMIMEEncryptionKey bKey = (BouncySMIMEEncryptionKey) key;
+
+      RecipientId     recId = new RecipientId();
+      X509Certificate cert = bKey.getCertificate();
+
+      Key privateKey = bKey.getKeyPair().getPrivate();
+
+      recId.setSerialNumber(cert.getSerialNumber());
+      recId.setIssuer(cert.getIssuerX500Principal().getEncoded());
+
+      SMIMEEnveloped       m = new SMIMEEnveloped(msg);
+      RecipientInformationStore   recipients = m.getRecipientInfos();
+      RecipientInformation        recipient = recipients.get(recId);
+
+      MimeBodyPart mbp = SMIMEUtil.toMimeBodyPart(recipient.getContent(privateKey, "BC"));
+
+      MimeMessage decryptedMessage = new MimeMessage(s);
+      
+      java.util.Enumeration enum = msg.getAllHeaderLines();
+      while (enum.hasMoreElements()) {
+	decryptedMessage.addHeaderLine((String) enum.nextElement());
+      }
+
+      decryptedMessage.setContent(mbp, mbp.getContentType());
+      
+      return decryptedMessage;
+
+    } catch (CMSException cmse) {
+      throw new EncryptionException(cmse);
+    } catch (java.security.NoSuchProviderException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (org.bouncycastle.mail.smime.SMIMEException sme) {
+      throw new MessagingException(sme.getMessage());
+    }
   }
 
   /**
@@ -70,7 +126,32 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    */
   public  BodyPart decryptBodyPart(BodyPart part, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException {
-    return null;
+    try {
+      BouncySMIMEEncryptionKey bKey = (BouncySMIMEEncryptionKey) key;
+
+      RecipientId     recId = new RecipientId();
+      X509Certificate cert = bKey.getCertificate();
+
+      Key privateKey = bKey.getKeyPair().getPrivate();
+
+      recId.setSerialNumber(cert.getSerialNumber());
+      recId.setIssuer(cert.getIssuerX500Principal().getEncoded());
+
+      SMIMEEnveloped       m = new SMIMEEnveloped((MimeBodyPart) part);
+      RecipientInformationStore   recipients = m.getRecipientInfos();
+      RecipientInformation        recipient = recipients.get(recId);
+
+      MimeBodyPart mbp = SMIMEUtil.toMimeBodyPart(recipient.getContent(privateKey, "BC"));
+
+      return mbp;
+    } catch (CMSException cmse) {
+      throw new EncryptionException(cmse);
+    } catch (java.security.NoSuchProviderException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (org.bouncycastle.mail.smime.SMIMEException sme) {
+      throw new MessagingException(sme.getMessage());
+    }
+
   }
 
   /**
@@ -78,7 +159,10 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    */
   public  BodyPart decryptMultipart(Multipart mpart, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException {
-    return null;
+
+    MimeBodyPart mbp = new MimeBodyPart();
+    mbp.setContent(mpart);
+    return decryptBodyPart(mbp,key);
   }
 
   /**
@@ -149,7 +233,16 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    */
   public  boolean checkSignature(Part p, EncryptionKey key)
     throws EncryptionException, MessagingException, IOException {
-    return false;
+
+    try {
+      SMIMESigned s = new SMIMESigned(p);
+      
+      return checkSignature(s);
+    } catch (CMSException cmse) {
+      throw new EncryptionException(cmse);
+    } catch (org.bouncycastle.mail.smime.SMIMEException sme) {
+      throw new MessagingException(sme.getMessage());
+    }
   }
 
   /**
@@ -157,7 +250,22 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    */
   public  boolean checkSignature(MimeMessage m, EncryptionKey key)
     throws EncryptionException, MessagingException, IOException {
-    return false;
+    try {
+      if (m.isMimeType("multipart/signed")) {
+	SMIMESigned s = new SMIMESigned((MimeMultipart)m.getContent());
+	return checkSignature(s);
+      } else if (m.isMimeType("application/pkcs7-mime")) {
+	SMIMESigned s = new SMIMESigned(m);
+	return checkSignature(s);
+      } else {
+	throw new EncryptionException("incorrect mime type -- not SMIME Signed?");
+      }
+    } catch (CMSException cmse) {
+      throw new EncryptionException(cmse);
+    } catch (org.bouncycastle.mail.smime.SMIMEException sme) {
+      throw new MessagingException(sme.getMessage());
+    }
+
   }
 
   /**
@@ -165,15 +273,62 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    */
   public  boolean checkSignature(MimeMultipart m, EncryptionKey key)
     throws EncryptionException, MessagingException, IOException {
-    return false;
+    try {
+      SMIMESigned s = new SMIMESigned(m);
+      return checkSignature(s);
+    } catch (CMSException cmse) {
+      throw new EncryptionException(cmse);
+    }
   }
+
+  /**
+   * Checks a SMIMESigned to make sure that the signature matches.
+   */
+  private boolean checkSignature(SMIMESigned s) 
+    throws EncryptionException, MessagingException, IOException {
+    try {
+      boolean returnValue = true;
+      CertStore certs = s.getCertificatesAndCRLs("Collection", "BC");
+      
+      SignerInformationStore signers = s.getSignerInfos();
+      
+      Collection c = signers.getSigners();
+      Iterator it = c.iterator();
+      
+      while (returnValue == true && it.hasNext()) {
+	SignerInformation signer = (SignerInformation)it.next();
+	Collection certCollection = certs.getCertificates(signer.getSID());
+	
+	Iterator certIt = certCollection.iterator();
+	X509Certificate cert = (X509Certificate)certIt.next();
+	
+	if (! signer.verify(cert, "BC")) {
+	  returnValue = false;
+	}
+
+      }
+    
+      return returnValue;
+    } catch (java.security.NoSuchAlgorithmException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (java.security.NoSuchProviderException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (java.security.cert.CertificateException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (java.security.cert.CertStoreException nsae) {
+      throw new EncryptionException(nsae);
+    } catch (CMSException cmse) {
+      throw new EncryptionException(cmse);
+    } 
+  }
+
 
   /**
    * Creates an empty EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
   public  EncryptionKeyManager createKeyManager() {
-    return null;
+    return new BouncySMIMEEncryptionKeyManager();
   }
 
   /**
@@ -181,7 +336,9 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    * Encryption provider.
    */
   public  EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] passwd) throws java.io.IOException {
-    return null;
+    BouncySMIMEEncryptionKeyManager mgr = new BouncySMIMEEncryptionKeyManager();
+    mgr.load(inputStream, passwd);
+    return mgr;
   }
 
 }
