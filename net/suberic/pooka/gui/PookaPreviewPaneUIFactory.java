@@ -60,10 +60,23 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     /**
      * Creates a JPanel which will be used to show messages and folders.
      *
-     * This implementation creates an instance of MessagePanel.
+     * This implementation creates an instance of PreviewContentPanel.
      */
     public ContentPanel createContentPanel() {
 	contentPanel = new PreviewContentPanel();
+	contentPanel.setSize(1000,1000);
+	
+	return contentPanel;
+    }
+
+    /**
+     * Creates a JPanel which will be used to show messages and folders.
+     *
+     * This implementation creates an instance PreviewConentPanel from a
+     * given MessagePanel.
+     */
+    public ContentPanel createContentPanel(MessagePanel mp) {
+	contentPanel = new PreviewContentPanel(mp);
 	contentPanel.setSize(1000,1000);
 	
 	return contentPanel;

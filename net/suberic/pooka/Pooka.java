@@ -60,7 +60,7 @@ public class Pooka {
 		    if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
 			MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
 			uiFactory=new PookaPreviewPaneUIFactory();
-			ContentPanel cp = new PreviewContentPanel(mp);
+			ContentPanel cp = ((PookaPreviewPaneUIFactory)uiFactory).createContentPanel(mp);
 			Pooka.getMainPanel().setContentPanel(cp);
 		    } else {
 			PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
