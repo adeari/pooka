@@ -13,8 +13,14 @@ import net.suberic.pooka.*;
  */
 public class MessagePrinterDisplay implements PrintJobListener {
 
+  public static int RENDERING = 0;
+  public static int PAGINATING = 5;
+  public static int PRINTING = 10;
+
   MessagePrinter mPrinter = null;
   DocPrintJob mJob = null;
+
+  int mStatus = RENDERING;
 
   int mCurrentPage = 0;
 
@@ -52,14 +58,21 @@ public class MessagePrinterDisplay implements PrintJobListener {
    */
   public void updateDisplayPane() {
     StringBuffer displayMessage = new StringBuffer();
-    displayMessage.append("Printing:  ");
+    displayMessage.append(getStatusString() + ":  ");
     displayMessage.append(mCurrentDoc);
     displayMessage.append("\r\n\r\n");
-    displayMessage.append("Page ");
-    displayMessage.append(mCurrentPage);
-    displayMessage.append(" of ");
-    displayMessage.append(mPageCount);
-    displayMessage.append("\r\n");
+    if (getStatus() > RENDERING) {
+      displayMessage.append(Pooka.getProperty("PrinterDisplay.page", "Page"));
+      displayMessage.append("  ");
+      displayMessage.append(mCurrentPage);
+      if (getStatus() > PAGINATING) {
+	displayMessage.append(" ");
+	displayMessage.append(Pooka.getProperty("PrinterDisplay.of", "of"));
+	displayMessage.append(" ");
+	displayMessage.append(mPageCount);
+      }
+      displayMessage.append("\r\n");
+    }
 
     final String msg = displayMessage.toString();
     if (SwingUtilities.isEventDispatchThread()) {
@@ -91,6 +104,21 @@ public class MessagePrinterDisplay implements PrintJobListener {
     updateDisplayPane();
   }
   
+  /**
+   * Gets the current status.
+   */
+  public int getStatus() {
+    return mStatus;
+  }
+
+  /**
+   * Sets the current status.
+   */
+  public void setStatus(int pStatus) {
+    mStatus = pStatus;
+    updateDisplayPane();
+  }
+
   /**
    * Checks to see if this is an internal dialog or not.
    */
@@ -217,6 +245,19 @@ public class MessagePrinterDisplay implements PrintJobListener {
 	    }
 	  }
 	});
+    }
+  }
+
+  /**
+   * Gets the string representation of the current status.
+   */
+  public String getStatusString() {
+    if (mStatus == RENDERING) {
+      return Pooka.getProperty("PrintDisplay.status.rendering", "Rendering");
+    } else if (mStatus == PAGINATING) {
+      return Pooka.getProperty("PrintDisplay.status.paginating", "Paginating");
+    } else {
+      return Pooka.getProperty("PrintDisplay.status.printing", "Printing");
     }
   }
 

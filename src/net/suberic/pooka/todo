@@ -32,8 +32,15 @@
 	event thread, then switch over to the folder thread for the real
 	work.
 
-*) add proper icon for spam button. make spam button available, and give
-	it a keybinding.
+*) bug?? - chance when running in cached mode of having a difference in the
+	message count?  looks like the messages are correct in the count,
+	but incorrect in the display table.
+
+*) bug:  disconnected mode:  connect.  close folder.  try to re-open folder.
+
+*) make spam button available, and give it a keybinding.  also make it so
+	hitting an unconfigured spam button gives you a choice to configure
+	it.
 
 *) fix error display with exception so that you can see the stack trace.
 

@@ -1056,7 +1056,7 @@ public class MessageProxy {
 
     try {
       MessagePrinter mp = new MessagePrinter(getMessageInfo());
-      mp.createTextPane();
+      mp.loadText();
       
       // now switch over to the AWTEventThread.
       

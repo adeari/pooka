@@ -19,6 +19,9 @@ public class MessagePrinter implements Printable {
   int mPageCount = 0;
   double[] mPageBreaks = null;
   double mScale = 1;
+  
+  String mContentType = null;
+  StringBuffer mMessageText = null;
 
   /**
    * This creates a new MessagePrinter for the given MessageInfo.
@@ -108,6 +111,11 @@ public class MessagePrinter implements Printable {
     Rectangle allocation = new Rectangle(0, 0, jtp.getSize().width, jtp.getSize().height);
 
     while (pageExists) {
+      if (mDisplay != null) {
+	// update the display
+	mDisplay.setCurrentPage(breakList.size());
+      }
+
       pageStart = pageEnd;
       pageEnd = pageStart + scaledPageHeight;
 
@@ -173,6 +181,11 @@ public class MessagePrinter implements Printable {
    */
   public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) {
     try {
+      // load the text if we haven't already
+      if (mMessageText == null) {
+	loadText();
+      }
+
       // create the JTextPage if we haven't already.
       if (jtp == null) {
 	createTextPane();
@@ -180,7 +193,15 @@ public class MessagePrinter implements Printable {
 
       // paginate.
       if (mPageBreaks == null) {
+	if (mDisplay != null) {
+	  // update the display
+	  mDisplay.setStatus(MessagePrinterDisplay.PAGINATING);
+	}
 	doPageCalculation(pageFormat);
+	if (mDisplay != null) {
+	  // update the display
+	  mDisplay.setStatus(MessagePrinterDisplay.PRINTING);
+	}
       }
 
       // if we're done, we're done.
@@ -210,7 +231,7 @@ public class MessagePrinter implements Printable {
       //scale the page so the width fits...
       g2.scale(mScale, mScale);
 
-      jtp.print(g2); 
+      jtp.print(g2);
       
       return Printable.PAGE_EXISTS;
       
@@ -221,19 +242,14 @@ public class MessagePrinter implements Printable {
   }
 
   /**
-   * Creates the appropriate JTextPane.
+   * Loads the text and sets the content type.
    */
-  public void createTextPane() throws MessagingException {
-    jtp = new JTextPane();
-
-    java.awt.Insets newMargin = new java.awt.Insets(0,0,0,0);
-    jtp.setMargin(newMargin);
-
-    StringBuffer messageText = new StringBuffer();
+  public void loadText() throws MessagingException {
+    mMessageText = new StringBuffer();
 
     String content = null;
     
-    String contentType = "text/plain";
+    mContentType = "text/plain";
     
     boolean displayHtml = false;
     
@@ -259,7 +275,7 @@ public class MessagePrinter implements Printable {
       content = message.getRawText();
     } else {
       if (displayHtml) {
-	contentType = "text/html";
+	mContentType = "text/html";
 	
 	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
 	  content = message.getHtmlAndTextInlines(true, false);
@@ -286,7 +302,18 @@ public class MessagePrinter implements Printable {
     }
     
     if (content != null)
-      messageText.append(content);
+      mMessageText.append(content);
+
+  }
+
+  /**
+   * Creates the appropriate JTextPane.
+   */
+  public void createTextPane() {
+    jtp = new JTextPane();
+
+    java.awt.Insets newMargin = new java.awt.Insets(0,0,0,0);
+    jtp.setMargin(newMargin);
 
     // pull in the correct font.
     String fontName = Pooka.getProperty("MessageWindow.editorPane.printing.font.name", "monospaced");
@@ -296,9 +323,11 @@ public class MessagePrinter implements Printable {
     
     if (f != null)
       jtp.setFont(f);
-    
-    jtp.setContentType(contentType);
-    jtp.setText(messageText.toString());
+
+    jtp.validate();
+
+    jtp.setContentType(mContentType);
+    jtp.setText(mMessageText.toString());
 
     jtp.setEditable(false);
 
