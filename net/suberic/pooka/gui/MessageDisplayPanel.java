@@ -8,6 +8,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.text.TextAction;
 import java.util.*;
+import java.util.regex.*;
 import javax.swing.text.JTextComponent;
 import javax.swing.event.*;
 import java.io.File;
@@ -54,6 +55,25 @@ public abstract class MessageDisplayPanel extends JPanel {
   
   public abstract void configureMessageDisplay() throws MessagingException;
   
+  /**
+   * This finds the given regular expression in the displayed page.
+   */
+  public int findRegexp(String regString) {
+    Pattern p = Pattern.compile(regString);
+    javax.swing.text.Document currentDoc = editorPane.getDocument();
+    try {
+      Matcher m = p.matcher(currentDoc.getText(0, currentDoc.getLength()));
+      if (m.find()) {
+	return m.start();
+      }
+    } catch (Exception e) {
+
+    }
+
+    return -1;
+
+  }
+
   /**
    * This calculates the default size for the EditorPane.
    * 
