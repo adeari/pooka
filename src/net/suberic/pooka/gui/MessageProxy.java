@@ -934,6 +934,7 @@ public class MessageProxy {
    * the message from the mailbox.
    */
   public void deleteMessage(boolean autoExpunge) {
+    // should always be done on FolderThread, not on UI thread.
     try {
       getMessageInfo().deleteMessage(autoExpunge);
       this.close();
@@ -1345,7 +1346,7 @@ public class MessageProxy {
 	new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
 	new ActionWrapper(new ForwardQuotedAction(), folderThread),
 	new BounceAction(),
-	new ActionWrapper(new DeleteAction(), folderThread),
+	new DeleteAction(), 
 	new ActionWrapper(new PrintAction(), folderThread),
 	new ActionWrapper(new SaveMessageAction(), folderThread),
 	new ActionWrapper(new CacheMessageAction(), folderThread),
@@ -1642,15 +1643,41 @@ public class MessageProxy {
     }
     
     public void actionPerformed(ActionEvent e) {
+      // should happen on UI thread.
+      ActionThread folderThread = messageInfo.getFolderInfo().getFolderThread();
+      
       if (getMessageUI() != null)
 	getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-	fw.setBusy(true);;
-      deleteMessage();
+	fw.setBusy(true);
+
+      if (fw != null && Pooka.getProperty("Pooka.fastDelete", "false").equalsIgnoreCase("true")) {
+	Vector v = new Vector();
+	v.add(MessageProxy.this);
+	FolderDisplayPanel fdp = null;
+	if (fw instanceof FolderInternalFrame) {
+	  fdp = ((FolderInternalFrame) fw).getFolderDisplay();
+	} else if (fw instanceof PreviewFolderPanel) {
+	  fdp = ((PreviewFolderPanel) fw).getFolderDisplay();
+	}
+	if (fdp != null)
+	  fdp.moveSelectionOnRemoval(v);
+      }
+
       
-      if (fw != null)
-	fw.setBusy(false);
+      folderThread.addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent ae) {
+	    try {
+	      deleteMessage();
+	    } finally {
+	    
+	      FolderDisplayUI fw = getFolderDisplayUI();
+	      if (fw != null)
+		fw.setBusy(false);
+	    }
+	  }
+	}, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
     }
   }
   

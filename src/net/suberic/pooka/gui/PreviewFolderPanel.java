@@ -287,7 +287,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
       };
-
+    
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
     else 

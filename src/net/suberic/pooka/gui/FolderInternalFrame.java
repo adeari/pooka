@@ -403,39 +403,39 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * if busy, or Cursor.DEFAULT_CURSOR if not busy.
      */
     public void setBusy(boolean newBusy) {
-	final boolean newValue = newBusy;
-
-	Runnable runMe = new Runnable() {
-		public void run() {
-		    if (newValue)
-			FolderInternalFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-		    else
-			FolderInternalFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		}
-	    };
-
-	if (SwingUtilities.isEventDispatchThread())
-	    runMe.run();
-	else
-	    SwingUtilities.invokeLater(runMe);
+      final boolean newValue = newBusy;
+      
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    if (newValue)
+	      FolderInternalFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	    else
+	      FolderInternalFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	  }
+	};
+      
+      if (SwingUtilities.isEventDispatchThread())
+	runMe.run();
+      else
+	SwingUtilities.invokeLater(runMe);
     }
-
-    /**
-     * Displays a status message for the folder.
-     */
-    public void updateStatus(String message) {
-	
-    }
-   
-    /**
-     * Displays a status message for the folder.
-     */
-    public void updateStatus(Event e, String message) {
-	if (message != null)
-	    updateStatus(message);
-
-    }
-
+  
+  /**
+   * Displays a status message for the folder.
+   */
+  public void updateStatus(String message) {
+    
+  }
+  
+  /**
+   * Displays a status message for the folder.
+   */
+  public void updateStatus(Event e, String message) {
+    if (message != null)
+      updateStatus(message);
+    
+  }
+  
   // Accessor methods.
   
   public MessagePanel getMessagePanel() {
@@ -454,22 +454,22 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     return folderDisplay;
   }
   
-    public void setFolderInfo(FolderInfo newValue) {
-	folderInfo=newValue;
-    }
-
-    public FolderInfo getFolderInfo() {
-	return folderInfo;
-    }
-
-    public FolderStatusBar getFolderStatusBar() {
-	return folderStatusBar;
-    }
-
-    public void setFolderStatusBar(FolderStatusBar newValue) {
-	folderStatusBar = newValue;
-    }
-
+  public void setFolderInfo(FolderInfo newValue) {
+    folderInfo=newValue;
+  }
+  
+  public FolderInfo getFolderInfo() {
+    return folderInfo;
+  }
+  
+  public FolderStatusBar getFolderStatusBar() {
+    return folderStatusBar;
+  }
+  
+  public void setFolderStatusBar(FolderStatusBar newValue) {
+    folderStatusBar = newValue;
+  }
+  
   /**
    * gets the actions handled both by the FolderInternalFrame and the 
    * selected Message(s).

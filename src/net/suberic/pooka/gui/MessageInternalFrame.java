@@ -299,10 +299,21 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * if busy, or Cursor.DEFAULT_CURSOR if not busy.
    */
   public void setBusy(boolean newValue) {
-    if (newValue)
-      this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    else
-      this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+    final boolean fNewValue = newValue;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  if (fNewValue)
+	    setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	  else
+	    setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+      };
+    
+    if (SwingUtilities.isEventDispatchThread()) {
+      runMe.run();
+    } else {
+      SwingUtilities.invokeLater(runMe);
+    }
   }
 
   /**

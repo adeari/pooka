@@ -233,7 +233,7 @@ public class FolderDisplayPanel extends JPanel {
      * Should be called on the AWTEventThread while the FolderThread
      * is locked.
      */
-    private void moveSelectionOnRemoval(Vector removedProxies) {
+    void moveSelectionOnRemoval(Vector removedProxies) {
       MessageProxy selectedProxy = getSelectedMessage();
       if (selectedProxy != null)  {
 	boolean selectNextMessage = false;
