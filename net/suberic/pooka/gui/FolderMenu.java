@@ -2,40 +2,58 @@ package net.suberic.pooka.gui;
 
 import javax.swing.*;
 import java.util.*;
-import javax.mail.Folder;
 import net.suberic.pooka.Pooka;
+import net.suberic.pooka.FolderInfo;
+import net.suberic.util.*;
 
-public class FolderMenu extends net.suberic.util.DynamicMenu {
+public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
 
     Vector folderList;
     FolderPanel fPanel;
-    
-    public FolderMenu(String key, FolderPanel newFPanel) {
-	super(Pooka.getProperty(key + ".Label", key));
 
-	setActionCommand(Pooka.getProperty(key + ".Action", key));
-
-	fPanel = newFPanel;
-	createMenus();
+    /**
+     * This creates a new FolderMenu.
+     */
+    public FolderMenu() {
     }
 
-    public void createMenus() {
-	/*	folderList = fPanel.getFolderList();
+    public void configureComponent(String key, VariableBundle vars) {
+	this.setActionCommand(vars.getProperty(key + ".Action", "message-move"));
+
+	fPanel = Pooka.getMainPanel().getFolderPanel();
+
+	MailTreeNode root =  (MailTreeNode)fPanel.getFolderTree().getModel().getRoot();
+	folderList = getAllChildren(root);
 	
-	Folder currentFolder;
-	
+	FolderNode currentFolder;
+
 	for (int i = 0; i < folderList.size(); i++) {
-	    currentFolder=(Folder)folderList.elementAt(i);
-	    JMenuItem mi = new JMenuItem(currentFolder.getName());
+	    currentFolder=(FolderNode)folderList.elementAt(i);
+	    JMenuItem mi = new JMenuItem(currentFolder.getFolderID());
 	    mi.setActionCommand(getActionCommand());
 	    
 	    this.add(mi);
-	    }*/
+	    }
     }
     
-    public void setActiveMenus(JComponent mainPanel) {
-	MainPanel mp = (MainPanel)mainPanel;
+    /**
+     * This recursively goes through the tree of MailTreeNodes and returns
+     * only the leaf values.
+     */
+    public Vector getAllChildren(MailTreeNode mtn) {
+	Vector current = new Vector();
+	if (mtn.isLeaf()) {
+	    current.addElement(mtn);
+	} else {
+	    Enumeration children = mtn.children();
+	    while (children.hasMoreElements()) {
+		current.addAll(getAllChildren((MailTreeNode)children.nextElement()));
+	    }
+	}
+	return current;
+    }
 
+    public void setActiveMenuItems() {
 	for (int j = 0; j < getItemCount(); j++) {
 	    JMenuItem mi = getItem(j);
 	    Action a = null;
@@ -60,8 +78,8 @@ public class FolderMenu extends net.suberic.util.DynamicMenu {
 	}
     }
 
-    protected Folder getTargetFolder(int folderNumber) {
-	return (Folder)folderList.elementAt(folderNumber);
+    protected FolderInfo getTargetFolder(int folderNumber) {
+	return (FolderInfo)((FolderNode)folderList.elementAt(folderNumber)).getFolderInfo();
     }
 }
 
