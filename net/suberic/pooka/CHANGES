@@ -1,3 +1,6 @@
+020304 release
+--------------
+
 fixed a bug in the VariableBundle which made it so backslashes weren't
 handled properly.  this caused file selection under windows to fail 
 horribly.
