@@ -27,9 +27,13 @@ public class AttachmentPane extends JPanel {
      */
     class AttachmentTableModel extends AbstractTableModel {
 	MessageProxy msg;
+	Vector columnNames;
 
 	public AttachmentTableModel(MessageProxy newMsg) {
 	    msg=newMsg;
+	    columnNames = new Vector();
+	    columnNames.add(Pooka.getProperty("AttachmentPane.header.name", "Filename"));
+	    columnNames.add(Pooka.getProperty("AttachmentPane.header.type", "Type"));
 	}
 
 	public int getRowCount() {
@@ -86,6 +90,12 @@ public class AttachmentPane extends JPanel {
 		return null;
 	}
 
+	public String getColumnName(int columnIndex) {
+	    if (columnIndex >= 0 && columnIndex < columnNames.size())
+		return (String)columnNames.elementAt(columnIndex);
+	    else
+		return null;
+	}
     }
 
     JTable table;
@@ -187,6 +197,8 @@ public class AttachmentPane extends JPanel {
 			    //
 			}
 		    }
+		} else {
+		    openWith();
 		}
 	    }
 	}
@@ -197,6 +209,9 @@ public class AttachmentPane extends JPanel {
      * Not implemented yet. (akp)
      */
     public void openWith() {
+	if (Pooka.isDebug())
+	    System.out.println("calling AttachmentPane.openWith()");
+	MimeBodyPart mbp = getSelectedPart();
     }
 
     /**
