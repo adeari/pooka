@@ -1,7 +1,5 @@
-
-*) move source from pooka/net to pooka/src/net.
-	*) make a version which builds and runs pooka from the local
-	libraries.
+*) make a version which builds and runs pooka from the local
+   libraries.
 
 *) update website
 
@@ -10,9 +8,10 @@
 -----
 
 *) add a way to put in custom headers into a new message.
-	started.  make it a table.
+	added.  
+	make button look better.
+	make it take the last header.
 	
-
 *) printing
 	timing--jtextpane creation should happen after dialog
 		should also show status - loading message, paginating,

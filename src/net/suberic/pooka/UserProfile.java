@@ -4,6 +4,7 @@ import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.InternetHeaders;
 
 public class UserProfile extends Object implements ValueChangeListener {
   Properties mailProperties;
@@ -128,6 +129,9 @@ public class UserProfile extends Object implements ValueChangeListener {
     profileList.removeElement(this);
   }
   
+  /**
+   * Populates the given message with the headers for this UserProfile.
+   */
   public void populateMessage(MimeMessage mMsg) throws MessagingException {
     // I hate this.  I hate having to grab half of these headers on my
     // own.
@@ -162,6 +166,51 @@ public class UserProfile extends Object implements ValueChangeListener {
 	    mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr, replyPersonal)});
 	  else
 	    mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr)});
+	
+      } catch (java.io.UnsupportedEncodingException uee) {
+	throw new MessagingException("", uee);
+      }
+    }
+  }
+  
+  /**
+   * Populates the given InternetHeaders object with the headers for this 
+   * UserProfile.
+   */
+  public void populateHeaders(InternetHeaders pHeaders) throws MessagingException {
+    // I hate this.  I hate having to grab half of these headers on my
+    // own.
+    
+    Enumeration keys = mailProperties.propertyNames();
+    String fromAddr = null, fromPersonal = null, replyAddr = null, replyPersonal = null;
+    
+    while (keys.hasMoreElements()) {
+      String key = (String)(keys.nextElement());
+      
+      if (key.equals("FromPersonal")) {
+	fromPersonal = mailProperties.getProperty(key);
+      } else if (key.equals("From")) {
+	fromAddr = mailProperties.getProperty(key);
+      } else if (key.equals("ReplyTo")) {
+	replyAddr = mailProperties.getProperty(key);
+      } else if (key.equals("ReplyToPersonal")) {
+	replyPersonal = mailProperties.getProperty(key);
+      } else {
+	pHeaders.setHeader(key, mailProperties.getProperty(key));
+      }
+      
+      try {
+	if (fromAddr != null) 
+	  if (fromPersonal != null && !(fromPersonal.equals(""))) 
+	    pHeaders.setHeader("From", new InternetAddress(fromAddr, fromPersonal).toString());
+	  else
+	    pHeaders.setHeader("From", new InternetAddress(fromAddr).toString());
+	
+	if (replyAddr != null && !(replyAddr.equals("")))
+	  if (replyPersonal != null)
+	    pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
+	  else
+	    pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr).toString());
 	
       } catch (java.io.UnsupportedEncodingException uee) {
 	throw new MessagingException("", uee);

@@ -220,7 +220,21 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     JLabel userProfileLabel = new JLabel(Pooka.getProperty("UserProfile.label","User:"), SwingConstants.RIGHT);
     userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
     JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
-    customHeaderButton = new JToggleButton();
+
+    java.net.URL customButtonURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.button", "/org/javalobby/icons/20x20png/Hammer.png"));
+
+    if (customButtonURL != null) {
+
+      ImageIcon headerIcon = new ImageIcon(customButtonURL);
+      java.awt.Image headerImage = headerIcon.getImage();
+      headerImage = headerImage.getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
+      headerIcon.setImage(headerImage);
+      customHeaderButton = new JToggleButton(headerIcon);
+      customHeaderButton.setMargin(new java.awt.Insets(1,1,1,1));
+      customHeaderButton.setSize(15,15);
+    } else {
+      customHeaderButton = new JToggleButton();
+    }
 
     customHeaderButton.addChangeListener(new ChangeListener() {
 
@@ -301,7 +315,47 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     
     return inputPanel;
   }
-  
+
+  /**
+   * Extends a DefaultTableModel to make it so certain columns are not
+   * editable.
+   */
+  class CustomHeaderTableModel extends javax.swing.table.DefaultTableModel {
+
+    // Constructor
+    public CustomHeaderTableModel(Vector headers, int rows) {
+      super(headers,rows);
+    }
+
+    // the number of rows that have uneditable headers in it.
+    int mUneditableRows = 0;
+
+    /**
+     * Sets the number of uneditable header rows we have.
+     */
+    public void setUneditableRows(int pRows) {
+      mUneditableRows = pRows;
+    }
+
+    /**
+     * Returns the number of uneditable header rows we have.
+     */
+    public int getUneditableRows() {
+      return mUneditableRows;
+    }
+
+    /**
+     * Returns whether or not this cell it editable.
+     */
+    public boolean isCellEditable(int row, int column) {
+      if (column == 0 && row < mUneditableRows) {
+	return false;
+      } else {
+	return true;
+      }
+    }
+  }
+
   /**
    * This creates a new JTextPane for the main text part of the new 
    * message.  It will also include the current text of the message.
@@ -376,6 +430,15 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	returnValue.setHeader(header, value);
       }
     }
+
+    if (customHeaderButton.isSelected()) {
+      populateCustomHeaders(returnValue);
+    } else {
+      UserProfile p = getSelectedProfile();
+      p.populateHeaders(returnValue);
+      returnValue.setHeader(Pooka.getProperty("Pooka.userProfileProperty", "X-Pooka-UserProfile"), p.getName());
+    }
+
     return returnValue;
   }
   
@@ -479,7 +542,13 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
     Box customInputPanel = new Box(BoxLayout.Y_AXIS);
 
-    customHeaderTable = new JTable(4, 2);
+    Vector headerNames = new Vector();
+    headerNames.add(Pooka.getProperty("NewMessage.customHeaders.header", "Header"));
+    headerNames.add(Pooka.getProperty("NewMessage.customHeaders.value", "Value"));
+
+    CustomHeaderTableModel dtm = new CustomHeaderTableModel(headerNames, 4);
+
+    customHeaderTable = new JTable(dtm);
 
     // get the preconfigured properties
 
@@ -489,7 +558,10 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     Enumeration keys = mailProperties.propertyNames();
 
     String fromAddr = null, fromPersonal = null, replyAddr = null, replyPersonal = null;
-    
+
+    // we want to put From and Reply-To first.
+    java.util.List otherProps = new ArrayList();
+
     while (keys.hasMoreElements()) {
       String key = (String)(keys.nextElement());
       
@@ -502,57 +574,65 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       } else if (key.equals("ReplyToPersonal")) {
 	replyPersonal = mailProperties.getProperty(key);
       } else {
-	headers.setProperty(key, mailProperties.getProperty(key));
+	otherProps.add(key);
+      }
+    }
+
+    try {
+      if (fromAddr != null) {
+	if (fromPersonal != null && !(fromPersonal.equals(""))) 
+	  headers.setProperty("From", new InternetAddress(fromAddr, fromPersonal).toString());
+	else
+	  headers.setProperty("From", new InternetAddress(fromAddr).toString());
+      } else {
+	headers.setProperty("From", "");
       }
       
-      try {
-	if (fromAddr != null) {
-	  if (fromPersonal != null && !(fromPersonal.equals(""))) 
-	    headers.setProperty("From", new InternetAddress(fromAddr, fromPersonal).toString());
-	  else
-	    headers.setProperty("From", new InternetAddress(fromAddr).toString());
-	} else {
-	  headers.setProperty("From", "");
-	}
-
-	if (replyAddr != null && !(replyAddr.equals(""))) {
-	  if (replyPersonal != null)
-	    headers.setProperty("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
-	  else
-	    headers.setProperty("Reply-To", new InternetAddress(replyAddr).toString());
-	} else {
-	  headers.setProperty("Reply-To", "");
-	}
-      } catch (java.io.UnsupportedEncodingException uee) {
-	//don't bother
-      } catch (javax.mail.MessagingException me) {
-	//don't bother
+      if (replyAddr != null && !(replyAddr.equals(""))) {
+	if (replyPersonal != null)
+	  headers.setProperty("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
+	else
+	  headers.setProperty("Reply-To", new InternetAddress(replyAddr).toString());
+      } else {
+	headers.setProperty("Reply-To", "");
       }
+    } catch (java.io.UnsupportedEncodingException uee) {
+      //don't bother
+    } catch (javax.mail.MessagingException me) {
+      //don't bother
     }
 
     String currentHeader = null;
     String currentValue = null;
     JLabel hdrLabel = null;
 
-    Enumeration headerKeys = headers.propertyNames();
-
-    int row = 0;
     javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) customHeaderTable.getModel();
 
-    while(headerKeys.hasMoreElements()) {
-      currentHeader=(String) headerKeys.nextElement();
+    model.setValueAt("From", 0, 0);
+    model.setValueAt(headers.getProperty("From", ""), 0, 1);
+
+    model.setValueAt("Reply-To", 1, 0);
+    model.setValueAt(headers.getProperty("Reply-To", ""), 1, 1);
+
+    int row = 2;
+    Iterator it = otherProps.iterator();
+    while(it.hasNext()) {
+      currentHeader=(String) it.next();
       currentValue = (String) headers.get(currentHeader);
       if (currentValue == null)
 	currentValue = "";
-
+      
       if (model.getRowCount() <= row) {
 	model.addRow(new Vector());
       }
+
       model.setValueAt(currentHeader, row, 0);
       model.setValueAt(currentValue, row, 1);
 
       row++;
     }
+
+    dtm.setUneditableRows(2 + otherProps.size());
 
     customInputPanel.add(new JScrollPane(customHeaderTable));
 
@@ -561,7 +641,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-    java.net.URL headerURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.image", "/org/javalobby/icons/20x20png/Plus.png"));
+    java.net.URL headerURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.add.button", "/org/javalobby/icons/20x20png/Plus.png"));
 
     JButton headerButton = null;
 
@@ -588,6 +668,37 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     returnValue.add(buttonPanel, BorderLayout.SOUTH);
     return returnValue;
 
+  }
+
+  /**
+   * Populates an InternetHeaders object from the CustomHeaderPane.
+   */
+  public void populateCustomHeaders(InternetHeaders pHeaders) {
+    if (customHeaderTable.isEditing()) {
+      Component editingComponent = customHeaderTable.getEditorComponent();
+      if (editingComponent != null) {
+	javax.swing.event.ChangeEvent event = new javax.swing.event.ChangeEvent(editingComponent);
+	customHeaderTable.editingStopped(event);
+      }
+    }
+    int rowCount = customHeaderTable.getRowCount();
+    System.err.println("doing " + rowCount + " headers.");
+    for (int i = 0; i < rowCount; i++) {
+      String header = null;
+      String value = null;
+      try {
+	header = (String) customHeaderTable.getValueAt(i, 0);
+	value = (String) customHeaderTable.getValueAt(i, 1);
+      } catch (ClassCastException cce) {
+	// ignore the header.
+      }
+
+      System.err.println("row " + i + ":  got " + header + ", " + value);
+      if (header != null && value != null && header.length() > 0 && value.length() > 0) {
+	pHeaders.setHeader(header, value);
+	System.err.println("row " + i + ":  set " + header + ": " + value);
+      }
+    }
   }
   
   /**
@@ -972,7 +1083,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       customHeaderButton.setSelected(true);
     }
   }
-  
+
 }
 
 

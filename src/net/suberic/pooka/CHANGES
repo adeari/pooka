@@ -1,3 +1,5 @@
+added a button for using custom headers on an outgoing mail message.
+
 fixed editor display of boolean properties in Folder editor.
 
 worked around a sun bug in jdk1.4 which would result in the 

@@ -978,6 +978,9 @@ AddressBook.button.image=/org/javalobby/icons/20x20png/Book.png
 AddressBook.selectionPanel.addImage=/org/javalobby/icons/20x20png/Right.png
 AddressBook.selectionPanel.removeImage=/org/javalobby/icons/20x20png/Left.png
 
+NewMessage.customHeader.button=/org/javalobby/icons/20x20png/Hammer.png
+NewMessage.customHeader.add.button=/org/javalobby/icons/20x20png/Plus.png
+
 NewAccountPooka.firstPanel=userName:fullName:password:serverName:protocol:smtpServer
 NewAccountPooka.firstPanel.propertyType=Composite
 NewAccountPooka.firstPanel.propertyScoped=true
