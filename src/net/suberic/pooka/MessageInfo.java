@@ -391,15 +391,47 @@ public class MessageInfo {
     }
     
   }
+  
+  /**
+   * A convenience method which sets autoExpunge by the value of 
+   * Pooka.autoExpunge, and then calls moveMessage(targetFolder, autoExpunge)
+   * with that value.
+   */
+  public void moveMessage(FolderInfo targetFolder) throws MessagingException {
+    moveMessage(targetFolder, Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
+  }
+  
+  /**
+   * Bounces this message to another user.
+   */
+  public void bounceMessage(String pAddress) throws javax.mail.MessagingException {
+    Address[] recipientList = javax.mail.internet.InternetAddress.parse(pAddress, false);
 
-    /**
-     * A convenience method which sets autoExpunge by the value of 
-     * Pooka.autoExpunge, and then calls moveMessage(targetFolder, autoExpunge)
-     * with that value.
-     */
-    public void moveMessage(FolderInfo targetFolder) throws MessagingException {
-	moveMessage(targetFolder, Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
+    MimeMessage mm = (MimeMessage)getMessage();
+    MimeMessage mmClone = new MimeMessage(mm);
+    
+    NewMessageInfo nmi = new NewMessageInfo(mmClone);
+    java.util.HashMap messageMap = new java.util.HashMap();
+    messageMap.put(mmClone, recipientList);
+
+    nmi.setSendMessageMap(messageMap);
+
+    final NewMessageInfo final_nmi = nmi;
+
+    UserProfile p = getDefaultProfile();
+    if (p != null && p.getMailServer() != null) {
+      final OutgoingMailServer mailServer = p.getMailServer();
+      mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent ae) {
+	    try {
+	      mailServer.sendMessage(final_nmi);
+	    } catch (MessagingException me) {
+	      getMessageProxy().showError(Pooka.getProperty("error.MessageUI.bounceFailed", "Failed to bounce Message."), me);
+	    }
+	  }
+	}, new java.awt.event.ActionEvent(this, 0, "message-send"));
     }
+  }
 
   /**
    * Deletes the Message from the current Folder.  If a Trash folder is

@@ -1,7 +1,6 @@
 package net.suberic.pooka;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -277,12 +276,22 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	      */
 	    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.sending", "Sending message over SMTP."));
 
-	    List sendMessageList = nmi.getSendMessageList();
-	    for (int i = 0; i < sendMessageList.size(); i++) {
-	      Message m = (Message) sendMessageList.get(i);
-	      sendTransport.sendMessage(m, m.getAllRecipients());
+	    Map sendMessageMap = nmi.getSendMessageMap();
+	    if (sendMessageMap != null && sendMessageMap.keySet().size() > 0) {
+	      Set keySet = sendMessageMap.keySet();
+	      Iterator iter = keySet.iterator();
+	      while (iter.hasNext()) {
+		Message m = (Message) iter.next();
+		Address[] recipients = (Address[]) sendMessageMap.get(m);
+		if (recipients == null)
+		  recipients = m.getAllRecipients();
+		
+		sendTransport.sendMessage(m, recipients);
+	      }
+	    } else {
+	      sendTransport.sendMessage(nmi.getMessage(), nmi.getMessage().getAllRecipients());
 	    }
-
+	    
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
 	  } catch (MessagingException me) {
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(me);	  

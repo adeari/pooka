@@ -1,3 +1,6 @@
+modified the sendMessageList of the NewMessageInfo to use a sendMessageMap
+instead.
+
 added a configurable spam button.
 
 changed the default action of the FolderSelectorPane to be only subscribed

@@ -34,6 +34,9 @@
 
 *) bug:  on startup, FolderSelectorPane is empty; have to unselect and 
 	reselect to get info.
+
+*) bug:  check to see if moving a message marks it as read.
+
 ----
 
 *) fix NPE if try to send a new message without configuring client.

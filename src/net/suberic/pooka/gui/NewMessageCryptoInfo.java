@@ -165,12 +165,12 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   /**
    * Returns the encrypted and/or signed message(s), as appropriate.
    */
-  public List createEncryptedMessages(MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
-    List returnValue = new LinkedList();
+  public Map createEncryptedMessages(MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+    Map returnValue = new HashMap();
     
     List recipientInfoList = getCryptoRecipientInfos();
     for (int i = 0; i < recipientInfoList.size(); i++) {
-      returnValue.add(((CryptoRecipientInfo) recipientInfoList.get(i)).handleMessage(mm));
+      returnValue.put(((CryptoRecipientInfo) recipientInfoList.get(i)).handleMessage(mm),((CryptoRecipientInfo) recipientInfoList.get(i)).getAllRecipients() );
     }
 
     return returnValue;
@@ -272,6 +272,33 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     }
 
     /**
+     * The recipients for this crypto configuration.
+     */
+    public Address[] getAllRecipients() {
+      Address[] returnValue = new Address[0];
+      returnValue = appendToArray(returnValue, toList);
+      returnValue = appendToArray(returnValue, ccList);
+      returnValue = appendToArray(returnValue, bccList);
+
+      return returnValue;
+    }
+
+    /**
+     * Appends to an array of Addresses.
+     */
+    private Address[] appendToArray(Address[] original, Address[] toAdd) {
+      if (toAdd != null && toAdd.length > 0) {
+	int oldSize = original.length;
+	Address[] newReturnValue = new Address[original.length + toAdd.length];
+	System.arraycopy(original, 0, newReturnValue, 0, original.length);
+	System.arraycopy(toAdd, 0, newReturnValue, original.length, toAdd.length);
+	return newReturnValue;
+      } else {
+	return original;
+      }
+     }
+
+    /**
      * Sets the recipients for the particular type.
      */
     public void setRecipients(Address[] pRecipients, Message.RecipientType type) {
@@ -319,9 +346,11 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
       MimeMessage returnValue = new MimeMessage(mm);
 
+      /*
       returnValue.setRecipients(Message.RecipientType.TO, getRecipients(Message.RecipientType.TO));
       returnValue.setRecipients(Message.RecipientType.CC, getRecipients(Message.RecipientType.CC));
       returnValue.setRecipients(Message.RecipientType.BCC, getRecipients(Message.RecipientType.BCC));
+      */
 
       Key sigKey = getSignatureKey();
       Key cryptoKey = getEncryptionKey();

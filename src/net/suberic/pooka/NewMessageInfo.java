@@ -1,7 +1,6 @@
 package net.suberic.pooka;
 import javax.mail.*;
-import java.util.List;
-import java.util.Enumeration;
+import java.util.*;
 import java.io.*;
 import javax.activation.*;
 import javax.mail.internet.*;
@@ -17,7 +16,7 @@ import java.security.Key;
  */
 public class NewMessageInfo extends MessageInfo {
 
-  List mSendMessageList = null;
+  Map mSendMessageMap = null;
 
   /**
    * Creates a NewMessageInfo to wrap the given Message.
@@ -145,14 +144,14 @@ public class NewMessageInfo extends MessageInfo {
       
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.encryptMessage", "Handing encryption..."));
       
-      mSendMessageList = cryptoInfo.createEncryptedMessages((MimeMessage) getMessage());
+      mSendMessageMap = cryptoInfo.createEncryptedMessages((MimeMessage) getMessage());
       
-      if (mSendMessageList.size() < 1) {
-	throw new MessagingException("failed to send message--no encrypted messages created.");
+      if (mSendMessageMap.keySet().size() < 1) {
+	throw new MessagingException("failed to send message--no encrypted or unencrypted messages created.");
       }
       
-      if (mSendMessageList.size() == 1) {
-	message = (Message) mSendMessageList.get(0);
+      if (mSendMessageMap.keySet().size() == 1) {
+	message = (Message) mSendMessageMap.keySet().iterator().next();
       }
       
       boolean sent = false;
@@ -339,10 +338,23 @@ public class NewMessageInfo extends MessageInfo {
   }
 
   /**
-   * The full list of Messages to be sent.
+   * The full map of Messages to be sent, which in turn map to the
+   * recipients they will go to.  If there is no Address array as the
+   * value in the map, then the message goes out to all recipients in 
+   * the headers.
    */
-  public List getSendMessageList() {
-    return mSendMessageList;
+  public Map getSendMessageMap() {
+    return mSendMessageMap;
+  }
+
+  /**
+   * The full map of Messages to be sent, which in turn map to the
+   * recipients they will go to.  If there is no Address array as the
+   * value in the map, then the message goes out to all recipients in 
+   * the headers.
+   */
+  void setSendMessageMap(Map pSendMessageMap) {
+    mSendMessageMap = pSendMessageMap;
   }
 
 }
