@@ -68,77 +68,6 @@ public class MailUtilities {
 
     handlePart((MimeMessage)m, bundle);
 
-    /*
-    String encryptionType = EncryptionManager.checkEncryptionType((MimeMessage)m);
-    EncryptionUtils utils = null;
-    if (encryptionType != null) {
-      try {
-	utils = EncryptionManager.getEncryptionUtils(encryptionType);
-      } catch (java.security.NoSuchProviderException nspe) {
-      }
-    }
-
-    if (utils != null) {
-      int encryptionStatus = utils.getEncryptionStatus((MimeMessage) m);
-      if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
-	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment((MimeMessage)m);
-	
-	bundle.addAttachment(newAttach);
-      } else if (encryptionStatus == EncryptionUtils.SIGNED) {
-	// in the case of signed attachments, we should get the wrapped body.
-
-	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment((MimeMessage)m);
-	MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
-
-	if (signedMbp != null) {
-	  String signedContentType = signedMbp.getContentType().toLowerCase();
-	  if (signedContentType.startsWith("multipart")) {
-	    bundle.addAll(parseAttachments((Multipart)signedMbp.getContent()));
-	  } else if (signedContentType.startsWith("message")) {
-	    bundle.addAttachment(new Attachment(signedMbp));
-	    Object msgContent;
-	    msgContent = signedMbp.getContent();
-	    
-	    if (msgContent instanceof Message)
-	      bundle.addAll(parseAttachments((Message)msgContent));
-	    else if (msgContent instanceof java.io.InputStream)
-	      bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
-	    else
-	      System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
-	    
-	  } else {
-	    bundle.addAttachment(new Attachment(signedMbp));
-	  }
-	}
-
-	bundle.addAttachment(newAttach);
-      } else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
-	bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment((MimeMessage) m));
-      } else {
-	// FIXME
-	bundle.addAttachment(new Attachment((MimeMessage)m));
-      }
-    } else {
-      String contentType = ((MimeMessage) m).getContentType().toLowerCase();
-      
-      if (contentType.startsWith("multipart")) {
-	ContentType ct = new ContentType(contentType);
-	
-	if (ct.getSubType().equalsIgnoreCase("alternative") && mp.getContent() instanceof Multipart) {
-	parseAlternativeAttachment(bundle, (MimeMessage) m);
-	} else if (m.getContent() instanceof Multipart) {
-	bundle.addAll(parseAttachments((Multipart)m.getContent()));
-	} else {
-	  Attachment attachment = new Attachment((MimeMessage)m);
-	  bundle.addAttachment(attachment);
-	}
-      } else {
-	Attachment attachment = new Attachment((MimeMessage)m);
-	bundle.addAttachment(attachment, new ContentType(contentType));
-      }
-    }
-    */
-
     return bundle;
   }
   
@@ -220,10 +149,11 @@ public class MailUtilities {
     } else {
       ContentType ct = new ContentType(mp.getContentType());
       if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-	if (ct.getSubType().equalsIgnoreCase("alternative") && mp.getContent() instanceof Multipart) {
-	  parseAlternativeAttachment(bundle, mp);
-	} else if (mp.getContent() instanceof Multipart) {
-	  bundle.addAll(parseAttachments((Multipart)mp.getContent()));
+	if (mp.getContent() instanceof Multipart) {
+	  if (ct.getSubType().equalsIgnoreCase("alternative"))
+	    parseAlternativeAttachment(bundle, mp);
+	  else 
+	    bundle.addAll(parseAttachments((Multipart)mp.getContent()));
 	} else {
 	  Attachment attachment = new Attachment(mp);
 	  bundle.addAttachment(attachment);

@@ -187,10 +187,14 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
    * Updates the CryptoRecipientInfos with information from the 
    * MessageUI.
    */
-  public boolean updateRecipientInfos(UserProfile profile, InternetHeaders headers) throws javax.mail.internet.AddressException {
+  public boolean updateRecipientInfos(UserProfile profile, InternetHeaders headers) throws javax.mail.internet.AddressException, javax.mail.MessagingException {
     // just use the defaults for now.
 
     InternetAddress[] toAddresses = InternetAddress.parse(headers.getHeader("To", ","), false);
+    if (toAddresses == null || toAddresses.length == 0) {
+      throw new MessagingException(Pooka.getProperty("error.NewMessage.noTo", "No To: recipient"));
+    }
+
     InternetAddress[] ccAddresses = InternetAddress.parse(headers.getHeader("CC", ","), false);
     InternetAddress[] bccAddresses = InternetAddress.parse(headers.getHeader("BCC", ","), false);
 
@@ -234,7 +238,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     }
 
     /**
-     * Creteas a new CryptoRecipieintInfo with the given signatureKey,
+     * Creates a new CryptoRecipieintInfo with the given signatureKey,
      * encryptionKey, toList, ccList, and bccList.
      */
     public CryptoRecipientInfo(Key pSignatureKey, Key pEncryptionKey, Address[] pToList, Address[] pCcList, Address[] pBccList) {
@@ -313,6 +317,15 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       returnValue.setRecipients(Message.RecipientType.TO, getRecipients(Message.RecipientType.TO));
       returnValue.setRecipients(Message.RecipientType.CC, getRecipients(Message.RecipientType.CC));
       returnValue.setRecipients(Message.RecipientType.BCC, getRecipients(Message.RecipientType.BCC));
+
+      Key sigKey = getSignatureKey();
+      Key cryptoKey = getEncryptionKey();
+
+      if (sigKey instanceof EncryptionKey && cryptoKey instanceof EncryptionKey) {
+	if (((EncryptionKey)sigKey).getType() != ((EncryptionKey)cryptoKey).getType()) {
+	  throw new MessagingException(Pooka.getProperty("error.NewMessage.differentEncryption", "Encryption and Signature Keys must be of same type (PGP or S/MIME)"));
+	}
+      }
 
       if (getSignatureKey() != null) {
 	try {

@@ -1,84 +1,29 @@
-*) test error with null to: field.
-
 *) fix jmaildir on windows xp
 
-*) add pgp/gpg support.
-  *) auto signature verification.
-     means checking keys for email addresses.
-	done.  test.
-
-  *) add crypto ui display for outgoing, also.
-     started.
-	make ui fit panel.
-	add default option
-	'encrypt' action doesn't use ui.
-
-	rules for signing - user:
-	1)  never
-	2)  always using key 1
-
-	rules for encrypting:
-	1)  do if we have a key for user.
-	2)  don't.
-
-	general:
-	don't sign with one and encrypt with another.  :)
-
-	for message:
-	signing:
-	*) do default for user profile
-	*) do sign using selected key
-	*) don't.
-
-	encryption
-	*) default for user profile
-	*) do using default key
-	*) do using given key
-	*) don't.
-
-	actions:
-	sign
-	don't sign
-	encrypt
-	don't encrypt
-
-	sign and select key
-	encrypt and select key
-
-	(from ui) select key
-
-  *) use default key (for signing, reading - default private; for sending, 
-		   default public by email address (?) -- also overridable,
-		   though.)
-  *) encrypted message should have some sort of 'this is an encrypted message' 
+*) encryption support:
+   *) test autodecrypt/auto sig check.  requires keys synched to email address.
+   *) test auto sign/auto encrypt.
+   *) encryption action should offer key list if no default key for address.
+   *) make sure UI shows up for auto-encrypted messages.
+   *) encrypted message should have some sort of 'this is an encrypted message'
       text instead of the blank text it currently has.
-  *) when selecting a key, have options for encryption (always use this key,
+   *) when selecting a key, have options for encryption (always use this key,
 	etc.)
-  *) key management
+   *) key management
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
   *) fix threading on encryption actions.
      *) !!! we're parsing each message on load now. !!!
-  *) add keybindings for encryption/decryption.
   *) fix startup errors if no encryption configured.
   *) add documentation
 
-*) classcastexception?
-java.lang.ClassCastException
-        at net.suberic.pooka.MailUtilities.parseAlternativeAttachment(MailUtilities.java:254)
-        at net.suberic.pooka.MailUtilities.handlePart(MailUtilities.java:224)
-        at net.suberic.pooka.MailUtilities.parseAttachments(MailUtilities.java:69)
-        at net.suberic.pooka.MessageInfo.loadAttachmentInfo(MessageInfo.java:62)
-*)
-javax.mail.internet.ParseException
-        at javax.mail.internet.ParameterList.<init>(ParameterList.java:81)
-        at javax.mail.internet.ContentType.<init>(ContentType.java:82)
-        at net.suberic.crypto.EncryptionManager.checkEncryptionType(EncryptionManager.java:129)
-        at net.suberic.pooka.MessageCryptoInfo.checkEncryptionType(MessageCryptoInfo.java:68)
-        at net.suberic.pooka.MessageCryptoInfo.getEncryptionUtils(MessageCryptoInfo.java:49)
-        at net.suberic.pooka.MessageCryptoInfo.isEncrypted(MessageCryptoInfo.java:122)
-        at net.suberic.pooka.MessageInfo.hasEncryption(MessageInfo.java:891)
-
+*) fix:
+java.security.UnrecoverableKeyException: incorrect password.
+        at net.suberic.crypto.cryptix.CryptixKeyManager.getPrivateKey(CryptixKeyManager.java:224)
+        at net.suberic.pooka.PookaEncryptionManager.getPrivateKey(PookaEncryptionManager.java:226)
+        at net.suberic.pooka.UserProfile.getEncryptionKey(UserProfile.java:509)
+        at net.suberic.pooka.UserProfile.getEncryptionKey(UserProfile.java:494)
+        at net.suberic.pooka.gui.NewMessageProxy$EncryptAction.actionPerformed(NewMessageProxy.java:399)
 
 *) arrow keys on read messages should scroll the window.
 
