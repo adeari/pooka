@@ -1186,8 +1186,33 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return folderDisplayUI;
     }
 
+    private void removeFromListeners(FolderDisplayUI display) {
+	if (display != null) {
+	    removeMessageChangedListener(display);
+	    removeMessageCountListener(display);
+	    getFolder().removeConnectionListener(display);
+	}
+    }
+
+    private void addToListeners(FolderDisplayUI display) {
+	if (display != null) {
+	    addMessageChangedListener(display);
+	    addMessageCountListener(display);
+	    getFolder().addConnectionListener(display);
+	}
+    }
+
+    /**
+     * This sets the given FolderDisplayUI to be the UI for this
+     * FolderInfo.
+     * 
+     * It automatically registers that FolderDipslayUI to be a listener
+     * to MessageCount, MessageChanged, and Connection events.
+     */
     public void setFolderDisplayUI(FolderDisplayUI newValue) {
+	removeFromListeners(folderDisplayUI);
 	folderDisplayUI = newValue;
+	addToListeners(folderDisplayUI);
     }
 
     public boolean isOpen() {

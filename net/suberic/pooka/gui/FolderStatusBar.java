@@ -5,7 +5,10 @@ import java.awt.FlowLayout;
 import net.suberic.pooka.event.*;
 import javax.mail.event.*;
 
-
+/**
+ * A status bar which shows things like the folder name, the number of 
+ * unread messages in a folder, etc.
+ */
 public class FolderStatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
     FolderInfo folderInfo;
     JLabel folderLabel;

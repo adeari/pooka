@@ -265,6 +265,8 @@ public class PreviewPanel extends JPanel implements FolderDisplayUI, MessageUI {
 
     }
 
+    public void messageChanged(MessageChangedEvent e) {
+    }
 
     /**
      * Gets the currently available Actions for this component.

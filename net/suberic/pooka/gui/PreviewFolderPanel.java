@@ -225,7 +225,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
     }
 
-    // MessageCounteListener
+    // MessageCountListener
     /**
      *
      */
@@ -234,8 +234,23 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     }
 
     public void messagesRemoved(MessageCountEvent e) { 
-	System.out.println("previewfolderpanel got the messaesremoved.");
 	getFolderStatusBar().messagesRemoved(e);
+	Runnable updateAdapter = new Runnable() {
+		public void run() {
+		    Pooka.getMainPanel().refreshActiveMenus();
+		}
+	    };
+	if (SwingUtilities.isEventDispatchThread())
+	    updateAdapter.run();
+	else
+	    SwingUtilities.invokeLater(updateAdapter);
+	
+    }
+
+    // MessageChangedListener
+    public void messageChanged(MessageChangedEvent e) {
+	getFolderStatusBar().messageChanged(e);
+
     }
 
     /**

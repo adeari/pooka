@@ -2,7 +2,7 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import javax.mail.event.*;
 
-public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, ActionContainer, net.suberic.pooka.event.MessageLoadedListener, MessageCountListener, ConnectionListener {
+public interface FolderDisplayUI extends UserProfileContainer, ErrorHandler, ActionContainer, net.suberic.pooka.event.MessageLoadedListener, MessageCountListener, MessageChangedListener, ConnectionListener {
     
     public void openFolderDisplay();
     

@@ -5,8 +5,6 @@ immediate todo:
 
 	fix the load message tracker
 
-	add a status bar type thing to the preview panel.
-
 	add the delete ui and make it actually controllable by a checkbox.
 
 	add a way to move directly to a message.
