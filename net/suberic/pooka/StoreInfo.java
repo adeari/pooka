@@ -371,7 +371,8 @@ public class StoreInfo implements ValueChangeListener {
      * Closes all of the Store's children.
      */
     public void closeAllFolders(boolean expunge) throws MessagingException {
-	System.out.println("closing all folders of store " + getStoreID());
+	if (Pooka.isDebug())
+	    System.out.println("closing all folders of store " + getStoreID());
 	Vector folders = getChildren();
 	if (folders != null) {
 	    for (int i = 0; i < folders.size(); i++) {

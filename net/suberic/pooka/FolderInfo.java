@@ -191,6 +191,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    if (Pooka.isDebug())
 			System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
 
+		    if (! parentStore.isAvailable())
+			throw new MessagingException();
+
 		    if (!parentStore.isConnected())
 			parentStore.connectStore();
 		    Store store = parentStore.getStore();
@@ -1109,7 +1112,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	if (isLoaded()) {
 	    open=false;
-	    folder.close(expunge);
+	    try {
+		folder.close(expunge);
+	    } catch (java.lang.IllegalStateException ise) {
+		throw new MessagingException(ise.getMessage(), ise);
+	    }
 	}
 
     }

@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.Pooka;
+import net.suberic.pooka.StoreInfo;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -213,10 +214,23 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    contentPanel.saveOpenFolders();
 	}
 	
+	Vector v = Pooka.getStoreManager().getStoreList();
+	for (int i = 0; i < v.size(); i++) {
+	    // FIXME:  we should check to see if there are any messages
+	    // to be deleted, and ask the user if they want to expunge the
+	    // deleted messages.
+	    try {
+		((StoreInfo)v.elementAt(i)).closeAllFolders(false);
+	    } catch (javax.mail.MessagingException me) {
+		// we really don't care.
+	    }
+	}
+
 	Pooka.resources.saveProperties(new File(Pooka.localrc));
 	System.exit(exitValue);
 	
     }
+
 
     // Accessor methods.
     // These shouldn't all be public.

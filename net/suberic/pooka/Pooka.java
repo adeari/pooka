@@ -55,7 +55,9 @@ public class Pooka {
 
 	JFrame frame = new JFrame("Pooka");
 	SimpleAuthenticator auth = new SimpleAuthenticator(frame);
-	defaultSession = javax.mail.Session.getDefaultInstance(System.getProperties(), auth);
+	java.util.Properties sysProps = System.getProperties();
+	sysProps.setProperty("mail.mbox.mailspool", resources.getProperty("Pooka.spoolDir", "/var/spool/mail"));
+	defaultSession = javax.mail.Session.getDefaultInstance(sysProps, auth);
 	if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	    defaultSession.setDebug(true);
 
