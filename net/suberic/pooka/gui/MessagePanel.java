@@ -164,26 +164,43 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	
     }
 
+    /**
+     * Calls createNewMessage(Message m) with a new MimeMessage object.
+     */
     public void createNewMessage() {
-	MimeMessage m = new MimeMessage(getMainPanel().getSession());
-
-	MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(m));
-	this.add(newMessageWindow);
-	newMessageWindow.setVisible(true);
-	try {
-	    newMessageWindow.setSelected(true);
-	} catch (java.beans.PropertyVetoException e) {
-	}
+	createNewMessage(new MimeMessage(getMainPanel().getSession()));
     }
 
+    /**
+     * Creates a NewMessageProxy and NewMessageWindow for the given 
+     * Message object.  Also will open the NewMessageWindow on the
+     * MessagePanel and set it as Active.
+     */
     public void createNewMessage(javax.mail.Message m) {
-	MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(m));
-	this.add(newMessageWindow);
-	newMessageWindow.setVisible(true);
-	try {
-	    newMessageWindow.setSelected(true);
-	} catch (java.beans.PropertyVetoException e) {
-	}
+	final MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(m));
+
+
+	Runnable openWindowCommand = new RunnableAdapter() {
+		public void run() {
+
+		    MessagePanel.this.add(newMessageWindow);
+
+		    newMessageWindow.setVisible(true);
+		    try {
+			newMessageWindow.setSelected(true);
+		    } catch (java.beans.PropertyVetoException e) {
+		    }
+		}
+	    };
+	if (SwingUtilities.isEventDispatchThread())
+	    openWindowCommand.run();
+	else 
+	    try {
+		SwingUtilities.invokeAndWait(openWindowCommand);
+	    } catch (Exception e) {
+		// shouldn't happen.
+	    }
+
     }
 
     public JInternalFrame getCurrentWindow() {
