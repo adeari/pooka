@@ -58,6 +58,10 @@ public class StoreInfo implements ValueChangeListener {
 	    available=false;
 	}
 
+	// don't allow a StoreInfo to get created with an empty folderList.
+	
+	if (Pooka.getProperty("Store." + storeID + ".folderList", "").equals(""))
+	    Pooka.setProperty("Store." + storeID + ".folderList", "INBOX");
 	
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty());
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".folderList");
