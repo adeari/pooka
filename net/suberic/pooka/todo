@@ -2,16 +2,17 @@ top todo:
 
 *) add color and font support
 	begun.  todo:
-	*) color chooser needs to disable the color button when the checkbox
-		isn't checked.
-	*) create a decent secondary interface style. (?)
 	*) test the folderPanel, messagePanel, and Folder settings.
+	  folderPanel looks ok except for the JPopupMenus.
+	  messagePanel looks fine.
+	  Folder -- read messages need to honor the font and font color.
 	*) Themes don't change immediately after you edit them; rather,
-	they wait until you restart.
+	  they wait until you restart.
 	*) Changing a Theme should notify everything that's using that
 		theme, and they should update appropriately.
 	*) The font for new messages doesn't update using the themes.
-	*) Add places to configure all of these settings.
+	*) Add places to configure all of these settings. -- and check
+	  the labels for these properties.
 	
 *) fix the UserProfile editor display.  (linux, jdk1.3.x)
 
@@ -38,6 +39,8 @@ works when you package up a .jar file.
 *) <sigh> save properties to a file at the end of an editor.
 
 *) fix the 'save draft?' messages under jdk1.2.
+
+*) fix the LookAndFeel support.
 
 ------------------
 

@@ -202,7 +202,8 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
       this.addStore((StoreInfo)added[i] , root);
     }
 
-    // note:  see if we need to do an explicit update here.
+    currentTheme = null;
+    configureInterfaceStyle();
   }
 
 

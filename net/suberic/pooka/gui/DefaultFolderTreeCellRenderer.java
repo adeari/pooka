@@ -187,10 +187,104 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	Dimension        retDimension = super.getPreferredSize();
 
 	if(retDimension != null)
-	    retDimension = new Dimension((int)((retDimension.width + 3) * 1.2),
+	  retDimension = new Dimension((int)((retDimension.width + 3) * 1.2),
 					 retDimension.height);
 	return retDimension;
     }
+  
+  /**
+   * Returns the color the text is drawn with when the node is selected.
+   */
+  public Color getTextSelectionColor() {
+    MainPanel mp = Pooka.getMainPanel();
+    if (mp != null) {
+      FolderPanel fp = mp.getFolderPanel();
+      
+      if (fp != null) {
+	javax.swing.plaf.metal.MetalTheme currentTheme = fp .getCurrentTheme();
+	if (currentTheme != null) {
+	    return currentTheme.getHighlightedTextColor();
+	}
+      }
+    }
+    return super.getTextSelectionColor();
+  }
+  
+  /**
+   * Returns the color the text is drawn with when the node isn't selected.
+   */
+  public Color getTextNonSelectionColor() {
+    MainPanel mp = Pooka.getMainPanel();
+    if (mp != null) {
+      FolderPanel fp = mp.getFolderPanel();
+      
+      if (fp != null) {
+	javax.swing.plaf.metal.MetalTheme currentTheme = fp .getCurrentTheme();
+	if (currentTheme != null) {
+	  return currentTheme.getUserTextColor();
+	}
+      }
+    }
+    return super.getTextNonSelectionColor();
+  }
+  
+  /**
+   * Returns the color to use for the background if node is selected.
+   */
+  public Color getBackgroundSelectionColor() {
+    MainPanel mp = Pooka.getMainPanel();
+    if (mp != null) {
+      FolderPanel fp = mp.getFolderPanel();
+      
+      if (fp != null) {
+	javax.swing.plaf.metal.MetalTheme currentTheme = fp .getCurrentTheme();
+	if (currentTheme != null) {
+	  return currentTheme.getTextHighlightColor();
+	}
+      }
+    }
+    return super.getBackgroundSelectionColor();
+  }
+
+  /**
+   * Returns the background color to be used for non selected nodes.
+   */
+  public Color getBackgroundNonSelectionColor() {
+    MainPanel mp = Pooka.getMainPanel();
+    if (mp != null) {
+      FolderPanel fp = mp.getFolderPanel();
+      
+	if (fp != null) {
+	  javax.swing.plaf.metal.MetalTheme currentTheme = fp .getCurrentTheme();
+
+	  if (currentTheme != null) {
+	    return currentTheme.getWindowBackground();
+	  }
+	}
+    }
+
+    return super.getBackgroundNonSelectionColor();
+  }
+
+  /**
+   * Returns the color the border is drawn.
+   */
+  public Color getBorderSelectionColor() {
+    MainPanel mp = Pooka.getMainPanel();
+    if (mp != null) {
+      FolderPanel fp = mp.getFolderPanel();
+      
+      if (fp != null) {
+	javax.swing.plaf.metal.MetalTheme currentTheme = fp .getCurrentTheme();
+	if (currentTheme != null) {
+	  return currentTheme.getFocusColor();
+	}
+      }
+    }
+
+    return super.getBorderSelectionColor();
+  }
+
 
 } //end class DefaultFolderTreeCellRenderer
 

@@ -202,10 +202,13 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
   public void setEnabled(boolean newValue) {
     if (useEnabledBox) {
       enabledBox.setEnabled(newValue);
-      inputButton.setEnabled(newValue && enabledBox.isSelected());
-    }
-    if (inputButton != null) {
-      inputButton.setEnabled(newValue);
+      if (inputButton != null) {
+	inputButton.setEnabled(newValue && enabledBox.isSelected());
+      }
+    } else {
+      if (inputButton != null) {
+	inputButton.setEnabled(newValue);
+      }
     }
     enabled=newValue;
   }

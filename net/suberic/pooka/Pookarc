@@ -734,7 +734,7 @@ Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
 
-Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge
+Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.folderPanel.theme:Pooka.messagePanel.theme
 Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
 Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
@@ -742,6 +742,11 @@ Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.SSL=Pooka.sslCertFile
 
 Pooka.sslCertFile.propertyType=File
+
+Pooka.messagePanel.theme.propertyType=List
+Pooka.messagePanel.theme.allowedValues=Pooka.theme
+Pooka.folderPanel.theme.propertyType=List
+Pooka.folderPanel.theme.allowedValues=Pooka.theme
 
 Pooka.theme=default:black
 Pooka.theme.propertyType=Multi
