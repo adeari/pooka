@@ -56,6 +56,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean open = false;
     private int unreadCount = 0;
     private int messageCount = 0;
+    private boolean newMessages = false;
 
     private FolderInfo parentFolder = null;
     private StoreInfo parentStore = null;
@@ -653,6 +654,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    getFolderTableModel().removeRows(removedProxies);
 		}
+		setNewMessages(true);
 		resetMessageCounts();
 		fireMessageCountEvent(mce);
 	    }
@@ -895,6 +897,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     public int getMessageCount() {
 	return messageCount;
+    }
+
+    public boolean hasNewMessages() {
+	return newMessages;
+    }
+
+    public void setNewMessages(boolean newValue) {
+	newMessages = newValue;
     }
 
     public FolderTracker getFolderTracker() {

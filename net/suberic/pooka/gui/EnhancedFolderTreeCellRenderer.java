@@ -71,6 +71,9 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    Object lastPath = tp.getLastPathComponent();
 	    if (lastPath instanceof FolderNode) {
 		FolderNode node = (FolderNode)lastPath;
+
+		if (node.getFolderInfo().hasNewMessages())
+		    setText("* " + getText() + " *");
 		
 		if (isSpecial(node)) {
 		    setFontToSpecial();

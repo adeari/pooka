@@ -35,6 +35,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 					  expanded, leaf, row, hasFocus);
 
 	this.hasFocus = hasFocus;
+
 	setText(stringValue);
 	if(sel)
 	    setForeground(getTextSelectionColor());
@@ -71,7 +72,10 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
 	if (tp != null && tp.getLastPathComponent() instanceof FolderNode) {
 	    FolderNode node = (FolderNode)tp.getLastPathComponent();
-	    
+
+	    if (node.getFolderInfo().hasNewMessages())
+		setText("* " + getText() + " *");
+
 	    if (isSpecial(node)) {
 		setFontToSpecial();
 	    } else {
@@ -113,6 +117,9 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
     }
 
+    /**
+     * This sets the font of the displayed component to the special font.
+     */
     public void setFontToSpecial() {
 	if (getSpecialFont() != null) {
 	    setFont(getSpecialFont());

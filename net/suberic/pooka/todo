@@ -18,8 +18,6 @@ different icon and different folder information (to: instead of from:).
 *) the update feature doesn't show up for INBOX (or maybe just doesn't show
 up for top-level folders?).
 
-*) the first unread message keeps getting selected on the FolderWindow.
-
 *) fix marc's ClassCastException.
 
 *) add a way to notify users of 'new' messages.
