@@ -36,6 +36,7 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, V
   protected FontUIResource subSystemFont = null;
   protected FontUIResource subUserFont = null;
   protected FontUIResource subSmallFont = null;
+  protected FontUIResource subMonospacedFont = null;
   
   
   /**
@@ -119,6 +120,7 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, V
     subSystemFont = createFontUIResource(property + ".systemFont", sourceBundle);
     subUserFont = createFontUIResource(property + ".userFont", sourceBundle);
     subSmallFont = createFontUIResource(property + ".smallFont", sourceBundle);
+    subMonospacedFont = createFontUIResource(property + ".monospacedFont", sourceBundle);
     
   }
   
@@ -247,5 +249,8 @@ public class ConfigurableMetalTheme extends DefaultMetalTheme implements Item, V
 	return subSmallFont;
       else
 	return super.getSubTextFont(); 
+    }
+    public FontUIResource getMonospacedFont() { 
+      return subMonospacedFont;
     }
 }
