@@ -348,6 +348,10 @@ public class AttachmentPane extends JPanel {
     return message.getMessageUI();
   }
 
+  public MessageProxy getMessageProxy() {
+    return message;
+  }
+
   /**
    * Shows an error message, either on the MessageUI if there is one, or
    * if not, on the main Pooka frame.

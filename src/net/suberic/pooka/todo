@@ -1,6 +1,3 @@
-*) cached filter doesn't seem to work--or at least, it doesn't seem
-selectable.
-
 *) make it so no cc: means no cc: header at all, rather than a blank cc:
 header.
 

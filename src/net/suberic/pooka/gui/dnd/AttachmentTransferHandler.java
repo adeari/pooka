@@ -21,23 +21,34 @@ public class AttachmentTransferHandler extends TransferHandler {
     System.err.println("creating transferable for attachment");
     
     System.err.println("c is " + c);
+
+    Attachment attachment = null;
+    MessageProxy proxy = null;
     if (c instanceof net.suberic.pooka.gui.AttachmentPane) {
-      System.err.println("selected attachment is " + ((AttachmentPane) c).getSelectedAttachment());
+      attachment = ((AttachmentPane) c).getSelectedAttachment();
+      proxy = ((AttachmentPane) c).getMessageProxy();
+      System.err.println("selected attachment is " + attachment);
     } else if (c instanceof JTable) {
       try {
 	Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.AttachmentPane"), c);
 	System.err.println("o is " + o);
 	if (o != null ) {
-	  System.err.println("selected attachment is " + ((AttachmentPane) o).getSelectedAttachment());
+	  attachment = ((AttachmentPane) o).getSelectedAttachment();
+	  proxy = ((AttachmentPane) o).getMessageProxy();
+	  System.err.println("selected attachment is " + attachment);
 	} else {
 	  return null;
 	}
-      } catch (Exception e) {
+      } catch ( Exception e) {
 	return null;
       }
     } 
-
-    return null;
+    
+    if (attachment != null && proxy != null) {
+      return new AttachmentTransferable(attachment, proxy);
+    } else {
+      return null;
+    }
     
   }
 

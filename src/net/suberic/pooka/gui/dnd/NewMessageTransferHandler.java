@@ -14,52 +14,88 @@ import net.suberic.pooka.gui.*;
  * A TransferHandler for a MessageProxy object.
  */
 public class NewMessageTransferHandler extends TransferHandler {
-  private DataFlavor messageFlavor;
-  private boolean shouldRemove;
-  
+  private DataFlavor[] usableDataFlavors = new DataFlavor[] {
+    MessageProxyTransferable.sMessageProxyDataFlavor,
+    DataFlavor.javaFileListFlavor
+  };
+
   public boolean importData(JComponent c, Transferable t) {
     System.err.println("new message importing");
-    if (!canImport(c, t.getTransferDataFlavors())) {
+    DataFlavor matchedFlavor = DndUtils.matchDataFlavor(usableDataFlavors, t.getTransferDataFlavors());
+    if (matchedFlavor == null) {
       return false;
     } else {
-      try {
-	NewMessageDisplayPanel nmdp = (NewMessageDisplayPanel) SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.NewMessageDisplayPanel"), c);
-	if (nmdp != null && isMessageProxy(t)) {
-	  MessageProxy proxy = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
-	  
-	  javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-	  mbp.setDataHandler(proxy.getMessageInfo().getRealMessage().getDataHandler());
-	  nmdp.getNewMessageProxy().getNewMessageInfo().addAttachment(new MBPAttachment(mbp));
-
-	  nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
-	  System.err.println("returning true.");
-	  return true;
-	}
-      } catch (Exception e) {
-	e.printStackTrace();
+      if (matchedFlavor == MessageProxyTransferable.sMessageProxyDataFlavor) {
+	return importMessageProxy(c, t);
+      } else if (matchedFlavor == DataFlavor.javaFileListFlavor) {
+	return importFileList(c, t);
+      } else {
+	// weird
+	return false;
       }
+    }
+  }
+
+  /**
+   * Imports a MessageProxy.
+   */
+  public boolean importMessageProxy(JComponent c, Transferable t) {
+    try {
+      NewMessageDisplayPanel nmdp = (NewMessageDisplayPanel) SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.NewMessageDisplayPanel"), c);
+      if (nmdp != null && isMessageProxy(t)) {
+	MessageProxy proxy = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
+	
+	javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+	mbp.setDataHandler(proxy.getMessageInfo().getRealMessage().getDataHandler());
+	nmdp.getNewMessageProxy().getNewMessageInfo().addAttachment(new MBPAttachment(mbp));
+	
+	nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	System.err.println("returning true.");
+	return true;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
     return false;
   }
   
-  public boolean canImport(JComponent c, DataFlavor[] flavors) {
-    if (flavors != null) {
-      if (flavors.length == 0) {
-	System.err.println("flavors.length == null.");
+  /**
+   * Imports a File or list of Files.
+   */
+  public boolean importFileList(JComponent c, Transferable t) {
+    try {
+      NewMessageDisplayPanel nmdp = (NewMessageDisplayPanel) SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.NewMessageDisplayPanel"), c);
+      if (nmdp != null) {
+	java.util.List fileList = (java.util.List) t.getTransferData(DataFlavor.javaFileListFlavor);
+	
+	Iterator it = fileList.iterator();
+	while (it.hasNext()) {
+	  File f = (File) it.next();
+	  nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f);
+	  
+	  nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	}
+	
+	System.err.println("returning true.");
+	return true;
       }
-
-      for (int i = 0; i < flavors.length; i++) {
-	System.err.println("flavor[" + i + "] = " + flavors[i]);
-	if (flavors[i] == MessageProxyTransferable.sMessageProxyDataFlavor)
-	  return true;
-      }
-
-    } else {
-      System.err.println("flavors == null.");
+    } catch (Exception e) {
+      e.printStackTrace();
     }
 
     return false;
+  }
+
+  public boolean canImport(JComponent c, DataFlavor[] flavors) {
+    System.err.println("checking canImport for NMTH, flavors " + flavors);
+    if (DndUtils.matchDataFlavor(usableDataFlavors, flavors) != null) {
+      System.err.println("can import.");
+      return true;
+    } else {
+      System.err.println("can't import.");
+      return false;
+    }
   }
 
   /**
