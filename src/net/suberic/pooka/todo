@@ -48,6 +48,9 @@ javax.mail.internet.ParseException
         at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
         at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
 
+*) fix notification settings.  my spam folder shouldn't show a star when
+	new messages come in.
+
 ----
 
 *) fix NPE if try to send a new message without configuring client.

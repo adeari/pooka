@@ -8,6 +8,9 @@ import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
 import javax.swing.*;
+import javax.print.*;
+import javax.print.attribute.*;
+import javax.print.attribute.standard.*;
 import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Vector;
@@ -1047,33 +1050,151 @@ public class MessageProxy {
    */
   
   public void printMessage() {
+    // Set the document type
+    DocFlavor messageFormat = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
+    MessagePrinter messagePrinter = new MessagePrinter(getMessageInfo());
+    
     try {
-      PrinterJob job = PrinterJob.getPrinterJob ();
-      Book book = new Book ();
-      MessagePrinter printer = new MessagePrinter(getMessageInfo());
-      PageFormat pf = job.pageDialog (job.defaultPage ());
-      int count = printer.getPageCount(pf);
-      book.append (printer, pf, count);
-      job.setPageable (book);
-      final PrinterJob externalJob = job;
+      // bring up a dialog.
+      PrintService[] services = PrintServiceLookup.lookupPrintServices(messageFormat, null);
       
-      if (job.printDialog ()) {
-	Thread t = new Thread(new Runnable() {
-	    public void run() {
-	      try {
-		externalJob.print ();
-	      }
-	      catch (PrinterException ex) {
-		ex.printStackTrace ();
-	      }
-	    }
-	  }, "printing thread");
-	t.start();
+      PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+      PrintService service =  ServiceUI.printDialog(null, 50, 50,
+						    services, 
+						    PrintServiceLookup.lookupDefaultPrintService(), 
+						    messageFormat,
+						      attributes);
 	
+	if (service != null) {
+	  // get info on print services
+	  PrintServiceAttributeSet psas = service.getAttributes();
+	  Attribute[] serverAttrs = psas.toArray();
+	  for (int i = 0 ; i < serverAttrs.length; i++) {
+	    System.err.println("attr[" + i + "]:  " + serverAttrs[i]);
+	  }
+	  DocFlavor[] supFlavors = service.getSupportedDocFlavors();
+	  for (int i = 0 ; i < supFlavors.length; i++) {
+	    System.err.println("supFlavors[" + i + "] = " + supFlavors[i]);
+	  }
+	  
+	  Attribute[] requestAttrs = attributes.toArray();
+	  for (int i = 0 ; i < requestAttrs.length; i++) {
+	    System.err.println("requestAttr[" + i + "]:  " + requestAttrs[i]);
+	  }
+	  
+	  Doc myDoc = new SimpleDoc(messagePrinter, messageFormat, null); 
+	  // Build a set of attributes
+	  //PrintRequestAttributeSet aset = service.getAttributes(); 
+	  /*
+	    PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet(); 
+	    aset.add(new Copies(1)); 
+	    aset.add(Sides.ONE_SIDED); 
+	    aset.add(new Destination(new java.net.URI("file:/tmp/out.ps")));
+	  */
+	  DocPrintJob job = service.createPrintJob();
+	  try {
+	    job.print(myDoc, attributes); 
+	  } catch (PrintException pe) {
+	    showError("Failed to print", pe);
+	  } 	
+
+	}
+      } catch (Exception e) {
+	showError("error printing", e);
       }
-    } catch (MessagingException me) {
-      showError(Pooka.getProperty("error.Printing", "Error printing Message:  ") + "\n", me);
-    }
+
+    /*
+      try {
+      // Set the document type
+      DocFlavor messageFormat = null;
+      String messageText = null;
+      if (Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageInfo().isHtml()) {
+      messageFormat = DocFlavor.STRING.TEXT_HTML;
+	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	  messageText = getMessageInfo().getHtmlAndTextInlines(true, false);
+	} else {
+	messageText = getMessageInfo().getHtmlPart(true, false);
+	}
+      } else {
+	messageFormat = DocFlavor.STRING.TEXT_PLAIN;
+	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	  messageText = getMessageInfo().getTextAndTextInlines(true, false);
+	} else {
+	  messageText = getMessageInfo().getTextPart(true, false);
+	}
+      }
+
+      try {
+      // bring up a dialog.
+      PrintService[] services = PrintServiceLookup.lookupPrintServices(messageFormat, null);
+
+      PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+      PrintService service =  ServiceUI.printDialog(null, 50, 50,
+						    services, 
+						    PrintServiceLookup.lookupDefaultPrintService(), 
+						    messageFormat,
+						    attributes);
+
+      if (service != null) {
+	// get info on print services
+	PrintServiceAttributeSet psas = service.getAttributes();
+	Attribute[] serverAttrs = psas.toArray();
+	for (int i = 0 ; i < serverAttrs.length; i++) {
+	  System.err.println("attr[" + i + "]:  " + serverAttrs[i]);
+	}
+	DocFlavor[] supFlavors = service.getSupportedDocFlavors();
+	for (int i = 0 ; i < supFlavors.length; i++) {
+	  System.err.println("supFlavors[" + i + "] = " + supFlavors[i]);
+	}
+
+	Attribute[] requestAttrs = attributes.toArray();
+	for (int i = 0 ; i < requestAttrs.length; i++) {
+	  System.err.println("requestAttr[" + i + "]:  " + requestAttrs[i]);
+	}
+
+	Doc myDoc = new SimpleDoc(messageText, messageFormat, null); 
+	// Build a set of attributes
+	//PrintRequestAttributeSet aset = service.getAttributes(); 
+	DocPrintJob job = service.createPrintJob();
+	try {
+	  job.print(myDoc, attributes); 
+	} catch (PrintException pe) {
+	  showError("Failed to print", pe);
+	} 	
+      }
+      } catch (Exception e) {
+	showError("error printing", e);
+      }
+      */
+      /*
+      // Create a Doc
+      Doc myDoc = new SimpleDoc(messageText, messageFormat, null); 
+      // Build a set of attributes
+      PrintRequestAttributeSet aset = new HashPrintRequestAttributeSet(); 
+      aset.add(new Copies(1)); 
+      aset.add(Sides.ONE_SIDED); 
+      System.err.println("created asset set.");
+      // discover the printers that can print the format according to the
+      // instructions in the attribute set
+      PrintService[] services = PrintServiceLookup.lookupPrintServices(messageFormat, aset);
+
+      // Create a print job from one of the print services
+      if (services.length > 0) { 
+	System.err.println("creating print job from service " + services[0]);
+	DocPrintJob job = services[0].createPrintJob(); 
+
+	try { 
+	  job.print(myDoc, aset); 
+	} catch (PrintException pe) {
+	  showError("Failed to print", pe);
+	} 
+	
+	System.err.println("not really printing.");
+      } else {
+      System.err.println("no print services found.");
+      }
+      */
+
   }
   
   /**
