@@ -26,6 +26,8 @@ public class FolderInfo implements MessageCountListener {
     private LoadMessageThread loaderThread;
     private FolderWindow folderWindow;
 
+    private boolean open;
+
     /**
      * Creates a new FolderInfo from a Folder and a Folder ID (like 
      * Store.defaultStore.folderList.folderName).
@@ -35,6 +37,35 @@ public class FolderInfo implements MessageCountListener {
 	folder=f;
 	f.addMessageCountListener(this);
 	folderID=fid;
+	f.addConnectionListener(new ConnectionAdapter() { 
+		public void closed(ConnectionEvent e) {
+		    System.out.println("Folder " + getFolderID() + " closed.");
+		    if (open == true) {
+			try {
+			    Store store = getFolder().getStore();
+			    if (!(store.isConnected()))
+				store.connect();
+			    openFolder(Folder.READ_WRITE);
+			} catch (MessagingException me) {
+			    System.out.println("Folder " + getFolderID() + " closed and unable to reopen:  " + me.getMessage());
+			}
+		    }
+		}
+		
+		public void disconnected(ConnectionEvent e) {
+		    System.out.println("Folder " + getFolderID() + " disconnected.");
+		    if (open == true) {
+			try {
+			    Store store = getFolder().getStore();
+			    if (!(store.isConnected()))
+				store.connect();
+			    openFolder(Folder.READ_WRITE);
+			} catch (MessagingException me) {
+			    System.out.println("Folder " + getFolderID() + " disconnected and unable to reconnect:  " + me.getMessage());
+			}
+		    }
+		}
+	    });
     }
 
     /**
@@ -67,7 +98,7 @@ public class FolderInfo implements MessageCountListener {
 
 	try {
 	    if (!(getFolder().isOpen()))
-		getFolder().open(Folder.READ_WRITE);
+		openFolder(Folder.READ_WRITE);
 	    Message[] msgs = folder.getMessages();
 	    MessageProxy mp;
 
@@ -192,6 +223,31 @@ public class FolderInfo implements MessageCountListener {
     public void removeMessageCountListener(MessageCountListener oldListener) {
 	messageCountListeners.remove(MessageCountListener.class, oldListener);
     }
+
+    public void fireMessageCountEvent(MessageCountEvent mce) {
+
+	// from the EventListenerList javadoc, including comments.
+
+	// Guaranteed to return a non-null array
+	Object[] listeners = messageCountListeners.getListenerList();
+	// Process the listeners last to first, notifying
+	// those that are interested in this event
+
+	if (mce.getType() == MessageCountEvent.ADDED) {
+	    for (int i = listeners.length-2; i>=0; i-=2) {
+		if (listeners[i]==MessageCountListener.class) {
+		    ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
+		}              
+	    }
+	} else if (mce.getType() == MessageCountEvent.REMOVED) {
+	    for (int i = listeners.length-2; i>=0; i-=2) {
+		if (listeners[i]==MessageCountListener.class) {
+		    ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
+		}              
+	    }
+
+	}
+    }
 	
     public void addMessageChangedListener(MessageChangedListener newListener) {
 	messageChangedListeners.add(MessageChangedListener.class, newListener);
@@ -216,6 +272,7 @@ public class FolderInfo implements MessageCountListener {
 	    }
 	    getFolderTableModel().addRows(addedProxies);
 	}
+	fireMessageCountEvent(e);
     }
 
     public void messagesRemoved(MessageCountEvent e) {
@@ -236,8 +293,40 @@ public class FolderInfo implements MessageCountListener {
 	    }
 	    getFolderTableModel().removeRows(removedProxies);
 	}
+	fireMessageCountEvent(e);
     }
 
+    /**
+     * This method opens the Folder, and sets the FolderInfo to know that
+     * the Folder should be open.  You should use this method instead of
+     * calling getFolder().open(), because if you use this method, then
+     * the FolderInfo will try to keep the Folder open, and will try to
+     * reopen the Folder if it gets closed before closeFolder is called.
+     */
+    public void openFolder(int mode) throws MessagingException {
+	if (folder.isOpen())
+	    return;
+	else {
+	    folder.open(mode);
+	    open=true;
+	}
+    }
+
+    /**
+     * This method closes the Folder.  If you open the Folder using 
+     * openFolder (which you should), then you should use this method
+     * instead of calling getFolder.close().  If you don't, then the
+     * FolderInfo will try to reopen the folder.
+     */
+    public void closeFolder(boolean expunge) throws MessagingException {
+	if (!(folder.isOpen()))
+	    return;
+	else {
+	    folder.close(expunge);
+	    open=false;
+	}
+    }
+    
     // Accessor methods.
 
     public Folder getFolder() {
