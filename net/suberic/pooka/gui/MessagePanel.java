@@ -81,9 +81,20 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	//this.setAutoscrolls(true);
 	this.setSize(1000, 1000);
 	
-	keyBindings = new ConfigurableKeyBinding(this, "InternalFrame.keyBindings", Pooka.getResources());
+	keyBindings = new ConfigurableKeyBinding(this, "MessagePanel.keyBindings", Pooka.getResources());
 	keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
 	keyBindings.setActive(getActions());
+
+	// if the MessagePanel itself ever gets focus, pass it on to the
+	// selected JInternalFrame.
+
+	this.addFocusListener(new FocusAdapter() {
+		public void focusGained(FocusEvent e) {
+		    JInternalFrame selectedFrame = getCurrentWindow();
+		    if (selectedFrame != null)
+			selectedFrame.requestFocus();
+		}
+	    });
     }
 
     /**
@@ -283,6 +294,35 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	}
     }
     
+    /**
+     * This moves the current window either 1 or 10 spaces up, down,
+     * left, or right, depending on the source of the event.
+     */
+
+    public void moveWindow(int modifiers, String cmd) {
+	JInternalFrame current = getCurrentWindow();
+
+	if (current != null) {
+	    int x = current.getX();
+	    int y = current.getY();
+	    
+	    int moveValue = 1;
+	    
+	    if ((modifiers & ActionEvent.SHIFT_MASK) != 0)
+		moveValue = 10;
+
+	    if (cmd.equals("left"))
+		x = x - moveValue;
+	    else if (cmd.equals("right"))
+		x = x + moveValue;
+	    else if (cmd.equals("up"))
+		y = y - moveValue;
+	    else if (cmd.equals("down"))
+		y = y + moveValue;
+	    
+	    current.setLocation(x, y);
+	}
+    }
 
     public MainPanel getMainPanel() {
 	return mainPanel;
@@ -301,9 +341,12 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public Action[] defaultActions = {
-	new newMessageAction(),
 	new NextWindowAction(),
-	new PreviousWindowAction()
+	new PreviousWindowAction(),
+	new MoveWindowAction("move-window-left"),
+	new MoveWindowAction("move-window-right"),
+	new MoveWindowAction("move-window-up"),
+	new MoveWindowAction("move-window-down")
     };
 
     public Action[] getDefaultActions() {
@@ -320,17 +363,6 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    }
 	}
 	return getDefaultActions();
-    }
-
-    public class newMessageAction extends AbstractAction {
-	newMessageAction() {
-	    super("message-new");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    createNewMessage();
-	}
-
     }
 
     public class NextWindowAction extends AbstractAction {
@@ -352,6 +384,22 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	    selectPreviousWindow();
 	}
     }
+
+    public class MoveWindowAction extends AbstractAction {
+	MoveWindowAction() {
+	    super("move-window");
+	}
+
+	MoveWindowAction(String cmdString) {
+	    super(cmdString);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    String cmdString = e.getActionCommand();
+	    moveWindow(e.getModifiers(), cmdString.substring(cmdString.lastIndexOf("-") +1));
+	}
+    }
+
 }
 
 

@@ -305,3 +305,4 @@ NewAccountPooka.password.propertyType=Password
 NewAccountPooka.type.propertyType=List
 NewAccountPooka.type.allowedValues=imap
 NewAccountPooka.type=imap
+

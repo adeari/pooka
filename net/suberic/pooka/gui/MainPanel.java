@@ -292,7 +292,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	new HelpAboutAction(),
 	new HelpLicenseAction(),
 	new SelectMessagePanelAction(),
-	new SelectFolderPanelAction()
+	new SelectFolderPanelAction(),
+	new NewMessageAction()
     };
 
 
@@ -422,4 +423,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    folderPanel.requestFocus();
 	}
     }
+
+    public class NewMessageAction extends AbstractAction {
+	NewMessageAction() {
+	    super("message-new");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    messagePanel.createNewMessage();
+	}
+
+    }
+
+
 }
