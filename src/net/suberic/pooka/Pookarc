@@ -921,10 +921,19 @@ Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatu
 Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.Files=Pooka.defaultMailSubDir:Pooka.sslCertFile
 Preferences.Spam=Pooka.spamAction
-Preferences.Debug=Pooka.debug:Pooka.sessionDebug
+#Preferences.Debug=Pooka.debug:Pooka.sessionDebug
+Preferences.Debug=Pooka.debug.level:Pooka.debug.session.level
 
 Pooka.debug=false
 Pooka.debug.propertyType=Boolean
+
+Pooka.debug.level=OFF
+Pooka.debug.level.propertyType=List
+Pooka.debug.level.allowedValues=SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+Pooka.debug.session.level=OFF
+Pooka.debug.session.level.propertyType=List
+Pooka.debug.session.level.allowedValues=SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+
 Pooka.sessionDebug=false
 Pooka.sessionDebug.propertyType=Boolean
 editors.debug=false
