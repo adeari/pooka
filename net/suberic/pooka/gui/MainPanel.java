@@ -9,6 +9,7 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.mail.Session;
+import javax.mail.MessagingException;
 import net.suberic.pooka.MailQueue;
 import net.suberic.pooka.UserProfile;
 import net.suberic.util.gui.*;
@@ -455,8 +456,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
-	    nmu.openMessageUI();
+	    try {
+		MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
+		nmu.openMessageUI();
+	    } catch (MessagingException me) {
+		Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
+	    }
 	    
 	}
 

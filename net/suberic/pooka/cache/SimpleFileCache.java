@@ -87,7 +87,7 @@ public class SimpleFileCache implements MessageCache {
 		if (m != null) {
 		    h = m.getDataHandler();
 		    if (saveToCache)
-			cacheMessage(m, uid, newUidValidity, CONTENT);
+			cacheMessage(m, uid, newUidValidity, MESSAGE);
 		    return h;
 		} else
 		    throw new MessagingException("No such message:  " + uid);
@@ -242,7 +242,7 @@ public class SimpleFileCache implements MessageCache {
 	    throw new StaleCacheException(uidValidity, newUidValidity);
 	}
 	try {
-	    if (status == CONTENT) {
+	    if (status == CONTENT || status == MESSAGE) {
 		File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
 		if (outFile.exists())
 		    outFile.delete();
@@ -254,13 +254,13 @@ public class SimpleFileCache implements MessageCache {
 		fos.close();
 	    }
 	    
-	    if (status == CONTENT || status == FLAGS || status == FLAGS_AND_HEADERS) {
+	    if (status == MESSAGE || status == FLAGS || status == FLAGS_AND_HEADERS) {
 		Flags flags = m.getFlags();
 		saveFlags(uid, uidValidity, flags);
 	    }
 
 
-	    if (status == CONTENT || status == HEADERS || status == FLAGS_AND_HEADERS) {
+	    if (status == MESSAGE || status == HEADERS || status == FLAGS_AND_HEADERS) {
 	    
 		File outFile = new File(cacheDir, uid + DELIMETER + HEADER_EXT);
 		if (outFile.exists())
@@ -313,10 +313,14 @@ public class SimpleFileCache implements MessageCache {
 	    File[] matchingFiles = cacheDir.listFiles(filter);
 	    for (int j = 0; j < matchingFiles.length; j++)
 		matchingFiles[j].delete();
-	    if (status == CONTENT) {
-		Long l = new Long(uids[i]);
-		cachedMessages.remove(l);
+
+	    Long l = new Long(uids[i]);
+	    if (status == MESSAGE || status == FLAGS_AND_HEADERS || status == FLAGS) {
 		cachedFlags.remove(l);
+	    }
+
+	    if (status == MESSAGE) {
+		cachedMessages.remove(l);
 		writeMsgFile();
 	    } 
 	}
@@ -470,7 +474,7 @@ public class SimpleFileCache implements MessageCache {
 	    try {
 		FileInputStream fis = new FileInputStream(f);
 		MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
-		javax.activation.DataSource source = new MimePartDataSource (mm);
+		javax.activation.DataSource source = new WrappedMimePartDataSource (mm, this, uid);
 		DataHandler dh = new DataHandler(source);
 		return dh;
 	    } catch (Exception e) {
@@ -669,6 +673,19 @@ public class SimpleFileCache implements MessageCache {
 	return folderInfo;
     }
 
+    /**
+     * Returns the size of the given message, or -1 if the message is
+     * not cached.
+     */
+    public int getSize(long uid) {
+	File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
+	if (! f.exists()) {
+	    return (int)f.length();
+	} else
+	    return -1;
+	    
+    }
+
     private class CacheID {
 	long id;
 	long lastAccessed;
@@ -691,18 +708,22 @@ public class SimpleFileCache implements MessageCache {
 	}
 	
 	public boolean accept(File dir, String name) {
-	    if (status == CONTENT) {
-		if (name.startsWith(uid + DELIMETER))
+	    if (status == MESSAGE || status == CONTENT) {
+		if (name.startsWith(uid + DELIMETER + CONTENT_EXT))
 		    return true;
-		else
-		    return false;
-	    } else {
-		if (name.startsWith(uid + DELIMETER))
-		    return true;
-		else
-		    return false;
-		
 	    }
+
+	    if (status == FLAGS || status == FLAGS_AND_HEADERS || status == MESSAGE) {
+		if (name.startsWith(uid + DELIMETER + FLAG_EXT))
+		    return true;
+	    }
+
+	    if (status == HEADERS || status == FLAGS_AND_HEADERS || status == MESSAGE) {
+		if (name.startsWith(uid + DELIMETER + HEADER_EXT))
+		    return true;
+	    }
+
+	    return false;
 	}
     }
 

@@ -242,8 +242,31 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      *
      * As defined in interface net.suberic.pooka.gui.ErrorHandler.
      */
+    public void showError(String errorMessage, Exception e) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+    }
+
+    /**
+     * Shows an Error with the given parameters.
+     *
+     * As defined in interface net.suberic.pooka.gui.ErrorHandler.
+     */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	final String errorMsg = errorMessage;
+	final String realTitle = title;
+	Runnable runMe = new Runnable() {
+		public void run() {
+
+		    JOptionPane.showMessageDialog(PreviewFolderPanel.this, errorMsg, realTitle, JOptionPane.ERROR_MESSAGE);
+		}
+	    };
+	
+	if (SwingUtilities.isEventDispatchThread()) {
+	    runMe.run();
+	} else {
+	    SwingUtilities.invokeLater(runMe);
+	}
+	
     }
 
     /**

@@ -25,6 +25,8 @@ public class CachingMimeMessage extends MimeMessage {
     }
 
     public int getSize() throws MessagingException {
+	return getCache().getSize(uid);
+	/*
 	try {
 	    if (getContent() != null) {
 		//return getContent().length;
@@ -35,6 +37,7 @@ public class CachingMimeMessage extends MimeMessage {
 	} catch (java.io.IOException ioe) {
 	    throw new MessagingException(ioe.getMessage(), ioe);
 	}
+	*/
     }
 
     protected InputStream getContentStream() throws MessagingException {

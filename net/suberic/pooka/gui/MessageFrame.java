@@ -120,6 +120,15 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
 
     /**
      * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage, Exception e) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
      * the MessageProxy can call the method without caring about the
      * actual implementation of the Dialog.
      */

@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.io.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.Session;
+import javax.mail.MessagingException;
 import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
@@ -207,43 +208,48 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
     public void openMessageWindow(MessageProxy m, boolean newMessage) {
 	JInternalFrame messageWindow = (JInternalFrame) m.getMessageUI();
 	if (messageWindow == null) {
-	    MessageUI mui = Pooka.getUIFactory().createMessageUI(m);
-	    m.setMessageUI(mui);
-	    messageWindow = (JInternalFrame) mui;
-	    newMessage = true;
+	    try {
+		MessageUI mui = Pooka.getUIFactory().createMessageUI(m);
+		m.setMessageUI(mui);
+		messageWindow = (JInternalFrame) mui;
+		newMessage = true;
+	    } catch (MessagingException me) {
+		Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."), me);
+	    }
 	} 
 
-	final JInternalFrame newMessageWindow = messageWindow;
-	final boolean isNew = newMessage;
-
-	Runnable openWindowCommand = new RunnableAdapter() {
-		public void run() {
-		    if (isNew) {
-			MessagePanel.this.add(newMessageWindow);
-			newMessageWindow.setVisible(true);
-		    } else {
-			if (newMessageWindow.isIcon())
-			    try {
-				newMessageWindow.setIcon(false);
-			    } catch (java.beans.PropertyVetoException e) {
-			    } 
-		    }
-		    
+	if (messageWindow != null) {
+	    final JInternalFrame newMessageWindow = messageWindow;
+	    final boolean isNew = newMessage;
+	    
+	    Runnable openWindowCommand = new RunnableAdapter() {
+		    public void run() {
+			if (isNew) {
+			    MessagePanel.this.add(newMessageWindow);
+			    newMessageWindow.setVisible(true);
+			} else {
+			    if (newMessageWindow.isIcon())
+				try {
+				    newMessageWindow.setIcon(false);
+				} catch (java.beans.PropertyVetoException e) {
+				} 
+			}
+			
 		    try {
 			newMessageWindow.setSelected(true);
 		    } catch (java.beans.PropertyVetoException e) {
 		    }
+		    }
+		};
+	    if (SwingUtilities.isEventDispatchThread())
+		openWindowCommand.run();
+	    else 
+		try {
+		    SwingUtilities.invokeAndWait(openWindowCommand);
+		} catch (Exception e) {
+		    // shouldn't happen.
 		}
-	    };
-	if (SwingUtilities.isEventDispatchThread())
-	    openWindowCommand.run();
-	else 
-	    try {
-		SwingUtilities.invokeAndWait(openWindowCommand);
-	    } catch (Exception e) {
-		// shouldn't happen.
-	    }
-	
+	}
     }
 
     /**

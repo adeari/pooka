@@ -23,7 +23,6 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     public ReadMessageInternalFrame(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
 	super(newParentContainer, newMsgProxy);
 
-	configureMessageInternalFrame();
     }
 
     public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
@@ -53,31 +52,25 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     /**
      * Configures the MessageInteralFrame.
      */
-    protected void configureMessageInternalFrame() {
+    public void configureMessageInternalFrame() throws MessagingException {
 	try {
-	    try {
-		this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
-	    } catch (MessagingException me) {
-		this.setTitle(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.noSubject", "<no subject>"));
-	    }
-	    
-	    messageDisplay = new ReadMessageDisplayPanel(msg);
-	    messageDisplay.configureMessageDisplay();
-	    
-	    toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
-	    
-	    this.getContentPane().add("North", toolbar);
-	    this.getContentPane().add("Center", messageDisplay);
-
-	    toolbar.setActive(this.getActions());
-
-	    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
-	    keyBindings.setActive(getActions());
-
+	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
 	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."));
-	    me.printStackTrace();
+	    this.setTitle(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.noSubject", "<no subject>"));
 	}
+	
+	messageDisplay = new ReadMessageDisplayPanel(msg);
+	messageDisplay.configureMessageDisplay();
+	
+	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
+	
+	this.getContentPane().add("North", toolbar);
+	this.getContentPane().add("Center", messageDisplay);
+	
+	toolbar.setActive(this.getActions());
+	
+	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+	keyBindings.setActive(getActions());
 	
     }
 

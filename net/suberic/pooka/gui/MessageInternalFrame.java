@@ -73,7 +73,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * duties.
      */
 
-    protected abstract void configureMessageInternalFrame();
+    protected abstract void configureMessageInternalFrame() throws MessagingException;
 
     /**
      * This opens the MessageInternalFrame by calling 
@@ -135,6 +135,15 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      */
     public void showError(String errorMessage) {
 	showError(errorMessage, Pooka.getProperty("Error", "Error"));
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage, Exception e) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
     }
 
     /**

@@ -5,7 +5,7 @@ public interface PookaUIFactory extends ErrorHandler {
     /**
      * Creates an appropriate MessageUI object for the given MessageProxy.
      */
-    public MessageUI createMessageUI(MessageProxy mp);
+    public MessageUI createMessageUI(MessageProxy mp) throws javax.mail.MessagingException;
 
     /**
      * Creates an appropriate FolderDisplayUI object for the given

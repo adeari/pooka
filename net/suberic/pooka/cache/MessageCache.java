@@ -6,14 +6,20 @@ import net.suberic.pooka.MessageInfo;
 
 public interface MessageCache {
 
-    // tag defining the entire message
-    public static int MESSAGE = 0;
+    // tag defining the content of the message
+    public static int CONTENT = 0;
 
     // tag defining the headers
     public static int HEADERS = 1;
 
     // tag defining the flags
     public static int FLAGS = 2;
+
+    // tag defining the flags and headers
+    public static int FLAGS_AND_HEADERS = 3;
+
+    // tag defining the entire message
+    public static int MESSAGE = 4;
 
     /**
      * Returns the datahandler for the given message uid.
@@ -137,6 +143,11 @@ public interface MessageCache {
      * Writes any offline changes made back to the server.
      */
     public void writeChangesToServer(Folder f) throws MessagingException;
+
+    /**
+     * Gets the size for the given message, if available.
+     */
+    public int getSize(long uid);
 
     /**
      * Returns whether a given uid exists fully in the cache or not.

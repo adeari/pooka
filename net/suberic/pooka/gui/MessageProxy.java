@@ -432,9 +432,9 @@ public class MessageProxy {
 
     public void showError(String message, Exception ex) {
 	if (getMessageUI() != null) 
-	    getMessageUI().showError(message + ex.getMessage());
+	    getMessageUI().showError(message + ex.getMessage(), ex);
 	else
-	    Pooka.getUIFactory().showError(message + ex.getMessage());
+	    Pooka.getUIFactory().showError(message + ex.getMessage(), ex);
     }
 
     /**

@@ -161,7 +161,19 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * actual implementation of the Dialog.
      */
     public void showError(String errorMessage, String title) {
-	JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	final String errorMsg = errorMessage;
+	final String realTitle = title;
+	Runnable runMe = new Runnable() {
+		public void run() {
+		    JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMsg, realTitle, JOptionPane.ERROR_MESSAGE);
+		}
+	    };
+
+	if (SwingUtilities.isEventDispatchThread()) {
+	    runMe.run();
+	} else {
+	    SwingUtilities.invokeLater(runMe);
+	}
     }
 
     /**
@@ -171,6 +183,15 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      */
     public void showError(String errorMessage) {
 	showError(errorMessage, Pooka.getProperty("Error", "Error"));
+    }
+
+    /**
+     * This shows an Error Message window.  We include this so that
+     * the MessageProxy can call the method without caring abou the
+     * actual implementation of the Dialog.
+     */
+    public void showError(String errorMessage, Exception e) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
     }
 
     /**
@@ -240,11 +261,22 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * This implementation sets the cursor to either Cursor.WAIT_CURSOR
      * if busy, or Cursor.DEFAULT_CURSOR if not busy.
      */
-    public void setBusy(boolean newValue) {
-	if (newValue)
-	    this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    public void setBusy(boolean newBusy) {
+	final boolean newValue = newBusy;
+
+	Runnable runMe = new Runnable() {
+		public void run() {
+		    if (newValue)
+			FolderInternalFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		    else
+			FolderInternalFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		}
+	    };
+
+	if (SwingUtilities.isEventDispatchThread())
+	    runMe.run();
 	else
-	    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	    SwingUtilities.invokeLater(runMe);
     }
 
     /**

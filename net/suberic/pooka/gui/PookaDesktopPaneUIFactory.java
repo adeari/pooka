@@ -4,6 +4,7 @@ import net.suberic.pooka.Pooka;
 import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
+import javax.mail.MessagingException;
 
 /**
  * This is an implementation of PookaUIFactory which creates InternalFrame
@@ -25,7 +26,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     /**
      * Creates an appropriate MessageUI object for the given MessageProxy.
      */
-    public MessageUI createMessageUI(MessageProxy mp) {
+    public MessageUI createMessageUI(MessageProxy mp) throws MessagingException {
 	// each MessageProxy can have exactly one MessageUI.
 	if (mp.getMessageUI() != null)
 	    return mp.getMessageUI();
@@ -33,9 +34,10 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 	MessageUI mui;
 	if (mp instanceof NewMessageProxy) {
 	    mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
-	} else
+	} else {
 	    mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
-	
+	    ((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
+	}
 	return mui;
     }
 
@@ -152,6 +154,13 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
      */
     public void showError(String errorMessage) {
 	showError(errorMessage, Pooka.getProperty("Error", "Error"));
+    }
+
+    /**
+     * This shows an Error Message window.  
+     */
+    public void showError(String errorMessage, Exception e) {
+	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
     }
 
     /**
