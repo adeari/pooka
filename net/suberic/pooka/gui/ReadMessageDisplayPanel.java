@@ -23,9 +23,15 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     boolean showFullHeaders = false;
     
     /**
-     * Creates a MessageDisplayPanel from the given Message.
+     * Creates an empty MessageDisplayPanel.
      */
-    
+    public ReadMessageDisplayPanel() {
+	super();
+    }
+
+    /**
+     * Creates a MessageDisplayPanel from the given Message.
+     */    
     public ReadMessageDisplayPanel(MessageProxy newMsgProxy) {
 	super(newMsgProxy);
     }
@@ -63,6 +69,21 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		    }
 		}
 	    });
+    }
+
+    /**
+     * This clears the ReadMessageDisplayPanel.
+     */
+    public void clearPanel() {
+	if (splitPane != null)
+	    this.remove(splitPane);
+	else
+	    this.remove(editorPane);
+	splitPane = null;
+	editorPane = null;
+	attachmentPanel = null;
+	editorScrollPane = null;
+	hasAttachment = false;
     }
 
     /**

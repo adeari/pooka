@@ -7,6 +7,8 @@ ui engine
 
 *) add an optional preview pane.
 
+*) bug:  i seem to have broken some of the sizing code.
+
 general ui
 ----------
 *) revamp the UserProfile, Store, and Folder editing process.  make a full
@@ -16,6 +18,7 @@ so you can edit them by right-clicking on the folder.  in other words, do
 a big ui overhaul.
 
 *) takes too long to open a window where there are a lot of new messages.
+	note:  this is much better now.
 
 *) add the ability to save messages to files.
 
@@ -39,6 +42,8 @@ disconnected mode.
 
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.
+
+*) support for ssl?'
 
 searching
 ---------
@@ -68,6 +73,9 @@ Panel.  we need to cache that.
 *) bug:  there's a problem either with line wrapping or with the size of the
 ReadMessageWindow.  They should be the same size, such that if you read a
 message that you wrote, the lines will wrap at the correct place.
+
+*) bug:  send mail seems to be on the awt event thread.
+
 
 after beta 1
 ----------------

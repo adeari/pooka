@@ -36,99 +36,142 @@ public class FolderDisplayPanel extends JPanel {
     FolderInfo folderInfo = null;
     boolean enabled = true;
 
-    /*
+    /**
+     * Creates an empty FolderDisplayPanel.
+     */
+    public FolderDisplayPanel() {
+	initWindow();
+	enabled=false;
+    }
+
+    /**
      * Creates a FolderDisplayPanel for the given FolderInfo.
      */
 
     public FolderDisplayPanel(FolderInfo newFolderInfo) {
-
-	setFolderInfo(newFolderInfo);
-
 	initWindow();
-
-	// if the FolderDisplayPanel itself gets the focus, pass it on to
-	// the messageTable
-
-	this.addFocusListener(new FocusAdapter() {
-		public void focusGained(FocusEvent e) {
-		    messageTable.requestFocus();
-		    if (getFolderInfo().hasNewMessages()) {
-			getFolderInfo().setNewMessages(false);
-			FolderNode fn = getFolderInfo().getFolderNode();
-			if (fn != null)
-			    fn.getParentContainer().repaint();
-		    }
-		    
-		}
-	    });
-
+	setFolderInfo(newFolderInfo);
+	addMessageTable();
     }
 
     /**
      * Initializes the window. 
      */
 
-    private void initWindow() {
+    public void initWindow() {
 	scrollPane = new JScrollPane();
 	this.setLayout(new BorderLayout());
 	this.add("Center", scrollPane);
 
 	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+	
+	// if the FolderDisplayPanel itself gets the focus, pass it on to
+	// the messageTable
+	this.addFocusListener(new FocusAdapter() {
+		public void focusGained(FocusEvent e) {
+		    if (messageTable != null)
+			messageTable.requestFocus();
+		    if (getFolderInfo() != null && getFolderInfo().hasNewMessages()) {
+			getFolderInfo().setNewMessages(false);
+			FolderNode fn = getFolderInfo().getFolderNode();
+			if (fn != null)
+			    fn.getParentContainer().repaint();
+		    }
+		}
+	    });
+    }
+
+    /**
+     * Creates the JTable for the FolderInfo and adds it to the component.
+     */
+    public void addMessageTable() {
+	if (folderInfo != null) {
+	    createMessageTable();
+	    scrollPane.getViewport().add(messageTable);
+	    int lastUnread = selectFirstUnread();
+	    makeSelectionVisible(lastUnread);
+	}
+	    
+    }
+
+    /**
+     * This creates the messageTable.
+     */
+    public void createMessageTable() {
 	messageTable=new JTable(getFolderInfo().getFolderTableModel());
+	getFolderInfo().getFolderTableModel().addTableModelListener(messageTable);
+
 	if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
 	    messageTable.setShowVerticalLines(false);
 	    messageTable.setShowHorizontalLines(false);
 	}
-
-	//messageTable.sizeColumnsToFit(JTable.AUTO_RESIZE_NEXT_COLUMN);
 	
 	for (int i = 0; i < messageTable.getColumnCount(); i++) {
 	    messageTable.getColumnModel().getColumn(i).setPreferredWidth(getFolderInfo().getFolderTableModel().getColumnSize(i));
 	}
+	
+	messageTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+	
+	messageTable.setDefaultRenderer(Object.class, new DefaultFolderCellRenderer());
+	messageTable.setDefaultRenderer(Number.class, new DefaultFolderCellRenderer());
 
-	getFolderInfo().getFolderTableModel().addTableModelListener(messageTable);
+	addListeners();
+    }
+    
+    /**
+     * This removes the current message table.
+     */
+    public void removeMessageTable() {
+	if (messageTable != null) {
+	    scrollPane.getViewport().remove(messageTable);
+	    if (getFolderInfo() != null)
+		getFolderInfo().getFolderTableModel().removeTableModelListener(messageTable);
+	    messageTable = null;
+	}
+    }
 
+    /**
+     * This adds all the listeners to the current FolderDisplayPanel.
+     */
+
+    public void addListeners() {
 	// add a mouse listener 
-
-		messageTable.addMouseListener(new MouseAdapter() {
-	    public void mouseClicked(MouseEvent e) {
-		if (e.getClickCount() == 2) {
-		    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
-		    if (rowIndex != -1) {
-			getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
-			MessageProxy selectedMessage = getSelectedMessage();
-			String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
-			if (selectedMessage != null) {
-			    Action clickAction = selectedMessage.getAction(actionCommand);
-			    if (clickAction != null && isEnabled()) {
-				clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
-				
+	
+	messageTable.addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent e) {
+		    if (e.getClickCount() == 2) {
+			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+			if (rowIndex != -1) {
+			    getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+			    MessageProxy selectedMessage = getSelectedMessage();
+			    String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
+			    if (selectedMessage != null) {
+				Action clickAction = selectedMessage.getAction(actionCommand);
+				if (clickAction != null && isEnabled()) {
+				    clickAction.actionPerformed (new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
+				    
+				}
 			    }
 			}
 		    }
 		}
-	    }
-
-	    public void mousePressed(MouseEvent e) {
-		if (SwingUtilities.isRightMouseButton(e)) {
-		    // see if anything is selected
-		    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
-		    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
-			getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+		
+		public void mousePressed(MouseEvent e) {
+		    if (SwingUtilities.isRightMouseButton(e)) {
+			// see if anything is selected
+			int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+			if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
+			    getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+			}
+			
+			MessageProxy selectedMessage = getSelectedMessage();
+			if (selectedMessage != null && isEnabled())
+			    selectedMessage.showPopupMenu(getMessageTable(), e);
 		    }
-		    
-		    MessageProxy selectedMessage = getSelectedMessage();
-		    if (selectedMessage != null && isEnabled())
-			selectedMessage.showPopupMenu(getMessageTable(), e);
 		}
-	    }
-	});
+	    });
 
 	messageTable.getSelectionModel().addListSelectionListener(new SelectionListener());
-	messageTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-	messageTable.setDefaultRenderer(Object.class, new DefaultFolderCellRenderer());
-	messageTable.setDefaultRenderer(Number.class, new DefaultFolderCellRenderer());
 
 	// add sorting by header.
 
@@ -158,36 +201,31 @@ public class FolderDisplayPanel extends JPanel {
 			if (selectedMessage != null) {
 			    int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
 			    messageTable.setRowSelectionInterval(selectedIndex, selectedIndex);
-			    String javaVersion = System.getProperty("java.version");
-			    
-			    if (javaVersion.compareTo("1.3") >= 0) {
-				
-				// this really is awful.  i hope that they fix getCellRect() and
-				// scrollToRect in 1.3
-				
-				int rowHeight = messageTable.getRowHeight();
-				JScrollBar vsb = scrollPane.getVerticalScrollBar();
-				int newValue = Math.min(rowHeight * (selectedIndex - 1), vsb.getMaximum() - vsb.getModel().getExtent());
-				vsb.setValue(newValue);
-				newValue = Math.min(rowHeight * (selectedIndex - 1), vsb.getMaximum() - vsb.getModel().getExtent());
-				vsb.setValue(newValue);
-			    } else {
-				messageTable.scrollRectToVisible(messageTable.getCellRect(selectedIndex, 1, true));
-			    }
+			    makeSelectionVisible(selectedIndex);
 			}
 		    }
 		}
 	    });
-	
-	
-	scrollPane.getViewport().add(messageTable);
-
+    }
+    
+    /**
+     * This finds the first unread message (if any) and sets that message
+     * to selected, and returns that index.
+     */
+    public int selectFirstUnread() {
 	int firstUnread = getFolderInfo().getFirstUnreadMessage();
 	if (firstUnread < 0)
 	    firstUnread = messageTable.getRowCount();
 	else 
 	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
-	
+
+	return firstUnread;
+    }
+
+    /**
+     * This scrolls the given row number to visible.
+     */
+    public void makeSelectionVisible(int rowNumber) {
 	String javaVersion = System.getProperty("java.version");
 
         if (javaVersion.compareTo("1.3") >= 0) {
@@ -197,15 +235,15 @@ public class FolderDisplayPanel extends JPanel {
 
 	    int rowHeight = messageTable.getRowHeight();
 	    JScrollBar vsb = scrollPane.getVerticalScrollBar();
-	    int newValue = Math.min(rowHeight * (firstUnread - 1), vsb.getMaximum() - vsb.getModel().getExtent());
+	    int newValue = Math.min(rowHeight * (rowNumber - 1), vsb.getMaximum() - vsb.getModel().getExtent());
 	    vsb.setValue(newValue);
-	    newValue = Math.min(rowHeight * (firstUnread - 1), vsb.getMaximum() - vsb.getModel().getExtent());
+	    newValue = Math.min(rowHeight * (rowNumber - 1), vsb.getMaximum() - vsb.getModel().getExtent());
 	    vsb.setValue(newValue);
 	} else {
-	    messageTable.scrollRectToVisible(messageTable.getCellRect(firstUnread, 1, true));
+	    messageTable.scrollRectToVisible(messageTable.getCellRect(rowNumber, 1, true));
 	}
-
     }
+
 
     /**
      * This method takes the currently selected row(s) and returns the
@@ -214,18 +252,22 @@ public class FolderDisplayPanel extends JPanel {
      * If no rows are selected, null is returned.
      */
     public MessageProxy getSelectedMessage() {
-	int rowsSelected = messageTable.getSelectedRowCount();
-
-	if (rowsSelected == 1) 
-	    return getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
-	else if (rowsSelected < 1) 
+	if (messageTable != null) {
+	    int rowsSelected = messageTable.getSelectedRowCount();
+	    
+	    if (rowsSelected == 1) 
+		return getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+	    else if (rowsSelected < 1) 
+		return null;
+	    else {
+		int[] selectedRows = messageTable.getSelectedRows();
+		MessageProxy[] msgSelected= new MessageProxy[selectedRows.length];
+		for (int i = 0; i < selectedRows.length; i++) 
+		    msgSelected[i] = getFolderInfo().getMessageProxy(selectedRows[i]);
+		return new MultiMessageProxy(selectedRows, msgSelected, this.getFolderInfo());
+	    }
+	} else {
 	    return null;
-	else {
-	    int[] selectedRows = messageTable.getSelectedRows();
-	    MessageProxy[] msgSelected= new MessageProxy[selectedRows.length];
-	    for (int i = 0; i < selectedRows.length; i++) 
-		msgSelected[i] = getFolderInfo().getMessageProxy(selectedRows[i]);
-	    return new MultiMessageProxy(selectedRows, msgSelected, this.getFolderInfo());
 	}
     }
 
@@ -242,6 +284,9 @@ public class FolderDisplayPanel extends JPanel {
 	return messageTable;
     }
 
+    /**
+     * This sets the FolderInfo.
+     */
     public void setFolderInfo(FolderInfo newValue) {
 	folderInfo=newValue;
     }
@@ -251,7 +296,10 @@ public class FolderDisplayPanel extends JPanel {
     }
 
     public FolderTableModel getFolderTableModel() {
-	return getFolderInfo().getFolderTableModel();
+	if (getFolderInfo() != null)
+	    return getFolderInfo().getFolderTableModel();
+	else
+	    return null;
     }
 
     /**

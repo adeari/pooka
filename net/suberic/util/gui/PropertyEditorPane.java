@@ -7,7 +7,7 @@ import net.suberic.util.VariableBundle;
 public class PropertyEditorPane extends Box implements PropertyEditorUI {
     Vector editors;
     PropertyEditorFactory factory;
-    JInternalFrame container;
+    Container container;
 
     /**
      * This contructor creates a PropertyEditor for the list of 
@@ -15,7 +15,7 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
      */     
     public PropertyEditorPane(PropertyEditorFactory newFactory, 
                               Vector properties, 
-                              JInternalFrame newContainer) {
+                              Container newContainer) {
 	super(BoxLayout.Y_AXIS);
         
 	factory = newFactory;
@@ -44,7 +44,7 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
      */     
     public PropertyEditorPane(PropertyEditorFactory newFactory, 
                               Vector properties, Vector templateTypes,
-                              JInternalFrame newContainer) {
+                              Container newContainer) {
 	super(BoxLayout.Y_AXIS);
         
 	factory = newFactory;
@@ -108,9 +108,13 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
 	buttonBox.add(createButton("Ok", new AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
 		setValue();
-		try {
-		    container.setClosed(true);
-		} catch (java.beans.PropertyVetoException pve) {
+		if (container instanceof JInternalFrame) {
+		    try {
+			((JInternalFrame)container).setClosed(true);
+		    } catch (java.beans.PropertyVetoException pve) {
+		    }
+		} else if (container instanceof JFrame) {
+		    ((JFrame)container).dispose();
 		}
 	    }
 	}, true));
@@ -123,9 +127,13 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
 
 	buttonBox.add(createButton("Cancel", new AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
-		try {
-		    container.setClosed(true);
-		} catch (java.beans.PropertyVetoException pve) {
+		if (container instanceof JInternalFrame) {
+		    try {
+			((JInternalFrame)container).setClosed(true);
+		    } catch (java.beans.PropertyVetoException pve) {
+		    }
+		} else if (container instanceof JFrame) {
+		    ((JFrame)container).dispose();
 		}
 	    }
 	}, false));

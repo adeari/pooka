@@ -61,9 +61,9 @@ public class NewMessageProxy extends MessageProxy {
 		UserProfile profile = getNewMessageUI().getSelectedProfile();
 		InternetHeaders headers = getNewMessageUI().getMessageHeaders();
 
-		String messageText = getMessageUI().getMessageText();
+		String messageText = getNewMessageUI().getMessageText();
 
-		String messageContentType = getMessageUI().getMessageContentType();
+		String messageContentType = getNewMessageUI().getMessageContentType();
 		getNewMessageInfo().sendMessage(profile, headers, messageText, messageContentType);
 
 		try {

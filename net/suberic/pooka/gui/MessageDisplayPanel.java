@@ -31,6 +31,13 @@ public abstract class MessageDisplayPanel extends JPanel {
     JScrollPane attachmentScrollPane;
 
     /**
+     * Creates an empty MessageDisplayPanel.
+     */
+    public MessageDisplayPanel() {
+	this.setLayout(new BorderLayout());
+    }
+
+    /**
      * Creates a MessageDisplayPanel for the given MessageProxy.
      */
     public MessageDisplayPanel(MessageProxy newMsgProxy) {

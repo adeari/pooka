@@ -3,6 +3,10 @@ package net.suberic.pooka.gui;
 public interface NewMessageUI extends MessageUI {
     public void setModified(boolean newValue);
 
+    public String getMessageText();
+
+    public String getMessageContentType();
+
     public java.io.File[] getFiles(String Title, String buttonText);
 
     public void attachmentAdded(int index);

@@ -1,4 +1,8 @@
 package net.suberic.pooka.gui;
+import net.suberic.util.gui.PropertyEditorFactory;
+import net.suberic.pooka.Pooka;
+import javax.swing.JInternalFrame;
+
 
 /**
  * This is an implementation of PookaUIFactory which creates InternalFrame
@@ -7,12 +11,15 @@ package net.suberic.pooka.gui;
 public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    
     MessagePanel messagePanel = null;
-
+    PropertyEditorFactory editorFactory = null;
+    
     /**
      * Constructor.
      */
     public PookaDesktopPaneUIFactory(MessagePanel newMessagePanel) {
 	messagePanel = newMessagePanel;
+
+	editorFactory = new PookaDesktopPropertyEditorFactory(Pooka.getResources());
     }
 
     /**
@@ -47,9 +54,31 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     }
 
     /**
+     * Shows an Editor Window for the properties in the properties 
+     * Vector with the given title.
+     */
+    public void showEditorWindow(String title, java.util.Vector properties) {
+	JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, properties);
+	getMessagePanel().add(jif);
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
+	    
+    }
+
+    /**
      * Returns the MessagePanel associated with this Factory.
      */
     public MessagePanel getMessagePanel() {
 	return messagePanel;
+    }
+
+    /**
+     * Returns the PropertyEditorFactory used by this component.
+     */
+    public PropertyEditorFactory getEditorFactory() {
+	return editorFactory;
     }
 }

@@ -9,10 +9,6 @@ public interface MessageUI extends UserProfileContainer, ErrorHandler, ActionCon
 
     public MessageProxy getMessageProxy();
 
-    public String getMessageText();
-
-    public String getMessageContentType();
-
     public String showInputDialog(String inputMessage, String title);
 
     public String showInputDialog(Object[] inputPanels, String title);

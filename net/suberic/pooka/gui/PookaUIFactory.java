@@ -13,4 +13,13 @@ public interface PookaUIFactory {
      */
     public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi);
 
+    /**
+     * Shows an Editor Window.
+     */
+    public void showEditorWindow(String title, java.util.Vector properties);
+
+    /**
+     * Returns the PropertyEditorFactory used by this component.
+     */
+    public net.suberic.util.gui.PropertyEditorFactory getEditorFactory();
 }

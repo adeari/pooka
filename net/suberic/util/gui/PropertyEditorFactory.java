@@ -26,17 +26,17 @@ public class PropertyEditorFactory {
     }
 
     /**
-     * This method returns an EditorWindow (a JInternalFrame in this 
+     * This method returns an EditorWindow (a JFrame in this
      * implementation) which has an editor for each property in the
      * properties Vector.  The title string is the title of the 
      * JInternalFrame.
      */
     public Container createEditorWindow(String title, Vector properties) {
-	JInternalFrame jif = new JInternalFrame(title, false, false, false, false);
-	jif.getContentPane().add(new PropertyEditorPane(this, properties, jif));
-	jif.setSize(100,100);
-	jif.pack();
-	return jif;
+	JFrame jf = new JFrame(title);
+	jf.getContentPane().add(new PropertyEditorPane(this, properties, jf));
+	jf.setSize(100,100);
+	jf.pack();
+	return jf;
     }
 
     /**
@@ -119,7 +119,7 @@ public class PropertyEditorFactory {
 
     public String showInputDialog(DefaultPropertyEditor dpe, String query) {
 	if (dpe instanceof java.awt.Component) 
-	    return JOptionPane.showInternalInputDialog(dpe, query);
+	    return JOptionPane.showInputDialog(dpe, query);
 	else
 	    return null;
     }
