@@ -111,7 +111,7 @@ public class FolderTracker extends Thread {
 		}
 	    }
 	    
-	    folderInfo.resetUnread();
+	    folderInfo.resetMessageCounts();
 	}
     }
     
