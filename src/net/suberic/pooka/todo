@@ -1,9 +1,6 @@
 *) bug:  can't switch back to original theme in theme configuration (starts
 	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
 
-*) change FolderTracker to use events rather than synchronizing on the
-   folder lock.
-
 *) connecting when server is down:  connection refused error message
 	really terribly formatted.
 
@@ -36,15 +33,17 @@
 *) fix cryptix inclusion from webstart.
 
 *) fix disconnection handling really.
-   -) order of events.
+   -) order of events. -- make sure the Store check is high priority.
    -) handling of events, including timeouts and such.
-	- check isConnected() on IMAPStore
-	  -- download javamail source.  sigh.
 	- check order of handlings; make sure we don't end up in a 
 	  situation where we wait too long to check the connection status.
    -) make sure auto-reconnects work.
-   
+
+*) move todo list and CHANGES file to top directory.   
+
 -----------
+
+*) add an option to build.xml for compiling with deprecation enabled.
 
 *) fix non-plaintext-password support with imap (logindisabled)
 

@@ -240,7 +240,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       loading = true;
 
       if (parentStore != null) {
-	//try {
 	getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
 	
 	if (! parentStore.isAvailable())

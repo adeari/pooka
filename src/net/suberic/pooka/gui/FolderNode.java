@@ -441,7 +441,6 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   public void openFolder(boolean pReconnect) {
 
     try {
-      
       getFolderInfo().loadAllMessages();
       
       if (! getFolderInfo().isSortaOpen() || (pReconnect && ! getFolderInfo().isConnected())) {
@@ -494,7 +493,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       final MessagingException newMe = me;
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
-	    Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + "\n", newMe);
+	    Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
 	  }
 	});
     }

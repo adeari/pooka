@@ -1,3 +1,7 @@
+made it so the FolderTracker's actions run at a lower priority.  also fixed
+the tracking function so that it calculates the next update time after the
+first one has finished, rather than before.
+
 fixed a display bug in which a line that was the exact length of the display
 field then followed by a newline would add in an extra, unnecessary newline.
 
