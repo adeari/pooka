@@ -187,6 +187,7 @@ FolderTable.Subject.value=Subject
 FolderTable.Subject.size=235
 FolderTable.2xClickAction=file-open
 FolderTable.UnreadStyle=BOLD
+FolderTable.showLines=true
 
 SentFolderTable=SentDate:To:Subject
 SentFolderTable.SentDate.value=Date

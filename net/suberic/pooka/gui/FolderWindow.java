@@ -151,6 +151,11 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
 	messageTable=new JTable(getFolderInfo().getFolderTableModel());
+	if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
+	    messageTable.setShowVerticalLines(false);
+	    messageTable.setShowHorizontalLines(false);
+	}
+
 	//messageTable.sizeColumnsToFit(JTable.AUTO_RESIZE_NEXT_COLUMN);
 	
 	for (int i = 0; i < messageTable.getColumnCount(); i++) {
