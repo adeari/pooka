@@ -240,7 +240,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     class OpenAction extends AbstractAction {
 
 	OpenAction() {
-	    super("folder-open");
+	    super("file-open");
 	}
 
 	OpenAction(String nm) {

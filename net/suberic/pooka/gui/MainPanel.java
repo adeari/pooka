@@ -19,7 +19,7 @@ import net.suberic.util.gui.*;
  * @version 0.7 02/28/2000
  */
 
-public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelectionListener, net.suberic.pooka.UserProfileContainer {
+public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer {
     private ConfigurableMenuBar mainMenu;
     private ConfigurableToolbar mainToolbar;
     private FolderPanel folderPanel;
@@ -178,10 +178,6 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	}
     }
 
-    public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
-	refreshActiveMenus(mainMenu);
-    }
-
     /**
      * As defined in net.suberic.pooka.UserProfileContainer.
      *
@@ -288,7 +284,9 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	new EditUserConfigAction(),
 	new EditStoreConfigAction(),
 	new HelpAboutAction(),
-	new HelpLicenseAction()
+	new HelpLicenseAction(),
+	new SelectMessagePanelAction(),
+	new SelectFolderPanelAction()
     };
 
 
@@ -394,6 +392,28 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	    String fileName="COPYING";
 	    String dir="/net/suberic/pooka";
 	    showHelpScreen(Pooka.getProperty("MenuBar.Help.License.Label", "License"), this.getClass().getResource(dir + "/" + fileName));
+	}
+    }
+
+    class SelectMessagePanelAction extends AbstractAction {
+	
+	SelectMessagePanelAction() {
+	    super("select-message-panel");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    messagePanel.requestFocus();
+	}
+    }
+
+    class SelectFolderPanelAction extends AbstractAction {
+	
+	SelectFolderPanelAction() {
+	    super("select-folder-panel");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    folderPanel.requestFocus();
 	}
     }
 }

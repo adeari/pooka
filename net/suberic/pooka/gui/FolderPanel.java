@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.ValueChangeListener;
+import net.suberic.util.gui.ConfigurableKeyBinding;
 import java.awt.*;
 import java.awt.event.*;
 import javax.mail.*;
@@ -17,6 +18,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
     JTree folderTree;
     DefaultTreeModel folderModel;
     Session session;
+    ConfigurableKeyBinding keyBindings;
     
     public FolderPanel(MainPanel newMainPanel) {
 	mainPanel=newMainPanel;
@@ -34,7 +36,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 		if (e.getClickCount() == 2) {
 		    MailTreeNode tmpNode = getSelectedNode();
 		    if (tmpNode != null) {
-			String actionCommand = Pooka.getProperty("FolderPanel.2xClickAction", "folder-open");
+			String actionCommand = Pooka.getProperty("FolderPanel.2xClickAction", "file-open");
 			Action clickAction = getSelectedNode().getAction(actionCommand);
 			if (clickAction != null ) {
 			    clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
@@ -64,8 +66,27 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 		    }
 		}
 	    });
-	folderTree.addTreeSelectionListener(getMainPanel());
+	folderTree.addTreeSelectionListener(new TreeSelectionListener() {
+		public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
+		    getMainPanel().refreshActiveMenus(getMainPanel().getMainMenu());
+		    keyBindings.setActive(getActions());
+		}
+	    });
+
 	folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
+
+	keyBindings = new ConfigurableKeyBinding(this, "FolderPanel.keyBindings", Pooka.getResources());
+	keyBindings.setActive(getActions());
+
+	// if the FolderPanel itself ever gets focus, pass it on to the
+	// folderTree.
+
+	this.addFocusListener(new FocusAdapter() {
+		public void focusGained(FocusEvent e) {
+		    folderTree.requestFocus();
+		}
+	    });
+
     }
 
     public MailTreeNode getSelectedNode() {

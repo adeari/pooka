@@ -7,6 +7,7 @@ import java.util.*;
 import net.suberic.pooka.gui.*;
 import net.suberic.util.ValueChangeListener;
 import net.suberic.util.thread.ActionThread;
+import net.suberic.util.VariableBundle;
 
 /**
  * This class does all of the work for a Store.  It keeps track of the
@@ -15,6 +16,8 @@ import net.suberic.util.thread.ActionThread;
  */
 
 public class StoreInfo implements ValueChangeListener {
+    public static Vector allStores = null;
+
     private Store store;
 
     // The is the store ID.
@@ -217,6 +220,82 @@ public class StoreInfo implements ValueChangeListener {
 	    connected=false;
 	    store.close();
 	}
+    }
+
+    /**
+     * This loads and creates all the Stores from the Store property of
+     * the VariableBundle.
+     */
+    public static Vector loadAllStores(VariableBundle resources) {
+	allStores = new Vector();
+	String storeID = null;
+	StringTokenizer tokens =  new StringTokenizer(resources.getProperty("Store", ""), ":");
+	
+	while (tokens.hasMoreTokens()) {
+	    storeID=(String)tokens.nextElement();
+	    
+	    addStore(storeID);	    
+	}
+
+	return allStores;
+    }
+
+    /**
+     * This adds the store with the given storeName to the allStores list.
+     */
+    public static void addStore(String storeName) {
+	if (getStoreInfo(storeName) == null) {
+	    StoreInfo store = new StoreInfo(storeName);
+	    allStores.add(store);
+	}
+    }
+
+    /**
+     * This adds the StoreInfo to the allStores list.
+     */
+    public static void addStore(StoreInfo storeInfo) {
+	if (!allStores.contains(storeInfo))
+	    allStores.add(storeInfo);
+    }
+
+    /**
+     * This removes the StoreInfo with the given storeName from the allStores
+     * list.
+     */
+    public static void removeStore (String storeName) {
+	boolean removed = false;
+
+	for (int i = 0; (removed == false) && i < allStores.size(); i++) {
+	    StoreInfo si = (StoreInfo)(allStores.elementAt(i));
+
+	    if (si.getStoreID().equals(storeName)) {
+		allStores.remove(si);
+		removed = true;
+	    }
+	}	
+    }
+    
+    /**
+     * This removes the StoreInfo from the allStores list.
+     */
+
+    public static void removeStore (StoreInfo storeInfo) {
+	allStores.remove(storeInfo);
+    }
+
+    /**
+     * This returns the StoreInfo with the given storeName if it exists
+     * in the allStores Vector; otherwise, returns null.
+     */
+    static public StoreInfo getStoreInfo(String storeName) {
+	for (int i = 0; i < allStores.size(); i++) {
+	    StoreInfo si = (StoreInfo)(allStores.elementAt(i));
+
+	    if (si.getStoreID().equals(storeName)) {
+		return si;
+	    }
+	}	
+	return null;
     }
 
     // Accessor methods.

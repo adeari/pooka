@@ -28,15 +28,14 @@ Pooka.openFoldersOnConnect=true
 
 MenuBar=File:Edit:Mail:Window:Help
 
-MenuBar.File=NewFolder:NewMail:OpenFolder:OpenMessage:Close:SaveAs:Print:Exit
+MenuBar.File=NewFolder:NewMail:Open:Close:SaveAs:Print:Exit
 #MenuBar.File=NewMail:OpenFolder:OpenMessage:Close:Exit
 
 MenuBar.File.NewFolder.Action=folder-new
 MenuBar.File.NewFolder.Image=/net/suberic/pooka/gui/images/New.gif
 MenuBar.File.NewMail.Action=message-new
-MenuBar.File.OpenFolder.Action=folder-open
-MenuBar.File.OpenFolder.Image=/net/suberic/pooka/gui/images/Open.gif
-MenuBar.File.OpenMessage.Action=message-open
+MenuBar.File.Open.Action=file-open
+MenuBar.File.Open.Image=/net/suberic/pooka/gui/images/Open.gif
 MenuBar.File.Close.Action=file-close
 MenuBar.File.Close.Image=/net/suberic/pooka/gui/images/Delete.gif
 MenuBar.File.SaveAs.Action=file-saveAs
@@ -86,18 +85,15 @@ MenuBar.Help=About:License
 MenuBar.Help.About.Action=help-about
 MenuBar.Help.License.Action=help-license
 
-#MainToolbar = FolderNew:FolderOpen:FolderClose:|:MessageNew:MessageOpen:MessageSave:MessageClose:|:Cut:Copy:Paste
-MainToolbar = FolderOpen:MessageNew:MessageOpen:MessageClose:|:Cut:Copy:Paste:Print
+MainToolbar = Open:MessageNew:MessageClose:|:Cut:Copy:Paste:Print
 MainToolbar.FolderNew.Action=folder-new
 MainToolbar.FolderNew.Image=/net/suberic/pooka/gui/images/New.gif
-MainToolbar.FolderOpen.Action=folder-open
-MainToolbar.FolderOpen.Image=/net/suberic/pooka/gui/images/Open.gif
 MainToolbar.FolderClose.Action=folder-close
 MainToolbar.FolderClose.Image=/net/suberic/pooka/gui/images/Delete.gif
 MainToolbar.MessageNew.Action=message-new
 MainToolbar.MessageNew.Image=/net/suberic/pooka/gui/images/New.gif
-MainToolbar.MessageOpen.Action=message-open
-MainToolbar.MessageOpen.Image=/net/suberic/pooka/gui/images/Open.gif
+MainToolbar.Open.Action=file-open
+MainToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
 MainToolbar.MessageSave.Action=message-save
 MainToolbar.MessageSave.Image=/net/suberic/pooka/gui/images/Save.gif
 MainToolbar.MessageClose.Action=file-close
@@ -116,7 +112,7 @@ FolderWindowToolbar.Down.Action=folder-down
 FolderWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
 FolderWindowToolbar.Up.Action=folder-up
 FolderWindowToolbar.Up.Image=/net/suberic/pooka/gui/images/Up.gif
-FolderWindowToolbar.Open.Action=message-open
+FolderWindowToolbar.Open.Action=file-open
 FolderWindowToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
 FolderWindowToolbar.Reply.Action=message-reply
 FolderWindowToolbar.Reply.Image=/net/suberic/pooka/gui/images/Reply.gif
@@ -154,7 +150,7 @@ MessageWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 MessageWindowToolbar.Copy.Action=copy-to-clipboard
 MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 
-FolderPanel.2xClickAction=folder-open
+FolderPanel.2xClickAction=file-open
 
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 FolderTable=New:SentDate:From:Subject
@@ -177,7 +173,7 @@ FolderTable.From.value=From
 FolderTable.From.size=200
 FolderTable.Subject.value=Subject
 FolderTable.Subject.size=235
-FolderTable.2xClickAction=message-open
+FolderTable.2xClickAction=file-open
 FolderTable.UnreadStyle=BOLD
 
 SentFolderTable=SentDate:To:Subject
@@ -190,20 +186,20 @@ FolderTable.Subject.size=260
 
 # -- Popup menus.
 FolderNode.popupMenu=Open:Update:Close:New:Edit
-FolderNode.popupMenu.Open.Action=folder-open
+FolderNode.popupMenu.Open.Action=file-open
 FolderNode.popupMenu.Update.Action=folder-update
 FolderNode.popupMenu.Close.Action=folder-close
 FolderNode.popupMenu.New.Action=file-new
 FolderNode.popupMenu.Edit.Action=file-edit
 
 StoreNode.popupMenu=Open:Subscribe:Close:Edit
-StoreNode.popupMenu.Open.Action=folder-open
+StoreNode.popupMenu.Open.Action=file-open
 StoreNode.popupMenu.Close.Action=file-close
 StoreNode.popupMenu.Subscribe.Action=folder-subscribe
 StoreNode.popupMenu.Edit.Action=file-edit
 
 MessageProxy.popupMenu=Open:Move:Reply:ReplyAll:Forward:Delete
-MessageProxy.popupMenu.Open.Action=message-open
+MessageProxy.popupMenu.Open.Action=file-open
 MessageProxy.popupMenu.Move.Action=message-move
 MessageProxy.popupMenu.Move.class=net.suberic.pooka.gui.FolderMenu
 MessageProxy.popupMenu.Reply.Action=message-reply
@@ -212,7 +208,7 @@ MessageProxy.popupMenu.Forward.Action=message-forward
 MessageProxy.popupMenu.Delete.Action=message-delete
 
 MultiMessageProxy.popupMenu=Open:Move:Delete
-MultiMessageProxy.popupMenu.Open.Action=message-open
+MultiMessageProxy.popupMenu.Open.Action=file-open
 MultiMessageProxy.popupMenu.Move.Action=message-move
 MultiMessageProxy.popupMenu.Move.class=net.suberic.pooka.gui.FolderMenu
 MultiMessageProxy.popupMenu.Delete.Action=message-delete

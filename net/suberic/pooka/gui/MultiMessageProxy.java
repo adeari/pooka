@@ -171,7 +171,7 @@ public class MultiMessageProxy extends MessageProxy{
 
     public class OpenAction extends AbstractAction {
 	OpenAction() {
-	    super("message-open");
+	    super("file-open");
 	}
 
 	public void actionPerformed(java.awt.event.ActionEvent e) {

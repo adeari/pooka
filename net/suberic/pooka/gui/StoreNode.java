@@ -142,7 +142,7 @@ public class StoreNode extends MailTreeNode {
     class OpenAction extends AbstractAction {
 	
         OpenAction() {
-            super("folder-open");
+            super("file-open");
         }
 	
         OpenAction(String nm) {

@@ -149,7 +149,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 		    if (rowIndex != -1) {
 			getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
 			MessageProxy selectedMessage = getSelectedMessage();
-			String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "message-open");
+			String actionCommand = Pooka.getProperty("MessagePanel.2xClickAction", "file-open");
 			if (selectedMessage != null) {
 			    Action clickAction = selectedMessage.getAction(actionCommand);
 			    if (clickAction != null) {

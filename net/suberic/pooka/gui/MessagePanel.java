@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
 import net.suberic.util.swing.RunnableAdapter;
+import net.suberic.util.gui.ConfigurableKeyBinding;
 import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -70,6 +71,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     // end internal class ExtendedDesktopManager
 
     MainPanel mainPanel;
+    ConfigurableKeyBinding keyBindings;
 
     /**
      * Creates a new MessagePanel to go in the given MainPanel.
@@ -79,6 +81,9 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	//this.setAutoscrolls(true);
 	this.setSize(1000, 1000);
 	
+	keyBindings = new ConfigurableKeyBinding(this, "InternalFrame.keyBindings", Pooka.getResources());
+	keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	keyBindings.setActive(getActions());
     }
 
     /**
@@ -214,6 +219,71 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	return null;
     }
 
+    /**
+     * This makes the next JInternalFrame in the list be selected.
+     */
+    public void selectNextWindow() {
+	JInternalFrame[] allFrames = getAllFrames();
+
+	if (allFrames.length > 0) {
+	    for(int i = 0; i < allFrames.length; i++) {
+		if (allFrames[i].isSelected()) {
+		    JInternalFrame selected = allFrames[i];
+		    JInternalFrame newSelected = allFrames[i + 1 % allFrames.length];
+ 		    try {
+			setPosition(selected, allFrames.length -1);
+			newSelected.setSelected(true);
+		    } catch (java.beans.PropertyVetoException e) {
+		    } 		    
+
+		    return;
+		}
+	    }
+
+	    // if we get to this point, it means that there are windows,
+	    // but none of them are selected.
+
+	    try {
+		allFrames[0].setSelected(true);
+	    } catch (java.beans.PropertyVetoException e) {
+	    } 		    
+	}
+    }
+
+    /**
+     * This makes the previous JInternalFrame in the list be selected.
+     */
+    public void selectPreviousWindow() {
+	JInternalFrame[] allFrames = getAllFrames();
+
+	if (allFrames.length > 0) {
+	    for(int i = 0; i < allFrames.length; i++) {
+		if (allFrames[i].isSelected()) {
+		    int j;
+		    if (i > 0)
+			j = i-1;
+		    else
+			j = allFrames.length -1;
+		    try {
+			allFrames[j].setSelected(true);
+		    } catch (java.beans.PropertyVetoException e) {
+		    } 		    
+		    
+		    return;
+		}
+	    }
+
+	    // if we get to this point, it means that there are windows,
+	    // but none of them are selected.
+
+	    try {
+		allFrames[0].setSelected(true);
+	    } catch (java.beans.PropertyVetoException e) {
+	    } 		    
+	}
+    }
+    
+
     public MainPanel getMainPanel() {
 	return mainPanel;
     }
@@ -231,7 +301,9 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public Action[] defaultActions = {
-	new newMessageAction()
+	new newMessageAction(),
+	new NextWindowAction(),
+	new PreviousWindowAction()
     };
 
     public Action[] getDefaultActions() {
@@ -261,6 +333,25 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 
     }
 
+    public class NextWindowAction extends AbstractAction {
+	NextWindowAction() {
+	    super("window-next");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    selectNextWindow();
+	}
+    }
+
+    public class PreviousWindowAction extends AbstractAction {
+	PreviousWindowAction() {
+	    super("window-previous");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    selectPreviousWindow();
+	}
+    }
 }
 
 
