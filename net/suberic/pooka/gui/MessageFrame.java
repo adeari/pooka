@@ -62,6 +62,9 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   public void configureInterfaceStyle() {
     try {
       Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+      getMessageDisplay().sizeToDefault();
+      this.setSize(MessageFrame.this.getPreferredSize());
     } catch (Exception e) {
     }
   }
@@ -98,6 +101,9 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
 	  public void run() {
 	    try {
 	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
+	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	      getMessageDisplay().sizeToDefault();
+              MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
 	    } catch (Exception e) {
 	    }
 

@@ -109,20 +109,34 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
      */
 
     public void itemStateChanged(ItemEvent ie) {
-      Pooka.getMainPanel().refreshCurrentUser();
-      SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
-	    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
-	      try {
-		Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
-		setDefaultFont(editorPane);
-	      } catch (Exception e) {
-		System.err.println("error setting theme:  " + e);
+      if (ie.getStateChange() == ItemEvent.SELECTED) {
+	Pooka.getMainPanel().refreshCurrentUser();
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      NewMessageUI nmui = ((NewMessageProxy)msg).getNewMessageUI();
+	      if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+		try {
+		  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
+		  Font currentFont = editorPane.getFont();
+		  setDefaultFont(editorPane);
+		  Font newFont = editorPane.getFont();
+		  if (currentFont != newFont) {
+		    sizeToDefault();
+		  }
+                  MessageUI mui = getMessageProxy().getMessageUI();
+                  if (mui instanceof MessageInternalFrame) {
+                    ((MessageInternalFrame) mui).resizeByWidth();
+                  } else if (mui instanceof MessageFrame) {
+                    ((MessageFrame) mui).resizeByWidth();
+                  }
+		  
+		} catch (Exception e) {
+		  System.err.println("error setting theme:  " + e);
+		}
 	      }
 	    }
-	  }
-	});
+	  });
+      }
 	
     }
 

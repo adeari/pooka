@@ -70,6 +70,10 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   public void configureInterfaceStyle() {
     try {
       Pooka.getUIFactory().getPookaThemeManager().updateUI(this, this);
+      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+      getMessageDisplay().sizeToDefault();
+      MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
+      
     } catch (Exception e) {
     }
   }
@@ -99,13 +103,17 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * Called when the specifics of a Theme change.
    */
   public void themeChanged(ConfigurableMetalTheme theme) {
-    // we should really only be getting messages from our own curren themes,
+    // we should really only be getting messages from our own current themes,
     // but, hey, it never hurts to check.
     if (currentTheme != null && currentTheme == theme) {
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    try {
 	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageInternalFrame.this, MessageInternalFrame.this, true);
+	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
+	      getMessageDisplay().sizeToDefault();
+	      MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
+
 	    } catch (Exception e) {
 	    }
 

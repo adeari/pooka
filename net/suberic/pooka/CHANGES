@@ -1,3 +1,5 @@
+added support for dynamically switching between LookAndFeels.
+
 clicking Ok on a property editor now saves the current properties to disk.
 this means that you no longer have to exit out of pooka cleanly in order to
 have your changes save.

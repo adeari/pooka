@@ -3,14 +3,7 @@ top todo:
 *) add color and font support
 	begun.  todo:
 	*) Folder -- read messages need to honor the font and font color.
-	   -- done?  check font color.
-	*) The font for new messages doesn't update using the themes.
-	   -- somewhat fixed, though there are still cases where it doesn't
-		work, as well as a problem with not resizing the window.
-	*) Add places to configure all of these settings. -- and check
-	  the labels for these properties. -- should be done?
-	
-*) fix the UserProfile editor display.  (linux, jdk1.3.x)
+	   -- done?  check font color.  -- read messages don't get font color.
 
 *) have Pooka itself change its icon if you get new messages, in addition to 
 changing the title bar.
@@ -45,6 +38,8 @@ works when you package up a .jar file.
 
 *) make search window look different than normal window.
 
+*) search results window shows all (? at least lots) messages as unread.
+
 	-- disconnect imap --
 
 *) disconnected imap is way too slow.  
@@ -61,6 +56,9 @@ works when you package up a .jar file.
 	LoadMessageThread use the main FolderThread synchronization.
 
 ------------
+
+*)  when you change users for a new message, then, even if the theme 
+doesn't change, you still resize the window.
 
 *) add pgp/gpg support.
 
