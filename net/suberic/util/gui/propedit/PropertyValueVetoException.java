@@ -2,6 +2,7 @@ package net.suberic.util.gui.propedit;
 
 public class PropertyValueVetoException extends Exception {
   
+  String propertyName;
   String rejectedValue;
   String reason;
   PropertyEditorListener listener;
@@ -9,10 +10,18 @@ public class PropertyValueVetoException extends Exception {
   /**
    * Creates a new PropertyValueVetoException.
    */
-  public PropertyValueVetoException(String pRejectedValue, String pReason, PropertyEditorListener pListener) {
+  public PropertyValueVetoException(String pProperty, String pRejectedValue, String pReason, PropertyEditorListener pListener) {
+    propertyName = pProperty;
     rejectedValue = pRejectedValue;
     reason = pReason;
     listener = pListener;
+  }
+
+  /**
+   * Returns the property being changed.
+   */
+  public String getProperty() {
+    return propertyName;
   }
 
   /**
@@ -28,7 +37,7 @@ public class PropertyValueVetoException extends Exception {
   public String getReason() {
     return reason;
   }
-
+  
   /**
    * Returns the listener that rejected the change.
    */

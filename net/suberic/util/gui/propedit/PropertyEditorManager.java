@@ -1,9 +1,11 @@
 package net.suberic.util.gui.propedit;
 import net.suberic.util.VariableBundle;
 import java.util.HashMap;
+import java.util.List;
 
 /**
- * This manages a set of PropertyEditors.
+ * This manages a set of PropertyEditors.  Basically, this acts as a
+ * Transaction for the PropertyEditors.
  */
 public class PropertyEditorManager {
 
@@ -62,5 +64,28 @@ public class PropertyEditorManager {
    */
   public void setProperty(String property, String value) {
     sourceBundle.setProperty(property, value);
+  }
+
+  /**
+   * Creates an appropriate PropertyEditorUI for the given property and
+   * editorTemplate, using this PropertyEditorManager.
+   */
+  public PropertyEditorUI createEditor(String property, String editorTemplate) {  
+    return getFactory().createEditor(property, editorTemplate, this);
+  }
+  
+  /**
+   * Creates an appropriate PropertyEditorUI for the given properties and
+   * editorTemplates, using this PropertyEditorManager.
+   */
+  public PropertyEditorUI createEditor(List properties, List editorTemplates) {  
+    return getFactory().createEditor(properties, editorTemplates, this);
+  }
+  
+  /**
+   * Commits the changes to the underlying VariableBundle.
+   */
+  public void commit() {
+    sourceBundle.saveProperties();
   }
 }

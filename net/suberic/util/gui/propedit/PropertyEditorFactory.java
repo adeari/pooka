@@ -82,12 +82,28 @@ public class PropertyEditorFactory {
    */
   public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
     JFrame jf = new JFrame(title);
-    jf.getContentPane().add(new PropertyEditorPane(mgr, properties, templateTypes, jf));
+    jf.getContentPane().add(new PropertyEditorPane(mgr, properties, templates, jf));
     jf.setSize(200,200);
     jf.pack();
     return jf;
   }
   
+
+  /**
+   * Creates an appropriate PropertyEditorUI for the given property and
+   * editorTemplate, using the given PropertyEditorManager.
+   */
+  public PropertyEditorUI createEditor(String property, String editorTemplate, PropertyEditorManager mgr) {
+    return null;
+  }
+
+  /**
+   * Creates an appropriate PropertyEditorUI for the given property and
+   * editorTemplate, using the given PropertyEditorManager.
+   */
+  public PropertyEditorUI createEditor(List properties, List editorTemplates, PropertyEditorManager mgr) {
+    return null;
+  }
   
 }
 
