@@ -119,6 +119,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   // whether or not this is a namespace
   protected boolean mNamespace = false;
 
+  // the thread for connections to this folder.
+  protected ActionThread mFolderThread;
+
   /**
    * For subclasses.
    */
@@ -231,6 +234,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     try {
       loading = true;
+
       if (parentStore != null) {
 	//try {
 	if (Pooka.isDebug())
@@ -297,6 +301,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  }
 	}
       }
+
       if (tmpFolder != null && tmpFolder.length > 0) {
 	setFolder(tmpFolder[0]);
 	if (! getFolder().isSubscribed())
@@ -309,15 +314,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  setStatus(INVALID);
 	setFolder(null);
       }
-      /*
-	} catch (MessagingException me) {
-	if (Pooka.isDebug()) {
-	System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
-	me.printStackTrace();
-	}
-	setStatus(NOT_LOADED);
-	setFolder(null);
-      */
+
+
+      if (mFolderThread == null) {
+	mFolderThread = new ActionThread(parentStore.getStoreID() + "." + getFolderID() + " - ActionThread");
+	mFolderThread.start();
+      }
+      
+
     } finally {
       loading = false;
     }
@@ -2555,7 +2559,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   public ActionThread getFolderThread() {
-    return getParentStore().getStoreThread();
+    if (mFolderThread != null)
+      return mFolderThread;
+    else
+      return getParentStore().getStoreThread();
   }
   
   public FolderInfo getTrashFolder() {

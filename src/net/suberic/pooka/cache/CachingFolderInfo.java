@@ -12,6 +12,7 @@ import java.io.File;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderTableModel;
+import net.suberic.util.thread.ActionThread;
 
 /**
  * A FolderInfo which caches its messages in a MessageCache.
@@ -156,6 +157,14 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       } else {
 	setFolder(new FolderProxy(getFolderName()));
       }
+
+
+      if (mFolderThread == null) {
+	mFolderThread = new ActionThread(getParentStore().getStoreID() + "." + getFolderID() + " - ActionThread");
+	mFolderThread.start();
+      }
+      
+
     } catch (MessagingException me) {
       if (Pooka.isDebug()) {
 	System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );
