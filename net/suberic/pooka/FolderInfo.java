@@ -128,6 +128,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		open = false;
 		folder = null;
 	    }
+	    folder.addMessageChangedListener(this);
 	    loaded = true;
 	} catch (MessagingException me) {
 	    loaded = false;
@@ -536,6 +537,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	MessageProxy mp = getMessageProxy(e.getMessage());
 	mp.unloadTableInfo();
 	mp.loadTableInfo();
+	fireMessageChangedEvent(e);
     }
 
     /**
