@@ -48,6 +48,8 @@ icons changing?  test.
 		 -- somewhat started with the new test address api.
 	*)  change the new user setup so that it configures an outbox
 		automatically.
+	*)  change the new user setup so that it configures a sent folder
+		automatically.
 	*) make it so there is some way for the NetworkConnection to detect
 		whether or not it's up.
 			-- started.  make sure it's enough.
