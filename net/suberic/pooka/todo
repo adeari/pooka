@@ -111,7 +111,6 @@ preview:
 	-- tabbing between the address components for New Messages
 	-- the MailFileSystemView doesn't seem to work at all (!)
 	-- up and down arrows while composing new messages.
-	-- ssl doesn't work.
 
 *) add support for other mail formats, like maildir (and maybe hotmail?).
 	shift pop3 backing from mbox to maildir.
