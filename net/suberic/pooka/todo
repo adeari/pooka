@@ -1,16 +1,8 @@
 alpha release
 -------------
 
-*)  fix the MessageWindow sizes--they're way too big now.
-
-*)  make the editor for new messages wrap properly at 75 (or user configurable)
-characters.
-
-*)  make the GUI Authenticator (which should come up when you don't enter
-your password in the Store Configuration) work--right now it doesn't.  note:
-it actually works ok (just ok) when you start it up from scratch--but when
-you make a new Store without a password, it shows up lots and lots of times
-and basically just fails all over the place.
+*)  fix the MessageWindow sizes.  we need to have it size up to be charLength
++ size of scrollbar.
 
 *)  enable keybindings so they work properly.
 
@@ -76,6 +68,31 @@ too easy for the entire client to hang if your network connection hangs, be
 it checking to see if there are new messages, loading the information on 
 current messages, etc.
 
+*) fix the display of the messages in the FolderWindow--right now, you get
+too much date info, not enough Subject.
+
+*) add an optional preview pane.
+
+*) add a search and replace for the message editors.
+
+*) add something to search through all messages in the folder.
+
+*) restore the Window Menu.
+
+*) restore the move messages between folders functionality.
+
+*) create a Trash folder.
+
+*) add the ability to print
+
+*) add the ability to save messages to files.
+
+*) make the folderWindow sortable
+
+*) add ability to reply/forward with attachments, or as inline, and so forth
+
+*) enable voice control
+
 -------
 
 open messages from the FolderWindow
@@ -88,13 +105,9 @@ create and send message
 	fix the signature
 	add ability of setting return values by hand (not by UserProfile)
 	make a sent folder
-	make it so that if there are any errors sending the message, that it's
-		saved and editable.  not quite sure what to do there with a 
-		send thread, but....
 
 user profiles/information
 	can do.  todo:
-	make it actually get the correct default profile.
 	make sure that the sendMailURL is properly updated as soon as it's
 		entered.  i think right now you have to restart, or reopen
 		folders, or something like that.
@@ -130,9 +143,4 @@ BUGS
 updates of pkamailrc aren't handled correctly--some lines aren't deleted.
 
 actions on FolderPanel are always available in the menu.
-
-none of the window sizings are right.
-
-adding a new UserProfile isn't noticed by the new message window--you still get
-only the old choices until you restart.
 
