@@ -13,6 +13,7 @@
 
 *) add configurable spam button/action.
 	*) bounce messages
+	-- done.  add bounce message filter.
 
 *) fix error display with exception so that you can see the stack trace.
 

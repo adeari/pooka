@@ -1,3 +1,5 @@
+added Bounce Message command.
+
 modified the sendMessageList of the NewMessageInfo to use a sendMessageMap
 instead.
 

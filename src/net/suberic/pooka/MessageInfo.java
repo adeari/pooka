@@ -404,13 +404,13 @@ public class MessageInfo {
   /**
    * Bounces this message to another user.
    */
-  public void bounceMessage(String pAddress) throws javax.mail.MessagingException {
-    Address[] recipientList = javax.mail.internet.InternetAddress.parse(pAddress, false);
+  public void bounceMessage(Address[] recipientList) throws javax.mail.MessagingException {
 
     MimeMessage mm = (MimeMessage)getMessage();
     MimeMessage mmClone = new MimeMessage(mm);
     
     NewMessageInfo nmi = new NewMessageInfo(mmClone);
+    net.suberic.pooka.gui.NewMessageProxy nmp = new net.suberic.pooka.gui.NewMessageProxy(nmi);
     java.util.HashMap messageMap = new java.util.HashMap();
     messageMap.put(mmClone, recipientList);
 

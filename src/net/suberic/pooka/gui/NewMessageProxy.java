@@ -141,6 +141,14 @@ public class NewMessageProxy extends MessageProxy {
 	  }
 	};
       SwingUtilities.invokeLater(runMe);
+    } else {
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+	    me.printStackTrace(System.out);
+	  }
+	};
+      SwingUtilities.invokeLater(runMe);
     }
   }
   

@@ -156,7 +156,7 @@ MenuBar.Edit.SelectAll.Action=select-all
 MenuBar.Edit.Find.Action=message-find
 MenuBar.Edit.FindNext.Action=message-find-next
 
-MenuBar.Mail=NewMsg:Open:OpenMulti:Reply:ReplyAll:ReplyMulti:Forward:ForwardMulti:Send:Move:Copy:Delete:Expunge:Filter:AddSignature:SearchFolder:Subscribe
+MenuBar.Mail=NewMsg:Open:OpenMulti:Reply:ReplyAll:ReplyMulti:Forward:ForwardMulti:Send:Move:Copy:Bounce:Delete:Expunge:Filter:AddSignature:SearchFolder:Subscribe
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Open.Action=file-open
 MenuBar.Mail.OpenMulti=Text:Html:Default:Full:Raw
@@ -181,6 +181,7 @@ MenuBar.Mail.Move.class=net.suberic.pooka.gui.FolderMenu
 MenuBar.Mail.Move.Action=message-move
 MenuBar.Mail.Copy.class=net.suberic.pooka.gui.FolderMenu
 MenuBar.Mail.Copy.Action=message-copy
+MenuBar.Mail.Bounce.Action=message-bounce
 MenuBar.Mail.Delete.Action=message-delete
 MenuBar.Mail.Expunge.Action=message-expunge
 MenuBar.Mail.Filter.Action=message-filter

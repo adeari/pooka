@@ -858,7 +858,58 @@ public class MessageProxy {
       getMessageUI().setBusy(true);;
     
   }
-  
+
+  /**
+   * Bounces the message.  Pops up a dialog to request the address(es)
+   * to which to bounce the message.
+   */
+  public void bounceMessage() {
+    
+    String addressString = null;
+    Address[] addresses = null;
+
+    boolean resolved = false;
+    while (! resolved) {
+      if (getMessageUI() != null)
+	addressString = getMessageUI().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
+      else if (getMessageInfo().getFolderInfo().getFolderDisplayUI() != null) {
+	addressString = getMessageInfo().getFolderInfo().getFolderDisplayUI().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
+      } else {
+	addressString = Pooka.getUIFactory().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
+      }
+      if (addressString == null) {
+	resolved = true;
+      } else {
+	try {
+	  addresses = javax.mail.internet.InternetAddress.parse(addressString, false);
+	  resolved = true;
+	} catch (MessagingException me) {
+	  showError(Pooka.getProperty("error.bounceMessage.addresses", "Error parsing address entry."), me);
+	}
+      }
+    }
+    
+    if (addresses != null) {
+      final Address[] final_addresses = addresses;
+      
+      ActionThread folderThread = getMessageInfo().getFolderInfo().getFolderThread();
+      folderThread.addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent ae) {
+	    try {
+	      getMessageInfo().bounceMessage(final_addresses);
+	    } catch (javax.mail.MessagingException me) {
+	      final MessagingException final_me = me;
+	      SwingUtilities.invokeLater(new Runnable() {
+		public void run() { 
+		  showError(Pooka.getProperty("error.bounceMessage.error", "Error bouncing Message"), final_me);
+		}
+		});
+	    }
+	  }
+	}, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
+    }
+    }
+
   /**
    * Deletes the Message from the current Folder.  If a Trash folder is
    * set, this method moves the message into the Trash folder.  If no
@@ -1243,6 +1294,7 @@ public class MessageProxy {
 	new ActionWrapper(new ForwardAsInlineAction(), folderThread),
 	new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
 	new ActionWrapper(new ForwardQuotedAction(), folderThread),
+	new BounceAction(),
 	new ActionWrapper(new DeleteAction(), folderThread),
 	new ActionWrapper(new PrintAction(), folderThread),
 	new ActionWrapper(new SaveMessageAction(), folderThread),
@@ -1516,6 +1568,23 @@ public class MessageProxy {
     }
   }
   
+  
+  public class BounceAction extends AbstractAction {
+    
+    BounceAction() {
+      super("message-bounce");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+
+      bounceMessage();
+
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
   
   public class DeleteAction extends AbstractAction {
     DeleteAction() {
