@@ -5,6 +5,9 @@ import java.util.StringTokenizer;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 public class MailUtilities {
     public MailUtilities() {
@@ -19,6 +22,22 @@ public class MailUtilities {
 	Object content = null;
 	try {
 	    content = m.getContent();
+	} catch (UnsupportedEncodingException uee) {
+	    try {
+		/**
+		 * Just read the InputStream directly into a byte array and
+		 * hope for the best.  :)
+		 */
+		InputStream is = ((MimeMessage)m).getInputStream();
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		int b;
+		while ((b = is.read()) != -1)
+		    bos.write(b);
+		byte[] barray = bos.toByteArray();
+		content = new String(barray, Pooka.getProperty("Pooka.defaultCharset", "iso-8859-1"));
+	    } catch (IOException ioe) {
+		throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+	    }
 	} catch (IOException ioe) {
 	    throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
 	}

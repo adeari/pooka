@@ -90,8 +90,6 @@ message that you wrote, the lines will wrap at the correct place.
 
 *) bug:  send mail seems to be on the awt event thread.
 
-*) bug:  handle attachments of type X-UNKNOWN
-
 *) bug:  the MenuBar.Mail.Move resource isn't loaded on first startup.
 
 after beta 1
