@@ -42,13 +42,13 @@ public class AddressEntryEditor extends CompositeEditorPane {
 
     VariableBundle wrappedBundle = factory.getBundle();
     try {
-      entry.setAddress(new javax.mail.internet.InternetAddress(wrappedBundle.getProperty("currentAddress.address")));
+      entry.setAddress(new javax.mail.internet.InternetAddress(wrappedBundle.getProperty("currentAddress.address", "")));
     } catch (javax.mail.internet.AddressException ae) {
 
     }
-    entry.setPersonalName(wrappedBundle.getProperty("currentAddress.personalName"));
-    entry.setFirstName(wrappedBundle.getProperty("currentAddress.firstName"));
-    entry.setLastName(wrappedBundle.getProperty("currentAddress.lastName"));
+    entry.setPersonalName(wrappedBundle.getProperty("currentAddress.personalName", ""));
+    entry.setFirstName(wrappedBundle.getProperty("currentAddress.firstName", ""));
+    entry.setLastName(wrappedBundle.getProperty("currentAddress.lastName", ""));
   }
   
   public class AddressPropertyEditorFactory extends PropertyEditorFactory {

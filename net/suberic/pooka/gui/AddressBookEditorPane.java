@@ -30,7 +30,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     new DeleteAction()
       };
 
-  JPopupMenu popupMenu;
+  ConfigurablePopupMenu popupMenu;
 
   public AddressBookEditorPane(PropertyEditorFactory newFactory, String newProperty, String newTemplateType, VariableBundle bundle, boolean isEnabled) {
     configureEditor(newFactory, newProperty, newTemplateType, bundle, isEnabled);
@@ -70,7 +70,9 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
     this.add(addressPane);
     this.add(editPanel);
 
-    popupMenu = new ConfigurablePopupMenu("AddressBookEditor.popupMenu", bundle);
+    popupMenu = new ConfigurablePopupMenu();
+    popupMenu.configureComponent("AddressBookEditor.popupMenu", bundle);
+    popupMenu.setActive(getActions());
   }
 
   /**
@@ -123,7 +125,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 	      addressTable.setRowSelectionInterval(rowIndex, rowIndex);
 	    }
 	    
-	    showPopupMenu();
+	    showPopupMenu(addressTable, e);
 	  }
 	}
       });
@@ -222,8 +224,8 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
   /**
    * Brings up the current popup menu.
    */
-  public void showPopupMenu() {
-    
+  public void showPopupMenu(JComponent component, MouseEvent e) {
+    popupMenu.show(component, e.getX(), e.getY());
   }
 
   /**
@@ -354,6 +356,8 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
       }
       newEntries[length] = e;
 
+      entries = newEntries;
+
       fireTableRowsInserted(length, length);
     }
 
@@ -374,6 +378,7 @@ public class AddressBookEditorPane extends DefaultPropertyEditor {
 	  if (removedRow != entries.length -1) 
 	    System.arraycopy(entries, removedRow + 1, newEntries, removedRow, entries.length - removedRow - 1);
 
+	  entries = newEntries;
 	  fireTableRowsDeleted(removedRow, removedRow);
 	}
       }

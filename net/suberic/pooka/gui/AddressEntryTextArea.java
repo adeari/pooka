@@ -1,20 +1,26 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.Pooka;
 import java.awt.event.KeyEvent;
+import java.util.LinkedList;
 import javax.swing.*;
 import javax.mail.internet.InternetAddress;
 
 /**
- * This is a JTextArea which uses an AddressMatcher to fill in completed
- * addresses.
+ *<p> This is a JTextArea which uses an AddressMatcher to fill in completed
+ * addresses.  It also will store 
  */
 public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea implements java.awt.event.FocusListener {
-
+  
+  //---------- static variables -------------//
   // the update thread for all AddressEntryTextAreas
   static Thread updateThread;
 
   // the list of all AddressEntryTextAreas
   static java.util.WeakHashMap areaList = new java.util.WeakHashMap();
+
+  //---------- instance variables -----------//
+  // the list of Addresses
+  LinkedList addressList = new LinkedList();
 
   // if we're doing this by delay or by keystroke
   boolean automaticallyDisplay = false;
@@ -297,4 +303,21 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
       }
     }
   }
+
+  /**
+   * <p>An address entry.  Consists of a text representation, an underlying
+   * address representation, and a status.</p>
+   */
+  public class AddressField {
+    public String addressText;
+    public String actualAddress;
+    public int status;
+
+    public AddressField(String newText, String newActual, int newStatus) {
+      addressText = newText;
+      actualAddress = newActual;
+      status = newStatus;
+    }
+  }
+
 }
