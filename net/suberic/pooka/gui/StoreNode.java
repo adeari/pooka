@@ -195,13 +195,13 @@ public class StoreNode extends MailTreeNode {
     class TestAction extends AbstractAction {
 	
         TestAction() {
-            super("test");
+            super("file-test");
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
 
 	    try {
-		Store s = getStoreInfo().getStore();
+		Store s = Pooka.getStoreManager().getStoreInfo("mailtest").getStore();
 		System.out.println("got store.");
 		if (!s.isConnected()) {
 		    if (Pooka.isDebug()) {
@@ -223,6 +223,7 @@ public class StoreNode extends MailTreeNode {
 		System.out.println("got messaging exception.");
 		me.printStackTrace();
 	    }
+	    
 
 	    /*
 	    JInternalFrame jif = new JInternalFrame();
