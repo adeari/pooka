@@ -39,6 +39,10 @@ mailbox--right now it hangs.
 *)  associated with above, multithread properly--too many actions happen
 on the main i/o thread.
 
+*)  fix the occasional NullPointerException in the FolderInfo (?)
+
+*)  fix the actions update when a message is unselected/deleted.
+
 *)  make the FolderChooser less clunky.  add the ability to create and
 remove Folders.
 

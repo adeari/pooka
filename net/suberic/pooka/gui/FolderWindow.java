@@ -9,6 +9,8 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.text.TextAction;
 import java.util.*;
+import net.suberic.util.gui.*;
+import net.suberic.util.event.*;
 
 /**
  * This basically is just the GUI representation of the Messages in
@@ -22,6 +24,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
     FolderInfo folderInfo = null;
     StatusBar statusBar = null;
     MessagePanel messagePanel = null;
+    ConfigurableToolbar toolbar;
 
     public class StatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
 	JLabel folderLabel;
@@ -74,8 +77,12 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	getFolderInfo().setFolderWindow(this);
 
-	initWindow();
 
+	initWindow();
+	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
+	this.getContentPane().add("North", toolbar);
+
+	toolbar.setActive(getActions());
     }
 
     /**
@@ -219,6 +226,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
 	    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
+	    toolbar.setActive(getActions());
 	}
     }
 

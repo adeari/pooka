@@ -100,13 +100,13 @@ MainToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
 FolderWindowToolbar=Down:Up:Open:Delete
 FolderWindowToolbar.Down.Action=folder-down
-FolderWindowToolbar.Image=Down.gif
+FolderWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
 FolderWindowToolbar.Up.Action=folder-up
-FolderWindowToolbar.Up.Image=Up.gif
+FolderWindowToolbar.Up.Image=/net/suberic/pooka/gui/images/Up.gif
 FolderWindowToolbar.Open.Action=message-open
-FolderWindowToolbar.Open.Image=Open.gif
-FolderWindowToolbar.Delete=message-delete
-FolderWindowToolbar.Delete.Image=Delete.gif
+FolderWindowToolbar.Open.Image=/net/suberic/pooka/gui/images/Open.gif
+FolderWindowToolbar.Delete.Action=message-delete
+FolderWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 
 NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste
 NewMessageWindowToolbar.Send.Action=message-send
