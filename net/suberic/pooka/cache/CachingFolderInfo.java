@@ -3,6 +3,7 @@ import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.MessageChangedEvent;
+import javax.mail.event.ConnectionEvent;
 import net.suberic.pooka.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
@@ -16,8 +17,6 @@ import net.suberic.pooka.gui.FolderTableModel;
 
 public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     protected MessageCache cache = null;
-    protected HashMap uidToInfoTable = new HashMap();
-    protected long uidValidity;
 
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
@@ -83,68 +82,24 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    
 	    if (!loaderThread.isAlive())
 		loaderThread.start();
+
+	    if (preferredStatus == CONNECTED)
+		getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+			
+			public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+			    try {
+				synchronizeCache();
+			    } catch (Exception e) {
+				if (getFolderDisplayUI() != null) 
+				    getFolderDisplayUI().showError(Pooka.getProperty("error.CachingFolder.synchronzing", "Error synchronizing with folder"), Pooka.getProperty("error.CachingFolder.synchronzing.title", "Error synchronizing with folder"), e);
+			    }
+			}
+		    }, getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-count-changed"));
+	    
+	    
 	}
     }
     
-    /**
-     * This just checks to see if we can get a NewMessageCount from the
-     * folder.  As a brute force method, it also accesses the folder
-     * at every check, catching and throwing away any Exceptions that happen.  
-     * It's nasty, but it _should_ keep the Folder open..
-     */
-    /*
-      // excluded--same as UIDFolderInfo.
-    public void checkFolder() {
-	if (Pooka.isDebug())
-	    System.out.println("checking folder " + getFolderName());
-
-	// i'm taking this almost directly from ICEMail; i don't know how
-	// to keep the stores/folders open, either.  :)
-
-	StoreInfo s = null;
-	try {
-	    
-	    if (isOpen()) {
-                Folder current = getFolder();
-                if (current != null && current.isOpen()) {
-                    current.getNewMessageCount();
-                    current.getUnreadMessageCount();
-                }
-	    } else if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
-		s = getParentStore();
-		if (! s.isConnected())
-		    s.connectStore();
-		
-		openFolder(Folder.READ_WRITE);
-
-		if (isAvailable() && preferred_state == PASSIVE)
-		    closeFolder(false);
-	    } 
-	    
-
-	} catch ( MessagingException me ) {
-	}
-	
-	resetMessageCounts();
-    }
-    */
-
-    /*
-      // excluded--same as parent class.
-    protected void updateFolderOpenStatus(boolean isNowOpen) {
-	if (isNowOpen) {
-	    status = CONNECTED;
-	    try {
-		uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
-		if (getFolderTableModel() != null)
-		    synchronizeCache();
-	    } catch (Exception e) { }
-	    
-	} else
-	    status = CLOSED;
-    }
-    */
-
     /**
      * Gets the row number of the first unread message.  Returns -1 if
      * there are no unread messages, or if the FolderTableModel is not
@@ -195,15 +150,27 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
+
 	long cacheUidValidity = getCache().getUIDValidity();
-	
+
 	if (uidValidity != cacheUidValidity) {
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
+	    
 	    getCache().invalidateCache();
 	    getCache().setUIDValidity(uidValidity);
 	}
 
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
+
 	// first write all the changes that we made back to the server.
 	getCache().writeChangesToServer(getFolder());
+
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
 
 	FetchProfile fp = new FetchProfile();
 	fp.add(FetchProfile.Item.ENVELOPE);
@@ -221,6 +188,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing--uids.length = " + uids.length);
 
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
+	
 	long[] addedUids = cache.getAddedMessages(uids, uidValidity);
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing--addedUids.length = " + addedUids.length);
@@ -247,6 +217,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
 	updateFlags(uids, messages, cacheUidValidity);
 	
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().clearStatusMessage();
+
     }
 
     protected void updateFlags(long[] uids, Message[] messages, long uidValidity) throws MessagingException {
@@ -469,7 +442,13 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		newFolderName = (String)tokens.nextToken();
 		FolderInfo childFolder = getChild(newFolderName);
 		if (childFolder == null) {
-		    childFolder = new CachingFolderInfo(this, newFolderName);
+		    if (Pooka.getProperty(getFolderProperty() + "." + newFolderName + ".cacheMessages", "false").equalsIgnoreCase("true"))
+			childFolder = new CachingFolderInfo(this, newFolderName);
+		    else if (Pooka.getProperty(getParentStore().getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
+			childFolder = new UIDFolderInfo(this, newFolderName);
+		    } else
+			childFolder = new FolderInfo(this, newFolderName);
+		    
 		    newChildren.add(childFolder);
 		} else {
 		    newChildren.add(childFolder);
@@ -484,41 +463,49 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
 
     /**
-     * Unloads all messages.  This should be run if ever the current message
-     * information becomes out of date, as can happen when the connection
-     * to the folder goes down.
-     *
-     * Note that for this implementation, we just keep everything; we only
-     * need to worry when we do the cache synchronization.
-     */
-    public void unloadAllMessages() {
-	//folderTableModel = null;
-    }
-
-    /**
      * This method closes the Folder.  If you open the Folder using 
      * openFolder (which you should), then you should use this method
      * instead of calling getFolder.close().  If you don't, then the
      * FolderInfo will try to reopen the folder.
      */
     public void closeFolder(boolean expunge) throws MessagingException {
-
-	if (getFolderTracker() != null) {
-	    getFolderTracker().removeFolder(this);
-	    setFolderTracker(null);
-	}
-
-	if (isLoaded() && isAvailable()) {
-	    setStatus(CLOSED);
-	    try {
-		getFolder().close(expunge);
-	    } catch (java.lang.IllegalStateException ise) {
-		throw new MessagingException(ise.getMessage(), ise);
-	    }
-	}
-
+	closeFolder(expunge, false);
     }
 
+    public void closed(ConnectionEvent e) {
+	if (Pooka.isDebug()) {
+	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
+	}
+	
+	if (getFolderDisplayUI() != null) {
+	    if (getStatus() == CLOSED)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.CachingFolder.disconnected", "Folder disconnected.  Only cached messages will be available."));
+	}
+	
+	if (status == CONNECTED) {
+	    setStatus(LOST_CONNECTION);
+	}
+	
+	fireConnectionEvent(e);
+    }
+    
+    public void disconnected(ConnectionEvent e) {
+	if (Pooka.isDebug()) {
+	    System.out.println("Folder " + getFolderID() + " disconnected.");
+	    Thread.dumpStack();
+	}
+	
+	if (getFolderDisplayUI() != null) {
+	    if (getStatus() == CLOSED)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.CachingFolder.disconnected", "Folder disconnected.  Only cached messages will be available."));
+	}
+	
+	if (status == CONNECTED) {
+	    setStatus(LOST_CONNECTION);
+	}
+	fireConnectionEvent(e);
+    }
+    
     /**
      * This returns the MessageCache associated with this FolderInfo,
      * if any.
@@ -527,34 +514,5 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	return cache;
     }
 
-    /**
-     * Returns the MessageInfo associated with the given uid.
-     */
-    public MessageInfo getMessageInfoByUid(long uid) {
-	return (MessageInfo) uidToInfoTable.get(new Long(uid));
-    }
-
-    /**
-     * Returns the "real" message from the underlying folder that matches up
-     * to the given UID.
-     */
-    public javax.mail.internet.MimeMessage getRealMessageById(long uid) throws MessagingException {
-	Folder f = getFolder();
-	if (f != null && f instanceof UIDFolder) {
-	    javax.mail.internet.MimeMessage m = null;
-	    try {
-		m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
-		return m;
-	    } catch (IllegalStateException ise) {
-		return null;
-	    }
-	} else {
-	    return null;
-	}
-    }
-
-    public long getUIDValidity() {
-	return uidValidity;
-    }
 }
 

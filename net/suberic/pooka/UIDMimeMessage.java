@@ -466,7 +466,7 @@ public class UIDMimeMessage extends MimeMessage {
 	return parent.getUIDValidity();
     }
 
-    protected MimeMessage getMessage() throws MessagingException {
+    public MimeMessage getMessage() throws MessagingException {
 	return parent.getRealMessageById(uid);
     }
 }

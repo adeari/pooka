@@ -19,7 +19,7 @@ import net.suberic.util.thread.ActionThread;
  * for a Folder, the FolderInfo object has a reference to it.
  */
 
-public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer, MessageChangedListener {
+public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer, MessageChangedListener, ConnectionListener {
 
     // folder is currently open and available.
     public static int CONNECTED = 0;
@@ -54,7 +54,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     // shows the preferred state of the FolderInfo.  should be CONNECTED,
     // PASSIVE, DISCONNECTED, or CLOSED.
-    protected int preferred_state;
+    protected int preferredStatus = CONNECTED;
 
     // the Folder wrapped by this FolderInfo.
     private Folder folder;
@@ -248,53 +248,56 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
 	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
 	
-	folder.addConnectionListener(new ConnectionAdapter() { 
-		public void closed(ConnectionEvent e) {
-		    if (Pooka.isDebug()) {
-			System.out.println("Folder " + getFolderID() + " closed:  " + e);
-		    }
-
-		    if (getFolderDisplayUI() != null)
-			getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please re-open."));
-
-		    if (status == CONNECTED) {
-			setStatus(LOST_CONNECTION);
-		    }
-
-		    fireConnectionEvent(e);
-		}
-		
-		public void disconnected(ConnectionEvent e) {
-		    if (Pooka.isDebug()) {
-			System.out.println("Folder " + getFolderID() + " disconnected.");
-			Thread.dumpStack();
-		    }
-		    
-		    if (getFolderDisplayUI() != null)
-			getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please re-open."));
-
-		    if (status == CONNECTED) {
-			setStatus(LOST_CONNECTION);
-		    }
-		    fireConnectionEvent(e);
-		}
-
-		public void opened (ConnectionEvent e) {
-		    fireConnectionEvent(e);
-		}
-	    });
-
+	folder.addConnectionListener(this);
 	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
 	if (!defProfile.equals(""))
 	    defaultProfile = UserProfile.getProfile(defProfile);
-
+	
 	// if we got to this point, we should assume that the open worked.
-
+	
 	if (getFolderTracker() == null) {
 	    FolderTracker tracker = Pooka.getFolderTracker();
 	    tracker.addFolder(this);
 	    this.setFolderTracker(tracker);
 	}
+    }
+
+    public void closed(ConnectionEvent e) {
+	if (Pooka.isDebug()) {
+	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
+	}
+	
+	if (getFolderDisplayUI() != null) {
+	    if (status != CLOSED)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please close and re-open."));
+	}
+
+	if (status == CONNECTED) {
+	    setStatus(LOST_CONNECTION);
+	}
+	
+	fireConnectionEvent(e);
+    }
+    
+    public void disconnected(ConnectionEvent e) {
+	if (Pooka.isDebug()) {
+	    System.out.println("Folder " + getFolderID() + " disconnected.");
+	    Thread.dumpStack();
+	}
+	
+	if (getFolderDisplayUI() != null) {
+	    if (status != CLOSED)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.Folder.disconnected", "Disconnected from folder.  Please close and re-open."));
+	}
+	
+	if (status == CONNECTED) {
+	    setStatus(LOST_CONNECTION);
+	}
+	fireConnectionEvent(e);
+    }
+    
+    public void opened (ConnectionEvent e) {
+	fireConnectionEvent(e);
     }
     
     /**
@@ -631,11 +634,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		if (Pooka.isDebug())
 		    System.out.println("Returning " + i);
 		return i + 1;
-    } else { 
-	if (Pooka.isDebug())
-	    System.out.println("Returning -1");
-	return -1;
-    }
+	    } else { 
+		if (Pooka.isDebug())
+		    System.out.println("Returning -1");
+		return -1;
+	    }
 	} catch (MessagingException me) {
 	    if (Pooka.isDebug())
 		System.out.println("Messaging Exception.  Returning -1");
@@ -739,12 +742,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
+     * gets the 'real' message for the given MessageInfo.
+     */
+    public Message getRealMessage(MessageInfo mi) throws MessagingException {
+	return mi.getMessage();
+    }
+
+    /**
      * This sets the given Flag for all the MessageInfos given.
      */
     public void setFlags(MessageInfo[] msgs, Flags flag, boolean value) throws MessagingException {
 	Message[] m = new Message[msgs.length];
 	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = msgs[i].getMessage();
+	    m[i] = getRealMessage(msgs[i]);
 	}
 
 	getFolder().setFlags(m, flag, value);
@@ -756,7 +766,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
 	Message[] m = new Message[msgs.length];
 	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = msgs[i].getMessage();
+	    m[i] = getRealMessage(msgs[i]);
 	}
 
 	getFolder().copyMessages(m, targetFolder.getFolder());
@@ -768,7 +778,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void appendMessages(MessageInfo[] msgs) throws MessagingException {
 	Message[] m = new Message[msgs.length];
 	for (int i = 0; i < msgs.length; i++) {
-	    m[i] = msgs[i].getMessage();
+	    m[i] = getRealMessage(msgs[i]);
 	}
 
 	getFolder().appendMessages(m);

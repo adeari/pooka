@@ -3,6 +3,7 @@ import javax.mail.*;
 import javax.mail.event.MessageCountEvent;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.MessageChangedEvent;
+import javax.mail.event.ConnectionEvent;
 import net.suberic.pooka.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
@@ -108,7 +109,7 @@ public class UIDFolderInfo extends FolderInfo {
 		
 		openFolder(Folder.READ_WRITE);
 
-		if (isAvailable() && preferred_state == PASSIVE)
+		if (isAvailable() && preferredStatus == PASSIVE)
 		    closeFolder(false);
 	    } 
 	    
@@ -140,13 +141,25 @@ public class UIDFolderInfo extends FolderInfo {
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
+	if (getFolderDisplayUI() != null)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
+
 	long newValidity = ((UIDFolder)getFolder()).getUIDValidity();
 	if (uidValidity != newValidity) {
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.validityMismatch", "Error:  validity not correct.  reloading..."));
+	    
 	    unloadAllMessages();
 	    loadAllMessages();
 	    if (getFolderDisplayUI() != null)
 		getFolderDisplayUI().resetFolderTableModel(folderTableModel);
+
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().clearStatusMessage();
+
 	} else {
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
 	    FetchProfile fp = new FetchProfile();
 	    fp.add(FetchProfile.Item.ENVELOPE);
 	    fp.add(FetchProfile.Item.FLAGS);
@@ -154,6 +167,9 @@ public class UIDFolderInfo extends FolderInfo {
 	    Message[] messages = getFolder().getMessages();
 	    getFolder().fetch(messages, fp);
 	    
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Comparing new messages to current list..."));
+
 	    long[] uids = new long[messages.length];
 	    
 	    for (int i = 0; i < messages.length; i++) {
@@ -188,7 +204,9 @@ public class UIDFolderInfo extends FolderInfo {
 	    }
 	    
 	    updateFlags(uids, messages, uidValidity);
-	    
+
+	    if (getFolderDisplayUI() != null)
+		getFolderDisplayUI().clearStatusMessage();
 	}
     }
 
@@ -335,6 +353,7 @@ public class UIDFolderInfo extends FolderInfo {
 	fireMessageChangedEvent(mce);
     }
 
+    
 
     public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
 	if (m instanceof UIDMimeMessage)
@@ -413,6 +432,47 @@ public class UIDFolderInfo extends FolderInfo {
 	    }
 	}
 
+    }
+
+    public void closed(ConnectionEvent e) {
+	if (Pooka.isDebug()) {
+	    System.out.println("Folder " + getFolderID() + " closed:  " + e);
+	}
+	
+	if (getFolderDisplayUI() != null) {
+	    if (status != CLOSED)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
+	}
+
+	if (status == CONNECTED) {
+	    setStatus(LOST_CONNECTION);
+	}
+	
+	fireConnectionEvent(e);
+    }
+    
+    public void disconnected(ConnectionEvent e) {
+	if (Pooka.isDebug()) {
+	    System.out.println("Folder " + getFolderID() + " disconnected.");
+	    Thread.dumpStack();
+	}
+	
+	if (getFolderDisplayUI() != null) {
+	    if (status != CLOSED)
+		getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
+	}
+	
+	if (status == CONNECTED) {
+	    setStatus(LOST_CONNECTION);
+	}
+	fireConnectionEvent(e);
+    }
+
+    /**
+     * gets the 'real' message for the given MessageInfo.
+     */
+    public Message getRealMessage(MessageInfo mi) throws MessagingException {
+	return ((UIDMimeMessage)mi.getMessage()).getMessage();
     }
 
     /**
