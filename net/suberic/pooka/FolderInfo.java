@@ -17,9 +17,6 @@ import net.suberic.util.ValueChangeListener;
 
 public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer {
 
-    private static int folderInfoCounter = 0;
-    private int folderInfoID;
-
     private Folder folder;
 
     // The is the folder ID: storeName.parentFolderName.folderName
@@ -60,7 +57,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     
     public FolderInfo(FolderInfo parent, String fname) {
-	folderInfoID = folderInfoCounter++;
 	parentFolder = parent;
 	setFolderID(parent.getFolderID() + "." + fname);
 	folderName = fname;
@@ -78,7 +74,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     
     public FolderInfo(StoreInfo parent, String fname) {
-	folderInfoID = folderInfoCounter++;
 	parentStore = parent;
 	setFolderID(parent.getStoreID() + "." + fname);
 	folderName = fname;
