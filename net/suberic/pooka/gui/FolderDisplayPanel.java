@@ -373,6 +373,7 @@ public class FolderDisplayPanel extends JPanel {
 		}
 	    });
 
+	/*
 	messageTable.registerKeyboardAction(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 		    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
@@ -418,7 +419,7 @@ public class FolderDisplayPanel extends JPanel {
 		    }
 		}
 	    }, KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_SPACE, 0),  JComponent.WHEN_FOCUSED);
-
+	*/
 	
     }
     

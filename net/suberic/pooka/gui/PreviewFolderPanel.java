@@ -22,177 +22,166 @@ import net.suberic.util.swing.*;
 
 public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
-    private PreviewContentPanel contentPanel;
+  private PreviewContentPanel contentPanel;
+  
+  private FolderDisplayPanel folderDisplay = null;
+  private FolderInfo displayedFolder = null;
+  
+  private FolderStatusBar folderStatusBar = null;
+  
+  ConfigurableKeyBinding keyBindings;
+  
+  private boolean enabled;
+  
+  private Action[] defaultActions;
+  
+  /**
+   * Creates an empty PreviewFolderPanel.
+   */
+  public PreviewFolderPanel(PreviewContentPanel newContentPanel) {
+    contentPanel = newContentPanel;
+    
+    this.setSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.previewPanel.folderSize", "200"))));
+    this.setPreferredSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200"))));
+    
+    folderDisplay = new FolderDisplayPanel();
+    
+  }
+  
+  /**
+   * Creates a new PreviewFolderPanel for the given Folder.
+   */
+  public PreviewFolderPanel(PreviewContentPanel newContentPanel, FolderInfo folder) {
+    contentPanel = newContentPanel;
+    
+    displayedFolder = folder;
+    folderDisplay = new FolderDisplayPanel(folder);
 
-    private FolderDisplayPanel folderDisplay = null;
-    private FolderInfo displayedFolder = null;
+    configurePanel();
+  }
+  
+  /**
+   * Creates a new PreviewFolderPanel for the given Folder.
+   */
+  public PreviewFolderPanel(PreviewContentPanel newContentPanel, FolderInternalFrame fif) {
+    contentPanel = newContentPanel;
 
-    private FolderStatusBar folderStatusBar = null;
+    displayedFolder = fif.getFolderInfo();
+    folderDisplay = fif.getFolderDisplay();
+    
+    configurePanel();
+  }
 
-    ConfigurableKeyBinding keyBindings;
-
-    private boolean enabled;
-
-    private Action[] defaultActions;
-
-    /**
-     * Creates an empty PreviewFolderPanel.
-     */
-    public PreviewFolderPanel(PreviewContentPanel newContentPanel) {
-      contentPanel = newContentPanel;
-
-      this.setSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.previewPanel.folderSize", "200"))));
-      this.setPreferredSize(new java.awt.Dimension(newContentPanel.getSize().width, Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200"))));
-
-      folderDisplay = new FolderDisplayPanel();
-
-    }
-
-    /**
-     * Creates a new PreviewFolderPanel for the given Folder.
-     */
-    public PreviewFolderPanel(PreviewContentPanel newContentPanel, FolderInfo folder) {
-	contentPanel = newContentPanel;
-
-	this.setSize(newContentPanel.getSize());
-
-	displayedFolder = folder;
-	folderDisplay = new FolderDisplayPanel(folder);
-	folderStatusBar = new FolderStatusBar(folder);
-
-	this.setLayout(new java.awt.BorderLayout());
-
-	this.add("Center", folderDisplay);
-	this.add("South", folderStatusBar);
-
-	defaultActions = new Action[] {
-	    new ExpungeAction(),
-	    new NextMessageAction(),
-	    new PreviousMessageAction(),
-	    new NextUnreadMessageAction(),
-	    new GotoMessageAction(),
-	    new SearchAction(),
-	    new SelectAllAction(),
-	    new PreviewMessageAction()
-		};
-
-	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
-	
-	keyBindings.setActive(getActions());
-
-	// if the PreviewFolderPanel itself gets the focus, pass it on to
-	// the folderDisplay
-	
-	this.addFocusListener(new FocusAdapter() {
-	    public void focusGained(FocusEvent e) {
-	      if (folderDisplay != null)
-		folderDisplay.requestFocus();
-	    }
-	  });
-    }
-
-    /**
-     * Creates a new PreviewFolderPanel for the given Folder.
-     */
-    public PreviewFolderPanel(PreviewContentPanel newContentPanel, FolderInternalFrame fif) {
-	contentPanel = newContentPanel;
-
-	this.setSize(newContentPanel.getSize());
-
-	displayedFolder = fif.getFolderInfo();
-	folderDisplay = fif.getFolderDisplay();
-	folderStatusBar = new FolderStatusBar(displayedFolder);
-
-	this.setLayout(new java.awt.BorderLayout());
-
-	this.add("Center", folderDisplay);
-	this.add("South", folderStatusBar);
-
-	defaultActions = new Action[] {
-	    new ExpungeAction(), 
-	    new NextMessageAction(),
-	    new PreviousMessageAction(),
-	    new GotoMessageAction(),
-	    new SearchAction(),
-	    new SelectAllAction(),
-	    new PreviewMessageAction()
-		};
-	keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
-	
-	keyBindings.setActive(getActions());
-
-	// if the PreviewFolderPanel itself gets the focus, pass it on to
-	// the folderDisplay
-	
-	this.addFocusListener(new FocusAdapter() {
-	    public void focusGained(FocusEvent e) {
-	      if (folderDisplay != null)
-		folderDisplay.requestFocus();
-	    }
-	  });
-    }
-
-    /**
-     * Searches the underlying FolderInfo's messages for messages matching
-     * the search term.
-     */
-    public void searchFolder() {
-	getFolderInfo().showSearchFolder();
-    }
-
-    /**
-     * Opens the display for the given Folder.
-     *
-     * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
-     */
-    public void openFolderDisplay() {
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    if (displayedFolder != null) 
-	      contentPanel.showFolder(displayedFolder.getFolderID());
-	    setEnabled(true);
-	  } 
+  /**
+   * Configures the PreviewFolderPanel.
+   */
+  void configurePanel() {
+    
+    this.setSize(contentPanel.getSize());
+    
+    folderStatusBar = new FolderStatusBar(displayedFolder);
+    
+    this.setLayout(new java.awt.BorderLayout());
+    
+    this.add("Center", folderDisplay);
+    this.add("South", folderStatusBar);
+    
+    defaultActions = new Action[] {
+      new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()), 
+      new NextMessageAction(),
+      new PreviousMessageAction(),
+      new GotoMessageAction(),
+      new SearchAction(),
+      new SelectAllAction(),
+      new PreviewMessageAction()
 	};
-      if (SwingUtilities.isEventDispatchThread())
-	runMe.run();
-      else
-	SwingUtilities.invokeLater(runMe);
+    
+    keyBindings = new ConfigurableKeyBinding(this, "PreviewFolderWindow.keyBindings", Pooka.getResources());
+    
+    keyBindings.setActive(getActions());
+    
+    // if the PreviewFolderPanel itself gets the focus, pass it on to
+    // the folderDisplay
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (folderDisplay != null)
+	    folderDisplay.requestFocus();
+	}
+      });
+    
+    getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+	  if (enabled) {
+	    if (keyBindings != null) {
+	      keyBindings.setActive(getActions());
+	    }
+	  } 
+	}
+      });
+  }
+  
+  /**
+   * Searches the underlying FolderInfo's messages for messages matching
+   * the search term.
+   */
+  public void searchFolder() {
+    getFolderInfo().showSearchFolder();
+  }
+  
+  /**
+   * Opens the display for the given Folder.
+   *
+   * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
+   */
+  public void openFolderDisplay() {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  if (displayedFolder != null) 
+	    contentPanel.showFolder(displayedFolder.getFolderID());
+	  setEnabled(true);
+	} 
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
+    
+  }
+  
+  /**
+   * Closes the display for the given Folder.
+   *
+   * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
+   */
+  public void closeFolderDisplay() {
+    folderDisplay.removeMessageTable();
+    if (displayedFolder != null && displayedFolder.getFolderDisplayUI() == this)
+      displayedFolder.setFolderDisplayUI(null);
+    displayedFolder = null;
+    setEnabled(false);
+  }
+  
+  /**
+   * This expunges all the messages marked as deleted in the folder.
+   */
+  public void expungeMessages() {
+    try {
+      getFolderInfo().getFolder().expunge();
+    } catch (MessagingException me) {
+      showError(Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
+    }   
+  }
 
-    }
-
-    /**
-     * Closes the display for the given Folder.
-     *
-     * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
-     */
-    public void closeFolderDisplay() {
-	folderDisplay.removeMessageTable();
-	if (displayedFolder != null && displayedFolder.getFolderDisplayUI() == this)
-	    displayedFolder.setFolderDisplayUI(null);
-	displayedFolder = null;
-	setEnabled(false);
-    }
-
-    /**
-     * This expunges all the messages marked as deleted in the folder.
-     */
-    public void expungeMessages() {
-	try {
-	    getFolderInfo().getFolder().expunge();
-	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
-	}   
-    }
-
-    /**
-     * Gets the FolderInfo for the currently displayed Folder.
-     *
-     * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
-     */
-    public FolderInfo getFolderInfo() {
-	return displayedFolder;
-    }
-
+  /**
+   * Gets the FolderInfo for the currently displayed Folder.
+   *
+   * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.
+   */
+  public FolderInfo getFolderInfo() {
+    return displayedFolder;
+  }
+  
   /**
    * Sets the FolderInfo to be displayed by this PreviewFolderPanel.
    */
@@ -202,7 +191,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     getFolderDisplay().createMessageTable();
     
     displayedFolder = fi;
-
+    
   }
   
   /**
@@ -212,6 +201,9 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
    */
   public void setEnabled(boolean newValue) {
     enabled = newValue;
+    
+    if (keyBindings != null)
+      keyBindings.setActive(getActions());
   }
   
   /**
@@ -223,15 +215,15 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     return getFolderDisplay().selectMessage(messageNumber);
   }
   
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * This makes the given row visible.
-     */
-    public void makeSelectionVisible(int messageNumber) {
-      getFolderDisplay().makeSelectionVisible(messageNumber);
-    }
-
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   * This makes the given row visible.
+   */
+  public void makeSelectionVisible(int messageNumber) {
+    getFolderDisplay().makeSelectionVisible(messageNumber);
+  }
+  
   public int selectNextMessage() {
     return getFolderDisplay().selectNextMessage();
   }
@@ -251,7 +243,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
    */
   public void resetFolderTableModel(FolderTableModel ftm) {
     getFolderDisplay().resetFolderTableModel(ftm);
-    }
+  }
   
   /**
    * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
@@ -600,7 +592,6 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("message-preview");
       contentPanel.refreshCurrentMessage();
     }
   }
