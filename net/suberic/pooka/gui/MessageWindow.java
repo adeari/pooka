@@ -33,6 +33,9 @@ public class MessageWindow extends JInternalFrame {
     ConfigurableToolbar toolbar;
     boolean hasAttachment = false;
 
+    //<sigh>
+    JScrollPane attachmentScrollPane, headerScrollPane;
+
     /**
      * Creates a MessageWindow from the given Message.
      */
@@ -68,8 +71,12 @@ public class MessageWindow extends JInternalFrame {
 	
 	headerPanel = createHeaderPanel(msg);
 	bodyPanel = createBodyPanel(msg);
-	
-	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerPanel);
+
+	headerPanel.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	headerScrollPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	tabbedPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
 
 	if (!getMessageProxy().hasLoadedAttachments())
 	    getMessageProxy().loadAttachmentInfo();
@@ -342,7 +349,9 @@ public class MessageWindow extends JInternalFrame {
      */
     public void addAttachmentPane() {
 	attachmentPanel = new AttachmentPane(getMessageProxy());
-	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentPanel);
+	attachmentScrollPane = new JScrollPane(attachmentPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	attachmentScrollPane.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "200")));
+	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentScrollPane);
     }
 
     /**
@@ -351,10 +360,11 @@ public class MessageWindow extends JInternalFrame {
 
     public void removeAttachmentPane() {
 	if (attachmentPanel != null) {
-	    tabbedPane.setSelectedComponent(headerPanel);
-	    tabbedPane.remove(attachmentPanel);
+	    tabbedPane.setSelectedComponent(headerScrollPane);
+	    tabbedPane.remove(attachmentScrollPane);
 	}
 	attachmentPanel = null;
+	attachmentScrollPane=null;
     }
 
     /**

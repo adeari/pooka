@@ -143,6 +143,7 @@ AttachmentPane.Actions.SaveAs.Action=file-save-as
 MessageWindow.backgroundColor=white
 MessageWindow.hsize=500
 MessageWindow.vsize=500
+MessageWindow.headerPanel.vsize=200
 
 MessageWindow.Header.DefaultHeaders=From:To:CC:Date:Subject
 MessageWindow.Header.ShowFullHeaders=false
