@@ -1,3 +1,6 @@
+messages without CC or BCC entries no longer send a blank cc or bcc line
+in the headers.
+
 fixed autocaching support.  made it so we also show a status while downloading
 lots of new messages.
 

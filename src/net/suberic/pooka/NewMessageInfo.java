@@ -38,15 +38,6 @@ public class NewMessageInfo extends MessageInfo {
       
       MimeMessage mMsg = (MimeMessage) message;
       
-      // moving to getHeaders() in NewMessageUI to support custom headers.
-      /*
-      if (profile != null) {
-	factory.showStatusMessage(Pooka.getProperty("info.sendMessage.popFromProfile", "Populating message from profile..."));
-	profile.populateMessage(mMsg);
-	mMsg.setHeader(Pooka.getProperty("Pooka.userProfileProperty", "X-Pooka-UserProfile"), profile.getName());
-      }
-      */
-      
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.settingHeaders", "Setting headers..."));
       
       Enumeration individualHeaders = headers.getAllHeaders();

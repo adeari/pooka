@@ -13,12 +13,9 @@
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.
 
-*) make it so no cc: means no cc: header at all, rather than a blank cc:
-header.
-
 *) make status icon for store itself.
 
-*) test w/gnu javamail
+*) test w/gnu javamail -- ???
 
 -----
 

@@ -195,8 +195,21 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       throw new MessagingException(Pooka.getProperty("error.NewMessage.noTo", "No To: recipient"));
     }
 
-    InternetAddress[] ccAddresses = InternetAddress.parse(headers.getHeader("CC", ","), false);
-    InternetAddress[] bccAddresses = InternetAddress.parse(headers.getHeader("BCC", ","), false);
+    String ccHeaderLine = headers.getHeader("CC", ",");
+    InternetAddress[] ccAddresses;
+    if (ccHeaderLine != null && ccHeaderLine.length() > 0) {
+      ccAddresses = InternetAddress.parse(ccHeaderLine, false);
+    } else {
+      ccAddresses = new InternetAddress[0];
+    }
+
+    String bccHeaderLine = headers.getHeader("BCC", ",");
+    InternetAddress[] bccAddresses;
+    if (bccHeaderLine != null && bccHeaderLine.length() > 0) {
+      bccAddresses = InternetAddress.parse(bccHeaderLine, false);
+    } else {
+      bccAddresses = new InternetAddress[0];
+    }
 
     Key cryptKey = null;
 

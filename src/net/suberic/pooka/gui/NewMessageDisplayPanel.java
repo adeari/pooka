@@ -462,7 +462,10 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	  value = ((EntryTextArea)(inputTable.get(key))).getText();
 	}
 	
-	returnValue.setHeader(header, value);
+	// don't set it if it's blank.
+	if (value != null && value.length() > 0) {
+	  returnValue.setHeader(header, value);
+	}
       }
     }
 
