@@ -1,24 +1,14 @@
-*) icons:  need new message in inbox for atg 
-
 *) fix synch w/subscribed folders and INBOX problem.
 
 *) -- windows --
   *) support windows registry attachment associations.
 	-- check icemail
   *) printing in windows can leave control characters at the end of lines
-  *) in windows, a file being sent to an application will need to have the
-	correct extension.  otherwise, the app (like word) won't recognize
-	it as the correct filetype.
 
 *) check for memory leaks
  -- especially w/preview pane mode?
 
 *) make sure that if you close a store, it doesn't reopen it.
-
-*) fix protocol timeout for imap/ssl? -- update this todo with more
-	specifics.  -- i think it's that if we lose our connection but 
-	don't notice, then we try to restore the connection and wait a 
-	long long time. -- test.
 
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
@@ -225,7 +215,9 @@ desktop pane.
 *)  when you change users for a new message, then, even if the theme 
 doesn't change, you still resize the window.
 
-*) add pgp/gpg support.
+*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
+	for that.  slimpgp or cyptix.  s/mime is available from together
+	(@ sourceforge).
 
 *) read messages don't get font color set properly.  works in jdk1.4.
 
