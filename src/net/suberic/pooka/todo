@@ -13,19 +13,6 @@
 
 *) fix error display with exception so that you can see the stack trace.
 
-*) add support for running without any local files.
-	-- support for http: access?
-	    -- fix variable bundle to make sure that we close the stream
-	    -- better error messages
-	    -- test .htaccess connection.
-
-*) ?? ^D message, hit return for next message, get an error?
-	tough.  could fix by having a temporary 'deleted' flag on the message
-	itself, maybe?
-	- thought was to make stuff happen almost immediately on the awt
-	event thread, then switch over to the folder thread for the real
-	work.
-
 *) printing right now truncates long lines.
 	-- try new jdk1.4 printing system?
 
@@ -50,6 +37,21 @@ javax.mail.internet.ParseException
 
 *) fix notification settings.  my spam folder shouldn't show a star when
 	new messages come in.
+
+*) add a way to put in custom headers into a new message.
+
+*) add support for running without any local files.
+	-- support for http: access?
+	    -- fix variable bundle to make sure that we close the stream
+	    -- better error messages
+	    -- test .htaccess connection.
+
+*) ?? ^D message, hit return for next message, get an error?
+	tough.  could fix by having a temporary 'deleted' flag on the message
+	itself, maybe?
+	- thought was to make stuff happen almost immediately on the awt
+	event thread, then switch over to the folder thread for the real
+	work.
 
 ----
 
