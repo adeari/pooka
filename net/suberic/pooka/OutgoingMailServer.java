@@ -225,6 +225,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	connected = true;
       } catch (MessagingException me) {
 	// if the connection/mail transport isn't available.
+	me.printStackTrace();
 	FolderInfo outbox = getOutbox();
 	
 	if (outbox != null) {
