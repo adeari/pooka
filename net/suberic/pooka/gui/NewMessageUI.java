@@ -2,6 +2,8 @@ package net.suberic.pooka.gui;
 
 public interface NewMessageUI extends MessageUI {
   public void setModified(boolean newValue);
+
+  public boolean isModified();
   
   public String getMessageText();
   

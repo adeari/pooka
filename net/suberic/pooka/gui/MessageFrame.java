@@ -34,19 +34,30 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
      */
 
     public MessageFrame(MessageProxy newMsgProxy) {
-	super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"));
-
-	msg=newMsgProxy;
-
-	this.getContentPane().setLayout(new BorderLayout());
-
-	msg.setMessageUI(this);
+      super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"));
+      
+      msg=newMsgProxy;
+      
+      this.getContentPane().setLayout(new BorderLayout());
+      
+      msg.setMessageUI(this);
 	
+      java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+      if (standardUrl != null) {
+	ImageIcon standardIcon = new ImageIcon(standardUrl);
+	setIconImage(standardIcon.getImage());
+      }
+
     }
 
     protected MessageFrame() {
 	this.getContentPane().setLayout(new BorderLayout());
 
+      java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+      if (standardUrl != null) {
+	ImageIcon standardIcon = new ImageIcon(standardUrl);
+	setIconImage(standardIcon.getImage());
+      }
     }
 
     /**

@@ -135,7 +135,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
       dispose();
     
     if (nmp.getNewMessageUI() == this) {
-      if (isModified()) {
+      if (((NewMessageProxy)getMessageProxy()).promptForClose()) {
 	int saveDraft = promptSaveDraft();
 	switch (saveDraft) {
 	case JOptionPane.YES_OPTION:

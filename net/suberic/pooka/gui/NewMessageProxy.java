@@ -281,6 +281,27 @@ public class NewMessageProxy extends MessageProxy {
   public NewMessageInfo getNewMessageInfo() {
     return (NewMessageInfo) messageInfo;
   }
+
+  /**
+   * Returns whether or not we should prompt the user to see if they really
+   * want to close the window for this message.
+   */
+  public boolean promptForClose() {
+    if (! Pooka.getProperty("Pooka.checkUnsentMessages", "false").equalsIgnoreCase("true")) {
+      return false;
+    }
+    if (System.getProperty("java.version").compareTo("1.3") < 0) {
+      return false;
+    }
+
+    NewMessageUI nmui = getNewMessageUI();
+
+    if (nmui != null) {
+      return nmui.isModified();
+    }
+    
+    return false;
+  }
   
   public Action[] defaultActions = {
     new SendAction(),

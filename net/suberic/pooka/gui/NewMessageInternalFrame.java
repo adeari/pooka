@@ -141,7 +141,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
       setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
     } else {
       setDefaultCloseOperation(JInternalFrame.DO_NOTHING_ON_CLOSE);
-      if (isModified()) {
+      if (((NewMessageProxy)getMessageProxy()).promptForClose()) {
 	int saveDraft = promptSaveDraft();
 	switch (saveDraft) {
 	case JOptionPane.YES_OPTION:

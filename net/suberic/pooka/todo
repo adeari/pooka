@@ -1,15 +1,8 @@
 top todo:
 
-*) have Pooka itself change its icon if you get new messages, in addition to 
-changing the title bar.
-	done.  todo:  get good icons.
-	add same for Message and NewMessage windows.
-	
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
 possible folders, nor just the ones that are open.
-
-*) fix the 'save draft?' messages under jdk1.2.
 
 (windows)
 
@@ -71,6 +64,10 @@ doesn't change, you still resize the window.
 	*)  change the new user setup so that it configures an outbox
 		automatically.
 
+*) have Pooka itself change its icon if you get new messages, in addition to 
+changing the title bar.
+	done.  todo:  get good icons.
+	
 *) add support for external editors, such as emacs.
 
 *) address book/ldap support.

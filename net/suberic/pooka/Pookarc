@@ -74,6 +74,9 @@ Pooka.defaultSigGenerator=net.suberic.pooka.FileSignatureGenerator
 Pooka.autoExpunge=true
 Pooka.autoExpunge.propertyType=Boolean
 
+Pooka.checkUnsentMessages=true
+Pooka.checkUnsentMessages.propertyType=Boolean
+
 Pooka.fetchBatchSize=50
 
 Pooka.xmailer=Pooka
@@ -734,7 +737,7 @@ Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
 
-Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.folderPanel.theme:Pooka.messagePanel.theme
+Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.checkUnsentMessages:Pooka.folderPanel.theme:Pooka.messagePanel.theme
 Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
 Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage

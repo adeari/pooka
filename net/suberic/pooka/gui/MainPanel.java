@@ -273,23 +273,26 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   public boolean processUnsentMessages() {
     Vector unsentMessages = NewMessageProxy.getUnsentProxies();
     boolean cancel = false;
-    for (int i = 0; !cancel && i < unsentMessages.size(); i++) {
-      NewMessageProxy current = (NewMessageProxy)unsentMessages.get(i);
-      NewMessageUI nmui = current.getNewMessageUI();
-      // FIXME
-      if (nmui != null) {
-	nmui.openMessageUI();
-	int saveDraft = nmui.promptSaveDraft();
-	switch (saveDraft) {
-	case JOptionPane.YES_OPTION:
-	  current.saveDraft();
-	  break;
-	case JOptionPane.NO_OPTION:
-	  nmui.setModified(false);
-	  nmui.closeMessageUI();
-	  break;
-	case JOptionPane.CANCEL_OPTION:
-	  cancel = true;
+    Vector unsentCopy = new Vector(unsentMessages);
+    for (int i = 0; !cancel && i < unsentCopy.size(); i++) {
+      NewMessageProxy current = (NewMessageProxy)unsentCopy.get(i);
+      if (current.promptForClose()) {
+	NewMessageUI nmui = current.getNewMessageUI();
+	// FIXME
+	if (nmui != null) {
+	  nmui.openMessageUI();
+	  int saveDraft = nmui.promptSaveDraft();
+	  switch (saveDraft) {
+	  case JOptionPane.YES_OPTION:
+	    current.saveDraft();
+	    break;
+	  case JOptionPane.NO_OPTION:
+	    nmui.setModified(false);
+	    nmui.closeMessageUI();
+	    break;
+	  case JOptionPane.CANCEL_OPTION:
+	    cancel = true;
+	  }
 	}
       }
     }
