@@ -45,7 +45,10 @@ public class PopInboxFolderInfo extends FolderInfo {
       password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
     String server = Pooka.getProperty("Store." + storeID + ".server", "");
     String protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
-    
+    if (Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
+      protocol = "pop3s";
+    }
+
     URLName url = new URLName(protocol, server, -1, "", user, password);
     
     mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
@@ -77,11 +80,11 @@ public class PopInboxFolderInfo extends FolderInfo {
       java.util.Properties props = new java.util.Properties(System.getProperties());
       
       if (Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-	props.setProperty("mail.pop3.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
-	props.setProperty("mail.pop3.socketFactory.fallback", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.fallback", "false"));
-	props.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.port", "995"));
+	props.setProperty("mail.pop3s.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
+	props.setProperty("mail.pop3s.socketFactory.fallback", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.fallback", "false"));
+	//props.setProperty("mail.pop3s.socketFactory.port", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.port", "995"));
       }
-
+      
       Session session = javax.mail.Session.getInstance(props, Pooka.defaultAuthenticator);
       
       if (Pooka.isDebug()) {

@@ -3,6 +3,7 @@ package net.suberic.pooka;
 import net.suberic.util.*;
 
 import java.util.logging.*;
+import java.util.*;
 
 /**
  * This class manages logging for Pooka.  It basically provides a bridge
@@ -10,16 +11,21 @@ import java.util.logging.*;
  */
 
 public class PookaLogManager implements ValueChangeListener {
-
-  // the various log settings we use.
-  String[] logSettings = new String[] {
+  
+  // the logging strings that we're currently monitoring
+  Set mMonitoredLogStrings = null;
+  
+  // the default list of log settings we monitor
+  String[] mDefaultLogSettings = new String[] {
     "Pooka.debug",
     "Pooka.debug.session",
     "editors.debug",
     "Pooka.debug.gui",
     "Pooka.debug.gui.focus",
-    "Pooka.debug.gui.filechooser"
+    "Pooka.debug.gui.filechooser",
+    "Pooka.debug.logManager"
   };
+  
   
   /**
    * Constructor.  Sets itself as a valueChangeListener for all of the
@@ -27,14 +33,17 @@ public class PookaLogManager implements ValueChangeListener {
    */
   public PookaLogManager() {
     VariableBundle globalBundle = Pooka.getResources();
-    for (int i = 0; i < logSettings.length; i++) {
-      globalBundle.addValueChangeListener(this, logSettings[i]);
+    mMonitoredLogStrings = new HashSet(Arrays.asList(mDefaultLogSettings));
+    
+    Iterator it = mMonitoredLogStrings.iterator();
+    while (it.hasNext()) {
+      globalBundle.addValueChangeListener(this, (String) it.next() + ".logLevel");
     }
     
     refresh();
-
+    
     configureListeners();
-
+    
     // set up logging to log all messages.  stupid.
     Logger global = Logger.getLogger("");
     Handler[] globalHandlers = global.getHandlers();
@@ -48,12 +57,28 @@ public class PookaLogManager implements ValueChangeListener {
    * Refreshes all logging states from the current configuration.
    */
   public void refresh() {
-    for (int i = 0; i < logSettings.length; i++) {
-      Level newLevel = Level.parse(Pooka.getProperty(logSettings[i] + ".level", "OFF"));
-      setLogLevel(logSettings[i], newLevel);
+    Iterator it = mMonitoredLogStrings.iterator();
+    while (it.hasNext()) {
+      String current = (String) it.next();
+      refresh(current);
     }
   }
 
+  /**
+   * Refreshes the logging state for the given property.
+   */
+  public void refresh(String pKey) {
+    String levelKey = Pooka.getProperty(pKey + ".logLevel", "DEFAULT");
+    Level newLevel = null;
+    if (levelKey == null || levelKey.equals("") || levelKey.equalsIgnoreCase("DEFAULT")) {
+      newLevel = null;
+    } else {
+      newLevel = Level.parse(levelKey);
+    }
+    getLogger().log(Level.FINE, "set log level for " + pKey + " to " + newLevel);
+    setLogLevel(pKey, newLevel);
+  }
+  
   /**
    * Sets up additional listeners.
    */
@@ -80,9 +105,9 @@ public class PookaLogManager implements ValueChangeListener {
 	  logger.log(logLevel, evt.getPropertyName() + ":  oldValue=" + oldValue + "; newValue=" + newValue);
 	}
       });
-
+    
   }
-
+  
   /**
    * Sets the appropriate log setting.
    */
@@ -92,13 +117,56 @@ public class PookaLogManager implements ValueChangeListener {
       current.setLevel(pLogLevel);
     }
   }
-
+  
   // ValueChangeListener
   /**
    * Responds to a change in a configured value.
    */
-  public void valueChanged(String changedValue) {
-    Level newLevel = Level.parse(Pooka.getProperty(changedValue, "OFF"));
-    setLogLevel(changedValue, newLevel);
+    public void valueChanged(String pChangedValue) {
+      String key = pChangedValue;
+      // this should always end with .logLevel.
+      if (pChangedValue.endsWith(".logLevel")) {
+	key = pChangedValue.substring(0, pChangedValue.length() - 9);
+      }
+      
+      refresh(key);
+    }
+  
+  /**
+   * Adds a logger for us to watch over.
+   */
+  public void addLogger(String pKey) {
+    if (! mMonitoredLogStrings.contains(pKey)) {
+      mMonitoredLogStrings.add(pKey);
+      Pooka.getResources().addValueChangeListener(this, pKey + ".logLevel");
+      String levelKey = Pooka.getProperty(pKey + ".logLevel", "DEFAULT");
+      Level newLevel = null;
+      if (levelKey == null || levelKey.equals("") || levelKey.equalsIgnoreCase("DEFAULT")) {
+	newLevel = null;
+      } else {
+	newLevel = Level.parse(levelKey);
+      }
+      setLogLevel(pKey, newLevel);
+      getLogger().log(Level.FINE, "added key " + pKey + "; set value to " + newLevel);
+      
+    }
+  }
+  
+  /**
+   * Removes a logger from the monitored list.
+   */
+  public void removeLogger(String pKey) {
+    if (mMonitoredLogStrings.contains(pKey)) {
+      mMonitoredLogStrings.remove(pKey);
+      Pooka.getResources().removeValueChangeListener(this, pKey + ".logLevel"); 
+      getLogger().log(Level.FINE, "removed key " + pKey);
+    }
+  }
+  
+  /**
+   * Gets the logger for this class.
+   */
+  public Logger getLogger() {
+    return Logger.getLogger("Pooka.debug.logManager");
   }
 }

@@ -441,9 +441,13 @@ public class NewAccountPooka {
 		      folderTree.scrollPathToVisible(new javax.swing.tree.TreePath(mtn.getPath()));
 		    }
 		    
-		    Pooka.getUIFactory().clearStatus();
-		    
-		    showConfirmation();
+		    SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			  Pooka.getUIFactory().clearStatus();
+			  
+			  showConfirmation();
+			}
+		      });
 		  }
 		});
 	    } catch (MessagingException me) {

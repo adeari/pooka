@@ -304,7 +304,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	setFolder(tmpFolder[0]);
 	if (! getFolder().isSubscribed())
 	  getFolder().setSubscribed(true);
-
+	
 	type = getFolder().getType();
 	setStatus(CLOSED);
       } else {
@@ -327,69 +327,71 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     initializeFolderInfo();
     
   }
-
-    /**
-     * This adds a listener to the Folder.
+  
+  /**
+   * This adds a listener to the Folder.
+   */
+  protected void addFolderListeners() {
+    if (folder != null) {
+      folder.addMessageChangedListener(this);
+      folder.addMessageCountListener(this);
+      folder.addConnectionListener(this);
+    }
+  }
+  
+  /**
+   * this is called by loadFolders if a proper Folder object 
+   * is returned.
      */
-    protected void addFolderListeners() {
-	if (folder != null) {
-	    folder.addMessageChangedListener(this);
-	    folder.addMessageCountListener(this);
-	    folder.addConnectionListener(this);
-	}
-    }
-
-    /**
-     * this is called by loadFolders if a proper Folder object 
-     * is returned.
-     */
-    protected void initializeFolderInfo() {
-	addFolderListeners();
-
-	Pooka.getResources().addValueChangeListener(this, getFolderProperty());
-	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
-	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
-	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".displayFilters");
-	Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".backendFilters");
-
-	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
-	if (!defProfile.equals(""))
-	  defaultProfile = UserProfile.getProfile(defProfile);
-	
-	// if we got to this point, we should assume that the open worked.
-	
-	if (getFolderTracker() == null) {
-	  FolderTracker tracker = Pooka.getFolderTracker();
-	  tracker.addFolder(this);
-	  this.setFolderTracker(tracker);
-	}
-    }
-
-    public void closed(ConnectionEvent e) {
-      synchronized(this) {
-	getLogger().log(Level.FINE, "Folder " + getFolderID() + " closed:  " + e);
-	
-	// check to see if the parent store is still open.
-	
-	StoreInfo parentStoreInfo = getParentStore();
-	if (parentStoreInfo != null) {
-	  parentStoreInfo.checkConnection();
-	}
-      
-	if (getFolderDisplayUI() != null) {
-	  if (status != CLOSED)
-	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
-	}
-	
-	
-	if (status == CONNECTED) {
-	  setStatus(LOST_CONNECTION);
-	}
-	
-      }
-      fireConnectionEvent(e);
-    }
+  protected void initializeFolderInfo() {
+    addFolderListeners();
     
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty());
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".folderList");
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".displayFilters");
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".backendFilters");
+    
+    Pooka.getLogManager().addLogger(getFolderProperty());
+    
+    String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
+    if (!defProfile.equals(""))
+      defaultProfile = UserProfile.getProfile(defProfile);
+    
+    // if we got to this point, we should assume that the open worked.
+    
+    if (getFolderTracker() == null) {
+      FolderTracker tracker = Pooka.getFolderTracker();
+      tracker.addFolder(this);
+      this.setFolderTracker(tracker);
+    }
+  }
+  
+  public void closed(ConnectionEvent e) {
+    synchronized(this) {
+      getLogger().log(Level.FINE, "Folder " + getFolderID() + " closed:  " + e);
+      
+      // check to see if the parent store is still open.
+      
+      StoreInfo parentStoreInfo = getParentStore();
+      if (parentStoreInfo != null) {
+	parentStoreInfo.checkConnection();
+      }
+      
+      if (getFolderDisplayUI() != null) {
+	if (status != CLOSED)
+	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
+      }
+      
+      
+      if (status == CONNECTED) {
+	setStatus(LOST_CONNECTION);
+      }
+      
+    }
+    fireConnectionEvent(e);
+  }
+  
   public void disconnected(ConnectionEvent e) {
     synchronized(this) {
       if (getLogger().isLoggable(Level.FINE)) {
@@ -1550,6 +1552,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
     
     Pooka.getResources().removeValueChangeListener(this);
+    Pooka.getLogManager().removeLogger(getFolderProperty());
+
     if (getFolderDisplayUI() != null)
       getFolderDisplayUI().closeFolderDisplay();
     
@@ -2507,10 +2511,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   public ActionThread getFolderThread() {
-    if (mFolderThread != null)
-      return mFolderThread;
-    else
-      return getParentStore().getStoreThread();
+    return getParentStore().getStoreThread();
   }
   
   public FolderInfo getTrashFolder() {
@@ -2547,18 +2548,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     else
       Pooka.getUIFactory().clearStatus();
   }
-
+  
   /**
    * Returns the logger for this Folder.
    */
   public Logger getLogger() {
     if (mLogger == null) {
-      mLogger = Logger.getLogger("Pooka.debug." + getFolderProperty());
+      mLogger = Logger.getLogger(getFolderProperty());
     }
     return mLogger;
   }
   
-
   class EditPropertiesAction extends AbstractAction {
     
     EditPropertiesAction() {

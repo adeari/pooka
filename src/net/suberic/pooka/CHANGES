@@ -10,9 +10,10 @@ modified the smtp tls code to comply with javamail 1.3.2.
 
 upgraded to JavaMail 1.3.2.
 
-added some support for jdk 1.4 logging framework.
+added some support for jdk 1.4 logging framework, including a way to
+configure more granulated log settings.
 
-fixed OutOfMemoryError when trying to subscribe to folders.
+fixed OutOfMemoryError when trying to subscribe to folders in jdk 1.5.
 
 fixed focus with jdk1.5 and closing internal frames bug.
 

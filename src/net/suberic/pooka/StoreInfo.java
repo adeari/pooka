@@ -24,8 +24,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   // logger
   Logger mLogger = null;
 
+  // the actual connection information
   private Store store;
-  
+  private Session mSession;
+
   // The is the store ID.
   private String storeID;
   
@@ -66,7 +68,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   /**
    * Creates a new StoreInfo from a Store ID.
    */
-  
   public StoreInfo(String sid) {
     setStoreID(sid);
     
@@ -108,6 +109,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       if (!password.equals(""))
 	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
       server = Pooka.getProperty("Store." + storeID + ".server", "");
+      
+      if (protocol.equals("imap") && Pooka.getProperty(getStoreProperty() + ".SSL").equalsIgnoreCase("true")) {
+	protocol = "imaps";
+      }
     }
     
     
@@ -120,11 +125,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
     
     try {
-      Session s = Session.getInstance(p, Pooka.defaultAuthenticator);
-      if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
-	s.setDebug(true);
-
-      store = s.getStore(url);
+      mSession = Session.getInstance(p, Pooka.defaultAuthenticator);
+      
+      updateSessionDebug();
+      
+      store = mSession.getStore(url);
       available=true;
     } catch (NoSuchProviderException nspe) {
       Pooka.getUIFactory().showError(Pooka.getProperty("error.loadingStore", "Unable to load Store ") + getStoreID(), nspe);
@@ -149,6 +154,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".port");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".connection");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".useSubscribed");
+    Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".sessionDebug.level");
+    
+    // tell the log manager to listen to these settings.
+    Pooka.getLogManager().addLogger(getStoreProperty());
+    Pooka.getLogManager().addLogger(getStoreProperty() + ".sessionDebug");
     
     if (available) {
       store.addConnectionListener(new ConnectionAdapter() { 
@@ -221,6 +231,8 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Properties p = new Properties(System.getProperties());
     
     String realProtocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
+    boolean useSSL = Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true");
+    
     if (realProtocol.equalsIgnoreCase("imap")) {
       loadImapProperties(p);
     } else if (realProtocol.equalsIgnoreCase("pop3")) {
@@ -252,15 +264,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   void loadImapProperties(Properties p) {
     p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
     p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
-
+    
     p.setProperty("mail.imaps.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
     p.setProperty("mail.imaps.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
     
     // set up ssl
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-      p.setProperty("mail.imap.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
-      p.setProperty("mail.imap.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
-      p.setProperty("mail.imap.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".port", "993"));
+      p.setProperty("mail.imaps.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
+      p.setProperty("mail.imaps.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
+      //p.setProperty("mail.imaps.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".port", "993"));
     }
 
   }
@@ -270,9 +282,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   void loadPop3Properties(Properties p) {
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-      p.setProperty("mail.pop3.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
-      p.setProperty("mail.pop3.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
-      p.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "995"));
+      p.setProperty("mail.pop3s.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
+      p.setProperty("mail.pop3s.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
+      //p.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "995"));
     }
   }
     
@@ -428,6 +440,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * This handles the event that the StoreInfo is removed from Pooka.
    */
   public void remove() {
+    // FIXME need to do a lot here.
+    Pooka.getResources().removeValueChangeListener(this);
+    Pooka.getLogManager().removeLogger(getStoreProperty());
+    // FIXME
+    // Pooka.getResources().removePropertyTree(getStoreProperty())
     
   }
 
@@ -443,7 +460,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
       defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
     } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
-      
+	
       if (storeNode != null) {
 	Enumeration childEnum = storeNode.children();
 	Vector v = new Vector();
@@ -481,8 +498,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       }
     } else if (changedValue.equals(getStoreProperty() + ".useSubscribed")) {
       useSubscribed = Pooka.getProperty(getStoreProperty() + ".useSubscribed", "false").equalsIgnoreCase("true");
+    } else if (changedValue.equals(getStoreProperty() + ".sessionDebug.level")) {
+      updateSessionDebug();
     }
-
+    
   }
   
 
@@ -1026,9 +1045,19 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   public Logger getLogger() {
     if (mLogger == null) {
-      mLogger = Logger.getLogger("Pooka.debug." + getStoreProperty());
+      mLogger = Logger.getLogger(getStoreProperty());
     }
     return mLogger;
   }
   
+  /**
+   * Updates the debug status on the session.
+   */
+  void updateSessionDebug() {
+    if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true") || (! Pooka.getProperty(getStoreProperty() + ".sessionDebug.level", "OFF").equalsIgnoreCase("OFF"))) {
+      mSession.setDebug(true);
+    } else {
+      mSession.setDebug(false);
+    }
+  }
 }

@@ -792,7 +792,7 @@ Folder.editableFields.uiConfig.theme.propertyType=List
 Folder.editableFields.uiConfig.theme.allowedValues=Pooka.theme
 Folder.editableFields.uiConfig.theme._includeAddButton=true
 
-Folder.editableFields.logging=debug.level
+Folder.editableFields.logging=logLevel
 Folder.editableFields.logging.scoped=true
 Folder.editableFields.logging.scopeRoot=Folder.editableFields
 Folder.editableFields.logging.propertyType=Composite
@@ -809,9 +809,9 @@ Folder.editableFields.notifyNewMessagesNode=True
 Folder.editableFields.autoCache.propertyType=DefaultBoolean
 Folder.editableFields.autoCache.value=
 
-Folder.editableFields.debug.level=DEFAULT
-Folder.editableFields.debug.level.propertyType=List
-Folder.editableFields.debug.level.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+Folder.editableFields.logLevel=DEFAULT
+Folder.editableFields.logLevel.propertyType=List
+Folder.editableFields.logLevel.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
 
 
 Store.propertyType=Multi
@@ -835,7 +835,7 @@ Store.editableFields.editor.connection.scoped=true
 Store.editableFields.editor.connection.scopeRoot=Store.editableFields
 Store.editableFields.editor.connection.propertyType=Composite
 
-Store.editableFields.editor.logging=debug.level
+Store.editableFields.editor.logging=logLevel:sessionDebug.logLevel
 Store.editableFields.editor.logging.scoped=true
 Store.editableFields.editor.logging.scopeRoot=Store.editableFields
 Store.editableFields.editor.logging.propertyType=Composite
@@ -924,9 +924,12 @@ Store.editableFields.useMaildir=true
 Store.editableFields.trashFolder.namePrefix=Store.
 Store.editableFields.trashFolder.nameSuffix=.trashFolder
 
-Store.editableFields.debug.level=DEFAULT
-Store.editableFields.debug.level.propertyType=List
-Store.editableFields.debug.level.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+Store.editableFields.logLevel=DEFAULT
+Store.editableFields.logLevel.propertyType=List
+Store.editableFields.logLevel.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+Store.editableFields.sessionDebug.logLevel=OFF
+Store.editableFields.sessionDebug.logLevel.propertyType=List
+Store.editableFields.sessionDebug.logLevel.allowedValues=DEFAULT:SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
 
 Preferences=UI:Reply:Startup:Signature:HTML:Files:Spam:Debug
 Preferences.propertyScoped=false
@@ -941,17 +944,17 @@ Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.Files=Pooka.defaultMailSubDir:Pooka.sslCertFile
 Preferences.Spam=Pooka.spamAction
 #Preferences.Debug=Pooka.debug:Pooka.sessionDebug
-Preferences.Debug=Pooka.debug.level:Pooka.debug.session.level
+Preferences.Debug=Pooka.debug.logLevel:Pooka.debug.session.logLevel
 
 Pooka.debug=false
 Pooka.debug.propertyType=Boolean
 
-Pooka.debug.level=OFF
-Pooka.debug.level.propertyType=List
-Pooka.debug.level.allowedValues=SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
-Pooka.debug.session.level=OFF
-Pooka.debug.session.level.propertyType=List
-Pooka.debug.session.level.allowedValues=SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+Pooka.debug.logLevel=OFF
+Pooka.debug.logLevel.propertyType=List
+Pooka.debug.logLevel.allowedValues=SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
+Pooka.debug.session.logLevel=OFF
+Pooka.debug.session.logLevel.propertyType=List
+Pooka.debug.session.logLevel.allowedValues=SEVERE:WARNING:INFO:CONFIG:FINE:FINER:FINEST:OFF
 
 Pooka.sessionDebug=false
 Pooka.sessionDebug.propertyType=Boolean

@@ -2,7 +2,24 @@
 	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
 
 -----------
+*) support jdk 1.5
+   *) JOptionPane error on initial startup; hangs.
+	done?  test?
+   *) add support for ocean theme 
 
+*) fix TLS/SSL support for SMTP with new javamail 1.3.2.
+*) fix non-plaintext-password support with imap (logindisabled)
+
+*) check out situation with multiple connections.  see if we can speed
+   up things that way.  possibilities:
+	*) reuse our connections so we don't have to renegotiate ssl
+	   connections each time.
+	*) use separate threads for each folder so we can do the ssl
+	   negotiation in parallel.
+*) take shutdown off of awt thread.
+*) test timeouts; make sure that javamail timeout doesn't apply while
+   data is still being transferred.  or for ssl for that matter.
+	
 *) add support for running without any local files.
    *) big tasks:  
       *) url access for all file resources
@@ -22,7 +39,7 @@
 			-- gives error on startup. -- still does.  sigh.
 		*) encryption key files
 			-- gives error.
-*) add support for running off of removable media (run from directory; cache/
+  *) add support for running off of removable media (run from directory; cache/
 	config files relative to config file)
 	*) startup
 	   - needs to ask where to get configuration file.  either can be 
@@ -33,29 +50,12 @@
 	*) usage
 	   - export for http usage needs to be put in the correct place
 		and tested.
-*) file list:  pgp/smime files, signature file, address book, ssl cert file,
+  *) file list:  pgp/smime files, signature file, address book, ssl cert file,
 	mbox file (n/a).
    -- also:  pooka home, mailcap file, pookarc file
 
-*) check out situation with multiple connections.  see if we can speed
-   up things that way.  possibilities:
-	*) reuse our connections so we don't have to renegotiate ssl
-	   connections each time.
-	*) use separate threads for each folder so we can do the ssl
-	   negotiation in parallel.
-*) take shutdown off of awt thread.
-*) test timeouts; make sure that javamail timeout doesn't apply while
-   data is still being transferred.  or for ssl for that matter.
-	
-*) add support for composing new email messages from an external source,
-say, like reacting to a mailto: link.
-
 *) fix problem with starting up work account and having it select first
 	message (???)
-
-*) support jdk 1.5
-   *) JOptionPane error on initial startup; hangs.
-   *) add support for ocean theme 
 
 *) add a way to tell what a store's (and folder's) current thread is up to.
 
@@ -68,12 +68,8 @@ say, like reacting to a mailto: link.
 
 *) fix cryptix inclusion from webstart.
 
-*) fix TLS/SSL support for SMTP with new javamil 1.3.2.
-*) fix non-plaintext-password support with imap (logindisabled)
-
-*) debug:  make store/folder debug work:  register property/debug level;
-	make ui select DEFAULT by default.
-
+*) add support for composing new email messages from an external source,
+say, like reacting to a mailto: link.
 -----
 
 *) test w/gnu javamail -- ???

@@ -607,16 +607,31 @@ public class VariableBundle extends Object {
     Vector currentListenerList;
     while (keys.hasMoreElements()) {
       currentListenerList = (Vector)VCListeners.get(keys.nextElement());
-      while (currentListenerList.contains(vcl))
+      while (currentListenerList != null && currentListenerList.contains(vcl))
 	currentListenerList.remove(vcl);
     }
     
     keys = VCGlobListeners.keys();
     while (keys.hasMoreElements()) {
       currentListenerList = (Vector)VCGlobListeners.get(keys.nextElement());
-      while (currentListenerList.contains(vcl))
+      while (currentListenerList != null && currentListenerList.contains(vcl))
 	currentListenerList.remove(vcl);
     }
+  }
+
+  /**
+   * This removes the given ValueChangeListener from listening on the 
+   * given property.
+   */
+  public void removeValueChangeListener(ValueChangeListener vcl, String property) {
+    Vector currentListenerList;
+    currentListenerList = (Vector)VCListeners.get(property);
+    while (currentListenerList != null && currentListenerList.contains(vcl))
+	currentListenerList.remove(vcl);
+    
+    currentListenerList = (Vector)VCGlobListeners.get(property);
+    while (currentListenerList != null && currentListenerList.contains(vcl))
+	currentListenerList.remove(vcl);
   }
 
   /**

@@ -120,7 +120,11 @@ public class KeySelectorPane extends SwingPropertyEditor {
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
     
-    retProps.setProperty(property, (String)valueDisplay.getSelectedItem());
+    String newValue = (String) valueDisplay.getSelectedItem();
+    if (newValue == null)
+      newValue = "";
+
+    retProps.setProperty(property, newValue);
     
     return retProps;
   }

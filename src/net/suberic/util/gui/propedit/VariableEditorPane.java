@@ -63,6 +63,14 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     valueComponent.setLayout(new java.awt.CardLayout());
 
     String currentValue = manager.getProperty(keyProperty, "");
+    if (currentValue == "") {
+      // check the editor for this, if any.
+      PropertyEditorUI keyEditor = manager.getPropertyEditor(keyProperty);
+      if (keyEditor != null) {
+	currentValue = keyEditor.getValue().getProperty(keyProperty, "");
+      }
+    }
+
     showPanel(currentValue);
 
     manager.registerPropertyEditor(property, this);

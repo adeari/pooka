@@ -18,7 +18,7 @@ public class Pooka {
   
   // the log manager.
   static public PookaLogManager mLogManager;
-
+  
   // the startup/configuration file
   static public String localrc = null;
   
@@ -661,6 +661,13 @@ public class Pooka {
     sTrustManager = pTrustManager;
   }
 
+  /**
+   * The Log Manager.
+   */
+  static public PookaLogManager getLogManager() {
+    return mLogManager;
+  }
+  
   private static long sStartTime = 0;
   private static long sLastUpdate = 0;
   /**

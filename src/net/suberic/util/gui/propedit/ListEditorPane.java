@@ -10,6 +10,7 @@ import java.util.*;
  */
 public class ListEditorPane extends SwingPropertyEditor {
   protected int originalIndex;
+  protected String mOriginalValue;
   protected JLabel label;
   protected JComboBox inputField;
   JButton addButton;
@@ -52,14 +53,32 @@ public class ListEditorPane extends SwingPropertyEditor {
     //valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
     //valueComponent.add(inputField);
     manager.registerPropertyEditor(property, this);
+
+    // if we're showing something other than the actually configured
+    // value, fire an event.
+    if (isChanged()) {
+      String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
+      try {
+	firePropertyChangingEvent(newValue);
+	firePropertyChangedEvent(newValue);
+      } catch (PropertyValueVetoException pvve) {
+	manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
+	inputField.setSelectedIndex(currentIndex);
+      } 
+    }
   }
-  
 
   /**
    * Creates the JComboBox with the appropriate options.
    */
   protected JComboBox createComboBox() {
     String originalValue = manager.getProperty(property, "");
+    // we set this to the real original value, rather than the default
+    // value if none is set.
+    mOriginalValue = originalValue;
+    // now we get the default value.
+    if (originalValue.equalsIgnoreCase(""))
+	originalValue = manager.getProperty(editorTemplate, "");
     String currentItem;
     originalIndex=-1;
     Vector items = new Vector();
@@ -196,6 +215,7 @@ public class ListEditorPane extends SwingPropertyEditor {
 	firePropertyChangedEvent(currentValue);
 	currentIndex = newIndex;
       }
+      
       if (isEnabled() && isChanged()) { 
 	manager.setProperty(property, currentValue);
       }
@@ -204,7 +224,7 @@ public class ListEditorPane extends SwingPropertyEditor {
       inputField.setSelectedIndex(currentIndex);
     } 
   }
-    
+  
   /**
    * Returns the current values of the edited properties as a 
    * java.util.Properties object.
@@ -224,6 +244,7 @@ public class ListEditorPane extends SwingPropertyEditor {
   public void resetDefaultValue() {
     // this will be handled by the ItemListener we have on the inputField,
     // so we don't have to notify listeners here.
+
     inputField.setSelectedIndex(originalIndex);
   }
   
@@ -232,7 +253,7 @@ public class ListEditorPane extends SwingPropertyEditor {
    * the last save.
    */
   public boolean isChanged() {
-    return (!(originalIndex == inputField.getSelectedIndex()));
+    return (mOriginalValue != (String)labelToValueMap.get(inputField.getSelectedItem()));
   }
   
   /**
