@@ -394,9 +394,15 @@ public class FolderFileWrapper extends File {
     private void loadChildren() {
 	if (isDirectory() ||  ! exists()) {
 	    try {
+		/*
 		if (!folder.getStore().isConnected()) {
-		    folder.getStore().connect();
+		    if (Pooka.isDebug()) {
+			System.out.println("parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
+			folder.getStore().connect();
+		    }
 		}
+		*/
+
 		Folder[] childList = folder.list();
 		children = new FolderFileWrapper[childList.length];
 		for (int i = 0; i < childList.length; i++) {

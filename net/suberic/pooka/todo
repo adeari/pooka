@@ -13,9 +13,8 @@ a menu option and from the 'open with' dialog.
 	updated live.
 
 *)  get JFileChooser to work with the mail stores.  sort of done; still
-	need to deal with disconnection issues and return value issues.
-	 -- disconnection:  check to see if the Store is actually staying
-	    open or not.
+	need to deal with disconnection issues.
+	 -- disconnection:  might be fixed.  test it out and see.
 
 -- final checks before alpha 2 release.
 

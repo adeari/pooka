@@ -170,7 +170,7 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    /*
+
 	    JFileChooser jfc =
 		new JFileChooser("/", new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo().getStore()));
 	    jfc.setMultiSelectionEnabled(true);
@@ -181,13 +181,12 @@ public class StoreNode extends MailTreeNode {
 	    if (returnValue == JFileChooser.APPROVE_OPTION) {
 		net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
 		    ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
-		System.out.println("got folder " + wrapper.getPath());
-		
-	    */
-	    
-
-	    String newFolder = JOptionPane.showInternalInputDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), "Subscribe to what folder?");
-	    getStoreInfo().subscribeFolder(newFolder);
+		getStoreInfo().subscribeFolder(wrapper.getAbsolutePath());
+	    }
+		/*
+		  String newFolder = JOptionPane.showInternalInputDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), "Subscribe to what folder?");
+		  getStoreInfo().subscribeFolder(newFolder);
+		*/
 	}
     }
     
@@ -198,8 +197,14 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    JFileChooser jfc = new JFileChooser("/", new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo().getStore()));
-	    jfc.showOpenDialog(getParentContainer());
+	    try {
+		Folder[] folders = getStoreInfo().getStore().getDefaultFolder().list();
+		for (int i = 0; i < folders.length; i++) {
+		    folders[i].list();
+		}
+	    } catch (Exception ex) {
+		System.out.println("caught exception: " + ex.getMessage());
+	    }
 	}
     }
 

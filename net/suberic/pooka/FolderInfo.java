@@ -561,7 +561,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 	
 	if (!found) {
-	    String currentValue = Pooka.getProperty(getFolderProperty() + ".folderList");
+	    String currentValue = Pooka.getProperty(getFolderProperty() + ".folderList", "");
 	    if (currentValue.equals(""))
 		Pooka.setProperty(getFolderProperty() + ".folderList", addFolderName);
 	    else
