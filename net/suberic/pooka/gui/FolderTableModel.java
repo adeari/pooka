@@ -35,8 +35,20 @@ public class FolderTableModel extends AbstractTableModel {
 	return (String)columnNames.elementAt(col);
     }
     
+    /**
+     * This returns the value at the given row and column.
+     * 
+     * note that i actually catch any ArrayOutOfBoundsExceptions and 
+     * return a new Object if this happens.
+     *
+     * As defined in javax.swing.table.TableModel, more or less
+     */
     public Object getValueAt(int row, int col) {
-	return ((MessageProxy)data.elementAt(row)).getTableInfo().elementAt(col);
+	try {
+	    return ((MessageProxy)data.elementAt(row)).getTableInfo().elementAt(col);
+	} catch (ArrayIndexOutOfBoundsException ae) {
+	    return new Object();
+	}
     }
     
     public boolean isCellEditable(int rowIndex, int columnIndex) {
