@@ -9,12 +9,25 @@ import java.util.*;
 
 public class ItemManager implements ValueChangeListener {
   
-  private List itemList;
+  // an  ordered list of item id's
+  private List itemIdList;
+
+  // the mapping from the item id's to the items themselves
   private HashMap itemIdMap = new HashMap();
+
+  // for convenience, the itemList itself.
+  private List itemList;
+
+  //the ItemListChange listeners
   private List listenerList = new LinkedList();
 
+  // the resource which defines this ItemList
   private String resourceString;
+
+  // the VariableBundle which contains the Item information.
   private VariableBundle sourceBundle;
+
+  // the ItemCreator which is used to create new items.
   private ItemCreator itemCreator;
 
   /**
@@ -47,7 +60,10 @@ public class ItemManager implements ValueChangeListener {
    * returns null.
    */
   public synchronized Item getItem(String itemID) {
-    return (Item)itemIdMap.get(itemID);
+    if (itemID != null && itemIdList.contains(itemID))
+      return (Item)itemIdMap.get(itemID);
+    else
+      return null;
   }
 
   /**
@@ -64,8 +80,7 @@ public class ItemManager implements ValueChangeListener {
     if (itemName != null && itemName.length > 0) {
       StringBuffer itemString = new StringBuffer();
       for (int i = 0 ; i < itemName.length; i++) {
-	Item currentItem = getItem(itemName[i]);
-	if (currentItem == null || ! itemList.contains(currentItem)) 
+	if (! itemIdList.contains(itemName[i]))
 	  itemString.append(itemName[i] + ":");
       }
       if (itemString.length() > 0)
@@ -103,8 +118,7 @@ public class ItemManager implements ValueChangeListener {
    * This removes the item with the given itemName.
    */
   public synchronized void removeItem(String itemName) {
-    if (getItem(itemName) != null)
-      removeFromItemString(new String[] { itemName });
+    removeFromItemString(new String[] { itemName });
   }
   
   /**
@@ -118,7 +132,7 @@ public class ItemManager implements ValueChangeListener {
     
     Vector matches = new Vector();
     for ( int i = 0; i < itemNames.length; i++) {
-      if (getItem(itemNames[i]) != null)
+      if (itemIdList.contains(itemNames[i]))
 	matches.add(itemNames[i]);
       
     }
@@ -128,8 +142,7 @@ public class ItemManager implements ValueChangeListener {
     
     String[] removedItems = new String[matches.size()];
     
-    for (int i = 0; i < matches.size(); i++) 
-      removedItems[i] = (String) matches.elementAt(i);
+    matches.toArray(removedItems);
     
     removeFromItemString(removedItems);
   }
@@ -158,28 +171,62 @@ public class ItemManager implements ValueChangeListener {
   }
   
   /**
-   * This compares the itemList object with the Item property, and
+   * This compares the itemList object with the resourceString property, and
    * updates the itemList appropriately.
+   *
+   * This method is called from valueChanged() when the underlying resource
+   * changes.  It actually goes through and updates the objects on the 
+   * ItemManager, and then notifies its ItemListChangedListeners by calling
+   * fireItemListChangeEvent().
    */
   public synchronized void refreshItems() {
-    Vector newItemList = new Vector();
-    
+    LinkedList newIdList = new LinkedList();
+    LinkedList newItemList = new LinkedList();
+
+    Vector addedItemList = new Vector();
+    Vector removedIdList = new Vector(itemIdList);
+
     StringTokenizer tokens =  new StringTokenizer(sourceBundle.getProperty(resourceString, ""), ":");
     
     String itemID;
+
+    // at the end of this loop, we should end up with a newIdList which is a 
+    // list of the currently valid item id's, a newItemList which is a list
+    // of the currently valid items, an addedItemList which is a list of added
+    // items, and a removedIdList which is a list of removed id's.
     while (tokens.hasMoreTokens()) {
       itemID = tokens.nextToken();
-      Item currentItem = getItem(itemID);
-      if (currentItem != null)
-	newItemList.add(currentItem);
-      else 
-	newItemList.add(itemCreator.createItem(sourceBundle, resourceString, itemID));
+      newIdList.add(itemID);
+
+      if (itemIdList.contains(itemID)) {
+	removedIdList.remove(itemID);
+      } else {
+	// this is being added.
+	Item currentItem = (Item) itemIdMap.get(itemID);
+	if (currentItem == null) {
+	  itemIdMap.put(itemID, itemCreator.createItem(sourceBundle, resourceString, itemID));
+	}
+	addedItemList.add(itemIdMap.get(itemID));
+      }
+      newItemList.add(itemIdMap.get(itemID));
+    }
+
+    Item[] removedItems = new Item[removedIdList.size()];
+    for (int i = 0 ; i < removedIdList.size(); i++) {
+      Item currentItem = (Item) itemIdMap.get(removedIdList.get(i));
+      if (currentItem != null) {
+	itemIdMap.remove(removedIdList.get(i));
+	removedItems[i] = currentItem;
+      }
     }
     
-    if (! newItemList.equals(itemList)) {
-      itemList = newItemList;
-      //fireItemListChangeEvent();
-    }
+    Item[] addedItems = new Item[addedItemList.size()];
+    addedItemList.toArray(addedItems);
+    
+    itemList = newItemList;
+    itemIdList = newIdList;
+    
+    fireItemListChangeEvent(new ItemListChangeEvent(this, addedItems, removedItems));
   }
 
   /**
@@ -189,7 +236,7 @@ public class ItemManager implements ValueChangeListener {
    * refreshItems() when it gets one.
    */
   public void valueChanged(String changedValue) {
-    if (changedValue.equals(resourceString))
+    if (! changedValue.equals(resourceString))
       refreshItems();
   }
   
@@ -226,6 +273,7 @@ public class ItemManager implements ValueChangeListener {
    */
   private void createItemList() {
     itemList = new LinkedList();
+    itemIdList = new LinkedList();
     String itemID = null;
     
     StringTokenizer tokens =  new StringTokenizer(sourceBundle.getProperty(resourceString, ""), ":");
@@ -234,6 +282,7 @@ public class ItemManager implements ValueChangeListener {
       itemID=(String)tokens.nextToken();
       Item newItem = itemCreator.createItem(sourceBundle, resourceString, itemID);
       itemList.add(newItem);
+      itemIdList.add(itemID);
       itemIdMap.put(itemID, newItem);
     }
     
