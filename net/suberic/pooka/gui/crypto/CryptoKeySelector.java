@@ -15,52 +15,36 @@ public class CryptoKeySelector {
   /**
    * Selects a public key.
    */
-  public static java.security.Key selectPublicKey() throws java.security.KeyStoreException {
-    /*
-    EncryptionKeyManager mgr = Pooka.getCryptoManager().getKeyManager();
-    if (mgr != null) {
-      Set publicKeys = mgr.publicKeyAliases();
-      String alias = showKeySet(publicKeys, "Select public key.");
-      if (alias == null) 
-	return null;
+  public static java.security.Key selectPublicKey() throws java.security.GeneralSecurityException {
 
-      return mgr.getPublicKey(alias);
-    } else {
-      System.out.println("crypto manager == null.");
+    Set publicKeys = Pooka.getCryptoManager().publicKeyAliases();
+    String alias = showKeySet(publicKeys, "Select public key.");
+    if (alias == null) 
       return null;
-    }
-    */
-    // FIXME
-    return null;
+    
+    return Pooka.getCryptoManager().getPublicKey(alias);
   }
 
   /**
    * Selects a private key.
    */
-  public static java.security.Key selectPrivateKey()  throws java.security.KeyStoreException {
-    /*
-    EncryptionKeyManager mgr = Pooka.getCryptoManager().getKeyManager();
-    if (mgr != null) {
-      Set privateKeys = mgr.privateKeyAliases();
-      String alias = showKeySet(privateKeys, "Select private key.");
-      if (alias == null) 
-	return null;
+  public static java.security.Key selectPrivateKey()  throws java.security.GeneralSecurityException {
 
-      char[] passphrase = showPassphraseDialog();
-      return mgr.getPrivateKey(alias, passphrase);
-    } else {
-      System.out.println("crypto manager == null.");
+    Set privateKeys = Pooka.getCryptoManager().privateKeyAliases();
+    String alias = showKeySet(privateKeys, "Select private key.");
+    if (alias == null) 
       return null;
-    } 
-    */
-    // FIXME
-    return null;
+    
+    char[] passphrase = showPassphraseDialog();
+    return Pooka.getCryptoManager().getPrivateKey(alias, passphrase);
+    
   }
     
   /**
    * Shows a dialog for selecting a key from a set.
    */
   public static String showKeySet(Set keys, String title) {
+
     Vector keyList = new Vector(keys);
     JList displayList = new JList(keyList);
     int value = JOptionPane.showConfirmDialog(Pooka.getMainPanel(), new JScrollPane(displayList), title, JOptionPane.YES_NO_OPTION);

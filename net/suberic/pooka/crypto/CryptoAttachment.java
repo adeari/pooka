@@ -77,7 +77,6 @@ public class CryptoAttachment extends Attachment {
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
     else {
-      
       /*
       Object o = super.getDataHandler().getContent();
       if (o instanceof Multipart) {
@@ -96,8 +95,11 @@ public class CryptoAttachment extends Attachment {
       mbp.setDataHandler(super.getDataHandler());
       mbp.setHeader("Content-Type", super.getDataHandler().getContentType());
 
+      System.err.println("decrypting part.");
       decryptedBodyPart = utils.decryptBodyPart(mbp, key);
 
+      System.err.println("part decrypted.");
+      System.err.println("content = " + decryptedBodyPart.getContent());
       return decryptedBodyPart;
     }
     

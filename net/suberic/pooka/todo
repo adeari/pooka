@@ -1,27 +1,24 @@
-*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
-	for that.  slimpgp or cyptix.  s/mime is available from together
-	(@ sourceforge).  -- use rfc3156.
-
-	-- started.  todo on api:
-		- key management
-			- including importing keys from emails.
-		- sign and encrypt
-		- more checks, proper excpetions
-	-- todo on pooka
-		- key management
-		  - inc. default key for user, addressbookentry 
-		  - ?? different KeyStores for different users?
-		- way to show encryption information (ui)
-		  -- thought:  show decrypted or encrypted.  which by default
-			       is configurable.  when decryption is attempted,
-			       there's a ui, though it will probably try the
-			       default for the user, first.
-			       - sigs auto-verified?
-		  -- need a way to show current encryption status, plus a way
-			to decrypt/check signature
-		  -- ?? button at bottom that shows status?
-			
-	-- mozilla does s/mime.
+*) add pgp/gpg support.
+  -- started.  todo on api:
+       	- key management
+	- including importing keys from emails.
+	- sign and encrypt
+	- more checks, proper exceptions
+-- todo on pooka
+	- check keys--they seem to not all work.  make sure that all 
+	  available keys work, and that only keys that work are available?
+	- check decryption.  doesn't seem to work.
+	- key management
+	  - inc. default key for user, addressbookentry 
+	- way to show encryption information (ui)
+	  -- thought:  show decrypted or encrypted.  which by default
+		       is configurable.  when decryption is attempted,
+		       there's a ui, though it will probably try the
+		       default for the user, first.
+		       - sigs auto-verified?
+	  -- need a way to show current encryption status, plus a way
+		to decrypt/check signature
+	  -- ?? button at bottom that shows status?
 
 *) fix error in encoded stream problem.
 	-- just better error (?)  or maybe print out as far as it goes.
@@ -168,6 +165,9 @@ java.lang.ArrayIndexOutOfBoundsException: 0
 	pooka can recover without restarting.
 
 -----
+
+*) additional crypto stuff
+	- different KeyStores for different users?
 
 *) regexp? (add search/replace to editor)
   -- started.  todo:

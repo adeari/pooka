@@ -2,6 +2,7 @@ package net.suberic.pooka;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -83,7 +84,6 @@ public class PookaEncryptionManager {
       if (smimeUtils != null) {
 	smimeKeyMgr = smimeUtils.createKeyManager();
 	try {
-	  System.err.println("loading " + smimePrivateFilename + " with password " + smimePrivatePwString);
 	  smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
 	} catch (java.security.GeneralSecurityException gse) {
 	  System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
@@ -92,7 +92,7 @@ public class PookaEncryptionManager {
 	}
       
 	try {
-	  smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), null);
+	  smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), smimePrivatePwString.toCharArray());
 	} catch (java.io.IOException fnfe) {
 	  System.out.println("Error loading S/MIME public keystore from file " + smimePublicFilename + ":  " + fnfe.getMessage());
 	} catch (java.security.GeneralSecurityException gse) {
@@ -114,6 +114,51 @@ public class PookaEncryptionManager {
    */
   public Key[] getPrivateKeys(String address) {
     return null;
+  }
+
+  /**
+   * Returns all available private keys.
+   */
+  /*
+  public Key[] getPrivateKeys() {
+    Key[] returnValue = new Key[0];
+    if (pgpKeyMgr != null) {
+      Key[] pgpKeys = pgpKeyMgr.getPrivateKeys();
+      if (pgpKeys != null && pgpKeys.length > 0)
+	returnValue = pgpKeys;
+    }
+
+    if (smimeKeyMgr != null) {
+      Key[] smimeKeys = smimeKeyMgr.getPrivateKeys();
+      if (smimeKeys != null && smimeKeys.length > 0) {
+	if (returnValue.length > 0) {
+	  Key[] newReturnValue = new Key[returnValue.length + smimeKeys.length];
+	  System.arraycopy(returnValue, 0, newReturnValue, 0, returnValue.length);
+	  System.arraycopy(smimeKeys, 0, newReturnValue, returnValue.length, smimeKeys.length);
+	  returnValue = newReturnValue;
+	} else {
+	  returnValue = smimeKeys;
+	}
+      }
+    }
+    
+    return returnValue;
+  }
+  */
+
+  /**
+   * Returns all available private key aliases.
+   */
+  public Set privateKeyAliases() throws java.security.KeyStoreException {
+    Set returnValue = new java.util.HashSet();
+    if (pgpKeyMgr != null) {
+      returnValue.addAll(pgpKeyMgr.privateKeyAliases());
+    }
+    if (smimeKeyMgr != null) {
+      returnValue.addAll(smimeKeyMgr.privateKeyAliases());
+    }
+
+    return returnValue;
   }
 
   /**
@@ -139,6 +184,21 @@ public class PookaEncryptionManager {
   }
 
   /**
+   * Returns the Private key for the given alias.
+   */
+  public Key getPrivateKey(String alias, char[] password) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+
+    Key returnValue = null;
+    if (pgpKeyMgr != null)
+      returnValue = pgpKeyMgr.getPrivateKey(alias, password);
+
+    if (returnValue == null && smimeKeyMgr != null)
+      returnValue = smimeKeyMgr.getPrivateKey(alias, password);
+
+    return returnValue;
+  }
+
+  /**
    * Returns the password for this alias.
    */
   protected char[] getPasswordForAlias(String alias, boolean check) {
@@ -154,34 +214,39 @@ public class PookaEncryptionManager {
   }
 
   /**
-   * Returns the Private key for the given alias.
+   * Returns the Public key for the given alias.
    */
-  public Key getPublicKey(String alias) {
-    try {
-    if (pgpKeyMgr != null || smimeKeyMgr != null) {
-      char[] password = getPasswordForAlias(alias, false);
-      
-      try {
-	return pgpKeyMgr.getPublicKey(alias);
-      } catch (java.security.KeyStoreException kse) {
-	
-      }
-      
-    } 
-        } catch (Exception e) {
-      e.printStackTrace();
-    }
+  public Key getPublicKey(String alias) throws java.security.KeyStoreException, java.security.NoSuchAlgorithmException, java.security.UnrecoverableKeyException {
+    Key returnValue = null;
+    if (pgpKeyMgr != null)
+      returnValue = pgpKeyMgr.getPublicKey(alias);
 
-    return null;
+    if (returnValue == null && smimeKeyMgr != null) 
+      returnValue = smimeKeyMgr.getPublicKey(alias);
+
+    return returnValue;
   }
 
   /**
    * Returns the public key(s) for the given email address.
    */
   public Key[] getPublicKeys(String address) {
-
-
     return null;
+  }
+
+  /**
+   * Returns all available public key aliases.
+   */
+  public Set publicKeyAliases() throws java.security.KeyStoreException {
+    Set returnValue = new java.util.HashSet();
+    if (pgpKeyMgr != null) {
+      returnValue.addAll(pgpKeyMgr.publicKeyAliases());
+    }
+    if (smimeKeyMgr != null) {
+      returnValue.addAll(smimeKeyMgr.publicKeyAliases());
+    }
+
+    return returnValue;
   }
 
   /**
@@ -215,7 +280,11 @@ public class PookaEncryptionManager {
     throws MessagingException  {
     if (key != null) {
       try {
-	return EncryptionManager.getEncryptionUtils(mMsg).encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+	if (key instanceof EncryptionKey) {
+	  return ((EncryptionKey) key).getEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+	} else {
+	  return EncryptionManager.getEncryptionUtils("PGP").encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+	}
       } catch (Exception e) {
 	e.printStackTrace();
       }

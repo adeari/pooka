@@ -487,9 +487,11 @@ public class MessageProxy {
    */
   public void decryptMessage() {
     MessageInfo info = getMessageInfo();
+    System.err.println("decrypting message.");
     if (info != null) {
       if (info.hasEncryption()) {
 
+	System.err.println("has encryption.");
 	java.security.Key key = getDefaultProfile().getEncryptionKey();
 
 	try {
@@ -501,14 +503,14 @@ public class MessageProxy {
 	  
 	}
 	  
-	  MessageCryptoInfo cInfo = info.getCryptoInfo();
-	  int sigStatus = 0;
-	  int encryptStatus = 0;
-	  
-	  try {
-	    boolean hasSignature = cInfo.isSigned();
-	    if (hasSignature) {
-	      if (cInfo.isSignatureValid()) {
+	MessageCryptoInfo cInfo = info.getCryptoInfo();
+	int sigStatus = 0;
+	int encryptStatus = 0;
+	
+	try {
+	  boolean hasSignature = cInfo.isSigned();
+	  if (hasSignature) {
+	    if (cInfo.isSignatureValid()) {
 	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
 	    } else {
 	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
@@ -521,9 +523,9 @@ public class MessageProxy {
 	  sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION;
 	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed:  "), e);
 	}
-	  
+	
 	// check the encryption
-
+	
 	try {
 	  boolean isEncrypted = cInfo.isEncrypted();
 	  if (isEncrypted) {
