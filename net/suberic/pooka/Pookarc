@@ -595,7 +595,7 @@ Search.operations.True=equals
 Search.operations.False=notEquals
 Search.operations.NotContains=not
 
-FolderFilters.backend=MoveFilter:DeleteFilter
+FolderFilters.backend=MoveFilter:DeleteFilter:FlagFilter
 FolderFilters.backend.MoveFilter.class=net.suberic.pooka.filter.MoveFilterAction
 FolderFilters.backend.MoveFilter.editorClass=net.suberic.pooka.gui.filter.MoveFilterEditor
 FolderFilters.backend.DeleteFilter.class=net.suberic.pooka.filter.DeleteFilterAction

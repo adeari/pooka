@@ -61,9 +61,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		    loaderThread = createLoaderThread();
 		
 		try {
-		    
-		    if (!(getFolder().isOpen())) {
+
+		    if (status < DISCONNECTED && !(getFolder().isOpen())) {
 			openFolder(Folder.READ_WRITE);
+		    } else {
+			uidValidity = cache.getUIDValidity();
 		    }
 		    
 		    long[] uids = cache.getMessageUids();
@@ -113,6 +115,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    }
 	}
     }
+    
     
     /**
      * Gets the row number of the first unread message.  Returns -1 if
@@ -527,6 +530,20 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    if (folderNode != null) 
 		folderNode.loadChildren();
 	}
+    }
+    
+    /**
+     * This actually loads up the Folder object itself.  This is used so 
+     * that we can have a FolderInfo even if we're not connected to the
+     * parent Store.
+     *
+     * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
+     * Once the parent store is connected, we can try to load the folder.  
+     * If the load is successful, we go to a CLOSED state.  If it isn't,
+     * then we can either return to NOT_LOADED, or INVALID.
+     */
+    public void loadFolder() {
+	setStatus(DISCONNECTED);
     }
 
     /**

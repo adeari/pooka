@@ -37,12 +37,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // messages.
     public static int DISCONNECTED = 15;
 
-    // folder is just simply closed.
-    public static int CLOSED = 18;
-
     // Folder doesn't seem to exist on server, but exists in cache.
-    public static int CACHE_ONLY = 20;
+    public static int CACHE_ONLY = 18;
     
+    // folder is just simply closed.
+    public static int CLOSED = 20;
+
     // folder is not yet loaded.
     public static int NOT_LOADED = 25;
 
@@ -117,7 +117,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	setFolderID(parent.getFolderID() + "." + fname);
 	mFolderName = fname;
 
-	if (parent.isAvailable() && parent.isLoaded())
+	if (parent.isLoaded())
 	    loadFolder();
 
 	updateChildren();
@@ -323,15 +323,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void openFolder(int mode) throws MessagingException {
 	
 	if (Pooka.isDebug())
-	    System.out.println(this + ":  opening folder.");
+	    System.out.println(this + ":  loading folder.");
 
 	if (! isLoaded())
 	    loadFolder();
 	
-	if (!getParentStore().isConnected())
-	    getParentStore().connectStore();
+	if (Pooka.isDebug())
+	    System.out.println(this + ":  folder loaded.  making sure parent store is connected.  status is " + status);
 
-	if (isLoaded() && isAvailable()) {
+	if (status < PASSIVE) {
+	    if (!getParentStore().isConnected())
+		getParentStore().connectStore();
+	}
+
+	if (Pooka.isDebug())
+	    System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
+
+	if (status == CLOSED) {
+	    if (Pooka.isDebug())
+		System.out.println(this + ":  isLoaded() and isAvailable().");
 	    if (folder.isOpen()) {
 		if (folder.getMode() == mode)
 		    return;
@@ -408,7 +418,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 	*/
 
-	if (isLoaded() && isAvailable()) {
+	if (isLoaded() && isValid()) {
 	    setStatus(CLOSED);
 	    try {
 		folder.close(expunge);
@@ -1622,7 +1632,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (display != null) {
 	    removeMessageChangedListener(display);
 	    removeMessageCountListener(display);
-	    getFolder().removeConnectionListener(display);
+	    //getFolder().removeConnectionListener(display);
 	}
     }
 
@@ -1630,7 +1640,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (display != null) {
 	    addMessageChangedListener(display);
 	    addMessageCountListener(display);
-	    getFolder().addConnectionListener(display);
+	    //getFolder().addConnectionListener(display);
 	}
     }
 
@@ -1656,6 +1666,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public boolean isAvailable() {
+	return (status < CLOSED);
+    }
+
+    public boolean isValid() {
 	return (status != INVALID);
     }
 

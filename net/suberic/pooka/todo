@@ -4,15 +4,25 @@ beta 1
 search: 
 add support for incoming message filter
 add support for message display filter
-ok.  search editor:  need to make sure that we're returning all of the 
-	properties that we edit.  that way we can make sure that 
-	also need to be able to disable it.
-	also:  we don't seem to populate things other than Subject
-	correctly.  either that or we don't get compounds.  i don't know.
 filter editor:  fix the color button size.  
 	add a filter editor for delete, move, and font.
 	
 error:  filterfoldercellrenderer has problems with search forms.
+
+*) caching messages marks them as read.
+
+*) make it so Disconnected IMAP actually works if you're disconnected.  :)
+this means that we need to change the way that stores are loaded and 
+connected.
+
+
+
+
+
+
+---------------
+
+old
 
 
 *) check:  see how outgoing and incoming mail handle tab characters.
