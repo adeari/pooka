@@ -180,6 +180,14 @@ FolderTable.Subject.size=235
 FolderTable.2xClickAction=message-open
 FolderTable.UnreadStyle=BOLD
 
+SentFolderTable=SentDate:To:Subject
+SentFolderTable.SentDate.value=Date
+SentFolderTable.SentDate.size=100
+FolderTable.To.value=To
+FolderTable.To.size=210
+FolderTable.Subject.value=Subject
+FolderTable.Subject.size=260
+
 # -- Popup menus.
 FolderNode.popupMenu=Open:Update:Close:New:Edit
 FolderNode.popupMenu.Open.Action=folder-open

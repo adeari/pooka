@@ -61,6 +61,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private StoreInfo parentStore = null;
     private UserProfile defaultProfile = null;
 
+    private boolean sentFolder = false;
+    private boolean trashFolder = false;
+    
     /**
      * Creates a new FolderInfo from a parent FolderInfo and a Folder 
      * name.
@@ -235,10 +238,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * FolderTableModel.
      */
     public FolderTableModel loadAllMessages() {
+	String tableType;
+
+	if (isSentFolder())
+	    tableType="SentFolderTable";
+	else
+	    tableType="FolderTable";
+
 	Vector messageProxies = new Vector();
 
 	if (columnValues == null) {
-	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration("FolderTable", "");
+	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
 	    Vector colvals = new Vector();
 	    Vector colnames = new Vector();
 	    Vector colsizes = new Vector();
@@ -247,9 +257,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	    while (tokens.hasMoreElements()) {
 		tmp = (String)tokens.nextElement();
-		colvals.addElement(Pooka.getProperty("FolderTable." + tmp + ".value", tmp));
-		colnames.addElement(Pooka.getProperty("FolderTable." + tmp + ".label", tmp));
-		colsizes.addElement(Pooka.getProperty("FolderTable." + tmp + ".size", tmp));
+		colvals.addElement(Pooka.getProperty(tableType + "." + tmp + ".value", tmp));
+		colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
+		colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
 	    }	    
 	    setColumnNames(colnames);
 	    setColumnValues(colvals);
@@ -809,6 +819,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void setFolderTracker(FolderTracker newTracker) {
 	folderTracker = newTracker;
+    }
+
+    public boolean isTrashFolder() {
+	return trashFolder;
+    }
+
+    public void setTrashFolder(boolean newValue) {
+	trashFolder = newValue;
+    }
+
+    public boolean isSentFolder() {
+	return sentFolder;
+    }
+
+    public void setSentFolder(boolean newValue) {
+	sentFolder = newValue;
     }
 
     /**
