@@ -137,7 +137,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	}
       });
 
-    keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
+    keyBindings = new ConfigurableKeyBinding(this, "NewMessageWindow.keyBindings", Pooka.getResources());
     //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
     
     keyBindings.setActive(getActions());
@@ -721,8 +721,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("selecting attachment");
       if (attachmentPanel != null) {
+	tabbedPane.setSelectedComponent(attachmentScrollPane);
 	attachmentPanel.requestFocus();
       }
     }
@@ -737,14 +737,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("selecting editor");
-      if (editorStatus == WITHOUT_ATTACHMENTS) {
-	if (editorPane != null)
-	  editorPane.requestFocus();
-      } else if (editorStatus == WITH_ATTACHMENTS) {
-	if (otherEditorPane != null)
-	  otherEditorPane.requestFocus();
-      }
+      tabbedPane.setSelectedComponent(headerScrollPane);
     }
   }
 

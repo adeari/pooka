@@ -2,6 +2,9 @@
 	-- keybindings for address book
 	-- keybindings for saving attachments.
 	-- keybindings for opening folders.
+	-- keybindings for search
+	-- keybindings for get new messages
+	-- keybindings for detachwindow
 
 *) disconnected:  
 	*)  make an option for caching everything.
@@ -20,6 +23,8 @@ to use "'s correctly.
 
 *) fix reverse sorting.
 --------
+
+*) threading of attachment actions.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath

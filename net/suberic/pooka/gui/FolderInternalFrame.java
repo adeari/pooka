@@ -411,129 +411,129 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	folderStatusBar = newValue;
     }
 
-    /**
-     * gets the actions handled both by the FolderInternalFrame and the 
-     * selected Message(s).
-     */
-
-    public class SelectionListener implements javax.swing.event.ListSelectionListener {
-	SelectionListener() {
-	}
-
-	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-	    // the main menus are handled by the FolderDisplayPanel itself.
-	    if (toolbar != null)
-		toolbar.setActive(getActions());
-	    if (keyBindings != null)
-		keyBindings.setActive(getActions());
-	}
-    }
-
-    /**
-     * This registers the Keyboard action not only for the FolderInternalFrame
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
-     *            String aCommand, KeyStroke aKeyStroke, int aCondition)
-     */
-
-    public void registerKeyboardAction(ActionListener anAction,
-       	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
-	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-
-	getFolderDisplay().registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	folderStatusBar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+  /**
+   * gets the actions handled both by the FolderInternalFrame and the 
+   * selected Message(s).
+   */
+  
+  public class SelectionListener implements javax.swing.event.ListSelectionListener {
+    SelectionListener() {
     }
     
-    /**
-     * This unregisters the Keyboard action not only for the FolderInternalFrame
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
-     */
-
-    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
-	super.unregisterKeyboardAction(aKeyStroke);
-
-	getFolderDisplay().unregisterKeyboardAction(aKeyStroke);
-	folderStatusBar.unregisterKeyboardAction(aKeyStroke);
-	toolbar.unregisterKeyboardAction(aKeyStroke);
+    public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+      // the main menus are handled by the FolderDisplayPanel itself.
+      if (toolbar != null)
+	toolbar.setActive(getActions());
+      if (keyBindings != null)
+	keyBindings.setActive(getActions());
     }
-
-    /**
-     * As specified by net.subeic.pooka.UserProfileContainer
-     */
-
-    public UserProfile getDefaultProfile() {
-	if (getFolderInfo() != null) {
-	    return getFolderInfo().getDefaultProfile();
-	}
-	else {
-	    return null;
-	}
-    }
-
-    /**
-     * Returns whether or not this window is enabled.  This should be true
-     * just about all of the time.  The only time it won't be true is if
-     * the Folder is closed or disconnected, and the mail store isn't set
-     * up to work in disconnected mode.
-     */
-    public boolean isEnabled() {
-	return enabled;
-    }
-
-    /**
-     * This sets whether or not the window is enabled.  This should only
-     * be set to false when the Folder is no longer available.
-     */
-    public void setEnabled(boolean newValue) {
-	enabled = newValue;
-    }
-
-    // MessageLoadedListener
+  }
+  
+  /**
+   * This registers the Keyboard action not only for the FolderInternalFrame
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
+   *            String aCommand, KeyStroke aKeyStroke, int aCondition)
+   */
+  
+  public void registerKeyboardAction(ActionListener anAction,
+				     String aCommand, KeyStroke aKeyStroke, int aCondition) {
+    super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
     
-    /**
-     * Displays that a message has been loaded.
-     * 
-     * Defined in net.suberic.pooka.event.MessageLoadedListener.
-     */
-    public void handleMessageLoaded(MessageLoadedEvent e) {
-	final MessageLoadedEvent event = e;
+    getFolderDisplay().registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    folderStatusBar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+  }
+  
+  /**
+   * This unregisters the Keyboard action not only for the FolderInternalFrame
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+   */
+  
+  public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+    super.unregisterKeyboardAction(aKeyStroke);
+    
+    getFolderDisplay().unregisterKeyboardAction(aKeyStroke);
+    folderStatusBar.unregisterKeyboardAction(aKeyStroke);
+    toolbar.unregisterKeyboardAction(aKeyStroke);
+  }
+  
+  /**
+   * As specified by net.suberic.pooka.UserProfileContainer
+   */
+  
+  public UserProfile getDefaultProfile() {
+    if (getFolderInfo() != null) {
+      return getFolderInfo().getDefaultProfile();
+    }
+    else {
+      return null;
+    }
+  }
 
-	Runnable runMe = new Runnable() {
-
-		public void run() {
-	if (event.getType() == MessageLoadedEvent.LOADING_STARTING) {
+  /**
+   * Returns whether or not this window is enabled.  This should be true
+   * just about all of the time.  The only time it won't be true is if
+   * the Folder is closed or disconnected, and the mail store isn't set
+   * up to work in disconnected mode.
+   */
+  public boolean isEnabled() {
+    return enabled;
+  }
+  
+  /**
+   * This sets whether or not the window is enabled.  This should only
+   * be set to false when the Folder is no longer available.
+   */
+  public void setEnabled(boolean newValue) {
+    enabled = newValue;
+  }
+  
+  // MessageLoadedListener
+  
+  /**
+   * Displays that a message has been loaded.
+   * 
+   * Defined in net.suberic.pooka.event.MessageLoadedListener.
+   */
+  public void handleMessageLoaded(MessageLoadedEvent e) {
+    final MessageLoadedEvent event = e;
+    
+    Runnable runMe = new Runnable() {
+	
+	public void run() {
+	  if (event.getType() == MessageLoadedEvent.LOADING_STARTING) {
 	    if (getFolderStatusBar().getTracker() != null) {
-		getFolderStatusBar().setTracker(new LoadMessageTracker(event.getLoadedMessageCount(), 0, event.getNumMessages()));
-		getFolderStatusBar().getLoaderPanel().add(getFolderStatusBar().getTracker());
+	      getFolderStatusBar().setTracker(new LoadMessageTracker(event.getLoadedMessageCount(), 0, event.getNumMessages()));
+	      getFolderStatusBar().getLoaderPanel().add(getFolderStatusBar().getTracker());
 	    }
-	} else if (event.getType() == MessageLoadedEvent.LOADING_COMPLETE) {
-
+	  } else if (event.getType() == MessageLoadedEvent.LOADING_COMPLETE) {
+	    
 	    if (getFolderStatusBar().getTracker() != null) {
-		getFolderStatusBar().getLoaderPanel().remove(getFolderStatusBar().getTracker());
+	      getFolderStatusBar().getLoaderPanel().remove(getFolderStatusBar().getTracker());
 		getFolderStatusBar().setTracker(null);
 	    }
-	} else if (event.getType() == MessageLoadedEvent.MESSAGES_LOADED) {
+	  } else if (event.getType() == MessageLoadedEvent.MESSAGES_LOADED) {
 	    if (getFolderStatusBar().getTracker() != null)
-		getFolderStatusBar().getTracker().handleMessageLoaded(event);
+	      getFolderStatusBar().getTracker().handleMessageLoaded(event);
+	  }
+	  getFolderStatusBar().repaint();
 	}
-	getFolderStatusBar().repaint();
-		}
-	    };
-
-	if (!SwingUtilities.isEventDispatchThread()) {
-	    SwingUtilities.invokeLater(runMe);
-	} else {
-	    runMe.run();
-	}
+      };
+    
+    if (!SwingUtilities.isEventDispatchThread()) {
+      SwingUtilities.invokeLater(runMe);
+    } else {
+      runMe.run();
     }
+  }
 
     // ConnectionListener
     

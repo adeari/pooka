@@ -267,6 +267,17 @@ public class AttachmentPane extends JPanel {
     if (prefSize.getHeight() > defaultHeight)
       this.setPreferredSize(new Dimension((int)prefSize.getWidth(), defaultHeight));
     
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (getTable() != null) {
+	    if (getSelectedAttachment() == null) {
+	      getTable().setRowSelectionInterval(0,0);
+	    }
+	    getTable().requestFocus();
+	  }
+	}
+      });
+
     createKeyBindings();
   }
   
@@ -458,9 +469,7 @@ public class AttachmentPane extends JPanel {
 	  ExternalLauncher el = new ExternalLauncher();
 	  el.setCommandContext(cmd, dh);
 	  el.show();
-	  
 	}
-	
       }
     } catch (Exception e) {
       //
@@ -607,8 +616,6 @@ public class AttachmentPane extends JPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("open.");
-
       openSelectedAttachment();
     }
   }
@@ -619,7 +626,6 @@ public class AttachmentPane extends JPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("open with.");
       openWith();
     }
   }
@@ -630,7 +636,6 @@ public class AttachmentPane extends JPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("save as.");
       saveAttachment();
     }
   }

@@ -116,7 +116,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     this.add(WITH_ATTACHMENTS, splitPane);
     this.add(WITHOUT_ATTACHMENTS, editorScrollPane);
     
-    keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
+    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
     keyBindings.setActive(getActions());
     
     editorPane.addMouseListener(new MouseAdapter() {
@@ -420,7 +420,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("selecting attachment");
       if (attachmentPanel != null) {
 	attachmentPanel.requestFocus();
       }
@@ -436,7 +435,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("selecting editor");
       if (editorStatus == WITHOUT_ATTACHMENTS) {
 	if (editorPane != null)
 	  editorPane.requestFocus();

@@ -87,8 +87,8 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
     //this.setAutoscrolls(true);
     this.setSize(1000, 1000);
     
-    keyBindings = new ConfigurableKeyBinding(this, "MessagePanel.keyBindings", Pooka.getResources());
-    keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+    keyBindings = new ConfigurableKeyBinding(this, "ContentPanel.keyBindings", Pooka.getResources());
+    //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
     keyBindings.setActive(getActions());
     
     // if the MessagePanel itself ever gets focus, pass it on to the
