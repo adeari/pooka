@@ -1,6 +1,8 @@
-
 *) make it so the connection objects actually have a clue as to whether
 or not they're actually connected, instead of relying on the user.
+
+*) bug:  in preview mode, select multiple messages, including the last
+	one.  delete.  get error.
 
 *) detach a message from the desktop pane.  do an open with.  it uses the
 	jdesktoppane, not a standalone window.
