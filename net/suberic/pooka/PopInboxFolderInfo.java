@@ -222,12 +222,31 @@ public class PopInboxFolderInfo extends FolderInfo {
 
 	    if (lastUid != null) {
 		int lastRead = newMessages.length - 1;
+		int lastUidLength = lastUid.length();
+
 		boolean found = false;
 		while (lastRead >= 0 && found == false) {
 		    String newUid = getUID(newMessages[lastRead], f);
+
 		    if (Pooka.isDebug())
 			System.out.println("offset is " + lastRead + "; newUid is " + newUid);
-		    int value = newUid.compareTo(lastUid);
+
+		    // let's try to be safe here, and say that, for any value
+		    // that's a different length, the one with the longer
+		    // length is later than the one that's shorter.  this
+		    // should take care of any case where a server is doing
+		    // something stupid, like having its uids be '9' and '10'.
+
+		    int value;
+		    if (lastUidLength == newUid.length()) {
+		      value = newUid.compareTo(lastUid);
+		    } else {
+		      if (newUid.length() < lastUidLength)
+			value = -1;
+		      else
+			value = 1;
+		    }
+
 		    if (Pooka.isDebug())
 			System.out.println("newUid.compareTo(lastUid) is " + value);
 		    if (value <= 0)
