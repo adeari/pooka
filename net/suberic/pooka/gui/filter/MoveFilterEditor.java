@@ -16,11 +16,12 @@ public class MoveFilterEditor extends FilterEditor {
    * Configures the given FilterEditor from the given VariableBundle and
    * property.
    */
-  public void configureEditor(net.suberic.util.VariableBundle bundle, String propertyName) {
+  public void configureEditor(net.suberic.util.gui.propedit.PropertyEditorManager newManager, String propertyName) {
     property = propertyName;
-    sourceBundle = bundle;
+    manager = newManager;
     
-    fsp = new FolderSelectorPane(propertyName + ".targetFolder", sourceBundle);
+    fsp = new FolderSelectorPane();
+    fsp.configureEditor(propertyName + ".targetFolder", manager);
     
     this.add(fsp);
   }
@@ -31,7 +32,7 @@ public class MoveFilterEditor extends FilterEditor {
   public java.util.Properties getValue() {
     Properties props = fsp.getValue();
     
-    String oldClassName = sourceBundle.getProperty(property + ".class", "");
+    String oldClassName = manager.getProperty(property + ".class", "");
     if (!oldClassName.equals(FILTER_CLASS))
       props.setProperty(property + ".class", FILTER_CLASS);
     
@@ -39,15 +40,15 @@ public class MoveFilterEditor extends FilterEditor {
   }
   
   /**
-   * Sets the values represented by this FilterEditor in the sourceBundle.
+   * Sets the values represented by this FilterEditor in the manager.
    */
   public void setValue() {
     
     fsp.setValue();
     
-    String oldClassName = sourceBundle.getProperty(property + ".class", "");
+    String oldClassName = manager.getProperty(property + ".class", "");
     if (!oldClassName.equals(FILTER_CLASS))
-      sourceBundle.setProperty(property + ".class", FILTER_CLASS);
+      manager.setProperty(property + ".class", FILTER_CLASS);
   }
   
 }

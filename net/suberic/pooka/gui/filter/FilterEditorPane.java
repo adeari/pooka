@@ -1,7 +1,7 @@
-package net.suberic.pooka.gui.filter.propedit;
+package net.suberic.pooka.gui.filter;
 import net.suberic.pooka.gui.search.*;
 import net.suberic.pooka.*;
-import net.suberic.util.gui.*;
+import net.suberic.util.gui.propedit.*;
 import net.suberic.util.VariableBundle;
 import javax.swing.*;
 import java.util.Vector;
@@ -10,10 +10,7 @@ import java.util.Vector;
  * This is a class that lets you choose your filter actions.
  */
 public class FilterEditorPane extends SwingPropertyEditor implements java.awt.event.ItemListener {
-  String property;
-  String originalValue;
-  VariableBundle sourceBundle;
-  
+
   JLabel label;
   JComboBox typeCombo;
   JPanel filterConfigPanel;
@@ -24,18 +21,23 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
   /**
    * Configures the FilterEditorPane.
    */
-  public void configureEditor(PropertyEditorFactory factory, String newProperty, String typeTemplate, VariableBundle bundle, boolean isEnabled) {
-    property=newProperty;
-    sourceBundle=bundle;
-    originalValue = sourceBundle.getProperty(property, "");
-    
+  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+    property=propertyName;
+    manager=newManager;
+    editorTemplate = template;
+    originalValue = manager.getProperty(property, "");
+
+    if (debug) {
+      System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
+    }
+
     editorTable = new java.util.HashMap();
     
     // create the label
-    label = new JLabel(sourceBundle.getProperty(typeTemplate + ".label", "Action"));
+    label = new JLabel(manager.getProperty(editorTemplate + ".label", "Action"));
     
     // find out if we're a display filter or a backend filter
-    String filterType = sourceBundle.getProperty(typeTemplate + ".filterType", "display");
+    String filterType = manager.getProperty(editorTemplate + ".filterType", "display");
     
     // create the combo
     Vector filterLabels = null;
@@ -56,7 +58,7 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
     for (int i = 0; i < filterLabels.size(); i++) {
       String label = (String) filterLabels.elementAt(i);
       FilterEditor currentEditor = Pooka.getSearchManager().getEditorForFilterLabel(label);
-      currentEditor.configureEditor(sourceBundle, property);
+      currentEditor.configureEditor(manager, property);
       
       filterConfigPanel.add(label, currentEditor);
       editorTable.put(label, currentEditor);
@@ -102,7 +104,7 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
    */
   public void resetDefaultValue() {
     // get the current value, if any
-    String currentLabel = Pooka.getSearchManager().getLabelForFilterClass(sourceBundle.getProperty(property + ".class", ""));
+    String currentLabel = Pooka.getSearchManager().getLabelForFilterClass(manager.getProperty(property + ".class", ""));
     if (currentLabel != null) {
       typeCombo.setSelectedItem(currentLabel);
     } else {
