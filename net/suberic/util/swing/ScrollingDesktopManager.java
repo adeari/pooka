@@ -1,6 +1,7 @@
 package net.suberic.util.swing;
 import javax.swing.*;
 import java.awt.event.*;
+import java.lang.reflect.Method;
 
 /**
  * <p>
@@ -46,6 +47,12 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
     private JDesktopPane pane = null;
 
     private boolean updating = false;
+
+    private Method getScrollModeMethod = null;
+    
+    private Method setScrollModeMethod = null;
+
+    private static Integer SIMPLE_SCROLL_MODE;
 
     /**
      * <p>
@@ -167,10 +174,18 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
     }
 
     /**
-     * Implements componentRemoved() to call updateDesktopSize().
+     * Implements componentRemoved() as an empty method.  This is necessary
+     * because, in order to move components between layers, JLayeredPane
+     * removes the component from one layer and then adds it to the other
+     * layer.  This can lead to problems, as the desktop may resize and
+     * remove the area where the pane was going to be replaced.
+     * 
+     * Fortunately, closeFrame() is called when a JInternalFrame is 
+     * actually removed from the JDesktopPane, so it should be safe to
+     * ignore the componentRemoved events.
      */
     public void componentRemoved(java.awt.event.ContainerEvent e) {
-	updateDesktopSize();
+	//updateDesktopSize();
     }
 
     /**
@@ -191,14 +206,9 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
      * This actually does the updating of the parent JDesktopPane.
      */
     public void updateDesktopSize() {
-	if (!updating && scrollPane != null) {
+	if (!updating && scrollPane != null && scrollPane.isShowing()) {
 	    updating = true;
-	    // boolean oldBackingEnabled = scrollPane.getViewport().isBackingStoreEnabled();
-	    // scrollPane.getViewport().setBackingStoreEnabled(false);
-
-	    int oldScrollMode = scrollPane.getViewport().getScrollMode();
-	    scrollPane.getViewport().setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
-
+	    int oldValue = saveScrollMode();
 
 	    JScrollBar hsb = scrollPane.getHorizontalScrollBar();
 	    JScrollBar vsb = scrollPane.getVerticalScrollBar();
@@ -233,19 +243,11 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	    max_x = Math.max(max_x, bounds.width + bounds.x);
 	    max_y = Math.max(max_y, bounds.height + bounds.y);
 
-	    printstats(pane, scrollPane, "pre; min_x = " + min_x + ", min_y = " + min_y  + ", max_x  = " + max_x + ", max_y =" + max_y);
 	    
 	    if (min_x != 0 || min_y != 0) {
 		for (int i = 0; i < allFrames.length; i++) {
 		    allFrames[i].setLocation(allFrames[i].getX() - min_x, allFrames[i].getY() - min_y);
 		    
-		    /*
-		    System.out.println("moving frame " + i);
-		    try {
-			Thread.sleep(5000);
-		    } catch (Exception e) {
-		    }
-		    */
 		}
 
 		windowsWidth = windowsWidth - min_x;
@@ -268,20 +270,11 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 
 	    pane.setSize(max_x - min_x, max_y - min_y);
 
-	    /*
-	    System.out.println("reset size.");
-	    try {
-		Thread.sleep(5000);
-	    } catch (Exception e) {
-	    }
-	    */
-
 	    /*********************************/
 
 	    int prefWidth = max_x - min_x;
 	    int prefHeight = max_y - min_y;
 
-	    System.out.println("newWidth = " + prefWidth + ", newHeight = " + prefHeight);
 
 	    boolean hasVsb = false, needsVsb = false, hasHsb = false, needsHsb = false;
 	    // if a scrollbar is added, check to see if the space covered
@@ -310,41 +303,30 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	    else
 		needsVsb = false;
 	
-	    System.out.println("has/needs hsb, has/needs vsb:  " + hasHsb + needsHsb + hasVsb + needsVsb);
-
 	    if (hasVsb == false && needsVsb == true) {
-		if (windowsWidth < bounds.width - vsb.getPreferredSize().width)
+		if (windowsWidth < bounds.width + bounds.x - vsb.getPreferredSize().width) {
 		    prefWidth-=vsb.getPreferredSize().width;
+		}
 	    } else if (hasVsb == true && needsVsb == false) {
-		if (max_x <= bounds.width)
+		if (windowsWidth <= bounds.width + bounds.x) {
 		    prefWidth+= vsb.getPreferredSize().width;
+		}
 	    }
 
 	    if (hasHsb == false && needsHsb == true) {
-		if (windowsHeight < bounds.height - hsb.getPreferredSize().height) {
+		if (windowsHeight < bounds.height + bounds.y - hsb.getPreferredSize().height) {
 		    prefHeight-=hsb.getPreferredSize().height;
 		}
 	    } else if (hasHsb == true && needsHsb == false) {
-		if (max_y <= bounds.height) {
-		    System.out.println("changing prefHeight from " + prefHeight + " to (" + prefHeight + " + " + hsb.getPreferredSize().height + ").  ");
+		if (windowsHeight <= bounds.height + bounds.y) {
 		    prefHeight+= hsb.getPreferredSize().height;
 		}
 	    }
 		    
 	    /**************************************/
 	    
-	    System.out.println("\nprefWidth = " + prefWidth + ", prefHeight = " + prefHeight + "\n\n");
-	    
 	    pane.setPreferredSize(new java.awt.Dimension(prefWidth, prefHeight));
 	    scrollPane.validate();
-	    
-	    /*
-	    System.out.println("did validate.");
-	    try {
-		Thread.sleep(5000);
-	    } catch (Exception e) {
-	    }	    
-	    */
 	    
 	    hsb = scrollPane.getHorizontalScrollBar();
 	    vsb = scrollPane.getVerticalScrollBar();
@@ -357,50 +339,88 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 		vsb.setMaximum(vval - min_y + vsb.getModel().getExtent());
 	    }
 
-	    /*
-	    System.out.println("about to reset scrollbars.");
-	    try {
-		Thread.sleep(5000);
-	    } catch (Exception e) {
-	    }
-	    */
-
 	    hsb.setValue(hval - min_x);
 	    
 	    vsb.setValue(vval - min_y);
 
-	    /*
-	    System.out.println("done resetting scrollbars.");
-	    try {
-		Thread.sleep(5000);
-	    } catch (Exception e) {
-	    }
-	    */
-
-	    scrollPane.getViewport().setScrollMode(oldScrollMode);
-	    //	    scrollPane.getViewport().setBackingStoreEnabled(oldBackingEnabled);
+	    resetScrollMode(oldValue);
 
 	    updating = false;
 	}
     }
- 
-    public void printstats(JDesktopPane pane, JScrollPane scrollPane, String message) {
-	System.out.println("\n" + message);
+
+    public int saveScrollMode() {
 	JViewport viewport = scrollPane.getViewport();
-	JInternalFrame[] allFrames = pane.getAllFrames();
+	if (getScrollModeMethod == null) {
+	    configureScrollMethods();
+	} 
 	
-	System.out.println("getBounds() of MessagePanel is " + pane.getBounds());
-	System.out.println("getPreferredSize() of MessagePanel is " + pane.getPreferredSize());
-	    System.out.println("getViewRect() is JViewport is " + viewport.getViewRect());
-	    System.out.println("getSize() is JViewport is " + viewport.getSize());
-	    System.out.println("HSB.getValue() is " + scrollPane.getHorizontalScrollBar().getValue() + ", hsb.isVisible = " + scrollPane.getHorizontalScrollBar().isVisible());
-	    System.out.println("VSB.getValue() is " + scrollPane.getVerticalScrollBar().getValue() + ", VSB.isVisible() = " + scrollPane.getVerticalScrollBar().isVisible());
-	    for (int i = 0; i < allFrames.length; i++) {
-		System.out.println("allFrames[i] = " + allFrames[i].getLocation());
-		System.out.println("convertPoint(allFrames[" + i + "]) = " + SwingUtilities.convertPoint(allFrames[i], 0, 0, pane));
-	    } 
+	if (getScrollModeMethod.getName().equals("isBackingStoreEnabled")) {
+	    if (viewport.isBackingStoreEnabled()) {
+		viewport .setBackingStoreEnabled(false);
+		return 1;
+	    } else {
+		return 0;
+	    }
+	} else {
+	    try {
+		Integer retVal = (Integer) getScrollModeMethod.invoke(viewport, new Object[] { null });
+		setScrollModeMethod.invoke(scrollPane.getViewport(), new Object[] { SIMPLE_SCROLL_MODE });
+		return retVal.intValue();
+	    } catch (Exception e) {
+		return 0;
+	    }
+	}
+
     }
 
+    public void resetScrollMode(int oldValue) {
+	JViewport viewport = scrollPane.getViewport();
+	if (setScrollModeMethod == null)
+	    configureScrollMethods();
+
+	if (setScrollModeMethod.getName().equals("setBackingStoreEnabled")) {
+	    if (oldValue == 1)
+		viewport.setBackingStoreEnabled(true);
+	} else {
+	    try {
+		setScrollModeMethod.invoke(viewport, new Object[] { new Integer(oldValue) });
+	    } catch (Exception e) {
+		// dunno...  ?
+	    }
+	}
+
+    }
+
+    private void configureScrollMethods() {
+	// heh.  this will be lots and lots of fun.
+	Class viewportClass = scrollPane.getViewport().getClass();
+	
+	try {
+	    getScrollModeMethod = viewportClass.getMethod("getScrollMode", null);
+	    Class[] args = new Class[] {
+		    Integer.TYPE
+		    };
+	    setScrollModeMethod = viewportClass.getMethod("setScrollMode", args);
+	    SIMPLE_SCROLL_MODE = (Integer) viewportClass.getField("SIMPLE_SCROLL_MODE").get(null);
+	} catch (Exception e) {
+	    try {
+		getScrollModeMethod = viewportClass.getMethod("isBackingStoreEnabled", null);
+		setScrollModeMethod = viewportClass.getMethod("setBackingStoreEnabled", new Class[] { Boolean.TYPE } );
+	    } catch (Exception ex) {
+		// this would be bad.  :)
+	    }
+	}
+
+	
+    }
+
+
+    /**
+     * This sets the scrollPane object.  It also removes this as a 
+     * listener on the previous scrollPane object (if any), and then sets
+     * it as an adjustmentListener on the scrollPane's JScrollBars.
+     */
     public void setScrollPane(JScrollPane newScrollPane) {
 	if (scrollPane != null) {
 	    scrollPane.getHorizontalScrollBar().removeAdjustmentListener(this);
@@ -415,6 +435,11 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	return scrollPane;
     }
 
+    /**
+     * This sets the desktopPane object.  It also removes this as a 
+     * listener on the previous desktopPane object (if any), and then sets
+     * itself as a ContainerListener on the new JDesktopPane.
+     */
     public void setDesktopPane(JDesktopPane newDesktopPane) {
 	if (pane != null) 
 	    pane.removeContainerListener(this);
