@@ -1128,6 +1128,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     protected void runMessagesAdded(MessageCountEvent mce) {
 	if (folderTableModel != null) {
 	    Message[] addedMessages = mce.getMessages();
+
 	    MessageInfo mp;
 	    Vector addedProxies = new Vector();
 	    for (int i = 0; i < addedMessages.length; i++) {
@@ -1555,7 +1556,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    resetMessageCounts();
+	    
+	    //resetMessageCounts();
+	    
+	    if (Thread.currentThread() == getFolderThread() )
+		checkFolder();
+	    else 
+		getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+			public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+			    checkFolder();
+			}
+		    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
 	}
     }
 

@@ -89,8 +89,14 @@ public class PopInboxFolderInfo extends FolderInfo {
 
     public void openFolder(int mode) throws MessagingException {
 	super.openFolder(mode);
-	checkFolder();
-	
+	//checkFolder();
+    }
+
+    public synchronized void loadAllMessages() {
+	if (folderTableModel == null) {
+	    super.loadAllMessages();
+	    checkFolder();
+	}
     }
 
     /**
@@ -120,9 +126,15 @@ public class PopInboxFolderInfo extends FolderInfo {
 			    String uid = getUID(msgs[i], f);
 			    msgsToAppend[i].addHeader(UID_HEADER, uid);
 			}
-			getFolder().appendMessages(msgsToAppend);
+			if (Pooka.isDebug()) 
+			    System.out.println(Thread.currentThread() + ":  running appendMessages; # of added messages is " + msgsToAppend.length);
 
-			if (! Pooka.getProperty(getFolderProperty() + ".leaveMessagesOnServer", "false").equalsIgnoreCase("true")) {
+			getFolder().appendMessages(msgsToAppend);
+			
+			if (! leaveMessagesOnServer()) {
+			    if (Pooka.isDebug())
+				System.out.println("removing all messages.");
+			    
 			    for (int i = 0; i < msgs.length; i++) {
 				msgs[i].setFlag(Flags.Flag.DELETED, true);
 				if (Pooka.isDebug())
@@ -199,6 +211,8 @@ public class PopInboxFolderInfo extends FolderInfo {
      * This retrieves new messages from the pop folder.
      */
     public Message[] getNewMessages(Folder f) throws MessagingException {
+	if (Pooka.isDebug())
+	    System.out.println("getting new messages.");
 	Message[] newMessages = f.getMessages();
 	if (newMessages.length > 0) {
 	    String lastUid = null;
@@ -207,18 +221,37 @@ public class PopInboxFolderInfo extends FolderInfo {
 	    } catch (IOException ioe) {
 	    }
 
+	    if (Pooka.isDebug())
+		System.out.println("read:  lastUID is " + lastUid);
+
 	    if (lastUid != null) {
-		int offset = newMessages.length - 1;
-		while (offset >= 0 && (getUID(newMessages[offset], f).compareTo(lastUid) < 0)) {
-		    offset--;
+		int lastRead = newMessages.length - 1;
+		boolean found = false;
+		while (lastRead >= 0 && found == false) {
+		    String newUid = getUID(newMessages[lastRead], f);
+		    if (Pooka.isDebug())
+			System.out.println("offset is " + lastRead + "; newUid is " + newUid);
+		    int value = newUid.compareTo(lastUid);
+		    if (Pooka.isDebug())
+			System.out.println("newUid.compareTo(lastUid) is " + value);
+		    if (value <= 0)
+			found = true;
+		    else 
+			lastRead--;
 		}
-		
-		if (newMessages.length - 1 - offset == 0)
+
+		if (Pooka.isDebug())
+		    System.out.println("final lastRead is " + lastRead + "; for reference, newMessages.length = " + newMessages.length);
+		if (newMessages.length - lastRead < 2) {
 		    // no new messages
+		    if (Pooka.isDebug())
+			System.out.println("no new messages.");
 		    return new Message[0];
-		else {
-		    Message[] returnValue = new Message[newMessages.length - offset - 1];
-		    System.arraycopy(newMessages, offset, returnValue, 0, newMessages.length - offset - 1);
+		} else {
+		    if (Pooka.isDebug())
+			System.out.println("returning " + (newMessages.length - lastRead - 1) + " new messages.");
+		    Message[] returnValue = new Message[newMessages.length - lastRead - 1];
+		    System.arraycopy(newMessages, lastRead + 1, returnValue, 0, newMessages.length - lastRead - 1);
 		    
 		    try {
 			writeLastUid(getUID(newMessages[newMessages.length - 1], f));
@@ -231,6 +264,8 @@ public class PopInboxFolderInfo extends FolderInfo {
 		// if we don't have a reference to a last uid, then assume
 		// all the messages are new.
 		
+		if (Pooka.isDebug())
+		    System.out.println(newMessages.length + " messages in folder.  no last read id.  returning all.");
 		if (newMessages.length > 0)
 		    try {
 			writeLastUid(getUID(newMessages[newMessages.length - 1], f));
@@ -239,6 +274,8 @@ public class PopInboxFolderInfo extends FolderInfo {
 		return newMessages;
 	    }
 	} else {
+	    if (Pooka.isDebug())
+		System.out.println("no messages in folder.");
 	    // no messages.
 	    return newMessages;
 	}
@@ -249,7 +286,8 @@ public class PopInboxFolderInfo extends FolderInfo {
 	if (uidFile.exists()) {
 	    BufferedReader br = new BufferedReader(new FileReader(uidFile));
 	    String lastUid = br.readLine();
-	    System.out.println("lastUid is " + lastUid);
+	    if (Pooka.isDebug())
+		System.out.println("lastUid is " + lastUid);
 	    
 	    br.close();
 
@@ -295,8 +333,13 @@ public class PopInboxFolderInfo extends FolderInfo {
 	
     }
 
+    public boolean leaveMessagesOnServer() {
+	return Pooka.getProperty(getParentStore().getStoreProperty() + ".leaveMessagesOnServer", "false").equalsIgnoreCase("true");
+    }
+
     public ChangeCache getChangeAdapter() {
 	return changeAdapter;
     }
     
 }
+
