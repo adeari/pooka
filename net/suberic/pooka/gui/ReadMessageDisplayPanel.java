@@ -158,16 +158,27 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
      * default value.
      */
     public void sizeToDefault() {
-	Dimension prefSize = getDefaultEditorPaneSize();
-	JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
-	if (vsb != null)
-	    prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
-	editorScrollPane.setPreferredSize(prefSize);
-	int width = prefSize.width;
-	this.setPreferredSize(new Dimension(width, width));
-	this.setSize(this.getPreferredSize());
-	if (splitPane != null && attachmentPanel != null)
-	    splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+    }
+
+    public void addNotify() {
+	super.addNotify();
+	
+	if (firstShow) {
+	    Dimension prefSize = getDefaultEditorPaneSize();
+	    JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
+	    if (vsb != null)
+		prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
+	    editorScrollPane.setPreferredSize(prefSize);
+	    int width = prefSize.width;
+	    this.setPreferredSize(new Dimension(width, width));
+	    this.setSize(this.getPreferredSize());
+	    if (splitPane != null && attachmentPanel != null) {
+		System.out.println("setting splitPane divider location to " + (splitPane.getPreferredSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+		splitPane.setDividerLocation((int)(splitPane.getPreferredSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
+	    }
+	    
+	    firstShow = false;
+	}
     }
     
 
