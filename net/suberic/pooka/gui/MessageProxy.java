@@ -492,14 +492,23 @@ public class MessageProxy {
 
 	net.suberic.pooka.crypto.EncryptionKey key = getDefaultProfile().getEncryptionKey();
 
-	MessageCryptoInfo cInfo = info.getCryptoInfo();
-	int sigStatus = 0;
-	int encryptStatus = 0;
-
 	try {
-	  boolean hasSignature = cInfo.isSigned();
-	  if (hasSignature) {
-	    if (cInfo.isSignatureValid()) {
+	  if (key == null) {
+	    key = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPrivateKey();
+	  }
+	} catch (Exception e) {
+	  showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
+	  
+	}
+	  
+	  MessageCryptoInfo cInfo = info.getCryptoInfo();
+	  int sigStatus = 0;
+	  int encryptStatus = 0;
+	  
+	  try {
+	    boolean hasSignature = cInfo.isSigned();
+	    if (hasSignature) {
+	      if (cInfo.isSignatureValid()) {
 	      sigStatus = CryptoStatusDisplay.SIGNATURE_VERIFIED;
 	    } else {
 	      sigStatus = CryptoStatusDisplay.SIGNATURE_BAD;
@@ -510,7 +519,7 @@ public class MessageProxy {
 	  }
 	} catch (Exception e) {
 	  sigStatus = net.suberic.pooka.gui.crypto.CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION;
-	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
+	  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed:  "), e);
 	}
 	  
 	// check the encryption
@@ -528,7 +537,7 @@ public class MessageProxy {
 	  }
 	} catch (Exception e) {
 	  encryptStatus = CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY;
-	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed"), e);
+	  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
 	}
 	
 	CryptoStatusDisplay csd = getCryptoStatusDisplay();
@@ -539,7 +548,7 @@ public class MessageProxy {
 	  try {
 	    getMessageUI().refreshDisplay();
 	  } catch (MessagingException me) {
-	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed"), me);
+	    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
 	  }
 	}
       }

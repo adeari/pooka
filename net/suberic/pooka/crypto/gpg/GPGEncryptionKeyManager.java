@@ -218,13 +218,22 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
    * @exception UnrecoverableKeyException if the key cannot be recovered
    * (e.g., the given password is wrong).
    */
-  public EncryptionKey getPrivateKey(String alias, char[] password)
+  public EncryptionKey getPrivateKey(String alias, char[] passphrase)
     throws KeyStoreException {
 
     if (! loaded)
       throw new KeyStoreException ( "store not loaded." );
 
-    return (EncryptionKey) privateKeyMap.get(alias);
+    GPGEncryptionKey gpgKey = (GPGEncryptionKey) privateKeyMap.get(alias);
+
+    if (gpgKey == null)
+      return null;
+
+    String newAlias = gpgKey.getAlias();
+
+    System.err.println("returning new key with alias " + newAlias + ", passphrase " + new String(passphrase));
+    GPGEncryptionKey newKey = new GPGEncryptionKey(newAlias, new String(passphrase));
+    return newKey;
   }
   
   

@@ -23,11 +23,17 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     if (gpgKey != null) {
       alias = gpgKey.getAlias();
       passphrase = gpgKey.getPassphrase();
-    } else {
-      alias = "allen";
-      passphrase = "biteme";
-    }
+      if (alias == null || alias.length() < 1) {
+	throw new EncryptionException("key has no associated alias.");
+      }
 
+      if (passphrase == null || passphrase.length() < 1) {
+	throw new EncryptionException("passphrase required for decryption.");
+      }
+    } else 
+      throw new EncryptionException("no key provided.");
+
+    System.err.println("decrypting with alias " + alias + ", passphrase " + passphrase);
     try {
       File outFile = writeStreamToFile(encryptedStream);
       outFile.deleteOnExit();
@@ -45,6 +51,8 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
       processWriter.flush();
       processWriter.close();
 
+      System.err.println("getting input stream.");
+
       InputStream is = p.getInputStream();
       
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -57,6 +65,7 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
 	numRead = is.read(bytesRead);
       }
 
+      System.err.println("got response " + new String(baos.toByteArray()));
       return baos.toByteArray();
       
     } catch (java.io.IOException ioe) {

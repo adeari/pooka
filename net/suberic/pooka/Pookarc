@@ -94,6 +94,7 @@ Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
 
 EncryptionManager.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
+EncryptionManager.savePasswordsForSession=false
 
 Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
 Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png

@@ -379,7 +379,7 @@ public class NewMessageProxy extends MessageProxy {
     
     public void actionPerformed(ActionEvent e) {
       getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_YES);
-      if (getNewMessageInfo().getSignatureKey() == null && (getDefaultProfile != null || getDefaultProfile().getEncryptionKey() == null)) {
+      if (getNewMessageInfo().getSignatureKey() == null && (getDefaultProfile() == null || getDefaultProfile().getEncryptionKey() == null)) {
 	try {
 	  EncryptionKey signKey = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPrivateKey();
 	  getNewMessageInfo().setSignatureKey(signKey);
