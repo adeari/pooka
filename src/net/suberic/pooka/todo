@@ -54,6 +54,7 @@ say, like reacting to a mailto: link.
 	message (???)
 
 *) support jdk 1.5
+   *) JOptionPane error on initial startup; hangs.
    *) add support for ocean theme 
 
 *) add a way to tell what a store's (and folder's) current thread is up to.
