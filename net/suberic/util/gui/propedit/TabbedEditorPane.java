@@ -89,7 +89,9 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     SwingPropertyEditor currentEditor;
     
     for (int i = 0; i < propsToEdit.size(); i++) {
-      String currentProperty = editorTemplate + "." + (String)propsToEdit.get(i);
+      String currentProperty = (String)propsToEdit.get(i);
+      if (templateScoped) 
+	currentProperty = editorTemplate + currentProperty;
 
       if (debug) {
 	System.out.println("getting editor for " + currentProperty);
