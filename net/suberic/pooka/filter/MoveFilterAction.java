@@ -33,7 +33,6 @@ public class MoveFilterAction implements FilterAction {
 	    // failedMove.add(filteredMessage[i];
 	    //}
 	}
--
 	return moved;
     }
 
