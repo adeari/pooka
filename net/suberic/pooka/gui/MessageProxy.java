@@ -177,6 +177,13 @@ public class MessageProxy {
     }
 
     /**
+     * Returns whether or not this message has attachments.
+     */
+    public boolean hasAttachments() throws MessagingException {
+	return messageInfo.hasAttachments();
+    }
+
+    /**
      * This gets a Flag property from the Message.
      */
 

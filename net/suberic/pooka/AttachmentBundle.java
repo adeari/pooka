@@ -46,7 +46,7 @@ class AttachmentBundle {
      * The attachments are separated by the separator flag.
      */
     public String getTextAndTextInlines(String separator, boolean showFullHeaders, boolean withHeaders, int maxLength, String truncationMessage) throws IOException {
-	StringBuffer returnValue = null;
+	StringBuffer returnValue = new StringBuffer();
 	if (textPart != null)
 	    returnValue.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
 	

@@ -127,7 +127,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		otherEditorPane.setCaretPosition(0);
 	    } 
 
-	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
+	    if (getMessageProxy().hasAttachments()) {
 		attachmentPanel = new AttachmentPane(msg);
 		attachmentScrollPane.setViewportView(attachmentPanel);
 		((CardLayout)getLayout()).show(this, WITH_ATTACHMENTS);
