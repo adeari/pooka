@@ -9,6 +9,7 @@ ok.  search editor:  need to make sure that we're returning all of the
 	also need to be able to disable it.
 filter editor:  fix the color button size.  
 	add a filter editor for delete, move, and font.
+error:  filterfoldercellrenderer has problems with search forms.
 
 
 *) check:  see how outgoing and incoming mail handle tab characters.

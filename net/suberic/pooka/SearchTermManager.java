@@ -317,6 +317,7 @@ public class SearchTermManager {
      * creates an editor for a given filter label.
      */
     public net.suberic.pooka.gui.filter.FilterEditor getEditorForFilterLabel(String label) {
+	
 	String property = (String) filterLabelToPropertyMap.get(label);
 	String className = Pooka.getProperty(property + ".editorClass", "");
 	if (className.equals(""))
@@ -327,6 +328,7 @@ public class SearchTermManager {
 		net.suberic.pooka.gui.filter.FilterEditor editor = (net.suberic.pooka.gui.filter.FilterEditor) editorClass.newInstance();
 		return editor;
 	    } catch (Exception e) {
+		e.printStackTrace();
 		return null;
 	    }
 	}

@@ -16,15 +16,17 @@ public class FontFilterEditor extends FilterEditor {
      * property.
      */
     public void configureEditor(net.suberic.util.VariableBundle bundle, String propertyName) {
-	System.out.println("creating ffe.");
 	property = propertyName;
 	sourceBundle = bundle;
 	
-	origFontString = sourceBundle.getProperty(propertyName + ".style");
+	origFontString = sourceBundle.getProperty(propertyName + ".style", "");
 
 	fontCombo = createFontCombo();
 
-	fontCombo.setSelectedItem(getFontLabel(origFontString));
+	if (origFontString.equals("")) 
+	    fontCombo.setSelectedIndex(0);
+	else
+	    fontCombo.setSelectedItem(getFontLabel(origFontString));
 	
 	this.add(fontCombo);
 

@@ -65,6 +65,8 @@ public class FilterEditorPane extends DefaultPropertyEditor implements java.awt.
 	for (int i = 0; i < filterLabels.size(); i++) {
 	    String label = (String) filterLabels.elementAt(i);
 	    FilterEditor currentEditor = Pooka.getSearchManager().getEditorForFilterLabel(label);
+	    currentEditor.configureEditor(sourceBundle, property);
+
 	    filterConfigPanel.add(label, currentEditor);
 	    editorTable.put(label, currentEditor);
 	}
@@ -117,7 +119,6 @@ public class FilterEditorPane extends DefaultPropertyEditor implements java.awt.
 	}
 	
 	FilterEditor currentEditor = getFilterEditor();
-	currentEditor.configureEditor(sourceBundle, property);
 	
     }
 
