@@ -14,44 +14,40 @@ import net.suberic.pooka.gui.*;
  * A TransferHandler for a Folder.
  */
 public class FolderTransferHandler extends TransferHandler {
-  private boolean shouldRemove;
 
   static DataFlavor[] acceptableFlavors = new DataFlavor[] {
     MessageProxyTransferable.sMessageProxyDataFlavor
   };
 
   public boolean importData(JComponent c, Transferable t) {
-    System.err.println("importing.");
     if (!canImport(c, t.getTransferDataFlavors())) {
-      System.err.println("can't import.");
       return false;
     } else {
-      System.err.println("class is " + c);
       FolderInfo fi = DndUtils.getFolderInfo(c);
       if (fi != null) {
-	System.err.println("got folder info.");
+	MessageProxy mp = null;
 	try {
-	  MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
+	  mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	  if (mp != null) {
-	    System.err.println("copying.");
-	    mp.copyMessage(fi);
-	    shouldRemove = true;
+	    mp.getMessageInfo().copyMessage(fi);
 	    return true;
 	  }
 	} catch (Exception e) {
-	  e.printStackTrace();
+	  if (mp != null)
+	    mp.showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + fi.toString() +"\n", e);
+	  if (Pooka.isDebug())
+	    e.printStackTrace();
 	  return false;
 	}
       } else {
 	return false;
       }
     }
-
+    
     return false;
   }
   
   protected Transferable createTransferable(JComponent c) {
-    System.err.println("creating transferable.");
     if (c instanceof net.suberic.pooka.gui.FolderDisplayPanel) {
       return new MessageProxyTransferable(((FolderDisplayPanel) c).getSelectedMessage());
     } else if (c instanceof JTable) {
@@ -77,12 +73,10 @@ public class FolderTransferHandler extends TransferHandler {
   }
 
   protected void exportDone(JComponent c, Transferable data, int action) {
-    System.err.println("export Done.");
-    if (action == MOVE && shouldRemove) {
+    if (action == MOVE) {
       try {
 	MessageProxy mp = (MessageProxy) data.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	if (mp != null) {
-	  System.err.println("deleting message.");
 	  mp.deleteMessage(true);
 	}
       } catch (Exception e) {
@@ -94,7 +88,6 @@ public class FolderTransferHandler extends TransferHandler {
   public boolean canImport(JComponent c, DataFlavor[] flavors) {
     
     boolean returnValue = (DndUtils.matchDataFlavor(acceptableFlavors, flavors) != null);
-    System.err.println("canImport = " + returnValue);
     return returnValue;
   }
 

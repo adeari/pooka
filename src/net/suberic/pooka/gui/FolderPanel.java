@@ -384,7 +384,6 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     }
 
     public void drop(DropTargetDropEvent dtde) {
-      System.err.println("dropping.");
       boolean accept = false;
       // first see if we accept this drag.
       if (mTransferHandler.canImport(folderTree, dtde.getCurrentDataFlavors())) {
@@ -403,15 +402,21 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 	    
 	    // and now drop here.
 	    accept = true;
-	    System.err.println("accepting drop.");
 	    
 	    dtde.acceptDrop(dtde.getDropAction());
+
+	    try {
+	      java.awt.datatransfer.Transferable trans = dtde.getTransferable();
+	      boolean returnValue = mTransferHandler.importData(folderTree, trans);
+	      dtde.dropComplete(returnValue);
+	    } catch (RuntimeException re) {
+	      dtde.dropComplete(false);
+	    }
 	  }
 	}
       }
 
       if (! accept) {
-	System.err.println("rejecting drop.");
 	dtde.rejectDrop();
       }
     }

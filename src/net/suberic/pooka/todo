@@ -1,8 +1,11 @@
 *) add drag and drop
 	*) include message
-	*) move message
 	*) attach file
 	*) save attachment?
+
+   *) error:  move should be able to tell if move was successful or not.
+	also, fix (error:  proxy) message if you drag a message into a
+	imap-disconnected closed folder (mailtest inbox).
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.

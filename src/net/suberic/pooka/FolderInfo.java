@@ -1265,6 +1265,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 	
 	getFolder().copyMessages(m, target);
+
+	// if we do a copy, we'll probably need to do a refresh on the target
+	// folder, also.
+	
+	targetFolder.checkFolder();
+
       } else {
 	targetFolder.appendMessages(msgs);
       }
