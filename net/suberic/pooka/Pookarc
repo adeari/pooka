@@ -156,9 +156,13 @@ MessageWindowToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 
 FolderPanel.2xClickAction=folder-open
 
-FolderTable=SentDate:From:Subject
+FolderTable=Flagged:New:Attachments:SentDate:From:Subject
 FolderTable.Status.tag=SEEN
-FolderTable.Attachments.value=Content-Type
+FolderTable.Flagged.value=FLAG.FLAGGED
+FolderTable.New.value=FLAG.RECENT
+FolderTable.Seen.value=FLAG.SEEN
+FolderTable.Attachments.value=attachments
+#FolderTable.Attachments.class=net.suberic.pooka.gui.AttachmentCellRenderer
 FolderTable.SentDate.value=Date
 FolderTable.From.value=From
 FolderTable.Subject.value=Subject
