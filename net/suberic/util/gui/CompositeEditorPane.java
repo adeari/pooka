@@ -15,6 +15,30 @@ import net.suberic.util.VariableBundle;
  * Configuration.scoped=false
  * foo=zork
  * bar=frobozz
+ *
+ * Options:
+ *
+ * Configuration.scoped - shows that the properties listed are subproperties
+ *   of both the property and the template.  So, in this example, if you 
+ *   had Configuration.scoped, the properties edited would be 
+ *   Configuration.foo and Configuration.bar
+ * Configuration.scopeRoot - if the setting is scoped, then this is the
+ *   root for the template's scope.  Useful when dealing with properties that
+ *   can be reached from multiple points (i.e. if 
+ *   Configuration.one.two.three=foo:bar also, then you could set the 
+ *   scopeRoot to Configuration and use the already configured foo and bar.
+ * Configuration.subProperty.addSubProperty - shows whether or not you
+ *   should add the given subproperty to the edited property for this editor.
+ *   Useful if you have a CompositeEditorPane that contains other 
+ *   Composite or Tabbed EditorPanes.  If Configuration.foo is another
+ *   CompositeEditorPane which in turn edits .frotz and .ozmoo, and 
+ *   Configuration.foo.addSubProperty=true (the default), then 
+ *   Configuration.foo.frotz and Configuration.foo.ozmoo will be edited.
+ *   If Configuration.foo.addSubProperty=false, then Configuration.frotz
+ *   and Configuration.ozmoo will be edited, using Configuration.foo.frotz
+ *   and Configuration.foo.ozmoo as templates.  This is primarily useful
+ *   when using MultiEditorPanes.
+ *
  */
 public class CompositeEditorPane extends DefaultPropertyEditor {
   Vector editors;
@@ -68,17 +92,23 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     Vector templates = new Vector();
     
     if (scoped) {
+      //System.out.println("testing for template " + template);
       String scopeRoot = bundle.getProperty(template + ".scopeRoot", template);
       //System.out.println("scopeRoot is " + scopeRoot);
       Vector templateNames = bundle.getPropertyAsVector(template, "");
       //System.out.println("templateNames = getProp(" + template + ") = " + bundle.getProperty(template, ""));
       for (int i = 0; i < templateNames.size() ; i++) {
-	properties.add(property + "." + (String) templateNames.elementAt(i));
+	String currentSubProperty =  (String) templateNames.elementAt(i);
+	if (bundle.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false"))
+	  properties.add(property);
+	else
+	  properties.add(property + "." + (String) templateNames.elementAt(i));
+
 	templates.add(scopeRoot + "." + (String) templateNames.elementAt(i));
 	//System.out.println("adding " + (String) templateNames.elementAt(i) + ", template " + (String) templateNames.elementAt(i));
       }
     } else {
-      //System.out.println("creating prop list for Compository EP using " + property + ", " + template);
+      //System.out.println("creating prop list for Composite EP using " + property + ", " + template);
       properties = bundle.getPropertyAsVector(property, "");
       templates = bundle.getPropertyAsVector(template, "");
     }

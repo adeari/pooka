@@ -20,6 +20,7 @@ public class PookaExternalPropertyEditorFactory extends PropertyEditorFactory {
      * Overrides createEditor in PropertyEditorFactory.
      */
     public DefaultPropertyEditor createEditor(String property) {
+      
 	String test = getBundle().getProperty(property + ".propertyType", "");
 	if (test.equalsIgnoreCase("Folder"))
 	    return createFolderEditor(property);

@@ -401,27 +401,35 @@ UserProfile.default.allowedValues=UserProfile
 AddressBook.propertyType=Multi
 AddressBook.editableFields=editor
 AddressBook.editableFields.scoped=true
+
+AddressBook.editableFields.editor=config:addressList
 AddressBook.editableFields.editor.scoped=true
 AddressBook.editableFields.editor.propertyType=Tabbed
 AddressBook.editableFields.editor.propertyScoped=true
-
-AddressBook.editableFields.editor=config:addressList
+AddressBook.editableFields.editor.addSubProperty=false
 
 AddressBook.editableFields.editor.config=type:edit
 AddressBook.editableFields.editor.config.scoped=true
+AddressBook.editableFields.editor.config.scopeRoot=AddressBook.editableFields
 AddressBook.editableFields.editor.config.propertyType=Composite
-AddressBook.editableFields.editor.config.type.propertyType=List
-AddressBook.editableFields.editor.config.type.allowedValues=file:ldap
-AddressBook.editableFields.editor.config.edit.propertyType=Variable
-AddressBook.editableFields.editor.config.edit.scoped=true
-AddressBook.editableFields.editor.config.edit.keyProperty=type
-AddressBook.editableFields.editor.config.edit.allowedValues=file:ldap
 
-AddressBook.editableFields.editor.config.edit.file.propertyType=Composite
-AddressBook.editableFields.editor.config.edit.file=filename
+AddressBook.editableFields.edit.propertyType=Variable
+AddressBook.editableFields.edit.allowedValues=file:ldap
+AddressBook.editableFields.edit.addSubProperty=false
+AddressBook.editableFields.edit.scoped=true
+AddressBook.editableFields.edit.keyProperty=type
+AddressBook.editableFields.edit.allowedValues=file:ldap
 
-AddressBook.editableFields.editor.config.edit.ldap.propertyType=Composite
-AddressBook.editableFields.editor.config.edit.ldap=server
+AddressBook.editableFields.type.propertyType=List
+AddressBook.editableFields.type.allowedValues=file:ldap
+AddressBook.editableFields.type=file
+
+AddressBook.editableFields.edit.file.propertyType=Composite
+AddressBook.editableFields.edit.file.scoped=true
+AddressBook.editableFields.edit.file=filename
+
+AddressBook.editableFields.edit.ldap.propertyType=Composite
+AddressBook.editableFields.edit.ldap=server
 
 AddressBook.editableFields.editor.addressList=addressListEditor
 AddressBook.editableFields.editor.addressList.scoped=true

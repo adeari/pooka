@@ -16,7 +16,10 @@ import net.suberic.util.VariableBundle;
  * TabbedList.tabTwo=prop5:prop6
  * TabbedList.tabThree=prop7:prop8:prop9
  *
- * Note that you can also set this up to have the 
+ * Options:
+ * TabbedList.propertyScoped - add the subproperty to the property instead
+ *                             of using it as its own property
+ * TabbedList.templateScoped - add subproperty to the template
  *
  */
 public class TabbedEditorPane extends DefaultPropertyEditor {
@@ -64,12 +67,12 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
     for (int i = 0; i < propsToEdit.size(); i++) {
       String currentProperty = template + "." + (String)propsToEdit.elementAt(i);
       
-      //System.out.println("getting editor for " + currentProperty);
+      //System.out.println("TEP:  getting editor for " + currentProperty);
       if (propertyScoped) {
-	//System.out.println("getting editor for " + property + ", " + currentProperty);
+	//System.out.println("TEP:  propScoped; getting editor for " + property + ", " + currentProperty);
 	currentEditor = createEditorPane(property, currentProperty);
       } else {
-	//System.out.println("getting editor for " + currentProperty + ", " + currentProperty);
+	//System.out.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
 	currentEditor = createEditorPane(currentProperty, currentProperty);
       }
       
