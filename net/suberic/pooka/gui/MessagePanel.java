@@ -73,7 +73,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public void openMessageWindow(MessageProxy m) {
-	MessageWindow newMessageWindow = new MessageWindow(this, m, false);
+	MessageWindow newMessageWindow = new MessageWindow(this, m);
 	this.add(newMessageWindow);
 	newMessageWindow.setVisible(true);
 	try {
@@ -85,7 +85,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public void createNewMessage() {
 	MimeMessage m = new MimeMessage(getMainPanel().getSession());
 
-	MessageWindow newMessageWindow = new MessageWindow(this, new NewMessageProxy(m), true);
+	MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(m));
 	this.add(newMessageWindow);
 	newMessageWindow.setVisible(true);
 	try {
@@ -95,7 +95,7 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     }
 
     public void createNewMessage(javax.mail.Message m) {
-	MessageWindow newMessageWindow = new MessageWindow(this, new NewMessageProxy(m), true);
+	MessageWindow newMessageWindow = new NewMessageWindow(this, new NewMessageProxy(m));
 	this.add(newMessageWindow);
 	newMessageWindow.setVisible(true);
 	try {
