@@ -46,9 +46,9 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 	    // showError();
 	}
 
-	messageCardPanel.add("empty", messageDisplay();
+	messageCardPanel.add("message", messageDisplay);
 
-	splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
+	splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageCardPanel);
 
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 
@@ -103,10 +103,9 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 	if (current != null) {
 	    MessageProxy mp = current.getFolderDisplay().getSelectedMessage();
 	    if (! (mp instanceof MultiMessageProxy)) {
-		messageDisplay.setMessageProxy(mp);
+		ReadMessageDisplayPanel newMessageDisplay = new ReadMessageDisplayPanel(mp);
 		try {
-		    System.out.println("reconfiguring Message Display.");
-		    messageDisplay.configureMessageDisplay();
+		    newMessageDisplay.configureMessageDisplay();
 		    if (mp != null) {
 			System.out.println("mp text is now " + messageDisplay.getMessageText());
 		    } else {
@@ -117,7 +116,9 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 		} catch (javax.mail.MessagingException me) {
 		    //showError();
 		}
-		messageDisplay.repaint();
+		messageCardPanel.add("message", newMessageDisplay);
+		messageCardPanel.remove(messageDisplay);
+		messageDisplay = newMessageDisplay;
 	    }
 	}
     }
