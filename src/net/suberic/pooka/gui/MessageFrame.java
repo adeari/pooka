@@ -168,34 +168,92 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   
   /**
    * This shows an Confirm Dialog window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */    
-  public int showConfirmDialog(String messageText, String title, int type) {
-    return JOptionPane.showConfirmDialog(this, messageText, title, type);
+  public int showConfirmDialog(String pMessageText, String pTitle, int pType) {
+    final String messageText = pMessageText;
+    final String title = pTitle;
+    final int type = pType;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(MessageFrame.this, messageText, title, type));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getInt();
   }
   
   /**
    * This shows an Confirm Dialog window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */    
-  public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-    return JOptionPane.showConfirmDialog(this, messageText, title, optionType, iconType);
+  public int showConfirmDialog(String pMessageText, String pTitle, int pOptionType, int pIconType) {
+    final String messageText = pMessageText;
+    final String title = pTitle;
+    final int optionType = pOptionType;
+    final int iconType = pIconType;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(MessageFrame.this, messageText, title, optionType, iconType));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getInt();
   }
   
   /**
    * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
-  public void showError(String errorMessage, String title) {
-    JOptionPane.showMessageDialog(this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+  public void showError(String pErrorMessage, String pTitle) {
+    final String errorMessage = pErrorMessage;
+    final String title = pTitle;
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  JOptionPane.showMessageDialog(MessageFrame.this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+	}
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
   }
   
   /**
    * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage) {
@@ -204,7 +262,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   
   /**
    * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, Exception e) {
@@ -233,8 +291,27 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
-  public String showInputDialog(String inputMessage, String title) {
-    return JOptionPane.showInputDialog(this, inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  public String showInputDialog(String pInputMessage, String pTitle) {
+    final String inputMessage = pInputMessage;
+    final String title = pTitle;
+    
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInputDialog(MessageFrame.this, inputMessage, title, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getString(); 
   }
   
   /**
@@ -242,8 +319,27 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
-  public String showInputDialog(Object[] inputPanes, String title) {
-    return JOptionPane.showInputDialog(this, inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+  public String showInputDialog(Object[] pInputPanes, String pTitle) {
+    final Object[] inputPanes = pInputPanes;
+    final String title = pTitle;
+    
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInputDialog(MessageFrame.this, inputPanes, title, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getString();
   }
   
   /**
@@ -251,8 +347,25 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
-  public void showMessageDialog(String message, String title) {
-    JOptionPane.showMessageDialog(this, message, title, JOptionPane.PLAIN_MESSAGE);
+  public void showMessageDialog(String pErrorMessage, String pTitle) {
+    final String errorMessage = pErrorMessage;
+    final String title = pTitle;
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  JOptionPane.showMessageDialog(MessageFrame.this, errorMessage, title, JOptionPane.PLAIN_MESSAGE);
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
   }
 
   /**

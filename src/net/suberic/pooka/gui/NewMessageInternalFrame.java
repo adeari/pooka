@@ -352,6 +352,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
    * Shows a SendFailedDialog.
    */
   public SendFailedDialog showSendFailedDialog(OutgoingMailServer server, javax.mail. MessagingException sfe) {
+    // note that this should always be invoked on the AWTEventThread.
     SendFailedDialog sfd = new SendFailedDialog(server, sfe);
     sfd.configureComponent();
     //Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);

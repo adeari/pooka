@@ -329,6 +329,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
    * Shows a SendFailedDialog.
    */
   public SendFailedDialog showSendFailedDialog(OutgoingMailServer server, javax.mail. MessagingException sfe) {
+    // note this should always be called on the AWTEventThread.
     SendFailedDialog sfd = new SendFailedDialog(server, sfe);
     sfd.configureComponent();
     JOptionPane.showMessageDialog(Pooka.getMainPanel(), new Object[] { sfd }, "Error sending message", JOptionPane.QUESTION_MESSAGE);    

@@ -22,10 +22,23 @@ public class LoadHttpConfigPooka {
    * Starts the dialog.
    */
   public void start() {
-    mFrame = new JFrame();
-    java.net.Authenticator.setDefault(new HttpAuthenticator(mFrame));
-    mFrame.show();
-    showChoices();
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  mFrame = new JFrame();
+	  java.net.Authenticator.setDefault(new HttpAuthenticator(mFrame));
+	  mFrame.show();
+	  showChoices();
+	}
+      };
+
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception ie) {
+      }
+    }
   }
 
   /**

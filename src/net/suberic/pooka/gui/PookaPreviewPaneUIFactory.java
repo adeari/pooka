@@ -433,6 +433,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * of the given allowedValues.
    */
   public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
+    // note that this should always be invoked on the AWTEventThread.
+
     SearchForm sf = null;
     if (allowedValues != null)
       sf = new SearchForm(selectedFolders, allowedValues);

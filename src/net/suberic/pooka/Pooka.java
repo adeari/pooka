@@ -411,8 +411,21 @@ public class Pooka {
    * Called if an incorrect version of Java is being used.
    */
   private static void versionError() {
-    String errorString = Pooka.getProperty("error.incorrectJavaVersion", "Error running Pooka.  This version (1.0 beta) \nof Pooka requires a 1.2 or 1.3 JDK.  \n\nFor JDK 1.4, please use a release of Pooka 1.1.\n\nPooka can be downloaded from\nhttp://pooka.sourceforge.net/\n\nYour JDK version:  ");
-    javax.swing.JOptionPane.showMessageDialog(null, errorString + System.getProperty("java.version"));
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  String errorString = Pooka.getProperty("error.incorrectJavaVersion", "Error running Pooka.  This version (1.0 beta) \nof Pooka requires a 1.2 or 1.3 JDK.  \n\nFor JDK 1.4, please use a release of Pooka 1.1.\n\nPooka can be downloaded from\nhttp://pooka.sourceforge.net/\n\nYour JDK version:  ");
+	  javax.swing.JOptionPane.showMessageDialog(null, errorString + System.getProperty("java.version"));
+	}
+      };
+
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception ie) {
+      }
+    }
   }
 
   /**

@@ -337,8 +337,27 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
-  public String showInputDialog(String inputMessage, String title) {
-    return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  public String showInputDialog(String pInputMessage, String pTitle) {
+    final String inputMessage = pInputMessage;
+    final String title = pTitle;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getString();
   }
   
   /**

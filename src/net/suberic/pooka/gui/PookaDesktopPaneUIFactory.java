@@ -7,6 +7,7 @@ import net.suberic.pooka.gui.search.*;
 import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.mail.MessagingException;
@@ -372,20 +373,29 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
-    final String displayMessage = formatMessage(newMessage);
+    //final String displayMessage = formatMessage(newMessage);
+    final String displayMessage = newMessage;
     final String fTitle = title;
 
     Runnable runMe = new Runnable() {
 	public void run() {
+	  //JLabel displayPanel = new JLabel(displayMessage);
 	  JTextArea displayPanel = new JTextArea(displayMessage);
-	  JScrollPane scrollPane = new JScrollPane(displayPanel);
-	  scrollPane.setMaximumSize(new java.awt.Dimension(400,400));
+	  displayPanel.setEditable(false);
+	  java.awt.Dimension dpSize = displayPanel.getPreferredSize();
+	  JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+	  scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
+	  System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
+	  System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
+	  //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+	  //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
+	  //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
 
 	  JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
 	  //JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
 	}
       };
-
+    
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
 	SwingUtilities.invokeAndWait(runMe);
@@ -394,7 +404,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     } else {
       runMe.run();
     }
-    }
+  }
   
   /**
    * Shows a status message.

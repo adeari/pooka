@@ -178,25 +178,66 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   
   /**
    * This shows an Confirm Dialog window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */    
-  public int showConfirmDialog(String messageText, String title, int type) {
-    return JOptionPane.showInternalConfirmDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), messageText, title, type);
+  public int showConfirmDialog(String pMessageText, String pTitle, int pType) {
+    final String messageText = pMessageText;
+    final String title = pTitle;
+    final int type = pType;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), messageText, title, type));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getInt();
   }
   
   /**
    * This shows an Confirm Dialog window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */    
-  public int showConfirmDialog(String messageText, String title, int optionType, int iconType) {
-    return JOptionPane.showInternalConfirmDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), messageText, title, optionType);
+  public int showConfirmDialog(String pMessageText, String pTitle, int pOptionType, int pIconType) {
+    final String messageText = pMessageText;
+    final String title = pTitle;
+    final int optionType = pOptionType;
+    final int iconType = pIconType;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), messageText, title, optionType));
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getInt();
   }
   
   /**
    * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, String title) {
@@ -205,7 +246,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   
   /**
    * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage) {
@@ -214,7 +255,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   
   /**
    * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
+   * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
   public void showError(String errorMessage, Exception e) {
@@ -242,8 +283,24 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * the MessageProxy can call the method without caring about the
    * actual implementation of the Dialog.
    */
-  public void showMessageDialog(String message, String title) {
-    JOptionPane.showInternalMessageDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), message, title, JOptionPane.PLAIN_MESSAGE);
+  public void showMessageDialog(String pMessage, String pTitle) {
+    final String message = pMessage;
+    final String title = pTitle;
+    
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  JOptionPane.showInternalMessageDialog((JDesktopPane)Pooka.getMainPanel().getContentPanel(), message, title, JOptionPane.PLAIN_MESSAGE);
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
   }
   
   /**
@@ -260,8 +317,28 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
-  public String showInputDialog(Object[] inputPanes, String title) {
-    return JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+  public String showInputDialog(Object[] pInputPanes, String pTitle) {
+    final Object[] inputPanes = pInputPanes;
+    final String title = pTitle;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  fResponseWrapper.setString(JOptionPane.showInternalInputDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), inputPanes, title, JOptionPane.QUESTION_MESSAGE));
+	  
+	}
+      };
+    
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+    
+    return fResponseWrapper.getString();
   }
   
   /**
