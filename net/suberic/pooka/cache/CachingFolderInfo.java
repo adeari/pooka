@@ -256,7 +256,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
      */
     public void synchronizeCache() throws MessagingException {
 	
-	Thread.currentThread().dumpStack();
 	if (Pooka.isDebug())
 	    System.out.println("synchronizing cache.");
 
