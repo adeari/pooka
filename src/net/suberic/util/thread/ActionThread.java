@@ -71,11 +71,17 @@ public class ActionThread extends Thread {
       while (pair != null) {
 	try {
 	  synchronized(runLock) {
-	    
+	    try {
+	      mCurrentActionName = (String)pair.action.getValue(Action.NAME);
+	    } catch (Exception e) {
+	      mCurrentActionName = "Unknown action";
+	    }
 	    pair.action.actionPerformed(pair.event);
 	  }
 	} catch (Exception e) {
 	  e.printStackTrace();
+	} finally {
+	  mCurrentActionName = "";
 	}
 	pair = popQueue();
       }
@@ -134,12 +140,15 @@ public class ActionThread extends Thread {
     stopMe = newValue;
   }
 
+  /**
+   * Returns the run lock for this thread.
+   */
   public Object getRunLock() {
     return runLock;
   }
 
   /**
-   * Returns the current Queue size.
+   * Returns the queue size for this thread.
    */
   public int getQueueSize() {
     return actionQueue.size();
@@ -149,7 +158,6 @@ public class ActionThread extends Thread {
    * Returns the name of the current action.
    */
   public String getCurrentActionName() {
-    return "";
+    return mCurrentActionName;
   }
-
 }

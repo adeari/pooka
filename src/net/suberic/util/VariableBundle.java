@@ -20,7 +20,7 @@ public class VariableBundle extends Object {
   private Properties temporaryProperties = new Properties();
   private ResourceBundle resources;
   private VariableBundle parentProperties;
-  private File saveFile;
+  private File mSaveFile;
   private Vector removeList = new Vector();
   private Hashtable VCListeners = new Hashtable();
   private Hashtable VCGlobListeners = new Hashtable();
@@ -36,7 +36,7 @@ public class VariableBundle extends Object {
       fis.close();
     } catch (java.io.IOException ioe) {
     }
-    saveFile = propertiesFile;
+    mSaveFile = propertiesFile;
     
   }
     
@@ -222,8 +222,8 @@ public class VariableBundle extends Object {
    * VariableBundle--underlying defaults are not written.
    */
   public void saveProperties() {
-    if (saveFile != null) {
-      saveProperties(saveFile);
+    if (mSaveFile != null) {
+      saveProperties(mSaveFile);
     }
   }
   
@@ -233,18 +233,21 @@ public class VariableBundle extends Object {
    * VariableBundle--underlying defaults are not written.
    */
   public void saveProperties(File pSaveFile) {
+    if (pSaveFile == null)
+      return;
+
     if (writableProperties.size() > 0) { 
       File outputFile;
       String currentLine, key;
       int equalsLoc;
       
       try {
-	if (!saveFile.exists())
-	  saveFile.createNewFile();
+	if (! pSaveFile.exists())
+	  pSaveFile.createNewFile();
+       
+	outputFile  = pSaveFile.createTempFile(pSaveFile.getName(), ".tmp", pSaveFile.getParentFile());
 	
-	outputFile  = saveFile.createTempFile(saveFile.getName(), ".tmp", saveFile.getParentFile());
-	
-	BufferedReader readSaveFile = new BufferedReader(new FileReader(saveFile));
+	BufferedReader readSaveFile = new BufferedReader(new FileReader(pSaveFile));
 	BufferedWriter writeSaveFile = new BufferedWriter(new FileWriter(outputFile));
 	currentLine = readSaveFile.readLine();
 	while (currentLine != null) {
@@ -297,17 +300,17 @@ public class VariableBundle extends Object {
 	
 	// if you don't delete the .old file first, then the
 	// rename fails under Windows.
-	String oldSaveName = saveFile.getAbsolutePath() + ".old";
+	String oldSaveName = pSaveFile.getAbsolutePath() + ".old";
 	File oldSave = new File (oldSaveName);
 	if (oldSave.exists())
 	  oldSave.delete();
 	
-	String fileName = new String(saveFile.getAbsolutePath());
-	saveFile.renameTo(oldSave);
+	String fileName = new String(pSaveFile.getAbsolutePath());
+	pSaveFile.renameTo(oldSave);
 	outputFile.renameTo(new File(fileName));
 	
       } catch (Exception e) {
-	System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + saveFile.getName() + ": " + e.getMessage()));
+	System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + pSaveFile.getName() + ": " + e.getMessage()));
 	e.printStackTrace(System.err);
       }
       
@@ -602,14 +605,14 @@ public class VariableBundle extends Object {
    * Returns the current saveFile.
    */
   public File getSaveFile() {
-    return saveFile;
+    return mSaveFile;
   }
 
   /**
    * Sets the save file.
    */
   public void setSaveFile(File newFile) {
-    saveFile = newFile;
+    mSaveFile = newFile;
   }
 }
 

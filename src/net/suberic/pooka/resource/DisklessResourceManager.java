@@ -44,7 +44,8 @@ public class DisklessResourceManager extends ResourceManager {
     sourceBundle.saveProperties(new File("/home/allen/testOut"));
 
     //Properties newWritableProperties = new Properties(sourceBundle.getWritableProperties());
-    Properties newWritableProperties = new Properties(sourceBundle.getProperties());
+    pOutputFile.createNewFile();
+    VariableBundle newWritableProperties = new VariableBundle(pOutputFile, null);
     
     // first go through and edit out the inappropriate stores.
     
@@ -95,11 +96,12 @@ public class DisklessResourceManager extends ResourceManager {
 
     newWritableProperties.setProperty("Pooka.useLocalFiles", "false");
 
-    FileOutputStream outStream = new FileOutputStream(pOutputFile);
+    //FileOutputStream outStream = new FileOutputStream(pOutputFile);
     
-    newWritableProperties.store(outStream, null);
+    //newWritableProperties.setSaveFile(pOutputFile);
+    newWritableProperties.saveProperties();
     
-    outStream.close();
+    //outStream.close();
     
     
   }
