@@ -463,7 +463,7 @@ UserProfile.propertyType=Multi
 UserProfile.editableFields.scoped=true
 UserProfile.editableFields=editor
 
-UserProfile.editableFields.editor=user:config:uiConfig
+UserProfile.editableFields.editor=user:config:uiConfig:labelUiConfig
 UserProfile.editableFields.editor.propertyType=Tabbed
 UserProfile.editableFields.editor.propertyScoped=true
 UserProfile.editableFields.editor.addSubProperty=false
@@ -483,6 +483,11 @@ UserProfile.editableFields.editor.uiConfig.scoped=true
 UserProfile.editableFields.editor.uiConfig.addSubProperty=true
 UserProfile.editableFields.editor.uiConfig.scopeRoot=UIConfig.editableFields
 UserProfile.editableFields.editor.uiConfig=font:background:foreground:disabledText:select:focus
+
+UserProfile.editableFields.editor.labelUiConfig.scoped=true
+UserProfile.editableFields.editor.labelUiConfig.addSubProperty=true
+UserProfile.editableFields.editor.labelUiConfig.scopeRoot=UIConfig.editableFields
+UserProfile.editableFields.editor.labelUiConfig=font:background:foreground:disabledText:select:focus
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
