@@ -5,11 +5,11 @@ import javax.swing.*;
 import java.util.Vector;
 
 public class Pooka {
-    static public net.suberic.util.VariableBundle resources;
-    static public String localrc;
-    static public DateFormatter dateFormatter;
-    static public javax.activation.CommandMap mailcap;
-    static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
+  static public net.suberic.util.VariableBundle resources;
+  static public String localrc;
+  static public DateFormatter dateFormatter;
+  static public javax.activation.CommandMap mailcap;
+  static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
   static public net.suberic.pooka.gui.MainPanel panel;
   static public SearchTermManager searchManager;
   static public NetworkConnectionManager connectionManager;
@@ -40,7 +40,10 @@ public class Pooka {
     } catch (Exception e) {
       resources = new net.suberic.util.VariableBundle(new Object().getClass().getResourceAsStream("/net/suberic/pooka/Pookarc"), "net.suberic.pooka.Pooka");
     }
+
+    // set up the SSL socket factory.
     java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+    java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
 
     try {
 	UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));

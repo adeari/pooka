@@ -197,8 +197,8 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
 
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-      p.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
-      
+      //p.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+      p.setProperty("mail.imap.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
       p.setProperty("mail.imap.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
       
       p.setProperty("mail.imap.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "993"));
