@@ -1,3 +1,6 @@
+*) startup:
+	--make sure that the outbox gets configured correctly as an outbox
+
 *) default domain for outgoing addresses.
 	- test outbox failure.
 
@@ -5,19 +8,15 @@
 	-- specifically, make it so you can hit 'apply' and then have
 	   the entry editors be enabled.
 
-*) search doesn't work properly for sent folders.
-	-- started, at least.
-*) make search window look different than normal window.
-
-*) startup:
-	--make sure that the outbox gets configured correctly as an outbox
-
 *) support windows registry attachment associations.
 	-- check icemail
 
 *) check disconnection/reconnection on network removal/restoral.
 
 -------
+
+*) make it so the extra images aren't included in the build.  maybe convert
+	said images to pngs or jpgs?
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
 
@@ -114,6 +113,10 @@ preview:
 
 *) get some decent pooka icons.
 	
+*) search for sent folders ends up doing loading on the display thread.
+
+*) make search window look different than normal window.
+
 *) add support for saved searches.
 
 *) add 'filter by message'

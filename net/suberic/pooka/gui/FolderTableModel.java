@@ -63,7 +63,41 @@ public class FolderTableModel extends AbstractTableModel {
 	  return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
 	} else {
 	  Object key = columnKeys.get(col);
-	  return ((MessageProxy)data.elementAt(row)).getTableInfo().get(key);
+	  Object returnValue = ((MessageProxy)data.elementAt(row)).getTableInfo().get(key);
+	  // FIXME this is making us load stuff on the display thread.
+	  if (returnValue == null) {
+	    try {
+	      MessageProxy proxy = (MessageProxy)data.elementAt(row);
+	      HashMap tableInfo = proxy.getTableInfo();
+	      Set keySet = tableInfo.keySet();
+	      if (! keySet.contains(key)) {
+		if (key instanceof String) {
+		  String propertyName = (String)key;
+		  
+		  if (propertyName.startsWith("FLAG")) 
+		    tableInfo.put(propertyName, proxy.getMessageFlag(propertyName));
+		  else if (propertyName.equals("attachments"))
+		    tableInfo.put(propertyName, new BooleanIcon(proxy.getMessageInfo().hasAttachments(), net.suberic.pooka.Pooka.getProperty("FolderTable.Attachments.icon", "")));
+		  else if (propertyName.equalsIgnoreCase("subject")) 
+		    tableInfo.put(propertyName, proxy.new SubjectLine((String) proxy.getMessageInfo().getMessageProperty(propertyName)));
+		  else if (propertyName.equalsIgnoreCase("from")) 
+		    tableInfo.put(key, proxy.new AddressLine((String) proxy.getMessageInfo().getMessageProperty(propertyName)));
+		  else
+		    tableInfo.put(key, proxy.getMessageInfo().getMessageProperty(propertyName));
+		} else if (key instanceof SearchTermIconManager) {
+		  SearchTermIconManager stm = (SearchTermIconManager) key;
+		  tableInfo.put(key, new net.suberic.pooka.gui.SearchTermIcon(stm, proxy));
+		} else if (key instanceof net.suberic.pooka.RowCounter) {
+		  tableInfo.put(key, key);
+		}
+		
+		returnValue = ((MessageProxy)data.elementAt(row)).getTableInfo().get(key);
+	      }
+	    } catch (Exception e) {
+	      // ignore.
+	    }
+	  }
+	  return returnValue;
 	}
       }
     } catch (ArrayIndexOutOfBoundsException ae) {
