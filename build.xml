@@ -10,8 +10,13 @@
   <property name="activation_cp" value="${importdir}/activation.jar"/>
   <property name="mail_cp" value="${importdir}/mail.jar"/>
   <property name="jsse_cp" value="${importdir}/jsse.jar"/>
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}"/> 
-  
+  <property name="jcert_cp" value="${importdir}/jcert.jar"/>
+  <property name="jnet_cp" value="${importdir}/jnet.jar"/>
+  <property name="mbox_cp" value="${importdir}/mbox.jar"/>
+  <property name="kunststofff_cp" value="${importdir}/kunststoff.jar"/>
+
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${mbox_cp}:${kunstsoff_cp}"/> 
+
   <target name="clean">
     <delete dir="${distdir}"/>
     <delete dir="${builddir}"/>
@@ -38,6 +43,10 @@
         <include name="**/*"/>
       </fileset>
     </copy>
+    <copy file="${sourcedir}/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+    <copy todir="${builddir}/net/suberic/pooka/doc">
+      <fileset dir="${sourcedir}/suberic/pooka/doc"/>
+    </copy>
   </target>
 
   <target name="docs" depends="init">
@@ -58,16 +67,22 @@
   </target>
 
   <target name="dist-full" depends="compile">
-    <jar jarfile="${distdir}/pooka_full.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
-      <zipfileset src="${importdir}/activation.jar"/>
-      <zipfileset src="${importdir}/jcert.jar"/>
-      <zipfileset src="${importdir}/jnet.jar"/>
-      <zipfileset src="${importdir}/jsse.jar"/>
-      <zipfileset src="${importdir}/kunststoff.jar"/>
-      <zipfileset src="${importdir}/mail.jar"/>
-      <zipfileset src="${importdir}/mbox.jar"/>
+    <tstamp>
+      <format property="today" pattern="yyMMdd" locale="en"/>
+    </tstamp>
+    <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
+      <zipfileset src="${activation_cp}"/>
+      <zipfileset src="${jcert_cp}"/>
+      <zipfileset src="${jnet_cp}"/>
+      <zipfileset src="${jsse_cp}"/>
+      <zipfileset src="${mail_cp}"/>
+      <zipfileset src="${mbox_cp}"/>
     </jar>
   </target>
 
-  <target name="all" depends="compile,dist,docs"/>
+  <target name="all" depends="compile,dist-full,docs">
+    <jar jarfile="${distdir}/pooka_javadoc_${today}.jar" basedir="${docdir}"/>
+    <jar jarfile="${distdir}/pooka_src_${today}.jar" basedir="." includes="net/**"/>
+  </target>
+
 </project>
