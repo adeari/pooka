@@ -1,6 +1,8 @@
 
 *) bug:  in preview mode, select multiple messages, including the last
 	one.  delete.  get error.
+	-- fixed.  need to fix the PreviewContentPane's threading for
+	selectionChanged, though.
 
 *) make it so starting up is quicker (?).  -- check with threading, maybe?
 	either multiple threads for folders, or maybe check the threading
@@ -9,11 +11,12 @@
 *) fix the network connection test so that it doesn't hang if the
 	network is up, but the test host is unreachable.
 
-*) detach a message from the desktop pane.  do an open with.  it uses the
-	jdesktoppane, not a standalone window.
+*) detach a message with attachments.  do open with on the attachment.
+	jpopupwindow shows up on the messagepanel, not on the detached
+	panel.
 
-*) detach a message.  reply to it.
-
+*) make a way to reopen folders that have been disconnected other than
+	closing and reopening the store.
 ----------
 
 *) splashscreen?

@@ -41,35 +41,53 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * Creates an appropriate MessageUI object for the given MessageProxy.
    */
   public MessageUI createMessageUI(MessageProxy mp) throws MessagingException {
+    return createMessageUI(mp, null);
+  }
+
+  /**
+   * Creates an appropriate MessageUI object for the given MessageProxy, 
+   * using the provided MessageUI as a guideline.
+   */
+  public MessageUI createMessageUI(MessageProxy mp, MessageUI templateMui) throws javax.mail.MessagingException {
     // each MessageProxy can have exactly one MessageUI.
     if (mp.getMessageUI() != null)
       return mp.getMessageUI();
     
+    boolean createExternal = (templateMui != null && templateMui instanceof MessageFrame);
+
     MessageUI mui;
     if (mp instanceof NewMessageProxy) {
-      mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
+      if (createExternal)
+	mui = new NewMessageFrame((NewMessageProxy) mp);
+      else
+	mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
     } else {
-      mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
-      ((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
+      if (createExternal)
+	mui = new ReadMessageFrame(mp);
+      else {
+	mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
+	((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
+      }
     }
+    
     mp.setMessageUI(mui);
     return mui;
   }
   
-    /**
-     * Creates an appropriate FolderDisplayUI object for the given
-     * FolderInfo.
-     */
-    public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
-	// a FolderInfo can only have one FolderDisplayUI.
-	
-
-	if (fi.getFolderDisplayUI() != null)
-	    return fi.getFolderDisplayUI();
-
-	FolderDisplayUI fw = new FolderInternalFrame(fi, getMessagePanel());
-	return fw;
-    }
+  /**
+   * Creates an appropriate FolderDisplayUI object for the given
+   * FolderInfo.
+   */
+  public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
+    // a FolderInfo can only have one FolderDisplayUI.
+    
+    
+    if (fi.getFolderDisplayUI() != null)
+      return fi.getFolderDisplayUI();
+    
+    FolderDisplayUI fw = new FolderInternalFrame(fi, getMessagePanel());
+    return fw;
+  }
 
     /**
      * Shows an Editor Window with the given title, which allows the user

@@ -538,7 +538,7 @@ public class MessageProxy {
       NewMessageInfo nmi = new NewMessageInfo(newMessage);
       NewMessageProxy nmp = new NewMessageProxy(nmi);
       
-      MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp);
+      MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
 
       nmp.matchUserProfile();
 
@@ -577,6 +577,10 @@ public class MessageProxy {
     }
   }
   
+  /**
+   * Creates a NewMessageInfo & Proxy for a message which is a reply
+   * to the current message.  Opens a NewMessageUI for said Proxy.
+   */
   private void replyToMessage(boolean replyAll, boolean withAttachments) {
     if (getMessageUI() != null)
       getMessageUI().setBusy(true);
@@ -586,7 +590,9 @@ public class MessageProxy {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateReply(replyAll, withAttachments));
-      MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+      MessageUI nmui = null;
+      // if this has a messageui up, then make the reply 
+      nmui = getPookaUIFactory().createMessageUI(nmp, this.getMessageUI());
       nmui.openMessageUI();
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
@@ -603,6 +609,10 @@ public class MessageProxy {
     forwardMessage(withAttachments, MessageInfo.FORWARD_QUOTED);
   }
   
+  /**
+   * Creates a NewMessageInfo & Proxy for a message which is a forward
+   * to the current message.  Opens a NewMessageUI for said Proxy.
+   */
   private void forwardMessage(boolean withAttachments, int method) {
     if (getMessageUI() != null)
       getMessageUI().setBusy(true);
@@ -611,7 +621,7 @@ public class MessageProxy {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateForward(withAttachments, method));
-      MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+      MessageUI nmui = getPookaUIFactory().createMessageUI(nmp, getMessageUI());
       nmui.openMessageUI();
       
     } catch (MessagingException me) {

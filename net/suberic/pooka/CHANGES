@@ -1,3 +1,5 @@
+fixed some minor bugs involving detaching windows.
+
 fixed the theme support so that the default theme is actually used for
 just about everything.
 

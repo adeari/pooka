@@ -39,23 +39,33 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     return pookaThemeManager;
   }
 
-    /**
-     * Creates an appropriate MessageUI object for the given MessageProxy.
-     */
-    public MessageUI createMessageUI(MessageProxy mp) {
-	// each MessageProxy can have exactly one MessageUI.
-	if (mp.getMessageUI() != null)
-	    return mp.getMessageUI();
-	
-	MessageUI mui;
-	if (mp instanceof NewMessageProxy) {
-	    mui = new NewMessageFrame((NewMessageProxy) mp);
-	} else
-	    mui = new ReadMessageFrame(mp);
+  /**
+   * Creates an appropriate MessageUI object for the given MessageProxy.
+   */
+  public MessageUI createMessageUI(MessageProxy mp) {
+    return createMessageUI(mp, null);
+  }
 
-	mp.setMessageUI(mui);
-	return mui;
-    }
+  /**
+   * Creates an appropriate MessageUI object for the given MessageProxy, 
+   * using the provided MessageUI as a guideline.
+   *
+   * Note that this implementation ignores the mui component.
+   */
+  public MessageUI createMessageUI(MessageProxy mp, MessageUI templateMui) {
+    // each MessageProxy can have exactly one MessageUI.
+    if (mp.getMessageUI() != null)
+      return mp.getMessageUI();
+    
+    MessageUI mui;
+    if (mp instanceof NewMessageProxy) {
+      mui = new NewMessageFrame((NewMessageProxy) mp);
+    } else
+      mui = new ReadMessageFrame(mp);
+    
+    mp.setMessageUI(mui);
+    return mui;
+  }
 
     /**
      * Creates an appropriate FolderDisplayUI object for the given

@@ -148,10 +148,7 @@ public class FolderDisplayPanel extends JPanel {
 	  public void run() {
 	    moveSelectionOnRemoval(removedProxiesTmp);
 	    
-	    System.err.println("removing rows from foldertablemodel.");
-	    System.err.println("current rowcount = " + getFolderTableModel().getRowCount());
 	    getFolderTableModel().removeRows(removedProxiesTmp);
-	    System.err.println("after removerows, rowcount = " + getFolderTableModel().getRowCount());
 	  }
 	});
     } catch (Exception e) {
@@ -171,7 +168,8 @@ public class FolderDisplayPanel extends JPanel {
 	SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {
 	      MessageProxy selectedProxy = getSelectedMessage();
-	      if ( selectedProxy != null && selectedProxy.getMessageInfo().getMessage().equals(changedMessage)) {
+	      
+	      if ( selectedProxy != null && (! (selectedProxy instanceof MultiMessageProxy)) && selectedProxy.getMessageInfo().getMessage().equals(changedMessage)) {
 		selectNextMessage();
 	      }
 	    }
@@ -221,26 +219,40 @@ public class FolderDisplayPanel extends JPanel {
     private void moveSelectionOnRemoval(Vector removedProxies) {
       MessageProxy selectedProxy = getSelectedMessage();
       if (selectedProxy != null)  {
+	boolean selectNextMessage = false;
 	if (selectedProxy instanceof MultiMessageProxy) {
 	  MultiMessageInfo mmi = (MultiMessageInfo) selectedProxy.getMessageInfo();
 	  int messageCount = mmi.getMessageCount();
-	  boolean allAreRemoved = true;
-	  for (int i = 0; allAreRemoved && i < messageCount; i++) {
+	  selectNextMessage = true;
+	  for (int i = 0; selectNextMessage && i < messageCount; i++) {
 	    MessageProxy currentProxy = mmi.getMessageInfo(i).getMessageProxy();
 	    if (! removedProxies.contains(currentProxy))
-	      allAreRemoved=false;
+	      selectNextMessage=false;
 	  }
 	  
-	  if (allAreRemoved) {
-	    int newMsg = selectNextMessage();
-	    System.err.println("allproxies match:  next message is " + newMsg);
-	  } 
 	} else {
 	  if (removedProxies.contains(selectedProxy)) {
-	    int newMsg = selectNextMessage();
-	    System.err.println("next message is " + newMsg);
+	    selectNextMessage = true;
 	  }
 	  
+	}
+
+	if (selectNextMessage) {
+	  int currentlySelected = messageTable.getSelectedRow();
+	  int nextValue = getNextSelectableMessage(currentlySelected, removedProxies);
+	  if (nextValue >= messageTable.getRowCount()) {
+	    // in that case, check for a selectable message before this one.
+	    nextValue = getPreviousSelectableMessage(nextValue, removedProxies);
+	  }
+	  
+	  if (nextValue < 0) {
+	    // if we're removing all of the messages, then we should just
+	    // be able to unselect everything.
+	    int[] rowSelection = messageTable.getSelectedRows();
+	    messageTable.removeRowSelectionInterval(rowSelection[0], rowSelection[rowSelection.length - 1]);
+	  } else {
+	    selectMessage(nextValue);
+	  }
 	}
       }
     }
@@ -464,12 +476,29 @@ public class FolderDisplayPanel extends JPanel {
    */
   public int selectNextMessage() {
     int selectedRow = messageTable.getSelectedRow();
+    int nextSelectable = getNextSelectableMessage(selectedRow, null);
+    return selectMessage(nextSelectable);
+  }
+
+
+  /**
+   * Determines which message is the next selectable message.  If no 
+   * messages past this one are selectable (i.e. not deleted or about to
+   * be deleted), returns messageTable.getRowCount() (i.e. an unused
+   * row.
+   *
+   * Since we're polling flags on the Messages, this probably should be
+   * called on the FolderThread.  The change of selection itself, of course,
+   * should be done on the AWTEventThread.
+   */
+  public int getNextSelectableMessage(int selectedRow, Vector removedProxies) {
     int newRow = selectedRow + 1;
     boolean done = false;
     while (! done && newRow < messageTable.getRowCount() ) {
       MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
       try {
-	if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+
+	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
 	  newRow ++;
 	} else {
 	  done = true;
@@ -479,7 +508,7 @@ public class FolderDisplayPanel extends JPanel {
       }
     }
     
-    return selectMessage(newRow);
+    return newRow;
   }
   
   /**
@@ -493,12 +522,27 @@ public class FolderDisplayPanel extends JPanel {
       selectedRow = rowsSelected[0];
     else
       selectedRow = messageTable.getRowCount();
+
+    int previousSelectable = getPreviousSelectableMessage(selectedRow, null);
+    return selectMessage(previousSelectable);
+  }
+
+  /**
+   * Determines which message is the previous selectable message.  If no 
+   * messages before this one are selectable (i.e. not deleted or about to
+   * be deleted), returns -1.
+   *
+   * Since we're polling flags on the Messages, this probably should be
+   * called on the FolderThread.  The change of selection itself, of course,
+   * should be done on the AWTEventThread.
+   */
+  public int getPreviousSelectableMessage(int selectedRow, Vector removedProxies) {
     int newRow = selectedRow - 1;
     boolean done = false;
     while (! done && newRow >= 0 ) {
       MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
       try {
-	if (mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
 	  newRow--;
 	} else {
 	  done = true;
@@ -508,7 +552,7 @@ public class FolderDisplayPanel extends JPanel {
       }
     }
     
-    return selectMessage(newRow);
+    return newRow;
     
   }
   
@@ -533,7 +577,6 @@ public class FolderDisplayPanel extends JPanel {
   public int selectMessage(int messageNumber) {
     int rowCount = messageTable.getRowCount();
       
-    System.err.println("selecting message " + messageNumber + " of " + rowCount);
     if (rowCount > 0) {
       int numberToSet = messageNumber;
       
