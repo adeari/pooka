@@ -35,7 +35,11 @@ public class ActionThread extends Thread {
 	    sleeping = false;
 	    ActionEventPair pair = popQueue();
 	    while (pair != null) {
-		pair.action.actionPerformed(pair.event);
+		try {
+		    pair.action.actionPerformed(pair.event);
+		} catch (Exception e) {
+		    e.printStackTrace();
+		}
 		pair = popQueue();
 	    }
 	    try {
