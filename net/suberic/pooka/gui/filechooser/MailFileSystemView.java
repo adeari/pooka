@@ -135,76 +135,80 @@ public class MailFileSystemView
 
     }
 
-    /**
-     * Creates a new Folder under the containingDir.
-     */
-    public File createNewFolder(File containingDir) {
-	if (Pooka.isDebug())
-	    System.out.println("running createNewFolder.");
-
-	try {
-	    Folder parentFolder = null;
-	    if (containingDir instanceof FolderFileWrapper) {
-		parentFolder = ((FolderFileWrapper)containingDir).getFolder();
-		
-		Folder newFolder = parentFolder.getFolder("New_folder");
-		for (int i = 1; newFolder.exists(); i++) {
-		    newFolder=parentFolder.getFolder("New_folder_" + i);
-		}
-		
-		newFolder.create(Folder.HOLDS_FOLDERS);
-		
-		return new FolderFileWrapper(newFolder, (FolderFileWrapper)containingDir);
-	    } else {
-		return null;
-
-		//parentFolder = store.getFolder(containingDir.getAbsolutePath());
-	    }
-	} catch (MessagingException me) {
+  /**
+   * Creates a new Folder under the containingDir.
+   */
+  public File createNewFolder(File containingDir) {
+    if (Pooka.isDebug())
+      System.out.println("running createNewFolder.");
+    
+    try {
+      Folder parentFolder = null;
+      if (containingDir instanceof FolderFileWrapper) {
+	parentFolder = ((FolderFileWrapper)containingDir).getFolder();
+	
+	Folder newFolder = parentFolder.getFolder("New_folder");
+	for (int i = 1; newFolder.exists(); i++) {
+	  newFolder=parentFolder.getFolder("New_folder_" + i);
 	}
+	
+	newFolder.create(Folder.HOLDS_FOLDERS);
 
+	((FolderFileWrapper) containingDir).refreshChildren();
+
+	//return new FolderFileWrapper(newFolder, (FolderFileWrapper)containingDir);
+	return ((FolderFileWrapper)containingDir).getFileByName(newFolder.getName());
+      } else {
 	return null;
-    }
 
-    /**
-     * Returns all of the files under a particular directory.
-     */
-    public File[] getFiles(File dir, boolean useFileHiding) {
+	//parentFolder = store.getFolder(containingDir.getAbsolutePath());
+      }
+    } catch (MessagingException me) {
+      Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder:  "), me);
+    }
+    
+    return null;
+  }
+
+  /**
+   * Returns all of the files under a particular directory.
+   */
+  public File[] getFiles(File dir, boolean useFileHiding) {
+    if (Pooka.isDebug())
+      System.out.println("running getFiles " + dir + ", " + useFileHiding + ".");
+    
+    if (dir instanceof FolderFileWrapper) {
+      if (Pooka.isDebug())
+	System.out.println("getFiles:  returning dir.listFiles()");
+      return ((FolderFileWrapper)dir).listFiles();
+    } else {
+      if (Pooka.isDebug())
+	System.out.println("getFiles:  dir isn't a FFW.");
+      if (dir == null) {
 	if (Pooka.isDebug())
-	    System.out.println("running getFiles " + dir + ", " + useFileHiding + ".");
-
-	if (dir instanceof FolderFileWrapper) {
-	    if (Pooka.isDebug())
-		System.out.println("getFiles:  returning dir.listFiles()");
-	    return ((FolderFileWrapper)dir).listFiles();
-	} else {
-	    if (Pooka.isDebug())
-		System.out.println("getFiles:  dir isn't a FFW.");
-	    if (dir == null) {
-		if (Pooka.isDebug())
-		    System.out.println("getFiles:  dir is null; returning null.");
-		return null; // FIXME: or set dir to root?
-	    }
-
-	    // FIXME: ugly?
-
-	    if (Pooka.isDebug())
-		System.out.println("getFiles:  just returning the root.");
-
-		File f = ((FolderFileWrapper)getDefaultRoot()).getFileByName(dir.getAbsolutePath());
-		
-		if (f == null) {
-		    if (Pooka.isDebug())
-			System.out.println("getFiles:  tried returning the root, but got null.  returning the root itself instead.");
-		    return new FolderFileWrapper[0];
-		}
-
-		if (Pooka.isDebug())
-		    System.out.println("getFiles:  returning " + f + ".listFiles() for getFiles()");
-		return f.listFiles();
-	}
+	  System.out.println("getFiles:  dir is null; returning null.");
+	return null; // FIXME: or set dir to root?
+      }
+      
+      // FIXME: ugly?
+      
+      if (Pooka.isDebug())
+	System.out.println("getFiles:  just returning the root.");
+      
+      File f = ((FolderFileWrapper)getDefaultRoot()).getFileByName(dir.getAbsolutePath());
+      
+      if (f == null) {
+	if (Pooka.isDebug())
+	  System.out.println("getFiles:  tried returning the root, but got null.  returning the root itself instead.");
+	return new FolderFileWrapper[0];
+      }
+      
+      if (Pooka.isDebug())
+	System.out.println("getFiles:  returning " + f + ".listFiles() for getFiles()");
+      return f.listFiles();
     }
-
+  }
+  
     /**
      * Returns the user's home directory.  Kind of a strange thing
      * on a mail system...
