@@ -96,12 +96,12 @@ public class MessageProxy {
 		String propertyName = (String)columnHeaders.elementAt(j);
 		
 		if (propertyName.startsWith("FLAG")) 
-		    tableInfo.addElement(new Boolean(getMessageFlag((String)(columnHeaders.elementAt(j)), message)));
+		    tableInfo.addElement(getMessageFlag((String)(columnHeaders.elementAt(j)), message));
 		else if (propertyName.equals("attachments"))
 		    try {
-			tableInfo.addElement(new Boolean(message.getContentType().substring(0, 15).equalsIgnoreCase("multipart/mixed")));
+			tableInfo.addElement(new BooleanIcon(message.getContentType().substring(0, 15).equalsIgnoreCase("multipart/mixed"), Pooka.getProperty("FolderTable.Attachments.icon", "")));
 		    } catch (MessagingException me) {
-			tableInfo.addElement(new Boolean(false));
+			tableInfo.addElement(new BooleanIcon(false, ""));
 		    }
 		else
 		    tableInfo.addElement(getMessageProperty((String)(columnHeaders.elementAt(j)), message));
@@ -130,24 +130,24 @@ public class MessageProxy {
      * This gets a Flag property from the Message.
      */
 
-    public boolean getMessageFlag(String flagName, Message msg) {
+    public BooleanIcon getMessageFlag(String flagName, Message msg) {
 	try {
 	    if (flagName.equals("FLAG.ANSWERED") )
-		return msg.isSet(Flags.Flag.ANSWERED);
+		return new BooleanIcon(msg.isSet(Flags.Flag.ANSWERED), Pooka.getProperty("FolderTable.Answered.icon", ""));
 	    else if (flagName.equals("FLAG.DELETED"))
-		return msg.isSet(Flags.Flag.DELETED);
+		return new BooleanIcon(msg.isSet(Flags.Flag.DELETED),Pooka.getProperty("FolderTable.Deleted.icon", ""));
 	    else if (flagName.equals("FLAG.DRAFT"))
-		return msg.isSet(Flags.Flag.DELETED);
+		return new BooleanIcon(msg.isSet(Flags.Flag.DRAFT), Pooka.getProperty("FolderTable.Draft.icon", ""));
 	    else if (flagName.equals("FLAG.FLAGGED"))
-		return msg.isSet(Flags.Flag.DELETED);
+		return new BooleanIcon(msg.isSet(Flags.Flag.FLAGGED), Pooka.getProperty("FolderTable.Flagged.icon", ""));
 	    else if (flagName.equals("FLAG.RECENT"))
-		return msg.isSet(Flags.Flag.DELETED);
+		return new BooleanIcon(msg.isSet(Flags.Flag.RECENT), Pooka.getProperty("FolderTable.Recent.icon", ""));
 	    else if (flagName.equals("FLAG.SEEN"))
-		return msg.isSet(Flags.Flag.DELETED);
+		return new BooleanIcon(msg.isSet(Flags.Flag.SEEN), Pooka.getProperty("FolderTable.Seen.icon", ""));
 	    else
-		return false;
+		return new BooleanIcon(false, "");
 	} catch (MessagingException me) {
-	    return false;
+	    return new BooleanIcon(false, "");
 	}
     }
 

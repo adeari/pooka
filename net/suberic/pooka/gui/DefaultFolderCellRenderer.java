@@ -21,7 +21,20 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
     }
     
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+
 	Component returnValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+	if (value instanceof BooleanIcon) {
+	    BooleanIcon bIcon = (BooleanIcon)value;
+	    if (bIcon.bool == true) {
+		Component icon = bIcon.getIcon();
+		if (icon != null) {
+		    icon.setBackground(returnValue.getBackground());
+		}
+		return icon;
+	    }
+	}
+
 
 	if (table.getModel() instanceof FolderTableModel) {
 	    FolderTableModel ftm = (FolderTableModel) table.getModel();
