@@ -12,12 +12,14 @@ public abstract class EncryptionUtils {
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
-  public abstract String decryptText(String encryptedText, EncryptionKey key);
+  public abstract byte[] decryptText(String encryptedText, EncryptionKey key)
+    throws EncryptionException;
 
   /**
    * Encrypts a section of text using an EncryptionKey.
    */
-  public abstract String encryptText(String plainText, EncryptionKey key);
+  public abstract byte[] encryptText(String plainText, EncryptionKey key)
+    throws EncryptionException;
 
   /**
    * Encrypts a Message.

@@ -5,6 +5,10 @@ import net.suberic.pooka.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
+import cryptix.message.*;
+import cryptix.openpgp.*;
+import cryptix.pki.*;
+
 /**
  * Utilities for encrypting/decrypting messages.
  */
@@ -13,14 +17,37 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
-  public String decryptText(String encryptedText, EncryptionKey key) {
-    return null;
+  public byte[] decryptText(String encryptedText, EncryptionKey key)
+    throws EncryptionException {
+    try {
+      PGPEncryptionKey pgpKey = (PGPEncryptionKey) key;
+      KeyBundle bundle = pgpKey.getKeyBundle();
+      char[] passphrase = pgpKey.getPassphrase();
+      
+      EncryptedMessage cryptMsg = new EncryptedMessage(encryptedText);
+      
+      Message decryptedMessage = cryptMsg.decrypt(bundle, passphrase);
+      
+      if (decryptedMessage instanceof LiteralMessage) {
+	LiteralMessage litMsg = (LiteralMessage) decryptedMessage;
+	byte[] returnValue = litMsg.getBinaryData();
+	return returnValue;
+      }
+
+      return null;
+    } catch (NotEncryptedToParameterException netpe) {
+      throw new EncryptionException(netpe.getMessage());
+    } catch (MessageException netpe) {
+      throw new MessageException(netpe.getMessage());
+    }
+
   }
 
   /**
    * Encrypts a section of text using an EncryptionKey.
    */
-  public String encryptText(String plainText, EncryptionKey key) {
+  public byte[] encryptText(String plainText, EncryptionKey key) 
+    throws EncryptionException {
     return null;
   }
 
