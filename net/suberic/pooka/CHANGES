@@ -1,3 +1,6 @@
+changed the SSL server support so that we now can connect using a self-signed
+certificate chain.
+
 fixed a bug in UIDFolderInfo which made it so you couldn't append 
 non-UIDMimeMessages.
 

@@ -69,7 +69,27 @@ public class PookaTrustManager implements X509TrustManager {
    * (default untrusted) certificate.
    */
   public boolean askIsTrusted(X509Certificate[] cert) {
-    return true;
+    X509Certificate certToPrint = null;
+    for (int i = 0; i < cert.length && certToPrint == null; i++) {
+      if (cert[i] != null)
+	certToPrint = cert[i];
+    }
+
+    int response = -1;
+    if (certToPrint != null) {
+      StringBuffer msg = new StringBuffer("The following certificate(s) are not trusted.  Accpet them anyway?\n\n");
+      msg.append("Issuer:  ");
+      msg.append(certToPrint.getIssuerDN().getName());
+      msg.append("\n");
+      response = net.suberic.pooka.Pooka.getUIFactory().showConfirmDialog(msg.toString(), "Accpet SSL certificate?", javax.swing.JOptionPane.YES_NO_OPTION);
+    } else {
+      response = net.suberic.pooka.Pooka.getUIFactory().showConfirmDialog("The certificate(s) for this server are not trusted.  Accpet them anyway?", "Accpet SSL certificate?", javax.swing.JOptionPane.YES_NO_OPTION);
+    }
+
+    if (response == javax.swing.JOptionPane.YES_OPTION)
+      return true;
+    else
+      return false;
   }
 }
 
