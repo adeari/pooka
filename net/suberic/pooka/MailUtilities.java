@@ -81,9 +81,35 @@ public class MailUtilities {
 	
 	bundle.addAttachment(newAttach);
       } else if (encryptionStatus == EncryptionUtils.SIGNED) {
+	// in the case of signed attachments, we should get the wrapped body.
+
 	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment((MimeMessage)m);
-	
+	MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
+
+	if (signedMbp != null) {
+	  String signedContentType = signedMbp.getContentType().toLowerCase();
+	  if (signedContentType.startsWith("multipart")) {
+	    bundle.addAll(parseAttachments((Multipart)signedMbp.getContent()));
+	  } else if (signedContentType.startsWith("message")) {
+	    bundle.addAttachment(new Attachment(signedMbp));
+	    Object msgContent;
+	    msgContent = signedMbp.getContent();
+	    
+	    if (msgContent instanceof Message)
+	      bundle.addAll(parseAttachments((Message)msgContent));
+	    else if (msgContent instanceof java.io.InputStream)
+	      bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
+	    else
+	      System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+	    
+	  } else {
+	    bundle.addAttachment(new Attachment(signedMbp));
+	  }
+	}
+
 	bundle.addAttachment(newAttach);
+      } else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
+	bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment((MimeMessage) m));
       } else {
 	// FIXME
 	bundle.addAttachment(new Attachment((MimeMessage)m));
@@ -136,9 +162,36 @@ public class MailUtilities {
 	
 	  bundle.addAttachment(newAttach);
 	} else if (encryptionStatus == EncryptionUtils.SIGNED) {
+	  // in the case of signed attachments, we should get the wrapped body.
+	  
 	  Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mbp);
-	
+	  MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
+	  
+	  if (signedMbp != null) {
+	    String signedContentType = signedMbp.getContentType().toLowerCase();
+	    if (signedContentType.startsWith("multipart")) {
+	      bundle.addAll(parseAttachments((Multipart)signedMbp.getContent()));
+	    } else if (signedContentType.startsWith("message")) {
+	      bundle.addAttachment(new Attachment(signedMbp));
+	      Object msgContent;
+	      msgContent = signedMbp.getContent();
+	    
+	      if (msgContent instanceof Message)
+		bundle.addAll(parseAttachments((Message)msgContent));
+	      else if (msgContent instanceof java.io.InputStream)
+		bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
+	      else
+		System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+	      
+	    } else {
+	      bundle.addAttachment(new Attachment(signedMbp));
+	    }
+	  }
+
 	  bundle.addAttachment(newAttach);
+
+	} else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
+	  bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mbp));
 	} else {
 	  // FIXME
 	  bundle.addAttachment(new Attachment(mbp));

@@ -44,6 +44,29 @@ public class SignedAttachment extends Attachment {
     super(msg);
   }
 
+  /**
+   * Returns the content part of the signed attachment.
+   */
+  public MimeBodyPart getSignedPart() throws javax.mail.MessagingException,
+  java.io.IOException {
+    Object content = getDataHandler().getContent();
+    if (content instanceof MimeMultipart) {
+      MimeMultipart mm = (MimeMultipart) content;
+
+      // this should be exactly two parts, one the content, the other the
+      // signature.
+      for (int i = 0; i < mm.getCount(); i++) {
+	// return the first one found.
+	MimeBodyPart mbp = (MimeBodyPart) mm.getBodyPart(i);
+	ContentType ct = new ContentType(mbp.getContentType());
+	if (! ct.getSubType().toLowerCase().endsWith("signature")) {
+	  return mbp;
+	} 
+      }
+    }
+
+    return null;
+  }
 
   /**
    * Returns the DataHandler for this Attachment.
@@ -56,6 +79,7 @@ public class SignedAttachment extends Attachment {
   /**
    * Returns the MimeType.
    */
+  /*
   public ContentType getMimeType() {
     try {
       return new ContentType("text/plain");
@@ -63,5 +87,5 @@ public class SignedAttachment extends Attachment {
       return null;
     }
   }
-  
+  */
 }

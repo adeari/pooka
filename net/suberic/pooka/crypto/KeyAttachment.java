@@ -39,28 +39,19 @@ public class KeyAttachment extends Attachment {
    * Returns the attached keys.
    */
   public Key[] extractKeys(EncryptionUtils utils) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
-    MimeBodyPart mbp = new MimeBodyPart();
-    mbp.setDataHandler(getDataHandler());
-    return utils.extractKeys(mbp);
-  }
+    net.suberic.crypto.UpdatableMBP mbp = new net.suberic.crypto.UpdatableMBP();
 
-  /**
-   * Returns the DataHandler for this Attachment.
-   */
-  public DataHandler getDataHandler() {
-    return super.getDataHandler();
-  }
-
-
-  /**
-   * Returns the MimeType.
-   */
-  public ContentType getMimeType() {
-    try {
-      return new ContentType("text/plain");
-    } catch (javax.mail.internet.ParseException pe) {
-      return null;
+    mbp.setContent(getDataHandler().getContent(), getMimeType().toString());
+    mbp.updateMyHeaders();
+    
+    if (utils == null) {
+      utils = net.suberic.crypto.EncryptionManager.getEncryptionUtils(mbp);
     }
+
+    if (utils != null) 
+      return utils.extractKeys(mbp);
+    else
+      return null;
   }
-  
+
 }
