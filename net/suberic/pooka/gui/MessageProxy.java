@@ -45,6 +45,48 @@ public class MessageProxy {
 
     public Action[] defaultActions;
 
+    /**
+     * This class should make it easy for us to sort subjects correctly.
+     * It stores both the subject String itself and a sortingString which
+     * is taken to lowercase and also has all of the starting 're:' characters
+     * removed.
+     */
+    public class SubjectLine implements Comparable {
+	String subject;
+	String sortingSubject;
+
+	/**
+	 * Constructor.
+	 */
+	public SubjectLine(String newSubject) {
+	    subject = newSubject;
+	    sortingSubject = subject.toLowerCase();
+	    int cutoffPoint = 0;
+	    while(sortingSubject.startsWith("re:", cutoffPoint)) {
+		for(cutoffPoint = cutoffPoint + 3; cutoffPoint > sortingSubject.length() && Character.isWhitespace(sortingSubject.charAt(cutoffPoint)); cutoffPoint++) { }
+	    }
+	    if (cutoffPoint != 0)
+		sortingSubject = sortingSubject.substring(cutoffPoint);
+	}
+
+	/**
+	 * Compare function.
+	 */
+	public int compareTo(Object o) {
+	    if (o instanceof SubjectLine) {
+		return sortingSubject.compareTo(((SubjectLine)o).sortingSubject);
+	    } else
+		return sortingSubject.compareToIgnoreCase(o.toString());
+	}
+
+	/**
+	 * toString() just returns the original subject.
+	 */
+	public String toString() {
+	    return subject;
+	}
+    }
+
     protected MessageProxy() {
     }
 
@@ -172,7 +214,7 @@ public class MessageProxy {
 	    } else if (prop.equals("Date")) {
 		return msg.getSentDate();
 	    } else if (prop.equals("Subject")) {
-		return msg.getSubject();
+		return new SubjectLine(msg.getSubject());
 	    } 
 	    
 	} catch (MessagingException me) {

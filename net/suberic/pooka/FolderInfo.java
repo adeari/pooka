@@ -47,6 +47,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private FolderTracker folderTracker = null;
 
     private boolean loaded = false;
+    private boolean loading = false;
     private boolean available = true;
     private boolean open = false;
     private boolean unread = false;
@@ -94,13 +95,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * parent Store.
      */
     public void loadFolder() {
-	if (isLoaded())
+	if (isLoaded() || loading)
 	    return;
 
 	Folder[] tmpFolder;
 	Folder tmpParentFolder;
 	
 	try {
+	    loading = true;
 	    if (parentStore != null) {
 		try {
 		    if (!parentStore.isConnected())
@@ -135,7 +137,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    loaded = false;
 	    open = false;
 	    folder = null;
-	} 
+	} finally {
+	    loading = false;
+	}
 	
 	if (folder != null) {
 	    initializeFolderInfo();
