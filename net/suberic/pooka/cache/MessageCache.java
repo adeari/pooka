@@ -75,7 +75,7 @@ public interface MessageCache {
      * This method changes both the client cache as well as the server, if
      * the server is available.
      */
-    public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException;
+    //public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException;
 
     /**
      * Removes all messages marked as 'DELETED'  from the given folder.  
@@ -106,4 +106,15 @@ public interface MessageCache {
      * cached for a message to be considered in the cache.
      */
     public long[] getMessageUids();
+
+    /**
+     * This returns the number of messages in the cache.
+     */
+    public int getMessageCount() throws MessagingException;
+
+    /**
+     * This returns the number of unread messages in the cache.
+     */
+    public int getUnreadMessageCount() throws MessagingException;
+
 }

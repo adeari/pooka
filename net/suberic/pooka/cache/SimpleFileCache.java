@@ -28,7 +28,7 @@ public class SimpleFileCache implements MessageCache {
     public static String FLAG_EXT = "flag";
     
     // the source FolderInfo.
-    private FolderInfo folderInfo;
+    private CachingFolderInfo folderInfo;
 
     // the directory in which the cache is stored.
     private File cacheDir;
@@ -49,7 +49,7 @@ public class SimpleFileCache implements MessageCache {
      * directory provided.
      */
 
-    public SimpleFileCache(FolderInfo folder, String directoryName) throws IOException {
+    public SimpleFileCache(CachingFolderInfo folder, String directoryName) throws IOException {
 	folderInfo = folder;
 	cacheDir = new File(directoryName);
 	if ( ! cacheDir.exists() )
@@ -271,6 +271,7 @@ public class SimpleFileCache implements MessageCache {
 	return true;
     }
 
+
     /**
      * Adds the messages to the given folder.  Returns the uids for the 
      * message.  Uses the status to determine how much of the message
@@ -279,6 +280,8 @@ public class SimpleFileCache implements MessageCache {
      * This method changes both the client cache as well as the server, if
      * the server is available.
      */
+    
+    /*
     public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException {
 	if (getFolderInfo().isAvailable()) {
 	    getFolderInfo().appendMessages(msgs);
@@ -286,7 +289,8 @@ public class SimpleFileCache implements MessageCache {
 	    throw new MessagingException("Error:  cannot append to an unavailable folder.");
 	}
     }
-    
+    */
+
     /**
      * Removes all messages marked as 'DELETED'  from the given folder.  
      * Returns the uids of all the removed messages.
@@ -301,7 +305,7 @@ public class SimpleFileCache implements MessageCache {
 	if (getFolderInfo().isAvailable()) {
 	    getFolderInfo().expunge();
 	} else {
-	    throw new MessagingException("Error:  cannot expunge an available folder.");
+	    throw new MessagingException("Error:  cannot expunge an unavailable folder.");
 	}
     }
 
@@ -500,7 +504,7 @@ public class SimpleFileCache implements MessageCache {
 	}
     }	    
 
-    public FolderInfo getFolderInfo() {
+    public CachingFolderInfo getFolderInfo() {
 	return folderInfo;
     }
 
@@ -540,7 +544,29 @@ public class SimpleFileCache implements MessageCache {
 	    }
 	}
     }
-	
+
+    /**
+     * This returns the number of messages in the cache.
+     */
+    public int getMessageCount() {
+	return cachedMessages.size();
+    }
+    
+    /**
+     * This returns the number of unread messages in the cache.
+     */
+    public int getUnreadMessageCount() throws MessagingException {
+	// sigh.
+	int unreadCount = 0;
+	for (int i = 0; i < cachedMessages.size(); i++) {
+	    Message m = (Message) cachedMessages.elementAt(i);
+	    if (m.isSet(Flags.Flag.SEEN))
+		unreadCount++;
+	}
+
+	return unreadCount;
+    }
+
 }
 
 

@@ -16,9 +16,9 @@ import java.io.ByteArrayInputStream;
 public class CachingMimeMessage extends MimeMessage {
 
     long uid;
-    FolderInfo parent;
+    CachingFolderInfo parent;
     
-    public CachingMimeMessage(FolderInfo parentFolderInfo, long newUid) {
+    public CachingMimeMessage(CachingFolderInfo parentFolderInfo, long newUid) {
 	super(Pooka.getDefaultSession());
 	uid = newUid;
 	parent = parentFolderInfo;

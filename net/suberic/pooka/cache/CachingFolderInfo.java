@@ -1,7 +1,12 @@
 package net.suberic.pooka.cache;
 import javax.mail.*;
+import javax.mail.event.MessageCountEvent;
 import javax.mail.internet.MimeMessage;
 import net.suberic.pooka.*;
+import java.util.Vector;
+import java.util.StringTokenizer;
+import net.suberic.pooka.gui.MessageProxy;
+import net.suberic.pooka.gui.FolderTableModel;
 
 /**
  * A FolderInfo which caches its messages in a MessageCache.
@@ -13,8 +18,23 @@ public class CachingFolderInfo extends FolderInfo {
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
 	
-	cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
+	try {
+	    cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
+	} catch (java.io.IOException ioe) {
+	    System.out.println("Error creating cache!");
+	    ioe.printStackTrace();
+	}
+    }
 
+    public CachingFolderInfo(FolderInfo parent, String fname) {
+	super(parent, fname);
+	
+	try {
+	    cache = new SimpleFileCache(this, Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
+	} catch (java.io.IOException ioe) {
+	    System.out.println("Error creating cache!");
+	    ioe.printStackTrace();
+	}
     }
 
     /**
@@ -23,65 +43,13 @@ public class CachingFolderInfo extends FolderInfo {
      * said FolderTableModel.  This is the basic way to populate a new
      * FolderTableModel.
      */
-    public FolderTableModel loadAllMessages() {
-	String tableType;
-
-	if (isSentFolder())
-	    tableType="SentFolderTable";
-	else
-	    tableType="FolderTable";
-
+    public net.suberic.pooka.gui.FolderTableModel loadAllMessages() {
 	Vector messageProxies = new Vector();
 
-	FetchProfile fp = new FetchProfile();
-	fp.add(FetchProfile.Item.FLAGS);
-	if (columnValues == null) {
-	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
-	    Vector colvals = new Vector();
-	    Vector colnames = new Vector();
-	    Vector colsizes = new Vector();
-	    
-	    String tmp;
-	
-	    while (tokens.hasMoreElements()) {
-		tmp = (String)tokens.nextElement();
-		String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
-		if (type.equalsIgnoreCase("Multi")) {
-		    SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
-		    colvals.addElement(stm);
-		    Vector toFetch = Pooka.getResources().getPropertyAsVector(tableType + "." + tmp + ".profileItems", "");
-		    if (toFetch != null) {
-			for (int z = 0; z < toFetch.size(); z++) {
-			    String profileDef = (String) toFetch.elementAt(z);
-			    if (profileDef.equalsIgnoreCase("Flags"))
-				fp.add(FetchProfile.Item.FLAGS);
-			    else if (profileDef.equalsIgnoreCase("Envelope"))
-				fp.add(FetchProfile.Item.ENVELOPE);
-			    else if (profileDef.equalsIgnoreCase("Content_Info"))
-				fp.add(FetchProfile.Item.CONTENT_INFO);
-			    else
-				fp.add(profileDef);
-			}
-		    }
-		} else if (type.equalsIgnoreCase("RowCounter")) {
-		    colvals.addElement(RowCounter.getInstance());
-		} else {
-		    String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
-		    colvals.addElement(value);
-		    fp.add(value);
-		}
-
-		colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
-		colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
-	    }	    
-	    setColumnNames(colnames);
-	    setColumnValues(colvals);
-	    setColumnSizes(colsizes);
-	}
-	    
+	FetchProfile fp = createColumnInformation();
 	if (loaderThread == null) 
 	    loaderThread = createLoaderThread();
-
+	    
 	try {
 	    if (!(getFolder().isOpen())) {
 		openFolder(Folder.READ_WRITE);
@@ -90,11 +58,12 @@ public class CachingFolderInfo extends FolderInfo {
 	    long[] uids = cache.getMessageUids();
 	    MessageInfo mi;
 	    
-	    for (int i = 0; i < msgs.length; i++) {
-		mi = new MessageInfo(new CachingMimeMessage(uids[i],this), this);
+	    for (int i = 0; i < uids.length; i++) {
+		Message m = new CachingMimeMessage(this, uids[i]);
+		mi = new MessageInfo(m, this);
 		
 		messageProxies.add(new MessageProxy(getColumnValues() , mi));
-		messageToInfoTable.put(msgs[i], mi);
+		messageToInfoTable.put(m, mi);
 	    }
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
@@ -109,6 +78,15 @@ public class CachingFolderInfo extends FolderInfo {
 	
 	if (!loaderThread.isAlive())
 	    loaderThread.start();
+	
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		    try {
+			synchronizeCache();
+		    } catch (MessagingException me) {
+		    }
+		}
+	    }, getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-count-changed"));
 	
 	return ftm;
     }
@@ -126,28 +104,68 @@ public class CachingFolderInfo extends FolderInfo {
 	// i'm taking this almost directly from ICEMail; i don't know how
 	// to keep the stores/folders open, either.  :)
 
+	StoreInfo s = null;
 	try {
+	    
 	    if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
-		StoreInfo s = getParentStore();
+		s = getParentStore();
 		if (! s.isConnected())
 		    s.connectStore();
 		
 		openFolder(Folder.READ_WRITE);
-		
-		
 	    }
-	    
+
+	    synchronizeCache();
+	    if (isAvailable() && status == PASSIVE)
+		closeFolder(false);
+
 	} catch ( MessagingException me ) {
-	    try {
-		if ( ! s.isConnected() )
-		    s.connect();
-	    } catch ( MessagingException me2 ) {
-	    }
-	}	    
+	}
 	
 	resetMessageCounts();
     }
 
+    /**
+     * Gets the row number of the first unread message.  Returns -1 if
+     * there are no unread messages, or if the FolderTableModel is not
+     * set or empty.
+     */
+    
+    public int getFirstUnreadMessage() {
+	// one part brute, one part force, one part ignorance.
+
+	if (Pooka.isDebug())
+	    System.out.println("getting first unread message");
+
+	if (getFolderTableModel() == null)
+	    return -1;
+
+	try {
+	    int countUnread = 0;
+	    int i;
+	    int unreadCount = cache.getUnreadMessageCount();
+	    if (unreadCount > 0) {
+		long[] uids = getCache().getMessageUids();
+		for (i = uids.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
+		    if (!(getMessageById(uids[i]).isSet(Flags.Flag.SEEN))) 
+			countUnread++;
+		}
+		if (Pooka.isDebug())
+		    System.out.println("Returning " + i);
+		return i + 1;
+	    } else { 
+		if (Pooka.isDebug())
+		    System.out.println("Returning -1");
+		return -1;
+	    }
+	} catch (MessagingException me) {
+	    if (Pooka.isDebug())
+		System.out.println("Messaging Exception.  Returning -1");
+	    return -1;
+	}
+
+    }
+    
     /**
      * This synchronizes the cache with the new information from the 
      * Folder.
@@ -158,8 +176,99 @@ public class CachingFolderInfo extends FolderInfo {
 	for (int i = 0; i < messages.length; i++) {
 	    uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
 	}
+	
+	long[] addedUids = cache.getAddedMessages(uids);
+	if (addedUids.length > 0) {
+	    Message[] addedMsgs = new Message[addedUids.length];
+	    for (int i = 0 ; i < addedUids.length; i++) {
+		addedMsgs[i] = new CachingMimeMessage(this, addedUids[i]);
+	    }
+	    MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.ADDED, false, addedMsgs);
+	    messagesAdded(mce);
+	}    
+
+	long[] removedUids = cache.getRemovedMessages(uids);
+	if (removedUids.length > 0) {
+	    Message[] removedMsgs = new Message[removedUids.length];
+	    for (int i = 0 ; i < removedUids.length; i++) {
+		removedMsgs[i] = getMessageById(removedUids[i]);
+	    }
+	    MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.REMOVED, false, removedMsgs);
+	    messagesRemoved(mce);
+	    
+	}
+    }
+
+    /**
+     * This sets the given Flag for all the MessageInfos given.
+     */
+    public void setFlags(MessageInfo[] msgs, Flags flag, boolean value) throws MessagingException {
+	// no optimization here.
+	for (int i = 0; i < msgs.length; i++) {
+	    msgs[i].getRealMessage().setFlags(flag, value);
+	}
+    }
+
+    /**
+     * This copies the given messages to the given FolderInfo.
+     */
+    public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+	targetFolder.appendMessages(msgs);
+    }
+
+    /**
+     * This appends the given message to the given FolderInfo.
+     */
+    public void appendMessages(MessageInfo[] msgs) throws MessagingException {
+	if (isAvailable()) {
+	    super.appendMessages(msgs);
+	} else {
+	    throw new MessagingException("cannot append messages to an unavailable folder.");
+	}
     }
     
+    /**
+     * This expunges the deleted messages from the Folder.
+     */
+    public void expunge() throws MessagingException {
+	if (isAvailable())
+	    getFolder().expunge();
+	else
+	    throw new MessagingException("Error:  cannot expunge an unavailable Folder.");
+    }
+
+    /**
+     * This updates the children of the current folder.  Generally called
+     * when the folderList property is changed.
+     */
+    
+    public void updateChildren() {
+	Vector newChildren = new Vector();
+
+	String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
+	if (childList != "") {
+	    StringTokenizer tokens = new StringTokenizer(childList, ":");
+	    
+	    String newFolderName;
+	
+	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+		newFolderName = (String)tokens.nextToken();
+		FolderInfo childFolder = getChild(newFolderName);
+		if (childFolder == null) {
+		    childFolder = new CachingFolderInfo(this, newFolderName);
+		    newChildren.add(childFolder);
+		} else {
+		    newChildren.add(childFolder);
+		}
+	    }
+       
+	    children = newChildren;
+	    
+	    if (folderNode != null) 
+		folderNode.loadChildren();
+	}
+    }
+
     /**
      * This returns the MessageCache associated with this FolderInfo,
      * if any.
@@ -169,8 +278,9 @@ public class CachingFolderInfo extends FolderInfo {
     }
     
     public javax.mail.internet.MimeMessage getMessageById(long uid) throws MessagingException {
-	if (folder != null && folder instanceof UIDFolder) {
-	    javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage) ((UIDFolder) folder).getMessageByUID(uid);
+	Folder f = getFolder();
+	if (f != null && f instanceof UIDFolder) {
+	    javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
 	    return m;
 	}
 	return null;
