@@ -150,7 +150,7 @@ public class AttachmentPane extends JPanel {
 	}
 	
       } catch (IOException ioe) {
-	getMessageUI().showError("Error saving file:  " + ioe.getMessage());
+	showError("Error saving file", ioe);
 	cancelSave();
       } finally {
 	if (outStream != null) {
@@ -169,7 +169,11 @@ public class AttachmentPane extends JPanel {
      */
     public ProgressDialog createDialog(int attachmentSize) {
       ProgressDialog dlg;
-      dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, saveFile.getName(), saveFile.getName());
+      if (getMessageUI() != null) {
+	dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, saveFile.getName(), saveFile.getName());
+      } else {
+	dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, saveFile.getName(), saveFile.getName());
+      }
 
       dlg.addCancelListener(new ProgressDialogListener() {
 	  public void dialogCancelled() {
@@ -352,7 +356,7 @@ public class AttachmentPane extends JPanel {
 	      jtp.setEditable(false);
 	      openAttachmentWindow(new JScrollPane(jtp), attachment.getName(), true);
 	    } catch (IOException ioe) {
-	      message.getMessageUI().showError("Error showing attachment:  ", ioe);
+	      showError("Error showing attachment:  ", ioe);
 	    }
 	  } else if (cmds[0].getCommandClass().equals("net.suberic.pooka.ExternalLauncher")) {
 	    try {
@@ -497,7 +501,11 @@ public class AttachmentPane extends JPanel {
       Object[] messageArray = new Object[2];
       messageArray[0] = inputMessage;
       messageArray[1] = togglePanel;
-      String cmd = getMessageUI().showInputDialog(messageArray, inputTitle);
+      String cmd = null;
+      if (getMessageUI() != null)
+	cmd = getMessageUI().showInputDialog(messageArray, inputTitle);
+      else
+	cmd = Pooka.getUIFactory().showInputDialog(messageArray, inputTitle);
       
       if (cmd != null) {
 	if (cmd.indexOf("%s") == -1)
@@ -519,7 +527,7 @@ public class AttachmentPane extends JPanel {
 	}
       }
     } catch (Exception e) {
-      //
+      e.printStackTrace();
     }
   }
   
@@ -548,7 +556,7 @@ public class AttachmentPane extends JPanel {
 	try {
 	  saveFileAs(attachment, saveChooser.getSelectedFile());
 	} catch (IOException exc) {
-	  message.getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+	  showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
 	}
       }
     }
@@ -671,6 +679,32 @@ public class AttachmentPane extends JPanel {
   
   public MessageUI getMessageUI() {
     return message.getMessageUI();
+  }
+
+  /**
+   * Shows an error message, either on the MessageUI if there is one, or
+   * if not, on the main Pooka frame.
+   */
+  public void showError(String message, Exception ioe) {
+    MessageUI mui = getMessageUI();
+    if (mui != null) {
+      mui.showError(message,ioe);
+    } else {
+      Pooka.getUIFactory().showError(message,ioe);
+    }
+  }
+
+  /**
+   * Shows an error message, either on the MessageUI if there is one, or
+   * if not, on the main Pooka frame.
+   */
+  public void showError(String message, String title, Exception ioe) {
+    MessageUI mui = getMessageUI();
+    if (mui != null) {
+      mui.showError(message, title, ioe);
+    } else {
+      Pooka.getUIFactory().showError(message, title, ioe);
+    }
   }
 
   //------------------------------------//

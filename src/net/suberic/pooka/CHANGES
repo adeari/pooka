@@ -1,3 +1,7 @@
+optimized loading/displaying of new messages in disconnected imap mode.
+
+fixed opening attachments from preview panel.
+
 added a fastDelete option (enabled by default) which auto-selects the next
 message when a delete is requested, instead of waiting for the delete to
 complete.

@@ -7,7 +7,6 @@
 
 -----
 *) make attachments openable from the messge panel.
-*) check opening attachments from preview pane 
 *) windows attachments associated with correct item (icemail lib)
 
 *) queuing of outgoing mails
@@ -21,6 +20,15 @@
 			-- started.  make sure it's enough.
 *) add support for jdk1.4
 	-- NetworkInterface classes
+
+*) -- windows --
+  *) support windows registry attachment associations.
+	-- check icemail
+	-- more or less added, but need to be able to access the library.
+*) printing in windows can leave control characters at the end of lines
+	-- test.  shouldn't happen anymore.
+
+---
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -39,13 +47,6 @@
 	*) save attachment?
 
 *) add support for saved searches.
-
-*) -- windows --
-  *) support windows registry attachment associations.
-	-- check icemail
-	-- more or less added, but need to be able to access the library.
-*) printing in windows can leave control characters at the end of lines
-	-- test.  shouldn't happen anymore.
 
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
