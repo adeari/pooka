@@ -34,6 +34,10 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
   CryptoStatusDisplay cryptoDisplay = null;
   Container cryptoPanel = null;
 
+  JScrollPane customHeaderScrollPane = null;
+  Container customHeaderPane = null;
+  JToggleButton customHeaderButton = null;
+
   /**
    * Creates a NewMessageDisplayPanel from the given Message.
    */
@@ -216,9 +220,24 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     JLabel userProfileLabel = new JLabel(Pooka.getProperty("UserProfile.label","User:"), SwingConstants.RIGHT);
     userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
     JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
+    customHeaderButton = new JToggleButton();
+
+    customHeaderButton.addChangeListener(new ChangeListener() {
+
+        public void stateChanged(ChangeEvent e) {
+	  if (customHeaderButton.isSelected()) {
+	    selectCustomHeaderPane();
+	  } else {
+	    removeCustomHeaderPane();
+	  }
+	}
+
+      });
+
     inputRow.add(userProfileLabel);
     inputRow.add(profileCombo);
-    
+    inputRow.add(customHeaderButton);
+
     UserProfile selectedProfile = Pooka.getMainPanel().getCurrentUser();
     
     if (selectedProfile != null)
@@ -283,82 +302,82 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     return inputPanel;
   }
   
-    /**
-     * This creates a new JTextPane for the main text part of the new 
-     * message.  It will also include the current text of the message.
-     */
-    public JTextPane createMessagePanel(MessageProxy aMsg) {
-	JTextPane retval = new net.suberic.util.swing.ExtendedEditorPane();
-	retval.setEditorKit(new MailEditorKit());
-
-	setDefaultFont(retval);
-
-	// see if this message already has a text part, and if so,
-	// include it.
+  /**
+   * This creates a new JTextPane for the main text part of the new 
+   * message.  It will also include the current text of the message.
+   */
+  public JTextPane createMessagePanel(MessageProxy aMsg) {
+    JTextPane retval = new net.suberic.util.swing.ExtendedEditorPane();
+    retval.setEditorKit(new MailEditorKit());
+    
+    setDefaultFont(retval);
+    
+    // see if this message already has a text part, and if so,
+    // include it.
+    
+    String origText = ((NewMessageInfo)getMessageProxy().getMessageInfo()).getTextPart(false);
+    if (origText != null && origText.length() > 0) 
+      retval.setText(origText);
+    
+    UserProfile profile = getSelectedProfile();
+    if (profile.autoAddSignature) {
+      retval.setCaretPosition(retval.getDocument().getLength());
+      if (profile.signatureFirst) {
 	
-	String origText = ((NewMessageInfo)getMessageProxy().getMessageInfo()).getTextPart(false);
-	if (origText != null && origText.length() > 0) 
-	    retval.setText(origText);
-	
-	UserProfile profile = getSelectedProfile();
-	if (profile.autoAddSignature) {
-	    retval.setCaretPosition(retval.getDocument().getLength());
-	    if (profile.signatureFirst) {
-
-	    }
-	    addSignature(retval);
-
-	}
-
-	// bodyInputPane.setContentType("text");
-	return retval;
-
-    }
-
-    /**
-     * This adds the current user's signature to the message at the current
-     * location of the cursor.
-     */
-    public void addSignature(JEditorPane editor) {
-	String sig = getSelectedProfile().getSignature();
-	if (sig != null) {
-	    try {
-		editor.getDocument().insertString(editor.getCaretPosition(), sig, null);
-	    } catch (javax.swing.text.BadLocationException ble) {
-		;
-	    }
-	}
-    }
-
-    /**
-     * This returns the values in the MesssageWindow as a set of 
-     * InternetHeaders.
-     */
-    public InternetHeaders getMessageHeaders() throws MessagingException {
-      InternetHeaders returnValue = new InternetHeaders();
-      String key;
-      
-      Enumeration keys = inputTable.keys();
-      while (keys.hasMoreElements()) {
-	key = (String)(keys.nextElement());
-	
-	if (! key.equals("UserProfile")) {
-	  String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
-	
-	  EntryTextArea inputField = (EntryTextArea) inputTable.get(key);
-	  String value = null;
-	  if (inputField instanceof AddressEntryTextArea) {
-	    value = ((AddressEntryTextArea) inputField).getParsedAddresses();
-	    value = ((NewMessageInfo)getMessageProxy().getMessageInfo()).convertAddressLine(value, getSelectedProfile());
-	  } else {
-	    value = ((EntryTextArea)(inputTable.get(key))).getText();
-	  }
-
-	  returnValue.setHeader(header, value);
-	}
       }
-      return returnValue;
+      addSignature(retval);
+      
     }
+    
+    // bodyInputPane.setContentType("text");
+    return retval;
+    
+  }
+  
+  /**
+   * This adds the current user's signature to the message at the current
+   * location of the cursor.
+   */
+  public void addSignature(JEditorPane editor) {
+    String sig = getSelectedProfile().getSignature();
+    if (sig != null) {
+      try {
+	editor.getDocument().insertString(editor.getCaretPosition(), sig, null);
+      } catch (javax.swing.text.BadLocationException ble) {
+	;
+      }
+    }
+  }
+  
+  /**
+   * This returns the values in the MesssageWindow as a set of 
+   * InternetHeaders.
+   */
+  public InternetHeaders getMessageHeaders() throws MessagingException {
+    InternetHeaders returnValue = new InternetHeaders();
+    String key;
+    
+    Enumeration keys = inputTable.keys();
+    while (keys.hasMoreElements()) {
+      key = (String)(keys.nextElement());
+      
+      if (! key.equals("UserProfile")) {
+	String header = new String(Pooka.getProperty("MessageWindow.Header." + key + ".MIMEHeader", key));
+	
+	EntryTextArea inputField = (EntryTextArea) inputTable.get(key);
+	String value = null;
+	if (inputField instanceof AddressEntryTextArea) {
+	  value = ((AddressEntryTextArea) inputField).getParsedAddresses();
+	  value = ((NewMessageInfo)getMessageProxy().getMessageInfo()).convertAddressLine(value, getSelectedProfile());
+	} else {
+	  value = ((EntryTextArea)(inputTable.get(key))).getText();
+	}
+	
+	returnValue.setHeader(header, value);
+      }
+    }
+    return returnValue;
+  }
   
   /**
    * This notifies the MessageDisplayPanel that an attachment has been added
@@ -449,7 +468,32 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
     tabbedPane.add(Pooka.getProperty("MessageWindow.EncryptionTab", "Encryption"), cryptoPanel);
   }
-  
+
+  /**
+   * Creates a new CustomHeaderPane.
+   */
+  public Container createCustomHeaderPane() {
+    return new JPanel();
+  }
+
+  /**
+   * Selects the custom header pane.
+   */
+  public void selectCustomHeaderPane() {
+    if (customHeaderPane == null) {
+      customHeaderPane = createCustomHeaderPane();
+      customHeaderScrollPane = new JScrollPane(customHeaderPane);
+    }
+    tabbedPane.setSelectedComponent(customHeaderScrollPane);
+  }
+
+  /**
+   * Removes the custom header pane, if any.
+   */
+  public void removeCustomHeaderPane() {
+
+  }
+
   /**
    * This removes the AttachmentPane from the JTabbedPane.
    */
@@ -767,7 +811,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	}
     }
 
-    /**
+  /**
    * Selects the Attachment panel.
    */
   public class AttachmentPanelAction extends AbstractAction {
@@ -796,6 +840,20 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     }
   }
 
+  /**
+   * Creates a new CustomHeaderEditorPane if there is not one alrady, and 
+   * then selects it.
+   */
+  public class CustomHeaderPanelAction extends AbstractAction {
+    CustomHeaderPanelAction() {
+      super("message-custom-headers");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      customHeaderButton.setSelected(true);
+    }
+  }
+  
 }
 
 
