@@ -17,7 +17,12 @@ public class Pooka {
 
     static public StoreManager storeManager;
 
+    static public boolean openFolders = true;
+
     static public void main(String argv[]) {
+
+	parseArgs(argv);
+
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
 
 	try {
@@ -62,11 +67,27 @@ public class Pooka {
 	    NewAccountPooka nap = new NewAccountPooka(panel.getMessagePanel());
 	    nap.start();
 	} else {
-	    if (getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true"))
+	    if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true"))
 		panel.getMessagePanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
 	}
 
 	panel.refreshActiveMenus();
+    }
+
+    /**
+     * This parses any command line arguments, and makes the appropriate
+     * changes.
+     */
+    public static void parseArgs(String[] argv) {
+	if (argv == null || argv.length < 1)
+	    return;
+
+	for (int i = 0; i < argv.length; i++) {
+	    if (argv[i] != null) {
+		if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders"))
+		    openFolders = false;
+	    }
+	}
     }
 
     static public String getProperty(String propName, String defVal) {
