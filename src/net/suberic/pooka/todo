@@ -1,9 +1,6 @@
 *) bug:  can't switch back to original theme in theme configuration (starts
 	as Metal, goes to GTK with Apply, then goes back to Metal with Apply).
 
-*) connecting when server is down:  connection refused error message
-	really terribly formatted.
-
 *) support jdk 1.5
    *) JOptionPane error on initial startup; hangs.
 	done?  test?
@@ -88,6 +85,7 @@
 say, like reacting to a mailto: link.
 
 -----
+*) virtual folder support <sigh>
 
 *) test w/gnu javamail -- ???
 *) test w/javamail 1.3.2.

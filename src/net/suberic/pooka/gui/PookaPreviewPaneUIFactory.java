@@ -25,7 +25,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 
   public boolean showing = false;
 
-  int maxErrorLine = 40;
+  int maxErrorLine = 50;
 
   /**
    * Constructor.
