@@ -1,3 +1,5 @@
+030530 release
+--------------
 
 fixed a few cache synchronization bugs in disconnected mode.
 
