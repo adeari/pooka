@@ -219,10 +219,14 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
      * This makes the FolderNode visible in its parent JTree.
      */
     public void makeVisible() {
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
 	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	TreeNode[] nodeList = ((DefaultTreeModel)folderTree.getModel()).getPathToRoot(this);
+	TreeNode[] nodeList = ((DefaultTreeModel)folderTree.getModel()).getPathToRoot(FolderNode.this);
 	TreePath path = new TreePath(nodeList);
 	folderTree.makeVisible(path);
+		}
+	    });
     }
 
     public void messageChanged(MessageChangedEvent mce) {
