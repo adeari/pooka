@@ -108,61 +108,66 @@ public class SimpleFileCache implements MessageCache {
     return getDataHandler(uid, uidValidity, true);
     }
     
-    /**
-     * Adds the given Flags to the message with the given uid.
-     *
-     * This affects both the client cache as well as the message on the
-     * server, if the server is available.
-     */
-    public void addFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
-      if (newUidValidity != uidValidity) {
-	throw new StaleCacheException(uidValidity, newUidValidity);
-      }
+  /**
+   * Adds the given Flags to the message with the given uid.
+   *
+   * This affects both the client cache as well as the message on the
+   * server, if the server is available.
+   */
+  public void addFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
+    if (newUidValidity != uidValidity) {
+      throw new StaleCacheException(uidValidity, newUidValidity);
+    }
+    
+    Flags f = getFlags(uid, newUidValidity);
+    if (f != null) {
+      f.add(flag);
+    } else {
+      f = flag;
+    }
+    
+    if (getFolderInfo().shouldBeConnected()) {
+      MimeMessage m = getFolderInfo().getRealMessageById(uid);
+      if (m != null)
+	m.setFlags(flag, true);
 
-      Flags f = getFlags(uid, newUidValidity);
-      if (f != null) {
-	f.add(flag);
-      } else {
-	f = flag;
-      }
+      saveFlags(uid, uidValidity, f);
+      
+    } else {
+      writeToChangeLog(uid, flag, ADDED);
+      
+      saveFlags(uid, uidValidity, f);
+      getFolderInfo().messageChanged(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getFolderInfo().getMessageInfoByUid(uid).getMessage()));
+    }
+    
+  }
+  
+  /**
+   * Removes the given Flags from the message with the given uid.
+   *
+   * This affects both the client cache as well as the message on the
+   * server, if the server is available.
+   */
+  public void removeFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
+    if (newUidValidity != uidValidity) {
+      throw new StaleCacheException(uidValidity, newUidValidity);
+    }
+    Flags f = getFlags(uid, newUidValidity);
+    if (f != null) {
+      f.remove(flag);
       
       if (getFolderInfo().shouldBeConnected()) {
 	MimeMessage m = getFolderInfo().getRealMessageById(uid);
 	if (m != null)
-	  m.setFlags(flag, true);
+	  m.setFlags(flag, false);
+	saveFlags(uid, uidValidity, f);
       } else {
-	writeToChangeLog(uid, flag, ADDED);
-	getFolderInfo().messageChanged(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getFolderInfo().getMessageInfoByUid(uid).getMessage()));
+	saveFlags(uid, uidValidity, f);
+	writeToChangeLog(uid, flag, REMOVED);
       }
       
-      saveFlags(uid, uidValidity, f);
     }
-
-    /**
-     * Removes the given Flags from the message with the given uid.
-     *
-     * This affects both the client cache as well as the message on the
-     * server, if the server is available.
-     */
-    public void removeFlag(long uid, long newUidValidity, Flags flag) throws MessagingException {
-	if (newUidValidity != uidValidity) {
-	    throw new StaleCacheException(uidValidity, newUidValidity);
-	}
-	Flags f = getFlags(uid, newUidValidity);
-	if (f != null) {
-	    f.remove(flag);
-
-	    if (getFolderInfo().shouldBeConnected()) {
-		MimeMessage m = getFolderInfo().getRealMessageById(uid);
-		if (m != null)
-		    m.setFlags(flag, false);
-	    } else {
-		writeToChangeLog(uid, flag, REMOVED);
-	    }
-	    
-	    saveFlags(uid, uidValidity, f);
-	}
-    }
+  }
 
   /**
    * Returns the InternetHeaders object for the given uid.
@@ -738,34 +743,34 @@ public class SimpleFileCache implements MessageCache {
     }
   }
 
-    /**
-     * Writes any offline changes made back to the server.
-     */
-    public void writeChangesToServer(Folder f) throws MessagingException {
-	try {
-	    getChangeAdapter().writeChanges((UIDFolder) f, getFolderInfo());
-	} catch (IOException ioe) {
-	    throw new MessagingException(net.suberic.pooka.Pooka.getProperty("error.couldNotGetChanges", "Error:  could not get cached changes."), ioe);
-	}
+  /**
+   * Writes any offline changes made back to the server.
+   */
+  public void writeChangesToServer(Folder f) throws MessagingException {
+    try {
+      getChangeAdapter().writeChanges((UIDFolder) f, getFolderInfo());
+    } catch (IOException ioe) {
+      throw new MessagingException(net.suberic.pooka.Pooka.getProperty("error.couldNotGetChanges", "Error:  could not get cached changes."), ioe);
     }
-
-    public CachingFolderInfo getFolderInfo() {
-	return folderInfo;
-    }
-
-    /**
-     * Returns the size of the given message, or -1 if the message is
-     * not cached.
-     */
-    public int getSize(long uid) {
-	File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
-	if (! f.exists()) {
-	    return (int)f.length();
-	} else
-	    return -1;
-	    
-    }
-
+  }
+  
+  public CachingFolderInfo getFolderInfo() {
+    return folderInfo;
+  }
+  
+  /**
+   * Returns the size of the given message, or -1 if the message is
+   * not cached.
+   */
+  public int getSize(long uid) {
+    File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
+    if (! f.exists()) {
+      return (int)f.length();
+    } else
+      return -1;
+    
+  }
+  
     private class CacheID {
 	long id;
 	long lastAccessed;

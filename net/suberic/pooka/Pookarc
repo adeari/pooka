@@ -4,6 +4,9 @@
 Pooka.debug=false
 Pooka.sessionDebug=false
 
+Pooka.useLocalFiles=true
+#Pooka.useLocalFiles=false
+
 Pooka.cacheDirectory=~/Mail/pooka
 Pooka.autoCache=true
 Pooka.autoPreview=true

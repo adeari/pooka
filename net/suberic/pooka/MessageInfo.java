@@ -141,8 +141,12 @@ public class MessageInfo {
   public Object getMessageProperty(String prop) throws MessagingException {
     Message msg = getMessage();
     if (prop.equals("From")) {
-      Address[] fromAddr = msg.getFrom();
-      return MailUtilities.decodeAddressString(fromAddr);
+      try {
+	Address[] fromAddr = msg.getFrom();
+	return MailUtilities.decodeAddressString(fromAddr);
+      } catch (javax.mail.internet.AddressException ae) {
+	return ((MimeMessage) msg).getHeader("From", ",");
+      }
     } else if (prop.equalsIgnoreCase("receivedDate")) {
       return msg.getReceivedDate();
     } else if (prop.equalsIgnoreCase("recipients")) {
@@ -381,36 +385,37 @@ public class MessageInfo {
 	moveMessage(targetFolder, Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
     }
 
-    /**
-     * Deletes the Message from the current Folder.  If a Trash folder is
-     * set, this method moves the message into the Trash folder.  If no
-     * Trash folder is set, this marks the message as deleted.  In addition,
-     * if the autoExpunge variable is set to true, it also expunges
-     * the message from the mailbox.
-     */
-    public void deleteMessage(boolean autoExpunge) throws MessagingException {
-	FolderInfo trashFolder = getFolderInfo().getTrashFolder();
-	if ((getFolderInfo().useTrashFolder()) && (trashFolder != null) && (trashFolder != getFolderInfo())) {
-	    try {
-		moveMessage(trashFolder, autoExpunge);
-	    } catch (MessagingException me) {
-		throw new MessagingException(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "No trash folder available."),  me);
-	    }
-	} else {
-	    
-	    // actually remove the message, if we haven't already moved it.
-	    
-	    try {
-		remove(autoExpunge);
-	    } catch (MessagingException me) {
-		throw new MessagingException(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", me);
-	    }   
-	}
-
-	if (getMessageProxy() != null)
-	    getMessageProxy().close();
+  /**
+   * Deletes the Message from the current Folder.  If a Trash folder is
+   * set, this method moves the message into the Trash folder.  If no
+   * Trash folder is set, this marks the message as deleted.  In addition,
+   * if the autoExpunge variable is set to true, it also expunges
+   * the message from the mailbox.
+   */
+  public void deleteMessage(boolean autoExpunge) throws MessagingException {
+    FolderInfo trashFolder = getFolderInfo().getTrashFolder();
+    if ((getFolderInfo().useTrashFolder()) && (trashFolder != null) && (trashFolder != getFolderInfo())) {
+      try {
+	moveMessage(trashFolder, autoExpunge);
+      } catch (MessagingException me) {
+	throw new MessagingException(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "No trash folder available."),  me);
+      }
+    } else {
+      
+      // actually remove the message, if we haven't already moved it.
+      
+      try {
+	remove(autoExpunge);
+      } catch (MessagingException me) {
+	me.printStackTrace();
+	throw new MessagingException(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", me);
+      }   
     }
-
+    
+    if (getMessageProxy() != null)
+      getMessageProxy().close();
+  }
+  
     /**
      * A convenience method which sets autoExpunge by the value of 
      * Pooka.autoExpunge, and then calls deleteMessage(boolean autoExpunge)
@@ -431,7 +436,7 @@ public class MessageInfo {
      * to remove().
      */
     public void remove(boolean autoExpunge) throws MessagingException {
-	Message m = getRealMessage();
+	Message m = getMessage();
 	if (m != null) {
 	  m.setFlag(Flags.Flag.DELETED, true);
 	  if ( autoExpunge ) {
@@ -517,7 +522,7 @@ public class MessageInfo {
      */
     public NewMessageInfo populateReply(boolean replyAll, boolean withAttachments) 
 	throws MessagingException {
-	MimeMessage newMsg = (MimeMessage) getRealMessage().reply(replyAll);
+	MimeMessage newMsg = (MimeMessage) getMessage().reply(replyAll);
 
 	MimeMessage mMsg = (MimeMessage) getMessage();
 
@@ -677,7 +682,7 @@ public class MessageInfo {
   public void saveMessageAs(File saveFile) throws MessagingException{
     try {
       FileOutputStream fos = new FileOutputStream(saveFile);
-      ((MimeMessage)getRealMessage()).writeTo(fos);
+      ((MimeMessage)getMessage()).writeTo(fos);
     } catch (IOException ioe) {
       MessagingException me = new MessagingException(Pooka.getProperty("error.errorCreatingAttachment", "Error attaching message"));
       me.setNextException(ioe);

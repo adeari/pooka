@@ -495,14 +495,17 @@ public class UIDFolderInfo extends FolderInfo {
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException  {
     // check the messages first; make sure we're just fetching 'real'
     // messages.
-    Message[] realMsgs = new Message[messages.length];
+    java.util.ArrayList realMsgList = new java.util.ArrayList();
     for (int i = 0; i < messages.length; i++) {
       Message currentMsg = messages[i].getRealMessage();
-      if (currentMsg instanceof UIDMimeMessage)
-	realMsgs[i] = ((UIDMimeMessage)currentMsg).getMessage();
-      else
-	realMsgs[i] = currentMsg;
+      if (currentMsg != null && currentMsg instanceof UIDMimeMessage) {
+	currentMsg = ((UIDMimeMessage)currentMsg).getMessage();
+      }
+      if (currentMsg != null)
+	realMsgList.add(currentMsg);
     }
+
+    Message[] realMsgs = (Message[]) realMsgList.toArray(new Message[0]);
     
     getFolder().fetch(realMsgs, profile);
 

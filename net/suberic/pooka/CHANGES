@@ -1,3 +1,8 @@
+we now show from addresses even if they aren't correctly formatted.
+
+fixed a bug where cached messages wouldn't show incorrectly identified
+'7-bit' encoded messages.
+
 disconnected imap now caches message flags correctly.
 
 added a hack way to override errors like a MissingStartBoundary.

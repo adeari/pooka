@@ -1,10 +1,21 @@
 
+*) disconnected:  reading message doesn't update gui.  
+		try deleting message.
+
+*) add support for running without any local files.
+
+*) add mrpostman support(?)
+
+*) add drag and drop
+
+*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
+	for that.  slimpgp or cyptix.  s/mime is available from together
+	(@ sourceforge).
+
 *) add "view pookarc"
 
 *) make sure that backend filters are run on new message loaded at 
 startup (i.e. not just on messagesAdded).
-
-*) add mrpostman support(?)
 
 *) printing in windows can leave control characters at the end of lines
 
@@ -13,6 +24,14 @@ startup (i.e. not just on messagesAdded).
 
 *) new message count in icon
 
+*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
+	message.  read it.  disconnect there.  get a few new messages.
+	reconnect from original pooka.
+
+*) add a dependent button/menu item.  so that that way instead of having
+	a separate Caching popup menu, you can just say "if caching,
+	add this menu item; if not, don't."
+
 ------
 
 *) add plugin for spam checker?
@@ -20,10 +39,6 @@ startup (i.e. not just on messagesAdded).
 ------
 
 *) add console?
-
-*) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
-	message.  read it.  disconnect there.  get a few new messages.
-	reconnect from original pooka.
 
 *) MoveFilter on closed imap folder:
 java.lang.ArrayIndexOutOfBoundsException: 0
@@ -40,10 +55,6 @@ java.lang.ArrayIndexOutOfBoundsException: 0
         at net.suberic.pooka.gui.propedit.FolderSelectorPane$1.actionPerformed(FolderSelectorPane.java:83)
 
 *) make it so folder windows save their settings (column width, sort order)
-
-*) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
-	for that.  slimpgp or cyptix.  s/mime is available from together
-	(@ sourceforge).
 
 *) more doc
 
@@ -172,9 +183,6 @@ preview:
 *) 1.4.1_01 bugs
 	  -- down arrow fairly consistently doesn't work when you type in a 
 	     line and then hit it.  hitting up, left, right resets it.
-	-- keybindings aren't right; open a message.  ^D it.  try to select
-	another message in the message list. -- worked around for the most
-	part.
 
 *) -- windows --
   *) support windows registry attachment associations.
@@ -194,10 +202,6 @@ preview:
 	*) make it so there is some way for the NetworkConnection to detect
 		whether or not it's up.
 			-- started.  make sure it's enough.
-
-*) add a dependent button/menu item.  so that that way instead of having
-	a separate Caching popup menu, you can just say "if caching,
-	add this menu item; if not, don't."
 
 *)  network on AWTEventThread:
     i think that i did this for a reason.  possible that in 1.4 original
@@ -367,8 +371,6 @@ typing in information and then be surprised when add clears it out.
 
 *) bug:  trying to go to a folder editor when there aren't any folders
 or stores configured is a big problem.
-
-*) some messages aren't parsed properly by the mbox provider.
 
 *) a nested message which is of type text/html doesn't get shown on the
 	display.
