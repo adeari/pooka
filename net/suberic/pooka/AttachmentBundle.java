@@ -197,12 +197,17 @@ class AttachmentBundle {
 	  }
 	}
       } 
-      String separator = Pooka.getProperty("MessageWindow.separator", "");
-      if (separator.equals(""))
-	headerText.append("\n\n");
-      else
+      if (useHtml) {
+	String separator = Pooka.getProperty("MessageWindow.htmlSeparator", "<hr><br>");
 	headerText.append(separator);
-      
+      } else {
+	String separator = Pooka.getProperty("MessageWindow.separator", "");
+	if (separator.equals(""))
+	  headerText.append("\n\n");
+	else
+	  headerText.append(separator);
+      }
+
       return headerText;
     } else {
       return new StringBuffer();

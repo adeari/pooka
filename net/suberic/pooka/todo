@@ -4,9 +4,6 @@ top todo:
 
 *) add more font support
 
-*)  make it so file->exit gives you the option for expunging deleted messages
-    from your mailboxes.
-
 *) fix the mimetypes/mailcap settings--we should use our own configuration
 file, with the defaults as a backup.  otherwise, you have the problem where
 if you set up a default handler for images, then, say, netscape also ends
@@ -22,12 +19,7 @@ changing the title bar.
 other words, we want everything that appears in the FolderTree, not all 
 possible folders, nor just the ones that are open.
 
-*) fix the header information display when we read html messages.  i think
-that there are cases where it doesn't display properly.
-
-*) fix both the multieditorpane and the tabbededitorpane (?) so that they 
-create the panels lazily.  otherwise, an editor pane that has a lot of sub
-panels takes forever to create.
+------------------
 
 	-- search --
 
@@ -105,6 +97,9 @@ error:  filterfoldercellrenderer has problems with search forms.
 	subfolders.  connect to the store.  the subfolders close back up.
 
 *) loadMessageTracker?  it doesn't seem to show up anymore.
+
+*)  make it so file->exit gives you the option for expunging deleted messages
+    from your mailboxes.
 
 *) bug:  if you go into the multi configuration editors and it's empty, you
 should more or less be forced to create a new entity.  otherwise you'll start
