@@ -103,7 +103,47 @@ public class CryptixPGPProviderImpl implements PGPProviderImpl {
    */
   public byte[] sign(InputStream rawStream, EncryptionKey key)
     throws EncryptionException {
-    return null;
+    
+    try {
+      CryptixPGPEncryptionKey pgpKey = (CryptixPGPEncryptionKey) key;
+      KeyBundle bundle = pgpKey.getKeyBundle();
+      char[] passphrase = pgpKey.getPassphrase();
+
+      LiteralMessageBuilder lmb = 
+	LiteralMessageBuilder.getInstance("OpenPGP");
+
+      byte[] msg;
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      
+      byte[] bytesRead = new byte[256];
+      int numRead = rawStream.read(bytesRead);
+      
+      while (numRead > -1) {
+	baos.write(bytesRead, 0, numRead);
+	numRead = rawStream.read(bytesRead);
+      }
+      msg = baos.toByteArray();
+
+      lmb.init(msg);
+      
+      LiteralMessage litMsg = (LiteralMessage)lmb.build();
+      
+      Message signature = null;
+
+      SignedMessageBuilder smb = 
+	SignedMessageBuilder.getInstance("OpenPGP");
+
+      smb.init(litMsg);
+      smb.addSigner(bundle, passphrase);
+
+      PGPSignedMessage signedMessage = (PGPSignedMessage)smb.build();
+      signature = signedMessage.getDetachedSignature();
+      return signature.getEncoded();
+
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }      
   }
  
   /**
@@ -112,21 +152,54 @@ public class CryptixPGPProviderImpl implements PGPProviderImpl {
   public boolean checkSignature(InputStream rawStream,
 				byte[] signature, EncryptionKey key)
     throws EncryptionException {
-    return false;
+
+    try {
+      CryptixPGPEncryptionKey pgpKey = (CryptixPGPEncryptionKey) key;
+      KeyBundle bundle = pgpKey.getKeyBundle();
+
+      byte[] msg;
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      
+      byte[] bytesRead = new byte[256];
+      int numRead = rawStream.read(bytesRead);
+      
+      while (numRead > -1) {
+	baos.write(bytesRead, 0, numRead);
+	numRead = rawStream.read(bytesRead);
+      }
+      msg = baos.toByteArray();
+
+      LiteralMessageBuilder lmb = 
+	LiteralMessageBuilder.getInstance("OpenPGP");
+      lmb.init(msg);
+
+      Message signedContentMessage = lmb.build();
+
+      MessageFactory mf = MessageFactory.getInstance("OpenPGP");
+      ByteArrayInputStream bais = new ByteArrayInputStream(signature);
+      PGPDetachedSignatureMessage signatureMessage = (PGPDetachedSignatureMessage) mf.generateMessage(bais);
+      
+      return signatureMessage.verify(signedContentMessage, bundle);
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }
   }
  
   /**
    * Returns a KeyStore provider.
    */
   public EncryptionKeyManager createKeyManager() {
-    return null;
+    return new CryptixKeyManager();
   }
  
   /**
    * Returns a KeyStore provider.
    */
   public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException {
-    return null;
+    EncryptionKeyManager keyMgr = new CryptixKeyManager();
+    keyMgr.load(inputStream, password);
+    return keyMgr;
   }
 
 }
