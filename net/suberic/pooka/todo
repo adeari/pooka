@@ -6,12 +6,6 @@
 	-- make it so we only get one connection failed message for a store.
 *) fix protocol timeout for imap/ssl?
 
-*) fix:java.lang.NullPointerException
-	at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:357)
-	at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
-	at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
-  -- check received folder for that.
-
 *) search doesn't work properly for sent folders.
 	-- started, at least.
 *) make search window look different than normal window.
@@ -27,6 +21,10 @@
 *) make address book editable as soon as you create it.
 
 *) check disconnection/reconnection on network removal/restoral.
+
+*) bringing up a disconnected folder with no new messages shows the
+	top of the folder rather than the bottom.
+	-- also, 0 messages, 0 unread?
 
 *) forward to all.
  

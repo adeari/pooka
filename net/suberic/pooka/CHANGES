@@ -1,3 +1,6 @@
+fixed a possible NPE in the MessageProxy if a message has an incorrectly
+formatted header.
+
 fixed a bug where an address without a personal name couldn't be added to
 the address book.
 

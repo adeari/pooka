@@ -357,7 +357,11 @@ public class MessageProxy {
 	  Object key = it.next();
 	  Object newValue = newTableInfo.get(key);
 	  Object oldValue = tableInfo.get(key);
-	  if (! newValue.equals(oldValue)) {
+	  if (newValue == null) {
+	    if (oldValue != null) {
+	      hasChanged = true;
+	    }
+	  } else if (oldValue == null || ! newValue.equals(oldValue)) {
 	    hasChanged = true;
 	  }
 	}
