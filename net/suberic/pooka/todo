@@ -11,6 +11,8 @@
   *) make sure we lose our settings for the message whenever the window
 	closes.
 
+*) fix new folder dialog
+
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
 	topics:
