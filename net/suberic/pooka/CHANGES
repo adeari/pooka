@@ -1,3 +1,5 @@
+Pooka now remembers its location on screen when restarting.
+
 fixed a problem in Preview mode in which the folder toolbar wouldn't get
 activated on startup.
 

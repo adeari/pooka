@@ -206,6 +206,10 @@ public class Pooka {
 	  finalFrame.pack();
 	  finalFrame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
 	  
+	  int x = Integer.parseInt(getProperty("Pooka.lastX", "10"));
+	  int y = Integer.parseInt(getProperty("Pooka.lastY", "10"));
+
+	  finalFrame.setLocation(x, y);
 	  finalFrame.show();
 	  
 	  uiFactory.setShowing(true);
