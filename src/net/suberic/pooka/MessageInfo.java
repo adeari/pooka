@@ -717,6 +717,11 @@ public class MessageInfo {
       Vector v = new Vector();
       v.add(this.getMessageProxy());
       spamFilter.performFilter(v);
+    } else {
+      int configureNow = Pooka.getUIFactory().showConfirmDialog("Spam action currently not configured.  Would you like to configure it now?", "Configure Spam action", javax.swing.JOptionPane.YES_NO_OPTION);
+      if (configureNow == javax.swing.JOptionPane.YES_OPTION) {
+	// show configure screen.
+      }
     }
   }
 
