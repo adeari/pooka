@@ -253,7 +253,7 @@ public class FolderDisplayPanel extends JPanel {
      * range, then the last message is selected.  If the MessageTable 
      * contains no messages, nothing happens.
      */
-    public void goToMessage(int messageNumber) {
+    public void selectMessage(int messageNumber) {
 	int rowCount = messageTable.getRowCount();
 
 	if (rowCount > 0) {

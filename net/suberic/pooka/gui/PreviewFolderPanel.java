@@ -131,6 +131,15 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     }
 
     /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
+     * This skips to the given message.
+     */
+    public void selectMessage(int messageNumber) {
+	getFolderDisplay().selectMessage(messageNumber);
+    }
+
+    /**
      * Sets the busy property of the panel.
      *
      * As defined in interface net.suberic.pooka.gui.FolderDisplayUI.

@@ -192,6 +192,15 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     /**
      * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
      * 
+     * This skips to the given message.
+     */
+    public void selectMessage(int messageNumber) {
+	getFolderDisplay().selectMessage(messageNumber);
+    }
+
+    /**
+     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+     * 
      * This implementation sets the cursor to either Cursor.WAIT_CURSOR
      * if busy, or Cursor.DEFAULT_CURSOR if not busy.
      */
