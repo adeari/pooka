@@ -23,8 +23,8 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
   /** the Image for DISCONNECTED connections. */
   public ImageIcon disconnectedImage = null;
 
-  /** the Image for DOWN connections. */
-  public ImageIcon downImage = null;
+  /** the Image for UNAVAILABLE connections. */
+  public ImageIcon unavailableImage = null;
   
   /** The combo box for selecting which connection to show.  */
   JComboBox comboBox;
@@ -37,7 +37,8 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
   /** The default actions supported by this component. */
   Action[] defaultActions = new Action[] {
     new ConnectAction(),
-    new DisconnectAction()
+    new DisconnectAction(),
+    new UnavailableAction()
       };
 
   /**
@@ -101,13 +102,13 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
     if (url != null) {
       connectedImage = new ImageIcon(url);
     }
-    url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.disconnectedIcon", "images/TrafficYellow.gif")); 
+    url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.disconnectedIcon", "images/TrafficRed.gif")); 
     if (url != null) {
       disconnectedImage = new ImageIcon(url);
     }
-    url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.downIcon", "images/TrafficRed.gif")); 
+    url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.unavailableIcon", "images/TrafficOff.gif")); 
     if (url != null) {
-      downImage = new ImageIcon(url);
+      unavailableImage = new ImageIcon(url);
     }
   }
   /**
@@ -135,8 +136,8 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
 	statusPanel.setIcon(connectedImage);
       } else if (status == NetworkConnection.DISCONNECTED) {
 	statusPanel.setIcon(disconnectedImage);
-      } else if (status == NetworkConnection.DOWN) {
-	statusPanel.setIcon(downImage);
+      } else if (status == NetworkConnection.UNAVAILABLE) {
+	statusPanel.setIcon(unavailableImage);
       }
     } else {
       statusPanel.setIcon(connectedImage);
@@ -240,6 +241,20 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
       NetworkConnection connection = getSelectedConnection();
       if (connection != null && connection.getStatus() == NetworkConnection.CONNECTED) {
 	connection.disconnect();
+      }
+    }
+  }
+
+  public class UnavailableAction extends AbstractAction {
+
+    UnavailableAction() {
+      super("connection-unavailable");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      NetworkConnection connection = getSelectedConnection();
+      if (connection != null) {
+	connection.makeUnavailable();
       }
     }
   }

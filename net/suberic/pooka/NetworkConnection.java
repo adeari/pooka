@@ -20,13 +20,13 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   String disconnectCommand = null;
 
-  int status = DOWN;
+  int status = DISCONNECTED;
 
   public static int CONNECTED = 0;
   
   public static int DISCONNECTED = 5;
 
-  public static int DOWN = 10;
+  public static int UNAVAILABLE = 10;
 
   private java.util.LinkedList listenerList = new java.util.LinkedList();
 
@@ -58,6 +58,9 @@ public class NetworkConnection implements net.suberic.util.Item {
     connectCommand = bundle.getProperty(getItemProperty() + ".connectCommand", "");
     disconnectCommand = bundle.getProperty(getItemProperty() + ".disconnectCommand", "");
 
+    if ( bundle.getProperty(getItemProperty() + ".connectOnStartup", "false").equalsIgnoreCase("true") ) {
+      this.connect();
+    }
   }
   
   /**
@@ -126,9 +129,9 @@ public class NetworkConnection implements net.suberic.util.Item {
 	  p.waitFor();
 	}
       }
-
-      if (status != DOWN) {
-	status = DOWN;
+      
+      if (status != DISCONNECTED) {
+	status = DISCONNECTED;
 	fireConnectionEvent();
       } else {
       }
@@ -147,6 +150,20 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public int disconnect() {
     return disconnect(true);
+  }
+
+  /**
+   * <p>Mark this network service as unavailable.  Note that if there
+   * is a disconnectCommand, this does <em>not</em> run it.</p>
+   *
+   * @return the new status of the server.
+   */
+  public int makeUnavailable() {
+    if (status != UNAVAILABLE) {
+	status = UNAVAILABLE;
+	fireConnectionEvent();
+    } 
+    return status;
   }
 
   /**

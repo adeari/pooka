@@ -28,7 +28,9 @@ public class OutgoingMailServer implements net.suberic.util.Item {
    */
   public OutgoingMailServer (String newId) {
     id = newId;
-    propertyName = "OutgoingMailServer." + newId;
+    propertyName = "OutgoingServer." + newId;
+    
+    configure();
   }
 
   /**
@@ -37,10 +39,12 @@ public class OutgoingMailServer implements net.suberic.util.Item {
   protected void configure() {
     VariableBundle bundle = Pooka.getResources();
 
-    connectionID = bundle.getProperty(getItemProperty() + ".connectionID", "");
-    outboxID = bundle.getProperty(getItemProperty() + ".outboxID", "");
+    connectionID = bundle.getProperty(getItemProperty() + ".connection", "");
+    outboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
+    System.err.println("outboxID for " + id + " is " + outboxID);
+    System.err.println("connectionID for " + getItemProperty() + ".connectionID is " + connectionID);
 
-    sendMailURL = new URLName(bundle.getProperty(getItemProperty() + ".sendMailURL", ""));
+    sendMailURL = new URLName("smtp://" + bundle.getProperty(getItemProperty() + ".server", "") + "/");
     
   }
 
@@ -93,17 +97,22 @@ public class OutgoingMailServer implements net.suberic.util.Item {
     FolderInfo outbox = getOutbox();
     NetworkConnection connection = getConnection();
 
-    outbox.appendMessages(new MessageInfo[] { nmi });
-    if (connection.getStatus() == NetworkConnection.CONNECTED)
-      sendAll();
-    else if (connect || Pooka.getProperty("Message.sendImmediately", "false").equalsIgnoreCase("true")) {
-      try {
-	connection.connect();
+    System.err.println("outbox is " + outbox);
+    if (outbox != null) {
+      outbox.appendMessages(new MessageInfo[] { nmi });
+      if (connection.getStatus() == NetworkConnection.CONNECTED)
 	sendAll();
-      } catch (MessagingException me) {
-	System.err.println("me is a " + me);
-	me.printStackTrace();
+      else if (connection.getStatus() == NetworkConnection.DISCONNECTED && (connect || Pooka.getProperty("Message.sendImmediately", "false").equalsIgnoreCase("true"))) {
+	try {
+	  connection.connect();
+	  sendAll();
+	} catch (MessagingException me) {
+	  System.err.println("me is a " + me);
+	  me.printStackTrace();
+	}
       }
+    } else {
+      Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
     }
   }
   
@@ -132,6 +141,7 @@ public class OutgoingMailServer implements net.suberic.util.Item {
    * stored until they're ready to be sent.
    */
   public FolderInfo getOutbox() {
+    
     return Pooka.getStoreManager().getFolder(outboxID);
   }
 

@@ -90,6 +90,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    * exists; otherwise, returns null.
    */
   public OutgoingMailServer getOutgoingMailServer(String OutgoingMailServerID) {
+    System.err.println("getting OutgoingMailServer for id " + OutgoingMailServerID);
     return (OutgoingMailServer) manager.getItem(OutgoingMailServerID);
   }
 
@@ -129,6 +130,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    * This creates a new OutgoingMailServer.
    */
   public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID) {
+    System.err.println("creating OutgoingMailServer from itemId " + itemID);
     return new OutgoingMailServer(itemID);
   }
 
@@ -136,11 +138,14 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
   // the background stuff.
   
   /**
-   * This loads and creates all the OutgoingMailServers using the "OutgoingMailServer" 
+   * This loads and creates all the OutgoingMailServers using the "OutgoingServer" 
    * property of the main Pooka VariableBundle.
    */
   private void createOutgoingMailServerList() {
-    manager = new ItemManager("OutgoingMailServer", Pooka.getResources(), this);
+    manager = new ItemManager("OutgoingServer", Pooka.getResources(), this);
+    Vector v = getOutgoingMailServerList();
+    System.err.println("create mailserverlist.  serverlist has length of " + v.size());
+
     manager.addItemListChangeListener(this);
   }
 }
