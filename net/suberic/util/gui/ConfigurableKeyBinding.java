@@ -72,10 +72,9 @@ public class ConfigurableKeyBinding implements ConfigurableUI {
 	    Action a = getAction(actionCmd);
 	    for (int i = 0; keyStrokeVector != null && i < keyStrokeVector.size(); i++) {
 		KeyStroke keyStroke = (KeyStroke)keyStrokeVector.elementAt(i);
+		currentComponent.unregisterKeyboardAction(keyStroke);
 		if (a != null) {
-		    currentComponent.registerKeyboardAction(a, actionCmd, keyStroke, getCondition() );
-		} else {
-		    currentComponent.unregisterKeyboardAction(keyStroke);
+		  currentComponent.registerKeyboardAction(a, actionCmd, keyStroke, getCondition() );
 		}
 	    }
 	}
