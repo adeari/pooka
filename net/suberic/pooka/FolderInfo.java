@@ -1140,7 +1140,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    setFolderTracker(null);
 	}
 
-	if (isLoaded()) {
+	if (isLoaded() && isAvailable()) {
 	    open=false;
 	    try {
 		folder.close(expunge);
