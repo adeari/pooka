@@ -39,15 +39,12 @@ public class MessageProxyTransferable implements Transferable {
   public DataFlavor[] getTransferDataFlavors() {
     System.err.println("getting transfer data flavors...");
     return new DataFlavor[] {
-      sMessageProxyDataFlavor,
-      DataFlavor.javaFileListFlavor
+      sMessageProxyDataFlavor
     };
   }
 
   public boolean isDataFlavorSupported(DataFlavor flavor) {
     if (flavor == sMessageProxyDataFlavor)
-      return true;
-    else if (flavor != null && flavor.isFlavorJavaFileListType())
       return true;
     else 
       return false;
@@ -56,6 +53,7 @@ public class MessageProxyTransferable implements Transferable {
   public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
     if (flavor == sMessageProxyDataFlavor) {
       return mMessageProxy;
+      /*
     } else if (flavor != null && flavor.isFlavorJavaFileListType()) {
       ArrayList returnValue = new ArrayList();
       MessageInfo info = mMessageProxy.getMessageInfo();
@@ -69,6 +67,7 @@ public class MessageProxyTransferable implements Transferable {
       }
 
       return returnValue;
+      */
     } else {
       throw new UnsupportedFlavorException(flavor);
     }

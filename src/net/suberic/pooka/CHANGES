@@ -1,3 +1,5 @@
+added support for drag and drop.
+
 added a way to specify caching scheme per folder, so we can avoid autocaching
 of messages in spam and/or sent folders.
 
@@ -10,8 +12,6 @@ in the headers.
 
 fixed autocaching support.  made it so we also show a status while downloading
 lots of new messages.
-
-added support for drag and drop.
 
 fixed expunging on backend filteres.
 

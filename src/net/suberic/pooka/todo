@@ -1,22 +1,7 @@
-*) add drag and drop
-   *) FIX THREADING!!! -- just try doing a big copy into a folder with a 
-	paste operation!!!
-
-   *) on win/osx:
-     *) fix file export for messages
-     *) fix file export for attachments
-     *) test with desktop/external apps.
-
+*) remove drag&drop for messages as files.
+   
+*) test drag&drop
 -----
-*) add a way to specify caching scheme per folder, so we can avoid autocaching
-	of messages in spam and/or sent folders.
-
-*) test w/gnu javamail -- ???
-*) test w/javamail 1.3.2.
-
-*) add a real debug system.
-
-*) separate out ui interfaces from swing implementations.
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -24,6 +9,19 @@
 	    -- better error messages
 	    -- come up with configuration/usage plan.
 	  
+
+*) add support for composing new email messages from an external source,
+say, like reacting to a mailto: link.
+
+
+-----
+
+
+*) test w/gnu javamail -- ???
+*) test w/javamail 1.3.2.
+
+*) add a real debug system.
+
 *) add support for saved searches.
 
 *) fix error display with exception so that you can see the stack trace.
@@ -34,18 +32,20 @@
 	a separate Caching popup menu, you can just say "if caching,
 	add this menu item; if not, don't."
 
-*) add support for composing new email messages from an external source,
-say, like reacting to a mailto: link.
+------
+
+*) separate out ui interfaces from swing implementations.
 
 *) check too many open files error on opening large cached folder?
-
------------
 
 *) fix NPE if try to send a new message without configuring client.
 
 *) add mark as unread 
 
 *) new message count in icon
+
+*) fix threading for drag and drop -- just try doing a big copy into a folder 
+	with a paste operation.
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5
@@ -103,7 +103,7 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	words, don't require a restart for encryption the first time.
 	  -- done.  make update only happen once per change, though.
    *) add documentation
-	*) need to document versions, including webstart crypix info
+	*) need to document versions, including webstart cryptix info
 	*) need to document unlimited strength jce info
    *) test autodecrypt/auto sig check.  requires keys synched to email address.
 	test
