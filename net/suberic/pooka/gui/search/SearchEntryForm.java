@@ -49,8 +49,10 @@ public class SearchEntryForm {
      * returns that value.
      */
     public SearchTerm generateSearchTerm() {
+	System.out.println("SearchEntryForm:  generating SearchTerm from " + searchFieldCombo.getSelectedItem() + " and " + operationCombo.getSelectedItem());
 	String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
 	String operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
+	System.out.println("using " + searchProperty + ", " + operationProperty);
 	String pattern = textField.getText();
 
 	return manager.generateSearchTerm(searchProperty, operationProperty, pattern);

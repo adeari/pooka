@@ -83,6 +83,10 @@ public class SearchEntryPanel extends JPanel {
 	basePanel.setLayout(new java.awt.BorderLayout());
 	basePanel.add(conditionPanel, java.awt.BorderLayout.SOUTH);
 	basePanel.add(entryPanel, java.awt.BorderLayout.CENTER);
+
+	int defaultHeight = entryPanel.getPreferredSize().height;
+	entryPanel.setPreferredSize(new java.awt.Dimension(entryPanel.getPreferredSize().width, defaultHeight * 3));
+
 	entryScrollPane = new JScrollPane(basePanel);
 	this.add(entryScrollPane);
     }
@@ -132,10 +136,16 @@ public class SearchEntryPanel extends JPanel {
 	}
     }
 
+    /**
+     * Returns the SearchTerm specified by this SearchEntryPanel.
+     */
     public SearchTerm getSearchTerm() {
+	System.out.println("calling SearchEntryPanel.getSearchTerm()");
 	if (searchTerms.size() > 0) {
+	    System.out.println("SearchEntryPanel:  searchTerms.size() > 0.");
 	    SearchEntryPair pair = (SearchEntryPair) searchTerms.elementAt(0);
 	    SearchTerm term = pair.form.generateSearchTerm();
+	    System.out.println("SearchEntryPanel:  setting term to " + term);
 	    for (int i = 1; i < searchTerms.size(); i++) {
 		SearchEntryPair newPair = (SearchEntryPair) searchTerms.elementAt(i);
 		SearchTerm newTerm = newPair.form.generateSearchTerm();

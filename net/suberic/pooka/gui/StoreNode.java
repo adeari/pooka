@@ -292,7 +292,25 @@ public class StoreNode extends MailTreeNode {
 	    JInternalFrame jif = new JInternalFrame();
 	    
 	    SearchForm sf = new SearchForm(new StoreInfo[] { getStoreInfo() }, false);
-	    sf.show();
+	    int returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
+	    if (returnValue == JOptionPane.OK_OPTION) {
+		System.out.println("got ok option.");
+		Vector selectedFolders = sf.getSelectedFolders();
+		javax.mail.search.SearchTerm searchTerm = sf.getSearchTerm();
+		Vector matchingValues = new Vector();
+		for (int i = 0; i < selectedFolders.size(); i++) {
+		    try {
+			net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
+			for (int j = 0; j < matches.length; j++) {
+			    matchingValues.add(matches[j]);
+			}
+		    } catch (MessagingException me) {
+			System.out.println("caught exception " + me);
+		    }
+		}
+
+		System.out.println("got " + matchingValues.size() + " matches.");
+	    }
 	    /*
 	    jif.getContentPane().add(sf);
 
