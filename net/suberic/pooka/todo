@@ -9,6 +9,8 @@
 		panel.
 	-- make the button actually be the right size.
 
+*) make address book editable as soon as you create it.
+
 *) probably happens when you add an address without a personal name.
    fix:  java.lang.NullPointerException
 	at java.util.Hashtable.put(Hashtable.java:375)
@@ -35,6 +37,11 @@
 	squashed.
 
 *) fix connection failed message for ssl stores
+
+*) fix:java.lang.NullPointerException
+	at net.suberic.pooka.gui.MessageProxy.refreshMessage(MessageProxy.java:357)
+	at net.suberic.pooka.thread.LoadMessageThread.loadWaitingMessages(LoadMessageThread.java:183)
+	at net.suberic.pooka.thread.LoadMessageThread.run(LoadMessageThread.java:53)
 
 -------
 
