@@ -7,18 +7,15 @@ all the information we need off the Message.  3)  effectively have a 'real'
 message which is what you make changes on.  4)  searches won't work in 
 disconnected mode.
 	-- started.  todo:
-	   *)  order the messages.  right now, messages seem to be cached
-	       in a random order.  we need to save that order.
 	   *)  make the cache editable so that we can work properly in 
 	       disconnected mode.
-	   *)  messages that are seen aren't automatically marked as such
-	       when the cache is populated.  possible that the problem is
-	       that we're not properly loading the messages enough when we
-	       intially cache them.  fix that--maybe optimize with a 
-	       fetch.
+	   *)  need to remove the 'Recent' flag from the cache once we've
+	       received a message.
 	   *)  fix it so it actually works in disconnected mode--make a log
 	       file for changes that are made, and then make the changes when
 	       we reconnect to the server.
+	   *)  loading the initial cache takes too long--we should have a 
+	       note on screen saying that we're caching things.
 	   *)  add a ui for configuring caching.
 	   *)  add a ui for seeing the caching mode for each message, and for
 	       explicitly caching the messages themselves.
