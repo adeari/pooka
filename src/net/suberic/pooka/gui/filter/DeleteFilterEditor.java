@@ -14,6 +14,7 @@ public class DeleteFilterEditor extends FilterEditor {
    * property.
    */
   public void configureEditor(net.suberic.util.gui.propedit.PropertyEditorManager newManager, String propertyName) {
+    manager = newManager;
     // there really isn't anything to do here, is there?
   }
   

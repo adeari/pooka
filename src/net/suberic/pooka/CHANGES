@@ -1,3 +1,5 @@
+fixed DeleteFilter so it doesn't throw an error on configuration.
+
 fixed forward with attachments so that it no longer tries to treat the 
 first attachment as the content of the message.
 

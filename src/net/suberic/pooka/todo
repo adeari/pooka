@@ -6,6 +6,10 @@
 *) sign up for doc and release-engineering tasks
 
 -----
+
+*) make it so a move filter for a given folder defaults to that store,
+	at least, or possibly no store at all.
+
 *) queuing of outgoing mails
 	todo on this:
 	*)  add some sort of an administrative api to the NetworkConnection
