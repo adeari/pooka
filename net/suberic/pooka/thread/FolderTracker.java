@@ -92,7 +92,14 @@ public class FolderTracker extends Thread {
      * It's nasty, but it _should_ keep the Folder open..
      */
     public void checkFolder(FolderInfo folderInfo) {
+      try {
 	folderInfo.checkFolder();
+      } catch (MessagingException me) {
+	if (Pooka.isDebug()) {
+	  System.out.println("caught exception checking folder " + folderInfo.getFolderID() + ":  " + me);
+	  me.printStackTrace();
+	}
+      }
     }
     
     public void updateFolders(long currentTime) {

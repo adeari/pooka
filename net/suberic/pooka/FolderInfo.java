@@ -745,36 +745,30 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     /**
      * This just checks to see if we can get a NewMessageCount from the
      * folder.  As a brute force method, it also accesses the folder
-     * at every check, catching and throwing away any Exceptions that happen.  
-     * It's nasty, but it _should_ keep the Folder open..
+     * at every check.  It's nasty, but it _should_ keep the Folder open..
      */
-    public void checkFolder() {
-	if (Pooka.isDebug())
-	    System.out.println("checking folder " + getFolderName());
-
-	// i'm taking this almost directly from ICEMail; i don't know how
-	// to keep the stores/folders open, either.  :)
-
-	if (isConnected()) {
-	    Store s = getParentStore().getStore();
-	    try {
-		//Folder f = s.getFolder("nfdsaf238sa");
-		//f.exists();
-		Folder current = getFolder();
-		if (current != null && current.isOpen()) {
-		    current.getNewMessageCount();
-		    current.getUnreadMessageCount();
-		}
-	    } catch ( MessagingException me ) {
-		try {
-		    if ( ! s.isConnected() )
-			s.connect();
-		} catch ( MessagingException me2 ) {
-		}
-	    }
-	    
-	    resetMessageCounts();
+    public void checkFolder() throws javax.mail.MessagingException {
+      if (Pooka.isDebug())
+	System.out.println("checking folder " + getFolderName());
+      
+      // i'm taking this almost directly from ICEMail; i don't know how
+      // to keep the stores/folders open, either.  :)
+      
+      if (isConnected()) {
+	//try {
+	//Store s = getParentStore().getStore();
+	Folder current = getFolder();
+	if (current != null && current.isOpen()) {
+	  current.getNewMessageCount();
+	  current.getUnreadMessageCount();
 	}
+	//} catch ( MessagingException me ) {
+	//  if ( ! s.isConnected() )
+	//    s.connect();
+	//}
+	
+	resetMessageCounts();
+      }
     }
 
     /**
@@ -1986,19 +1980,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    super("folder-update");
 	}
 	
-        public void actionPerformed(ActionEvent e) {
-	    
-	    //resetMessageCounts();
-	    
-	    if (Thread.currentThread() == getFolderThread() )
-		checkFolder();
-	    else 
-		getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-			public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-			    checkFolder();
-			}
-		    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+      public void actionPerformed(ActionEvent e) {
+	// should always be on the Folder thread.
+	try {
+	  checkFolder();
+	} catch (MessagingException me) {
+	  final MessagingException me2 = me;
+
+	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		if (getFolderDisplayUI() != null)
+		  getFolderDisplayUI().showError(Pooka.getProperty("error.updatingFolder", "Error updating Folder ") + getFolderID(), me2);
+		else
+		  Pooka.getUIFactory().showError(Pooka.getProperty("error.updatingFolder", "Error updating Folder ") + getFolderID(), me2);
+		  
+	      }
+	    });
+	  
 	}
+      }
     }
 
     class EmptyTrashAction extends AbstractAction {

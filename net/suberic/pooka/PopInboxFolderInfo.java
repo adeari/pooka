@@ -132,15 +132,31 @@ public class PopInboxFolderInfo extends FolderInfo {
    * is set to true, this will also go through and remove any messages
    * on the server that have been removed on the local client.
    */
-  public void checkFolder() {
+  public void checkFolder() throws MessagingException {
     if (Pooka.isDebug())
       System.out.println("checking folder " + getFolderName());
     
     Folder f = null;
-    try {
-      if (isConnected() && popStore != null) {
-	if (Pooka.isDebug())
-	  System.out.println("checking folder " + getFolderName() + ":  opening pop store.");
+    
+    if (isConnected() && popStore != null) {
+      if (Pooka.isDebug())
+	System.out.println("checking folder " + getFolderName() + ":  opening pop store.");
+      
+      NetworkConnection connection = getParentStore().getConnection();
+      int originalStatus = -1;
+      
+      if (connection != null) {
+	originalStatus = connection.getStatus();
+	if (connection.getStatus() == NetworkConnection.DISCONNECTED) {
+	  connection.connect();
+	}
+	
+	if (connection.getStatus() != NetworkConnection.CONNECTED) {
+	  throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for checking folder:  ") + getFolderID());
+	}
+      }
+      
+      try {
 	popStore.connect();
 	f = popStore.getDefaultFolder().getFolder("INBOX");
 	if (f != null) {
@@ -182,21 +198,26 @@ public class PopInboxFolderInfo extends FolderInfo {
 	  popStore.close();
 	}
 	resetMessageCounts();
+      } catch ( MessagingException me ) {
+	try {
+	  if (f != null && f.isOpen())
+	    f.close(false);
+	} catch (Exception e ) {
+	}
+	throw me;
+      } finally {
+	try {
+	  popStore.close();
+	} catch (Exception e) {
+	}
+
+	if (connection != null) {
+	  if (originalStatus == NetworkConnection.DISCONNECTED && originalStatus != connection.getStatus())
+	    connection.disconnect();
+	}
       }
-    } catch ( MessagingException me ) {
-      me.printStackTrace();
-      try {
-	if (f != null && f.isOpen())
-	  f.close(false);
-      } catch (Exception e ) {
-      }
-      
-      try {
-	popStore.close();
-      } catch (Exception e) {
-      }
-    } 
-    
+    }
+  
   }
   
   protected void runMessagesRemoved(MessageCountEvent mce) {

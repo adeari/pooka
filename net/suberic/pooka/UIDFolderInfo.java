@@ -111,48 +111,41 @@ public class UIDFolderInfo extends FolderInfo {
 	}
     }
     
-    /**
-     * This just checks to see if we can get a NewMessageCount from the
-     * folder.  As a brute force method, it also accesses the folder
-     * at every check, catching and throwing away any Exceptions that happen.  
-     * It's nasty, but it _should_ keep the Folder open..
-     */
-    public void checkFolder() {
-	if (Pooka.isDebug())
-	    System.out.println("checking folder " + getFolderName());
-
-	// i'm taking this almost directly from ICEMail; i don't know how
-	// to keep the stores/folders open, either.  :)
-
-	StoreInfo s = null;
-	try {
-	    
-	    if (isConnected()) {
-                Folder current = getFolder();
-                if (current != null && current.isOpen()) {
-                    current.getNewMessageCount();
-                    current.getUnreadMessageCount();
-		    resetMessageCounts();
-                }
-	    } else if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
-		s = getParentStore();
-		if (! s.isConnected())
-		    s.connectStore();
-		
-		openFolder(Folder.READ_WRITE);
-
-		resetMessageCounts();
-
-		if (isAvailable() && preferredStatus == PASSIVE)
-		    closeFolder(false);
-	    } 
-	    
-
-	} catch ( MessagingException me ) {
-	}
-    }
-
-    protected void updateFolderOpenStatus(boolean isNowOpen) {
+  /**
+   * This just checks to see if we can get a NewMessageCount from the
+   * folder.  As a brute force method, it also accesses the folder
+   * at every check.  It's nasty, but it _should_ keep the Folder open..
+   */
+  public void checkFolder() throws javax.mail.MessagingException {
+    if (Pooka.isDebug())
+      System.out.println("checking folder " + getFolderName());
+    
+    // i'm taking this almost directly from ICEMail; i don't know how
+    // to keep the stores/folders open, either.  :)
+    
+    StoreInfo s = null;
+    if (isConnected()) {
+      Folder current = getFolder();
+      if (current != null && current.isOpen()) {
+	current.getNewMessageCount();
+	current.getUnreadMessageCount();
+	resetMessageCounts();
+      }
+    } else if (isAvailable() && (status == PASSIVE || status == LOST_CONNECTION)) {
+      s = getParentStore();
+      if (! s.isConnected())
+	s.connectStore();
+      
+      openFolder(Folder.READ_WRITE);
+      
+      resetMessageCounts();
+      
+      if (isAvailable() && preferredStatus == PASSIVE)
+	closeFolder(false);
+    } 
+  }
+  
+  protected void updateFolderOpenStatus(boolean isNowOpen) {
 	if (isNowOpen) {
 	    status = CONNECTED;
 	    try {
