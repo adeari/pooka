@@ -12,9 +12,14 @@
 	    -- come up with configuration/usage plan.
 	-- figure out problem spots:
 		*) pop3 support?
+			-- ruling out pop3 boxes.
 		*) outgoing mailboxes?
+			-- works fine.  would be better if we allowed sent
+			   folder and 
 		*) address books?
+			-- gives error on startup.
 		*) encryption key files
+			-- gives error.
 *) add support for running off of removable media (run from directory; cache/
 	config files relative to config file)
 	*) startup
@@ -24,12 +29,8 @@
 	     configuration file--so if conf file is in z:\pooka\pookarc,
 	     then .\.pooka should map to z:\pooka\.pooka.
 	*) usage
-	   - need some plan for http access such that we can write a
-	     proper usage file.  something like 'export for http use'?
-	       started.  need to change it to use a VariableBundle, so that
-	       we save the right file.
-	       -- need to edit store list.  and make sure that stores are
-		  removed properly.
+	   - export for http usage needs to be put in the correct place
+		and tested.
 	
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
@@ -123,6 +124,7 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	*) on failure to send
 		*) show error first.  save to outbox default?  work offine?
 		*) offer to save to outbox if available
+		*) -- don't offer to save to outbox if not available.
 	*) offline setting???
 
 *) check:  if a folder realizes that it has become disconnected, it should

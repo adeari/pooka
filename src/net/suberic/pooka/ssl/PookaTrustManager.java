@@ -20,15 +20,28 @@ public class PookaTrustManager implements X509TrustManager {
 
   java.util.Set trustedCerts = new java.util.HashSet();
 
+  boolean mUseCertFile = true;
+
   /**
    * Creates a new TrustManager that wraps the given manager.
    */
-  public PookaTrustManager(TrustManager[] newWrappedManagers, String certFile) {
+  public PookaTrustManager(TrustManager[] pWrappedManagers, String pCertFile) {
+    this(pWrappedManagers, pCertFile, true);
+  }
+
+  /**
+   * Creates a new TrustManager that wraps the given manager.
+   */
+  public PookaTrustManager(TrustManager[] pWrappedManagers, String pCertFile, boolean pUseCertFile) {
     super();
-    certificateRepositoryFile = certFile;
-    for (int i = 0; i < newWrappedManagers.length; i++) {
-      if (newWrappedManagers[i] instanceof X509TrustManager)
-	wrappedManager = (X509TrustManager) newWrappedManagers[i];
+    
+    mUseCertFile = pUseCertFile;
+    if (mUseCertFile)
+      certificateRepositoryFile = pCertFile;
+
+    for (int i = 0; i < pWrappedManagers.length; i++) {
+      if (pWrappedManagers[i] instanceof X509TrustManager)
+	wrappedManager = (X509TrustManager) pWrappedManagers[i];
     }
     
     loadAccepted();
@@ -143,7 +156,7 @@ public class PookaTrustManager implements X509TrustManager {
 
     int response = -1;
     if (certToPrint != null) {
-      StringBuffer msg = new StringBuffer("The following certificate(s) are not trusted.  Accpet them anyway?\n\n");
+      StringBuffer msg = new StringBuffer("The following certificates are not trusted.  Accpet them anyway?\n\n");
       msg.append("Issuer:  ");
       msg.append(certToPrint.getIssuerDN().getName());
       msg.append("\n");
@@ -165,31 +178,34 @@ public class PookaTrustManager implements X509TrustManager {
     if (cert != null) {
       BufferedWriter fw = null;
 
-      if (certificateRepositoryFile != null && ! certificateRepositoryFile.equals("")) {
-	try {
-	  // see if we can open the file.
-	  fw = new BufferedWriter(new FileWriter(certificateRepositoryFile, true));
-	} catch (IOException ioe) {
-	  final Exception e = ioe;
+      if (mUseCertFile) {
+	if (certificateRepositoryFile != null && ! certificateRepositoryFile.equals("")) {
+	  try {
+	    // see if we can open the file.
+	    fw = new BufferedWriter(new FileWriter(certificateRepositoryFile, true));
+	  } catch (IOException ioe) {
+	    final Exception e = ioe;
+	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+		public void run() {
+		  net.suberic.pooka.Pooka.getUIFactory().showError("Error opening SSL certificate file:  " + certificateRepositoryFile, e);
+		}
+	      });
+	  }
+	} else {
+	  // don't give warning if we're not using a local certificate file.
 	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	      public void run() {
-		net.suberic.pooka.Pooka.getUIFactory().showError("Error opening SSL certificate file:  " + certificateRepositoryFile, e);
+		net.suberic.pooka.Pooka.getUIFactory().showError("Warning:  no certificate file set.\nCertificate will only be accepted for this session.\nGo to Configuation->Preferences->SSL to set a certificate file.");
 	      }
 	    });
 	}
-      } else {
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      net.suberic.pooka.Pooka.getUIFactory().showError("Warning:  no certificate file set.\nCertificate will only be accepted for this session.\nGo to Configuation->Preferences->SSL to set a certificate file.");
-	    }
-	  });
       }
 
       try {
 	for (int i = 0; i < cert.length; i++) {
 	  if (cert[i] != null) {
 	    trustedCerts.add(cert[i]);
-
+	    System.err.println("added " + cert[i] + " to trusted certs.  trustedCerts.length = " + trustedCerts.size());
 	    
 	    if (fw != null) {
 	      fw.write("-----BEGIN CERTIFICATE-----");
@@ -234,7 +250,7 @@ public class PookaTrustManager implements X509TrustManager {
    */
   public void loadAccepted() {
     FileInputStream fis = null;
-    if (certificateRepositoryFile != null) {
+    if (mUseCertFile && certificateRepositoryFile != null) {
       try {
 	fis = new FileInputStream(certificateRepositoryFile);
 	DataInputStream dis = new DataInputStream(fis);

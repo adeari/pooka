@@ -25,5 +25,18 @@ public abstract class ResourceManager {
    */
   public abstract PookaTrustManager createPookaTrustManager(javax.net.ssl.TrustManager[] pTrustManagers, String fileName);
 
-  
+  /**
+   * Gets a resource for reading.  pFileName could be a URL or a file name
+   * or some similar identifier that the ResourceManager can use.
+   */
+  public abstract java.io.InputStream getInputStream(String pFileName) 
+    throws java.io.IOException;
+
+  /**
+   * Gets a resource for writing.  pFileName could be a URL or a file name
+   * or some similar identifier that the ResourceManager can use.
+   */
+  public abstract java.io.OutputStream getOutputStream(String pFileName) 
+    throws java.io.IOException;
+
 }

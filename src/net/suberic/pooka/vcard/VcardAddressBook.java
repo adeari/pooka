@@ -52,6 +52,16 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Loads the AddressBook from the saved filename.
    */
   public void loadAddressBook() throws java.text.ParseException, java.io.IOException {
+    
+    InputStream is = Pooka.getResourceManager().getInputStream(fileName);
+    if (is != null) {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      for(Vcard newCard = Vcard.parse(reader); newCard != null; newCard = Vcard.parse(reader)) {
+	insertIntoList(newCard);
+      } 
+    }
+
+    /*
     File f = new File(fileName);
 
     if (f.exists()) {
@@ -62,6 +72,8 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
     } else {
       f.createNewFile();
     }
+    */
+
 
     sortList();
   }
@@ -128,9 +140,22 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
    * Saves the list.
    */
   public void saveAddressBook() throws java.io.IOException {
+    
+    /*
     File f = new File(fileName);
     if (f.exists()) {
       BufferedWriter writer = new BufferedWriter(new FileWriter(f));
+      for(int i = 0; i < orderedList.length; i++) {
+	orderedList[i].write(writer);
+      }
+      writer.flush();
+      writer.close();
+    }
+    */
+
+    OutputStream os = Pooka.getResourceManager().getOutputStream(fileName);
+    if (os != null) {
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
       for(int i = 0; i < orderedList.length; i++) {
 	orderedList[i].write(writer);
       }

@@ -5,6 +5,9 @@ import net.suberic.pooka.ssl.*;
 import net.suberic.pooka.*;
 import javax.activation.*;
 
+import java.net.*;
+import java.io.*;
+
 /**
  * A ResourceManager which uses files.
  */
@@ -40,5 +43,19 @@ public class FileResourceManager extends ResourceManager {
     return new PookaTrustManager(pTrustManagers, fileName);
   }
 
+  public java.io.InputStream getInputStream(String pFileName) 
+    throws java.io.IOException {
+    try {
+      URL url = new URL(pFileName);
+      return url.openStream();
+    } catch (MalformedURLException mue) {
+      return new FileInputStream(new File(pFileName));
+    }
+  }
   
+
+  public java.io.OutputStream getOutputStream(String pFileName) 
+    throws java.io.IOException {
+    return new FileOutputStream(new File(pFileName));
+  }
 }

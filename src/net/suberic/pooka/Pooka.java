@@ -43,6 +43,7 @@ public class Pooka {
   static public OutgoingMailServerManager outgoingMailManager;
   static public PookaEncryptionManager cryptoManager;
   static public net.suberic.pooka.resource.ResourceManager resourceManager;
+  static public net.suberic.pooka.ssl.PookaTrustManager sTrustManager = null;
 
   // the main Pooka panel.
   static public net.suberic.pooka.gui.MainPanel panel;
@@ -66,9 +67,15 @@ public class Pooka {
    * --rcfile <filename>     use the given file as the pooka startup file.
    *
    * --http  runs with a configuration file loaded via http
+   *
+   * --help shows these options.
    */
   static public void main(String argv[]) {
     sStartTime = System.currentTimeMillis();
+
+    loadInitialResources();
+
+    updateTime("intial resources parsed.");
 
     parseArgs(argv);
 
@@ -276,14 +283,46 @@ public class Pooka {
     }
 
   }
+
+  /**
+   * Loads the initial resources for Pooka.  These are used during startup.
+   */
+  private static void loadInitialResources() {
+    try {
+      ClassLoader cl = new Pooka().getClass().getClassLoader();
+      java.net.URL url;
+      if (cl == null) {
+	url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
+      } else {
+	url = cl.getResource("net/suberic/pooka/Pookarc");
+      }
+
+      if (url == null) {
+	//sigh
+	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
+      }
+      
+      java.io.InputStream is = url.openStream();
+      resources = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
+    } catch (Exception e) {
+      System.err.println("caught exception loading system resources:  " + e);
+      e.printStackTrace();
+      System.exit(-1);
+    }
+  }
   
 
   /**
    * Loads all the resources for Pooka.
    */
   public static void loadResources() {
-    
+    if (resources == null) {
+      System.err.println("Error starting up Pooka:  No system resource files found.");
+      System.exit(-1);
+    }
+
     try {
+      /*
       ClassLoader cl = new Pooka().getClass().getClassLoader();
       java.net.URL url;
       if (cl == null) {
@@ -298,6 +337,9 @@ public class Pooka {
       
       java.io.InputStream is = url.openStream();
       net.suberic.util.VariableBundle pookaDefaultBundle = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
+      */
+
+      net.suberic.util.VariableBundle pookaDefaultBundle = resources;
       if (! useLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
 	resourceManager = new DisklessResourceManager();
       } else {
@@ -309,7 +351,6 @@ public class Pooka {
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
       
       resources = resourceManager.createVariableBundle(localrc, pookaDefaultBundle);
-      
     } catch (Exception e) {
       System.err.println("caught exception:  " + e);
       e.printStackTrace();
@@ -345,6 +386,9 @@ public class Pooka {
 	} else if (argv[i].equals("--http")) {
 	  useHttp = true;
 	  useLocalFiles = false;
+	} else if (argv[i].equals("--help")) {
+	  System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  --help                       shows these options.\n"));
+	  System.exit(0);
 	}
       }
     }
@@ -588,6 +632,27 @@ public class Pooka {
    */
   static public HelpBroker getHelpBroker() {
     return helpBroker;
+  }
+
+  /**
+   * The ResourceManager controls access to resource files.
+   */
+  static public ResourceManager getResourceManager() {
+    return resourceManager;
+  }
+
+  /**
+   * The SSL Trust Manager.
+   */
+  static public net.suberic.pooka.ssl.PookaTrustManager getTrustManager() {
+    return sTrustManager;
+  }
+
+  /**
+   * The SSL Trust Manager.
+   */
+  static public void setTrustManager(net.suberic.pooka.ssl.PookaTrustManager pTrustManager) {
+    sTrustManager = pTrustManager;
   }
 
   private static long sStartTime = 0;

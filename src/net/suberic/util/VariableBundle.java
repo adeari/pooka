@@ -215,7 +215,46 @@ public class VariableBundle extends Object {
     return convertToVector(getProperty(propertyName, defaultValue));
   }
   
+  /**
+   * Converts a value which has multiple values separated by a ':' (colon)
+   * to a java.util.List.
+   */
+  public static List convertToList(String value) {
+    List returnValue = new ArrayList();
+    StringTokenizer tokens = new StringTokenizer(value, ":");
+    while (tokens.hasMoreElements())
+      returnValue.add(tokens.nextElement());
+    return returnValue;
+  }
   
+  /**
+   * Converts the given property value to a List using the convertToList
+   * call.
+   */
+  public List getPropertyAsList(String propertyName, String defaultValue) {
+    return convertToList(getProperty(propertyName, defaultValue));
+  }
+  
+  /**
+   * Converts a List of Strings to a colon-delimited String.
+   */
+  public static String convertToString(List pValue) {
+    if (pValue == null || pValue.size() == 0)
+      return "";
+    else {
+      StringBuffer returnBuffer = new StringBuffer();
+      Iterator it = pValue.iterator();
+      while (it.hasNext()) {
+	returnBuffer.append((String) it.next());
+	if (it.hasNext()) {
+	  returnBuffer.append(":");
+	}
+      }
+
+      return returnBuffer.toString();
+    }
+  }
+
   /**
    * Saves the current properties in the VariableBundle to a file.  Note
    * that this only saves the writableProperties of this particular
