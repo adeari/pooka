@@ -487,8 +487,8 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Refreshes the display.
    */
   public void refreshDisplay() throws javax.mail.MessagingException {
-    messageDisplay.resetEditorText();
     configureInterfaceStyle();
+    messageDisplay.resetEditorText();
     
     java.awt.Component fOwner = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     if (fOwner != null && messageDisplay != null && SwingUtilities.isDescendingFrom(fOwner, messageDisplay) && messageDisplay.getMessageUI() == null) {
