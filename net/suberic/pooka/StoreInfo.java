@@ -81,8 +81,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       user = "";
       password = "";
       server = "localhost";
-      //protocol = "mbox";
-      protocol = "maildir";
+      if (Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset").equalsIgnoreCase("true"))
+	protocol = "maildir";
+      else
+	protocol = "mbox";
       port = -1;
       popStore = true;
     } else {
@@ -207,7 +209,16 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       loadImapProperties(p);
     } else if (realProtocol.equalsIgnoreCase("pop3")) {
       loadPop3Properties(p);
-      if ( Pooka.getProperty(getStoreProperty() + ".useMaildir", "false").equalsIgnoreCase("false")) {
+      String useMaildir = Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset");
+
+      if (useMaildir.equals("unset")) {
+	System.err.println(getStoreProperty() + ".useMaildir = unset.  setting.");
+	//File f = new File(Pooka.getProperty() + ".
+	Pooka.setProperty(getStoreProperty() + ".useMaildir", "false");
+	useMaildir="false";
+      }
+	  
+      if ( useMaildir.equalsIgnoreCase("false")) {
 	loadMboxProperties(p);
       } else {
 	loadMaildirProperties(p);

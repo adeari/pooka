@@ -490,8 +490,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	
 	getFolderInfo().loadAllMessages();
 	
-	if (! getFolderInfo().isSortaOpen())
+	if (! getFolderInfo().isSortaOpen()) {
 	  getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE);
+	}
 	
 	int firstUnread = -1;
 	int messageCount = -1;

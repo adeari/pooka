@@ -177,6 +177,7 @@ public class PopInboxFolderInfo extends FolderInfo {
 	      msgsToAppend[i] = new MimeMessage((MimeMessage) msgs[i]);
 	      String uid = getUID(msgs[i], f);
 	      msgsToAppend[i].addHeader(UID_HEADER, uid);
+	      msgsToAppend[i].setFlag(Flags.Flag.RECENT, true);
 	      uidsRead.add(uid);
 	      if (Pooka.isDebug())
 		System.out.println("adding " + uid + " to read list.");

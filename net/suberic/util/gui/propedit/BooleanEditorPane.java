@@ -68,7 +68,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    */
   public void setValue() {
     if (isEnabled()) {
-      if (inputField.isSelected() != originalBoolean) {
+      if (inputField.isSelected() != originalBoolean || manager.getProperty(property, "unset").equals("unset")) {
 	String newValue;
 	if (inputField.isSelected())
 	  newValue = "true";
@@ -76,8 +76,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
 	  newValue = "false";
 	
 	manager.setProperty(property, newValue);
-      }
-
+      } 
     }
   }
   

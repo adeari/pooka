@@ -1,17 +1,9 @@
 *) change over from mbox to maildir or something like it.
-	-- make sure default for new is maildir, not mbox.
-	-- make sure old mbox setups still work
 	-- add configs for both.
 
-	-- fix list()
-	-- fix updatemsgs
 	-- tag new messages as recent.
-	-- see why sent folder won't open.
-	-- fix id for mfn -- right now, you can get duplicates.
 
 --
-
-*) check unsubscribe w/subdir.
 
 *) add "view pookarc"
 

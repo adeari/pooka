@@ -756,7 +756,7 @@ Store.editableFields.storeConfig.pop3=POP3:options
 Store.editableFields.storeConfig.pop3.POP3=server:user:password:port
 Store.editableFields.storeConfig.pop3.POP3.scoped=true
 Store.editableFields.storeConfig.pop3.POP3.scopeRoot=Store.editableFields
-Store.editableFields.storeConfig.pop3.options=SSL:leaveMessagesOnServer:deleteOnServerOnLocalDelete
+Store.editableFields.storeConfig.pop3.options=SSL:leaveMessagesOnServer:deleteOnServerOnLocalDelete:useMaildir
 Store.editableFields.storeConfig.pop3.options.scoped=true
 Store.editableFields.storeConfig.pop3.options.scopeRoot=Store.editableFields
 
@@ -782,13 +782,15 @@ Store.editableFields.expungeOnExit=false
 Store.editableFields.useSubscribed.propertyType=Boolean
 Store.editableFields.useSubscribed=false
 Store.editableFields.leaveMessagesOnServer.propertyType=Boolean
-Store.editableFields.leaveMessagesOnServer=false
+Store.editableFields.leaveMessagesOnServer=true
 Store.editableFields.deleteOnServerOnLocalDelete.propertyType=Boolean
-Store.editableFields.deleteOnServerOnLocalDelete=false
+Store.editableFields.deleteOnServerOnLocalDelete=true
 Store.editableFields.inboxLocation=/var/spool/mail/${user.name}
 Store.editableFields.inboxLocation.propertyType=File
 Store.editableFields.mailDirectory.propertyType=Directory
 Store.editableFields.mailDirectory=Pooka.cacheDirectory
+Store.editableFields.useMaildir.propertyType=Boolean
+Store.editableFields.useMaildir=true
 
 Store.editableFields.trashFolder.namePrefix=Store.
 Store.editableFields.trashFolder.nameSuffix=.trashFolder
