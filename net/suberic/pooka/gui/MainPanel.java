@@ -53,48 +53,47 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * This actually sets up the main panel.
      */
     public void configureMainPanel() {
-	// set supported actions
-	// this.setLayout(new BorderLayout());
-	// create the menu bar.
+      // set supported actions
+      // this.setLayout(new BorderLayout());
+      // create the menu bar.
+      
+      contentPanel = Pooka.getUIFactory().createContentPanel();
+      folderPanel = new FolderPanel(this);
+      infoPanel = new InfoPanel();
+      infoPanel.setMessage("Pooka");
+      
+      this.setLeftComponent(folderPanel);
+      this.setRightComponent(contentPanel.getUIComponent());
+      this.setDividerLocation(folderPanel.getPreferredSize().width);
+      
+      mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
+      mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
+      
+      keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
+      keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
-	contentPanel = Pooka.getUIFactory().createContentPanel();
-	folderPanel = new FolderPanel(this);
-	infoPanel = new InfoPanel();
-	infoPanel.setMessage("Pooka");
-	Pooka.getResources().addValueChangeListener(folderPanel, "Store");
-
-	this.setLeftComponent(folderPanel);
-	this.setRightComponent(contentPanel.getUIComponent());
-	this.setDividerLocation(folderPanel.getPreferredSize().width);
-
-	mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
-	mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
-
-	keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
-	keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
-
-	// set the default active menus.
-	// actually, don't do this here--let Pooka do it.  this is because
-	// the MenuBar hasn't actually been set yet.
-	//mainMenu.setActive(getActions());
-	//mainToolbar.setActive(getActions());
-	//keyBindings.setActive(getActions());
-	
-	getParentFrame().addWindowListener(new WindowAdapter() {
-		public void windowActivated(WindowEvent e) {
-		    setNewMessageFlag(false);
+      // set the default active menus.
+      // actually, don't do this here--let Pooka do it.  this is because
+      // the MenuBar hasn't actually been set yet.
+      //mainMenu.setActive(getActions());
+      //mainToolbar.setActive(getActions());
+      //keyBindings.setActive(getActions());
+      
+      getParentFrame().addWindowListener(new WindowAdapter() {
+	  public void windowActivated(WindowEvent e) {
+	    setNewMessageFlag(false);
 		}
-		
-		public void windowClosing(WindowEvent e) {
-		    exitPooka(1);
-		}
-	    });
-	
-	// set the initial currentUser
-	refreshCurrentUser();
-
-	// if openSavedFoldersOnStartup is set to true, then open all the
-	// saved folders.
+	  
+	  public void windowClosing(WindowEvent e) {
+	    exitPooka(1);
+	  }
+	});
+      
+      // set the initial currentUser
+      refreshCurrentUser();
+      
+      // if openSavedFoldersOnStartup is set to true, then open all the
+      // saved folders.
     }
 
     /**

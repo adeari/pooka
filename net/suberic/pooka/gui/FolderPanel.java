@@ -1,6 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
-import net.suberic.util.ValueChangeListener;
+import net.suberic.util.*;
 import net.suberic.util.gui.ConfigurableKeyBinding;
 import java.awt.*;
 import java.awt.event.*;
@@ -15,7 +15,7 @@ import java.util.Vector;
 /**
  * This class displays the Stores and Folders for Pooka.
  */
-public class FolderPanel extends JScrollPane implements ValueChangeListener, UserProfileContainer {
+public class FolderPanel extends JScrollPane implements ItemListChangeListener, UserProfileContainer {
     MainPanel mainPanel=null;
     JTree folderTree;
     DefaultTreeModel folderModel;
@@ -122,13 +122,13 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 	    root.add(storenode);
 	}
 	
-	Pooka.getStoreManager().addValueChangeListener(this);
+	Pooka.getStoreManager().addItemListChangeListener(this);
 
 	return root;
     }
 
     /**
-     * refreshStores() goes through the list of registered stores and 
+     * refreshStores(e) goes through the list of registered stores and 
      * compares these to the value of the "Store" property.  If any
      * stores are no longer listed in that property, they are removed
      * from the FolderPanel.  If any new stores are found, they are
@@ -140,34 +140,25 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
      * This function is usually called in response to a ValueChanged
      * action on the "Store" property.
      */
-    public void refreshStores() {
-	Vector newStoreList = Pooka.getStoreManager().getStoreList();
-	MailTreeNode root = (MailTreeNode)getFolderTree().getModel().getRoot();
-	
-	java.util.Enumeration storeEnum = root.children();
-
-	StoreNode currentStoreNode;
-	StoreInfo currentStoreInfo;
-	while (storeEnum.hasMoreElements()) {
-	    boolean found = false;
-	    currentStoreNode = ((StoreNode)storeEnum.nextElement());
-	    currentStoreInfo = currentStoreNode.getStoreInfo();
-	    for (int i=0; !(found) && i < newStoreList.size(); i++) {
-		if (currentStoreInfo == newStoreList.elementAt(i)) {
-		    found = true;
-		    newStoreList.removeElement(currentStoreInfo);
-		}
-	    }
-	    if (!(found) )
-		root.remove(currentStoreNode);
-	}
-
-	for (int i = 0; i < newStoreList.size() ; i++) {
-	    this.addStore((StoreInfo)newStoreList.elementAt(i) , root);
-	}
-
-	getFolderTree().updateUI();
+  public void refreshStores(ItemListChangeEvent e) {
+    Item[] removed = e.getRemoved();
+    Item[] added = e.getAdded();
+    MailTreeNode root = (MailTreeNode)getFolderTree().getModel().getRoot();
+    for (int i = 0; removed != null && i < removed.length; i++) {
+      StoreInfo currentStore = (StoreInfo) removed[i];
+      if (currentStore != null) {
+	StoreNode sn = currentStore.getStoreNode();
+	if (sn != null) 
+	  root.remove(sn);
+      }
     }
+
+    for (int i = 0; added != null && i < added.length ; i++) {
+      this.addStore((StoreInfo)added[i] , root);
+    }
+    
+    getFolderTree().updateUI();
+  }
 
 
     /**
@@ -188,13 +179,12 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
     }
 
     /**
-     * Specified by interface net.suberic.util.ValueChangeListener
+     * Specified by interface net.suberic.util.ItemListChangeListener
      *
      */
-    public void valueChanged(String changedValue) {
-	if (changedValue.equals("Store"))
-	    refreshStores();
-    }
+  public void itemListChanged(ItemListChangeEvent e) {
+    refreshStores(e);
+  }
 
     /**
      * Specified by interface net.suberic.pooka.UserProfileContainer

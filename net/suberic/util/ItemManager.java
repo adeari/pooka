@@ -24,6 +24,9 @@ public class ItemManager implements ValueChangeListener {
   // the resource which defines this ItemList
   private String resourceString;
 
+  // the current value.
+  private String currentValue;
+
   // the VariableBundle which contains the Item information.
   private VariableBundle sourceBundle;
 
@@ -180,53 +183,57 @@ public class ItemManager implements ValueChangeListener {
    * fireItemListChangeEvent().
    */
   public synchronized void refreshItems() {
-    LinkedList newIdList = new LinkedList();
-    LinkedList newItemList = new LinkedList();
-
-    Vector addedItemList = new Vector();
-    Vector removedIdList = new Vector(itemIdList);
-
-    StringTokenizer tokens =  new StringTokenizer(sourceBundle.getProperty(resourceString, ""), ":");
-    
-    String itemID;
-
-    // at the end of this loop, we should end up with a newIdList which is a 
-    // list of the currently valid item id's, a newItemList which is a list
-    // of the currently valid items, an addedItemList which is a list of added
-    // items, and a removedIdList which is a list of removed id's.
-    while (tokens.hasMoreTokens()) {
-      itemID = tokens.nextToken();
-      newIdList.add(itemID);
-
-      if (itemIdList.contains(itemID)) {
-	removedIdList.remove(itemID);
-      } else {
-	// this is being added.
-	Item currentItem = (Item) itemIdMap.get(itemID);
-	if (currentItem == null) {
-	  itemIdMap.put(itemID, itemCreator.createItem(sourceBundle, resourceString, itemID));
+    if (! sourceBundle.getProperty(resourceString).equals(currentValue)) {
+      currentValue = sourceBundle.getProperty(resourceString);
+      
+      LinkedList newIdList = new LinkedList();
+      LinkedList newItemList = new LinkedList();
+      
+      Vector addedItemList = new Vector();
+      Vector removedIdList = new Vector(itemIdList);
+      
+      StringTokenizer tokens =  new StringTokenizer(sourceBundle.getProperty(resourceString, ""), ":");
+      
+      String itemID;
+      
+      // at the end of this loop, we should end up with a newIdList which is a 
+      // list of the currently valid item id's, a newItemList which is a list
+      // of the currently valid items, an addedItemList which is a list of added
+      // items, and a removedIdList which is a list of removed id's.
+      while (tokens.hasMoreTokens()) {
+	itemID = tokens.nextToken();
+	newIdList.add(itemID);
+	
+	if (itemIdList.contains(itemID)) {
+	  removedIdList.remove(itemID);
+	} else {
+	  // this is being added.
+	  Item currentItem = (Item) itemIdMap.get(itemID);
+	  if (currentItem == null) {
+	    itemIdMap.put(itemID, itemCreator.createItem(sourceBundle, resourceString, itemID));
+	  }
+	  addedItemList.add(itemIdMap.get(itemID));
 	}
-	addedItemList.add(itemIdMap.get(itemID));
+	newItemList.add(itemIdMap.get(itemID));
       }
-      newItemList.add(itemIdMap.get(itemID));
-    }
-
-    Item[] removedItems = new Item[removedIdList.size()];
-    for (int i = 0 ; i < removedIdList.size(); i++) {
-      Item currentItem = (Item) itemIdMap.get(removedIdList.get(i));
-      if (currentItem != null) {
-	itemIdMap.remove(removedIdList.get(i));
-	removedItems[i] = currentItem;
+      
+      Item[] removedItems = new Item[removedIdList.size()];
+      for (int i = 0 ; i < removedIdList.size(); i++) {
+	Item currentItem = (Item) itemIdMap.get(removedIdList.get(i));
+	if (currentItem != null) {
+	  itemIdMap.remove(removedIdList.get(i));
+	  removedItems[i] = currentItem;
+	}
       }
+      
+      Item[] addedItems = new Item[addedItemList.size()];
+      addedItemList.toArray(addedItems);
+      
+      itemList = newItemList;
+      itemIdList = newIdList;
+      
+      fireItemListChangeEvent(new ItemListChangeEvent(this, addedItems, removedItems));
     }
-    
-    Item[] addedItems = new Item[addedItemList.size()];
-    addedItemList.toArray(addedItems);
-    
-    itemList = newItemList;
-    itemIdList = newIdList;
-    
-    fireItemListChangeEvent(new ItemListChangeEvent(this, addedItems, removedItems));
   }
 
   /**
@@ -236,7 +243,7 @@ public class ItemManager implements ValueChangeListener {
    * refreshItems() when it gets one.
    */
   public void valueChanged(String changedValue) {
-    if (! changedValue.equals(resourceString))
+    if (changedValue.equals(resourceString))
       refreshItems();
   }
   
@@ -276,7 +283,8 @@ public class ItemManager implements ValueChangeListener {
     itemIdList = new LinkedList();
     String itemID = null;
     
-    StringTokenizer tokens =  new StringTokenizer(sourceBundle.getProperty(resourceString, ""), ":");
+    currentValue = sourceBundle.getProperty(resourceString, "");
+    StringTokenizer tokens =  new StringTokenizer(currentValue, ":");
     
     while (tokens.hasMoreTokens()) {
       itemID=(String)tokens.nextToken();
