@@ -20,12 +20,14 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
     JTextField valueDisplay;
     JButton inputButton;
     VariableBundle sourceBundle;
-    boolean enabled;
+    //boolean enabled;
 
     /**
      * This creates a new FolderSelectorPane.
      */
     public FolderSelectorPane(String newProperty, String typeTemplate, VariableBundle bundle, boolean isEnabled) {
+	if (Pooka.isDebug())
+	    System.out.println("creating new FolderSelectorPane.");
 	configureEditor(null, newProperty, typeTemplate, bundle, isEnabled);
     }
 
@@ -54,6 +56,9 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
      * This configures the editor with the appropriate information.
      */
     public void configureEditor(PropertyEditorFactory factory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
+	
+	if (Pooka.isDebug())
+	    System.out.println("configuring FolderSelectorPane.");
 	property=newProperty;
 	propertyTemplate = templateType;
 	sourceBundle = bundle;
@@ -72,9 +77,18 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
 	
 	inputButton = createInputButton();
 
+	valueDisplay.setPreferredSize(new java.awt.Dimension(150 - inputButton.getPreferredSize().width, valueDisplay.getMinimumSize().height));
+
 	this.add(label);
-	this.add(valueDisplay);
-	this.add(inputButton);
+	labelComponent = label;
+	JPanel tmpPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0,0));
+	tmpPanel.add(valueDisplay);
+	tmpPanel.add(inputButton);
+	tmpPanel.setPreferredSize(new java.awt.Dimension(150, valueDisplay.getMinimumSize().height));
+	valueComponent = tmpPanel;
+	//this.add(valueDisplay);
+	//this.add(inputButton);
+	this.add(tmpPanel);
 
 	this.setEnabled(isEnabled);
 
@@ -84,31 +98,46 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
      * Creates a button that will bring up a way to select the
      */
     public JButton createInputButton() {
+	if (Pooka.isDebug())
+	    System.out.println("creating an input button.");
 	try {
 	    java.net.URL url = this.getClass().getResource(sourceBundle.getProperty("FolderSelectorPane.inputButton.image", "images/More.gif"));
 	    if (url != null) {
+		if (Pooka.isDebug())
+		    System.out.println("url isn't null.");
+
 		ImageIcon icon = new ImageIcon(url);
 	    
 		JButton newButton = new JButton(icon);
+		if (Pooka.isDebug())
+		    System.out.println("new button is created.");
+
 		newButton.setPreferredSize(new java.awt.Dimension(icon.getIconHeight(), icon.getIconWidth()));
 		newButton.addActionListener(new AbstractAction() {
 			public void actionPerformed(ActionEvent e) {
 			    selectNewFolder();
 			}
 		    });
+
+		if (Pooka.isDebug())
+		    System.out.println("returning button.");
 		
 		return newButton;
 	    }
 	} catch (java.util.MissingResourceException mre) {
 	}
-	    JButton newButton = new JButton();
-	    newButton.addActionListener(new AbstractAction() {
-		    public void actionPerformed(ActionEvent e) {
-			selectNewFolder();
-		    }
-		});
-	    
-	    return newButton;
+
+	if (Pooka.isDebug())
+	    System.out.println("error - creating a blank button.");
+
+	JButton newButton = new JButton();
+	newButton.addActionListener(new AbstractAction() {
+		public void actionPerformed(ActionEvent e) {
+		    selectNewFolder();
+		}
+	    });
+	
+	return newButton;
     }
     
     /**
@@ -157,7 +186,7 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
 	    String currentStoreName = property.substring(prefixSize, property.length() - suffixSize);
 	    net.suberic.pooka.StoreInfo currentStore = Pooka.getStoreManager().getStoreInfo(currentStoreName);
 	    if (currentStore != null) {
-		returnValue = new MailFileSystemView(currentStore.getStore());
+		returnValue = new MailFileSystemView(currentStore);
 	    }
 	}
 
@@ -167,6 +196,8 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
     //  as defined in net.suberic.util.gui.PropertyEditorUI
 
     public void setValue() {
+	if (Pooka.isDebug())
+	    System.out.println("calling fsp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
 	if (isEnabled() && isChanged())
 	    sourceBundle.setProperty(property, (String)valueDisplay.getText());
     }
@@ -188,9 +219,14 @@ public class FolderSelectorPane extends DefaultPropertyEditor {
     }
 
     public void setEnabled(boolean newValue) {
+	if (Pooka.isDebug())
+	    System.out.println("calling fsp.setEnabled(" + newValue + ")");
         if (inputButton != null) {
             inputButton.setEnabled(newValue);
             enabled=newValue;
+	    if (Pooka.isDebug())
+		System.out.println("set enabled to " + newValue);
+
         }
     }
 

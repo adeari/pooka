@@ -74,6 +74,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
 	constraints.fill = GridBagConstraints.BOTH;
 
 	for (int i = 0; i < properties.size(); i++) {
+	    //System.out.println("creating editor for " + (String)properties.elementAt(i) + " with template " + (String) templates.elementAt(i));
 	    currentEditor =
               factory.createEditor((String)properties.elementAt(i), (String) templates.elementAt(i));
 	    editors.add(currentEditor);

@@ -178,7 +178,7 @@ public class StoreNode extends MailTreeNode {
         public void actionPerformed(java.awt.event.ActionEvent e) {
 
 	    JFileChooser jfc =
-		new JFileChooser("/", new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo().getStore()));
+		new JFileChooser(getStoreInfo().getStoreID(), new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo()));
 	    jfc.setMultiSelectionEnabled(true);
 	    jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 	    int returnValue =
@@ -188,7 +188,13 @@ public class StoreNode extends MailTreeNode {
 	    if (returnValue == JFileChooser.APPROVE_OPTION) {
 		net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper =
 		    ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
-		getStoreInfo().subscribeFolder(wrapper.getAbsolutePath());
+		String absFileName = wrapper.getAbsolutePath();
+		int firstSlash = absFileName.indexOf('/');
+		String normalizedFileName = absFileName;
+		if (firstSlash >= 0)
+		    normalizedFileName = absFileName.substring(firstSlash);
+		    
+		getStoreInfo().subscribeFolder(normalizedFileName);
 	    }
 		/*
 		  String newFolder = JOptionPane.showInternalInputDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), "Subscribe to what folder?");
@@ -204,7 +210,7 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    MailFileSystemView mfsv = new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo().getStore());
+	    MailFileSystemView mfsv = new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo());
 	    File f = mfsv.createFileObject("/");
 	    File[] files = mfsv.getFiles(f, false);
 

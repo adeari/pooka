@@ -397,7 +397,7 @@ NewAccountPooka.type.propertyType=List
 NewAccountPooka.type.allowedValues=imap:pop3
 NewAccountPooka.type=imap
 
-FolderSelectorPane.inputButton.image=images/More.gif
+FolderSelectorPane.inputButton.image=/net/suberic/pooka/gui/images/More.gif
 
 Search.searchTerms=Answered:Deleted:Draft:Flagged:Recent:Seen:From:To:CC:ToOrCC:Body:Subject
 Search.searchTerms.Answered.class=javax.mail.search.FlagTerm

@@ -3,6 +3,8 @@ import javax.swing.*;
 import javax.mail.*;
 import java.io.*;
 import net.suberic.pooka.Pooka;
+import net.suberic.pooka.StoreInfo;
+import java.util.Vector;
 
 /**
  * This class implements a FileSystemView based on the available Folders in
@@ -12,30 +14,42 @@ import net.suberic.pooka.Pooka;
 public class MailFileSystemView
     extends javax.swing.filechooser.FileSystemView {
 
-    Store store;
-    FolderFileWrapper root = null;
+    StoreInfo[] storeList;
+    FolderFileWrapper[] roots = null;
 
     /**
      * This creates a new MailFileSystemView at the top of the Store list; 
      * all available Stores will be listed, with their folders under them.
      */
     public MailFileSystemView() {
-
+	Vector v = Pooka.getStoreManager().getStoreList();
+	for (int i = v.size() - 1; i >= 0; i--) {
+	    StoreInfo current = (StoreInfo) v.elementAt(i);
+	    if (! current.isConnected()) 
+		v.removeElementAt(i);
+	}
+	
+	storeList = new StoreInfo[v.size()];
+	for (int i = 0; i < v.size(); i++) {
+	    storeList[i] = (StoreInfo) v.elementAt(i);
+	}
+	
+	getRoots();
     }
     
     /**
      * This creates a MailFileSystemView out of a Store object.
      */
-    public MailFileSystemView(Store newStore) {
-	store = newStore;
+    public MailFileSystemView(StoreInfo newStore) {
+	storeList = new StoreInfo[] { newStore };
 	if (Pooka.isDebug())
-	    System.out.println("creating new MailFileSystemView for store " + store.getURLName());
+	    System.out.println("creating new MailFileSystemView for store " + newStore.getStoreID());
 
 	try {
-	    if (!store.isConnected()) {
+	    if (!newStore.isConnected()) {
 		if (Pooka.isDebug())
 		    System.out.println("store is not connected.  connecting.");
-		store.connect();
+		newStore.connectStore();
 	    }
 	    getRoots();
 	} catch (MessagingException me) {
@@ -78,24 +92,52 @@ public class MailFileSystemView
 	if (Pooka.isDebug())
 	    System.out.println("running createFileObject2 on filename '" + filename + "'");
 
-	FolderFileWrapper rootFile = ((FolderFileWrapper) getRoot());
-	if (rootFile == null) {
+	if (roots == null || roots.length == 0) {
 	    if (Pooka.isDebug())
 		System.out.println("root == null");
 	    return null;
 	}
-
+	
 	if (Pooka.isDebug())
 	    System.out.println("root != null");
-
+	
 	if (filename.equals("/") || filename.equals("")) {
-	    return rootFile;
+	    return roots[0];
 	}
 	
-	return rootFile.getFileByName
-	    (rootFile.filenameAsRelativeToRoot(filename));
+	int firstSlash = filename.indexOf('/');
+	String storeName = null;
+	String filePart = "";
+	if (firstSlash > -1) {
+	    storeName = filename.substring(0, firstSlash);
+	    if (Pooka.isDebug())
+		System.out.println("store name is " + storeName);
+	    if (firstSlash < filename.length()) {
+		filePart = filename.substring(firstSlash + 1);
+		if (Pooka.isDebug())
+		    System.out.println("file name is " + filePart);
+	    }
+	} else {
+	    if (Pooka.isDebug())
+		System.out.println("store name is " + filename);
+
+	    storeName = filename;
+	}
+
+	FolderFileWrapper currentRoot = findRoot(storeName);
+	if (currentRoot == null) {
+	    if (Pooka.isDebug())
+		System.out.println("found no matching store root for " + storeName + ".");
+	    return new File(filename);
+	}
+
+	return currentRoot.getFileByName(filePart);
+
     }
 
+    /**
+     * Creates a new Folder under the containingDir.
+     */
     public File createNewFolder(File containingDir) {
 	if (Pooka.isDebug())
 	    System.out.println("running createNewFolder.");
@@ -124,18 +166,32 @@ public class MailFileSystemView
 	return null;
     }
 
+    /**
+     * Returns all of the files under a particular directory.
+     */
     public File[] getFiles(File dir, boolean useFileHiding) {
 	if (Pooka.isDebug())
-	    System.out.println("running getFiles.");
+	    System.out.println("running getFiles " + dir + ", " + useFileHiding + ".");
 
 	if (dir instanceof FolderFileWrapper) {
+	    if (Pooka.isDebug())
+		System.out.println("getFiles:  returning dir.listFiles()");
 	    return ((FolderFileWrapper)dir).listFiles();
 	} else {
-	    if (dir == null)
+	    if (Pooka.isDebug())
+		System.out.println("getFiles:  dir isn't a FFW.");
+	    if (dir == null) {
+		if (Pooka.isDebug())
+		    System.out.println("getFiles:  dir is null; returning null.");
 		return null; // FIXME: or set dir to root?
-	    
+	    }
+
 	    // FIXME: ugly?
-		File f = ((FolderFileWrapper)getRoot()).getFileByName(dir.getAbsolutePath());
+
+	    if (Pooka.isDebug())
+		System.out.println("getFiles:  just returning the root.");
+
+		File f = ((FolderFileWrapper)getDefaultRoot()).getFileByName(dir.getAbsolutePath());
 		
 		if (f == null) return null; // FIXME: error?
 		
@@ -143,54 +199,61 @@ public class MailFileSystemView
 	}
     }
 
+    /**
+     * Returns the user's home directory.  Kind of a strange thing
+     * on a mail system...
+     */
     public File getHomeDirectory() {
 	if (Pooka.isDebug())
 	    System.out.println("running getHomeDirectory().");
 
-	if (root != null)
-	    return root;
-	else {
-	    return getRoot();
-	}
+	return getDefaultRoot();
     }
 
+    /**
+     * Returns the parent directory of the current File.
+     */
     public File getParentDirectory(File dir) {
 	if (Pooka.isDebug())
-	    System.out.println("running getParentDirectory");
+	    System.out.println("running getParentDirectory on " + dir);
 
 	if (dir == null)
 	    return null; // at root
 
 	if (! (dir instanceof FolderFileWrapper)) {
-	    if (getRoot() == null)
+	    if (roots != null && roots.length > 0) {
+		dir = createFileObject(dir.getPath());
+	    } else 
 		return null; // FIXME error?
-	    dir = ((FolderFileWrapper) getRoot()).getFileByName(dir.getAbsolutePath());
+	    
 	}
-
 	if (dir == null)
-	    return null; // FIXME error?
+	    return null; // at root
 
-	// FIXME is this cast always okay?
-	return ((FolderFileWrapper)dir).getParentFile();
+	return dir.getParentFile();
     }
 
+    /**
+     * Gets all the roots for this MailFileSystemView.
+     */
     public File[] getRoots() {
 	if (Pooka.isDebug())
 	    System.out.println("calling getRoots() on MailFileSystemView.");
 
-	if (root != null) {
+	if (roots != null) {
 	    if (Pooka.isDebug())
 		System.out.println("root has already been set.");
-	    return new File[] { root };
+	    return roots;
 	}
 	try {
 	    if (Pooka.isDebug())
 		System.out.println("setting folder f to store.getDefaultFolder().");
-	    Folder f = store.getDefaultFolder();
-	    if (Pooka.isDebug())
-		System.out.println("done setting f.");
-	    root = new FolderFileWrapper(f, null, "/");
-	    return new File[] { root };
+	    roots = new FolderFileWrapper[storeList.length];
+	    for (int i = 0; i < storeList.length; i++) {
+		Folder f = storeList[i].getStore().getDefaultFolder();
+		roots[i] = new FolderFileWrapper(f, null, storeList[i].getStoreID());
+	    }
+	    return roots;
 	} catch (MessagingException me) {
 	    return null; // FIXME: throw this on
 	}
@@ -204,7 +267,7 @@ public class MailFileSystemView
     }
 
     /**
-     * returns true for '/' only.
+     * returns true for all files in the roots array.
      */
     public boolean isRoot(File f) {
 	if (f.getParentFile() == null)
@@ -215,14 +278,26 @@ public class MailFileSystemView
 
     /* Not inherited. */
 
-    public File getRoot() {
-	if (root == null)
+    public File getDefaultRoot() {
+	if (roots == null)
 	    {
-		File[] roots = getRoots();
-		if (roots != null && roots.length > 0)
-		    root = ((FolderFileWrapper) roots[0]);
+		File[] localRoots = getRoots();
+		if (localRoots != null && localRoots.length > 0)
+		    return localRoots[0];
+		else
+		    return null;
 	    }
-	return root;
+	return roots[0];
     }
 
+    /**
+     * This finds the Root with the given name, if any.
+     */
+    public FolderFileWrapper findRoot(String name) {
+	for (int i = 0; i < roots.length; i++) {
+	    if (roots[i].getPath().equals(name))
+		return roots[i];
+	}
+	return null;
+    }
 }

@@ -129,6 +129,7 @@ public class FolderFileWrapper extends File {
      * Returns this object.
      */
     public File getAbsoluteFile() {
+	System.out.println("calling getAbsoluteFile() on " + getAbsolutePath());
 	if (this.isAbsolute())
 	    return this;
 	else 
@@ -151,18 +152,32 @@ public class FolderFileWrapper extends File {
      * the this on the parent and then appending this name.
      */
     public String getAbsolutePath() {
-	if (isAbsolute())
+	if (Pooka.isDebug())
+	    System.out.println("calling getAbsolutePath() on " + path);
+
+	if (isAbsolute()) {
+	    if (Pooka.isDebug())
+		System.out.println("returning " + getPath());
 	    return getPath();
+	}
 	else {
 	    if (parent != null) {
 		String parentPath = parent.getAbsolutePath();
-		if (parentPath != "/")
+		if (parentPath != "/") {
+		    if (Pooka.isDebug())
+			System.out.println("returning parentPath + slash + getPath() (" + parentPath + "/" + getPath() + ")");
+
 		    return parentPath + "/" + getPath();
-		else
+		} else {
+		    if (Pooka.isDebug())
+			System.out.println("returning just slash + getPath() (/" + getPath() + ")");
 		    return "/" + getPath();
-		
-	    } else
+		}
+	    } else {
+		if (Pooka.isDebug())
+		    System.out.println("returning just /.");
 		return "/";
+	    }
 	}
     }
     
@@ -448,11 +463,21 @@ public class FolderFileWrapper extends File {
 		    }
 		    
 		    
+		    if (Pooka.isDebug())
+			System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
 		    Folder[] childList = folder.list();
-		    children = new FolderFileWrapper[childList.length];
+		    if (Pooka.isDebug())
+			System.out.println(Thread.currentThread().getName() + ":  folder.list() returned " + childList + "; creating new folderFileWrapper.");
+
+		    FolderFileWrapper[] tmpChildren = new FolderFileWrapper[childList.length];
 		    for (int i = 0; i < childList.length; i++) {
-			children[i] = new FolderFileWrapper(childList[i], this);
+			if (Pooka.isDebug())
+			    System.out.println(Thread.currentThread().getName() + ":  calling new FolderFileWrapper for " + childList[i].getName() + " (entry # " + i);
+
+			tmpChildren[i] = new FolderFileWrapper(childList[i], this);
 		    }
+
+		    children = tmpChildren;
 		} catch (MessagingException me) {
 		    if (Pooka.isDebug())
 			System.out.println("caught exception during FolderFileWrapper.loadChildren() on " + getAbsolutePath() + ".");
@@ -470,7 +495,7 @@ public class FolderFileWrapper extends File {
 	    System.out.println("calling getFileByName(" + filename + ") on folder " + getName() + " (" + getPath() + ") (abs " + getAbsolutePath() + ")");
 
 	String origFilename = new String(filename);
-	if (filename == null || filename.length() < 1) {
+	if (filename == null || filename.length() < 1 || (filename.equals("/") && getParentFile() == null)) {
 	    if (Pooka.isDebug())
 		System.out.println("returning this for getFileByName()");
 	    return this;

@@ -8,7 +8,7 @@ import java.awt.Dimension;
  */
 public abstract class DefaultPropertyEditor extends JPanel implements PropertyEditorUI {
     // shows whether or not this component is enabled.
-    boolean enabled;
+    protected boolean enabled;
 
     // the label component.  this is used for a default implementation
     // of the sizing code we have below.
