@@ -130,7 +130,7 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener {
 	
 	try {
 	    Store store = session.getStore(urln);
-	    StoreNode storenode = new StoreNode(store, storeID, this);
+	    StoreNode storenode = new StoreNode(store, storeID, this, true);
 	    root.add(storenode);
 	} catch (NoSuchProviderException nspe) {
 	}

@@ -19,18 +19,22 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
     
     protected FolderInfo folderInfo = null;
     protected boolean hasLoaded = false;
+    protected boolean listSubscribedOnly;
 
     /**
      * creates a tree node that points to a folder
      *
      * @param newFolder	the store for this node
+     * @param newParent the parent component
+     * @param subscribedOnly whether or not the children of this node are
+     * just the subscribed folders, or all folders.
      */
-    public FolderNode(FolderInfo newFolderInfo, JComponent newParent) {
+    public FolderNode(FolderInfo newFolderInfo, JComponent newParent, boolean subscribedOnly) {
 	super(newFolderInfo, newParent);
+	listSubscribedOnly=subscribedOnly;
 	folderInfo = newFolderInfo;
 
 	commands = new Hashtable();
-
 	
 	Action[] actions = defaultActions;
 
@@ -41,19 +45,19 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	    }
 	}
 
+	if (listSubscribedOnly) {
+	    folderInfo.addMessageCountListener(new MessageCountAdapter() {
+		    public void messagesAdded(MessageCountEvent e) {
+			getParentContainer().repaint();
+		    }
 
-	folderInfo.addMessageCountListener(new MessageCountAdapter() {
-		public void messagesAdded(MessageCountEvent e) {
-		    getParentContainer().repaint();
-		}
-
-		public void messageRemoved(MessageCountEvent e) {
-		    getParentContainer().repaint();
-		}
-	    });
-
-	folderInfo.addMessageChangedListener(this);
-	
+		    public void messageRemoved(MessageCountEvent e) {
+			getParentContainer().repaint();
+		    }
+		});
+	    
+	    folderInfo.addMessageChangedListener(this);
+	}
     }
 
     
@@ -104,20 +108,41 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	
 	Folder folder = getFolder();
 
-	Folder[] subscribed;
-	
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + getFolderID() + ".folderList", "INBOX"), ":");
+	if (listSubscribedOnly) {
+	    Folder[] subscribed;
 	    
-	String newFolderName;
-
-	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + getFolderID() + ".folderList", "INBOX"), ":");
+	    
+	    String newFolderName;
+	    
+	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+		try {
+		    newFolderName = (String)tokens.nextToken();
+		    subscribed = folder.list(newFolderName);
+		    FolderNode node = new FolderNode(new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName), getParentContainer(), true);
+		    // we used insert here, since add() would mak
+		    // another recursive call to getChildCount();
+		    insert(node, i);
+		} catch (MessagingException me) {
+		    if (me instanceof FolderNotFoundException) {
+			JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
+		    } else {
+			me.printStackTrace();
+		    }
+		}
+	    }
+	} else {
 	    try {
-		newFolderName = (String)tokens.nextToken();
-		subscribed = folder.list(newFolderName);
-		FolderNode node = new FolderNode(new FolderInfo(subscribed[0], getFolderID() + "." + newFolderName), getParentContainer());
-		// we used insert here, since add() would mak
-		// another recursive call to getChildCount();
-		insert(node, i);
+		
+		Folder[] folderList = folder.list();
+		
+		for (int i = 0 ; i < folderList.length ; i++) {
+		    FolderNode node = new FolderNode(new FolderInfo(folderList[i], getFolderID() + "." + folderList[0].getName()), getParentContainer(), false);
+		    // we used insert here, since add() would mak
+		    // another recursive call to getChildCount();
+		    insert(node, i);
+		}
+
 	    } catch (MessagingException me) {
 		if (me instanceof FolderNotFoundException) {
 		    JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());

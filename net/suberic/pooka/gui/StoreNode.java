@@ -16,36 +16,40 @@ public class StoreNode extends MailTreeNode {
     protected String storeID = null;
     protected String displayName = null;
     private boolean connected = false;
+    protected boolean listSubscribedOnly;
 
-    public StoreNode(Store newStore, String storePrefix, JComponent parent) {
+    public StoreNode(Store newStore, String storePrefix, JComponent parent, boolean subscribedOnly) {
 	super(newStore, parent);
 	store = newStore;
 	storeID=storePrefix;
+	listSubscribedOnly=subscribedOnly;
 	displayName=Pooka.getProperty("Store." + storeID + ".displayName", storeID);
 	setCommands();
-	store.addConnectionListener(new ConnectionAdapter() {
-		public void closed(ConnectionEvent e) {
-		    System.out.println("Store " + displayName + " closed.");
-		    if (connected == true) {
-			try {
-			    connectStore();
-			} catch (MessagingException me) {
-			    System.out.println("Store " + displayName + " closed and unable to reconnect:  " + me.getMessage());
+	if (listSubscribedOnly) {
+	    store.addConnectionListener(new ConnectionAdapter() {
+		    public void closed(ConnectionEvent e) {
+			System.out.println("Store " + displayName + " closed.");
+			if (connected == true) {
+			    try {
+				connectStore();
+			    } catch (MessagingException me) {
+				System.out.println("Store " + displayName + " closed and unable to reconnect:  " + me.getMessage());
+			    }
 			}
 		    }
-		}
 
-		public void disconnected(ConnectionEvent e) {
-		    System.out.println("Folder " + displayName + " disconnected.");
-		    if (connected == true) {
-			try {
-			    connectStore();
-			} catch (MessagingException me) {
-			    System.out.println("Disconnected from store " + displayName + " and unable to reconnect:  " + me.getMessage());
+		    public void disconnected(ConnectionEvent e) {
+			System.out.println("Folder " + displayName + " disconnected.");
+			if (connected == true) {
+			    try {
+				connectStore();
+			    } catch (MessagingException me) {
+				System.out.println("Disconnected from store " + displayName + " and unable to reconnect:  " + me.getMessage());
+			    }
 			}
 		    }
-		}
-	    });
+		});
+	}
     }
     
     /**
@@ -103,21 +107,55 @@ public class StoreNode extends MailTreeNode {
 	    } catch (MessagingException me) {
 		return;
 	    }
-	
-	Folder[] subscribed;
-	
-	String folderName;
-	
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + storeID + ".folderList", "INBOX"), ":");
-	
-	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+
+	if (folder == null)
 	    try {
-		folderName = (String)tokens.nextToken();
-		subscribed = folder.list(folderName);
-		FolderNode node = new FolderNode(new FolderInfo(subscribed[0], storeID + "." + folderName ),getParentContainer());
-		// we used insert here, since add() would mak
-		// another recursive call to getChildCount();
-		insert(node, i);
+		folder = store.getDefaultFolder();
+	    } catch (MessagingException meFolder) {
+		try {
+		    store.close();
+		} catch (MessagingException meClose) {
+		    // we don't care here.
+		}
+		folder=null;
+		return;
+	    }
+
+
+	if (listSubscribedOnly) {
+	    Folder[] subscribed;
+	    
+	    String folderName;
+	    
+	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("Store." + storeID + ".folderList", "INBOX"), ":");
+	    
+	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+		try {
+		    folderName = (String)tokens.nextToken();
+		    subscribed = folder.list(folderName);
+		    FolderNode node = new FolderNode(new FolderInfo(subscribed[0], storeID + "." + folderName ),getParentContainer(), listSubscribedOnly);
+		    // we used insert here, since add() would mak
+		    // another recursive call to getChildCount();
+		    insert(node, i);
+		} catch (MessagingException me) {
+		    if (me instanceof FolderNotFoundException) {
+			JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
+		    } else {
+			me.printStackTrace();
+		    }
+		}
+	    }
+	} else {
+	    try {
+		Folder[] folderList = folder.list();
+
+		if (folderList != null) 
+		    for (int i = 0 ; i < folderList.length ; i++) {
+			FolderNode node = new FolderNode(new FolderInfo(folderList[i], storeID + "." + folderList[i].getName() ),getParentContainer(), false);
+			// we used insert here, since add() would mak
+			// another recursive call to getChildCount();
+			insert(node, i);
+		    }
 	    } catch (MessagingException me) {
 		if (me instanceof FolderNotFoundException) {
 		    JOptionPane.showInternalMessageDialog(((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel(), Pooka.getProperty("error.FolderWindow.folderNotFound", "Could not find folder.") + "\n" + me.getMessage());
@@ -127,7 +165,6 @@ public class StoreNode extends MailTreeNode {
 	    }
 	}
     }
-
     public String getStoreID() {
 	return storeID;
     }
@@ -163,9 +200,19 @@ public class StoreNode extends MailTreeNode {
 		}
 	}
     }
+
+    /**
+     * Subscribes to the given Folder.
+     *
+     */
+
+    public void subscribeFolder(Folder f) {
+    }
 	    
     
-    public Action[] defaultActions = new Action[] {new OpenAction()
+    public Action[] defaultActions = new Action[] {
+	new OpenAction(),
+	new SubscribeAction()
 	};
 
     public Action[] getDefaultActions() {
@@ -192,6 +239,24 @@ public class StoreNode extends MailTreeNode {
 		}
 	    javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
 	    folderTree.expandPath(folderTree.getSelectionPath());
+	}
+    }
+
+    class SubscribeAction extends AbstractAction {
+	
+        SubscribeAction() {
+            super("folder-subscribe");
+        }
+	
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+	    FolderChooser fc = new FolderChooser(store);
+	    ((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel().add((JInternalFrame)fc.getFrame());
+	    fc.show();
+	    try {
+		((JInternalFrame)fc.getFrame()).setSelected(true);
+	    } catch (java.beans.PropertyVetoException pve) {
+	    }
+
 	}
     }
 
