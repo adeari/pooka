@@ -1,4 +1,4 @@
-package net.suberic.pooka.gui;
+package net.suberic.pooka.gui.search;
 import javax.swing.*;
 import javax.mail.search.*;
 import java.util.*;
