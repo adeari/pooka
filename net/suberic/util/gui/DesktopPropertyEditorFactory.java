@@ -6,10 +6,25 @@ import java.util.Vector;
 
 public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
 
+    JDesktopPane desktop;
+
+    public DesktopPropertyEditorFactory(VariableBundle bundle, JDesktopPane newDesktop) {
+	super(bundle);
+	desktop = newDesktop;
+    }
 
     public DesktopPropertyEditorFactory(VariableBundle bundle) {
 	super(bundle);
     }
+
+    public JDesktopPane getDesktop() {
+	return desktop;
+    }
+
+    public void setDesktop(JDesktopPane newDesktop) {
+	desktop=newDesktop;
+    }
+    
 
     /**
      * This method returns an EditorWindow (a JInternalFrame in this 
@@ -24,7 +39,33 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
 	jif.pack();
 	return jif;
     }
+    
+    /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, Vector properties) {
+	JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties);
+	desktop.add(jif);
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
+    }
 
+    /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, Vector properties, Vector templates) {
+	JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates);
+	desktop.add(jif);
+	jif.setVisible(true);
+	try {
+	    jif.setSelected(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
+    }
+    
     /**
      * This method returns an EditorWindow (a JInternalFrame in this 
      * implementation) which has an editor for each property in the

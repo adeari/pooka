@@ -145,7 +145,13 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     public java.util.Properties getValue() {
 	java.util.Properties currentRetValue = new java.util.Properties();
 	for (int i = 0; i < editors.size(); i++) {
-	    currentRetValue = new java.util.Properties(((DefaultPropertyEditor)(editors.elementAt(i))).getValue());
+	    
+	    java.util.Properties newValue = ((DefaultPropertyEditor)(editors.elementAt(i))).getValue();
+	    java.util.Enumeration keys = newValue.propertyNames();
+	    while (keys.hasMoreElements()) {
+		String currentKey = (String) keys.nextElement();
+		currentRetValue.setProperty(currentKey, newValue.getProperty(currentKey));
+	    }
 	}
 
 	return currentRetValue;

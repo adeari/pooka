@@ -118,6 +118,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 	messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
 	messagePanel.setUIComponent(messageScrollPane);
 	
+	((PookaDesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
 	return messagePanel;
     }
 

@@ -2,6 +2,7 @@ package net.suberic.util.gui;
 import javax.swing.*;
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.Properties;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,8 @@ import net.suberic.util.VariableBundle;
 public class VariableEditorPane extends DefaultPropertyEditor {
     PropertyEditorFactory factory;
     VariableBundle sourceBundle;
+
+    Properties parentUIProperties;
 
     String property;
     String template;
@@ -56,10 +59,12 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 	    valueToTemplateMap.put(value, editValue);
 	}
 
-	labelComponent = new JLabel();
-	
 	String label = sourceBundle.getProperty(template + ".label", template);
-	JButton button = new JButton(label);
+	labelComponent = new JLabel(label);
+
+	String buttonLabel = sourceBundle.getProperty(template + ".button.label", template);
+	
+	JButton button = new JButton(buttonLabel);
 	button.addActionListener(new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
 
@@ -74,7 +79,14 @@ public class VariableEditorPane extends DefaultPropertyEditor {
      * This shows the editor window for the configured value.
      */
     public void showEditorWindow() {
+	PropertyEditorUI parent = getParentPropertyEditor();
 	String currentValue = sourceBundle.getProperty(keyProperty, "");
+
+	if (parent != null) {
+	    String test = parent.getValue().getProperty(keyProperty);
+	    if (test != null)
+		currentValue = test;
+	}
 
 	/*
 	String editValue = (String) valueToTemplateMap.get(currentValue);
@@ -92,19 +104,23 @@ public class VariableEditorPane extends DefaultPropertyEditor {
 	Vector templateVector = new Vector();
 	templateVector.add(editValue);
 
-	Container container = factory.createEditorWindow(sourceBundle.getProperty(editValue + ".title", editValue), propertyVector, templateVector);
-	if (container instanceof JFrame)
-	    ((JFrame) container).show();
-	else if (container instanceof JInternalFrame) {
-	    JInternalFrame jif = (JInternalFrame)container;
-	    ((net.suberic.pooka.gui.MessagePanel)net.suberic.pooka.Pooka.getMainPanel().getContentPanel()).add(jif);
-	    jif.setVisible(true);
-	    try {
-		jif.setSelected(true);
-	    } catch (java.beans.PropertyVetoException pve) {
-	    }
-	    
+	factory.showNewEditorWindow(sourceBundle.getProperty(editValue + ".title", editValue), propertyVector, templateVector);
+    }
+
+    /**
+     * Returns the parent PropertyEditorUI.
+     */
+    protected PropertyEditorUI getParentPropertyEditor() {
+	java.awt.Container parent = valueComponent.getParent();
+	PropertyEditorUI returnValue = null;
+	while (returnValue == null && parent != null) {
+	    if (parent instanceof PropertyEditorUI)
+		returnValue = (PropertyEditorUI) parent;
+	    else
+		parent = parent.getParent();
 	}
+
+	return returnValue;
     }
 
     public void setValue() {

@@ -54,6 +54,23 @@ public class PropertyEditorFactory {
     }
 
     /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, Vector properties) {
+	JFrame jf = (JFrame) createEditorWindow(title, properties);
+	jf.show();
+    }
+
+    /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, Vector properties, Vector templates) {
+	JFrame jf = (JFrame) createEditorWindow(title, properties, templates);
+	jf.show();
+    }
+
+
+    /**
      * This returns a DefaultPropertyEditor for the property passed.
      * If there is a value set for property.propertyType, it will return
      * the proper editor for that property type.  If there is no such
