@@ -47,16 +47,16 @@ public class MessagePrinter implements Printable {
 	ArrayList pgs = new ArrayList ();
 	String content;
 
+	int displayLength = 100000;
+	try {
+	    displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
+	} catch (NumberFormatException nfe) {
+	}
 	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	    int displayLength = 100000;
-	    try {
-		displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
-	    } catch (NumberFormatException nfe) {
-	    }
-	    content = net.suberic.pooka.MailUtilities.getTextAndTextInlines((MimeMessage)message.getMessage(), Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), false, true, displayLength);
-	
+	    content = message.getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), true, false, displayLength, "foo");
+	    
         } else
-	    content = net.suberic.pooka.MailUtilities.getTextPart((MimeMessage)message.getMessage(), false, true);
+	    content = message.getTextPart(true, false, displayLength, "foo");
 	
 	StringTokenizer st = new StringTokenizer (content, "\n");
 

@@ -125,13 +125,13 @@ public class NewMessageProxy extends MessageProxy {
     }
 
     /**
-     * This removes the given MimeBodyPart from the list of attachments.
+     * This removes the given Attachment from the list of attachments.
      * I figure that you're likely only to be removing attachments from 
      * the attachment list itself, so you should be able to get the
      * correct underlying object.
      */
-    public void detachFile(MimeBodyPart mbp) {
-	int index = getNewMessageInfo().removeAttachment(mbp);
+    public void detachFile(Attachment a) {
+	int index = getNewMessageInfo().removeAttachment(a);
 	if (index != -1)
 	    getNewMessageUI().attachmentRemoved(index);
     }

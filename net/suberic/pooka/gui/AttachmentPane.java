@@ -61,25 +61,19 @@ public class AttachmentPane extends JPanel {
 		v = msg.getAttachments();
 		
 		if (v != null && row < v.size()) {
-		    if (column == 0)
-			try {
-			    String name = (((MimeBodyPart)v.elementAt(row)).getFileName()); 
-			    if (name != null)
-				return name;
-			    else
-				return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
-			} catch (MessagingException me) {
+		    if (column == 0) {
+			String name = (((Attachment)v.elementAt(row)).getName()); 
+			if (name != null)
+			    return name;
+			else
 			    return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
-			}
-		    else if (column == 1)
-			try {
-			    String contentType = (((MimeBodyPart)v.elementAt(row)).getContentType());    
-			    if (contentType.indexOf(';') != -1)
-				contentType = contentType.substring(0, contentType.indexOf(';'));			
-			    return contentType;
-			} catch (MessagingException me) {
-			    return Pooka.getProperty("AttachmentPane.error.FileTypeUnavailable", "Unavailable");
-			}
+		    } else if (column == 1) {
+			
+			String contentType = ((Attachment)v.elementAt(row)).getMimeType().toString();    
+			if (contentType.indexOf(';') != -1)
+			    contentType = contentType.substring(0, contentType.indexOf(';'));			
+			return contentType;
+		    }
 		}
 	    } catch (MessagingException me) {
 	    }
@@ -89,14 +83,14 @@ public class AttachmentPane extends JPanel {
 	}
 
 	/**
-	 * A convenience method to return a particular MimeBodyPart
+	 * A convenience method to return a particular Attachment.
 	 *
 	 * Returns null if there is no entry at that row.
 	 */
-	public MimeBodyPart getPartAtRow(int row) {
+	public Attachment getAttachmentAtRow(int row) {
 	    try {
 		if (row < msg.getAttachments().size())
-		    return (MimeBodyPart)msg.getAttachments().elementAt(row);
+		    return (Attachment)msg.getAttachments().elementAt(row);
 	    } catch (MessagingException me) {
 	    }
 
@@ -113,14 +107,14 @@ public class AttachmentPane extends JPanel {
 
     class SaveAttachmentThread extends Thread {
 	
-	MimeBodyPart mbp;
+	Attachment attachment;
 	File saveFile;
 	JDialog jd;
 	JProgressBar progressBar;
 	boolean running = true;
 
-	SaveAttachmentThread(MimeBodyPart part, File newSaveFile) {
-	    mbp = part;
+	SaveAttachmentThread(Attachment newAttachment, File newSaveFile) {
+	    attachment = newAttachment;
 	    saveFile = newSaveFile;
 	}
 
@@ -131,9 +125,9 @@ public class AttachmentPane extends JPanel {
 	    int attachmentSize = 0;
 	    
 	    try {
-		decodedIS = mbp.getInputStream();
-		attachmentSize = mbp.getSize();
-		if (mbp.getEncoding().equalsIgnoreCase("base64"))
+		decodedIS = attachment.getInputStream();
+		attachmentSize = attachment.getSize();
+		if (attachment.getEncoding().equalsIgnoreCase("base64"))
 		    attachmentSize = (int) (attachmentSize * .73);
 		
 		createDialog(attachmentSize);
@@ -154,9 +148,6 @@ public class AttachmentPane extends JPanel {
 		jd.dispose();
 		
 	    } catch (IOException ioe) {
-		Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
-		cancelSave();
-	    } catch (MessagingException ioe) {
 		Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
 		cancelSave();
 	    } finally {
@@ -224,9 +215,9 @@ public class AttachmentPane extends JPanel {
 	table.addMouseListener(new MouseAdapter() {
 	    public void mousePressed(MouseEvent e) {
 		if (e.getClickCount() == 2) {
-		    MimeBodyPart selectedPart = getSelectedPart();
+		    Attachment selectedAttachment = getSelectedAttachment();
 		    String actionCommand = Pooka.getProperty("AttachmentPane.2xClickAction", "file-open");
-		    if (selectedPart != null) {
+		    if (selectedAttachment != null) {
 			Action clickAction = getActionByName(actionCommand);
 			if (clickAction != null) {
 			    clickAction.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, actionCommand));
@@ -254,11 +245,11 @@ public class AttachmentPane extends JPanel {
 
 
     /**
-     * getSelectedPart() will return the selected MimeBodyPart.
+     * getSelectedAttachment() will return the selected Attachment.
      */
 
-    public MimeBodyPart getSelectedPart() {
-	return getTableModel().getPartAtRow(getTable().getSelectedRow());
+    public Attachment getSelectedAttachment() {
+	return getTableModel().getAttachmentAtRow(getTable().getSelectedRow());
     }
 
     /**
@@ -266,13 +257,11 @@ public class AttachmentPane extends JPanel {
      * for the Attachment's Mime type.
      */
     public void openSelectedAttachment() {
-	MimeBodyPart mbp = getSelectedPart();
-	if (mbp != null) {
+	Attachment attachment = getSelectedAttachment();
+	if (attachment != null) {
 	    DataHandler dh = null;
-	    try {
-		dh = mbp.getDataHandler();
-	    } catch (MessagingException me) {
-	    }
+	    dh = attachment.getDataHandler();
+
 	    if (dh != null) {
 		dh.setCommandMap(Pooka.getMailcap());
 		if (Pooka.isDebug()) {
@@ -291,7 +280,7 @@ public class AttachmentPane extends JPanel {
 		    if (beanViewer instanceof Frame) {
 			Frame frameViewer = (Frame)beanViewer;
 			try {
-			    frameViewer.setTitle(mbp.getFileName());
+			    frameViewer.setTitle(attachment.getName());
 			} catch (Exception e) {
 			}
 			frameViewer.show();
@@ -324,10 +313,10 @@ public class AttachmentPane extends JPanel {
 	if (Pooka.isDebug())
 	    System.out.println("calling AttachmentPane.openWith()");
 	
-	MimeBodyPart mbp = getSelectedPart();
+	Attachment attachment = getSelectedAttachment();
 	String mType;
 	try {
-	    mType = mbp.getContentType();
+	    mType = attachment.getMimeType().toString();
 	    if (mType.indexOf(';') != -1)
 		mType = mType.substring(0, mType.indexOf(';'));
 
@@ -358,7 +347,7 @@ public class AttachmentPane extends JPanel {
 
 		DataHandler dh = null;
 		
-		dh = mbp.getDataHandler();
+		dh = attachment.getDataHandler();
 		if (dh != null) {
 		    dh.setCommandMap(Pooka.getMailcap());
 		    ExternalLauncher el = new ExternalLauncher();
@@ -379,21 +368,18 @@ public class AttachmentPane extends JPanel {
      * calls saveFileAs() to save the file.
      */
     public void saveAttachment() {
-	MimeBodyPart mbp = getSelectedPart();
-	if (mbp != null) {
+	Attachment attachment = getSelectedAttachment();
+	if (attachment != null) {
 	    JFileChooser saveChooser = new JFileChooser();
 
-	    try {
-		String fileName = mbp.getFileName();
-		if (fileName != null)
-		    saveChooser.setSelectedFile(new File(fileName));
-	    } catch (MessagingException me) {
-	    }
+	    String fileName = attachment.getName();
+	    if (fileName != null)
+		saveChooser.setSelectedFile(new File(fileName));
 
 	    int saveConfirm = saveChooser.showSaveDialog(this);
 	    if (saveConfirm == JFileChooser.APPROVE_OPTION) 
 		try {
-		    saveFileAs(mbp, saveChooser.getSelectedFile());
+		    saveFileAs(attachment, saveChooser.getSelectedFile());
 		} catch (IOException exc) {
 		    message.getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
 		}
@@ -401,9 +387,9 @@ public class AttachmentPane extends JPanel {
     }
 
     /**
-     * This actually saves the MimeBodyPart as the File saveFile.
+     * This actually saves the Attachment as the File saveFile.
      */
-    public void saveFileAs(MimeBodyPart mbp, File saveFile) throws IOException {
+    public void saveFileAs(Attachment mbp, File saveFile) throws IOException {
 	SaveAttachmentThread thread = new SaveAttachmentThread(mbp, saveFile);
 	thread.start();
 
@@ -415,8 +401,8 @@ public class AttachmentPane extends JPanel {
 
     public void removeAttachment() {
 	int selectedIndex = getTable().getSelectedRow();
-	MimeBodyPart mbp = getSelectedPart();
-	((NewMessageProxy)message).detachFile(mbp);
+	Attachment attachmentToRemove = getSelectedAttachment();
+	((NewMessageProxy)message).detachFile(attachmentToRemove);
     }
 
     public JPopupMenu getPopupMenu() {

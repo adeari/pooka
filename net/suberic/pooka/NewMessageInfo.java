@@ -13,6 +13,7 @@ public class NewMessageInfo extends MessageInfo {
 
     public NewMessageInfo(Message newMessage) {
 	message = newMessage;
+	attachments = new AttachmentBundle();
     }
 
     /**
@@ -41,14 +42,13 @@ public class NewMessageInfo extends MessageInfo {
 	    messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
 	
 	if (urlName != null) {
-	    Vector attachments = getAttachments();
-	    if (attachments != null && attachments.size() > 0) {
+	    if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
 		MimeBodyPart mbp = new MimeBodyPart();
 		mbp.setContent(messageText, messageContentType);
 		MimeMultipart multipart = new MimeMultipart();
 		multipart.addBodyPart(mbp);
-		for (int i = 0; i < attachments.size(); i++) 
-		    multipart.addBodyPart((BodyPart)attachments.elementAt(i));
+		for (int i = 0; i < attachments.getAttachments().size(); i++) 
+		    multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
 		multipart.setSubType("mixed");
 		getMessage().setContent(multipart);
 		getMessage().saveChanges();
@@ -79,28 +79,19 @@ public class NewMessageInfo extends MessageInfo {
     }
 
     /**
-     * Returns the attachments for the new messages.
-     */
-    public Vector getAttachments() {
-	return attachments;
-    }
-
-    /**
      * Adds an attachment to this message.
      */
-    public void addAttachment(BodyPart part) {
-	if (attachments == null) 
-	    attachments = new Vector();
-	attachments.add(part);
+    public void addAttachment(Attachment attachment) {
+	attachments.getAttachments().add(attachment);
     }
 
     /**
      * Removes an attachment from this message.
      */
-    public int removeAttachment(BodyPart part) {
+    public int removeAttachment(Attachment part) {
 	if (attachments != null) {
-	    int index = attachments.indexOf(part);	
-	    attachments.remove(index);
+	    int index = attachments.getAttachments().indexOf(part);	
+	    attachments.getAttachments().remove(index);
 	    return index;
 	}
 	
@@ -130,7 +121,7 @@ public class NewMessageInfo extends MessageInfo {
 	    
 	mbp.setDataHandler( dh );
 	
-	addAttachment(mbp);
+	addAttachment(new MBPAttachment(mbp));
     }
 
     /**
@@ -145,10 +136,14 @@ public class NewMessageInfo extends MessageInfo {
      */
     public String getTextPart(boolean showFullHeaders) {
 	try {
-	    return net.suberic.pooka.MailUtilities.getTextPart(getMessage(), showFullHeaders);
+	    return net.suberic.pooka.MailUtilities.parseAttachments(getMessage()).getTextPart(true, showFullHeaders, 10000, "foo");
+	} catch (java.io.IOException ioe) {
+	    // since this is a NewMessageInfo, there really shouldn't be an
+	    // IOException
+	    return null;
 	} catch (MessagingException me) {
-	    // since this is a NewMessageInfo, there really shouldn't be a 
-	    // messagingException here.
+	    // since this is a NewMessageInfo, there really shouldn't be a
+	    // MessagingException
 	    return null;
 	}
     }

@@ -105,15 +105,15 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    StringBuffer messageText = new StringBuffer();
 	    
 	    String content = null;
+	    int displayLength = 100000;
+	    try {
+		displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
+	    } catch (NumberFormatException nfe) {
+	    }
 	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-		int displayLength = 100000;
-		try {
-		    displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
-		} catch (NumberFormatException nfe) {
-		}
-		content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true, displayLength);
+		content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
 	    } else {
-		content = getMessageProxy().getMessageInfo().getTextPart( showFullHeaders(), true);
+		content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders(), displayLength, Pooka.getProperty("Pooka.truncationMessage", " ----- Message truncated ------ "));
 	    }
 	    
 	    if (content != null) {

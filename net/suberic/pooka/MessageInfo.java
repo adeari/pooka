@@ -29,7 +29,7 @@ public class MessageInfo {
     MessageProxy messageProxy;
 
     // the attachments on the message.
-    Vector attachments;
+    AttachmentBundle attachments;
 
     protected MessageInfo() {
     }
@@ -53,10 +53,11 @@ public class MessageInfo {
     public void loadAttachmentInfo() throws MessagingException {
 	try {
 	    if (getMessage().getContent() != null)
-		attachments = MailUtilities.getAttachments(getMessage(), false);
+		attachments = MailUtilities.parseAttachments(getMessage());
 	} catch (java.io.IOException ioe) {
+	    throw new MessagingException(ioe.getMessage());
 	}
-
+	
 	attachmentsLoaded = true;
     }
 
@@ -137,20 +138,43 @@ public class MessageInfo {
     /**
      * Gets the Content and inline text content for the Message.
      */
-    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders, int maxLength) throws MessagingException {
+    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders, int maxLength, String truncationMessage) throws MessagingException {
 	try {
-	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders, maxLength);
+	    if (!hasLoadedAttachments()) 
+		loadAttachmentInfo();
+	    return attachments.getTextAndTextInlines(attachmentSeparator, showFullHeaders, withHeaders, maxLength, truncationMessage);
 	} catch (FolderClosedException fce) {
-	    getFolderInfo().openFolder(Folder.READ_WRITE);
-	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders, maxLength);
+	    try {
+		getFolderInfo().openFolder(Folder.READ_WRITE);
+		loadAttachmentInfo();
+		return attachments.getTextAndTextInlines(attachmentSeparator, showFullHeaders, withHeaders, maxLength, truncationMessage);
+	    } catch (java.io.IOException ioe) {
+		throw new MessagingException(ioe.getMessage()); 
+	    }
+	} catch (java.io.IOException ioe) {
+	    throw new MessagingException(ioe.getMessage()); 
 	}
     }
 
     /**
      * Gets the Text part of the Content of this Message.
      */
-    public String getTextPart(boolean showFullHeaders, boolean withHeaders) throws MessagingException {
-	return MailUtilities.getTextPart(getMessage(), showFullHeaders, withHeaders);
+    public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+	try {
+	    if (!hasLoadedAttachments()) 
+		loadAttachmentInfo();
+	    return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	} catch (FolderClosedException fce) {
+	    try {
+		getFolderInfo().openFolder(Folder.READ_WRITE);
+		loadAttachmentInfo();
+		return attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	    } catch (java.io.IOException ioe) {
+		throw new MessagingException(ioe.getMessage()); 
+	    }
+	} catch (java.io.IOException ioe) {
+	    throw new MessagingException(ioe.getMessage()); 
+	}
     }
 
     /**
@@ -306,7 +330,7 @@ public class MessageInfo {
 
 	MimeMessage mMsg = (MimeMessage) getMessage();
 
-	String textPart = MailUtilities.getTextPart(mMsg, false);
+	String textPart = getTextPart(false, false, 10000, "foo");
 	UserProfile up = getDefaultProfile();
 
 	String parsedText;
@@ -340,7 +364,7 @@ public class MessageInfo {
 	MimeMessage mMsg = (MimeMessage) getMessage();
 	MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
 
-	String textPart = MailUtilities.getTextPart(message, false);
+	String textPart = getTextPart(false, false, 10000, "foo");
 	UserProfile up = getDefaultProfile();
 
 	String parsedText = null;
@@ -472,10 +496,10 @@ public class MessageInfo {
      */
     public Vector getAttachments() throws MessagingException {
 	if (hasLoadedAttachments())
-	    return attachments;
+	    return attachments.getAttachments();
 	else {
 	    loadAttachmentInfo();
-	    return attachments;
+	    return attachments.getAttachments();
 	}
 	    
     }

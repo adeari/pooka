@@ -1,5 +1,6 @@
 package net.suberic.pooka;
 import java.util.Vector;
+import java.io.IOException;
 
 /**
  * This class is here for my convenience so that I can have a single
@@ -7,10 +8,7 @@ import java.util.Vector;
  * that I want.
  */
 class AttachmentBundle {
-    StringBuffer textPart = null;
-    StringBuffer allText = new StringBuffer();
-    Vector textAttachments = new Vector();
-    Vector nonTextAttachments = new Vector();
+    Attachment textPart = null;
     Vector allAttachments = new Vector();
     
     AttachmentBundle() {
@@ -19,19 +17,48 @@ class AttachmentBundle {
     void addAll(AttachmentBundle subBundle) {
 	if (textPart == null)
 	    textPart = subBundle.textPart;
-	else if (subBundle.textPart != null) {
-	    javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-	    try {
-		mbp.setText(subBundle.textPart.toString());
-	    } catch (javax.mail.MessagingException me) {
-	    }
-	    textAttachments.add(mbp);
-	    allAttachments.add(mbp);
-	}
 
-	allText.append(subBundle.allText);
-	textAttachments.addAll(subBundle.textAttachments);
-	nonTextAttachments.addAll(subBundle.nonTextAttachments);
 	allAttachments.addAll(subBundle.allAttachments);
     }
+
+
+    /**
+     * This gets the Text part of a message.  This is useful if you want
+     * to display just the 'body' of the message without the attachments.
+     */
+    public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
+	if (textPart != null)
+	    return textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage);
+	else
+	    return null;
+    }
+
+    /**
+     * This returns the Attachments (basically, all the Parts in a Multipart
+     * except for the main body of the message).
+     */
+    public Vector getAttachments() {
+	return allAttachments;
+    }
+    
+    /**
+     * This method returns the Message Text plus the text inline attachments.
+     * The attachments are separated by the separator flag.
+     */
+    public String getTextAndTextInlines(String separator, boolean showFullHeaders, boolean withHeaders, int maxLength, String truncationMessage) throws IOException {
+	StringBuffer returnValue = null;
+	if (textPart != null)
+	    returnValue.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
+	
+	if (allAttachments != null && allAttachments.size() > 0) {
+	    for (int i = 0; i < allAttachments.size() ; i++) {
+		Attachment attach = (Attachment) allAttachments.elementAt(i);
+		if (attach.isPlainText())
+		    returnValue.append(attach.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
+	    }
+	}
+
+	return returnValue.toString();
+    }	
+    
 }
