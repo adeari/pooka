@@ -144,7 +144,7 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
       for (int i = 0 ; i < newConnections.length; i++) {
 	if (newConnections[i] != null) {
 	  comboBox.addItem(newConnections[i]);
-	  newConnection[i].addNetworkConnectionListener(this);
+	  newConnections[i].addConnectionListener(this);
 	}
       }
     }
