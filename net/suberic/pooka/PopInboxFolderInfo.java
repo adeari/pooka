@@ -2,9 +2,12 @@ package net.suberic.pooka;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.mail.event.MessageCountEvent;
+import javax.mail.event.MessageChangedEvent;
 import java.io.*;
 import java.util.Vector;
+import java.util.HashMap;
 import net.suberic.pooka.cache.ChangeCache;
+import net.suberic.pooka.gui.MessageProxy;
 
 /**
  * This represents the Inbox of a Pop3 folder.  It has an mbox backend, but
@@ -17,6 +20,8 @@ public class PopInboxFolderInfo extends FolderInfo {
   ChangeCache changeAdapter;
   String mailHome;
   
+  HashMap uidMap = new HashMap();
+
   public static String UID_HEADER = "X-Pooka-Pop-UID";
   
   /**
@@ -86,10 +91,38 @@ public class PopInboxFolderInfo extends FolderInfo {
     //checkFolder();
   }
   
+  /**
+   * <p> Loads all Messages into a new FolderTableModel, sets this 
+   * FolderTableModel as the current FolderTableModel, and then returns
+   * said FolderTableModel.  This is the basic way to populate a new
+   * FolderTableModel.</p>
+   */
   public synchronized void loadAllMessages() throws MessagingException {
     if (folderTableModel == null) {
       super.loadAllMessages();
+      // let's see how bad performance is for the mbox provider.  :)
+      populateUidMap();
       checkFolder();
+    }
+  }
+  
+  /**
+   * <p>Populates the UID map from the list of MessageProxies.</p>
+   */
+  void populateUidMap() {
+    if (folderTableModel != null) {
+      Vector v = folderTableModel.getAllProxies();
+      for (int i = 0; i < v.size(); i++) {
+	MessageProxy mp = (MessageProxy) v.elementAt(i);
+	try {
+	  String uid = (String) mp.getMessageInfo().getMessageProperty(UID_HEADER);
+	  uidMap.put(uid, null);
+	  if (Pooka.isDebug())
+	    System.out.println("adding " + uid + " to read list.");
+	} catch (MessagingException me) {
+	  Pooka.getUIFactory().showError("Error getting UID for message:  ", me);
+	}
+      }
     }
   }
   
@@ -119,6 +152,9 @@ public class PopInboxFolderInfo extends FolderInfo {
 	      msgsToAppend[i] = new MimeMessage((MimeMessage) msgs[i]);
 	      String uid = getUID(msgs[i], f);
 	      msgsToAppend[i].addHeader(UID_HEADER, uid);
+	      uidMap.put(uid, null);
+	      if (Pooka.isDebug())
+		System.out.println("adding " + uid + " to read list.");
 	    }
 	    if (Pooka.isDebug()) 
 	      System.out.println(Thread.currentThread() + ":  running appendMessages; # of added messages is " + msgsToAppend.length);
@@ -202,6 +238,34 @@ public class PopInboxFolderInfo extends FolderInfo {
     resetMessageCounts();
     fireMessageCountEvent(mce);
   }
+
+  /**
+   * <p>Overrides FolderInfo.fireMessageChangedEvent().</p>
+   */
+  public void fireMessageChangedEvent(MessageChangedEvent mce) {
+    try {
+      if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+	
+	MessageInfo mi = getMessageInfo(mce.getMessage());
+	MessageProxy mp = mi.getMessageProxy();
+	if (mp != null) {
+	  if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED) {
+	    mi.refreshFlags();
+	  } else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED) {
+	    mi.refreshHeaders();
+	  }
+	  mp.unloadTableInfo();
+	  mp.loadTableInfo();
+	}
+      }
+    } catch (MessagingException me) {
+      // if we catch a MessagingException, it just means
+      // that the message has already been expunged.
+    }
+    
+    super.fireMessageChangedEvent(mce);
+    
+  }
   
   /**
    * This retrieves new messages from the pop folder.
@@ -211,82 +275,25 @@ public class PopInboxFolderInfo extends FolderInfo {
       System.out.println("getting new messages.");
     Message[] newMessages = f.getMessages();
     if (newMessages.length > 0) {
-      String lastUid = null;
-      try {
-	lastUid = readLastUid(); 
-      } catch (IOException ioe) {
+      int lastRead = newMessages.length - 1;
+      while (! alreadyRead(newMessages[lastRead], f)) {
+	lastRead--;
       }
       
       if (Pooka.isDebug())
-	System.out.println("read:  lastUID is " + lastUid);
-      
-      if (lastUid != null) {
-	int lastRead = newMessages.length - 1;
-	int lastUidLength = lastUid.length();
-	
-	boolean found = false;
-	while (lastRead >= 0 && found == false) {
-	  String newUid = getUID(newMessages[lastRead], f);
-	  
-	  if (Pooka.isDebug())
-	    System.out.println("offset is " + lastRead + "; newUid is " + newUid);
-	  
-	  // let's try to be safe here, and say that, for any value
-	  // that's a different length, the one with the longer
-	  // length is later than the one that's shorter.  this
-	  // should take care of any case where a server is doing
-	  // something stupid, like having its uids be '9' and '10'.
-	  
-	  int value;
-	  if (lastUidLength == newUid.length()) {
-	    value = newUid.compareTo(lastUid);
-	  } else {
-	    if (newUid.length() < lastUidLength)
-	      value = -1;
-	    else
-	      value = 1;
-	  }
-	  
-	  if (Pooka.isDebug())
-	    System.out.println("newUid.compareTo(lastUid) is " + value);
-	  if (value <= 0)
-	    found = true;
-	  else 
-	    lastRead--;
-	}
-	
+	System.out.println("final lastRead is " + lastRead + "; for reference, newMessages.length = " + newMessages.length);
+      if (newMessages.length - lastRead < 2) {
+	// no new messages
 	if (Pooka.isDebug())
-	  System.out.println("final lastRead is " + lastRead + "; for reference, newMessages.length = " + newMessages.length);
-	if (newMessages.length - lastRead < 2) {
-	  // no new messages
-	  if (Pooka.isDebug())
-	    System.out.println("no new messages.");
-	  return new Message[0];
-	} else {
-	  if (Pooka.isDebug())
-	    System.out.println("returning " + (newMessages.length - lastRead - 1) + " new messages.");
-	  Message[] returnValue = new Message[newMessages.length - lastRead - 1];
-	  System.arraycopy(newMessages, lastRead + 1, returnValue, 0, newMessages.length - lastRead - 1);
-	  
-	  try {
-	    writeLastUid(getUID(newMessages[newMessages.length - 1], f));
-	  } catch (IOException ioe) {
-	  }
-	  
-	  return returnValue;
-	}
-      } else { 
-	// if we don't have a reference to a last uid, then assume
-	// all the messages are new.
-	
+	  System.out.println("no new messages.");
+	return new Message[0];
+      } else {
 	if (Pooka.isDebug())
-	  System.out.println(newMessages.length + " messages in folder.  no last read id.  returning all.");
-	if (newMessages.length > 0)
-	  try {
-	    writeLastUid(getUID(newMessages[newMessages.length - 1], f));
-	  } catch (IOException ioe) {
-	  }
-	return newMessages;
+	  System.out.println("returning " + (newMessages.length - lastRead - 1) + " new messages.");
+	Message[] returnValue = new Message[newMessages.length - lastRead - 1];
+	System.arraycopy(newMessages, lastRead + 1, returnValue, 0, newMessages.length - lastRead - 1);
+	
+	return returnValue;
       }
     } else {
       if (Pooka.isDebug())
@@ -355,5 +362,22 @@ public class PopInboxFolderInfo extends FolderInfo {
     return changeAdapter;
   }
   
+  /**
+   * <p>Checks to see whether or not we've already read this message.
+   * Used when we're leaving messages on the server.
+   */
+  public boolean alreadyRead(Message m, Folder f) throws javax.mail.MessagingException {
+    String newUid = getUID(m, f);
+    if (Pooka.isDebug()) 
+      System.out.println("checking to see if message with uid " + newUid + " is new.");
+
+    boolean returnValue = uidMap.containsKey(newUid);
+
+    if (Pooka.isDebug()) 
+      System.out.println(newUid + " already read = " + returnValue);
+
+    return returnValue;
+
+  }
 }
 
