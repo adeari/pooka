@@ -179,7 +179,8 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 
     public JTextPane createMessagePanel(MessageProxy aMsg) {
 	JTextPane retval = new JTextPane();
-	
+	retval.setEditorKit(new MailEditorKit());
+
 	setDefaultFont(retval);
 
 	// see if this message already has a text part, and if so,

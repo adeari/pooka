@@ -142,6 +142,30 @@ public class MailUtilities {
 	return returnValue.toString();
     }
 
+    /**
+     * This method takes a given character array and returns the offset
+     * position at which a line break should occur.
+     *
+     * If no break is necessary, the <code>finish</code> value is returned.
+     * 
+     */
+
+    public static int getBreakPosition(char[] buffer, int start, int finish, int breakLength) {
+	if ( finish - start <= breakLength)
+	    return finish;
+
+	int breakLocation = -1;
+	for (int caret = finish; breakLocation == -1 && caret > start; caret--) {
+	    if (Character.isWhitespace(buffer[caret])) {
+		breakLocation=caret;
+	    } 
+	}
+
+	if (breakLocation == -1)
+	    breakLocation = start + breakLength;
+
+	return breakLocation;
+    }
 
     /**
      * This takes a String and words wraps it at length wrapLength, 

@@ -62,54 +62,21 @@ public class ReadMessageWindow extends MessageWindow {
 	    this.getContentPane().add("Center", editorScrollPane);
 	}
 
-	this.sizeWindow();
-	
     }
 
-    private void sizeWindow() {
-	editorPane.setPreferredSize(getDefaultEditorPaneSize());
-	editorPane.setSize(editorPane.getPreferredSize());
-	editorScrollPane.setPreferredSize(getDefaultEditorPaneSize());
-	editorScrollPane.setSize(editorScrollPane.getPreferredSize());
-
-	if (attachmentPanel != null) {
-	    attachmentPanel.setPreferredSize(new Dimension((int)attachmentPanel.getPreferredSize().getWidth(), Integer.parseInt(Pooka.getProperty("Pooka.attachmentPanel.vsize", "100"))));
-	    attachmentPanel.setSize(attachmentPanel.getPreferredSize());
-	}
-	if (attachmentScrollPane != null) {
-	    attachmentScrollPane.setPreferredSize(new Dimension((int)attachmentScrollPane.getPreferredSize().getWidth(), Integer.parseInt(Pooka.getProperty("Pooka.attachmentPanel.vsize", "100"))));
-	    attachmentScrollPane.setSize(attachmentScrollPane.getPreferredSize());
-	}
-	
-	if (splitPane != null) {
-	    splitPane.resetToPreferredSizes();
-	}
-	this.resizeByWidth();
-    }
-
+    /**
+     * Overrides JComponent.addNotify().
+     *
+     * We override addNotify() here to call resizeByWidth() to set
+     * the correct width, and, if there is a splitPane with an attachment
+     * panel, to set the correct divider location on the split pane.
+     */
     public void addNotify() {
 	super.addNotify();
-	this.sizeWindow();
-    }
-
-    public void sizeStatus() {
-
-	reportSize("editorScrollPane", editorScrollPane);
-	if (splitPane == null)
-	    System.out.println("no split pane.");
-	else 
-	    reportSize("splitPane", splitPane);
-	if (attachmentPanel == null) {
-	    System.out.println("no attachment.");
-	} else {
-	    reportSize("attachmentPanel", attachmentPanel);
-	    reportSize("attachmentScrollPane", attachmentScrollPane);
-	}
-	reportSize("MessageWindow", this);
-    }
-
-    private void reportSize(String name, Component comp) {
-	System.out.println(name + ":  size is " + comp.getSize() + ", prefSize is " + comp.getPreferredSize());
+	editorScrollPane.setPreferredSize(getDefaultEditorPaneSize());
+	this.resizeByWidth();
+	if (splitPane != null && attachmentPanel != null)
+	    splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
     }
 
     /**

@@ -92,14 +92,35 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 	showError(errorMessage + e.getMessage(), title);
     }
 
+    /**
+     * This sets the default font for the editorPane to a font determined
+     * by the MessageWindow.editorPane.font (.name and .size) properties.
+     * 
+     * I believe that if the font cannot be found or instantiated, 
+     * nothing should happen, but i'm not sure.  :)
+     */
     public void setDefaultFont(JEditorPane jep) {
 	String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
 	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
 
 	Font f = new Font(fontName, Font.PLAIN, fontSize);
-	jep.setFont(f);
+	if (f != null)
+	    jep.setFont(f);
     }
 
+    /**
+     * This calculates the default size for the EditorPane.
+     * 
+     * Here, we use the MessageWindow.editorPane.* properties to determine
+     * the size.  Specifically, we check for the hsizeByCharLength
+     * property.  If this is set to true, then we dynamically determine
+     * the appropriate width using the current font of the editorPane 
+     * along with the charLength property.  
+
+     * If hsizeByCharLength is set to false, or if for whatever reason we 
+     * find that we're unable to determine an appropriate size, then we just 
+     * use the vsize and hsize properties.
+     */
     public Dimension getDefaultEditorPaneSize() {
 	int hsize = 500;
 	int vsize = 500;
@@ -116,14 +137,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 		Font currentFont = editorPane.getFont();
 		if (currentFont != null) {
 		    FontMetrics fm = this.getFontMetrics(currentFont);
-		    
-		    int[] firstWidths = fm.getWidths();
-		    int accumulator = 0;
-		    for (int i = 0; i < charLength; i++)
-			accumulator+=firstWidths[i];
-
-		    hsize = accumulator;
-
+		    hsize = (int)(charLength * fm.getStringBounds("Remember when you were young?  You shone like the sun.  Shine on you crazy diamo", editorPane.getGraphics()).getWidth() / 80);
 		}
 	    } else {
 		hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.hsize", "500"));
@@ -133,7 +147,6 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
 	}
 
 	Dimension retval = new Dimension(hsize, vsize);
-	retval = new Dimension(510, vsize);
 	return retval;
     }
 

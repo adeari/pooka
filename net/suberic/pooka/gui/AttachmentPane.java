@@ -118,6 +118,14 @@ public class AttachmentPane extends JPanel {
 	});
 
 	this.add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+
+	// the width will be resized; the only important part here is 
+	// the height.
+
+	Dimension prefSize = this.getPreferredSize();
+	int defaultHeight = Integer.parseInt(Pooka.getProperty("Pooka.attachmentPanel.vsize", "100"));
+	if (prefSize.getHeight() > defaultHeight)
+	    this.setPreferredSize(new Dimension((int)prefSize.getWidth(), defaultHeight));
 	
     }
 
