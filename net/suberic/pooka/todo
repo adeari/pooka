@@ -12,11 +12,7 @@ a menu option and from the 'open with' dialog.
 
 *) add new/unread/urgent/etc flags to the FolderTable.
 	somewhat done.  left todo:
-	1)  make the BooleanIcon implement Comparable
-	2)  generalize BooleanIcon so that you can do one dot for 'new and
-	unread', another for 'not new but unread', and an empty space for
-	'read'.
-	3)  fix the open folders twice on startup bug.
+	1)  fix the open folders twice on startup bug.
 
 *) fix tab navigation in the compose pane.
 
