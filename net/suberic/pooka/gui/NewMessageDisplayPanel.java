@@ -28,7 +28,6 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
   JScrollPane headerScrollPane;
   
   private Action[] defaultActions;
-
   
   /**
    * Creates a NewMessageDisplayPanel from the given Message.
@@ -36,7 +35,6 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
   
   public NewMessageDisplayPanel(NewMessageUI newMsgUI) {
     super(newMsgUI);
-    
   }
   
   /**
@@ -74,7 +72,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    showPopupMenu(editorPane, e);
 	  }
 	}
-
+	
 	public void mouseReleased(MouseEvent e) {
 	  if (e.isPopupTrigger()) {
 	    showPopupMenu(editorPane, e);
@@ -87,9 +85,57 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	  setModified(true);
 	}
       });
-
+    
     splitPane.resetToPreferredSizes();
+   
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  // if we get focus, see what we want to select by default.
+	  // if there's no to: done, select to:.  if there's no 
+	  // subject, select it.  if both of those are filled out, 
+	  // select the message.
+	  
+	  Component subjectComponent = null;
+	  Component toComponent = null;
 
+	  boolean done = false;
+
+	  if (inputTable != null) {
+	    String key;
+	    Enumeration keys = inputTable.keys();
+	    while (keys.hasMoreElements()) {
+	      key = (String)(keys.nextElement());
+	      
+	      if (key.equalsIgnoreCase("subject")) {
+		subjectComponent = (Component) inputTable.get(key);
+	      } else if (key.equalsIgnoreCase("to")) {
+		toComponent = (Component) inputTable.get(key);
+	      }
+	    }
+	    
+	    if (toComponent != null && toComponent instanceof JTextComponent) {
+	      String toValue = ((JTextComponent) toComponent).getText();
+	      if (toValue == null || toValue.length() == 0) {
+		done = true;
+		toComponent.requestFocus();
+	      }
+	    }
+
+	    if (! done && subjectComponent != null && subjectComponent instanceof JTextComponent) {
+	      String subjectValue = ((JTextComponent) subjectComponent).getText();
+	      if (subjectValue == null || subjectValue.length() == 0) {
+		done = true;
+		subjectComponent.requestFocus();
+	      }
+	    }
+	  }
+
+	  if (! done) {
+	    if (editorPane != null)
+	      editorPane.requestFocus();
+	  }
+	}
+      });
   }
 
     /**
@@ -106,118 +152,121 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	this.setSize(this.getPreferredSize());
     }
 
-    /**
-     * as defined in java.awt.event.ItemListener
-     *
-     * This implementation calls a refreshCurrentUser() on the MainPanel.
-     *
-     * It also updates the panel's interface style.
-     */
-
-    public void itemStateChanged(ItemEvent ie) {
-      if (ie.getStateChange() == ItemEvent.SELECTED) {
-	Pooka.getMainPanel().refreshCurrentUser();
-	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {
-	      NewMessageUI nmui = getNewMessageUI();
-	      if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
-		try {
-		  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
-		  Font currentFont = editorPane.getFont();
-		  setDefaultFont(editorPane);
-		  Font newFont = editorPane.getFont();
-		  if (currentFont != newFont) {
-		    sizeToDefault();
-		  }
-                  MessageUI mui = getMessageUI();
-                  if (mui instanceof MessageInternalFrame) {
-                    ((MessageInternalFrame) mui).resizeByWidth();
-                  } else if (mui instanceof MessageFrame) {
-                    ((MessageFrame) mui).resizeByWidth();
-                  }
-		  
-		} catch (Exception e) {
-		  System.err.println("error setting theme:  " + e);
+  /**
+   * as defined in java.awt.event.ItemListener
+   *
+   * This implementation calls a refreshCurrentUser() on the MainPanel.
+   *
+   * It also updates the panel's interface style.
+   */
+  public void itemStateChanged(ItemEvent ie) {
+    if (ie.getStateChange() == ItemEvent.SELECTED) {
+      Pooka.getMainPanel().refreshCurrentUser();
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    NewMessageUI nmui = getNewMessageUI();
+	    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+	      try {
+		Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
+		Font currentFont = editorPane.getFont();
+		setDefaultFont(editorPane);
+		Font newFont = editorPane.getFont();
+		if (currentFont != newFont) {
+		  sizeToDefault();
 		}
+		MessageUI mui = getMessageUI();
+		if (mui instanceof MessageInternalFrame) {
+		  ((MessageInternalFrame) mui).resizeByWidth();
+		} else if (mui instanceof MessageFrame) {
+		  ((MessageFrame) mui).resizeByWidth();
+		}
+		
+	      } catch (Exception e) {
+		System.err.println("error setting theme:  " + e);
 	      }
 	    }
-	  });
-      }
-	
+	  }
+	});
     }
-
-    public Container createHeaderInputPanel(MessageProxy aMsg, Hashtable proptDict) {
-	
-	Box inputPanel = new Box(BoxLayout.Y_AXIS);
-
-	Box inputRow = new Box(BoxLayout.X_AXIS);
-
-	// Create UserProfile DropDown
-	JLabel userProfileLabel = new JLabel(Pooka.getProperty("UserProfile.label","User:"), SwingConstants.RIGHT);
-	userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
-	JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
-	inputRow.add(userProfileLabel);
-	inputRow.add(profileCombo);
-	
-	UserProfile selectedProfile = Pooka.getMainPanel().getCurrentUser();
-
-	if (selectedProfile != null)
-	    profileCombo.setSelectedItem(selectedProfile);
-
-	profileCombo.addItemListener(this);
-	
-	proptDict.put("UserProfile", profileCombo);
-
-	inputPanel.add(inputRow);
-	
-	// Create Address panel
-
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
-	String currentHeader = null;
-	JLabel hdrLabel = null;
-	EntryTextArea inputField = null;
-
-	while (tokens.hasMoreTokens()) {
-	    inputRow = new Box(BoxLayout.X_AXIS);
-	    currentHeader=tokens.nextToken();
-	    hdrLabel = new JLabel(Pooka.getProperty("MessageWindow.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
-	    hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
-	    inputRow.add(hdrLabel);
-
-	    if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") && Pooka.getProperty("Pooka.useAddressCompletion", "false").equalsIgnoreCase("true")) {
-	      try {
-		inputField = new AddressEntryTextArea(getNewMessageUI(), getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
-	      } catch (MessagingException me) {
-		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
-	      }
-	    } else {
-	      try {
-		inputField = new net.suberic.util.swing.EntryTextArea(getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
-	      } catch (MessagingException me) {
-		inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
-	      }
-	    }
-
-	    inputField.setLineWrap(true);
-	    inputField.setWrapStyleWord(true);
-	    inputField.setBorder(BorderFactory.createEtchedBorder());
-	    inputField.addKeyListener(new KeyAdapter() {
-		public void keyTyped(KeyEvent e) {
-		  setModified(true);
-		}
-	      });
-
-
-	    inputRow.add(inputField);
-	    
-	    inputPanel.add(inputRow);
-
-	    proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
+    
+  }
+  
+  /**
+   * Creates the panel in which the addressing will be done, such as
+   * the To: field, Subject: field, etc.
+   */
+  public Container createHeaderInputPanel(MessageProxy aMsg, Hashtable proptDict) {
+    
+    Box inputPanel = new Box(BoxLayout.Y_AXIS);
+    
+    Box inputRow = new Box(BoxLayout.X_AXIS);
+    
+    // Create UserProfile DropDown
+    JLabel userProfileLabel = new JLabel(Pooka.getProperty("UserProfile.label","User:"), SwingConstants.RIGHT);
+    userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
+    JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
+    inputRow.add(userProfileLabel);
+    inputRow.add(profileCombo);
+    
+    UserProfile selectedProfile = Pooka.getMainPanel().getCurrentUser();
+    
+    if (selectedProfile != null)
+      profileCombo.setSelectedItem(selectedProfile);
+    
+    profileCombo.addItemListener(this);
+    
+    proptDict.put("UserProfile", profileCombo);
+    
+    inputPanel.add(inputRow);
+    
+    // Create Address panel
+    
+    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
+    String currentHeader = null;
+    JLabel hdrLabel = null;
+    EntryTextArea inputField = null;
+    
+    while (tokens.hasMoreTokens()) {
+      inputRow = new Box(BoxLayout.X_AXIS);
+      currentHeader=tokens.nextToken();
+      hdrLabel = new JLabel(Pooka.getProperty("MessageWindow.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
+      hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
+      inputRow.add(hdrLabel);
+      
+      if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") && Pooka.getProperty("Pooka.useAddressCompletion", "false").equalsIgnoreCase("true")) {
+	try {
+	  inputField = new AddressEntryTextArea(getNewMessageUI(), getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+	} catch (MessagingException me) {
+	  inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
 	}
-
-	return inputPanel;
+      } else {
+	try {
+	  inputField = new net.suberic.util.swing.EntryTextArea(getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
+	} catch (MessagingException me) {
+	  inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
+	}
+      }
+      
+      inputField.setLineWrap(true);
+      inputField.setWrapStyleWord(true);
+      inputField.setBorder(BorderFactory.createEtchedBorder());
+      inputField.addKeyListener(new KeyAdapter() {
+	  public void keyTyped(KeyEvent e) {
+	    setModified(true);
+	  }
+	});
+      
+      
+      inputRow.add(inputField);
+      
+      inputPanel.add(inputRow);
+      
+      proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
     }
-
+    
+    return inputPanel;
+  }
+  
     /**
      * This creates a new JTextPane for the main text part of the new 
      * message.  It will also include the current text of the message.

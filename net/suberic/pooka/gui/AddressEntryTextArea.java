@@ -442,9 +442,11 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   public void selectPreviousEntry() {
     Selection currentSelection = getCurrentSelection();
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
-    AddressBookEntry newValue = matcher.getPreviousMatch(currentSelection.text);
-    if (newValue != null) {
-      replaceAddressText(currentSelection, newValue.getID());
+    if (matcher != null) {
+      AddressBookEntry newValue = matcher.getPreviousMatch(currentSelection.text);
+      if (newValue != null) {
+	replaceAddressText(currentSelection, newValue.getID());
+      }
     }
   }
 

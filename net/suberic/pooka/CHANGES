@@ -1,3 +1,6 @@
+selecting a NewMessageWindow now selects either the to: field, the subject:
+field, or the text body, depending on which ones are filled out.
+
 changed the display algorithm so that several messages are loaded
 before the folder window itself is shown.
 
