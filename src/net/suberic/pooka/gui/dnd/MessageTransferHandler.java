@@ -18,16 +18,35 @@ public class MessageTransferHandler extends TransferHandler {
   private boolean shouldRemove;
   
   public boolean importData(JComponent c, Transferable t) {
-    System.err.println("importData:  component is " + c);
+    System.err.println("importData:  importing " + t);
     if (!canImport(c, t.getTransferDataFlavors())) {
       return false;
     } else {
-      return true;
+      System.err.println("trying to import...");
+      FolderInfo fi = getFolderInfo(c);
+      if (fi != null) {
+	System.err.println("got folder " + fi);
+	try {
+	  MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
+	  if (mp != null) {
+	    System.err.println("got mp " + mp);
+	    mp.moveMessage(fi);
+	    return true;
+	  }
+	} catch (Exception e) {
+	  e.printStackTrace();
+	  return false;
+	}
+      } else {
+	return false;
+      }
     }
+
+    return false;
   }
   
   protected Transferable createTransferable(JComponent c) {
-    System.err.println("creating transferable from " + c);
+    System.err.println("creating transferable");
     
     if (c instanceof net.suberic.pooka.gui.FolderDisplayPanel) {
       return new MessageProxyTransferable(((FolderDisplayPanel) c).getSelectedMessage());
@@ -36,7 +55,10 @@ public class MessageTransferHandler extends TransferHandler {
 	Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
 	System.err.println("o is " + o);
 	if (o != null ) {
-	  return new MessageProxyTransferable(((FolderDisplayPanel) o).getSelectedMessage());
+	  
+	  Transferable returnValue = new MessageProxyTransferable(((FolderDisplayPanel) o).getSelectedMessage());
+	  System.err.println("returning " + returnValue);
+	  return returnValue;
 	} else {
 	  return null;
 	}
@@ -52,9 +74,6 @@ public class MessageTransferHandler extends TransferHandler {
     return COPY_OR_MOVE;
   }
 
-  //Remove the old text if the action is a MOVE.
-  //However, we do not allow dropping on top of the selected text,
-  //so in that case do nothing.
   protected void exportDone(JComponent c, Transferable data, int action) {
     System.err.println("exportDone; exported " + data + ", action " + action);
     /*
@@ -74,10 +93,12 @@ public class MessageTransferHandler extends TransferHandler {
   }
 
   public boolean canImport(JComponent c, DataFlavor[] flavors) {
-    System.err.println("checking canImport for " + c + ", flavors " + flavors);
+    System.err.println("checking canImport, flavors " + flavors);
     if (containsMessageProxy(flavors)) {
+      System.err.println("can import.");
       return true;
     } else {
+      System.err.println("can't import.");
       return false;
     }
   }
@@ -98,4 +119,24 @@ public class MessageTransferHandler extends TransferHandler {
     return false;
   }
 
+  /**
+   * Gets the FolderInfo from the given Component.
+   */
+  public FolderInfo getFolderInfo(JComponent c) {
+    try {
+      Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
+      if (o != null) {
+	return ((FolderDisplayPanel) o).getFolderInfo();
+      } 
+      
+      o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderNode"), c);
+      if (o != null) {
+	return ((FolderNode) o).getFolderInfo();
+      } 
+      
+      return null;
+    } catch (Exception e) {
+      return null;
+    }
+  }
 }

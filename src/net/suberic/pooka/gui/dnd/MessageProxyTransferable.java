@@ -12,7 +12,7 @@ public class MessageProxyTransferable implements Transferable {
   public static DataFlavor sMessageProxyDataFlavor = null;
   static {
     try {
-      sMessageProxyDataFlavor = new DataFlavor(Class.forName("net.suberic.pooka.MessageProxy"), "MessageProxy");
+      sMessageProxyDataFlavor = new DataFlavor(Class.forName("net.suberic.pooka.gui.MessageProxy"), "MessageProxy");
     } catch (Exception e) {
       e.printStackTrace();
     }
