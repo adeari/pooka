@@ -207,7 +207,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public void loadFolder() throws MessagingException {
     boolean parentIsConnected = false;
-    
+
     if (isLoaded() || (loading && children == null)) 
       return;
     
@@ -227,6 +227,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (!parentStore.isConnected())
 	  parentStore.connectStore();
 	Store store = parentStore.getStore();
+
 	tmpParentFolder = store.getDefaultFolder();
 	if (Pooka.isDebug())
 	  System.out.println("got " + tmpParentFolder + " as Default Folder for store.");

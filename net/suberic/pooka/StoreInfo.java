@@ -81,7 +81,8 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       user = "";
       password = "";
       server = "localhost";
-      protocol = "mbox";
+      //protocol = "mbox";
+      protocol = "maildir";
       port = -1;
       popStore = true;
     } else {
@@ -243,6 +244,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	System.out.println("for store " + getStoreID() + ", inboxFileName = " + inboxFileName + "; userhome = " + userHomeName);
       p.setProperty("mail.mbox.inbox", inboxFileName);
       p.setProperty("mail.mbox.userhome", userHomeName);
+      p.setProperty("mail.store.maildir.imapEmulation", "true");
+      p.setProperty("mail.store.maildir.baseDir", userHomeName);
+      p.setProperty("mail.store.maildir.baseDir", userHomeName);
+      p.setProperty("mail.store.maildir.autocreatedir", "true");
     } 
     return p;
   }
@@ -403,7 +408,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   public void connectionStatusChanged(NetworkConnection connection, int newStatus) {
     // mbox folders still don't care.
-    if (!protocol.equalsIgnoreCase("mbox")) {
+    if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
       if (newStatus == NetworkConnection.CONNECTED) {
 	// we've connected.
 	// we probably don't care.
@@ -575,7 +580,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     } else { 
       try {
 	// don't test for connections for mbox providers.
-	if (!protocol.equalsIgnoreCase("mbox")) {
+	if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
 	  NetworkConnection currentConnection = getConnection();
 	  if (Pooka.isDebug())
 	    System.out.println("connect store " + getStoreID() + ":  checking connection.");
