@@ -14,6 +14,11 @@ a menu option and from the 'open with' dialog.
 
 *) fix the NullPointerException in the DefaultFolderCellRenderer.
 
+*) currently, opening a folder will make it so none of the other folders
+at that level will open.  so if you have three folders under 'mail' and 
+open up the store by opening 'mail/foo', then 'mail/bar' and 'mail/baz'
+won't open up.
+
 ?????? alpha 2 or not ??????
 ----------------------------
 
