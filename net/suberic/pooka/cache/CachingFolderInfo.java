@@ -5,6 +5,7 @@ import javax.mail.internet.MimeMessage;
 import net.suberic.pooka.*;
 import java.util.Vector;
 import java.util.StringTokenizer;
+import java.util.HashMap;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderTableModel;
 
@@ -14,7 +15,8 @@ import net.suberic.pooka.gui.FolderTableModel;
 
 public class CachingFolderInfo extends FolderInfo {
     protected MessageCache cache = null;
-
+    protected HashMap uidToMessageTable = new HashMap();
+    
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
 	
@@ -64,6 +66,7 @@ public class CachingFolderInfo extends FolderInfo {
 		
 		messageProxies.add(new MessageProxy(getColumnValues() , mi));
 		messageToInfoTable.put(m, mi);
+		uidToMessageTable.put(uids[i], m);
 	    }
 	} catch (MessagingException me) {
 	    System.out.println("aigh!  messaging exception while loading!  implement Pooka.showError()!");
@@ -171,13 +174,22 @@ public class CachingFolderInfo extends FolderInfo {
      * Folder.
      */
     public void synchronizeCache() throws MessagingException {
+	if (Pooka.isDebug())
+	    System.out.println("synchronizing cache.");
+
 	Message[] messages = getFolder().getMessages();
 	long[] uids = new long[messages.length];
 	for (int i = 0; i < messages.length; i++) {
 	    uids[i] = ((UIDFolder)getFolder()).getUID(messages[i]);
 	}
 	
+	if (Pooka.isDebug())
+	    System.out.println("synchronizing--uids.length = " + uids.length);
+
 	long[] addedUids = cache.getAddedMessages(uids);
+	if (Pooka.isDebug())
+	    System.out.println("synchronizing--addedUids.length = " + addedUids.length);
+
 	if (addedUids.length > 0) {
 	    Message[] addedMsgs = new Message[addedUids.length];
 	    for (int i = 0 ; i < addedUids.length; i++) {
@@ -188,6 +200,9 @@ public class CachingFolderInfo extends FolderInfo {
 	}    
 
 	long[] removedUids = cache.getRemovedMessages(uids);
+	if (Pooka.isDebug())
+	    System.out.println("synchronizing--removedUids.length = " + removedUids.length);
+
 	if (removedUids.length > 0) {
 	    Message[] removedMsgs = new Message[removedUids.length];
 	    for (int i = 0 ; i < removedUids.length; i++) {
@@ -199,6 +214,130 @@ public class CachingFolderInfo extends FolderInfo {
 	}
     }
 
+    
+    // as defined in javax.mail.event.MessageCountListener
+    
+    public void messagesAdded(MessageCountEvent e) {
+	if (Pooka.isDebug())
+	    System.out.println("Messages added.");
+	
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		    MessageCountEvent mce = (MessageCountEvent)actionEvent.getSource();
+		    if (folderTableModel != null) {
+			Message[] addedMessages = mce.getMessages();
+			MessageInfo mp;
+			Vector addedProxies = new Vector();
+			for (int i = 0; i < addedMessages.length; i++) {
+			    if (addedMessages[i] instanceof CachingMimeMessage) {
+				mp = new MessageInfo(addedMessages[i], FolderInfo.this);
+				addedProxies.add(new MessageProxy(getColumnValues(), mp));
+				messageToInfoTable.put(addedMessages[i], mp);
+				uidToMessageTable.put(((CachingMimeMessage) addedMessages[i]).getUID(), addedMessages[i]);
+			    } else {
+				// it's a 'real' message from the server.
+
+				long uid = ((UIDFolder)getFolder()).getUID(addedMessages[i]);
+				CachingMimeMessage newMsg = new CachingMimeMessage(CachingFolderInfo.this, uid);
+				mp = new MessageInfo(newMsg, FolderInfo.this);
+				addedProxies.add(new MessageProxy(getColumnValues(), mp));
+				messageToInfoTable.put(newMsg, mp);
+				uidToMessageTable.put(uid, newMsg);
+				
+			    }
+			}
+			addedProxies.removeAll(applyFilters(addedProxies));
+			if (addedProxies.size() > 0) {
+			    getFolderTableModel().addRows(addedProxies);
+			    setNewMessages(true);
+			    resetMessageCounts();
+			    fireMessageCountEvent(mce);
+			}
+		    }
+		    
+		}
+	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
+    }
+    
+    public void messagesRemoved(MessageCountEvent e) {
+	if (Pooka.isDebug())
+	    System.out.println("Messages Removed.");
+	
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	    MessageCountEvent mce = (MessageCountEvent)actionEvent.getSource();		
+	    if (folderTableModel != null) {
+		Message[] removedMessages = mce.getMessages();
+		if (Pooka.isDebug())
+		    System.out.println("removedMessages was of size " + removedMessages.length);
+		MessageInfo mi;
+		Vector removedProxies=new Vector();
+		for (int i = 0; i < removedMessages.length; i++) {
+		    if (Pooka.isDebug())
+			System.out.println("checking for existence of message.");
+		    mi = getMessageInfo(removedMessages[i]);
+		    if (mi.getMessageProxy() != null)
+			    mi.getMessageProxy().close();
+		    
+		    if (mi != null) {
+			if (Pooka.isDebug())
+			    System.out.println("message exists--removing");
+			removedProxies.add(mi.getMessageProxy());
+			messageToInfoTable.remove(mi);
+		    }
+		}
+		getFolderTableModel().removeRows(removedProxies);
+	    }
+	    resetMessageCounts();
+	    fireMessageCountEvent(mce);
+	}
+	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+    }
+    
+    /**
+     * This updates the TableInfo on the changed messages.
+     * 
+     * As defined by java.mail.MessageChangedListener.
+     */
+    
+    public void messageChanged(MessageChangedEvent e) {
+	// blech.  we really have to do this on the action thread.
+	getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+		    MessageChangedEvent mce = (MessageChangedEvent)actionEvent.getSource();
+		    // if the message is getting deleted, then we don't
+		    // really need to update the table info.  for that 
+		    // matter, it's likely that we'll get MessagingExceptions
+		    // if we do, anyway.
+		    try {
+			if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
+			    Message msg = mce.getMessage();
+			    MessageInfo mi = null;
+			    if (msg != null && msg instanceOf CachingMimeMessage) {
+				mi = getMessageInfoByUid(((CachingMimeMessage) msg).getUID());
+			    } else {
+				mi = getMessageInfoByUid(((UIDFolder)getFolder()).getUID(msg));
+			    }
+			    MessageProxy mp = mi.getMessageProxy();
+			    if (mp != null) {
+				mp.unloadTableInfo();
+				mp.loadTableInfo();
+				if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
+				    mi.refreshFlags();
+				else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
+				    mi.refreshHeaders();
+			    }
+			}
+		    } catch (MessagingException me) {
+			// if we catch a MessagingException, it just means
+			// that the message has already been expunged.
+		    }
+		    
+		    fireMessageChangedEvent(mce);
+		}
+	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+    }
+    
     /**
      * This sets the given Flag for all the MessageInfos given.
      */
@@ -277,7 +416,7 @@ public class CachingFolderInfo extends FolderInfo {
 	return cache;
     }
     
-    public javax.mail.internet.MimeMessage getMessageById(long uid) throws MessagingException {
+    public javax.mail.internet.MimeMessage getRealMessageById(long uid) throws MessagingException {
 	Folder f = getFolder();
 	if (f != null && f instanceof UIDFolder) {
 	    javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
