@@ -55,7 +55,17 @@ public class StoreInfo implements ValueChangeListener {
 
     public StoreInfo(String sid) {
 	setStoreID(sid);
-    
+	
+	configureStore();
+    }
+
+    /**
+     * This configures the store from the property information.
+     */
+    public void configureStore() {
+	connected = false;
+	authorized = false;
+	available = false;
 
 	protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
 
@@ -66,13 +76,14 @@ public class StoreInfo implements ValueChangeListener {
 	    protocol = "mbox";
 	    popStore = true;
 	} else {
+	    popStore = false;
 	    user = Pooka.getProperty("Store." + storeID + ".user", "");
 	    password = Pooka.getProperty("Store." + storeID + ".password", "");
 	    if (!password.equals(""))
 		password = net.suberic.util.gui.PasswordEditorPane.descrambleString(password);
 	    server = Pooka.getProperty("Store." + storeID + ".server", "");
 	}
-
+	
 	url = new URLName(protocol, server, -1, "", user, password);
 	
 	try {
@@ -81,7 +92,7 @@ public class StoreInfo implements ValueChangeListener {
 	} catch (NoSuchProviderException nspe) {
 	    available=false;
 	}
-
+	
 	// don't allow a StoreInfo to get created with an empty folderList.
 	
 	if (Pooka.getProperty("Store." + storeID + ".folderList", "").equals(""))
@@ -90,7 +101,12 @@ public class StoreInfo implements ValueChangeListener {
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty());
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".folderList");
 	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".defaultProfile");
+	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".protocol");
+	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".user");
+	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".password");
+	Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".server");
 
+	
 	if (available) {
 	    store.addConnectionListener(new ConnectionAdapter() { 
 		    
@@ -119,11 +135,13 @@ public class StoreInfo implements ValueChangeListener {
 		});
 	}
 
-	storeThread = new ActionThread(this.getStoreID() + " - ActionThread");
-	storeThread.start();
+	if (storeThread == null) {
+	    storeThread = new ActionThread(this.getStoreID() + " - ActionThread");
+	    storeThread.start();
+	}
 
 	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
-
+	
 	updateChildren();
 	
 	String trashFolderName = Pooka.getProperty(getStoreProperty() + ".trashFolder", "");
@@ -145,6 +163,9 @@ public class StoreInfo implements ValueChangeListener {
 
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getStoreProperty() + ".folderList", "INBOX"), ":");
 	
+	if (Pooka.isDebug())
+	    System.out.println("Pooka.getProperty(" + getStoreProperty() + ".folderList = " + Pooka.getProperty(getStoreProperty() + ".folderList"));
+
 	String newFolderName;
 
 	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
@@ -163,6 +184,8 @@ public class StoreInfo implements ValueChangeListener {
 	    }
 	} 
 	children = newChildren;
+	if (Pooka.isDebug())
+	    System.out.println(getStoreID() + ":  in configureStore.  children.size() = " + children.size());
 
 	if (storeNode != null)
 	    storeNode.loadChildren();
@@ -231,6 +254,32 @@ public class StoreInfo implements ValueChangeListener {
 	    updateChildren();
 	} else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
 	    defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
+	} else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server")) {
+
+	    if (storeNode != null) {
+		Enumeration enum = storeNode.children();
+		Vector v = new Vector();
+		while (enum.hasMoreElements())
+		    v.add(enum.nextElement());
+		
+		storeNode.removeChildren(v);
+	    }
+
+	    children = null;
+
+	    /*
+	    String realChildren = Pooka.getProperty(getStoreProperty() + ".folderList", "");
+	    Pooka.setProperty(getStoreProperty() + ".folderList", "");
+	    Pooka.setProperty(getStoreProperty() + ".folderList", realChildren);
+	    */
+
+	    try {
+		disconnectStore();
+	    } catch (Exception e) { }
+	    if (Pooka.isDebug())
+		System.out.println("calling configureStore()");
+
+	    configureStore();
 	}
     }
 

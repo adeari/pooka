@@ -1,10 +1,13 @@
 beta 1
 ---------------
 
-*) make it so you can switch a mail store from pop to imap (or vice-versa)
-   without restarting pooka.
+*) bug:  if you switch back from preview mode to desktop mode, we need
+to remove the listener on the JTable.
 
----- (?)
+*) need to fix the NewAccountPooka to 1) make it look right, and 2) support
+pop3 stores.
+
+----
 
 *) support for ssl?
 
@@ -70,6 +73,13 @@ the title bar.
 get messages.  so if you have certain folders that you care about, then you'll
 get notification, and if the other folders get messages, it won't do the
 new message notification.
+
+*) bug:  if you go into the multi configuration editors and it's empty, you
+should more or less be forced to create a new entity.  otherwise you'll start
+typing in informatio and then be surprised when add clears it out.
+
+*) bug:  trying to go to a folder editor when there aren't any folders
+or stores configured is a big problem.
 
 after beta 1
 ----------------

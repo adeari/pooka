@@ -154,6 +154,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * then we can either return to NOT_LOADED, or INVALID.
      */
     public void loadFolder() {
+	
 	if (Pooka.isDebug())
 	    System.out.println(Thread.currentThread() + "loading folder " + getFolderID());
 
@@ -311,6 +312,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * opened folder.
      */
     public void openFolder(int mode) throws MessagingException {
+	
+	if (Pooka.isDebug())
+	    System.out.println(this + ":  opening folder.");
 
 	if (! isLoaded())
 	    loadFolder();

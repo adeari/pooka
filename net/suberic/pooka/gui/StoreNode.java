@@ -11,6 +11,8 @@ import net.suberic.pooka.gui.search.*;
 import net.suberic.pooka.gui.filechooser.*;
 import java.io.File;
 import java.util.StringTokenizer;
+import java.util.Vector;
+import java.util.Enumeration;
 import javax.swing.*;
 import javax.mail.event.*;
 
@@ -78,6 +80,47 @@ public class StoreNode extends MailTreeNode {
      * This loads or updates the top-level children of the Store.
      */
     public void loadChildren() {
+	
+	if (Pooka.isDebug())
+	    System.out.println("calling loadChildren() for " + getStoreInfo().getStoreID());
+
+	Enumeration origChildren = super.children();
+	Vector origChildrenVector = new Vector();
+	while (origChildren.hasMoreElements())
+	    origChildrenVector.add(origChildren.nextElement());
+
+	if (Pooka.isDebug())
+	    System.out.println(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
+
+	Vector storeChildren = getStoreInfo().getChildren();
+	
+	if (Pooka.isDebug())
+	    System.out.println(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
+
+	if (storeChildren != null) {
+	    for (int i = 0; i < storeChildren.size(); i++) {
+		FolderNode node = popChild(((FolderInfo)storeChildren.elementAt(i)).getFolderName(), origChildrenVector);
+		if (node == null) {
+		    node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
+		    // we used insert here, since add() would mak
+		    // another recursive call to getChildCount();
+		    insert(node, 0);
+		}
+	    }
+	    
+	}
+	
+	removeChildren(origChildrenVector);
+	
+	hasLoaded=true;
+	
+
+	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+	if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+	    ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
+	}
+
+	/*
 	java.util.Vector storeChildren = getStoreInfo().getChildren();
     
 	if (storeChildren != null)
@@ -94,9 +137,44 @@ public class StoreNode extends MailTreeNode {
 	if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
 	    ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
 	}
-	
+	*/
     }
 
+    /**
+     * This goes through the Vector of FolderNodes provided and 
+     * returns the FolderNode for the given childName, if one exists.
+     * It will also remove the Found FolderNode from the childrenList
+     * Vector.
+     *
+     * If a FolderNode that corresponds with the given childName does
+     * not exist, this returns null.
+     *
+     */
+    public FolderNode popChild(String childName, Vector childrenList) {
+	if (children != null) {
+	    for (int i = 0; i < childrenList.size(); i++)
+		if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
+		    FolderNode fn = (FolderNode)childrenList.elementAt(i);
+		    childrenList.remove(fn);
+		    return fn;
+		}
+	}
+	
+	// no match.
+	return null;
+    }
+
+    /**
+     * This removes all the items in removeList from the list of this 
+     * node's children.
+     */
+    public void removeChildren(Vector removeList) {
+	for (int i = 0; i < removeList.size(); i++) {
+	    if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
+		this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
+	}
+    }
+    
     /**
      * This  creates the current PopupMenu if there is not one.  It then
      * will configure the PopupMenu with the current actions.
@@ -234,7 +312,6 @@ public class StoreNode extends MailTreeNode {
 		Folder defaultFolder = s.getDefaultFolder();
 		System.out.println("got default folder.");
 		defaultFolder.list();
-		System.out.println("called list.");
 	    } catch (MessagingException me) {
 		System.out.println("got messaging exception.");
 		me.printStackTrace();
