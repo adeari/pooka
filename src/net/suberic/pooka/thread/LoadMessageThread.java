@@ -186,7 +186,9 @@ public class LoadMessageThread extends Thread {
 		MessageInfo[] toFetch = new MessageInfo[fetchList.size()];
 		toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
 		synchronized(folderInfo.getFolderThread().getRunLock()) {
+		  folderInfo.getFolderThread().setCurrentActionName("Loading messages.");
 		  getFolderInfo().fetch(toFetch, fetchProfile);
+		  folderInfo.getFolderThread().setCurrentActionName("");
 		}
 	      } catch(MessagingException me) {
 		System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
@@ -199,16 +201,22 @@ public class LoadMessageThread extends Thread {
 	    // and refresh each message.
 	    try {
 	      synchronized(folderInfo.getFolderThread().getRunLock()) {
-		if (! mp.isLoaded())
-		  mp.loadTableInfo();
-		if (mp.needsRefresh())
-		  mp.refreshMessage();
-		else if (! mp.matchedFilters()) {
-		  mp.matchFilters();
+		try {
+		  folderInfo.getFolderThread().setCurrentActionName("Loading messages.");
+		  if (! mp.isLoaded())
+		    mp.loadTableInfo();
+		  if (mp.needsRefresh())
+		    mp.refreshMessage();
+		  else if (! mp.matchedFilters()) {
+		    mp.matchFilters();
+		  }
+		} finally {
+		  folderInfo.getFolderThread().setCurrentActionName("");
 		}
 	      } // synchronized
 	    } catch (Exception e) {
-	      e.printStackTrace();
+	      if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING))
+		e.printStackTrace();
 	    }
 	    
 	    loadedMessageCount++;

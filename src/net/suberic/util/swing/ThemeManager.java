@@ -41,7 +41,7 @@ public class ThemeManager implements ValueChangeListener, ItemCreator, ItemListC
     LookAndFeel laf = UIManager.getLookAndFeel();
     if (laf instanceof MetalLookAndFeel) {
       MetalLookAndFeel oldMlaf = ((MetalLookAndFeel)laf);
-      MetalTheme oldMt = new DefaultMetalTheme(); 
+      MetalTheme oldMt = getDefaultTheme();
       // not that that really matters.
 
       if (theme != null) {
@@ -108,7 +108,17 @@ public class ThemeManager implements ValueChangeListener, ItemCreator, ItemListC
     if (configID == null)
       return null;
 
-    return (MetalTheme) manager.getItem(configID);
+    Item returnValue = manager.getItem(configID);
+    if (returnValue == null)
+      return null;
+    else if (returnValue instanceof MetalTheme)
+      return (MetalTheme) returnValue;
+    else if (returnValue instanceof ThemeWrapperItem) 
+      return ((ThemeWrapperItem) returnValue).getWrappedTheme();
+    else
+      return null;
+
+    //return (MetalTheme) manager.getItem(configID);
   }
 
   /**
@@ -158,9 +168,19 @@ public class ThemeManager implements ValueChangeListener, ItemCreator, ItemListC
    * Creates a new Theme object.
    */
   public Item createItem(VariableBundle sourceBundle, String resourceString, String itemId) {
+    if (itemId != null && itemId.equals("Ocean")) {
+      ThemeWrapperItem wrapper = new ThemeWrapperItem(sourceBundle, resourceString, itemId);
+      try {
+	Class oceanThemeClass = Class.forName("javax.swing.plaf.metal.OceanTheme");
+	MetalTheme oceanTheme = (MetalTheme) oceanThemeClass.newInstance();
+	wrapper.setWrappedTheme(oceanTheme);
+	return wrapper;
+      } catch (Exception e) {
+	// probably not in jdk 1.5.  ignore.
+      }
+    }
+    
     return new ConfigurableMetalTheme(sourceBundle, resourceString, itemId);
   }
-  
-
 
 }

@@ -1,3 +1,5 @@
+added some support for the jdk 1.5 Ocean theme.
+
 modified date display to use dd/MM/yy for non-US English.
 
 fixed a few situations in which the mail store could be accessed on the

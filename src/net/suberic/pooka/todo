@@ -1,7 +1,3 @@
-*) ?? add support for ocean theme in jdk 1.5 ??
-
-*) modify date format so that it only defaults to MM/dd/yy in the US.
-
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:
 	*) reuse our connections so we don't have to renegotiate ssl
@@ -28,7 +24,7 @@ testing:
 
 *) test timeouts; make sure that javamail timeout doesn't apply while
    data is still being transferred.  or for ssl for that matter.
-*) test what happens if your connection fails during a LoadMessageThread action.
+
 *) fix disconnection handling really.
    -) order of events. -- make sure the Store check is high priority.
    -) handling of events, including timeouts and such.
