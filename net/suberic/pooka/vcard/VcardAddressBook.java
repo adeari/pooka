@@ -50,9 +50,19 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
   /**
    * Adds the given Vcard to the address book.
    */
-  protected void addAddress(Vcard newCard) {
+  public void addAddress(Vcard newCard) {
     Vcard[] newList = new Vcard[orderedList.length + 1];
-    int insertLocation = java.utils.Arrays.binarySearch(newCard);
+    int searchResult = java.util.Arrays.binarySearch(orderedList, newCard);
+    if (searchResult < 0) {
+      int insertLocation = (searchResult + 1) * -1;
+      if (insertLocation > 0)
+	System.arraycopy(orderedList, 0, newList, 0, insertLocation);
+      newList[insertLocation] = newCard;
+      if (orderedList.length - insertLocation > 0)
+	System.arraycopy(orderedList, insertLocation, newList, insertLocation + 1, orderedList.length - insertLocation); 
+
+      orderedList = newList;
+    }
   }
   
   /**
@@ -63,36 +73,6 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
     orderedList = (Vcard[]) arrayList.toArray(orderedList);
     java.util.Arrays.sort(orderedList);
   }
-  
-  /**
-   * Uses a binary search to find a matching Vcard.
-   */
-  /*
-  protected InternetAddress[] binarySearch(String matchString, int minimum, int maximum) {
-    boolean matched = false;
-    InternetAddress[] returnValue = null;
-
-    while (! matched) {
-      if ( maximum - minimum < 2) {
-	int choice = minimum + maximum / 2;
-	Vcard current = (Vcard) orderedList.get(choice);
-	int comparison = current.compareTo(matchString);
-	if (comparison < 0)
-	  maximum = choice;
-	else if (comparison > 0)
-	  minimum = choice;
-	else {
-	  // match has been found.
-	  matched = true;
-	  // get all the matches.
-
-	}
-      }
-    }
-    
-    return null;
-  }
-  */
   
   /**
    * Gets the AddressMatcher for this AddressBook.
@@ -166,14 +146,16 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
-      value = 0;
+      value = (value + 1) * -1;
+    } else {
+      // if we got a match, we want to return the next one.
+      value = value + 1;
     }
-
-    // see if the given value matches the string.
-    if (orderedList[value].compareTo(matchString) == 0 && value > 0)
-      return orderedList[value - 1].getAddress();
-    else
+    if (value >= orderedList.length) {
+      return orderedList[orderedList.length - 1].getAddress();
+    } else {
       return orderedList[value].getAddress();
+    }
   }
   
   /**
@@ -184,14 +166,16 @@ public class VcardAddressBook implements AddressBook, AddressMatcher {
     int value = java.util.Arrays.binarySearch(orderedList, matchString);
     // now get all the matches, if any.
     if (value < 0) {
-      value = 0;
+      value = (value + 2) * -1;
+    } else {
+      // if we got a match, we want to return the previous one.
+      value = value - 1;
     }
-
-    // see if the given value matches the string.
-    if (orderedList[value].compareTo(matchString) == 0 && value < orderedList.length - 1)
-      return orderedList[value + 1].getAddress();
-    else
+    if (value < 0) {
+      return orderedList[0].getAddress();
+    } else {
       return orderedList[value].getAddress();
+    }
   }
   
 }
