@@ -8,16 +8,6 @@ a menu option and from the 'open with' dialog.
 	inserting the sig, support for signature as a file, support for
 	signature as a generator....  lots of stuff, i suppose.
 
-*) add a way to notify users of 'new' messages. -- sort of done.  need to make
-	it nicer, maybe listing new messages on the title, and use italics
-	or something other than * * in the folderPanel.
-	-- also, check the update times for the selections of windows; i think
-	that the FolderNodes aren't being redrawn on time.  specifically,
-	i think that when the FolderWindow is selected, the FolderNode is
-	not redrawn.
-	-- note:  i'm switching it to an icon-based alert on the FolderPanel,
-	so i'll need to make sure that it works that way.
-
 *) bug:  fix what happens if you try sending out a bad email.  also, while
 	we're at it, make sure that the from: and smtp: information get 
 	updated live.
