@@ -77,6 +77,12 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	}
     }
 
+    /**
+     * This detaches this window from the MessagePanel, instead making it
+     * a top-level MessageFrame.
+     */
+    public abstract void  detachWindow();
+
 
     /**
      * This shows an Confirm Dialog window.  We include this so that
@@ -223,7 +229,8 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     // The actions supported by the window itself.
 
     public Action[] defaultActions = {
-	new CloseAction()
+	new CloseAction(),
+	new DetachAction()
     };
 
     class CloseAction extends AbstractAction {
@@ -237,6 +244,15 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	}
     }
 
+    class DetachAction extends AbstractAction {
+	DetachAction() {
+	    super("window-detach");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    detachWindow();
+	}
+    }
 }
 
 

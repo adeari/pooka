@@ -57,6 +57,18 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	
     }
 
+    public void detachWindow() {
+	ReadMessageFrame rmf = new ReadMessageFrame(getMessageProxy());
+	Point loc = getLocationOnScreen();
+	rmf.setLocation(loc);
+
+	rmf.show();
+	try {
+	    this.setClosed(true);
+	} catch (java.beans.PropertyVetoException pve) {
+	}
+    }
+
     /**
      * Overrides JComponent.addNotify().
      *

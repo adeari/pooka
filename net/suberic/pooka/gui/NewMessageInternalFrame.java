@@ -90,6 +90,10 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	}
     }
 
+    public void detachWindow() {
+
+    }
+
     /**
      * This returns the values in the MesssageWindow as a set of 
      * InternetHeaders.
