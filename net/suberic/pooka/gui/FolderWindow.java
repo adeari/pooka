@@ -83,8 +83,8 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	defaultActions = new Action[] {
 	    new CloseAction(),
-	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread())
-		
+	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
+	    new ActionWrapper(new SearchAction(), getFolderInfo().getFolderThread())
 		};
 
 	initWindow();
@@ -280,6 +280,19 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 		}
 	    });
 
+    }
+
+    /**
+     * Searches the underlying FolderInfo's messages for messages matching
+     * the search term.
+     */
+    public void searchFolder() {
+	javax.mail.search.SearchTerm term = new javax.mail.search.SubjectTerm("info");
+	try {
+	    MessageProxy[] matches = getFolderInfo().search(term);
+	} catch (Exception e) {
+	    System.out.println("caught exception.");
+	}
     }
 
     /**
@@ -484,6 +497,17 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	
         public void actionPerformed(ActionEvent e) {
 	    expungeMessages();
+	}
+    }
+
+    public class SearchAction extends AbstractAction {
+
+	SearchAction() {
+	    super("folder-search");
+	}
+	
+        public void actionPerformed(ActionEvent e) {
+	    searchFolder();
 	}
     }
 

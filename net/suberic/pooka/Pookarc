@@ -72,8 +72,10 @@ MenuBar.Edit.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MenuBar.Edit.Paste.Action=paste-from-clipboard
 MenuBar.Edit.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 
-#MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge:AddSignature
-MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:AddSignature
+#MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:Expunge:AddSignature:SearchFolder
+
+MenuBar.Mail=NewMsg:Reply:ReplyAll:Forward:Send:Move:Delete:AddSignature:SearchFolder
+
 MenuBar.Mail.NewMsg.Action=message-new
 MenuBar.Mail.Reply.Action=message-reply
 MenuBar.Mail.ReplyAll.Action=message-reply-all
@@ -84,6 +86,7 @@ MenuBar.Mail.Move.Action=message-move
 MenuBar.Mail.Delete.Action=message-delete
 MenuBar.Mail.Expunge.Action=message-expunge
 MenuBar.Mail.AddSignature.Action=message-add-signature
+MenuBar.Mail.SearchFolder.Action=folder-search
 
 MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
@@ -301,6 +304,7 @@ UserProfile.default.allowedValues=UserProfile
 Store.propertyType=Multi
 Store.editableFields=server:protocol:user:password:trashFolder:defaultProfile
 Store.protocol.propertyType=List
+Store.protocol.allowedValues=imap:pop3
 Store.protocol=imap
 Store.password.propertyType=Password
 Store.defaultProfile.propertyType=List
@@ -325,7 +329,7 @@ FolderTree.disconnectedStoreIcon=images/mailbox.gif
 NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
 NewAccountPooka.password.propertyType=Password
 NewAccountPooka.type.propertyType=List
-NewAccountPooka.type.allowedValues=imap
+NewAccountPooka.type.allowedValues=imap:pop3
 NewAccountPooka.type=imap
 
 FolderSelectorPane.inputButton.image=images/More.gif

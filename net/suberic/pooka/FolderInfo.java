@@ -851,7 +851,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		}
 	
     }
-    
+
+    /**
+     * Searches for messages in this folder which match the given
+     * SearchTerm.
+     *
+     * Basically wraps the call to Folder.search(), and then wraps the
+     * returned Message objects as MessageProxys.
+     */
+    public MessageProxy[] search(javax.mail.search.SearchTerm term) 
+    throws MessagingException {
+	Message[] returnValue = folder.search(term);
+	System.out.println("got " + returnValue.length + " results.");
+	return null;
+
+    }
 
     /**
      * This method closes the Folder.  If you open the Folder using 
