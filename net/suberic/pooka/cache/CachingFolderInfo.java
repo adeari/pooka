@@ -628,14 +628,25 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     }
     
     MessageCountEvent newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), removedCachingMessages);
+
+
     if (getFolderDisplayUI() != null) {
-      getFolderDisplayUI().removeRows(removedProxies);
+      if (removedProxies.size() > 0) {
+	final Vector finRemoved = removedProxies;
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      getFolderDisplayUI().removeRows(finRemoved);
+	    }
+	  });
+	
+      }
       resetMessageCounts();
       fireMessageCountEvent(newMce);
     } else {
       resetMessageCounts();
       fireMessageCountEvent(newMce);
-      getFolderTableModel().removeRows(removedProxies);
+      if (removedProxies.size() > 0)
+	getFolderTableModel().removeRows(removedProxies);
     }
   }
   

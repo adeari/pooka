@@ -158,6 +158,12 @@ public class FolderTableModel extends AbstractTableModel {
       }
     } else {
       System.out.println("got an empty/null added or deleted event.");
+      if (changedMsg == null) {
+	System.out.println("changedMsg was null.");
+
+      } else if ( changedMsg.size() > 0) {
+	System.out.println("changedMsg.size() = 0");
+      }
       Thread.currentThread().dumpStack();
     }
   }

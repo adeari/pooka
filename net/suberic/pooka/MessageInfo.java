@@ -420,26 +420,37 @@ public class MessageInfo {
 	StringBuffer intro = new StringBuffer(introTemplate);
 	int index = introTemplate.lastIndexOf('%', introTemplate.length());
 	try {
-	    while (index > -1) {
-		try {
-		    char nextChar = introTemplate.charAt(index + 1);
-		    if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
-
-		      Address[] fromAddresses = m.getFrom();
-		      if (fromAddresses.length > 0 && fromAddresses[0] != null)
-			intro.replace(index, index +2, MailUtilities.decodeAddressString(fromAddresses));
-		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
-		      intro.replace(index, index + 2, Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate()));
-		    } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
-			intro.replace(index, index + 2, m.getSubject());
-		    } else if (nextChar == '%') {
-			intro.replace(index, index+1, "%");
-		    }
-		    index = introTemplate.lastIndexOf('%', index -1);
-		} catch (StringIndexOutOfBoundsException e) {
-		    index = introTemplate.lastIndexOf('%', index -1);
+	  while (index > -1) {
+	    try {
+	      char nextChar = introTemplate.charAt(index + 1);
+	      String replaceMe = null;
+	      if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
+		
+		Address[] fromAddresses = m.getFrom();
+		if (fromAddresses.length > 0 && fromAddresses[0] != null) {
+		  replaceMe = MailUtilities.decodeAddressString(fromAddresses);
+		  if (replaceMe == null)
+		    replaceMe = "";
+		  intro.replace(index, index +2, replaceMe);
 		}
+	      } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
+		replaceMe = Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate());
+		if (replaceMe == null)
+		  replaceMe = "";
+		intro.replace(index, index + 2, replaceMe);
+	      } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
+		replaceMe = m.getSubject();
+		if (replaceMe == null)
+		  replaceMe = "";
+		intro.replace(index, index + 2, m.getSubject());
+	      } else if (nextChar == '%') {
+		intro.replace(index, index+1, "%");
+	      }
+	      index = introTemplate.lastIndexOf('%', index -1);
+	    } catch (StringIndexOutOfBoundsException e) {
+	      index = introTemplate.lastIndexOf('%', index -1);
 	    }
+	  }
 	} catch (MessagingException me) {
 	    return null;
 	}

@@ -1,3 +1,6 @@
+fixed a bug where responding or forwarding a message with a null subject
+would result in a NullPointerException
+
 fixed a bug where multiple messages could not be copied between folders
 
 changed the load message tracker to synchronize on the folder thread.

@@ -3,6 +3,7 @@
 *) things are still too slow.  :)  i had something happen where the old
 messages appeared, but the ones that had been read since were sitll marked
 as unread.  a bit later, they were marked as read.
+	-- make it so on first load, we do both a load and refresh.
 
 *) each loading of the FolderTableInfo rechecks the unread message
 	count, which sucks for performance.  improvements with new
