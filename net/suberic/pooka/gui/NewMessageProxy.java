@@ -363,7 +363,7 @@ public class NewMessageProxy extends MessageProxy {
       getNewMessageInfo().setEncryptMessage(NewMessageInfo.CRYPTO_YES);
       if (getNewMessageInfo().getEncryptionKey() == null) {
 	try {
-	  EncryptionKey cryptKey = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPublicKey();
+	  java.security.Key cryptKey = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPublicKey();
 	  getNewMessageInfo().setEncryptionKey(cryptKey);
 	} catch (Exception ex) {
 	  getMessageUI().showError(ex.getMessage(), ex);
@@ -381,7 +381,7 @@ public class NewMessageProxy extends MessageProxy {
       getNewMessageInfo().setSignMessage(NewMessageInfo.CRYPTO_YES);
       if (getNewMessageInfo().getSignatureKey() == null && (getDefaultProfile() == null || getDefaultProfile().getEncryptionKey() == null)) {
 	try {
-	  EncryptionKey signKey = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPrivateKey();
+	  java.security.Key signKey = net.suberic.pooka.gui.crypto.CryptoKeySelector.selectPrivateKey();
 	  getNewMessageInfo().setSignatureKey(signKey);
 	} catch (Exception ex) {
 	  getMessageUI().showError(ex.getMessage(), ex);

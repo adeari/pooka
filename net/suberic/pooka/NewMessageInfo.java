@@ -97,9 +97,9 @@ public class NewMessageInfo extends MessageInfo {
       }
       
       if (mEncryptMessage == CRYPTO_YES) {
-	System.err.println("encrypting with " + getKey());
-	if (getKey() != null) {
-	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getKey());
+	System.err.println("encrypting with " + getEncryptionKey());
+	if (getEncryptionKey() != null) {
+	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getEncryptionKey());
 	  message.writeTo(System.out);
 	} else {
 	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
@@ -288,14 +288,14 @@ public class NewMessageInfo extends MessageInfo {
   /**
    * Sets the encryption key for encrypting this message.
    */
-  public void setKey(Key pKey) {
+  public void setEncryptionKey(Key pKey) {
     mKey = pKey;
   }
 
   /**
    * Gets the encryption key we're using for this message.
    */
-  public Key getKey() {
+  public Key getEncryptionKey() {
     return mKey;
   }
 
