@@ -14,8 +14,18 @@ public class SearchEntryForm {
     // ui objects
     private JPanel panel;
     private JComboBox searchFieldCombo;
+    private JPanel selectionPanel; 
+
+    private JPanel stringMatchPanel;
     private JComboBox operationCombo;
     private JTextField textField;
+
+    private JPanel booleanPanel;
+    private JComboBox booleanValueCombo;
+
+    private JPanel datePanel;
+    private JComboBox dateComparisonCombo;
+    private JTextField dateField;
 
     // the source SearchTermManager.
     SearchTermManager manager;
@@ -28,13 +38,42 @@ public class SearchEntryForm {
 	panel = new JPanel();
 
 	searchFieldCombo = new JComboBox(manager.getTermLabels());
-	Vector operationFields = manager.getOperationLabels();
-	operationCombo = new JComboBox(operationFields);
-	textField = new JTextField(20);
-	
+
+	createPanels();
+
+	selectionPanel = new JPanel();
+	selectionPanel.setLayout(new java.awt.CardLayout());
+	selectionPanel.add(stringMatchPanel, SearchTermManager.STRING_MATCH);
+	selectionPanel.add(booleanPanel, SearchTermManager.BOOLEAN_MATCH);
+	selectionPanel.add(datePanel, SearchTermManager.DATE_MATCH);
+
 	panel.add(searchFieldCombo);
-	panel.add(operationCombo);
-	panel.add(textField);
+	panel.add(selectionPanel);
+    }
+
+    /**
+     * Creates all of the selection panels.
+     */
+    public void createPanels() {
+	stringMatchPanel = new JPanel();
+	Vector operationFields = manager.getOperationLabels(SearchTermManager.STRING_MATCH);
+	operationCombo = new JComboBox(operationFields);
+	textField = new JTextField(30);
+	
+	stringMatchPanel.add(operationCombo);
+	stringMatchPanel.add(textField);
+
+	booleanPanel = new JPanel();
+	Vector booleanFields = manager.getOperationLabels(SearchTermManager.BOOLEAN_MATCH);
+	booleanValueCombo = new JComboBox(booleanFields);
+	booleanPanel.add(booleanValueCombo);
+
+	datePanel = new JPanel();
+	Vector dateFields = manager.getOperationLabels(SearchTermManager.DATE_MATCH);
+	dateComparisonCombo = new JComboBox(dateFields);
+	dateField = new JTextField(30);
+	datePanel.add(dateComparisonCombo);
+	datePanel.add(dateField);
     }
 
     /**

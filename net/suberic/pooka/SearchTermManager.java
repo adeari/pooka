@@ -19,6 +19,10 @@ public class SearchTermManager {
     
     String sourceProperty;
 
+    public static String STRING_MATCH = "String";
+    public static String BOOLEAN_MATCH = "Boolean";
+    public static String DATE_MATCH = "Date";
+
     /**
      * Default constructor.  Initializes the labelToPropertyMap and the
      * termLabels Vector from the Pooka property.
