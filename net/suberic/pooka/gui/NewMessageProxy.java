@@ -17,7 +17,8 @@ public class NewMessageProxy extends MessageProxy {
   
   public NewMessageProxy(NewMessageInfo newMessage) {
     messageInfo = newMessage;
-    
+    messageInfo.setMessageProxy(this);
+
     commands = new Hashtable();
     
     Action[] actions = getActions();
@@ -57,6 +58,7 @@ public class NewMessageProxy extends MessageProxy {
    */
   public void send() {
     if (getNewMessageUI() != null) { 
+      getNewMessageUI().setBusy(true);
       try {
 	UserProfile profile = getNewMessageUI().getSelectedProfile();
 	InternetHeaders headers = getNewMessageUI().getMessageHeaders();
@@ -65,23 +67,54 @@ public class NewMessageProxy extends MessageProxy {
 	
 	String messageContentType = getNewMessageUI().getMessageContentType();
 	getNewMessageInfo().sendMessage(profile, headers, messageText, messageContentType);
-	
 	try {
 	  getNewMessageInfo().saveToSentFolder(profile);
 	} catch (MessagingException me) {
 	  getMessageUI().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 	}
-	getNewMessageUI().setModified(false);
-	getMessageUI().closeMessageUI();
+	
       } catch (MessagingException me) {
-	if (me instanceof SendFailedException) {
-	  getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
-	  me.printStackTrace(System.out);
-	} else {
-	  getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
-	  me.printStackTrace(System.out);
-	}
       }
+    }
+  }
+
+  /**
+   * Called when the send succeeds.
+   */
+  public void sendSucceeded() {
+    final NewMessageUI nmui = getNewMessageUI();
+    if (nmui != null) {
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    nmui.setBusy(false);
+	    nmui.setModified(false);
+	    nmui.closeMessageUI();
+	  }
+	};
+      SwingUtilities.invokeLater(runMe);
+    }
+  }
+
+  /**
+   * Called when the send fails.
+   */
+  public void sendFailed(Exception e) {
+    final Exception me = e;
+    final NewMessageUI nmui = getNewMessageUI();
+    if (nmui != null) {
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    if (me instanceof SendFailedException) {
+	      getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+	      me.printStackTrace(System.out);
+	    } else {
+	      getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+	      me.printStackTrace(System.out);
+	    }
+	    nmui.setBusy(false);
+	  }
+	};
+      SwingUtilities.invokeLater(runMe);
     }
   }
   
