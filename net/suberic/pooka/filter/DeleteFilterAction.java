@@ -10,30 +10,27 @@ public class DeleteFilterAction implements FilterAction {
 
     /**
      * Runs the filterAction on each MessageProxy in the filteredMessages
-     * array.  
+     * Vector.
      *
      * @param filteredMessages messages which have met the filter condition
      * and need to have the FilterAction performed on them.
      *
-     * @return messages which are not removed from their original folder
+     * @return messages which are removed from their original folder
      * by the filter.
      */
-    public MessageProxy[] performFilter(MessageProxy[] filteredMessages) {
-	Vector deleteFailed = new Vector();
-	for (int i = 0; i < filteredMessages.length; i++) {
+    public Vector performFilter(Vector filteredMessages) {
+	Vector deleted = new Vector();
+	for (int i = 0; i < filteredMessages.size(); i++) {
 	    //	    try {
-		filteredMessages[i].deleteMessage(false);
-		//    } catch (MessagingException me) {
-		//deleteFailed.add(filteredMessages[i]);
-		//}
+	    MessageProxy current = (MessageProxy) filteredMessages.elementAt(i);
+	    current.deleteMessage(false);
+	    deleted.add(current);
+	    //    } catch (MessagingException me) {
+	    //deleteFailed.add(filteredMessages[i]);
+	    //}
 	}
 	
-	MessageProxy[] returnValue = new MessageProxy[deleteFailed.size()];
-	for (int i = 0; i < deleteFailed.size(); i++) {
-	    returnValue[i] = (MessageProxy)deleteFailed.elementAt(i);
-	}
-
-	return returnValue;
+	return deleted;
     }
 
     /**

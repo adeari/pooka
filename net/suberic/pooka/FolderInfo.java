@@ -144,6 +144,27 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
+     * This applies each MessageFilter in filters array on the given 
+     * MessageProxy objects.
+     *
+     * @return a Vector containing the removed MessageProxy objects.
+     */
+    public Vector applyFilters(Vector messages) {
+	Vector notRemovedYet = new Vector(messages);
+	Vector removed = new Vector();
+	if (filters != null) 
+	    for (int i = 0; i < filters.length; i++) {
+		if (filters[i] != null) {
+		    Vector justRemoved = filters[i].filterMessages(notRemovedYet);
+		    removed.addAll(justRemoved);
+		    notRemovedYet.removeAll(justRemoved);
+		}
+	}
+	
+	return removed;
+    }
+
+    /**
      * This actually loads up the Folder object itself.  This is used so 
      * that we can have a FolderInfo even if we're not connected to the
      * parent Store.
@@ -739,15 +760,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 			addedProxies.add(mp);
 			messageToProxyTable.put(addedMessages[i], mp);
 		    }
-		    getFolderTableModel().addRows(addedProxies);
+		    addedProxies.removeAll(applyFilters(addedProxies));
+		    if (addedProxies.size() > 0) {
+			getFolderTableModel().addRows(addedProxies);
+			setNewMessages(true);
+			resetMessageCounts();
+			fireMessageCountEvent(mce);
+		    }
 		}
-		resetMessageCounts();
-		setNewMessages(true);
-		fireMessageCountEvent(mce);
+		
 	    }
-	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
-    }
-    
+	    }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
+				     }
+	
     public void messagesRemoved(MessageCountEvent e) {
 	if (Pooka.isDebug())
 	    System.out.println("Messages Removed.");

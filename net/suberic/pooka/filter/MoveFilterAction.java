@@ -13,30 +13,27 @@ public class MoveFilterAction {
 
     /**
      * Runs the filterAction on each MessageProxy in the filteredMessages
-     * array.  
+     * Vector.
      *
      * @param filteredMessages messages which have met the filter condition
      * and need to have the FilterAction performed on them.
      *
-     * @return messages which are not removed from their original folder
+     * @return messages which are removed from their original folder
      * by the filter.
      */
-    public MessageProxy[] performFilter(MessageProxy[] filteredMessages) {
-	Vector failedMove = new Vector();
-
-	for (int i = 0; i < filteredMessages.length; i++) {
+    public Vector performFilter(Vector filteredMessages) {
+	Vector moved = new Vector();
+	for (int i = 0; i < filteredMessages.size(); i++) {
 	    //try {
-	    filteredMessages[i].moveMessage(targetFolder);
+	    MessageProxy current = (MessageProxy) filteredMessages.elementAt(i);
+	    current.moveMessage(targetFolder);
+	    moved.add(current);
 	    // catch (MessagingException me) {
 	    // failedMove.add(filteredMessage[i];
 	    //}
 	}
 
-	MessageProxy[] returnValue = new MessageProxy[failedMove.size()];
-	for (int i = 0; i < failedMove.size(); i++) 
-	    returnValue[i] = (MessageProxy)failedMove.elementAt(i);
-
-	return returnValue;
+	return moved;
     }
 
     /**

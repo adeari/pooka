@@ -3,6 +3,7 @@ import javax.mail.*;
 import javax.mail.search.SearchTerm;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.filter.FilterAction;
+import java.util.Vector;
 
 /**
  * This represents a MessageFilter.  It contains a SearchTerm and an Action
@@ -31,32 +32,30 @@ public class MessageFilter {
 
     /**
      * This runs the searchTerm test for each MessageProxy in the
-     * messages array.  Each MessageProxy that matches the searchTerm
+     * messages Vector.  Each MessageProxy that matches the searchTerm
      * then has performFilter() run on it.
      * 
-     * @return:  any messages which are not removed from the current folder.
+     * @return:  all messages removed from the current folder.
      */
-    public MessageProxy[] filterMessages(MessageProxy[] messages) {
-	MessageProxy[] matches = new MessageProxy[messages.length];
-	for (int i = 0; i < messages.length; i++) {
-	    if (searchTerm.match(messages[i].getMessage()))
-		matches[i] = messages[i];
+    public Vector filterMessages(Vector messages) {
+	Vector matches = new Vector();
+	for (int i = 0; i < messages.size(); i++) {
+	    if (searchTerm.match(((MessageProxy)messages.elementAt(i)).getMessage()))
+		matches.add(messages.elementAt(i));
 	}
 
-	MessageProxy[] notRemoved = performFilter(matches);
-	
-	return notRemoved;
+	return performFilter(matches);
     }
 
     /**
      * Actually performs the FilterAction on the given MessageProxy array.
      * 
-     * @param filteredMessages An array of MessageProxy objects that are to
+     * @param filteredMessages A Vector of MessageProxy objects that are to
      * have the filter performed on them.  
      *
-     * @return  any messages which are not removed from the current folder.
+     * @return  all messagesremoved from the current folder.
      */
-    public MessageProxy[] performFilter(MessageProxy[] filteredMessages) {
+    public Vector performFilter(Vector filteredMessages) {
 	return action.performFilter(filteredMessages);
     }
 
