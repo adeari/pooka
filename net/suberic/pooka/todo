@@ -3,6 +3,10 @@ the password on the screen' part.
 
 *)  Add the ability to subscribe to/add new folders in the GUI.
 
+*)  make the default profile for each folder work properly.  right now it
+just gives you the default profile for the system, rather than making it 
+depend on what folder you're currently reading.
+
 *)  add context-sensitive menus (right-click menus)
 
 *)  make the GUI Authenticator (which should come up when you don't enter
