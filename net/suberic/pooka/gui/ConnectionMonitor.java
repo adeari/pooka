@@ -5,6 +5,7 @@ import javax.swing.*;
 import java.awt.event.*;
 
 import net.suberic.pooka.*;
+import net.suberic.util.*;
 import net.suberic.util.gui.ConfigurablePopupMenu;
 
 /**
@@ -14,10 +15,10 @@ import net.suberic.util.gui.ConfigurablePopupMenu;
  * @author Allen Petersen
  * @version $Revision$
  */
-public class ConnectionMonitor extends JPanel implements NetworkConnectionListener {
+public class ConnectionMonitor extends JPanel implements NetworkConnectionListener, net.suberic.util.ItemListChangeListener {
 
   /** the Image for CONNECTED connections. */
-  public  ImageIcon connectedImage = null;
+  public ImageIcon connectedImage = null;
 
   /** the Image for DISCONNECTED connections. */
   public ImageIcon disconnectedImage = null;
@@ -71,10 +72,25 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
 	  }
 	}
       });
-	
 
+    statusPanel.setIcon(connectedImage);
     this.add(comboBox);
     this.add(statusPanel);
+  }
+
+  /**
+   * Sets this ConnectionMonitor up to monitor all the connection controlled
+   * by the given NetworkConnectionManager.
+   */
+  public void monitorConnectionManager(NetworkConnectionManager newManager) {
+    java.util.Vector currentList = newManager.getConnectionList();
+    if (currentList != null && currentList.size() > 0) {
+      NetworkConnection[] newConnections = new NetworkConnection[currentList.size()];
+      System.arraycopy(currentList.toArray(), 0, newConnections, 0, currentList.size());
+      addConnections(newConnections);
+    }
+
+    newManager.addItemListChangeListener(this);
   }
 
   /**
@@ -100,7 +116,7 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
   public void showPopupMenu(MouseEvent e) {
     if (popupMenu == null) {
       popupMenu = new ConfigurablePopupMenu();
-      popupMenu.configureComponent("ConnnectionMonitor.popupMenu", Pooka.getResources());	
+      popupMenu.configureComponent("ConnectionMonitor.popupMenu", Pooka.getResources());	
       popupMenu.setActive(getActions());
     }
 
@@ -122,6 +138,8 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
       } else if (status == NetworkConnection.DOWN) {
 	statusPanel.setIcon(downImage);
       }
+    } else {
+      statusPanel.setIcon(connectedImage);
     }
   }
 
@@ -137,6 +155,25 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
   }
 
   /**
+   * Handles added or removed events from the NetworkConnectionManager.
+   */
+  public void itemListChanged(ItemListChangeEvent e) {
+    Item[] added = e.getAdded();
+    if (added != null && added.length > 0) {
+      NetworkConnection[] addedConnections = new NetworkConnection[added.length];
+      System.arraycopy(added, 0, addedConnections, 0, added.length);
+      addConnections(addedConnections);
+    }
+
+    Item[] removed = e.getRemoved();
+    if (removed != null && removed.length > 0) {
+      NetworkConnection[] removedConnections = new NetworkConnection[removed.length];
+      System.arraycopy(removed, 0, removedConnections, 0, removed.length);
+      removeConnections((NetworkConnection[]) removedConnections);
+    }
+  }
+
+  /**
    * Adds the given NetworkConnection(s) to the JComboBox list.
    */
   public void addConnections(NetworkConnection[] newConnections) {
@@ -145,6 +182,21 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
 	if (newConnections[i] != null) {
 	  comboBox.addItem(newConnections[i]);
 	  newConnections[i].addConnectionListener(this);
+	}
+      }
+    }
+  }
+
+  /**
+   * Removed the given NetworkConnection(s) from being monitored by
+   * this component.
+   */
+  public void removeConnections(NetworkConnection[] toRemove) {
+    if (toRemove != null && toRemove.length > 0) {
+      for (int i = 0 ; i < toRemove.length; i++) {
+	if (toRemove[i] != null) {
+	  comboBox.removeItem(toRemove[i]);
+	  toRemove[i].removeConnectionListener(this);
 	}
       }
     }
@@ -181,7 +233,7 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
   public class DisconnectAction extends AbstractAction {
 
     DisconnectAction() {
-      super("disconnection-connect");
+      super("connection-disconnect");
     }
 
     public void actionPerformed(ActionEvent e) {

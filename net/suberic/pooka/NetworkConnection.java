@@ -196,4 +196,11 @@ public class NetworkConnection implements net.suberic.util.Item {
   public String getItemProperty() {
     return propertyName;
   }
+
+  /**
+   * Returns the ItemID of this NetworkConnection.
+   */
+  public String toString() {
+    return getItemID();
+  }
 }
