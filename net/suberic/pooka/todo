@@ -1,9 +1,6 @@
 beta 1
 ---------------
 
-*) bug:  new message notification doesn't work for folders with both messages
-and subfolders.
-
 *) add ability to switch between preview and desktop mode without restarting.
 
 *) make it so you can switch a mail store from pop to imap (or vice-versa)
