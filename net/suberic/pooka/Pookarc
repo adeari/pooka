@@ -412,6 +412,10 @@ ConnectionMonitor.popupMenu.Connect.Action=connection-connect
 ConnectionMonitor.popupMenu.Disconnect.Action=connection-disconnect
 ConnectionMonitor.popupMenu.Unavailable.Action=connection-unavailable
 
+ConnectionMonitor.connectedIcon=images/TrafficGreen.gif
+ConnectionMonitor.disconnectedIcon=images/TrafficRed.gif
+ConnectionMonitor.unavailableIcon=images/TrafficOff.gif
+
 AttachmentPane=ContentType
 AttachmentPane.ContentType=Content-Type
 AttachmentPane.Actions=Open:OpenWith:SaveAs

@@ -1,18 +1,12 @@
+*) make it so the extra images aren't included in the build.  maybe convert
+	said images to pngs or jpgs?
 
 *) support windows registry attachment associations.
 	-- check icemail
 
-*) check disconnection/reconnection on network removal/restoral.
-
 -------
 
-*) make it so the extra images aren't included in the build.  maybe convert
-	said images to pngs or jpgs?
-
 *) fix connection failed message for ssl stores -- only fixable by sun?
-
-*) fix protocol timeout for imap/ssl? -- update this todo with more
-	specifics.
 
 *) preview pane: 
 	--make it so the status bar is at the bottom, underneath
@@ -36,6 +30,10 @@
 icons changing?  test.
 
 *) status messages:  make them appear and disappear at appropriate times.
+
+*) fix protocol timeout for imap/ssl? -- update this todo with more
+	specifics.
+*) check disconnection/reconnection on network removal/restoral.
 
 preview:
 	check what happens when we switch from desktop to preview and
