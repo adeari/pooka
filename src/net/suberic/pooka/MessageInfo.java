@@ -724,7 +724,14 @@ public class MessageInfo {
     if (spamFilter != null) {
       Vector v = new Vector();
       v.add(this.getMessageProxy());
-      spamFilter.performFilter(v);
+      java.util.List removed = spamFilter.performFilter(v);
+      if (removed != null && removed.size() > 0) {
+	try {
+	  getFolderInfo().expunge();
+	} catch (MessagingException me) {
+	  // throw it away
+	}
+      }
       return;
     } 
   }

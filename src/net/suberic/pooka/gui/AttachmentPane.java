@@ -282,7 +282,8 @@ public class AttachmentPane extends JPanel {
       try {
 	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
       } catch (Exception etwo) {
-	System.err.println("error setting theme:  " + etwo);
+	if (Pooka.isDebug())
+	  System.out.println("error setting theme:  " + etwo);
       }
     }
     return popupMenu;

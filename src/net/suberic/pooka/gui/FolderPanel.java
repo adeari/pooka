@@ -4,6 +4,7 @@ import net.suberic.util.*;
 import net.suberic.util.swing.*;
 import net.suberic.util.gui.ConfigurableKeyBinding;
 import java.awt.*;
+import java.awt.dnd.*;
 import java.awt.event.*;
 import javax.mail.*;
 import javax.swing.*;
@@ -96,6 +97,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 	      }
 	    }
 	  });
+
 	folderTree.addTreeSelectionListener(new TreeSelectionListener() {
 	    public void valueChanged(javax.swing.event.TreeSelectionEvent e) { 
 	      getMainPanel().refreshActiveMenus();
@@ -105,7 +107,22 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
 	  });
 	
 	folderTree.setCellRenderer(new EnhancedFolderTreeCellRenderer());
-	
+
+	folderTree.setDropTarget(new DropTarget() {
+	    public void dragOver(DropTargetDragEvent dtde) {
+	      Point e = dtde.getLocation();
+
+	      TreePath path = folderTree.getClosestPathForLocation(e.x, e.y);
+	      if (folderTree.getPathBounds(path).contains(e.x, e.y)) {
+		// this means that we're over a node.  make it selected.
+		
+		if (!folderTree.isPathSelected(path))
+		  folderTree.setSelectionPath(path);
+
+	      }
+	    }
+	  });
+
 	keyBindings = new ConfigurableKeyBinding(this, "FolderPanel.keyBindings", Pooka.getResources());
 	keyBindings.setActive(getActions());
 

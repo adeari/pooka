@@ -60,7 +60,20 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     
     headerPanel = createHeaderInputPanel(getMessageProxy(), inputTable);
     editorPane = createMessagePanel(getMessageProxy());
-    
+
+    installTransferHandler();
+
+    // workaround for java bug.
+    editorPane.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+	public void propertyChange(java.beans.PropertyChangeEvent evt) {
+	  String propertyName = evt.getPropertyName();
+	  if (propertyName != null && propertyName.equalsIgnoreCase("ui")) {
+	    installTransferHandler();
+	  }
+	}
+      });
+
+
     headerScrollPane = new JScrollPane(headerPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerScrollPane);
     
@@ -198,7 +211,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 		}
 		
 	      } catch (Exception e) {
-		System.err.println("error setting theme:  " + e);
+		if (Pooka.isDebug())
+		  System.out.println("error setting theme:  " + e);
 	      }
 	    }
 	  }
@@ -387,14 +401,28 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       
     }
     
-
-    //retval.setTransferHandler(new net.suberic.pooka.gui.dnd.NewMessageTransferHandler());
-
-    // bodyInputPane.setContentType("text");
     return retval;
     
   }
-  
+
+  TransferHandler mTransferHandler = null;
+  /**
+   * Installs the TransferHandler for this component.
+   */
+  public void installTransferHandler() {
+    if (editorPane != null && mTransferHandler == null) {
+      TransferHandler defaultHandler = editorPane.getTransferHandler();
+      
+      net.suberic.pooka.gui.dnd.MultipleTransferHandler multiHandler = new net.suberic.pooka.gui.dnd.MultipleTransferHandler();
+      multiHandler.addTransferHandler(defaultHandler);
+      multiHandler.addTransferHandler(new net.suberic.pooka.gui.dnd.NewMessageTransferHandler());
+      mTransferHandler = multiHandler;
+    }
+
+    if (editorPane != null) 
+      editorPane.setTransferHandler(mTransferHandler);
+  }
+
   /**
    * This adds the current user's signature to the message at the current
    * location of the cursor.
@@ -502,7 +530,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       try {
 	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentDisplayPanel, true);
       } catch (Exception e) {
-	System.err.println("error setting theme:  " + e);
+	if (Pooka.isDebug())
+	  System.out.println("error setting theme:  " + e);
       }
     }
     tabbedPane.add(attachmentDisplayPanel, Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), 1);
@@ -525,17 +554,6 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
     cryptoPanel.add(nmcd);
     
-    /*
-    NewMessageUI nmui = getNewMessageUI();
-    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
-      try {
-	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentDisplayPanel, true);
-      } catch (Exception e) {
-	System.err.println("error setting theme:  " + e);
-      }
-    }
-    */
-
     tabbedPane.add(Pooka.getProperty("MessageWindow.EncryptionTab", "Encryption"), cryptoPanel);
   }
 
@@ -794,7 +812,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       try {
 	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, popupMenu, true);
       } catch (Exception etwo) {
-	System.err.println("error setting theme:  " + etwo);
+	if (Pooka.isDebug())
+	  System.out.println("error setting theme:  " + e);
       }
     }
     popupMenu.show(component, e.getX(), e.getY());

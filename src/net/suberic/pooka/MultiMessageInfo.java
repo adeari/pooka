@@ -189,7 +189,15 @@ public class MultiMessageInfo extends MessageInfo {
       for (int i = 0; i < messages.length; i++) {
 	l.add(messages[i].getMessageProxy());
       }
-      spamFilter.performFilter(l);
+      java.util.List removed = spamFilter.performFilter(l);
+      if (removed != null && removed.size() > 0) {
+	try {
+	  getFolderInfo().expunge();
+	} catch (MessagingException me) {
+	  // throw it away
+	}
+      }
+      
     }
   }
   

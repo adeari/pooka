@@ -395,7 +395,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		try {
 		  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, attachmentPanel, true);
 		} catch (Exception etwo) {
-		  System.err.println("error setting theme:  " + etwo);
+		  if (Pooka.isDebug())
+		    System.out.println("error setting theme:  " + etwo);
 		}
 	      }
 	      
@@ -541,7 +542,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       try {
 	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
       } catch (Exception etwo) {
-	System.err.println("error setting theme:  " + etwo);
+	if (Pooka.isDebug())
+	  System.out.println("error setting theme:  " + e);
       }
     }
     popupMenu.show(component, e.getX(), e.getY());

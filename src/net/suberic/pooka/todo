@@ -1,11 +1,6 @@
 *) make it so no cc: means no cc: header at all, rather than a blank cc:
 header.
 
-*) fix incorrect display of unread messages (?) -- could have to do with
-	delete filter???
-
-*) add a place in preferences to enabled debug.
-
 *) check too many open files error on opening large cached folder?
 
 *) add drag and drop
