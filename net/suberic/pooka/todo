@@ -1,12 +1,3 @@
-*)  Make it so that there is some sort of alert (even just bolding the folder
-nodes in the tree on the left) when a folder has new messages.  
-
-*)  Make sure that the stores and folders stay open--right now, if you leave
-them alone for long enough, they close and aren't reopened. -- done?
-
-*)  StatusBar on the FolderWindow should get updated when messages come in
-or are deleted.
-
 *)  Fix the display of the MultiPropertyEditor.
 
 *)  Add the ability to subscribe to/add new folders in the GUI.
@@ -34,6 +25,14 @@ entered through a propertyEditor.
 *)  make window selection work after windows are closed--currently, if you
 close your selected window, no window is selected.  it should be that the
 next window in the stack (?) gets selected automatically.
+
+*)  all MessagingExceptions should be handled correctly, not (as in 
+MessageWindow) ignored.
+
+*)  the piece of code that keeps the Stores open only starts up if you open
+a FolderWindow.  so if you just start up the program and don't open any windows
+for a while, your connection to your Store can go down.
+
 open messages from the FolderWindow
 	can do.  todo on this:
 	customize settings--headers, window size.
