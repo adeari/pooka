@@ -17,10 +17,6 @@ ones that come in while you're already connected are labelled like that.
 
 *) add address book and alias support -- jph
 
-*) support receiving html mail.
-	-- done.  need to fix some displays and add a url handler, but that's
-	about it.
-
 *) fix the startup bugs:  
 	1)  windows take too long to show up
 	2)  sometimes the mailboxes are marked as broken when they shouldn't

@@ -38,7 +38,9 @@ Pooka.displayTextAttachments.propertyType=Boolean
 Pooka.attachmentDisplayMaxLength=100000
 
 Pooka.displayHtml=true
+Pooka.displayHtml.propertyType=Boolean
 Pooka.displayHtmlAsDefault=false
+Pooka.displayHtmlAsDefault.propertyType=Boolean
 
 Pooka.openFoldersOnConnect=true
 Pooka.openFoldersOnConnect.propertyType=Boolean
@@ -363,7 +365,7 @@ Store.editableFields.trashFolder.selectionRoot=currentStore
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
-Preferences=UI:Reply:Startup:Signature
+Preferences=UI:Reply:Startup:Signature:HTML
 Preferences.scoped=true
 Preferences.propertyType=Tabbed
 
@@ -371,6 +373,7 @@ Preferences.UI=Pooka.guiType:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAt
 Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
 Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
+Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v

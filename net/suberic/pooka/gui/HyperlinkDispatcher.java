@@ -2,6 +2,9 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import javax.swing.event.*;
 import java.util.StringTokenizer;
+import net.suberic.util.swing.HyperlinkMouseHandler;
+import javax.swing.JTextPane;
+import javax.swing.text.*;
 
 /**
  * This is a simple class which implements HyperlinkListener.
@@ -20,7 +23,33 @@ public class HyperlinkDispatcher implements HyperlinkListener {
      * Specified in javax.swing.event.HyperlinkListener.
      */
     public void hyperlinkUpdate(HyperlinkEvent e) {
-	if (e.getEventType() ==  HyperlinkEvent.EventType.ACTIVATED) {
+	if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
+	    if (e.getSource() instanceof HyperlinkMouseHandler.URLSelection) {
+		HyperlinkMouseHandler.URLSelection selection = (HyperlinkMouseHandler.URLSelection) e.getSource();
+		if (selection.editor instanceof JTextPane) {
+		    JTextPane pane = (JTextPane) selection.editor;
+		    StyledDocument doc = pane.getStyledDocument();
+		    StyledEditorKit kit = (StyledEditorKit) pane.getEditorKit();
+		    MutableAttributeSet attr = kit.getInputAttributes();
+		    SimpleAttributeSet sas = new SimpleAttributeSet();
+		    StyleConstants.setUnderline(sas, true);
+		    doc.setCharacterAttributes(selection.start, (selection.end - selection.start + 1), sas, false);
+		}
+	    }
+	} else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
+	    if (e.getSource() instanceof HyperlinkMouseHandler.URLSelection) {
+		HyperlinkMouseHandler.URLSelection selection = (HyperlinkMouseHandler.URLSelection) e.getSource();
+		if (selection.editor instanceof JTextPane) {
+		    JTextPane pane = (JTextPane) selection.editor;
+		    StyledDocument doc = pane.getStyledDocument();
+		    StyledEditorKit kit = (StyledEditorKit) pane.getEditorKit();
+		    MutableAttributeSet attr = kit.getInputAttributes();
+		    SimpleAttributeSet sas = new SimpleAttributeSet();
+		    StyleConstants.setUnderline(sas, false);
+		    doc.setCharacterAttributes(selection.start, (selection.end - selection.start + 1), sas, false);
+		}
+	    }
+	} else if (e.getEventType() ==  HyperlinkEvent.EventType.ACTIVATED) {
 	    String parsedVerb = Pooka.getProperty("Pooka.urlHandler", "netscape %s");
 	    if (parsedVerb.indexOf("%s") == -1)
 		parsedVerb = parsedVerb + " %s";

@@ -136,7 +136,7 @@ public class NewMessageInfo extends MessageInfo {
      */
     public String getTextPart(boolean showFullHeaders) {
 	try {
-	    return net.suberic.pooka.MailUtilities.parseAttachments(getMessage()).getTextPart(true, showFullHeaders, 10000, "foo");
+	    return (String) message.getContent();
 	} catch (java.io.IOException ioe) {
 	    // since this is a NewMessageInfo, there really shouldn't be an
 	    // IOException

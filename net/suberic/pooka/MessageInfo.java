@@ -444,6 +444,7 @@ public class MessageInfo {
 	MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
 
 	String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
+
 	UserProfile up = getDefaultProfile();
 
 	String parsedText = null;
