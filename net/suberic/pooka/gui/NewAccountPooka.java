@@ -202,6 +202,18 @@ public class NewAccountPooka {
 		javax.swing.SwingUtilities.invokeLater( new Runnable() {
 
 		    public void run() {
+		      MailTreeNode mtn = null;
+		      net.suberic.pooka.FolderInfo fi = storeInfo.getChild("INBOX");
+		      if (fi != null) {
+			mtn = fi.getFolderNode();
+		      } else {
+			mtn = storeInfo.getStoreNode();
+		      }
+		      if (mtn != null) {
+			javax.swing.JTree folderTree = ((FolderPanel)mtn.getParentContainer()).getFolderTree();
+			folderTree.scrollPathToVisible(new javax.swing.tree.TreePath(mtn.getPath()));
+		      }
+		      
 		      Pooka.getUIFactory().clearStatus();
 		      
 		      showConfirmation();
