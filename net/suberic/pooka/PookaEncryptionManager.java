@@ -476,7 +476,7 @@ public class PookaEncryptionManager {
    */
   public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, Key key) 
     throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
-    if (key == null) {
+    if (key == null && profile != null) {
       key = profile.getEncryptionKey();
     }
     

@@ -1,6 +1,6 @@
 package net.suberic.pooka;
 import javax.mail.*;
-import java.util.Vector;
+import java.util.List;
 import java.util.Enumeration;
 import java.io.*;
 import javax.activation.*;
@@ -16,27 +16,7 @@ import java.security.Key;
  */
 public class NewMessageInfo extends MessageInfo {
 
-  // ok, i could have just used sets of booleans, but...
-  public static int CRYPTO_YES = 0;
-  public static int CRYPTO_DEFAULT = 5;
-  public static int CRYPTO_NO = 10;
-
-  // whether or not we want to encrypt this message.
-  int mEncryptMessage = CRYPTO_DEFAULT;
-  
-  // whether or not we want to sign this message
-  int mSignMessage = CRYPTO_DEFAULT;
-
-  // the Key to use to sign this.  if null, then use the default
-  // key for the UserProfile.
-  Key mSignatureKey = null;
-
-  // the Key to use to encrypt this.  if null, then use the default
-  // key for the recipient(s).
-  Key mKey = null;
-
-  // public keys to attach to this message.
-  Key[] mAttachKeys = null;
+  List mSendMessageList = null;
 
   /**
    * Creates a NewMessageInfo to wrap the given Message.
@@ -51,7 +31,7 @@ public class NewMessageInfo extends MessageInfo {
    * InternetHeaders, the given messageText, the given ContentType, and 
    * the attachments already set for this object.
    */
-  public void sendMessage(UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException {
+  public void sendMessage(UserProfile profile, InternetHeaders headers, NewMessageCryptoInfo cryptoInfo, String messageText, String messageContentType) throws MessagingException {
     
     MimeMessage mMsg = (MimeMessage) message;
     
@@ -75,31 +55,23 @@ public class NewMessageInfo extends MessageInfo {
 
     if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
       messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
-    
-    MimeBodyPart publicKeyPart = null;
-    if (mAttachKeys != null && mAttachKeys.length > 0) {
-      java.security.Key firstKey = mAttachKeys[0];
-      if (firstKey instanceof EncryptionKey) {
-	try {
-	  EncryptionUtils utils = ((EncryptionKey) firstKey).getEncryptionUtils();
-	  publicKeyPart = utils.createPublicKeyPart(mAttachKeys);
-	} catch (Exception e) {
-	  // FIXME ignore for now.
-	}
-      }
-    }
 
-    if (publicKeyPart != null || (attachments.getAttachments() != null && attachments.getAttachments().size() > 0)) {
+    // see if we need to add any keys.
+    List keyParts = cryptoInfo.createAttachedKeyParts();
+    
+    if (keyParts.size() > 0 || (attachments.getAttachments() != null && attachments.getAttachments().size() > 0)) {
       MimeBodyPart mbp = new MimeBodyPart();
       mbp.setContent(messageText, messageContentType);
       MimeMultipart multipart = new MimeMultipart();
       multipart.addBodyPart(mbp);
+
       for (int i = 0; attachments.getAttachments() != null && i < attachments.getAttachments().size(); i++) {
 	multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
       }
 
-      if (publicKeyPart != null)
-	multipart.addBodyPart(publicKeyPart);
+      for (int i = 0; i < keyParts.size(); i++) {
+	multipart.addBodyPart((MimeBodyPart) keyParts.get(i));
+      }
 
       multipart.setSubType("mixed");
       getMessage().setContent(multipart);
@@ -112,32 +84,18 @@ public class NewMessageInfo extends MessageInfo {
 
     // do encryption stuff, if necessary.
 
-    if (mSignMessage == CRYPTO_YES || (mSignMessage == CRYPTO_DEFAULT && profile != null && profile.getSignAsDefault())) {
-      try {
-	message = Pooka.getCryptoManager().signMessage((MimeMessage) message, profile, mSignatureKey);
-      } catch (Exception e) {
-	e.printStackTrace();
-      }
-    }
+    // sigh
     
-    if (mEncryptMessage == CRYPTO_YES) {
-      try {
-	if (getEncryptionKey() != null) {
-	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message, getEncryptionKey());
-	} else {
-	  message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
-	}
-      } catch (Exception e) {
-	e.printStackTrace();
-      }
-    } else if (mEncryptMessage == CRYPTO_DEFAULT) {
-      try {
-	message = Pooka.getCryptoManager().encryptMessage((MimeMessage) message);
-      } catch (Exception e) {
-	e.printStackTrace();
-      }
-    }
+    mSendMessageList = cryptoInfo.createEncryptedMessages((MimeMessage) getMessage());
     
+    if (mSendMessageList.size() < 1) {
+      throw new MessagingException("failed to send message--no encrypted messages created.");
+    }
+
+    if (mSendMessageList.size() == 1) {
+      message = (Message) mSendMessageList.get(0);
+    }
+      
     boolean sent = false;
     if (profile != null) {
       OutgoingMailServer mailServer = profile.getMailServer();
@@ -295,108 +253,13 @@ public class NewMessageInfo extends MessageInfo {
     getMessage().setFlag(Flags.Flag.DRAFT, true);
 
     outboxFolder.appendMessages(new MessageInfo[] { this });
-
   }
 
   /**
-   * Returns whether we're planning on encrypting this message or not.
+   * The full list of Messages to be sent.
    */
-  public int getEncryptMessage() {
-    return mEncryptMessage;
-  }
-
-  /**
-   * Sets whether or not we want to encrypt this message.
-   */
-  public void setEncryptMessage(int pEncryptMessage) {
-    mEncryptMessage = pEncryptMessage;
-  }
-
-  /**
-   * Sets the encryption key for encrypting this message.
-   */
-  public void setEncryptionKey(Key pKey) {
-    mKey = pKey;
-  }
-
-  /**
-   * Gets the encryption key we're using for this message.
-   */
-  public Key getEncryptionKey() {
-    return mKey;
-  }
-
-  /**
-   * Attaches an encryption key to this message.
-   */
-  public synchronized void attachEncryptionKey(Key key) {
-    // doesn't handle case where key is added twice.
-    if (mAttachKeys == null) {
-      mAttachKeys = new Key[] { key };
-    } else {
-      Key[] newKeys = new Key[mAttachKeys.length + 1];
-      System.arraycopy(mAttachKeys, 0, newKeys, 0, mAttachKeys.length);
-      newKeys[mAttachKeys.length] = key;
-      mAttachKeys = newKeys;
-    }
-  }
-
-  /**
-   * Attaches an encryption key to this message.
-   */
-  public synchronized void removeEncryptionKey(Key key) {
-    if (mAttachKeys == null) {
-      return;
-    } else {
-      // doesn't handle case where key is added twice.
-      int removeIndex = -1;
-      for (int i = 0; i < mAttachKeys.length; i++) {
-	if (mAttachKeys[i] == key) {
-	  removeIndex = i;
-	}
-      }
-
-      if (removeIndex > -1) {
-	if (mAttachKeys.length == 1)
-	  mAttachKeys = null;
-	else {
-	  Key[] newKeys = new Key[mAttachKeys.length - 1];
-	  System.arraycopy(mAttachKeys, 0, newKeys, 0, removeIndex);
-	  if (removeIndex < mAttachKeys.length - 1) {
-	    System.arraycopy(mAttachKeys, removeIndex + 1, newKeys, removeIndex, mAttachKeys.length - removeIndex - 1);
-	  }
-	  mAttachKeys = newKeys;
-	}
-      }
-    }
-  }
-
-  /**
-   * Returns whether we're planning on encrypting this message or not.
-   */
-  public int getSignMessage() {
-    return mSignMessage;
-  }
-
-  /**
-   * Sets whether or not we want to encrypt this message.
-   */
-  public void setSignMessage(int pSignMessage) {
-    mSignMessage = pSignMessage;
-  }
-  
-  /**
-   * Gets the encryption key we're using for this message.
-   */
-  public Key getSignatureKey() {
-    return mSignatureKey;
-  }
-
-  /**
-   * Sets the encryption key for encrypting this message.
-   */
-  public void setSignatureKey(Key pSignatureKey) {
-    mSignatureKey = pSignatureKey;
+  public List getSendMessageList() {
+    return mSendMessageList;
   }
 
 }

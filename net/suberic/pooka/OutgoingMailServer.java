@@ -1,6 +1,7 @@
 package net.suberic.pooka;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.mail.*;
 import javax.mail.internet.*;
@@ -261,8 +262,16 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       if (connected) {
 	try {
 	  try {
-	    Message m = nmi.getMessage();
-	    sendTransport.sendMessage(m, m.getAllRecipients());
+	      /*
+		Message m = nmi.getMessage();
+		sendTransport.sendMessage(m, m.getAllRecipients());
+	      */	
+	    List sendMessageList = nmi.getSendMessageList();
+	    for (int i = 0; i < sendMessageList.size(); i++) {
+	      Message m = (Message) sendMessageList.get(i);
+	      sendTransport.sendMessage(m, m.getAllRecipients());
+	    }
+
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
 	  } catch (MessagingException me) {
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(me);	  
