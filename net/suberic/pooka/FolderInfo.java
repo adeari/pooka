@@ -2061,38 +2061,38 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     return columnNames;
   }
   
-    public void setColumnNames(Vector newValue) {
-	columnNames = newValue;
+  public void setColumnNames(Vector newValue) {
+    columnNames = newValue;
+  }
+  
+  public Vector getColumnSizes() {
+    return columnSizes;
+  }
+  
+  public void setColumnSizes(Vector newValue) {
+    columnSizes = newValue;
+  }
+  
+  public FolderDisplayUI getFolderDisplayUI() {
+    return folderDisplayUI;
+  }
+  
+  protected void removeFromListeners(FolderDisplayUI display) {
+    if (display != null) {
+      removeMessageChangedListener(display);
+      removeMessageCountListener(display);
+      //getFolder().removeConnectionListener(display);
     }
-
-    public Vector getColumnSizes() {
-	return columnSizes;
+  }
+  
+  protected void addToListeners(FolderDisplayUI display) {
+    if (display != null) {
+      addMessageChangedListener(display);
+      addMessageCountListener(display);
+      //getFolder().addConnectionListener(display);
     }
-
-    public void setColumnSizes(Vector newValue) {
-	columnSizes = newValue;
-    }
-
-    public FolderDisplayUI getFolderDisplayUI() {
-	return folderDisplayUI;
-    }
-
-     protected void removeFromListeners(FolderDisplayUI display) {
-	if (display != null) {
-	    removeMessageChangedListener(display);
-	    removeMessageCountListener(display);
-	    //getFolder().removeConnectionListener(display);
-	}
-    }
-
-    protected void addToListeners(FolderDisplayUI display) {
-	if (display != null) {
-	    addMessageChangedListener(display);
-	    addMessageCountListener(display);
-	    //getFolder().addConnectionListener(display);
-	}
-    }
-
+  }
+  
   /**
    * This sets the given FolderDisplayUI to be the UI for this
    * FolderInfo.

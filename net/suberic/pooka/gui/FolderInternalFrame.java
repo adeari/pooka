@@ -24,14 +24,14 @@ import net.suberic.util.swing.*;
  */
 
 public class FolderInternalFrame extends JInternalFrame implements FolderDisplayUI {
-    FolderInfo folderInfo = null;
-    FolderDisplayPanel folderDisplay = null;
-    FolderStatusBar folderStatusBar = null;
-    MessagePanel messagePanel = null;
-    ConfigurableToolbar toolbar;
-    ConfigurableKeyBinding keyBindings;
-    boolean enabled = true;
-
+  FolderInfo folderInfo = null;
+  FolderDisplayPanel folderDisplay = null;
+  FolderStatusBar folderStatusBar = null;
+  MessagePanel messagePanel = null;
+  ConfigurableToolbar toolbar;
+  ConfigurableKeyBinding keyBindings;
+  boolean enabled = true;
+  
   /**
    * Creates a Folder window from the given Folder.
    */
@@ -72,8 +72,12 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     this.getContentPane().add("North", toolbar);
     this.getContentPane().add("Center", folderDisplay);
     this.getContentPane().add("South", getFolderStatusBar());
-    
-    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+
+    int height = Integer.parseInt(Pooka.getProperty(getFolderInfo().getFolderProperty() + ".windowLocation.height", Pooka.getProperty("FolderWindow.height", "380")));
+    int width = Integer.parseInt(Pooka.getProperty(getFolderInfo().getFolderProperty() + ".windowLocation.width", Pooka.getProperty("FolderWindow.width","570")));
+      
+    this.setPreferredSize(new Dimension(width, height));
+
     this.setSize(this.getPreferredSize());
     
     keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
@@ -90,14 +94,13 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
       });
     
-    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-    
     getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
     
     this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     
     this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
+	  saveWindowSettings();
 	  getFolderInfo().setFolderDisplayUI(null);
 	}
       });
@@ -137,7 +140,11 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     this.getContentPane().add("Center", folderDisplay);
     this.getContentPane().add("South", getFolderStatusBar());
     
-    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
+    int height = Integer.parseInt(Pooka.getProperty(getFolderInfo().getFolderProperty() + ".windowLocation.height", Pooka.getProperty("FolderWindow.height", "380")));
+    int width = Integer.parseInt(Pooka.getProperty(getFolderInfo().getFolderProperty() + ".windowLocation.width", Pooka.getProperty("FolderWindow.width","570")));
+      
+    this.setPreferredSize(new Dimension(width, height));
+
     this.setSize(this.getPreferredSize());
     
     keyBindings = new ConfigurableKeyBinding(this, "FolderWindow.keyBindings", Pooka.getResources());
@@ -154,130 +161,159 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
       });
     
-    this.setPreferredSize(new Dimension(Integer.parseInt(Pooka.getProperty("folderWindow.height", "570")), Integer.parseInt(Pooka.getProperty("folderWindow.width","380"))));
-    
     getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(new SelectionListener());
     
     this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     
     this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
 	public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
+	  saveWindowSettings();
 	  getFolderInfo().setFolderDisplayUI(null);
 	}
       });
     
   }
+
+  /**
+   * Saves the FolderInternalFrame's current settings.
+   */
+  public void saveWindowSettings() {
+    String folderProperty = getFolderInfo().getFolderProperty();
+    
+    // we have to do these as absolute values.
+    MessagePanel mp = getMessagePanel();
+
+    int x = getX() + ((JScrollPane)mp.getUIComponent()).getHorizontalScrollBar().getValue();
+    int y = getY() + ((JScrollPane)mp.getUIComponent()).getVerticalScrollBar().getValue();
+    int layer = mp.getLayer(this);
+    int position = mp.getPosition(this);
+    boolean selected = this.isSelected();
+    
+    Pooka.setProperty(folderProperty + ".windowLocation.x", Integer.toString(x));
+    Pooka.setProperty(folderProperty + ".windowLocation.y", Integer.toString(y));
+    Pooka.setProperty(folderProperty + ".windowLocation.layer", Integer.toString(layer));
+    Pooka.setProperty(folderProperty + ".windowLocation.position", Integer.toString(position));
+    
+    if (selected)
+      Pooka.setProperty(folderProperty + ".windowLocation.selected", "true");
+    else
+      Pooka.setProperty(folderProperty + ".windowLocation.selected", "false");
+    
+    Pooka.setProperty(folderProperty + ".windowLocation.height", Integer.toString(getHeight()));
+    Pooka.setProperty(folderProperty + ".windowLocation.width", Integer.toString(getWidth()));
+  }
+
+  /**
+   * Searches the underlying FolderInfo's messages for messages matching
+   * the search term.
+   */
+  public void searchFolder() {
+    getFolderInfo().showSearchFolder();
+  }
   
-    /**
-     * Searches the underlying FolderInfo's messages for messages matching
-     * the search term.
-     */
-    public void searchFolder() {
-	getFolderInfo().showSearchFolder();
+  /**
+   * This method takes the currently selected row(s) and returns the
+   * appropriate MessageProxy object.
+   *
+   * If no rows are selected, null is returned.
+   */
+  public MessageProxy getSelectedMessage() {
+    return getFolderDisplay().getSelectedMessage();
+  }
+  
+  /**
+   * This resets the size to that of the parent component.
+   */
+  public void resize() {
+    this.setSize(getParent().getSize());
+  }
+  
+  /**
+   * This opens the FolderInternalFrame.
+   */
+  public void openFolderDisplay() {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  getMessagePanel().openFolderWindow(FolderInternalFrame.this);
+	} 
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
+  }
+  
+  /**
+   * This closes the FolderInternalFrame.
+   */
+  public void closeFolderDisplay(){
+    try {
+      saveWindowSettings();
+      this.setClosed(true);
+    } catch (java.beans.PropertyVetoException e) {
     }
-
-    /**
-     * This method takes the currently selected row(s) and returns the
-     * appropriate MessageProxy object.
-     *
-     * If no rows are selected, null is returned.
-     */
-    public MessageProxy getSelectedMessage() {
-	return getFolderDisplay().getSelectedMessage();
-    }
-
-    /**
-     * This resets the size to that of the parent component.
-     */
-    public void resize() {
-	this.setSize(getParent().getSize());
-    }
-
-    /**
-     * This opens the FolderInternalFrame.
-     */
-    public void openFolderDisplay() {
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    getMessagePanel().openFolderWindow(FolderInternalFrame.this);
-	  } 
-	};
-      if (SwingUtilities.isEventDispatchThread())
-	runMe.run();
-      else
-	SwingUtilities.invokeLater(runMe);
-    }
-
-    /**
-     * This closes the FolderInternalFrame.
-     */
-    public void closeFolderDisplay(){
-	try {
-	    this.setClosed(true);
-	} catch (java.beans.PropertyVetoException e) {
+  }
+  
+  /**
+   * This expunges all the messages marked as deleted in the folder.
+   */
+  public void expungeMessages() {
+    try {
+      getFolderInfo().getFolder().expunge();
+    } catch (MessagingException me) {
+      showError(Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
+    }   
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title) {
+    final String errorMsg = errorMessage;
+    final String realTitle = title;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMsg, realTitle, JOptionPane.ERROR_MESSAGE);
 	}
+      };
+    
+    if (SwingUtilities.isEventDispatchThread()) {
+      runMe.run();
+    } else {
+      SwingUtilities.invokeLater(runMe);
     }
+  }
 
-    /**
-     * This expunges all the messages marked as deleted in the folder.
-     */
-    public void expungeMessages() {
-	try {
-	    getFolderInfo().getFolder().expunge();
-	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.Message.ExpungeErrorMessage", "Error:  could not expunge messages.") +"\n" + me.getMessage());
-	}   
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title) {
-	final String errorMsg = errorMessage;
-	final String realTitle = title;
-	Runnable runMe = new Runnable() {
-		public void run() {
-		    JOptionPane.showInternalMessageDialog(getMessagePanel(), errorMsg, realTitle, JOptionPane.ERROR_MESSAGE);
-		}
-	    };
-
-	if (SwingUtilities.isEventDispatchThread()) {
-	    runMe.run();
-	} else {
-	    SwingUtilities.invokeLater(runMe);
-	}
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"));
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring abou the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, Exception e) {
-	showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
-    }
-
-    /**
-     * This shows an Error Message window.  We include this so that
-     * the MessageProxy can call the method without caring about the
-     * actual implementation of the Dialog.
-     */
-    public void showError(String errorMessage, String title, Exception e) {
-	showError(errorMessage + e.getMessage(), title);
-	e.printStackTrace();
-    }
-
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"));
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, Exception e) {
+    showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
+  }
+  
+  /**
+   * This shows an Error Message window.  We include this so that
+   * the MessageProxy can call the method without caring about the
+   * actual implementation of the Dialog.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    showError(errorMessage + e.getMessage(), title);
+    e.printStackTrace();
+  }
+  
   /**
    * This formats a display message.
    */
@@ -285,24 +321,24 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     return Pooka.getUIFactory().formatMessage(message);
   }
 
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * This skips to the given message.
-     */
-    public int selectMessage(int messageNumber) {
-	return getFolderDisplay().selectMessage(messageNumber);
-    }
-
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(String inputMessage, String title) {
+    return JOptionPane.showInternalInputDialog(getMessagePanel(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   * This skips to the given message.
+   */
+  public int selectMessage(int messageNumber) {
+    return getFolderDisplay().selectMessage(messageNumber);
+  }
+  
   /**
    * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
    * 
@@ -389,24 +425,24 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 
     }
 
-    // Accessor methods.
-
-    public MessagePanel getMessagePanel() {
-	if (messagePanel != null)
-	    return messagePanel;
-	else {
-	    ContentPanel cp = Pooka.getMainPanel().getContentPanel();
-	    if (cp instanceof MessagePanel)
-		return (MessagePanel) cp;
-	    else
-		return null;
-	}
+  // Accessor methods.
+  
+  public MessagePanel getMessagePanel() {
+    if (messagePanel != null)
+      return messagePanel;
+    else {
+      ContentPanel cp = Pooka.getMainPanel().getContentPanel();
+      if (cp instanceof MessagePanel)
+	return (MessagePanel) cp;
+      else
+	return null;
     }
-
-    public FolderDisplayPanel getFolderDisplay() {
-	return folderDisplay;
-    }
-
+  }
+  
+  public FolderDisplayPanel getFolderDisplay() {
+    return folderDisplay;
+  }
+  
     public void setFolderInfo(FolderInfo newValue) {
 	folderInfo=newValue;
     }

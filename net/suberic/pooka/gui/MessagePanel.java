@@ -427,8 +427,11 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
     JInternalFrame[] allFrames = getAllFrames();
     
     for(int i = 0; i < allFrames.length; i++) {
-      if (allFrames[i] instanceof FolderDisplayUI)
-	saveWindowLocation((FolderDisplayUI)allFrames[i]);
+      if (allFrames[i] instanceof FolderInternalFrame) {
+	FolderInternalFrame fif = (FolderInternalFrame)allFrames[i];
+	//saveWindowLocation(fif);
+	fif.saveWindowSettings();
+      }
     }
     
   }
@@ -437,7 +440,8 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * This saves the location of this FolderWindow, so that the next
    * time we start up, we can put it in the same place.
    */
-  
+
+  /*
   public void saveWindowLocation(FolderDisplayUI currentUI) {
     String folderProperty = currentUI.getFolderInfo().getFolderProperty();
     
@@ -460,6 +464,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
     else
       Pooka.setProperty(folderProperty + ".windowLocation.selected", "false");
   }
+  */
   
   /**
    * This saves a list of open folders, so that on future startup we

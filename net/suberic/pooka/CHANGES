@@ -1,3 +1,8 @@
+030328 release
+--------------
+
+folder windows now remember both their last location and their last size
+
 changed the order of disconnection for Stores.  this may eliminate some errors
 we were seeing while switching to disconnected mode.
 
