@@ -108,6 +108,8 @@ public class PropertyEditorFactory {
 	    return createVariableEditor(property, property);
 	else if (test.equalsIgnoreCase("File"))
 	    return createFileEditor(property, property);
+	else if (test.equalsIgnoreCase("Font"))
+	    return createFontEditor(property, property);
 	else if (test.equalsIgnoreCase("Color"))
 	    return createColorEditor(property, property);
 	else
@@ -142,6 +144,8 @@ public class PropertyEditorFactory {
 	    return createVariableEditor(property, typeTemplate);
 	else if (test.equalsIgnoreCase("File"))
 	    return createFileEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("Font"))
+	    return createFontEditor(property, typeTemplate);
 	else if (test.equalsIgnoreCase("Color"))
 	    return createColorEditor(property, typeTemplate);
 	else
@@ -210,6 +214,10 @@ public class PropertyEditorFactory {
 
     protected DefaultPropertyEditor createFileEditor(String property, String typeTemplate) {
 	return new FileSelectorPane(property, typeTemplate, sourceBundle);
+    }
+
+    protected DefaultPropertyEditor createFontEditor(String property, String typeTemplate) {
+	return new FontSelectorPane(property, typeTemplate, sourceBundle);
     }
 
     protected DefaultPropertyEditor createColorEditor(String property, String typeTemplate) {

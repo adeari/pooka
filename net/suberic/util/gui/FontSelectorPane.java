@@ -4,6 +4,8 @@ import net.suberic.util.VariableBundle;
 import java.io.*;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import net.suberic.util.swing.JFontChooser;
+import java.awt.Font;
 
 /**
  * This displays the currently selected file (if any), along with a 
@@ -102,7 +104,7 @@ public class FontSelectorPane extends DefaultPropertyEditor {
 	newButton.setPreferredSize(new java.awt.Dimension(icon.getIconHeight(), icon.getIconWidth()));
 	newButton.addActionListener(new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
-	      selectNewFolder();
+	      selectNewFont();
 	    }
 	  });
 	
@@ -114,7 +116,7 @@ public class FontSelectorPane extends DefaultPropertyEditor {
     JButton newButton = new JButton();
     newButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
-	  selectNewFolder();
+	  selectNewFont();
 	}
       });
     
@@ -125,23 +127,36 @@ public class FontSelectorPane extends DefaultPropertyEditor {
    * This actually brings up a FontChooser to select a new Font for 
    * the value of the property.
    */
-  public void selectNewFolder() {
-    JFileChooser jfc =
-      new JFileChooser((String)valueDisplay.getText());
-    jfc.setMultiSelectionEnabled(false);
-    jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-    
-    int returnValue =
-      jfc.showDialog(this,
-		     sourceBundle.getProperty("FolderEditorPane.Select",
-					      "Select"));
+  public void selectNewFont() {
+    String fontText = valueDisplay.getText();
+    JFontChooser jfc = null;
+    if (fontText != null && fontText.length() > 0) {
+      Font f = Font.decode(fontText);
+      if (f != null)
+	jfc = new JFontChooser(f, (String)valueDisplay.getText());
+    }
+    if (jfc == null)
+      jfc = new JFontChooser();
 
-    if (returnValue == JFileChooser.APPROVE_OPTION) {
-      File returnFont = jfc.getSelectedFile();
-      valueDisplay.setText(returnFont.getAbsolutePath());
+    //jfc.setMultiSelectionEnabled(false);
+    //jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    
+    Font returnValue = null;
+      //JFontChooser.showDialog(this,
+      //sourceBundle.getProperty("FontEditorPane.Select",
+      //				      "Select"), f);
+
+    System.err.println("returnValue = " + returnValue);
+    if (returnValue != null) {
+      //Font returnFont = jfc.getSelectedFile();
+      System.err.println("returnValue.getPSName() = " + returnValue.getPSName());
+      System.err.println("returnValue.getName() = " + returnValue.getName());
+      System.err.println("returnValue.getFontName() = " + returnValue.getFontName());
+      
+      valueDisplay.setText(returnValue.toString());
     }
-	    
-    }
+    
+  }
 
     //  as defined in net.suberic.util.gui.PropertyEditorUI
 
