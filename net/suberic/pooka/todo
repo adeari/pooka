@@ -1,5 +1,10 @@
 
 *) fix jmaildir on windows xp
+	done.  test.
+
+*) ?? ^D message, hit return for next message, get an error?
+
+*) ??? still a chance to send a message twice????? !!!! ????
 
 *) encryption support:
    *) fix startup errors if no encryption configured.
@@ -10,11 +15,11 @@
 	  - make sure you can use alternate keys even if one is set for
 		the default user.
 
-*) ?? ^D message, hit return for next message, get an error?
+*) fix ant.
+
+----
 
 *) ?? change reply-all binding?
-
-*) ??? still a chance to send a message twice????? !!!! ????
 
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.

@@ -13,17 +13,18 @@
   <property name="activation_cp" value="${importdir}/activation.jar"/>
   <property name="mail_cp" value="${importdir}/mail.jar"/>
   <property name="javahelp_cp" value="${importdir}/jh.jar"/>
+  <property name="crypto_cp" value="${importdir}/javamail-crypto.jar"/>
   <property name="icejni_cp" value="${importdir}/icejni.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}:${crypto_cp}"/> 
 
 <!-- libaries that will get included in the distribution -->
   <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
-  <property name="mbox_lib" value="${importdir}/mbox.jar"/>
-  <property name="maildir_lib" value="${importdir}/javamaildir.jar"/>
+  <property name="localproviders_lib" value="${importdir}/localproviders.jar"/>
   <property name="mail_dist_lib" value="${importdir}/mail.jar"/>
   <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
   <property name="activation_dist_lib" value="${importdir}/activation_dist.jar"/>
+  <property name="crypto_lib" value="${importdir}/javamail-crypto.jar"/>
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -118,10 +119,10 @@
       <zipfileset src="${activation_dist_lib}"/>
       <zipfileset src="${javahelp_dist_lib}"/>
       <zipfileset src="${mail_dist_lib}"/>
-      <zipfileset src="${mbox_lib}"/>
+      <zipfileset src="${localproviders_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
-      <zipfileset src="${maildir_lib}"/>
+      <zipfileset src="${crypto_lib}"/>
     </jar>
     <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
   </target>
