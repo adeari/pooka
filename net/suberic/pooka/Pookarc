@@ -5,6 +5,7 @@ Pooka.debug=false
 Pooka.sessionDebug=false
 
 Pooka.cacheDirectory=~/Mail/pooka
+Pooka.autoCache=true
 
 Message.sendImmediately=true
 

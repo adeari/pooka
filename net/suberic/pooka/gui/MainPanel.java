@@ -18,7 +18,7 @@ import net.suberic.util.gui.*;
  * The main panel for PookaMail
  * 
  * @author  Allen Petersen
- * @version 0.9 10/27/2000
+ * @version $Id$
  */
 
 public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer, ActionContainer {

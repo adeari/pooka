@@ -34,6 +34,9 @@ public class VirtualFolderInfo extends FolderInfo {
 	createFilters();
 
 	resetDefaultActions();
+
+	setNotifyNewMessagesMain(false);
+	setNotifyNewMessagesNode(false);
     }
 
     /**

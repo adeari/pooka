@@ -19,13 +19,17 @@ import net.suberic.pooka.gui.FolderTableModel;
 public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     protected MessageCache cache = null;
 
+    boolean autoCache = false;
     public CachingFolderInfo(StoreInfo parent, String fname) {
 	super(parent, fname);
-	
+
+	autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
     }
 
     public CachingFolderInfo(FolderInfo parent, String fname) {
 	super(parent, fname);
+
+	autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
     }
 
     /**
@@ -362,7 +366,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 		    messageToInfoTable.put(addedMessages[i], mp);
 		    uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
 		    try {
-			getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+			if (autoCache) {
+			    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.CONTENT);
+			} else {
+			    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS);
+			}
 		    } catch (MessagingException me) {
 			System.out.println("caught exception:  " + me);
 			me.printStackTrace();

@@ -104,6 +104,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private boolean sentFolder = false;
     private boolean trashFolder = false;
 
+    private boolean notifyNewMessagesMain = true;
+    private boolean notifyNewMessagesNode = true;
+
     /**
      * For subclasses.
      */
@@ -129,6 +132,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	resetDefaultActions();
 	
+	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
+	    setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
+
+	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
+	    setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
     }
 
 
@@ -150,6 +158,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	createFilters();
 
 	resetDefaultActions();
+
+	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
+	    setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
+
+	if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
+	    setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
     }
     
     /**
@@ -1731,6 +1745,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public void setTrashFolder(boolean newValue) {
 	trashFolder = newValue;
+	setNotifyNewMessagesMain(! newValue);
+	setNotifyNewMessagesNode(! newValue);
 	resetDefaultActions();
 	if (getFolderNode() != null)
 	    getFolderNode().popupMenu = null;
@@ -1742,6 +1758,24 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void setSentFolder(boolean newValue) {
 	sentFolder = newValue;
+	setNotifyNewMessagesMain(! newValue);
+	setNotifyNewMessagesNode(! newValue);
+    }
+
+    public boolean notifyNewMessagesMain() {
+	return notifyNewMessagesMain;
+    }
+
+    public void setNotifyNewMessagesMain(boolean newValue) {
+	notifyNewMessagesMain = newValue;
+    }
+
+    public boolean notifyNewMessagesNode() {
+	return notifyNewMessagesNode;
+    }
+
+    public void setNotifyNewMessagesNode(boolean newValue) {
+	notifyNewMessagesNode = newValue;
     }
 
     public MessageFilter[] getDisplayFilters() {
