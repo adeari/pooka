@@ -200,7 +200,12 @@ public class FolderFileWrapper extends File {
    * Returns the Folder's name.
    */
   public String getName() {
-    return folder.getName();
+    String name = folder.getName();
+    if (name == null || name.length() < 1) {
+      // this is probably a store.
+      return path;
+    }
+    return name;
   }
   
   /**
@@ -217,7 +222,10 @@ public class FolderFileWrapper extends File {
    * This returns the parent Folder as a FolderFileWrapper.
    */
   public File getParentFile() {
-    return parent;
+    if (parent != null)
+      return parent;
+    else
+      return this;
   }
   
   /**

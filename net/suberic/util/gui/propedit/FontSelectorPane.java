@@ -87,7 +87,7 @@ public class FontSelectorPane extends SwingPropertyEditor {
    */
   public JButton createInputButton() {
     try {
-      java.net.URL url = this.getClass().getResource(manager.getProperty("FontSelectorPane.inputButton.image", "images/More.gif"));
+      java.net.URL url = this.getClass().getResource(manager.getProperty("FontSelectorPane.inputButton.image", "/net/suberic/util/gui/images/More.gif"));
       if (url != null) {
 	ImageIcon icon = new ImageIcon(url);
 	

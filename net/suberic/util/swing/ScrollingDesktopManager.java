@@ -66,19 +66,25 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	setScrollPane(scrollPane);
     }
 
-    /**
-     * <p>This extends the behaviour of DefaultDesktopManager by 
-     * calling <code>updateDesktopSize()</code> after
-     * completing its action.
-     * 
-     * Overrides 
-     * <code>javax.swing.DefaultDesktopManager.closeFrame(JInternalFrame f).
-     * </code>
-     */
-    public void closeFrame(JInternalFrame f) {
-	super.closeFrame(f);
-	updateDesktopSize();
+  /**
+   * <p>This extends the behaviour of DefaultDesktopManager by 
+   * calling <code>updateDesktopSize()</code> after
+   * completing its action.
+   * 
+   * Overrides 
+   * <code>javax.swing.DefaultDesktopManager.closeFrame(JInternalFrame f).
+   * </code>
+   */
+  public void closeFrame(JInternalFrame f) {
+    super.closeFrame(f);
+    updateDesktopSize();
+    // workaround for bug in jdk1.4
+    if (pane != null) {
+      JInternalFrame jif = pane.getSelectedFrame();
+      if (jif != null)
+	jif.requestFocus();
     }
+  }
     
     /**
      * <p>This extends the behaviour of DefaultDesktopManager by 

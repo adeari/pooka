@@ -84,7 +84,6 @@ public class MailFileSystemView
    * @filename is an IMAP folder name.
    */
   public File createFileObject(String filename) {
-    
     // todo jph:  strip off any leading directoy separators.  we
     // want to call getFileByName with a relative path (in this case
     // to the root directory) always.
@@ -131,7 +130,8 @@ public class MailFileSystemView
       return new File(filename);
     }
     
-    return currentRoot.getFileByName(filePart);
+    File returnValue = currentRoot.getFileByName(filePart);
+    return returnValue;
     
   }
   
@@ -304,6 +304,16 @@ public class MailFileSystemView
       return false;
   }
   
+  /**
+   * Returns true if the directory is traversable.
+   */
+  public Boolean isTraversable(File f) {
+    if (f != null && f instanceof FolderFileWrapper) {
+      return new Boolean(true);
+    } else
+      return new Boolean(false);
+  }
+
   /*
    * Checks if <code>f</code> represents a real directory or file as opposed to a
    * special folder such as <code>"Desktop"</code>. Used by UI classes to decide if

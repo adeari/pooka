@@ -305,7 +305,7 @@ public class StoreNode extends MailTreeNode {
     }
     
     public void actionPerformed(java.awt.event.ActionEvent e) {
-      
+
       JFileChooser jfc =
 	new JFileChooser(getStoreInfo().getStoreID(), new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo()));
       jfc.setMultiSelectionEnabled(true);

@@ -131,16 +131,23 @@ preview:
 *) add support for jdk1.4
 	-- the MailFileSystemView doesn't seem to work at all (!) -- ok, it
 	does work, but only if you browse to something other than the default.
-	-- up and down arrows while composing new messages.
+	  -- move modifications to folderinfo wrappers
 	-- check NewAccountPooka display--not all of the main window is drawn.
 	-- property editors like User Email info aren't correctly sized.
-	-- keybindings aren't right; open a message.  ^D it.  try to select
-	another message in the message list.
+	    -- more or less fixed
 	-- new printing system.
 	-- new focus architecture
+	-- new keybinding architecture
 	-- NetworkInterface classes
 	-- regexp?
 	-- InputVerifier
+
+*) 1.4.1_01 bugs
+	  -- down arrow fairly consistently doesn't work when you type in a 
+	     line and then hit it.  hitting up, left, right resets it.
+	-- keybindings aren't right; open a message.  ^D it.  try to select
+	another message in the message list. -- worked around for the most
+	part.
 
 *) add a keybinding to bring up the address book selector.
 

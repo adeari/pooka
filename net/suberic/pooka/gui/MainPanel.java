@@ -117,7 +117,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      */    
     public Action[] getActions() {
 	Action[] actions = getDefaultActions();
-	Component focusedComponent = SwingUtilities.findFocusOwner(this);
+	Component focusedComponent = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
 	if (focusedComponent != null) {
 	    if (folderPanel != null) 
 		if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel))
@@ -618,41 +618,23 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
     }
 
-    public class NewMessageAction extends AbstractAction {
-	NewMessageAction() {
-	    super("message-new");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    try {
-		MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
-		nmu.openMessageUI();
-	    } catch (MessagingException me) {
-		Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
-	    }
-	    
-	}
-
+  public class NewMessageAction extends AbstractAction {
+    NewMessageAction() {
+      super("message-new");
     }
+    
+    public void actionPerformed(ActionEvent e) {
+      java.awt.KeyboardFocusManager kfm = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
 
-    /*
-      // this doesn't appear to be necessary.
-    public class SelectMenuAction extends AbstractAction {
-	SelectMenuAction() {
-	    super("menu-select");
-	}
-
-	SelectMenuAction(String cmd) {
-	    super(cmd);
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    	    System.out.println("performing Action " + e.getActionCommand());
-	    //	    selectMenu(e.getActionCommand().charAt(e.getActionCommand().length() -1));
-	}
-
+      try {
+	MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
+	nmu.openMessageUI();
+      } catch (MessagingException me) {
+	Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
+      }
+      
     }
-    */
-
+    
+  }
 
 }

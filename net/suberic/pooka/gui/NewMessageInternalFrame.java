@@ -221,79 +221,79 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
     }
     
-    /**
-     * This unregisters the Keyboard action not only for the FolderWindow
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
-     */
-
-    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
-	if (messageDisplay != null)
-	    messageDisplay.unregisterKeyboardAction(aKeyStroke);
-	toolbar.unregisterKeyboardAction(aKeyStroke);
-    }
-
-    /**
-     * This notifies the NewMessageUI that the attachment at the 
-     * provided index has been removed.  This does not actually remove
-     * the attachment, but rather should be called by the MessageProxy
-     * when an attachment has been removed.
-     */
-    public void attachmentRemoved(int index) {
-	getNewMessageDisplay().attachmentRemoved(index);
-    }
-
-    /**
-     * This notifies the NewMessageUI that an attachment has been added
-     * at the provided index.  This does not actually add an attachment,
-     * but rather should be called by the MessageProxy when an attachment
-     * has been added.
-     */
-    public void attachmentAdded(int index) {
-	getNewMessageDisplay().attachmentAdded(index);
-    }
-
-    /**
-     * Pops up a JFileChooser and returns the results.
-     *
-     * Note:  i'd like to have this working so that you can attach multiple
-     * files at once, but it seems that the JFileChooser really doesn't 
-     * want to return an array with anything in it for getSelectedFiles().  
-     * So for now, I'll leave the Pooka API as is, but only ever return a 
-     * single entry in the File array.
-     */
-    public File[] getFiles(String title, String buttonText) {
-	JFileChooser jfc = new JFileChooser();
-	jfc.setDialogTitle(title);
-	jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	jfc.setMultiSelectionEnabled(false);
-	int a = jfc.showDialog(this, buttonText);
-
-	if (a == JFileChooser.APPROVE_OPTION)
-	    return new File[] {jfc.getSelectedFile()};
-	else
-	    return null;
-    }
-
-    /**
-     * As specified by interface net.suberic.pooka.UserProfileContainer.
-     *
-     * This implementation returns the DefaultProfile of the associated
-     * MessageProxy if the MessageInternalFrame is not editable.  If the 
-     * MessageInternalFrame is editable, it returns the currently selected 
-     * UserProfile object.
-     */
-
-    public UserProfile getDefaultProfile() {
-	if (isEditable())
-	    return getSelectedProfile();
-	else
-	    return getMessageProxy().getDefaultProfile();
-    }
-
+  /**
+   * This unregisters the Keyboard action not only for the FolderWindow
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+   */
+  
+  public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+    if (messageDisplay != null)
+      messageDisplay.unregisterKeyboardAction(aKeyStroke);
+    toolbar.unregisterKeyboardAction(aKeyStroke);
+  }
+  
+  /**
+   * This notifies the NewMessageUI that the attachment at the 
+   * provided index has been removed.  This does not actually remove
+   * the attachment, but rather should be called by the MessageProxy
+   * when an attachment has been removed.
+   */
+  public void attachmentRemoved(int index) {
+    getNewMessageDisplay().attachmentRemoved(index);
+  }
+  
+  /**
+   * This notifies the NewMessageUI that an attachment has been added
+   * at the provided index.  This does not actually add an attachment,
+   * but rather should be called by the MessageProxy when an attachment
+   * has been added.
+   */
+  public void attachmentAdded(int index) {
+    getNewMessageDisplay().attachmentAdded(index);
+  }
+  
+  /**
+   * Pops up a JFileChooser and returns the results.
+   *
+   * Note:  i'd like to have this working so that you can attach multiple
+   * files at once, but it seems that the JFileChooser really doesn't 
+   * want to return an array with anything in it for getSelectedFiles().  
+   * So for now, I'll leave the Pooka API as is, but only ever return a 
+   * single entry in the File array.
+   */
+  public File[] getFiles(String title, String buttonText) {
+    JFileChooser jfc = new JFileChooser();
+    jfc.setDialogTitle(title);
+    jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    jfc.setMultiSelectionEnabled(false);
+    int a = jfc.showDialog(this, buttonText);
+    
+    if (a == JFileChooser.APPROVE_OPTION)
+      return new File[] {jfc.getSelectedFile()};
+    else
+      return null;
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.UserProfileContainer.
+   *
+   * This implementation returns the DefaultProfile of the associated
+   * MessageProxy if the MessageInternalFrame is not editable.  If the 
+   * MessageInternalFrame is editable, it returns the currently selected 
+   * UserProfile object.
+   */
+  
+  public UserProfile getDefaultProfile() {
+    if (isEditable())
+      return getSelectedProfile();
+    else
+      return getMessageProxy().getDefaultProfile();
+  }
+  
   /**
    * Shows an Address Selection form for the given AddressEntryTextArea.
    */
