@@ -47,12 +47,18 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 		- more checks, proper excpetions
 	-- todo on pooka
 		- key management
+		  - inc. default key for user, addressbookentry 
+		  - ?? different KeyStores for different users?
 		- way to show encryption information (ui)
 		  -- thought:  show decrypted or encrypted.  which by default
 			       is configurable.  when decryption is attempted,
 			       there's a ui, though it will probably try the
 			       default for the user, first.
 			       - sigs auto-verified?
+		  -- need a way to show current encryption status, plus a way
+			to decrypt/check signature
+		  -- ?? button at bottom that shows status?
+			
 	-- mozilla does s/mime.
 
 -----
