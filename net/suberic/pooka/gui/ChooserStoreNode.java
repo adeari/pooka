@@ -88,6 +88,8 @@ public class ChooserStoreNode extends MailTreeNode {
 		me.printStackTrace();
 	    }
 	}
+
+	hasLoaded=true;
     }
 
     public String getStoreID() {

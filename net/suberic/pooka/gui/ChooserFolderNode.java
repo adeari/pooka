@@ -50,13 +50,6 @@ public class ChooserFolderNode extends MailTreeNode {
     }
    
     /**
-     * returns the folder for this node
-     */
-    public Folder getFolder() {
-	return folder;
-    }
-    
-    /**
      * return the number of children for this folder node. The first
      * time this method is called we load up all of the folders
      * under the store's defaultFolder
@@ -120,8 +113,20 @@ public class ChooserFolderNode extends MailTreeNode {
 
     }
 
+    /**
+     * returns the folder for this node
+     */
+    public Folder getFolder() {
+	return folder;
+    }
+    
+
     public String getFolderProperty() {
 	return folderProperty;
+    }
+
+    public String getFolderName() {
+	return getFolder().getName();
     }
 
     /**
@@ -132,4 +137,11 @@ public class ChooserFolderNode extends MailTreeNode {
 	return folder.getName();
     }
 }
+
+
+
+
+
+
+
 

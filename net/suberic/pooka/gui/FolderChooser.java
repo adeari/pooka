@@ -17,8 +17,8 @@ public class FolderChooser {
     protected JTree tree;
     protected DefaultTreeModel treeModel;
     protected DefaultTreeModel subscribedTree;
-    //    protected Vector unsubscribed = new Vector();
-    //    protected Vector subscribed = new Vector();
+    protected Vector unsubscribed = new Vector();
+    protected Vector subscribed = new Vector();
 
     /**
      * Creates a new FolderChooser for the selected Store.
@@ -86,16 +86,24 @@ public class FolderChooser {
      * Note that changes are not made until saveSubscribedList() is called.
      */
     public void subscribeFolder(ChooserFolderNode node) {
+	if (unsubscribed.contains(node))
+	    unsubscribed.removeElement(node);
+	else
+	    subscribed.add(node);
 	node.setSubscribed(true);
     }
 
     /**
-     * This removes the Folder represented by node from the lsit of 
+     * This removes the Folder represented by node from the list of 
      * subscribed folders.
      *
      * Note that changes are not made until saveSubscribedList() is called.
      */
     public void unsubscribeFolder(ChooserFolderNode node) {
+	if (subscribed.contains(node))
+	    subscribed.removeElement(node);
+	else
+	    unsubscribed.add(node);
 	node.setSubscribed(false);
     }
 
@@ -115,92 +123,95 @@ public class FolderChooser {
      * the main Pooka configuration.  Called by the 'Ok' button.
      */
     public void saveSubscribedList() {
-	Properties p = new Properties();
-	ChooserFolderNode node;
+	unsubscribeOldFolders();
+	subscribeNewFolders();
+    }
+    
+    /**
+     * This unsubscribes to the old folders.
+     */
 
-	Enumeration children = ((MailTreeNode)treeModel.getRoot()).children();
-
-	Vector subscribed = new Vector();
-
-	String prefix = "Store." + storeID;
-
-	while (children.hasMoreElements()) {
-	    node = (ChooserFolderNode)children.nextElement();
-	    if (node.isLeaf()) {
-		if (node.isSubscribed())
-		    subscribed.add(node.getFolder().getName());
-	    } else {
-		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), p))
-		    subscribed.add(node.getFolder().getName());
-	    }
-	}    
-
-	if (!subscribed.isEmpty()) {
-	    String propValue = new String();
-	    
-	    for (int i = 0; i < subscribed.size(); i++) {
-		propValue = propValue.concat((String)subscribed.elementAt(i) + ":");
-	    }
-	    
-
-	    if (propValue.endsWith(":"))
-		propValue=propValue.substring(0, propValue.length() - 1);
-
-	    p.setProperty(prefix + ".folderList", propValue);
+    private void unsubscribeOldFolders() {
+	for (int i = 0; i < unsubscribed.size(); i++) {
+	    unsubscribeNode((ChooserFolderNode)unsubscribed.elementAt(i));
 	}
-
-	// at this point, i should really go through and make sure to
-	// remove all the old properties.  i'll do that later.
-
-	Enumeration propsSet = p.propertyNames();
-	String propName;
-	while (propsSet.hasMoreElements()) {
-	    propName = (String)propsSet.nextElement();
-	    Pooka.setProperty(propName, p.getProperty(propName));
-	}
-	    
     }
 
     /**
-     * This method take a ChooserFolderNode which has children and then sets 
-     * the appropriate properties.
+     * This unsubscribes to the node and, if the parent is now empty,
+     * unsubscribes it and on up the tree, also.
      */
-    private boolean readSubscribedTree(ChooserFolderNode parentNode, String prefix, Properties properties) {
+    
+    private void unsubscribeNode(ChooserFolderNode node) {
+	TreeNode parent = node.getParent();
+	if (parent instanceof ChooserFolderNode) {
+	    ChooserFolderNode parentNode = (ChooserFolderNode)parent;
+	    Vector parentList = Pooka.getResources().getPropertyAsVector(parentNode.getFolderProperty() + ".folderList", "");
+	    Vector keptFolders = new Vector();
 
-	ChooserFolderNode node;
-
-	Enumeration children = parentNode.children();
-
-	Vector subscribed = new Vector();
-
-	while (children.hasMoreElements()) {
-	    node = (ChooserFolderNode)children.nextElement();
-	    if (node.isLeaf()) {
-		if (node.isSubscribed())
-		    subscribed.add(node.getFolder().getName());
-	    } else {
-		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), properties))
-		    subscribed.add(node.getFolder().getName());
+	    for (int i = 0; i < parentList.size(); i++) {
+		String current = (String)parentList.elementAt(i);
+		if (!(current.equals(node.getFolderName())))
+		    keptFolders.add(current);
 	    }
-	}    
+
+	    if (keptFolders.size() == 0)
+		unsubscribeNode(parentNode);
+	    else {
+		String newParentList = new String();
+		for (int j = 0; j < keptFolders.size(); j++) 
+		    newParentList = newParentList.concat(((String)keptFolders.elementAt(j)) + ":");
+		
+		if (newParentList.endsWith(":"))
+		    newParentList = newParentList.substring(0, newParentList.length() - 1);
+
+		Pooka.setProperty(parentNode.getFolderProperty() + ".folderList", newParentList);
+	    }
+	}
+
+	Pooka.getResources().removeProperty(node.getFolderProperty());
+	Pooka.getResources().removeProperty(node.getFolderProperty() + ".folderList");
 	
-	if (!subscribed.isEmpty()) {
-	    String propValue = new String();
+    }
+	
+    /**
+     * Subscribes to all the new folders.
+     */
+    private void subscribeNewFolders() {
+	for (int i = 0; i < subscribed.size(); i++) {
+	    subscribeNode((ChooserFolderNode)subscribed.elementAt(i));
+	}
+    }
+
+    /**
+     * Subscribes to the provided ChooserFolderNode.  If the parent also
+     * isn't subscribed, calls itself recursively to subscribe to it.
+     */
+
+    private void subscribeNode(ChooserFolderNode node) {
+	TreeNode parent = node.getParent();
+	if (parent instanceof ChooserFolderNode) {
+	    ChooserFolderNode parentNode = (ChooserFolderNode)parent;
+	    String parentList = Pooka.getProperty(parentNode.getFolderProperty() + ".folderList", "");
 	    
-	    for (int i = 0; i < subscribed.size(); i++) {
-		propValue = propValue.concat((String)subscribed.elementAt(i) + ":");
+	    if (parentList.equals("")) {
+		subscribeNode(parentNode);
+		Pooka.setProperty(parentNode.getFolderProperty() + ".folderList", node.getFolderName());
+	    } else {
+		Pooka.setProperty(parentNode.getFolderProperty() + ".folderList", parentList + ":" + node.getFolderName());
 	    }
 	    
-
-	    if (propValue.endsWith(":"))
-		propValue=propValue.substring(0, propValue.length() - 1);
-	    
-	    properties.setProperty(prefix + ".folderList", propValue);
-
-	    return true;
-	} else
-	    return false;
+	} else if (parent instanceof ChooserStoreNode) {
+	    ChooserStoreNode parentNode = (ChooserStoreNode)parent;
+	    String parentList = Pooka.getProperty(parentNode.getStoreProperty() + ".folderList", "");
+	    if (parentList.equals("")) {
+		Pooka.setProperty(parentNode.getStoreProperty() + ".folderList", node.getFolderName());
+	    } else {
+		Pooka.setProperty(parentNode.getStoreProperty() + ".folderList", parentList + ":" + node.getFolderName());
+	    }
+	}
     }
+
 
     /**
      * This takes a TreeModel which represents the entire Folder 

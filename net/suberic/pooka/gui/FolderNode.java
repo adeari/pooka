@@ -141,6 +141,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener {
 	removeChildren(origChildrenVector);
 	
 	hasLoaded=true;
+	
+	((javax.swing.tree.DefaultTreeModel)(((FolderPanel)getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(this);
     }
 
     /**
