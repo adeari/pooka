@@ -86,7 +86,14 @@ public class CryptoAttachment extends Attachment {
 	return null;
       }
       */
-      MimeBodyPart mbp = new MimeBodyPart(super.getDataHandler().getInputStream());
+      System.err.println("super.getDataHandler() = " + super.getDataHandler());
+      super.getDataHandler().writeTo(System.out);
+
+      //MimeBodyPart mbp = new MimeBodyPart(super.getDataHandler().getInputStream());
+      MimeBodyPart mbp = new MimeBodyPart();
+      mbp.setDataHandler(super.getDataHandler());
+      mbp.setHeader("Content-Type", super.getDataHandler().getContentType());
+
       decryptedBodyPart = utils.decryptBodyPart(mbp, key);
 
       return decryptedBodyPart;

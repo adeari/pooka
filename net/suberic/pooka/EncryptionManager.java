@@ -50,6 +50,22 @@ public class EncryptionManager {
 	PGPMimeEncryptionUtils cryptoUtils  = new PGPMimeEncryptionUtils();
 	cryptoUtils.setPGPProviderImpl(providerImpl);
 	pgpUtils = cryptoUtils;
+
+	keyMgr = cryptoUtils.createKeyManager();
+	String publicFilename = sourceBundle.getProperty(key + ".keyStore.public.filename", "");
+
+	String privateFilename = sourceBundle.getProperty(key + ".keyStore.private.filename", "");
+	String pwString = sourceBundle.getProperty(key + ".keyStore.private.password", "");
+	
+	char[] pwArray = new char[pwString.length()];
+	for (int i = 0; i < pwString.length(); i++) {
+	  pwArray[i] = pwString.charAt(i);
+	}
+	keyMgrPasswd = pwArray;
+	
+	keyMgr.load(new FileInputStream(new File(publicFilename)), null);
+	keyMgr.load(new FileInputStream(new File(privateFilename)), keyMgrPasswd);
+	
       } catch (Exception e) {
 	e.printStackTrace();
       }
@@ -61,7 +77,7 @@ public class EncryptionManager {
 	Class utilsClass = Class.forName(smimeUtilsClassName);
 	EncryptionUtils newUtils = (EncryptionUtils) utilsClass.newInstance();
 	smimeUtils = newUtils;
-      } catch (Exception e) {
+      } catch (Throwable e) {
 	e.printStackTrace();
       }
     }
@@ -81,11 +97,13 @@ public class EncryptionManager {
       }
       keyMgrPasswd = pwArray;
 
+      /*
       try {
 	keyMgr = defaultUtils.createKeyManager(new FileInputStream(new File(keyMgrFilename)), keyMgrPasswd);
       } catch (Exception e) {
 	e.printStackTrace();
       }
+      */
     }
   }
 

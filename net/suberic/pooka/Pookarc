@@ -95,7 +95,7 @@ Pooka.userProfileProperty=X-Pooka-UserProfile
 
 
 EncryptionManager.pgp.provider=net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl
-EncryptionManager.smime.provider=net.suberic.pooka.crypto.bouncy.SMIMEEncryptionUtils
+#EncryptionManager.smime.provider=net.suberic.pooka.crypto.bouncy.SMIMEEncryptionUtils
 EncryptionManager.default=pgp
 EncryptionManager.savePasswordsForSession=false
 

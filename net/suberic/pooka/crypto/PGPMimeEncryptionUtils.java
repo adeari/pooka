@@ -150,8 +150,11 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     throws EncryptionException, MessagingException, java.io.IOException {
     // check the type; should be multipart/encrypted
 
+    System.err.println("got part " + part);
     String contentType = part.getContentType();
+    System.err.println("getContentType() returns " + contentType);
     ContentType ct = new ContentType(contentType);
+    System.err.println("ct = " + ct);
     if (contentType == null || ! ct.getBaseType().equalsIgnoreCase("multipart/encrypted")) {
       throw new EncryptionException ("error in content type:  expected 'multipart/encrypted', got '" + contentType + "'");
     }
@@ -348,14 +351,14 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Returns a KeyStore provider.
    */
-  public EncryptionKeyManager createKeyManager() {
+  public EncryptionKeyManager createKeyManager() throws EncryptionException {
     return getPGPProviderImpl().createKeyManager();
   }
 
   /**
    * Returns a KeyStore provider.
    */
-  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws java.io.IOException {
+  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws java.io.IOException, EncryptionException {
     return getPGPProviderImpl().createKeyManager(inputStream, password);
 
   }

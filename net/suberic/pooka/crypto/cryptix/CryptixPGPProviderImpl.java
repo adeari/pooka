@@ -15,6 +15,13 @@ import cryptix.pki.*;
  */
 public class CryptixPGPProviderImpl implements PGPProviderImpl {
 
+  public CryptixPGPProviderImpl() {
+    // register the encryption providers.
+    
+    java.security.Security.addProvider(new cryptix.jce.provider.CryptixCrypto() );
+    java.security.Security.addProvider(new cryptix.openpgp.provider.CryptixOpenPGP() );
+  }
+
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
@@ -189,14 +196,14 @@ public class CryptixPGPProviderImpl implements PGPProviderImpl {
   /**
    * Returns a KeyStore provider.
    */
-  public EncryptionKeyManager createKeyManager() {
+  public EncryptionKeyManager createKeyManager() throws EncryptionException {
     return new CryptixKeyManager();
   }
  
   /**
    * Returns a KeyStore provider.
    */
-  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException {
+  public EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException, EncryptionException {
     EncryptionKeyManager keyMgr = new CryptixKeyManager();
     keyMgr.load(inputStream, password);
     return keyMgr;

@@ -8,17 +8,31 @@ import java.security.*;
 import java.io.*;
 import java.util.*;
 
-import cryptix.message.*;
-import cryptix.openpgp.*;
-import cryptix.pki.*;
+import cryptix.openpgp.PGPKeyBundle;
+import cryptix.openpgp.PGPPublicKey;
+import cryptix.openpgp.packet.PGPPublicKeyPacket;
+
+import cryptix.pki.ExtendedKeyStore;
+import cryptix.pki.KeyBundle;
 
 /**
  * This manages a set of Encryption keys for use with PGP or S/MIME.
  */
 public class CryptixKeyManager implements EncryptionKeyManager {
 
-  HashMap keyBundleMap = new HashMap();
-  
+  int loadCount = 0;
+  KeyStore publicKeyStore = null;
+  KeyStore privateKeyStore = null;
+
+  public CryptixKeyManager() throws EncryptionException {
+    try {
+      publicKeyStore = ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
+      privateKeyStore = ExtendedKeyStore.getInstance("OpenPGP/KeyRing");
+    } catch (Exception e) {
+      throw new EncryptionException (e);
+    }
+  }
+
   /*
    * Loads this KeyStore from the given input stream.
    *
@@ -47,31 +61,19 @@ public class CryptixKeyManager implements EncryptionKeyManager {
     throws IOException, EncryptionException {
     PGPKeyBundle bundle = null;
 
+    // FIXME
     try {
+      if (loadCount > 0)
+	publicKeyStore.load(stream, null);
+      else
+	privateKeyStore.load(stream, null);
       
-      MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-      Collection msgs = mf.generateMessages(stream);
-      
-      stream.close();
-      
-      Iterator iter = msgs.iterator();
-      while (iter.hasNext()) {
-	KeyBundleMessage kbm = (KeyBundleMessage) iter.next();
-	bundle = (PGPKeyBundle)kbm.getKeyBundle();
-	Iterator principalIter = bundle.getPrincipals();
-	while (principalIter.hasNext()) {
-	  (java.security.Principal) principal = (java.security.Principal) principalIter.next();
-	  String name = principal.getNext();
-	  keyBundleMap.put(name, bundle);
-	}
-      }
-      
-    } catch (NoSuchAlgorithmException nsae) {
-      throw new EncryptionException(nsae);
-    } catch (MessageException me) {
-      throw new EncryptionException(me);
+      loadCount++;
+    } catch (IOException ioe) {
+      throw ioe;
+    } catch (Exception e) {
+      throw new EncryptionException(e);
     }
-    
   }
   
   /**
@@ -89,7 +91,13 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public void store(OutputStream stream, char[] password)
     throws IOException, EncryptionException {
-    // FIXME
+    try {
+      publicKeyStore.store(stream, password);
+    } catch (IOException ioe) {
+      throw ioe;
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }
   }
   
   /**
@@ -102,8 +110,13 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public int size()
     throws KeyStoreException {
-    //FIXME
-    return keyBundleMap.size();
+    int counter = 0;
+    try {
+      counter += publicKeyStore.size();
+      counter += privateKeyStore.size();
+    } catch (Exception e) {
+    }
+    return counter;
   }
   
   /**
@@ -125,14 +138,36 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public EncryptionKey getPublicKey(String alias)
     throws KeyStoreException {
-    // FIXME - distinguish public and private keys
-    KeyBundle bundle = keyBundleMap.get(alias);
+    
+    KeyBundle bundle = ((ExtendedKeyStore)publicKeyStore).getKeyBundle(alias);
+    
+    System.err.println("got key bundle " + bundle + " for alias " + alias);
+
     if (bundle != null) {
+      Iterator iter = bundle.getPublicKeys();
+      if (! iter.hasNext()) {
+	try {
+	  System.err.println("no next; publicKeyStore.getKey(" + alias + ", null)=" + publicKeyStore.getKey(alias, null));
+	} catch (Throwable t) {
+	  System.err.println("no next:  getKey() throws exception " + t);
+	  t.printStackTrace();
+	}
+      }
+      while (iter.hasNext()) {
+	PGPPublicKey publickey = (PGPPublicKey)iter.next();
+	System.err.println("got public key " + publickey);
+	PGPPublicKeyPacket keypkt = 
+	  (PGPPublicKeyPacket)publickey.getPacket();
+	System.err.println("cryptor is " + keypkt.getAlgorithm() + ", a " + keypkt.getAlgorithm().getClass());
+
+      }
+      System.err.println("done with public keys.");
+
       CryptixPGPEncryptionKey key = new CryptixPGPEncryptionKey(bundle, null);
       return key;
-    } else {
-      return null;
     }
+
+    return null;
   }
 
   /**
@@ -154,14 +189,26 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public EncryptionKey getPrivateKey(String alias, char[] password)
     throws KeyStoreException, EncryptionException {
-    // FIXME - distinguish public and private keys
-    KeyBundle bundle = keyBundleMap.get(alias);
+
+    KeyBundle bundle = ((ExtendedKeyStore)privateKeyStore).getKeyBundle(alias);
+    
     if (bundle != null) {
+
+      Iterator iter = bundle.getPrivateKeys();
+      if (! iter.hasNext()) {
+	try {
+	  System.err.println("no next; privateKeyStore.getKey(" + alias + ", null)=" + privateKeyStore.getKey(alias, null));
+	} catch (Throwable t) {
+	  System.err.println("no next:  getKey() throws exception " + t);
+	  t.printStackTrace();
+	}
+      }
+      
       CryptixPGPEncryptionKey key = new CryptixPGPEncryptionKey(bundle, null);
       return key;
-    } else {
-      return null;
     }
+
+    return null;
   }
   
   
@@ -258,8 +305,13 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public Set publicKeyAliases()
     throws KeyStoreException {
-    // FIXME
-    return new HashSet(keyBundleMap.keySet());
+
+    HashSet returnValue = new HashSet();
+    Enumeration enum = publicKeyStore.aliases();
+    while (enum.hasMoreElements())
+      returnValue.add(enum.nextElement());
+    
+    return returnValue;
   }
 
   /**
@@ -272,8 +324,13 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public Set privateKeyAliases()
     throws KeyStoreException {
-    // FIXME
-    return new HashSet(keyBundleMap.keySet());
+
+    HashSet returnValue = new HashSet();
+    Enumeration enum = privateKeyStore.aliases();
+    while (enum.hasMoreElements())
+      returnValue.add(enum.nextElement());
+    
+    return returnValue;
   }
   
   
@@ -289,8 +346,8 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public boolean containsPublicKeyAlias(String alias)
     throws KeyStoreException {
-    // FIXME
-    return keyBundleMap.containsKey(alias);
+
+    return publicKeyStore.isKeyEntry(alias);
   }
 
   /**
@@ -305,8 +362,8 @@ public class CryptixKeyManager implements EncryptionKeyManager {
    */
   public boolean containsPrivateKeyAlias(String alias)
     throws KeyStoreException {
-    // FIXME
-    return keyBundleMap.containsKey(alias);
+
+    return privateKeyStore.isKeyEntry(alias);
   }
   
 }

@@ -37,10 +37,10 @@ public interface PGPProviderImpl {
   /**
    * Returns a KeyStore provider.
    */
-  public abstract EncryptionKeyManager createKeyManager();
+  public abstract EncryptionKeyManager createKeyManager() throws EncryptionException;
 
   /**
    * Returns a KeyStore provider.
    */
-  public abstract EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException;
+  public abstract EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] password) throws IOException, EncryptionException;
 }
