@@ -1843,7 +1843,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public void setStatus(int newStatus) {
 	synchronized(this) {
-	    System.out.println("setting status for " + this + " to " + newStatus);
 	    status = newStatus;
 	}
     }
