@@ -244,21 +244,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	contentPanel.saveOpenFolders();
       }
       
-      Vector v = Pooka.getStoreManager().getStoreList();
-      for (int i = 0; i < v.size(); i++) {
-	// FIXME:  we should check to see if there are any messages
-	// to be deleted, and ask the user if they want to expunge the
-	// deleted messages.
-	try {
-	  ((StoreInfo)v.elementAt(i)).closeAllFolders(false, true);
-	} catch (Exception e) {
-	  // we really don't care.
-	}
-      }
-      
-      Pooka.resources.saveProperties(new File(Pooka.localrc));
-      System.exit(exitValue);
-      
+      Pooka.exitPooka(exitValue);
     }
 
   /**

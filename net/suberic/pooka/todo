@@ -1,7 +1,5 @@
 *) threading of attachment actions.
 
-*)  ?? if network connection goes down, pooka hangs on exit.
-
 *) document keybindings
 	-- keybindings for address book
 	-- keybindings for saving attachments.

@@ -1,3 +1,13 @@
+020810 release
+--------------
+
+NOTE:  i modified the local mail store (mbox) configuration a bit.  if you're
+using any local mail folders, you may need to change the Mail Directory and
+Inbox File settings.  your inbox is specified by Inbox File; subfolders are
+stored in Mail Directory/folders.
+
+pooka can now exit even if all the open stores aren't available.
+
 made it so we don't do unnecessary redraws on the folder panel every time
 a message changes or is loaded.
 

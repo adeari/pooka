@@ -220,6 +220,59 @@ public class Pooka {
       }
     }
   }
+
+  /**
+   * Exits Pooka.  Attempts to close all stores first.
+   */
+  public static void exitPooka(int exitValue) {
+    Vector v = getStoreManager().getStoreList();
+    final java.util.HashMap doneMap = new java.util.HashMap();
+    for (int i = 0; i < v.size(); i++) {
+      // FIXME:  we should check to see if there are any messages
+      // to be deleted, and ask the user if they want to expunge the
+      // deleted messages.
+      final StoreInfo currentStore = (StoreInfo)v.elementAt(i);
+      net.suberic.util.thread.ActionThread storeThread = currentStore.getStoreThread();
+      if (storeThread != null) {
+	doneMap.put(currentStore, new Boolean(false));
+	storeThread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	    
+	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	      try {
+		currentStore.closeAllFolders(false, true);
+		currentStore.disconnectStore();
+		doneMap.put(currentStore, new Boolean(true));
+	      } catch (Exception e) {
+		// we really don't care.
+	      }
+	    }
+	  }, storeThread), new java.awt.event.ActionEvent(getMainPanel(), 1, "store-close"));
+      }
+    }
+    long sleepTime = 30000;
+    try {
+      sleepTime = Long.parseLong(getProperty("Pooka.exitTimeout", "30000"));
+    } catch (Exception e) {
+    }
+    long currentTime = System.currentTimeMillis();
+    boolean done = false;
+    while (! done && System.currentTimeMillis() - currentTime < sleepTime) {
+      try {
+	Thread.currentThread().sleep(1000);
+      } catch (InterruptedException ie) {
+      }
+      done = true;
+      for (int i = 0; done && i < v.size(); i++) {
+	Object key = v.get(i);
+	Boolean value = (Boolean) doneMap.get(key);
+	if (value != null && ! value.booleanValue())
+	  done = false;
+      }
+    }
+
+    Pooka.resources.saveProperties(new java.io.File(Pooka.localrc));
+    System.exit(exitValue);
+  }
   
   /**
    * Convenience method for getting Pooka configuration properties.  Calls

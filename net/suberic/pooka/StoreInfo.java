@@ -243,7 +243,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	System.out.println("for store " + getStoreID() + ", inboxFileName = " + inboxFileName + "; userhome = " + userHomeName);
       p.setProperty("mail.mbox.inbox", inboxFileName);
       p.setProperty("mail.mbox.userhome", userHomeName);
-      
     } 
     return p;
   }
