@@ -25,18 +25,18 @@ public class StoreNode extends MailTreeNode {
 	setCommands();
 	store.addConnectionListener(new ConnectionAdapter() {
 		public void closed(ConnectionEvent e) {
-		    System.out.println("Folder " + displayName + " closed.");
+		    System.out.println("Store " + displayName + " closed.");
 		    if (connected == true) {
 			try {
 			    connectStore();
 			} catch (MessagingException me) {
-			    System.out.println("Disconnected from store " + displayName + " and unable to reconnect:  " + me.getMessage());
+			    System.out.println("Store " + displayName + " closed and unable to reconnect:  " + me.getMessage());
 			}
 		    }
 		}
 
 		public void disconnected(ConnectionEvent e) {
-		    System.out.println("Folder " + displayName + " closed.");
+		    System.out.println("Folder " + displayName + " disconnected.");
 		    if (connected == true) {
 			try {
 			    connectStore();
