@@ -95,6 +95,16 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	keyBindings.setActive(getActions());
 	toolbar.setActive(getActions());
+
+	// if the FolderWindow itself gets the focus, pass it on to
+	// the messageTable
+
+	this.addFocusListener(new FocusAdapter() {
+		public void focusGained(FocusEvent e) {
+		    messageTable.requestFocus();
+		}
+	    });
+
     }
 
     /**
