@@ -72,7 +72,8 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    if (lastPath instanceof FolderNode) {
 		FolderNode node = (FolderNode)lastPath;
 
-		if (node.getFolderInfo().hasNewMessages())
+		FolderInfo fi = node.getFolderInfo();
+		if ((! fi.isTrashFolder()) && (! fi.isSentFolder()) && fi.hasNewMessages())
 		    setText("* " + getText() + " *");
 		
 		if (isSpecial(node)) {

@@ -54,7 +54,10 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 			    getParentContainer().repaint();
-			    Pooka.getMainPanel().setNewMessageFlag(true);
+			    if ((! folderInfo.isTrashFolder()) && (! folderInfo.isSentFolder())) { 
+				
+				Pooka.getMainPanel().setNewMessageFlag(true);
+			    }
 			}
 		    });
 	    }
@@ -65,8 +68,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 			    getParentContainer().repaint();
 			}
 		    });
+		
 	    }
-	});
+	    });
 	
 	folderInfo.addMessageChangedListener(this);
 	loadChildren();
