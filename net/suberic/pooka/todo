@@ -1,15 +1,4 @@
-*) ?? ^D message, hit return for next message, get an error?
-	tough.  could fix by having a temporary 'deleted' flag on the message
-	itself, maybe?
-	- thought was to make stuff happen almost immediately on the awt
-	event thread, then switch over to the folder thread for the real
-	work.
-
-*) ??? still a chance to send a message twice????? !!!! ????
-
 *) encryption support:
-   *) fix 'encrypted message' text display.
-	make sure to test with attachments.
    *) if no keystore named, don't try loading?  test.
 
    *) add documentation
@@ -25,7 +14,16 @@
 	see about prepackaging cryptix and bouncycastle.
 ----
 
+*) ?? ^D message, hit return for next message, get an error?
+	tough.  could fix by having a temporary 'deleted' flag on the message
+	itself, maybe?
+	- thought was to make stuff happen almost immediately on the awt
+	event thread, then switch over to the folder thread for the real
+	work.
+
 *) fix NPE if try to send a new message without configuring client.
+
+*) add configurable spam button/action.
 
 *) fix error display with exception so that you can see the stack trace.
 

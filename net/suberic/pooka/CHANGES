@@ -1,3 +1,6 @@
+fixed a case where hitting 'send' twice could end up sending two copies
+of the message.
+
 fixed toolbar button margins in jdk 1.4.2.
 
 modified the attachment filechooser to select for multiple files, now that

@@ -39,11 +39,16 @@ class AttachmentBundle {
     if (subBundle.textPart != null)
       subBundle.textPart.setHeaderSource(subBundle);
     
-    if (textPart == null)
+    if (textPart == null) {
       textPart = subBundle.textPart;
-    else if (subBundle.textPart != null)
+    } else if (textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) {
+      if (subBundle.textPart != null) {
+	textPart = subBundle.textPart;
+      }
+    } else if (subBundle.textPart != null) {
       allAttachments.add(subBundle.textPart);
-    
+    }
+
     allAttachments.addAll(subBundle.allAttachments);
   }
 
@@ -77,6 +82,7 @@ class AttachmentBundle {
    * Adds an Attachment using the given ContentType.
    */
   synchronized void addAttachment(Attachment newAttach, ContentType ct) {
+
     if ((textPart == null || textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
       textPart = newAttach;
     } else if (textPart == null && newAttach instanceof net.suberic.pooka.crypto.CryptoAttachment) {
@@ -93,6 +99,7 @@ class AttachmentBundle {
    * to display just the 'body' of the message without the attachments.
    */
   public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
+
     StringBuffer retVal = new StringBuffer();
     
     if (withHeaders)

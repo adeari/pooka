@@ -73,9 +73,10 @@ public class NewMessageProxy extends MessageProxy {
     // thread:  AwtEvent
 
     synchronized(this) {
-      if (sendLock)
+      if (sendLock) {
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.sendMessage.alreadySendingMessage", "Already sending message."));
 	return;
-      else
+      } else
 	sendLock = true;
     }
     
@@ -94,10 +95,9 @@ public class NewMessageProxy extends MessageProxy {
 	}
       }
     } catch (MessagingException me) {
+      sendLock=false;
       getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
-    } finally {
-      sendLock = false;
-    }
+    } 
   }
 
   /**
@@ -123,6 +123,7 @@ public class NewMessageProxy extends MessageProxy {
    * Called when the send fails.
    */
   public void sendFailed(Exception e) {
+    sendLock=false;
     Pooka.getUIFactory().clearStatus();
     final Exception me = e;
     final NewMessageUI nmui = getNewMessageUI();

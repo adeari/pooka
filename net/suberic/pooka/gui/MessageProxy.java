@@ -487,12 +487,13 @@ public class MessageProxy {
     if (info != null) {
       if (info.hasEncryption()) {
 
-	java.security.Key key = getDefaultProfile().getEncryptionKey();
-
 	MessageCryptoInfo cInfo = info.getCryptoInfo();
+
 	try {
 	  if (cInfo != null && cInfo.isEncrypted()) {
 	    
+	    java.security.Key key = getDefaultProfile().getEncryptionKey(cInfo.getEncryptionType());
+
 	    if (key == null) {
 	      try {
 		key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());
