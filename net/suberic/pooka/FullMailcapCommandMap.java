@@ -9,7 +9,7 @@ import java.io.*;
  * as well as standard, external-to-java entries.
  */
 
-public class FullMailcapCommandMap extends CommandMap {
+public class FullMailcapCommandMap extends MailcapCommandMap {
     private Vector mailcapMaps;
     private static String externalLauncher = "net.suberic.pooka.ExternalLauncher";
 
@@ -58,10 +58,6 @@ public class FullMailcapCommandMap extends CommandMap {
     public FullMailcapCommandMap(InputStream is) {
 	this();
 	addMailcapFile(is);
-    }
-
-    public DataContentHandler createDataContentHandler(java.lang.String mimeType) {
-	return null;
     }
 
     public CommandInfo[] getAllCommands(java.lang.String mimeType) {

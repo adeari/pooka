@@ -8,6 +8,7 @@ import java.io.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.*;
 import javax.activation.*;
+import javax.swing.table.AbstractTableModel;
 
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.ExternalLauncher;
@@ -19,46 +20,95 @@ import java.awt.*;
  */
 
 public class AttachmentPane extends JPanel {
-    JList listBox;
-    Hashtable mappingTable = new Hashtable();
-    JPopupMenu popupMenu;
 
-    public AttachmentPane (MimeMessage mMsg) {
+    /**
+     * The AttachmentTableModel displays the MessageProxy's attachments
+     * list as a JTable.
+     */
+    class AttachmentTableModel extends AbstractTableModel {
+	MessageProxy msg;
+
+	public AttachmentTableModel(MessageProxy newMsg) {
+	    msg=newMsg;
+	}
+
+	public int getRowCount() {
+	    if (msg.getAttachments() != null)
+		return msg.getAttachments().size();
+	    else
+		return 0;
+	}
+
+	/**
+	 * As of now, we just have two columns:  file name and file type.
+	 * Maybe in the future we'll have an icon, too.
+	 */
+	public int getColumnCount() {
+	    return 2;
+	}
+
+	/**
+	 * This gets the displayed value for each column in the table.
+	 */
+	public Object getValueAt(int row, int column) {
+	    Vector v = msg.getAttachments();
+	    if (v != null && row < v.size()) {
+		if (column == 0)
+		    try {
+			String name = (((MimeBodyPart)v.elementAt(row)).getFileName()); 
+			if (name != null)
+			    return name;
+			else
+			    return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
+		    } catch (MessagingException me) {
+			return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
+		    }
+		else if (column == 1)
+		    try {
+			return (((MimeBodyPart)v.elementAt(row)).getContentType());    
+		    } catch (MessagingException me) {
+			return Pooka.getProperty("AttachmentPane.error.FileTypeUnavailable", "Unavailable");
+		    }
+	    }
+	    // if it's not a valid request, just return null.
+	    return null;
+	}
+
+	/**
+	 * A convenience method to return a particular MimeBodyPart
+	 *
+	 * Returns null if there is no entry at that row.
+	 */
+	public MimeBodyPart getPartAtRow(int row) {
+	    if (row < msg.getAttachments().size())
+		return (MimeBodyPart)msg.getAttachments().elementAt(row);
+	    else
+		return null;
+	}
+
+    }
+
+    JTable table;
+    AttachmentTableModel tableModel;
+    JPopupMenu popupMenu;
+    MessageProxy message;
+    Action[] defaultActions;
+
+    public AttachmentPane (MessageProxy msg) {
 	super();
 
-	// first see if we really should be creating this or not.
-	Object content = null;
-	try {
-	    content = mMsg.getContent();
-	} catch (Exception e) {
-	    return;
-	}
-	
-	if (content == null || !(content instanceof MimeMultipart))
-	    return;
-
-
-	// so we probably should actually have an attachmentPane.
-
-	MimeMultipart msgContent = (MimeMultipart) content;
-
-	Vector listElements = new Vector();
-
-	try {
-	    for (int i = 0; i < msgContent.getCount(); i++) {
-		MimeBodyPart mbp = (MimeBodyPart)msgContent.getBodyPart(i);
-		String title = mbp.getContentType();
-		listElements.add(title);
-		mappingTable.put(title, mbp);
-	    }
-	} catch (javax.mail.MessagingException me) {
-	}
+	message=msg;
+	defaultActions = createDefaultActions();
 
 	popupMenu = createPopupMenu();
 
-	listBox = new JList(listElements);
+	tableModel = new AttachmentTableModel(message);
 
-	listBox.addMouseListener(new MouseAdapter() {
+	table = new JTable(tableModel);
+
+	tableModel.addTableModelListener(table);
+
+	table.addMouseListener(new MouseAdapter() {
 	    public void mousePressed(MouseEvent e) {
 		if (e.isPopupTrigger()) {
 		    getPopupMenu().show(AttachmentPane.this, e.getX(), e.getY());
@@ -67,26 +117,23 @@ public class AttachmentPane extends JPanel {
 	    }
 	});
 
-	this.add(new JScrollPane(listBox, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	this.add(new JScrollPane(table, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED));
+	
     }
 
 
     /**
-     * getSelectedPart() will return the selected MimeBodyPart, as 
-     * converted from the mappingTable.
+     * getSelectedPart() will return the selected MimeBodyPart.
      */
 
     public MimeBodyPart getSelectedPart() {
-	String selectedTitle = (String)listBox.getSelectedValue();
-
-	if (selectedTitle == null) 
-	    return null;
-	else {
-	    return (MimeBodyPart)mappingTable.get(selectedTitle);
-	}
-	
+	return getTableModel().getPartAtRow(getTable().getSelectedRow());
     }
 
+    /**
+     * This opens up the selected Attachment using the default handler
+     * for the Attachment's Mime type.
+     */
     public void openSelectedAttachment() {
 	MimeBodyPart mbp = getSelectedPart();
 	if (mbp != null) {
@@ -137,9 +184,18 @@ public class AttachmentPane extends JPanel {
 	}
     }
 
+    /**
+     * This opens the Attachment with the program of the user's choice.
+     * Not implemented yet. (akp)
+     */
     public void openWith() {
     }
 
+    /**
+     * This opens up a JFileChooser to let the user choose under what
+     * name and where the selected Attachment should be saved.  It then
+     * calls saveAttachmentAs() to save the file.
+     */
     public void saveAttachment() {
 	MimeBodyPart mbp = getSelectedPart();
 	if (mbp != null) {
@@ -161,6 +217,9 @@ public class AttachmentPane extends JPanel {
 	}
     }
 
+    /**
+     * This actually saves the MimeBodyPart as the File saveFile.
+     */
     public void saveFileAs(MimeBodyPart mbp, File saveFile) throws IOException {
 	InputStream decodedIS;
 	BufferedOutputStream outStream;
@@ -187,13 +246,35 @@ public class AttachmentPane extends JPanel {
 	}
     }
 
+    /**
+     * This removes the Attachment from the message.
+     */
+
+    public void removeAttachment() {
+	int selectedIndex = getTable().getSelectedRow();
+	MimeBodyPart mbp = getSelectedPart();
+	((NewMessageProxy)message).detachFile(mbp);
+    }
 
     public JPopupMenu getPopupMenu() {
 	return popupMenu;
     }
 
+    public AttachmentTableModel getTableModel() {
+	return tableModel;
+    }
+
+    public JTable getTable() {
+	return table;
+    }
+
     protected JPopupMenu createPopupMenu() {
-	String key = "AttachmentPane.Actions";
+	String key;
+	if (message instanceof NewMessageProxy)
+	    key = "AttachmentPane.NewMsgActions";
+	else 
+	    key = "AttachmentPane.Actions";
+
 	StringTokenizer iKeys = null;
 	try {
 	    iKeys = new StringTokenizer(Pooka.getProperty(key), ":");
@@ -256,11 +337,9 @@ public class AttachmentPane extends JPanel {
     }
 
     public Action getActionByName(String actionName) {
-	System.out.println("getting action " + actionName);
 	Action[] actionList = getActions();
 	for (int i = 0; i < actionList.length; i++) {
 	    if (actionName.equals((String)actionList[i].getValue(Action.NAME))) {
-		System.out.println("matched actionName " + actionName);
 		return actionList[i];
 	    }
 	}
@@ -268,12 +347,19 @@ public class AttachmentPane extends JPanel {
 		
     }
 
-    public Action[] defaultActions = {
-	new OpenAction(),
-	new OpenWithAction(),
-	new SaveAsAction()
-    };
-
+    public Action[] createDefaultActions() {
+	if (message instanceof NewMessageProxy)
+	    return new Action[] {
+		new RemoveAction()
+		    };
+	else
+	    return new Action[] {
+		new OpenAction(),
+		new OpenWithAction(),
+		new SaveAsAction()
+		    };
+    }
+    
     public Action[] getActions() {
 	return getDefaultActions();
     }
@@ -311,6 +397,16 @@ public class AttachmentPane extends JPanel {
 	
         public void actionPerformed(ActionEvent e) {
 	    saveAttachment();
+	}
+    }
+
+    class RemoveAction extends AbstractAction {
+	RemoveAction() {
+	    super("file-remove");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    removeAttachment();
 	}
     }
 

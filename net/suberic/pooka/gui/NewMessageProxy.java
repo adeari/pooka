@@ -10,7 +10,6 @@ import java.io.*;
 
 public class NewMessageProxy extends MessageProxy {
     Hashtable commands;
-    Vector attachments = null;
 
     public NewMessageProxy(Message newMessage) {
 	message=newMessage;
@@ -59,15 +58,19 @@ public class NewMessageProxy extends MessageProxy {
 		
 		urlName = msgWindow.populateMessageHeaders(getMessage());
 		if (urlName != null) {
-		    if (attachments != null && attachments.size() > 1) {
+		    if (attachments != null && attachments.size() > 0) {
 			MimeBodyPart mbp = new MimeBodyPart();
 			mbp.setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
 			MimeMultipart multipart = new MimeMultipart();
 			multipart.addBodyPart(mbp);
 			for (int i = 0; i < attachments.size(); i++) 
 			    multipart.addBodyPart((BodyPart)attachments.elementAt(i));
+			multipart.setSubType("mixed");
 			getMessage().setContent(multipart);
+			getMessage().saveChanges();
+			System.out.println("message set.  content should be " + multipart.toString() );
 		    } else {
+			System.out.println("no attachment.");
 			getMessage().setContent(msgWindow.getMessageText(), msgWindow.getMessageContentType());
 		    }
 	       
@@ -78,8 +81,10 @@ public class NewMessageProxy extends MessageProxy {
 	    } catch (MessagingException me) {
 		if (me instanceof SendFailedException) {
 		    JOptionPane.showInternalMessageDialog(getMessageWindow().getDesktopPane(), Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+		    me.printStackTrace(System.out);
 		} else {
 		    JOptionPane.showInternalMessageDialog(getMessageWindow().getDesktopPane(), Pooka.getProperty("error.MessageWindow.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+		    me.printStackTrace(System.out);
 		}
 	    }
 	    
@@ -91,10 +96,15 @@ public class NewMessageProxy extends MessageProxy {
      * calls getFileToAttach(), and then sends that to attachFile().
      */
     public void attach() {
+	System.out.println("calling NewMessageProxy.attach()");
 	File[] f = getFileToAttach();
-	if (f != null)
+	if (f != null) {
+	    System.out.println("file was returned.  length is " + f.length);
 	    for (int i = 0; i < f.length; i++)
 		attachFile(f[i]);
+	}
+	else
+	    System.out.println("attached file was null.");
     }
 
     /**
@@ -114,13 +124,24 @@ public class NewMessageProxy extends MessageProxy {
      * to true.
      */
     public void attachFile(File f) {
+	System.out.println("attaching file.");
 	try {
-	    FileInputStream fis = new FileInputStream(f);
-	    MimeBodyPart mbp = new MimeBodyPart(fis);
+	    /*FileInputStream fis = new FileInputStream(f);
+	      MimeBodyPart mbp = new MimeBodyPart(fis);*/
+	    
+	    MimeBodyPart mbp = new MimeBodyPart();
+	    mbp.setContent(f, Pooka.getMimeTypesMap().getContentType(f));
+	    
+	    System.out.println("set filename to " + f.getName());
+	    mbp.setFileName(f.getName());
 	    if (attachments == null)
 		attachments = new Vector();
+	    System.out.println("attached filename is " + mbp.getFileName());
+	    System.out.println("attached content type is " + mbp.getContentType());
+	    
 	    attachments.add(mbp);
-	    getMessageWindow().updateAttachmentPane();
+	    
+	    getMessageWindow().attachmentAdded(attachments.size() -1);
 	} catch (Exception e) {
 	    getMessageWindow().showError(Pooka.getProperty("error.MessageWindow.unableToAttachFile", "Unable to attach file."), Pooka.getProperty("error.MessageWindow.unableToAttachFile.title", "Unable to Attach File."), e);
 	}
@@ -134,9 +155,11 @@ public class NewMessageProxy extends MessageProxy {
      * correct underlying object.
      */
     public void detachFile(MimeBodyPart mbp) {
-	if (attachments != null)
+	if (attachments != null) {
+	    int index = attachments.indexOf(mbp);
 	    attachments.remove(mbp);
-	getMessageWindow().updateAttachmentPane();
+	    getMessageWindow().attachmentRemoved(index);
+	}
     }
 
     public Message getMessage() {

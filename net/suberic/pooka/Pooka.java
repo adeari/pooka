@@ -8,6 +8,7 @@ public class Pooka {
     static public String localrc;
     static public java.text.SimpleDateFormat dateFormatter;
     static public javax.activation.CommandMap mailcap;
+    static public javax.activation.MimetypesFileTypeMap mimeTypesMap = new javax.activation.MimetypesFileTypeMap();
 
     static public void main(String argv[]) {
 	localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc"); 
@@ -23,6 +24,8 @@ public class Pooka {
 	UserProfile.createProfiles(resources);
 
 	mailcap = new FullMailcapCommandMap();
+	javax.activation.CommandMap.setDefaultCommandMap(mailcap);
+	javax.activation.FileTypeMap.setDefaultFileTypeMap(mimeTypesMap);
 
 	JFrame frame = new JFrame("Pooka");
 	frame.setBackground(Color.lightGray);
@@ -70,7 +73,18 @@ public class Pooka {
     static public javax.activation.CommandMap getMailcap() {
 	return mailcap;
     }
+
+    static public javax.activation.MimetypesFileTypeMap getMimeTypesMap() {
+	return mimeTypesMap;
+    }
 }
+
+
+
+
+
+
+
 
 
 

@@ -20,7 +20,9 @@ public class MessageWindow extends JInternalFrame {
 
     MessageProxy msg;
     JSplitPane splitPane = null;
-    JComponent headerPanel = null;
+    JTabbedPane tabbedPane = null;
+    Container headerPanel = null;
+    AttachmentPane attachmentPanel = null;
     JComponent bodyPanel = null;
     int headerStyle = MessageWindow.HEADERS_DEFAULT;
     boolean editable = false;
@@ -62,9 +64,21 @@ public class MessageWindow extends JInternalFrame {
 	this.getContentPane().add("North", toolbar);
 
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+	tabbedPane = new JTabbedPane();
 	
-	splitPane.setTopComponent(createHeaderPanel(msg));
-	splitPane.setBottomComponent(createBodyPanel(msg));
+	headerPanel = createHeaderPanel(msg);
+	bodyPanel = createBodyPanel(msg);
+	
+	tabbedPane.add(Pooka.getProperty("MessageWindow.HeaderTab", "Headers"), headerPanel);
+
+	if (!getMessageProxy().hasLoadedAttachments())
+	    getMessageProxy().loadAttachmentInfo();
+
+	if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0)
+	    addAttachmentPane();
+	
+	splitPane.setTopComponent(tabbedPane);
+	splitPane.setBottomComponent(bodyPanel);
 	this.getContentPane().add("Center", splitPane);
 	
 	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "300")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "200")));
@@ -79,29 +93,6 @@ public class MessageWindow extends JInternalFrame {
 	    });
 	
     }
-
-    /**
-     * Create a New Message Window
-
-
-    public MessageWindow(Session thisSession) {
-	super(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"), true, true, true, true);
-	
-	editable=true;
-	
-	try {
-	} catch (MessagingException me) {
-	}
-
-	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-	
-	splitPane.setTopComponent(createHeaderPanel(msg));
-	splitPane.setBottomComponent(createBodyPanel(msg));
-	this.getContentPane().add(splitPane);
-    }
-	
-    */		 
-
 
     public void closeMessageWindow() {
 	
@@ -127,47 +118,19 @@ public class MessageWindow extends JInternalFrame {
     }
 
     public Container createHeaderPanel(MessageProxy aMsg) {
-	/*
-	 * This is interesting.  We need to deal with several possibilities:
-	 *
-	 * 1)  Simple (non-editable) with just basic headers
-	 * 2)  Simple with full headers
-	 * 3)  Simple with attachments and both header sets
-	 * 4)  Editable with just UserProfile
-	 * 5)  Editable with normal headers
-	 * 6)  Editable with full headers
-	 */
-
 	if (isEditable()) {
 	    return createHeaderInputPanel(aMsg, inputTable);
-	} else if (aMsg.getMessage() instanceof MimeMessage) {
-	    MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
-
-	    boolean multiTest = false;
-	    
-	    try {
-		multiTest = (mMsg.getContent() instanceof Multipart);
-	    } catch (Exception e) {
-	    }
-
-	    if (multiTest) {
-		JSplitPane hdrSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-		hdrSplitPane.setTopComponent(createHeaderTextField(mMsg));
-		hdrSplitPane.setBottomComponent(createAttachmentPanel(mMsg));
-		return hdrSplitPane;
-	    } else {
-		return createHeaderTextField(mMsg);
-	    }
+	} else {
+	    return createHeaderTextField(aMsg);
 	}
-
-	//shouldn't happen.
-	return null;
     }
 	
 
-    public JTextArea createHeaderTextField(MimeMessage mMsg) {
+    public JTextArea createHeaderTextField(MessageProxy aMsg) {
+	MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
+	
 	JTextArea headerArea = new JTextArea();
-
+	
 	if (showFullHeaders()) {
 	}
 	else {
@@ -251,15 +214,6 @@ public class MessageWindow extends JInternalFrame {
 	return inputPanel;
     }
 
-    /**
-     * This returns the JComponent which shows the attachments.
-     *
-     * All it does now is returns a new AttachmentPane.
-     */
-    public JComponent createAttachmentPanel(MimeMessage mMsg) {
-	return new AttachmentPane(mMsg);
-    }
-
     public JComponent createBodyPanel(MessageProxy aMsg) {
 	editorPane = new JEditorPane();
 	
@@ -327,26 +281,80 @@ public class MessageWindow extends JInternalFrame {
 
     /**
      * Pops up a JFileChooser and returns the results.
+     *
+     * Note:  i'd like to have this working so that you can attach multiple
+     * files at once, but it seems that the JFileChooser really doesn't 
+     * want to return an array with anything in it for getSelectedFiles().  
+     * So for now, I'll leave the Pooka API as is, but only ever return a 
+     * single entry in the File array.
      */
     public File[] getFiles(String title, String buttonText) {
 	JFileChooser jfc = new JFileChooser();
 	jfc.setDialogTitle(title);
 	jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	jfc.setMultiSelectionEnabled(true);
+	jfc.setMultiSelectionEnabled(false);
 	int a = jfc.showDialog(this, buttonText);
+	System.out.println("filechooser returned " + a + ".  approve-option = " + JFileChooser.APPROVE_OPTION + ".  The file selected (singular) was " + jfc.getSelectedFile() + ".  The length of the file array was " + jfc.getSelectedFiles().length);
+
 	if (a == JFileChooser.APPROVE_OPTION)
-	    return jfc.getSelectedFiles();
+	    return new File[] {jfc.getSelectedFile()};
 	else
 	    return null;
     }
+    /**
+     * This notifies the MessageWindow that an attachment has been added
+     * at the provided index.  This does not actually add an attachment,
+     * but rather should be called by the MessageProxy when an attachment
+     * has been added.
+     *
+     * If an AttachmentPane does not currently exist for this MessageWindow,
+     * this method will call addAttachmentPane() to create one.
+     */
+    public void attachmentAdded(int index) {
+	if (getAttachmentPanel() == null)
+	    addAttachmentPane();
+	else
+	    getAttachmentPanel().getTableModel().fireTableRowsInserted(index, index);
+    }
 
     /**
-     * This updates the attachment panel.  This should be called when an
-     * attachment is added, removed, or changed on the underlying 
-     * MessageInfo object.
+     * This notifies the MessageWindow that the attachment at the 
+     * provided index has been removed.  This does not actually remove
+     * the attachment, but rather should be called by the MessageProxy
+     * when an attachment has been removed.
+     *
+     * If this removes the last attachment, the entire AttachmentPane
+     * is removed from the MessageWindow.
      */
-    public void updateAttachmentPane() {
+    public void attachmentRemoved(int index) {
+	Vector attach = getMessageProxy().getAttachments();
+	if (attach == null || attach.size() == 0) {
+	    removeAttachmentPane();
+	} else {
+	    getAttachmentPanel().getTableModel().fireTableRowsDeleted(index, index);
+	}
+    }
 
+    /**
+     * This creates the JComponent which shows the attachments, and then
+     * adds it to the JTabbedPane.
+     *
+     */
+    public void addAttachmentPane() {
+	attachmentPanel = new AttachmentPane(getMessageProxy());
+	tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentPanel);
+    }
+
+    /**
+     * This removes the AttachmentPane from the JTabbedPane.
+     */
+
+    public void removeAttachmentPane() {
+	if (attachmentPanel != null) {
+	    tabbedPane.setSelectedComponent(headerPanel);
+	    tabbedPane.remove(attachmentPanel);
+	}
+	attachmentPanel = null;
     }
 
     /**
@@ -411,6 +419,10 @@ public class MessageWindow extends JInternalFrame {
 
     public void setMessageProxy(MessageProxy newValue) {
 	msg = newValue;
+    }
+
+    public AttachmentPane getAttachmentPanel() {
+	return attachmentPanel;
     }
 
     //------- Actions ----------//

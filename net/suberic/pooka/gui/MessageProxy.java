@@ -28,11 +28,17 @@ public class MessageProxy {
     // if the tableInfo has been loaded yet.
     boolean loaded = false;
 
+    // if the attachments have been loaded yet.
+    boolean attachmentsLoaded = false;
+
     // commands for the GUI
     Hashtable commands;
 
     // The Window associated with this MessageProxy.
     MessageWindow msgWindow;
+
+    // The attachments
+    Vector attachments;
 
     protected MessageProxy() {
     }
@@ -82,6 +88,14 @@ public class MessageProxy {
 	    loaded=true;
 	}
     }	
+
+    /**
+     * This loads the Attachment information into the attachments vector.
+     */
+
+    public void loadAttachmentInfo() {
+	attachments = MailUtilities.getAttachments(getMessage());
+    }
 
     /**
      * This gets a particular property (From, To, Date, Subject, or just
@@ -305,6 +319,10 @@ public class MessageProxy {
 	return loaded;
     }
 
+    public boolean hasLoadedAttachments() {
+	return attachmentsLoaded;
+    }
+
     public MessageWindow getMessageWindow() {
 	return msgWindow;
     }
@@ -312,6 +330,11 @@ public class MessageProxy {
     public void setMessageWindow(MessageWindow newValue) {
 	msgWindow = newValue;
     }
+
+    public Vector getAttachments() {
+	return attachments;
+    }
+
 
     public Action getAction(String name) {
 	return (Action)commands.get(name);
