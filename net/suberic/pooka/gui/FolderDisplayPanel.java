@@ -110,8 +110,8 @@ public class FolderDisplayPanel extends JPanel {
 	
 	messageTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 	
-	messageTable.setDefaultRenderer(Object.class, new DefaultFolderCellRenderer());
-	messageTable.setDefaultRenderer(Number.class, new DefaultFolderCellRenderer());
+	messageTable.setDefaultRenderer(Object.class, new FilterFolderCellRenderer());
+	messageTable.setDefaultRenderer(Number.class, new FilterFolderCellRenderer());
 
 	messageTable.setCellSelectionEnabled(false);
 	messageTable.setColumnSelectionAllowed(false);

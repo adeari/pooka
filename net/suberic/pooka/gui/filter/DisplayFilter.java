@@ -5,13 +5,8 @@ package net.suberic.pooka.gui.filter;
  * should do things like change colors, fonts, etc.  They probably can't
  * or shouldn't be used actually to remove messages from the display.
  */
-public interface DisplayFilter {
+public interface DisplayFilter extends net.suberic.pooka.filter.FilterAction {
    
-    /**
-     * Configures the filter from the given property.
-     */
-    public void configure(String propertyName);
-
     /**
      * Applies the filter to the given component.
      */

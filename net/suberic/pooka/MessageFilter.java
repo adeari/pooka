@@ -55,35 +55,6 @@ public class MessageFilter {
 	return null;
     }
 
-    /**
-     * This runs the searchTerm test for each MessageInfo in the
-     * messages Vector.  Each MessageInfo that matches the searchTerm
-     * then has performFilter() run on it.
-     * 
-     * @return:  all messages removed from the current folder.
-     */
-    public Vector filterMessages(Vector messages) {
-	Vector matches = new Vector();
-	for (int i = 0; i < messages.size(); i++) {
-	    if (searchTerm.match(((net.suberic.pooka.gui.MessageProxy)messages.elementAt(i)).getMessageInfo().getMessage()))
-		matches.add(messages.elementAt(i));
-	}
-
-	return performFilter(matches);
-    }
-
-    /**
-     * Actually performs the FilterAction on the given MessageInfo array.
-     * 
-     * @param filteredMessages A Vector of MessageInfo objects that are to
-     * have the filter performed on them.  
-     *
-     * @return  all messagesremoved from the current folder.
-     */
-    public Vector performFilter(Vector filteredMessages) {
-	return action.performFilter(filteredMessages);
-    }
-
     // accessor methods.
 
     public SearchTerm getSearchTerm() {

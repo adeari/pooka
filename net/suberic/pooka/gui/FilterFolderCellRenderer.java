@@ -16,9 +16,17 @@ import java.util.Calendar;
 public class FilterFolderCellRenderer extends DefaultTableCellRenderer {
 
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-
+	
 	Component returnValue = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-
+	if (isSelected) {
+	    setForeground(table.getSelectionForeground());
+	    setBackground(table.getSelectionBackground());
+	}
+	else {
+	    setForeground(table.getForeground());
+	    setBackground(table.getBackground());
+	}
+	
 	if (value instanceof TableCellIcon) {
 	    TableCellIcon tcIcon = (TableCellIcon)value;
 	    Component icon = tcIcon.getIcon();

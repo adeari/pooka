@@ -13,11 +13,18 @@ public class ColorDisplayFilter implements DisplayFilter {
     }
 
     /**
+     * a no-op.
+     */
+    public java.util.Vector performFilter(java.util.Vector tmp) {
+	return tmp;
+    }
+ 
+    /**
      * Configures the filter from the given property.
      */
-    public void configure(String propertyName) {
+    public void initializeFilter(String propertyName) {
 	try {
-	    newColor = new Color(Integer.parseInt(Pooka.getProperty(propertyName + ".rgb", "742")));
+	    newColor = new Color(Integer.parseInt(net.suberic.pooka.Pooka.getProperty(propertyName + ".rgb", "742")));
 	} catch (Exception e) {
 	    newColor = new Color(742);
 	}

@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.ConfigurablePopupMenu;
 import net.suberic.util.thread.*;
+import net.suberic.pooka.gui.filter.DisplayFilter;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
@@ -107,7 +108,7 @@ public class MessageProxy {
     Vector tableInfo;
 
     // matching Filters.
-    net.suberic.pooka.gui.filter.DisplayFilter[] matchingFilters;
+    DisplayFilter[] matchingFilters;
 
     // the column Headers for the FolderInfo Vector; used for loading the
     // tableInfo.
@@ -254,6 +255,23 @@ public class MessageProxy {
 		
 		getMessageInfo().isSeen();
 	    
+		// match the given filters for the FolderInfo.
+		
+		MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
+		if (folderFilters != null) {
+		    Vector tmpMatches = new Vector();
+		    for (int i = 0; i < folderFilters.length; i++) {
+			if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
+			    tmpMatches.add(folderFilters[i].getAction());
+		    }
+		    
+		    matchingFilters = new DisplayFilter[tmpMatches.size()];
+		    for (int i = 0; i < tmpMatches.size(); i++) {
+			//System.out.println("adding a matching filter.");
+			matchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
+		    }
+		}
+
 		loaded=true;
 	    } catch (MessagingException me) {
 	    }

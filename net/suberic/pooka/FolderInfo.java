@@ -83,7 +83,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private Action[] defaultActions;
 
     //filters
-    private MessageFilter[] filters = null;
+    private BackendMessageFilter[] backendFilters = null;
+    private MessageFilter[] displayFilters = null;
 
     protected LoadMessageThread loaderThread;
     private FolderTracker folderTracker = null;
@@ -1413,18 +1414,34 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     /**
      * This takes the FolderProperty.filters property and uses it to populate
-     * the messageFilters array.
+     * the backendMessageFilters and displayMessageFilters arrays.
      */
     public void createFilters() {
-	Vector filterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters", "");
-	if (filterNames != null && filterNames.size() > 0) {
-	    filters = new MessageFilter[filterNames.size()];
-	    for (int i = 0; i < filterNames.size(); i++) {
-		filters[i] = new MessageFilter(getFolderProperty() + ".filters." + (String) filterNames.elementAt(i));
+	Vector backendFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters.backend", "");
+	if (backendFilterNames != null && backendFilterNames.size() > 0) {
+	    backendFilters = new BackendMessageFilter[backendFilterNames.size()];
+	    for (int i = 0; i < backendFilterNames.size(); i++) {
+		backendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".filters.backend." + (String) backendFilterNames.elementAt(i));
 	    }
 	}
-    }
 
+	Vector foundFilters = new Vector();
+	Vector defaultFilterNames = Pooka.getResources().getPropertyAsVector("FolderInfo.defaultDisplayFilters", "");
+	
+	for (int i = 0; i < defaultFilterNames.size(); i++) {
+	    foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
+	}
+
+	Vector displayFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters.display", "");
+	for (int i = 0; i < displayFilterNames.size(); i++) {
+	    foundFilters.add(new MessageFilter(getFolderProperty() + ".filters.display." + (String) displayFilterNames.elementAt(i)));
+	}
+
+	displayFilters = new MessageFilter[foundFilters.size()];
+	for (int i = 0; i < foundFilters.size(); i++)
+	    displayFilters[i] = (MessageFilter) foundFilters.elementAt(i);
+    }
+    
     /**
      * This applies each MessageFilter in filters array on the given 
      * MessageInfo objects.
@@ -1434,10 +1451,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public Vector applyFilters(Vector messages) {
 	Vector notRemovedYet = new Vector(messages);
 	Vector removed = new Vector();
-	if (filters != null) 
-	    for (int i = 0; i < filters.length; i++) {
-		if (filters[i] != null) {
-		    Vector justRemoved = filters[i].filterMessages(notRemovedYet);
+	if (backendFilters != null) 
+	    for (int i = 0; i < backendFilters.length; i++) {
+		if (backendFilters[i] != null) {
+		    Vector justRemoved = backendFilters[i].filterMessages(notRemovedYet);
 		    removed.addAll(justRemoved);
 		    notRemovedYet.removeAll(justRemoved);
 		}
@@ -1639,6 +1656,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void setSentFolder(boolean newValue) {
 	sentFolder = newValue;
+    }
+
+    public MessageFilter[] getDisplayFilters() {
+	return displayFilters;
     }
 
     /**
