@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui.search;
 import net.suberic.pooka.*;
+import net.suberic.util.VariableBundle;
 import javax.swing.*;
 import java.util.Vector;
 import java.awt.event.*;
@@ -70,6 +71,24 @@ public class SearchEntryPanel extends JPanel {
 	manager = newManager;
 	populatePanel();
     }
+
+    /**
+     * Creates a new SearchEntryPanel populated by the SearchTerm defined
+     * by the given Property.
+     */
+    public SearchEntryPanel(SearchTermManager newManager, String property) {
+	this(newManager, property, Pooka.getResources());
+    }
+
+    /**
+     * Creates a new SearchEntryPanel populated by the SearchTerm defined
+     * by the given Property.
+     */
+    public SearchEntryPanel(SearchTermManager newManager, String property, VariableBundle bundle) {
+	this(newManager);
+	setSearchTerm(property, bundle);
+    }
+
     
     /**
      * Populates the panel with all the appropriate widgets.  Called by
@@ -186,4 +205,21 @@ public class SearchEntryPanel extends JPanel {
 	} else
 	    return null;
     }
+
+    /**
+     * This sets the currently depicted SearchTerm to the one defined by
+     * the rootProperty in the given VariableBundle.
+     */
+    public void setSearchTerm(String rootProperty, VariableBundle bundle) {
+
+    }
+
+    /**
+     * This returns the defined SearchTerm as a set of Properties, with the
+     * given rootProperty as the root.
+     */
+    public java.util.Properties generateSearchTermProperties(String rootProperty) {
+	return new java.util.Properties();
+    }
+
 }

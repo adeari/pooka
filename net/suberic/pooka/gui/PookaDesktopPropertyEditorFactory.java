@@ -26,8 +26,8 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
 	    return createFolderEditor(property);
 	else if (test.equalsIgnoreCase("Filter"))
 	    return createFilterEditor(property);
-	//else if (test.equalsIgnoreCase("SearchTerm"))
-	//  return createSearchEditor(property);
+	else if (test.equalsIgnoreCase("SearchTerm"))
+	  return createSearchEditor(property);
 	else
 	    return super.createEditor(property);
     }
@@ -48,8 +48,8 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
 	    return createFolderEditor(property, typeTemplate);
 	else if (test.equalsIgnoreCase("Filter"))
 	    return createFilterEditor(property, typeTemplate);
-	//else if (test.equalsIgnoreCase("SearchTerm"))
-	//    return createSearchEditor(property, typeTemplate);
+	else if (test.equalsIgnoreCase("SearchTerm"))
+	    return createSearchEditor(property, typeTemplate);
 	else
 	    return super.createEditor(property, typeTemplate);
     }
@@ -85,16 +85,16 @@ public class PookaDesktopPropertyEditorFactory extends DesktopPropertyEditorFact
 
     /**
      * This returns a new SearchTermEditor.
+     */
     public DefaultPropertyEditor createSearchEditor(String property, String typeTemplate) {
 	return new net.suberic.pooka.gui.search.SearchEditorPane(property, typeTemplate, getBundle());
     }
-     */
 
 
     /**
      * This returns a new SearchTermEditor.
+     */
     public DefaultPropertyEditor createSearchEditor(String property) {
 	return new net.suberic.pooka.gui.search.SearchEditorPane(property, property, getBundle());
     }
-     */
 }
