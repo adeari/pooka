@@ -94,7 +94,7 @@ public class SimpleFileCache implements MessageCache {
 	    cacheMessage(m, uid, newUidValidity, MESSAGE);
 	  return h;
 	} else
-	  throw new MessagingException("No such message:  " + uid);
+	  throw new MessageRemovedException("No such message:  " + uid);
       } else {
 	throw new NotCachedException("Message is not cached, and folder is not available.");
       }
@@ -192,7 +192,7 @@ public class SimpleFileCache implements MessageCache {
 	    cacheMessage(m, uid, newUidValidity, HEADERS);
 	  return h;
 	} else
-	  throw new MessagingException("No such message:  " + uid);
+	  throw new MessageRemovedException("No such message:  " + uid);
       } else {
 	throw new NotCachedException("Message is not cached, and folder is not available.");
       }
@@ -223,7 +223,7 @@ public class SimpleFileCache implements MessageCache {
 			cacheMessage(m, uid, newUidValidity, FLAGS);
 		    return f;
 		} else
-		    throw new MessagingException("No such message:  " + uid);
+		    throw new MessageRemovedException("No such message:  " + uid);
 	    } else {
 		throw new NotCachedException("Message is not cached, and folder is not available.");
 	    }

@@ -188,8 +188,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
       }
     } catch (MessagingException me) {
-      //System.err.println("error:  " + me);
-      //me.printStackTrace();
       setStatus(DISCONNECTED);
       throw me;
     } finally {
@@ -370,7 +368,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * FetchProfile.
    */
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException {
-    // if we're connected, go ahead and fetch these.  why the hell not?
+    // if we're connected, go ahead and fetch these.
 
     int cacheStatus = -1;
     boolean doFlags = profile.contains(FetchProfile.Item.FLAGS);

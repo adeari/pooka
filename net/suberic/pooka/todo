@@ -1,7 +1,4 @@
 
-*) disconnected:  reading message doesn't update gui.  
-		try deleting message.
-
 *) add support for running without any local files.
 
 *) add mrpostman support(?)

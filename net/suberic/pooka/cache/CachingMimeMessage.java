@@ -150,7 +150,16 @@ public class CachingMimeMessage extends UIDMimeMessage {
    * @see 		javax.mail.Flags
    */
   public synchronized Flags getFlags() throws MessagingException {
-    return (Flags) getCache().getFlags(getUID(), getUIDValidity()).clone();
+    try {
+      return (Flags) getCache().getFlags(getUID(), getUIDValidity()).clone();
+    } catch (MessagingException me) {
+      if (me instanceof MessageRemovedException) {
+	return new Flags();
+      } else {
+	throw me;
+      }
+    }
+
   }
 
   /**
@@ -217,7 +226,15 @@ public class CachingMimeMessage extends UIDMimeMessage {
     }
 
     public InternetHeaders getHeaders() throws MessagingException {
+      try {
 	return getCache().getHeaders(getUID(), getUIDValidity());
+      } catch (MessagingException me) {
+	if (me instanceof MessageRemovedException) {
+	  return new InternetHeaders();
+	} else {
+	  throw me;
+	}
+      }
     }
 
 }

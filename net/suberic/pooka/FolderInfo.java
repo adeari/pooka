@@ -1149,24 +1149,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	resetMessageCounts();
       }
       
-      if (Pooka.isDebug())
-	System.out.println("firing message changed event.");
       // Guaranteed to return a non-null array
       Object[] listeners = eventListeners.getListenerList();
       // Process the listeners last to first, notifying
       // those that are interested in this event
       for (int i = listeners.length-2; i>=0; i-=2) {
-	if (Pooka.isDebug())
-	  System.out.println("listeners[" + i + "] is " + listeners[i] );
 	if (listeners[i]==MessageChangedListener.class) {
-	  if (Pooka.isDebug())
-	    System.out.println("check.  running messageChanged on listener.");
 	  ((MessageChangedListener)listeners[i+1]).messageChanged(mce);
 	}              
       }
-
-      if (Pooka.isDebug())
-	System.out.println("done handing event " + mce);
     }  
   
     public void addConnectionListener(ConnectionListener newListener) {
@@ -1187,18 +1178,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public void fireConnectionEvent(ConnectionEvent e) {
       // from the EventListenerList javadoc, including comments.
       
-      if (Pooka.isDebug())
-	System.out.println("firing connection event.");
       // Guaranteed to return a non-null array
       Object[] listeners = eventListeners.getListenerList();
       // Process the listeners last to first, notifying
       // those that are interested in this event
       for (int i = listeners.length-2; i>=0; i-=2) {
-	if (Pooka.isDebug())
-	  System.out.println("listeners[" + i + "] is " + listeners[i] );
 	if (listeners[i]==ConnectionListener.class) {
-	  if (Pooka.isDebug())
-	    System.out.println("check.  it's a connection listener.");
 	  ConnectionListener listener = (ConnectionListener) listeners[i+1];
 	  if (e.getType() == ConnectionEvent.CLOSED)
 	    listener.closed(e);
@@ -1535,9 +1520,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   public void fireMessageCountEvent(MessageCountEvent mce) {
     
-    if (Pooka.isDebug())
-      System.out.println("firing MessageCountEvent on " + getFolderID());
-    
     // from the EventListenerList javadoc, including comments.
     
     // Guaranteed to return a non-null array
@@ -1547,22 +1529,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (mce.getType() == MessageCountEvent.ADDED) {
       for (int i = listeners.length-2; i>=0; i-=2) {
-	if (Pooka.isDebug())
-	  System.out.println("listeners[" + i + "] is " + listeners[i] );
 	if (listeners[i]==MessageCountListener.class) {
-	  if (Pooka.isDebug())
-	    System.out.println("check.  running messagesAdded on listener.");
-	  
 	  ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
 	}              
       }
     } else if (mce.getType() == MessageCountEvent.REMOVED) {
       for (int i = listeners.length-2; i>=0; i-=2) {
-	if (Pooka.isDebug())
-	  System.out.println("listeners[" + i + "] is " + listeners[i] );
 	if (listeners[i]==MessageCountListener.class) {
-	  if (Pooka.isDebug())
-	    System.out.println("check.  running messagesRemoved on listener " + listeners[i+1] );
 	  
 	  ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
 	}              
@@ -1637,14 +1610,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (Pooka.isDebug())
       System.out.println("Messages Removed.");
     
-    if (Thread.currentThread() == getFolderThread() )
+    if (Thread.currentThread() == getFolderThread() ) {
       runMessagesRemoved(e);
-    else 
+    } else {
       getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 	  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
 	    runMessagesRemoved((MessageCountEvent)actionEvent.getSource());
 	  }
 	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "messages-removed"));
+    }
   }
   
   /**
