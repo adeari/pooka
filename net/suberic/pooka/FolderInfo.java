@@ -154,11 +154,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     resetDefaultActions();
     
-    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
-      setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
+      setNotifyNewMessagesMain(true);
     
-    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
-      setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
+      setNotifyNewMessagesNode(true);
   }
   
   
@@ -193,11 +193,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     resetDefaultActions();
     
-    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equals(""))
-      setNotifyNewMessagesMain(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "true").equalsIgnoreCase("true"));
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
+      setNotifyNewMessagesMain(true);
     
-    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equals(""))
-      setNotifyNewMessagesNode(Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "true").equalsIgnoreCase("true"));
+    if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
+      setNotifyNewMessagesNode(true);
   }
   
   /**

@@ -1,3 +1,6 @@
+fixed a bug in which the new message notification didn't appear immediately
+on the FolderNode.
+
 fixed a case where hitting 'send' twice could end up sending two copies
 of the message.
 

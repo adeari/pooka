@@ -292,6 +292,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 
   int lastFolderStatus = -1;
   boolean lastUnread = false;
+  boolean lastNewMessages = false;
+
   /**
    * Checks to see if the Folder's status has changed from the last time
    * we redrew this node.  If it has, then we redraw the node.
@@ -301,9 +303,12 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     if (fi != null) {
       int currentStatus = fi.getStatus();
       boolean hasUnread = fi.hasUnread();
-      if (currentStatus != lastFolderStatus || hasUnread != lastUnread) {
+      boolean hasNewMessages = fi.hasNewMessages();
+
+      if (currentStatus != lastFolderStatus || hasUnread != lastUnread || hasNewMessages != lastNewMessages) {
 	lastFolderStatus = currentStatus;
 	lastUnread = hasUnread;
+	lastNewMessages = hasNewMessages;
 	getParentContainer().repaint();
       }
     }
