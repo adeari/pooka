@@ -147,8 +147,10 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      * component to that of the current preferred width.
      */
     public void resizeByWidth() {
+	/*
 	int width = (int)messageDisplay.getPreferredSize().getWidth();
 	this.setPreferredSize(new Dimension(width, width));
+	*/
 	this.setSize(this.getPreferredSize());
     }
 

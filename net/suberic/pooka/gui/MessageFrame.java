@@ -135,7 +135,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
      * component to that of the current preferred width.
      */
     public void resizeByWidth() {
-	int width = (int)messageDisplay.getPreferredSize().getWidth();
+	//int width = (int)messageDisplay.getPreferredSize().getWidth();
 	//this.setPreferredSize(new Dimension(width, width));
 	this.setSize(this.getPreferredSize());
     }

@@ -6,8 +6,8 @@ Pooka.sessionDebug=false
 
 Message.sendImmediately=true
 
-Pooka.hsize = 800
-Pooka.vsize = 600
+Pooka.hsize=800
+Pooka.vsize=600
 
 Pooka.guiType=Desktop
 Pooka.guiType.propertyType=List
