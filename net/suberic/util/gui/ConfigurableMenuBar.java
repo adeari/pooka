@@ -12,7 +12,7 @@ import javax.swing.Action;
  * and updated using an array of Actions.
  */
 
-public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
+public class ConfigurableMenuBar extends JMenuBar implements ConfigurableUI {
 
     // the latest commands list.  i'm storing this for now because i 
     // can't do a JButton.removeActionListeners().
@@ -20,7 +20,7 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
     private Hashtable commands = new Hashtable();
 
     /**
-     * This creates a new ConfigurableMenubar using the menubarID as the
+     * This creates a new ConfigurableMenuBar using the menubarID as the
      * configuration key, and vars as the source forthe values of all the
      * properties.
      *
@@ -28,7 +28,7 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
      * Menubar.
      */
 
-    public ConfigurableMenubar(String menuBarID, VariableBundle vars) {
+    public ConfigurableMenuBar(String menuBarID, VariableBundle vars) {
 	super();
 	
 	configureComponent(menuBarID, vars);
@@ -59,13 +59,13 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
    * definition of the menu from the associated resource file.
    */
 
-    protected JMenu createMenu(String key) {
+    protected JMenu createMenu(String key, VariableBundle vars) {
 	StringTokenizer iKeys = null;
 	try {
-	    iKeys = new StringTokenizer(Pooka.getProperty(key), ":");
+	    iKeys = new StringTokenizer(vars.getProperty(key), ":");
 	} catch (MissingResourceException mre) {
 	    try {
-		System.err.println(Pooka.getProperty("error.NoSuchResource") + " " + mre.getKey());
+		System.err.println(vars.getProperty("error.NoSuchResource") + " " + mre.getKey());
 	    } catch (MissingResourceException mretwo) {
 		System.err.println("Unable to load resource " + mre.getKey());
 	    } finally {
@@ -76,7 +76,7 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
 	JMenu menu;
 	
 	try {
-	    menu = new JMenu(Pooka.getProperty(key + ".Label"));
+	    menu = new JMenu(vars.getProperty(key + ".Label"));
 	} catch (MissingResourceException mre) {
 	    menu = new JMenu(key);
     }
@@ -86,7 +86,7 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
 	if (currentToken.equals("-")) {
 	    menu.addSeparator();
 	} else {
-	    JMenuItem mi = createMenuItem(key, currentToken);
+	    JMenuItem mi = createMenuItem(key, currentToken, vars);
 	    menu.add(mi);
 	}
     }
@@ -95,13 +95,13 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
         /**
      * And this actually creates the menu items themselves.
      */
-    protected JMenuItem createMenuItem(String menuID, String menuItemID) {
+    protected JMenuItem createMenuItem(String menuID, String menuItemID, VariableBundle vars) {
     // TODO:  should also make these undo-able.
 	
-	if (Pooka.getProperty(menuID + "." + menuItemID, "") == "") {
+	/*	if (vars.getProperty(menuID + "." + menuItemID, "") == "") { */
 	    JMenuItem mi;
 	    try {
-		mi = new JMenuItem(Pooka.getProperty(menuID + "." + menuItemID + ".Label"));
+		mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
 	    } catch (MissingResourceException mre) {
 		mi = new JMenuItem(menuItemID);
 	    }
@@ -109,7 +109,7 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
 	    java.net.URL url = null;
 	    
 	    try {
-		url = this.getClass().getResource(Pooka.getProperty(menuID + "." + menuItemID + ".Image"));
+		url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
 	    } catch (MissingResourceException mre) {
 	    } /*catch (java.net.MalformedURLException mue) {
 		System.out.println("malformedURL for " + menuID + "." + menuItemID + ".Image");
@@ -119,14 +119,101 @@ public class ConfigurableMenubar extends JMenubar implements ConfigurableUI {
 		mi.setIcon(new ImageIcon(url));
 	    }
 	    
-	    String cmd = Pooka.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
+	    String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
 	    
 	    mi.setActionCommand(cmd);	
 	    return mi;
-	} else 
-	    if (Pooka.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
+	    /*	}
+	    if (vars.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
 		return new FolderMenu(menuID + "." + menuItemID, getFolderPanel());
-	    }
+		}
 	    else
 		return createMenu(menuID + "." + menuItemID );
+	    */
     }
+
+    /**
+     * As defined in net.suberic.util.gui.ConfigurableUI
+     */
+    public void setActive(javax.swing.Action[] newActions) {
+	Hashtable tmpHash = new Hashtable();
+	if (newActions != null && newActions.length > 0) {
+	    for (int i = 0; i < newActions.length; i++) {
+		String cmdName = (String)newActions[i].getValue(Action.NAME);
+		tmpHash.put(cmdName, newActions[i]);
+	    }
+	}
+	setActive(tmpHash);	
+    }
+
+    /**
+     * As defined in net.suberic.util.gui.ConfigurableUI
+     */
+    public void setActive(Hashtable commands) {
+	clearListeners();
+    }
+
+    private void setActiveMenuItems(JMenu men) {
+	if (men instanceof net.suberic.util.DynamicMenu) {
+	    ((net.suberic.util.DynamicMenu)men).setActiveMenus(this);
+	} else {
+	    for (int j = 0; j < men.getItemCount(); j++) {
+		if ((men.getItem(j)) instanceof JMenu) {
+		    setActiveMenuItems((JMenu)(men.getItem(j)));
+		} else {
+		    JMenuItem mi = men.getItem(j);
+		    Action a = getAction(mi.getActionCommand());
+		    if (a != null) {
+			//mi.removeActionListener(a);
+			mi.addActionListener(a);
+			mi.setEnabled(true);
+		    } else {
+			mi.setEnabled(false);
+		    }
+		}
+	    }
+	}
+    }	    
+
+    private void setActiveMenus(JMenuBar menuBar) {
+	for (int i = 0; i < menuBar.getMenuCount(); i++) {
+	    setActiveMenuItems(menuBar.getMenu(i));
+	}
+    }
+
+
+    /**
+     * This clears all of the current listeners on the Menu.
+     */
+    
+    private void clearListeners() {
+	for (int i = 0; i < this.getMenuCount(); i++) {
+	    removeActiveMenuItems(getMenu(i));
+	}
+    }
+
+    private void removeActiveMenuItems(JMenu men) {
+	for (int j = 0; j < men.getItemCount(); j++) {
+	    if ((men.getItem(j)) instanceof JMenu) {
+		removeActiveMenuItems((JMenu)(men.getItem(j)));
+	    } else {
+		JMenuItem mi = men.getItem(j);
+		Action a = getAction(mi.getActionCommand());
+		if (a != null) {
+		    mi.removeActionListener(a);
+		}
+	    }
+	}
+    }
+
+    /**
+     * This gets an action from the supported commands.  If there is no
+     * supported action, it returns null
+     */
+    
+    public Action getAction(String command) {
+	return (Action)commands.get(command);
+    }
+
+
+}
