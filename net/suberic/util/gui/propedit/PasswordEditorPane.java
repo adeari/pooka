@@ -27,18 +27,12 @@ public class PasswordEditorPane extends StringEditorPane {
       originalValue = "";
     currentValue = originalValue;
 
-    String defaultLabel;
-    int dotIndex = property.lastIndexOf(".");
-    if (dotIndex == -1) 
-      defaultLabel = new String(property);
-    else
-      defaultLabel = property.substring(dotIndex+1);
-    
     if (debug) {
       System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
     }
 
-    label = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
+    label = createLabel();
+
     inputField = new JPasswordField(originalValue);
     inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
     inputField.addFocusListener(new FocusAdapter() {

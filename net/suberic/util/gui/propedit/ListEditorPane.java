@@ -28,14 +28,8 @@ public class ListEditorPane extends SwingPropertyEditor {
     manager=newManager;
     editorTemplate = template;
     
-    String defaultLabel;
-    int dotIndex = property.lastIndexOf(".");
-    if (dotIndex == -1) 
-      defaultLabel = new String(property);
-    else
-      defaultLabel = property.substring(dotIndex+1);
-    
-    label = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
+    label = createLabel();
+
     inputField = createComboBox();
     
     Box inputBox = new Box(BoxLayout.X_AXIS);
@@ -113,7 +107,7 @@ public class ListEditorPane extends SwingPropertyEditor {
 	    } catch (PropertyValueVetoException pvve) {
 	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
 	      inputField.setSelectedIndex(currentIndex);
-	    }
+	    } 
 	  }
 	}
       });
@@ -125,7 +119,24 @@ public class ListEditorPane extends SwingPropertyEditor {
    * Creates a button to add a new value to the List.
    */
   public JButton createAddButton() {
-    return null;
+    JButton returnValue = new JButton("Add");
+    returnValue.addActionListener(new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  addNewEntry();
+	}
+      });
+    
+    return returnValue;
+  }
+
+  /**
+   * Opens up an editor to add a new Item to the List.
+   */
+  public void addNewEntry() {
+    String editedProperty = manager.getProperty(editorTemplate + ".allowedValues", "");
+    Vector v = new Vector();
+    v.add(editedProperty);
+    manager.getFactory().showNewEditorWindow("Add property", v);
   }
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI

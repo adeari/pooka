@@ -27,15 +27,9 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     originalValue = manager.getProperty(property, manager.getProperty(template, "false"));
     originalBoolean = originalValue.equalsIgnoreCase("true");
 
-    String defaultLabel;
-    int dotIndex = property.lastIndexOf(".");
-    if (dotIndex == -1) 
-      defaultLabel = new String(property);
-    else
-      defaultLabel = property.substring(dotIndex+1);
-    
+    label = createLabel();
+
     inputField = new JCheckBox();
-    label = new JLabel(manager.getProperty(template + ".label", defaultLabel));
     
     inputField.setSelected(originalBoolean);
 

@@ -122,6 +122,22 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
   
   /**
+   * Creates a JLabel for this component.
+   */
+  public JLabel createLabel() {
+    String defaultLabel;
+    int dotIndex = property.lastIndexOf(".");
+    if (dotIndex == -1) 
+      defaultLabel = new String(property);
+    else
+      defaultLabel = property.substring(dotIndex+1);
+    
+    JLabel returnValue = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
+    
+    return returnValue;
+  }
+
+  /**
    * Gets the minimum size for the labelComponent.
    */
   public Dimension getMinimumLabelSize() {
