@@ -186,6 +186,9 @@ public class AttachmentHandler {
     SwingUtilities.invokeLater(new Runnable() {
       public void run() {
 	MessageUI mui = getMessageUI();
+	if (Pooka.isDebug())
+	    System.out.println("opening attachment window.");
+
 	if ((mui != null && mui instanceof JInternalFrame) || (mui == null && Pooka.getUIFactory() instanceof PookaDesktopPaneUIFactory) ) {
 	  JDesktopPane desktop = ((PookaDesktopPaneUIFactory) Pooka.getUIFactory()).getMessagePanel();
 	  JInternalFrame jif = new JInternalFrame(title, true, true, true, true);
@@ -295,6 +298,9 @@ public class AttachmentHandler {
 	  dh.setCommandMap(Pooka.getMailcap());
 	  ExternalLauncher el = new ExternalLauncher();
 	  el.setCommandContext(cmd, dh);
+	  if (Pooka.isDebug())
+	    System.out.println("opening external launcher with ");
+
 	  el.show();
 	}
       }

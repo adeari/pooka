@@ -1,16 +1,8 @@
 *) -- windows --
-  *) support windows registry attachment associations.
-	-- check icemail
-	-- more or less added, but need to be able to access the library.
 
 *) -- windows testing --
   *) test registry associations 
-     *) library included by hand
      *) library included via webstart
-     *) set up a way to include library?
-  *) test error message with OpenWith
-  *) printing in windows can leave control characters at the end of lines
-	-- test.  shouldn't happen anymore.
 
 ---
 
