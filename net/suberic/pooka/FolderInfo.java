@@ -116,6 +116,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    loadFolder();
 
 	updateChildren();
+
+	resetDefaultActions();
     }
     
     /**

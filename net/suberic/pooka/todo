@@ -13,9 +13,6 @@ a menu option and from the 'open with' dialog.
 	inserting the sig, support for signature as a file, support for
 	signature as a generator....  lots of stuff, i suppose.
 
-*) the update feature doesn't show up for INBOX (or maybe just doesn't show
-up for top-level folders?).
-
 *) add a way to notify users of 'new' messages. -- sort of done.  need to make
 	it nicer, maybe listing new messages on the title, and use italics
 	or something other than * * in the folderPanel.
