@@ -33,6 +33,12 @@ public class MessagePanel extends JDesktopPane {
 	
 	public void closeFrame(JInternalFrame f) {
 	    super.closeFrame(f);
+	    JInternalFrame allFrames[] = getAllFrames();
+	    if (allFrames.length > 0 && allFrames[0] != null)
+		try {
+		    allFrames[0].setSelected(true);
+		} catch (java.beans.PropertyVetoException pve) {
+		}
 	    mainPanel.refreshActiveMenus(mainPanel.getMainMenu());
 	}
     }
@@ -63,7 +69,6 @@ public class MessagePanel extends JDesktopPane {
 
     public void openMessageWindow(MessageProxy m) {
 	MessageWindow newMessageWindow = new MessageWindow(m, false);
-	newMessageWindow.pack();
 	this.add(newMessageWindow);
 	try {
 	    newMessageWindow.setSelected(true);
@@ -75,7 +80,6 @@ public class MessagePanel extends JDesktopPane {
 	MimeMessage m = new MimeMessage(getMainPanel().getSession());
 
 	MessageWindow newMessageWindow = new MessageWindow(new NewMessageProxy(m), true);
-	//newMessageWindow.pack();
 	this.add(newMessageWindow);
 	try {
 	    newMessageWindow.setSelected(true);
@@ -85,7 +89,6 @@ public class MessagePanel extends JDesktopPane {
 
     public void createNewMessage(javax.mail.Message m) {
 	MessageWindow newMessageWindow = new MessageWindow(new NewMessageProxy(m), true);
-	//newMessageWindow.pack();
 	this.add(newMessageWindow);
 	try {
 	    newMessageWindow.setSelected(true);
