@@ -1,0 +1,12 @@
+2001-08-22
+
+added limited address book support using Vcards.
+
+added support for reading RFC 2047 encoded headers
+
+fixed bug where an outgoing message window could be closed even if the
+send failed.
+
+fixed sorting of subject lines and from addresses
+
+
