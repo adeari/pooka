@@ -12,7 +12,8 @@ import java.io.*;
 public class FullMailcapCommandMap extends MailcapCommandMap {
     private Vector mailcapMaps;
     private static String externalLauncher = "net.suberic.pooka.ExternalLauncher";
-
+    private File sourceFile = null;;
+    
     public FullMailcapCommandMap() {
 	/**
 	 * this adds the following files/resources, in order:
@@ -41,10 +42,13 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 	}
 	
 	try {
-	    if (System.getProperty("file.separator").equals("\\"))
+	    if (System.getProperty("file.separator").equals("\\")) {
 		addMailcapFile(System.getProperty("user.home") + "\\mailcap.txt");
-	    else
+		sourceFile = new File(System.getProperty("user.home") + "\\mailcap.txt");
+	    } else {
 		addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
+		sourceFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
+	    }
 	}  catch (IOException ioe) {
 	    // if it doesn't exist, it's ok.
 	}
@@ -111,6 +115,59 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
     public void addMailcap(java.lang.String mail_cap) {
 	MailcapMap mc = (MailcapMap)mailcapMaps.lastElement();
 	mc.addMailcapEntry(mail_cap);
+	if (sourceFile != null)
+	    writeEntryToSourceFile(mail_cap);
+    }
+
+    /**
+     * This writes the entry to the mailcap file.  Note that it actually
+     * ends up overwriting _all_ entries for that particular mime type.
+     */
+    private void writeEntryToSourceFile(String mail_cap) {
+	int semicolonIndex = mail_cap.indexOf(';');
+	if (semicolonIndex > -1) {
+	    String mimeType = mail_cap.substring(0, semicolonIndex +1);
+	    try {
+		if (!sourceFile.exists())
+		    sourceFile.createNewFile();
+
+		File outputFile  = sourceFile.createTempFile(sourceFile.getName(), ".tmp", sourceFile.getParentFile());
+
+		BufferedReader readSourceFile = new BufferedReader(new FileReader(sourceFile));
+		BufferedWriter writeSourceFile = new BufferedWriter(new FileWriter(outputFile));
+		currentLine = readSourceFile.readLine();
+		while (currentLine != null) {
+		    equalsLoc = currentLine.indexOf(';');
+		    if (equalsLoc != -1) {
+			String key = currentLine.substring(0, equalsLoc);
+			if (!mimeType.equals(key)) {
+			    writeSourceFile.write(currentLine);
+			    writeSourceFile.newLine();
+			}
+		    }
+		}
+
+		writeSourceFile.write(mail_cap);
+		writeSourceFile.newLine();
+
+		readSourceFile.close();
+		writeSourceFile.flush();
+		writeSourceFile.close();
+
+		// if you don't delete the .old file first, then the
+                // rename fails under Windows.
+                String oldSourceName = sourceFile.getAbsolutePath() + ".old";
+                File oldSource = new File (oldSourceName);
+                if (oldSource.exists())
+                  oldSource.delete();
+
+		String fileName = new String(sourceFile.getAbsolutePath());
+		sourceFile.renameTo(oldSource);
+		outputFile.renameTo(new File(fileName));
+		oldSource.delete();
+	    } catch (Exception e) {
+	    }
+	}
     }
 
     public void addMailcapFile(java.lang.String mailcapFileName) throws IOException {

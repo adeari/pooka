@@ -451,7 +451,6 @@ public class AttachmentPane extends JPanel {
 	}
 	
         public void actionPerformed(ActionEvent e) {
-	    System.out.println("open-with");
 	    openWith();
 	}
     }
