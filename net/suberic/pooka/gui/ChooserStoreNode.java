@@ -76,8 +76,12 @@ public class ChooserStoreNode extends MailTreeNode {
 		
 	    if (folderList != null) 
 		for (int i = 0 ; i < folderList.length ; i++) {
-		    ChooserFolderNode node = new ChooserFolderNode(folderList[i], getStoreProperty() + "." + folderList[i].getName(), getParentContainer());
-		    // we used insert here, since add() would mak
+		    ChooserFolderNode node = 
+			new ChooserFolderNode(folderList[i],
+					      getStoreProperty() + "." +
+					      folderList[i].getName(),
+					      getParentContainer());
+		    // we used insert here, since add() would make
 		    // another recursive call to getChildCount();
 		    insert(node, i);
 		}
