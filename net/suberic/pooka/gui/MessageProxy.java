@@ -312,6 +312,7 @@ public class MessageProxy {
 	getMessageInfo().isSeen();
 	
 	loaded=true;
+
 	// notify the JTable that this proxy has loaded.
 	MessageChangedEvent mce = new MessageChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
 

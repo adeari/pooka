@@ -1356,6 +1356,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		getFolderTableModel().addRows(addedProxies);
 		setNewMessages(true);
 		resetMessageCounts();
+
+		// notify the message loaded thread.
+		MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
+		loaderThread.loadMessages(addedArray);
+
 		fireMessageCountEvent(mce);
 	    }
 	}

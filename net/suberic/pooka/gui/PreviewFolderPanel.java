@@ -383,14 +383,22 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 
     // MessageChangedListener
     public void messageChanged(MessageChangedEvent e) {
+      if (getFolderStatusBar() != null)
 	getFolderStatusBar().messageChanged(e);
+      if (getFolderDisplay() != null)
 	getFolderDisplay().moveSelectionOnRemoval(e);
 
-	SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    getFolderDisplay().repaint();
-		}
+      final MessageInfo mi = getFolderInfo().getMessageInfo(e.getMessage());
+      if (mi != null) {
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		// really, all we should do here is update the individual
+		// row.
+		// getFolderDisplay().repaint();
+		getFolderDisplay().repaintMessage(mi.getMessageProxy());
+	      }
 	    });
+	}
     }
 
     public void removeRows(java.util.Vector removedProxies) {

@@ -265,6 +265,7 @@ public class PopInboxFolderInfo extends FolderInfo {
    * <p>Overrides FolderInfo.fireMessageChangedEvent().</p>
    */
   public void fireMessageChangedEvent(MessageChangedEvent mce) {
+    /*
     try {
       if (!mce.getMessage().isSet(Flags.Flag.DELETED) || ! Pooka.getProperty("Pooka.autoExpunge", "true").equalsIgnoreCase("true")) {
 	
@@ -284,6 +285,7 @@ public class PopInboxFolderInfo extends FolderInfo {
       // if we catch a MessagingException, it just means
       // that the message has already been expunged.
     }
+    */
     
     super.fireMessageChangedEvent(mce);
     

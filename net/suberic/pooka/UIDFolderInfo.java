@@ -286,32 +286,38 @@ public class UIDFolderInfo extends FolderInfo {
     protected void runMessagesAdded(MessageCountEvent mce)  {
 	if (folderTableModel != null) {
 	    try {
-		Message[] addedMessages = mce.getMessages();
-		FetchProfile fp = new FetchProfile();
-		fp.add(FetchProfile.Item.ENVELOPE);
-		fp.add(FetchProfile.Item.FLAGS);
-		fp.add(UIDFolder.FetchProfileItem.UID);
-		getFolder().fetch(addedMessages, fp);
-		MessageInfo mp;
-		Vector addedProxies = new Vector();
-		for (int i = 0; i < addedMessages.length; i++) {
-		    UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
-		    long uid = newMsg.getUID();
-		    if (getMessageInfoByUid(uid) != null) {
-		      if (Pooka.isDebug())
-			System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
-		    } else {
-		      mp = new MessageInfo(newMsg, this);
-		      addedProxies.add(new MessageProxy(getColumnValues(), mp));
-		      messageToInfoTable.put(newMsg, mp);
-		      uidToInfoTable.put(new Long(uid), mp);
-		    }
+	      Message[] addedMessages = mce.getMessages();
+	      FetchProfile fp = new FetchProfile();
+	      fp.add(FetchProfile.Item.ENVELOPE);
+	      fp.add(FetchProfile.Item.FLAGS);
+	      fp.add(UIDFolder.FetchProfileItem.UID);
+	      getFolder().fetch(addedMessages, fp);
+	      MessageInfo mi;
+	      Vector addedProxies = new Vector();
+	      for (int i = 0; i < addedMessages.length; i++) {
+		UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
+		long uid = newMsg.getUID();
+		if (getMessageInfoByUid(uid) != null) {
+		  if (Pooka.isDebug())
+		    System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
+		} else {
+		  mi = new MessageInfo(newMsg, this);
+		  // this has already been fetched; no need to do so again.
+		  mi.setFetched(true);
+		  addedProxies.add(new MessageProxy(getColumnValues(), mi));
+		  messageToInfoTable.put(newMsg, mi);
+		  uidToInfoTable.put(new Long(uid), mi);
 		}
-		addedProxies.removeAll(applyFilters(addedProxies));
-		if (addedProxies.size() > 0) {
-		    getFolderTableModel().addRows(addedProxies);
+	      }
+	      addedProxies.removeAll(applyFilters(addedProxies));
+	      if (addedProxies.size() > 0) {
+		getFolderTableModel().addRows(addedProxies);
 		setNewMessages(true);
 		resetMessageCounts();
+		
+		// notify the message loaded thread.
+		MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
+		loaderThread.loadMessages(addedArray);
 		
 		// change the Message objects in the MessageCountEvent to 
 		// our UIDMimeMessages.

@@ -3,6 +3,10 @@
 	tableInfos before we add the messages to the FolderTable, or b)
 	have a way to display unloaded infos, and an event system that will
 	update the table when the tableInfo is loaded.
+	  -- i'm doing this as displaying unloaded tableInfos combined with
+		the event system.  it's set up more or less.  todo:
+		- make it work under jdk1.4 --what's up with that?
+	        - make it not obviously load for 
 
 *) add a browser to browse/select all registered (open or not) Folders.  in 
 other words, we want everything that appears in the FolderTree, not all 
