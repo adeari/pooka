@@ -69,6 +69,7 @@ public class DndUtils {
    * or null if no match is found.
    */
   public static DataFlavor matchDataFlavor(DataFlavor[] acceptableFlavors, DataFlavor[] availableFlavors) {
+    System.err.println("matching data flavor...");
     if (acceptableFlavors != null && availableFlavors != null) {
       for (int i = 0; i < availableFlavors.length; i++) {
 	for (int j = 0; j < acceptableFlavors.length; j++) {
@@ -79,6 +80,45 @@ public class DndUtils {
     }
     
     return null;
+  }
+
+  /**
+   * Creates a temporary file with the given name.
+   */
+  public static File createTemporaryFile(String fileName) throws java.io.IOException {
+    File returnValue = null;
+    File tmpDir = null;
+    String tmpDirString = System.getProperty("java.io.tmpdir");
+    System.err.println("tmpDirString = " + tmpDirString);
+    if (tmpDirString != null && tmpDirString.length() > 0) {
+      File firstType = new File(tmpDirString);
+      if (firstType != null && firstType.exists() && firstType.isDirectory() && firstType.canWrite()) {
+	tmpDir = firstType;
+	System.err.println("tmpDir is " + tmpDir);
+      }
+    } 
+
+    if (tmpDir == null) {
+      // try creating a temporary file.
+      File tempfile = File.createTempFile("pooka", "tmp");
+      tmpDir = tempfile.getParentFile();
+    }
+
+    if (tmpDir != null) {
+      File testMe = new File(tmpDir, fileName);
+      if (! testMe.exists()) {
+	returnValue = testMe;
+      }
+    }
+
+    if (returnValue == null) {
+      // oh well.  just create a normal temporary file.
+      returnValue = File.createTempFile(fileName, null);
+    }
+
+    returnValue.deleteOnExit();
+   
+    return returnValue;
   }
 
   /**

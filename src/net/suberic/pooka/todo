@@ -1,7 +1,11 @@
 *) add drag and drop
+   *) fix file export for messages
+   *) fix file export for attachments
    *) make sure that pasting cut message into new message removes the
 	cut message.
+		???? make that work ????
    *) test with desktop/external apps.
+
    *) error:  fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
    *) make sure folderwindow cut/paste is enabled everywhere; add to 
@@ -13,7 +17,7 @@
 *) make it so no cc: means no cc: header at all, rather than a blank cc:
 header.
 
-*) check too many open files error on opening large cached folder?
+*) make status icon for store itself.
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -25,8 +29,6 @@ header.
 
 *) fix error display with exception so that you can see the stack trace.
 
-*) make status icon for store itself.
-
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
 *) add a dependent button/menu item.  so that that way instead of having
@@ -37,6 +39,8 @@ header.
 say, like reacting to a mailto: link.
 
 *) test w/gnu javamail
+
+*) check too many open files error on opening large cached folder?
 
 -----------
 

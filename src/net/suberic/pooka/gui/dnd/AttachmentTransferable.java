@@ -11,12 +11,20 @@ public class AttachmentTransferable implements Transferable {
   
   Attachment mAttachment = null;
   MessageProxy mMessageProxy = null;
-  
-  public AttachmentTransferable(Attachment pAttachment, MessageProxy pMessageProxy) {
+  File mTmpFile = null;
+
+  public AttachmentTransferable(Attachment pAttachment, MessageProxy pMessageProxy) throws java.io.IOException {
     setAttachment(pAttachment);
     setMessageProxy(pMessageProxy);
+    // create a temp file in the tmp directory.
+
+    String filename = pAttachment.getName();
+    if (filename == null || filename.length() == 0) {
+      filename = "Attachment";
+    }
+    mTmpFile = DndUtils.createTemporaryFile(filename);
   }
-  
+
   public DataFlavor[] getTransferDataFlavors() {
     return new DataFlavor[] {
       DataFlavor.javaFileListFlavor
@@ -34,14 +42,23 @@ public class AttachmentTransferable implements Transferable {
     if (isDataFlavorSupported(flavor)) {
       java.util.LinkedList list = new java.util.LinkedList();
 
-      File f = File.createTempFile("pooka", "attachment");
-      AttachmentHandler handler = new AttachmentHandler(mMessageProxy);
-      handler.saveFileAs(mAttachment, f);
-
-      list.add(f);
+      list.add(mTmpFile);
       return list;
     } else {
       throw new UnsupportedFlavorException(flavor);
+    }
+  }
+
+  /**
+   * Writes the File object for this attachment.
+   */
+  public void writeFile() {
+    System.err.println("writing file " + mTmpFile);
+    AttachmentHandler handler = new AttachmentHandler(mMessageProxy);
+    try {
+      handler.saveFileAs(mAttachment, mTmpFile);
+    } catch (IOException exc) {
+      handler.showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
     }
   }
 

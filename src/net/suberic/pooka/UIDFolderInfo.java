@@ -573,6 +573,9 @@ public class UIDFolderInfo extends FolderInfo {
       javax.mail.internet.MimeMessage m = null;
       try {
 	m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
+	if (m == null) {
+	  throw new MessagingException("UID " + uid + ":  no such message.");
+	}
 	return m;
       } catch (IllegalStateException ise) {
 	throw new MessagingException(ise.getMessage());

@@ -165,55 +165,55 @@ public class Attachment {
 	}
     }
 
-    public int getSize() {
-	return size;
-    }
-
-    public String getName() {
-	return name;
-    }
-
-    public String getEncoding() {
-	return encoding;
-    }
-
-    public ContentType getMimeType() {
-      return mimeType;
-    }
-
-    public boolean isText() {
-	return getMimeType().match("text/");
-    }
-
-    public boolean isPlainText() {
-	return getMimeType().match("text/plain") ;
-    }
-
-    public boolean isHtml() {
-	return getMimeType().match("text/html");
-    }
-
-    /**
-     * Returns the text of the Attachment, up to maxLength bytes.  If 
-     * the content is truncated, then append the truncationMessage at the
-     * end of the content displayed.
-     *
-     * If withHeaders is set, then show the Headers to go with this message.
-     * If showFullHeaders is also set, then show all the headers.  
-     */
-    public String getText(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws java.io.IOException {
-	if (isPlainText()) {
-	    StringBuffer retVal = new StringBuffer();
-	    if (withHeaders)
-		retVal.append(getHeaderInformation(showFullHeaders));
-	    
-	    retVal.append(getText(maxLength, truncationMessage));
-
-	    return retVal.toString();
-	} else
-	    return null;
-    }
-
+  public int getSize() {
+    return size;
+  }
+  
+  public String getName() {
+    return name;
+  }
+  
+  public String getEncoding() {
+    return encoding;
+  }
+  
+  public ContentType getMimeType() {
+    return mimeType;
+  }
+  
+  public boolean isText() {
+    return getMimeType().match("text/");
+  }
+  
+  public boolean isPlainText() {
+    return getMimeType().match("text/plain") ;
+  }
+  
+  public boolean isHtml() {
+    return getMimeType().match("text/html");
+  }
+  
+  /**
+   * Returns the text of the Attachment, up to maxLength bytes.  If 
+   * the content is truncated, then append the truncationMessage at the
+   * end of the content displayed.
+   *
+   * If withHeaders is set, then show the Headers to go with this message.
+   * If showFullHeaders is also set, then show all the headers.  
+   */
+  public String getText(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws java.io.IOException {
+    if (isPlainText()) {
+      StringBuffer retVal = new StringBuffer();
+      if (withHeaders)
+	retVal.append(getHeaderInformation(showFullHeaders));
+      
+      retVal.append(getText(maxLength, truncationMessage));
+      
+      return retVal.toString();
+    } else
+      return null;
+  }
+  
   /**
    * Returns the String content of this message, up to maxLength 
    * bytes.

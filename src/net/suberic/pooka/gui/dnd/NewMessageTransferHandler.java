@@ -60,6 +60,10 @@ public class NewMessageTransferHandler extends TransferHandler {
 	nmdp.getNewMessageProxy().getNewMessageInfo().addAttachment(new MBPAttachment(mbp));
 	
 	nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	
+	proxy.setImportDone(true);
+	proxy.removeMessageOnCompletion();
+
 	return true;
       }
     } catch (Exception e) {
@@ -82,9 +86,12 @@ public class NewMessageTransferHandler extends TransferHandler {
 	  Iterator it = fileList.iterator();
 	  while (it.hasNext()) {
 	    File f = (File) it.next();
-	    nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f);
+	    System.err.println("f = " + f);
+	    if (f != null) {
+	      nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f);
 	    
-	    nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	      nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	    } 
 	  }
 	
 	  return true;

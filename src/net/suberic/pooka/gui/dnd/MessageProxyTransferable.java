@@ -37,6 +37,7 @@ public class MessageProxyTransferable implements Transferable {
   }
   
   public DataFlavor[] getTransferDataFlavors() {
+    System.err.println("getting transfer data flavors...");
     return new DataFlavor[] {
       sMessageProxyDataFlavor,
       DataFlavor.javaFileListFlavor

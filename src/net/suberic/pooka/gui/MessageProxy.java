@@ -961,8 +961,8 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public void deleteMessage(boolean autoExpunge) {
     // should always be done on FolderThread, not on UI thread.
     try {
-      getMessageInfo().deleteMessage(autoExpunge);
       setDeleteInProgress(true);
+      getMessageInfo().deleteMessage(autoExpunge);
       this.close();
     } catch (MessagingException me) {
       if (me instanceof NoTrashFolderException) {
