@@ -25,8 +25,6 @@ public class MailWrappedView extends WrappedPlainView {
 
     private int characterLength = 72;
 
-    private Segment lineBuffer = new Segment();
-
     /**
      * This implementation will break the line at the character length
      * returned by getCharacterLength().
@@ -34,14 +32,15 @@ public class MailWrappedView extends WrappedPlainView {
      * Overrides <code>WrappedPlainView.calculateBreakPosition</code>
      */
     protected int calculateBreakPosition(int p0, int p1) {
-	int p;
+	super.calculateBreakPosition(p0, p1);
 	try {
-	    getDocument().getText(p0, p1 - p0, lineBuffer);
-	    return MailUtilities.getBreakPosition(lineBuffer.array, p0, p1, getCharacterLength());
+	    String text = getDocument().getText(p0, p1 - p0);
+	    int offset = MailUtilities.getBreakOffset(text, getCharacterLength()); 
+	    return p0 + offset;
 	} catch (javax.swing.text.BadLocationException ble) {
 	    return p1;
 	}
-    } 
+    }
 
     public int getCharacterLength() {
 	return characterLength;

@@ -150,19 +150,20 @@ public class MailUtilities {
      * 
      */
 
-    public static int getBreakPosition(char[] buffer, int start, int finish, int breakLength) {
-	if ( finish - start <= breakLength)
-	    return finish;
+    public static int getBreakOffset(String buffer, int breakLength) {
+	if ( buffer.length() <= breakLength ) {
+	    return buffer.length();
+	}
 
 	int breakLocation = -1;
-	for (int caret = finish; breakLocation == -1 && caret > start; caret--) {
-	    if (Character.isWhitespace(buffer[caret])) {
-		breakLocation=caret;
+	for (int caret = breakLength; breakLocation == -1 && caret >= 0; caret--) {
+	    if (Character.isWhitespace(buffer.charAt(caret))) {
+		breakLocation=caret + 1;
 	    } 
 	}
 
 	if (breakLocation == -1)
-	    breakLocation = start + breakLength;
+	    breakLocation = breakLength;
 
 	return breakLocation;
     }
