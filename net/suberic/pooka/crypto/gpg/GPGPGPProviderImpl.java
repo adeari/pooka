@@ -112,6 +112,24 @@ public class GPGPGPProviderImpl implements PGPProviderImpl {
     }
   }
 
+
+  /**
+   * Signs a section of text.
+   */
+  public byte[] sign(InputStream rawStream, EncryptionKey key)
+    throws EncryptionException {
+    
+  }
+
+  /**
+   * Checks a signature against a section of text.
+   */
+  public boolean checkSignature(InputStream rawStream, 
+				byte[] signature, EncryptionKey key)
+    throws EncryptionException {
+    return true;
+  }
+
   /**
    * Writes an input stream to a temporary File.
    */

@@ -21,4 +21,16 @@ public interface PGPProviderImpl {
   public byte[] encrypt(java.io.InputStream rawStream, EncryptionKey key)
     throws EncryptionException;
 
+  /**
+   * Signs a section of text.
+   */
+  public abstract byte[] sign(InputStream rawStream, EncryptionKey key)
+    throws EncryptionException;
+
+  /**
+   * Checks a signature against a section of text.
+   */
+  public abstract boolean checkSignature(InputStream rawStream, 
+					 byte[] signature, EncryptionKey key)
+    throws EncryptionException;
 }

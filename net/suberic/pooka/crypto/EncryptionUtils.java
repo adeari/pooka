@@ -23,9 +23,23 @@ public abstract class EncryptionUtils {
     throws EncryptionException;
 
   /**
+   * Signs a section of text.
+   */
+  public abstract byte[] sign(InputStream rawStream, EncryptionKey key)
+    throws EncryptionException;
+
+  /**
+   * Checks a signature against a section of text.
+   */
+  public abstract boolean checkSignature(InputStream rawStream, 
+					 byte[] signature, EncryptionKey key)
+    throws EncryptionException;
+
+
+  /**
    * Encrypts a Message.
    */
-  public abstract Message encryptMessage(Session s, Message msg, EncryptionKey key) 
+  public abstract MimeMessage encryptMessage(Session s, MimeMessage msg, EncryptionKey key) 
     throws EncryptionException, MessagingException;
 
   /**
@@ -49,22 +63,26 @@ public abstract class EncryptionUtils {
   /**
    * Signs a Part.
    */
-  public abstract Part signPart(Part p, EncryptionKey key);
+  public abstract BodyPart signBodyPart(BodyPart p, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException;
 
   /**
    * Checks the signature on a Part.
    */
-  public abstract boolean checkSignature(Part p, EncryptionKey key);
+  public abstract boolean checkSignature(Part p, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException;
 
   /**
    * Signs a Message.
    */
-  public abstract Message signMessage(Message m, EncryptionKey key);
+  public abstract MimeMessage signMessage(Session s, MimeMessage m, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException;
 
   /**
    * Checks the signature on a Message.
    */
-  public abstract boolean checkSignature(Message m, EncryptionKey key);
+  public abstract boolean checkSignature(MimeMessage m, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException;
 
   public static boolean isEncrypted(Part pPart) throws MessagingException {
     String contentType = pPart.getContentType().toLowerCase();

@@ -48,13 +48,31 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   }
 
   /**
+   * Signs a section of text.
+   */
+  public byte[] sign(InputStream rawStream, EncryptionKey key)
+    throws EncryptionException {
+    return pgpImpl.sign(rawStream, key);
+
+  }
+
+  /**
+   * Checks a signature against a section of text.
+   */
+  public boolean checkSignature(InputStream rawStream, 
+					 byte[] signature, EncryptionKey key)
+    throws EncryptionException {
+    return pgpImpl.checkSignature(rawStream, signature, key);
+  }
+
+  /**
    * Encrypts a Message.
    */
-  public javax.mail.Message encryptMessage(Session s, javax.mail.Message msg, EncryptionKey key) 
+  public MimeMessage encryptMessage(Session s, MimeMessage msg, EncryptionKey key) 
     throws EncryptionException, MessagingException {
     MimeMessage encryptedMessage = new MimeMessage(s);
 
-    java.util.Enumeration enum = ((MimeMessage)msg).getAllHeaderLines();
+    java.util.Enumeration enum = msg.getAllHeaderLines();
     while (enum.hasMoreElements()) {
       encryptedMessage.addHeaderLine((String) enum.nextElement());
     }
@@ -188,28 +206,64 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Signs a Part.
    */
-  public Part signPart(Part p, EncryptionKey key) {
-    return null;
+  public BodyPart signBodyPart(BodyPart p, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException {
+    MimeMultipart mpart = new MimeMultipart("signed");
+
+    InputStream is = p.getInputStream();
+
+    byte[] signature = sign(is, key);
+    MimeBodyPart sigPart = new MimeBodyPart();
+
+    ByteArrayDataSource dataSource = new ByteArrayDataSource(signature, "signature", "application/pgp-signature");
+    
+    javax.activation.DataHandler dh = new javax.activation.DataHandler(dataSource);
+      
+    sigPart.setDataHandler(dh);
+
+    mpart.addBodyPart(p);
+    mpart.addBodyPart(sigPart);
+    
+    MimeBodyPart returnValue = new MimeBodyPart();
+    returnValue.setContent(mpart);
+    return returnValue;
   }
 
   /**
    * Checks the signature on a Part.
    */
-  public boolean checkSignature(Part p, EncryptionKey key) {
+  public boolean checkSignature(Part p, EncryptionKey key) 
+    throws EncryptionException, MessagingException, IOException {
     return false;
   }
 
   /**
    * Signs a Message.
    */
-  public Message signMessage(Message m, EncryptionKey key) {
-    return null;
+  public MimeMessage signMessage(Session s, MimeMessage msg, EncryptionKey key)
+    throws EncryptionException, MessagingException, IOException {
+
+    MimeMessage signedMessage = new MimeMessage(s);
+
+    java.util.Enumeration enum = msg.getAllHeaderLines();
+    while (enum.hasMoreElements()) {
+      signedMessage.addHeaderLine((String) enum.nextElement());
+    }
+
+    InputStream is = msg.getInputStream();
+    MimeBodyPart mbp = new MimeBodyPart(is);
+    
+    BodyPart signedPart = signBodyPart(mbp, key);
+
+    signedMessage.setContent(signedPart, signedPart.getContentType());
+
+    return signedMessage;
   }
 
   /**
    * Checks the signature on a Message.
    */
-  public boolean checkSignature(Message m, EncryptionKey key) {
+  public boolean checkSignature(MimeMessage msg, EncryptionKey key) {
     return false;
   }
 
