@@ -1,3 +1,5 @@
+disconnected imap now caches message flags correctly.
+
 added a hack way to override errors like a MissingStartBoundary.
 
 keybindings now work in preview pane mode with the preview panel selected.
@@ -19,7 +21,7 @@ fixed a couple of memory leaks
 
 the outbox folder now gets the correct toolbar in preview pane mode.
 
-switching pop local store from mbox to maildir.
+switched pop local store from mbox to maildir.
 
 for internal frames, focus now goes to the correct component instead of to
 the toolbar.

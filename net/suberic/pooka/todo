@@ -1,9 +1,3 @@
-*) change over from mbox to maildir or something like it.
-	-- tag new messages as recent. -- send to az
-
-*) disconnected:  log in connected.  have new mail. read it.  exit.  restart 
-disconnected.  new messages from last time are still unread.
---
 
 *) add "view pookarc"
 

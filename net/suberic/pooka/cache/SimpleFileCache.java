@@ -118,6 +118,7 @@ public class SimpleFileCache implements MessageCache {
       if (newUidValidity != uidValidity) {
 	throw new StaleCacheException(uidValidity, newUidValidity);
       }
+
       Flags f = getFlags(uid, newUidValidity);
       if (f != null) {
 	f.add(flag);
@@ -574,7 +575,7 @@ public class SimpleFileCache implements MessageCache {
     Flags getFlagsFromCache(long uid) {
       Flags returnValue = (Flags) cachedFlags.get(new Long(uid));
       if (returnValue != null) {
-	return returnValue;
+	return new Flags(returnValue);
       } else {	    
 	File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
 	if (f.exists()) {
