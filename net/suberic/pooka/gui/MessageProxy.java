@@ -148,7 +148,8 @@ public class MessageProxy {
 		    tableInfo.addElement(getMessageFlag((String)(columnHeaders.elementAt(j)), message));
 		else if (propertyName.equals("attachments"))
 		    try {
-			tableInfo.addElement(new BooleanIcon(message.getContentType().substring(0, 15).equalsIgnoreCase("multipart/mixed"), Pooka.getProperty("FolderTable.Attachments.icon", "")));
+			String contentType = message.getContentType();
+			tableInfo.addElement(new BooleanIcon(contentType.length() >= 15 && contentType.substring(0, 15).equalsIgnoreCase("multipart/mixed"), Pooka.getProperty("FolderTable.Attachments.icon", "")));
 		    } catch (MessagingException me) {
 			tableInfo.addElement(new BooleanIcon(false, ""));
 		    }
