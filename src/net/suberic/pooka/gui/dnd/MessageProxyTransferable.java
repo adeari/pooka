@@ -79,7 +79,7 @@ public class MessageProxyTransferable implements Transferable {
    */
   private File extractMessageInfo(MessageInfo info) throws java.io.IOException {
     try {
-      File f = File.createTempFile("pooka", "message");
+      File f = DndUtils.createTemporaryFile("pooka_message.txt");
       info.saveMessageAs(f);
       return f;
     } catch (javax.mail.MessagingException me) {

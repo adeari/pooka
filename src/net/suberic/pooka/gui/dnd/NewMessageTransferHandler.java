@@ -50,21 +50,37 @@ public class NewMessageTransferHandler extends TransferHandler {
    * Imports a MessageProxy.
    */
   public boolean importMessageProxy(JComponent c, Transferable t) {
+    // this is exactly the same as importing a File, but with some added
+    // checks and such.
+    
     try {
       NewMessageDisplayPanel nmdp = (NewMessageDisplayPanel) SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.NewMessageDisplayPanel"), c);
-      if (nmdp != null && isMessageProxy(t)) {
-	MessageProxy proxy = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
+      if (nmdp != null) {
+	java.util.List fileList = DndUtils.extractFileList(t);
 	
-	javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-	mbp.setDataHandler(proxy.getMessageInfo().getRealMessage().getDataHandler());
-	nmdp.getNewMessageProxy().getNewMessageInfo().addAttachment(new MBPAttachment(mbp));
-	
-	nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
-	
-	proxy.setImportDone(true);
-	proxy.removeMessageOnCompletion();
-
-	return true;
+	if (fileList != null) {
+	  Iterator it = fileList.iterator();
+	  while (it.hasNext()) {
+	    File f = (File) it.next();
+	    System.err.println("f = " + f);
+	    if (f != null) {
+	      nmdp.getNewMessageProxy().getNewMessageInfo().attachFile(f, "message/rfc822");
+	    
+	      nmdp.attachmentAdded(nmdp.getNewMessageProxy().getNewMessageInfo().getAttachments().size() -1);
+	    } 
+	  }
+	  
+	  try {
+	    MessageProxy mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
+	    System.err.println("don't allow for a removal.");
+	    mp.setImportDone(false);
+	    DndUtils.getClipboard(c).setContents(null, null);
+	  } catch (Exception otherExc) {
+	    otherExc.printStackTrace();
+	    // ignore here.
+	  }
+	  return true;
+	}
       }
     } catch (Exception e) {
       e.printStackTrace();

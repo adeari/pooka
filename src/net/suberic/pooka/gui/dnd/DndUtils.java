@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.List;
 import java.util.ArrayList;
 import javax.swing.*;
+import java.awt.*;
 
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.gui.*;
@@ -14,6 +15,18 @@ import net.suberic.pooka.gui.*;
  */
 public class DndUtils {
 
+  /**
+   * Indicates if it is safe to access the system clipboard. Once false,
+   * access will never be checked again.
+   */
+  private static boolean canAccessSystemClipboard = true;
+
+  /**
+   * Key used in app context to lookup Clipboard to use if access to
+   * System clipboard is denied.
+   */
+  private static Object SandboxClipboardKey = new Object();
+  
   static boolean isLinux = System.getProperty("os.name").startsWith("Linux");
 
   /**
@@ -149,4 +162,50 @@ public class DndUtils {
       return null;
     }
   }
+
+  /**
+   * Returns the clipboard to use for cut/copy/paste.
+   */
+  public static Clipboard getClipboard(JComponent c) {
+    if (canAccessSystemClipboard()) {
+      return c.getToolkit().getSystemClipboard();
+    }
+    Clipboard clipboard = (Clipboard)sun.awt.AppContext.getAppContext().
+      get(SandboxClipboardKey);
+    if (clipboard == null) {
+      clipboard = new Clipboard("Sandboxed Component Clipboard");
+      sun.awt.AppContext.getAppContext().put(SandboxClipboardKey,
+					     clipboard);
+    }
+    return clipboard;
+  }
+  
+/**
+ * Returns true if it is safe to access the system Clipboard.
+ * If the environment is headless or the security manager
+ * does not allow access to the system clipboard, a private
+ * clipboard is used.
+ */
+  public static boolean canAccessSystemClipboard() {
+    if (canAccessSystemClipboard) {
+      if (GraphicsEnvironment.isHeadless()) {
+	canAccessSystemClipboard = false;
+	return false;
+      }
+      
+      SecurityManager sm = System.getSecurityManager();
+      if (sm != null) {
+	try {
+	  sm.checkSystemClipboardAccess();
+	  return true;
+	} catch (SecurityException se) {
+	  canAccessSystemClipboard = false;
+	  return false;
+	}
+      }
+      return true;
+    }
+    return false;
+  }
+    
 }

@@ -1,15 +1,18 @@
 *) add drag and drop
-   *) fix file export for messages
-   *) fix file export for attachments
+   *) on win/osx:
+     *) fix file export for messages
+     *) fix file export for attachments
+     *) test with desktop/external apps.
+
    *) make sure that pasting cut message into new message removes the
 	cut message.
-		???? make that work ????
-   *) test with desktop/external apps.
-
+		*) ???? make that work ????
+		*) should that work???
    *) error:  fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
    *) make sure folderwindow cut/paste is enabled everywhere; add to 
 	keybindings list; give tooltips in toolbar.
+   *) don't allow drag-and-drop into the same folder.
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.

@@ -280,6 +280,13 @@ public class NewMessageInfo extends MessageInfo {
    * Attaches the given File to the message.
    */
   public void attachFile(File f) throws MessagingException {
+    attachFile(f, null);
+  }
+
+  /**
+   * Attaches the given File to the message using the given content type.
+   */
+  public void attachFile(File f, String contentType) throws MessagingException {
     // borrowing liberally from ICEMail here.
     
     MimeBodyPart mbp = new MimeBodyPart();
@@ -291,17 +298,21 @@ public class NewMessageInfo extends MessageInfo {
     mbp.setFileName(f.getName());
     
     if (Pooka.getMimeTypesMap().getContentType(f).startsWith("text"))
-      mbp.setDisposition(Part.ATTACHMENT);
-    else
       mbp.setDisposition(Part.INLINE);
+    else
+      mbp.setDisposition(Part.ATTACHMENT);
     
     mbp.setDescription(f.getName());
     
     mbp.setDataHandler( dh );
     
-    String type = dh.getContentType();
-    
-    mbp.setHeader("Content-Type", type);
+    if (contentType == null) {
+      String type = dh.getContentType();
+      
+      mbp.setHeader("Content-Type", type);
+    } else {
+      mbp.setHeader("Content-Type", contentType);
+    }
     
     addAttachment(new MBPAttachment(mbp));
   }
