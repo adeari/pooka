@@ -1,10 +1,10 @@
-*) -- windows --
+*) new message count in icon
 
-*) -- windows testing --
-  *) test registry associations 
-     *) library included via webstart
-
----
+*) add drag and drop
+	*) include message
+	*) move message
+	*) attach file
+	*) save attachment?
 
 *) add support for running without any local files.
 	-- support for http: access?
@@ -14,17 +14,7 @@
 	  
 *) fix error display with exception so that you can see the stack trace.
 
-*) new message count in icon
-
-*) add drag and drop
-	*) include message
-	*) move message
-	*) attach file
-	*) save attachment?
-
 *) add support for saved searches.
-
-*) add mark as unread 
 
 *) add ability for ui components to be enabled/disabled programmatically.
 	- both for adding to menus/tables and enabling/disabling options.
@@ -32,9 +22,14 @@
 	a separate Caching popup menu, you can just say "if caching,
 	add this menu item; if not, don't."
 
+*) add support for composing new email messages from an external source,
+say, like reacting to a mailto: link.
+
 -----------
 
 *) fix NPE if try to send a new message without configuring client.
+
+*) add mark as unread 
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5
@@ -82,9 +77,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	see pooka_problems blob
 
 -----
-
-*) add support for composing new email messages from an external source,
-say, like reacting to a mailto: link.
 
 *) encryption improvements.
    *) if no keystore named, don't try loading?  test.

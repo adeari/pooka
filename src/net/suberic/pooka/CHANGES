@@ -1,3 +1,6 @@
+040525 release
+--------------
+
 left and right arrows on read message pane now just scrolls left and right.
 
 fixed FilterEditor so that the correct filter is shown. 

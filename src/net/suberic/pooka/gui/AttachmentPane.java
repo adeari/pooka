@@ -15,9 +15,6 @@ import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import java.awt.*;
 
-//import com.ice.jni.dde.JNIDDE;
-//import com.ice.jni.registry.*;
-
 /**
  * This class basically creates a visual list of the parts of a 
  * MimeMessage.
