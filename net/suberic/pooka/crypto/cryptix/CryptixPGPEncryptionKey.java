@@ -1,17 +1,18 @@
-package net.suberic.pooka.crypto;
+package net.suberic.pooka.crypto.cryptix;
 
 import cryptix.message.*;
 import cryptix.openpgp.*;
 import cryptix.pki.*;
 
 import net.suberic.util.*;
+import net.suberic.pooka.crypto.*;
 
-public class PGPEncryptionKey extends EncryptionKey {
+public class CryptixPGPEncryptionKey extends EncryptionKey {
 
   KeyBundle keyBundle = null;
   char[] passphrase = null;
 
-  public PGPEncryptionKey(KeyBundle kb, char[] pphrase) {
+  public CryptixPGPEncryptionKey(KeyBundle kb, char[] pphrase) {
     keyBundle = kb;
     passphrase = pphrase;
   }

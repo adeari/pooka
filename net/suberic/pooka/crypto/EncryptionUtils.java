@@ -2,6 +2,7 @@ package net.suberic.pooka.crypto;
 
 import net.suberic.pooka.*;
 import javax.mail.*;
+import javax.mail.internet.*;
 import java.io.*;
 
 /**
@@ -18,13 +19,13 @@ public abstract class EncryptionUtils {
   /**
    * Encrypts a section of text using an EncryptionKey.
    */
-  public abstract byte[] encryptText(String plainText, EncryptionKey key)
+  public abstract byte[] encrypt(InputStream rawStream, EncryptionKey key)
     throws EncryptionException;
 
   /**
    * Encrypts a Message.
    */
-  public abstract Message encryptMessage(Message msg, EncryptionKey key) 
+  public abstract Message encryptMessage(Session s, Message msg, EncryptionKey key) 
     throws EncryptionException, MessagingException;
 
   /**
@@ -36,7 +37,7 @@ public abstract class EncryptionUtils {
   /**
    * Encrypts a BodyPart;
    */
-  public abstract BodyPart encryptBodyPart(BodyPart part, EncryptionKey key) 
+  public abstract Multipart encryptPart(Part part, EncryptionKey key) 
     throws EncryptionException, MessagingException;
 
   /**
@@ -45,5 +46,15 @@ public abstract class EncryptionUtils {
   public abstract BodyPart decryptBodyPart(BodyPart part, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException;
 
-  
+
+  public static boolean isEncrypted(Part pPart) throws MessagingException {
+    String contentType = pPart.getContentType().toLowerCase();
+    
+    if (contentType.startsWith("multipart")) {
+      ContentType ct = new ContentType(contentType);
+      if (ct.getSubType().equalsIgnoreCase("encrypted")) 
+	return true;
+    }
+    return false;
+  }
 }

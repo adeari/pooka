@@ -5,67 +5,59 @@ import net.suberic.pooka.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 
-import cryptix.message.*;
-import cryptix.openpgp.*;
-import cryptix.pki.*;
+import java.io.*;
 
 /**
  * Utilities for encrypting/decrypting messages.
+ *
+ * This class just handles the parsing of the PGP/MIME message itself.
+ * Actual PGP encoding/decoding is left to the PGPProviderImpl class itself.
  */
 public class PGPMimeEncryptionUtils extends EncryptionUtils {
+
+  PGPProviderImpl pgpImpl = null;
+  /**
+   * Returns the PGPProviderImpl.
+   */
+  public PGPProviderImpl getPGPProviderImpl() {
+    return pgpImpl;
+  }
+  /**
+   * Sets the PGPProviderImpl.
+   */
+  public void setPGPProviderImpl(PGPProviderImpl newPgpImpl) {
+    pgpImpl = newPgpImpl;
+  }
 
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
   public byte[] decrypt(java.io.InputStream encryptedStream, EncryptionKey key)
     throws EncryptionException {
-    try {
-      PGPEncryptionKey pgpKey = (PGPEncryptionKey) key;
-      KeyBundle bundle = pgpKey.getKeyBundle();
-      char[] passphrase = pgpKey.getPassphrase();
-      
-      MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-      java.util.Collection col = mf.generateMessages(encryptedStream);
-      if (col.isEmpty()) {
-	throw new EncryptionException("no Messages in Input Stream.");
-      }
-
-      java.util.Iterator iter = col.iterator();
-
-      cryptix.message.Message msg = (cryptix.message.Message) iter.next();
-
-      EncryptedMessage cryptMsg = (EncryptedMessage) msg;
-      
-      cryptix.message.Message decryptedMessage = cryptMsg.decrypt(bundle, passphrase);
-      
-      if (decryptedMessage instanceof LiteralMessage) {
-	LiteralMessage litMsg = (LiteralMessage) decryptedMessage;
-	byte[] returnValue = litMsg.getBinaryData();
-	return returnValue;
-      }
-
-      return null;
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new EncryptionException(e.getMessage());
-    }
-
+    return pgpImpl.decrypt(encryptedStream, key);
   }
 
   /**
    * Encrypts a section of text using an EncryptionKey.
    */
-  public byte[] encryptText(String plainText, EncryptionKey key) 
+  public byte[] encrypt(java.io.InputStream rawStream, EncryptionKey key)
     throws EncryptionException {
-    return null;
+
+    return pgpImpl.encrypt(rawStream, key);
   }
 
   /**
    * Encrypts a Message.
    */
-  public javax.mail.Message encryptMessage(javax.mail.Message msg, EncryptionKey key) 
+  public javax.mail.Message encryptMessage(Session s, javax.mail.Message msg, EncryptionKey key) 
     throws EncryptionException, MessagingException {
-    return null;
+    MimeMessage encryptedMessage = new MimeMessage((MimeMessage)msg);
+
+    Multipart mp = encryptPart(msg, key);
+
+    encryptedMessage.setContent(mp);
+
+    return encryptedMessage;
   }
 
   /**
@@ -91,9 +83,33 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Encrypts a BodyPart;
    */
-  public BodyPart encryptBodyPart(BodyPart part, EncryptionKey key) 
+  public Multipart encryptPart(Part part, EncryptionKey key) 
     throws EncryptionException, MessagingException {
-    return null;
+
+    try {
+      MimeMultipart mm = new MimeMultipart();
+      mm.setSubType("encrypted");
+      
+      MimeBodyPart idPart = new MimeBodyPart();
+      idPart.setContent("Version: 1", "application/pgp-encrypted");
+      
+      MimeBodyPart encryptedContent = new MimeBodyPart();
+      byte[] encryptedBytes = encrypt(part.getInputStream(), key);
+      ByteArrayDataSource dataSource = new ByteArrayDataSource(encryptedBytes, "message", "application/octet-stream");
+      
+      javax.activation.DataHandler dh = new javax.activation.DataHandler(dataSource);
+      
+      encryptedContent.setFileName("message");
+      encryptedContent.setDataHandler(dh);
+
+      mm.addBodyPart(idPart);
+      mm.addBodyPart(encryptedContent);
+      
+      return mm;
+    
+    } catch (IOException ioe) {
+      throw new MessagingException(ioe.toString());
+    }
   }
 
   /**
