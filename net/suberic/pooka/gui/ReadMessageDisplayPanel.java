@@ -156,13 +156,21 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       } else {
 	
 	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	  content = getMessageProxy().getMessageInfo().getTextAndTextInlines(true, showFullHeaders());
+	  // Is there only an HTML part?  Regardless, we will still display it as text.
+	  if (getMessageProxy().getMessageInfo().isHtml())
+	    content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
+	  else
+	    content = getMessageProxy().getMessageInfo().getTextAndTextInlines(true, showFullHeaders());
 	} else {
-	  content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders());
+	  // Is there only an HTML part?  Regardless, we will still display it as text.
+	  if (getMessageProxy().getMessageInfo().isHtml())
+	    content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
+	  else
+	    content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders());
 	}
+
 	editorPane.setContentType("text/plain");
-	otherEditorPane.setContentType("text/plain");
-	
+        otherEditorPane.setContentType("text/plain");
       }
       
       if (content != null) {
