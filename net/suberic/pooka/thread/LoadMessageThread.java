@@ -68,35 +68,30 @@ public class LoadMessageThread extends Thread {
 	int updateCounter = 0;
 
 	if (numMessages > 0) {
-	    LoadMessageTracker lmt = new LoadMessageTracker(getLoadedMessageCount(), 0, numMessages);
-	    this.addMessageLoadedListener(lmt);
-	    
-	    // FIXME
-	    if (getFolderInfo().getFolderDisplayUI() instanceof FolderInternalFrame) {
-		FolderInternalFrame fif = (FolderInternalFrame) getFolderInfo().getFolderDisplayUI();
-		fif.getStatusBar().add(lmt);
-	    }
+	    MessageLoadedListener display = getFolderInfo().getFolderDisplayUI();
+	    if (display != null)
+		this.addMessageLoadedListener(display);
+
+	    fireMessageLoadedEvent(MessageLoadedEvent.LOADING_STARTING);
 	    
 	    for(int i=numMessages-1; i >= 0; i--) {
 		mp=(MessageProxy)messages.elementAt(i);
 		mp.loadTableInfo();
 		
 		if (++updateCounter >= getUpdateMessagesCount()) {
-		    fireMessageLoadedEvent();
+		    fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED);
 		    updateCounter = 0;		   
 		}
 		loadedMessageCount++;
 	    }
+	    
 	    if (updateCounter > 0)
-		fireMessageLoadedEvent();
+		fireMessageLoadedEvent(MessageLoadedEvent.MESSAGES_LOADED);
 	    
-	    removeMessageLoadedListener(lmt);
+	    fireMessageLoadedEvent(MessageLoadedEvent.LOADING_COMPLETE);
 	    
-	    // FIXME
-	    if (getFolderInfo().getFolderDisplayUI() instanceof FolderInternalFrame) {
-		((FolderInternalFrame)getFolderInfo().getFolderDisplayUI()).getStatusBar().remove(lmt);
-		((FolderInternalFrame)getFolderInfo().getFolderDisplayUI()).getStatusBar().repaint();
-	    }
+	    if (display != null)
+		removeMessageLoadedListener(display);
 	}
     }
     
@@ -104,9 +99,9 @@ public class LoadMessageThread extends Thread {
      * Fires a new MessageLoadedEvent to each registered MessageLoadedListener.
      */
 
-    public void fireMessageLoadedEvent() {
+    public void fireMessageLoadedEvent(int type) {
 	for (int i = 0; i < messageLoadedListeners.size(); i ++) {
-	    ((MessageLoadedListener)messageLoadedListeners.elementAt(i)).handleMessageLoaded(new MessageLoadedEvent(this));
+	    ((MessageLoadedListener)messageLoadedListeners.elementAt(i)).handleMessageLoaded(new MessageLoadedEvent(this, type, getLoadedMessageCount(), messages.size()));
 	}
     }
 

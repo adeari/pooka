@@ -33,6 +33,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	JLabel folderLabel;
 	JLabel messageCount;
 	JPanel loaderPanel;
+	LoadMessageTracker tracker = null;
 
 	public StatusBar() {
 	    this.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -263,6 +264,22 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	    this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
+    /**
+     * Displays a status message for the folder.
+     */
+    public void updateStatus(String message) {
+	
+    }
+   
+    /**
+     * Displays a status message for the folder.
+     */
+    public void updateStatus(Event e, String message) {
+	if (message != null)
+	    updateStatus(message);
+
+    }
+
     // Accessor methods.
 
     public MessagePanel getMessagePanel() {
@@ -382,6 +399,70 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	enabled = newValue;
     }
 
+    // MessageLoadedListener
+    
+    /**
+     * Displays that a message has been loaded.
+     * 
+     * Defined in net.suberic.pooka.event.MessageLoadedListener.
+     */
+    public void handleMessageLoaded(MessageLoadedEvent e) {
+	final MessageLoadedEvent event = e;
+
+	if (event.type == MessageLoadedEvent.LOADING_STARTED) {
+	    if (getStatusBar().loadMessageTracker != null) {
+		getStatusBar.add(new loadMessageTracker(event.loadedMessageCount, 0, event.numMessages));
+	    }
+	    getStatusBar().repaint();
+	} else if (event.type == MessageLoadedEvent.LOADING_COMPLETE) {
+	    if (getStatusBar().loadMessageTracker != null) {
+		getStatusBar.remove(getStatusBar().loadMessageTracker);
+		getStatusBar().loadMessageTracker = null;
+	    }
+	} else if (event.type == MessageLoadedEvent.MESSAGES_LOADED) {
+	    if (getStatusBar().loadMessageTracker != null)
+		getStatusBar().loadMessageTracker.handleMEssageLoaded(event);
+	}
+    }
+
+    // ConnectionListener
+    
+    /**
+     *
+     */
+    public void closed(ConnectionEvent e) {
+
+    }
+
+    /**
+     *
+     */
+    public void disconnected(ConnectionEvent e) {
+
+    }
+
+    /**
+     *
+     */
+    public void opened(ConnectionEvent e) {
+
+    }
+
+    // MessageCounteListener
+    /**
+     *
+     */
+    public void messagesAdded(MessageCountEvent e) {
+
+    }
+
+    public void messagesRemoved(MessageCountEvent e) { 
+
+    }
+
+    /**
+     * Gets the Actions for this component.
+     */
     public Action[] getActions() {
 	if (isEnabled()) {
 	    Action[] returnValue;

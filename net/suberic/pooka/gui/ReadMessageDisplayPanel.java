@@ -39,6 +39,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
      */    
     public ReadMessageDisplayPanel(MessageProxy newMsgProxy) {
 	super(newMsgProxy);
+
+	this.setLayout(new CardLayout());
     }
 
     /**

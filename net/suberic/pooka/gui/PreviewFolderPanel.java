@@ -185,6 +185,53 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	e.printStackTrace();
     }
 
+
+    // MessageLoadedListener
+    
+    /**
+     * 
+     * Defined in net.suberic.pooka.event.MessageLoadedListener.
+     */
+    public void handleMessageLoaded(net.suberic.pooka.event.MessageLoadedEvent e) {
+	
+    }
+
+    // ConnectionListener
+    
+    /**
+     *
+     */
+    public void closed(ConnectionEvent e) {
+
+    }
+
+    /**
+     *
+     */
+    public void disconnected(ConnectionEvent e) {
+
+    }
+
+    /**
+     *
+     */
+    public void opened(ConnectionEvent e) {
+
+    }
+
+    // MessageCounteListener
+    /**
+     *
+     */
+    public void messagesAdded(MessageCountEvent e) {
+
+    }
+
+    public void messagesRemoved(MessageCountEvent e) { 
+
+    }
+
+
     /**
      * Gets the currently available Actions for this component.
      *

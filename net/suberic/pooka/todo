@@ -9,6 +9,8 @@ ui engine
 
 *) bug:  i seem to have broken some of the sizing code.
 
+*) fix all of the thread issues that i've introduced.  :)
+
 general ui
 ----------
 *) revamp the UserProfile, Store, and Folder editing process.  make a full
@@ -30,6 +32,8 @@ a big ui overhaul.
 
 *) add undo/redo support
 
+*) make it so you can skip directly to any message in the folder.
+
 protocol support
 ----------------
 *) add pop3/local mail spool support.
@@ -43,7 +47,7 @@ disconnected mode.
 *) fix the jfilechooser so it doesn't disconnect all of our folders when you
 use it--or at least so it doesn't matter if it does.
 
-*) support for ssl?'
+*) support for ssl?
 
 searching
 ---------
