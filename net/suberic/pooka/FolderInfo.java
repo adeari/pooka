@@ -358,7 +358,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       if (Pooka.isDebug())
 	System.out.println(this + ":  checking parent store.");
       
-      
       if (!getParentStore().isConnected()) {
 	if (Pooka.isDebug())
 	  System.out.println(this + ":  parent store isn't connected.  trying connection.");

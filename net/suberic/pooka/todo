@@ -3,13 +3,12 @@
 	for laptop configurations, sent folder configuration, etc.
 	include the .pooka directory configuration.
 	started:  todo:
-	*) make it so it actually opens your inbox.
 	*) configure sent folder
 	*) configure outbox.
-	*) premake ssl file.
 	*) make us test the connection to the configured servers first.
 	*) pop:  keep message on folder, etc.
-	*) gen:  actually make .pooka dir config do something.
+	*) gen:  actually make .pooka dir config do something. -- somewhat
+			done.
 
 *) get rid of the Edit button for the Variable setting.  make it a separate
 	pane instead or something.

@@ -6,6 +6,7 @@ import net.suberic.util.thread.*;
 import net.suberic.util.gui.propedit.*;
 import javax.swing.*;
 import java.util.*;
+import java.io.File;
 
 import javax.mail.MessagingException;
 
@@ -78,12 +79,14 @@ public class NewAccountPooka {
     jta.setBackground(jl.getBackground());
     //jta.setForeground(jl.getForeground());
     jta.setFont(jl.getFont());
+
     contentPane.add(jta);
     
     contentPane.add(new PropertyEditorPane(manager,
 					   propertyVector,
 					   propertyVector,
 					   firstEntryWindow));
+
     firstEntryWindow.pack();
     firstEntryWindow.show();
     firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -98,6 +101,8 @@ public class NewAccountPooka {
       });
     
 
+    java.awt.Point p = getMessagePanel().getNewWindowLocation(firstEntryWindow, true);
+    firstEntryWindow.setLocation(p);
     getMessagePanel().add(firstEntryWindow);
     firstEntryWindow.setVisible(true);
     try {
@@ -119,12 +124,15 @@ public class NewAccountPooka {
 
       testConnections(props);
 
+      createFiles(props);
+
       setupFolders(props);
 
       saveProperties(props);
       openInbox();
 
     } catch (Exception e) {
+      e.printStackTrace();
       handleInvalidEntry(e.getMessage());
     }
 
@@ -247,6 +255,8 @@ public class NewAccountPooka {
 	  port = 143;
       }
       testConnection(mailServerName, port);
+    } else {
+      // setup mbox connection
     }
   }
 
@@ -260,7 +270,7 @@ public class NewAccountPooka {
   /**
    * Sets up your sent folder and outbox.
    */
-  public void setupFolders(Properties props) {
+  public void setupFolders(Properties props) throws Exception {
     String storeName = props.getProperty("Store");
     String protocol = props.getProperty("Store." + storeName + ".protocol");
     String localStoreName = storeName;
@@ -274,6 +284,20 @@ public class NewAccountPooka {
       props.setProperty("Store.local.useInbox", "false");
       props.setProperty("Store.local.folderList", "sent:outbox");
       props.setProperty("Store.local.protocol", "mbox");
+
+      String pookaDirName = props.getProperty("Pooka.cacheDirectory");
+
+      File sentFile = new File(pookaDirName + File.separator + "sent");
+      if (! sentFile.exists())
+	sentFile.createNewFile();
+
+      File outboxFile = new File(pookaDirName + File.separator + "outbox");
+      if (! outboxFile.exists())
+	outboxFile.createNewFile();
+      
+      props.setProperty("Store.local.mailDirectory", pookaDirName);
+
+
     } else {
       // we're fine if not.
       props.setProperty("Store." + localStoreName + ".folderList", "INBOX:sent:outbox");
@@ -286,6 +310,28 @@ public class NewAccountPooka {
 
     String userName = props.getProperty("UserProfile");
     props.setProperty("UserProfile." + userName + ".sentFolder", localStoreName + "/sent");
+  }
+
+  /**
+   * Creates any other necessary files.
+   */
+  public void createFiles(Properties props) throws Exception {
+    String pookaDirName = manager.getProperty("NewAccountPooka.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
+
+    File pookaDir = new File(pookaDirName);
+    if (! pookaDir.exists())
+      pookaDir.mkdir();
+
+    String sslFileName = pookaDirName + File.separator + "sslCertificates";
+
+    File sslFile = new File(sslFileName);
+    if (!sslFile.exists())
+      sslFile.createNewFile();
+
+    props.setProperty("Pooka.cacheDirectory", pookaDirName);
+
+    props.setProperty("Pooka.sslCertFile", sslFileName);
+
   }
 
   /**
@@ -312,7 +358,10 @@ public class NewAccountPooka {
 		    MailTreeNode mtn = null;
 		    net.suberic.pooka.FolderInfo fi = storeInfo.getChild("INBOX");
 		    if (fi != null) {
-		      mtn = fi.getFolderNode();
+		      FolderNode fn = fi.getFolderNode();
+		      Action openAction = fn.getAction("file-open");
+		      openAction.actionPerformed(new java.awt.event.ActionEvent(this, 0, "file-open"));
+		      mtn = fn;
 		    } else {
 		      mtn = storeInfo.getStoreNode();
 		    }
@@ -366,6 +415,7 @@ public class NewAccountPooka {
   }
   
   public void handleInvalidEntry(String message) {
+    System.out.println("error:  " + message);
     StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
     if (message != null && message.length() > 0) {
       errorMessage.append("\n");

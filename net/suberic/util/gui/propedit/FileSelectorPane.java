@@ -28,7 +28,8 @@ public class FileSelectorPane extends SwingPropertyEditor {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
-    originalValue = parseValue(manager.getProperty(property, ""));
+    originalValue = manager.getProperty(property, "");
+    String currentValue = parseValue(manager.getProperty(property, ""));
     
     if (debug) {
       System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
@@ -36,7 +37,7 @@ public class FileSelectorPane extends SwingPropertyEditor {
 
     label = createLabel();
 
-    valueDisplay = new JTextField(originalValue);
+    valueDisplay = new JTextField(currentValue);
     
     inputButton = createInputButton();
     
