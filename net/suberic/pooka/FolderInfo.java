@@ -211,7 +211,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (isLoaded() || (loading && children == null)) 
       return;
     
-    Folder[] tmpFolder;
+    Folder[] tmpFolder = null;
     Folder tmpParentFolder;
     
     try {
@@ -228,33 +228,36 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  parentStore.connectStore();
 	Store store = parentStore.getStore();
 
-	tmpParentFolder = store.getDefaultFolder();
-	if (Pooka.isDebug())
-	  System.out.println("got " + tmpParentFolder + " as Default Folder for store.");
-	tmpFolder = tmpParentFolder.list(mFolderName);
-
-	if (tmpFolder == null || tmpFolder.length == 0) {
-	  // check to see if this is a shared folder.
-
-	  try {
-	    if (Pooka.isDebug())
-	      System.out.println("folder " + getFolderID() + " returned null; checking to see if it's a shared folder.");
-
-	    Folder[] sharedFolders = store.getSharedNamespaces();
-	    
-	    if (sharedFolders != null && sharedFolders.length > 0) {
-	      for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
-		if (sharedFolders[i].getName().equalsIgnoreCase(mFolderName)) {
-		  tmpFolder = new Folder[1];
-		  tmpFolder[0] =  sharedFolders[i] ;
-		}
+	// first see if we're a namespace
+	try {
+	  if (Pooka.isDebug())
+	    System.out.println("checking to see if " + getFolderID() + " is a shared folder.");
+	  
+	  Folder[] sharedFolders = store.getSharedNamespaces();
+	  
+	  if (sharedFolders != null && sharedFolders.length > 0) {
+	    for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
+	      if (sharedFolders[i].getName().equalsIgnoreCase(mFolderName)) {
+		tmpFolder = new Folder[1];
+		tmpFolder[0] =  sharedFolders[i] ;
 	      }
 	    }
-	  } catch (Exception e) {
-	    // if we get a not supported exception or some such here,
-	    // just ignore it.
 	  }
+	} catch (Exception e) {
+	  // if we get a not supported exception or some such here,
+	  // just ignore it.
 	}
+
+	if (tmpFolder == null || tmpFolder.length == 0) {
+	  // not a shared namespace
+	  tmpParentFolder = store.getDefaultFolder();
+	  if (Pooka.isDebug())
+	    System.out.println("got " + tmpParentFolder + " as Default Folder for store.");
+	  if (Pooka.isDebug())
+	    System.err.println("doing a list on default folder " + tmpParentFolder + " for folder " + mFolderName);
+	  tmpFolder = tmpParentFolder.list(mFolderName);
+	}
+
 	if (Pooka.isDebug())
 	  System.out.println("got " + tmpFolder + " as Folder for folder " + getFolderID() + ".");
 	
@@ -267,6 +270,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  tmpParentFolder = parentFolder.getFolder();
 	  if (tmpParentFolder != null) {
 	    parentIsConnected = true;
+	    if (Pooka.isDebug())
+	      System.out.println("running list (" + mFolderName + ") on parent folder " + tmpParentFolder);
 	    tmpFolder = tmpParentFolder.list(mFolderName);
 	  } else {
 	    tmpFolder = null;

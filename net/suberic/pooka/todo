@@ -6,12 +6,16 @@
 
 *) support shared folders.
 	-- started.  see if there are any bugs in there.
+	-- make sync with subscribed work w/namespaces
 
 *) bounce messages
 
 *) some case(s) in which we're not generating the attachment bundle 
 	correctly?  one instance is how we're handling multipart/alternative
 	entries that don't actually have multiple parts.
+
+*) changing using store's subscribed list doesn't happen in realtime; have
+	to reload instead.
 
 *) add support for running without any local files.
 	-- support for http: access?
