@@ -54,9 +54,38 @@ public class MessageInfo {
    * This loads the Attachment information into the attachments vector.
    */
   public void loadAttachmentInfo() throws MessagingException {
-    attachments = MailUtilities.parseAttachments(getMessage());
+    try {
+      attachments = MailUtilities.parseAttachments(getMessage());
+      attachmentsLoaded = true;
+    } catch (MessagingException me) {
+      // if we can't parse the message, try loading it as a single text
+      // file.
+      try {
+	javax.mail.internet.MimeMessage mimeMessage = (javax.mail.internet.MimeMessage)getMessage();
+	AttachmentBundle bundle = new AttachmentBundle(mimeMessage);
+	ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	java.util.List headerList = new java.util.ArrayList();
+	java.util.Enumeration enum = mimeMessage.getAllHeaders();
+	while (enum.hasMoreElements()) {
+	  Header hdr = (Header) enum.nextElement();
+	  headerList.add(hdr.getName());
+	}
+	String[] excludeList = (String[]) headerList.toArray(new String[0]);
+	mimeMessage.writeTo(baos, excludeList);
+	String content = baos.toString("ISO-8859-1");
+	javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+	mbp.setText(content);
+	Attachment textPart = new Attachment(mbp);
+	bundle.textPart = textPart;
+	
+	attachments = bundle;
+      } catch (Exception e) {
+	throw me;
+      }
+    } catch (java.io.IOException ioe) {
+      throw new MessagingException("Error loading Message:  " + ioe.toString(), ioe);
+    }
     
-    attachmentsLoaded = true;
   }
 
   /**

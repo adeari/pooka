@@ -1,9 +1,13 @@
+added a hack way to override errors like a MissingStartBoundary.
+
+keybindings now work in preview pane mode with the preview panel selected.
+
 fixed a deadlock in FolderInfo.copyMessages().
 
 made opening folders in the background the default.
 
 removed the old code that messed with the scroll move during internal pane
-moves.  should be all ok under jdk 1.4.  (?)
+moves.  should be all ok under jdk 1.4.
 
 fixed a bug where unsubscribing to the last subfolder of a folder doesn't
 work.

@@ -475,6 +475,12 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void refreshDisplay() throws javax.mail.MessagingException {
     configureInterfaceStyle();
     messageDisplay.resetEditorText();
+    if ( SwingUtilities.isDescendingFrom(java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), messageDisplay) && messageDisplay.getMessageUI() == null ) {
+      System.err.println("message display has focus.");
+      if (current != null) {
+	current.requestFocus();
+      }
+    }
   }
   
   public boolean getAutoPreview() {

@@ -1,27 +1,31 @@
 *) change over from mbox to maildir or something like it.
 	-- tag new messages as recent. -- send to az
 
-*) add at least one more piece of documentation.
-
+*) disconnected:  log in connected.  have new mail. read it.  exit.  restart 
+disconnected.  new messages from last time are still unread.
 --
 
 *) add "view pookarc"
 
-*) add console?
-
-*) fix the problem with things like MissingStartBoundary by getting the
-raw input stream.
-
 *) make sure that backend filters are run on new message loaded at 
 startup (i.e. not just on messagesAdded).
+
+*) add mrpostman support(?)
+
+*) printing in windows can leave control characters at the end of lines
+
+*) change the keybinding for the address book.  otherwise you get address book
+	entries while you're navigating the to field.
+
+*) new message count in icon
 
 ------
 
 *) add plugin for spam checker?
 
-*) add mrpostman support(?)
-
 ------
+
+*) add console?
 
 *) test:  discon imap.  disconnect.  connect from somwhere else.  get a new
 	message.  read it.  disconnect there.  get a few new messages.
@@ -42,11 +46,6 @@ java.lang.ArrayIndexOutOfBoundsException: 0
         at net.suberic.pooka.gui.propedit.FolderSelectorPane$1.actionPerformed(FolderSelectorPane.java:83)
 
 *) make it so folder windows save their settings (column width, sort order)
-
-*) printing in windows can leave control characters at the end of lines
-
-*) change the keybinding for the address book.  otherwise you get address book
-	entries while you're navigating the to field.
 
 *) add pgp/gpg support. -- and/or s/mime?  probably make a generic class
 	for that.  slimpgp or cyptix.  s/mime is available from together
@@ -120,6 +119,8 @@ java.lang.ArrayIndexOutOfBoundsException: 0
 	-- maybe change the toolbars so there's only 1?
 	-- ?? make it so you can compose messages in the main window ??
   -- switching from preview to desktop gives outbox a "normal" toolbar.
+  -- switching from desktop to preview, hitting return both opens window
+	and shows the message in the preview pane.
 
 *) NPE -- is that from switching from preview to desktop?
 	-- check window menu from switching preview to desktop.
@@ -188,12 +189,7 @@ preview:
 
 *) add a keybinding to bring up the address book selector.
 
-*) add support for other mail formats, like maildir (and maybe hotmail?).
-	shift pop3 backing from mbox to maildir.
-
 *) spam filtering
-
-*) new message count in icon
 
 *) queuing of outgoing mails
 	todo on this:
@@ -322,8 +318,6 @@ desktop pane.
 *)  when you change users for a new message, then, even if the theme 
 doesn't change, you still resize the window.
 
-*) read messages don't get font color set properly.  works in jdk1.4.
-
 *) add support for external editors, such as emacs.
 
 *) address book/ldap support.
@@ -381,12 +375,6 @@ typing in information and then be surprised when add clears it out.
 or stores configured is a big problem.
 
 *) some messages aren't parsed properly by the mbox provider.
-*) the mbox provider isn't safe for mailboxes that are edited by
-	     other processes.
-
-*) fix the jfilechooser so it doesn't disconnect all of our folders when you
-use it--or at least so it doesn't matter if it does.  -- only on unix.  
-	doesn't happen on linux with latest glibc?
 
 *) a nested message which is of type text/html doesn't get shown on the
 	display.
@@ -414,8 +402,6 @@ window at -5, -5.
 
 *) add interfaces for all the rest of the features.  :)
 
-*) add ldap support
-
 *) add 'edit message as new' for normal messages.
 
 *) add support for flowed text
@@ -436,9 +422,6 @@ attachments that you don't want to keep (?) -- and change the subject.
 *) check it to see if we can still get the same kind of 
 	folders-always-available performance while not keeping a separate
 	imapd connection open for each folder.
-
-make an update Thread -- sort of done.  need to institute update time.
-
 
 the Spice is life
 

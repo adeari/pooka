@@ -56,22 +56,81 @@ public class MailUtilities {
   /**
    * This parses the message given into an AttachmentBundle.
    */
-  public static AttachmentBundle parseAttachments(Message m) throws MessagingException {
-    try {
-      AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
+  public static AttachmentBundle parseAttachments(Message m) throws MessagingException, java.io.IOException {
+    AttachmentBundle bundle = new AttachmentBundle((MimeMessage)m);
+    
+    String contentType = ((MimeMessage) m).getContentType().toLowerCase();
+    
+    if (contentType.startsWith("multipart")) {
+      ContentType ct = new ContentType(contentType);
       
-      String contentType = ((MimeMessage) m).getContentType().toLowerCase();
-      
-      if (contentType.startsWith("multipart")) {
-	ContentType ct = new ContentType(contentType);
+      if (ct.getSubType().equalsIgnoreCase("alternative")) {
+	Multipart mp = (Multipart) m.getContent();
+	MimeBodyPart textPart = null;
+	MimeBodyPart htmlPart = null;
 	
+	for (int i = 0; i < mp.getCount(); i++) {
+	  MimeBodyPart current = (MimeBodyPart)mp.getBodyPart(i);
+	  ContentType ct2 = new ContentType(current.getContentType());
+	  if (ct2.match("text/plain"))
+	    textPart = current;
+	  else if (ct2.match("text/html"))
+	    htmlPart = current;
+	}
+	  
+	if (htmlPart != null && textPart != null) {
+	  Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
+	  bundle.textPart = attachment;
+	} else {
+	  // hurm
+	  if (textPart != null) {
+	    Attachment attachment = new Attachment(textPart);
+	    bundle.textPart = attachment;
+	  } else if (htmlPart != null) {
+	    Attachment attachment = new Attachment(htmlPart);
+	      bundle.textPart = attachment;
+	  } else {
+	    bundle.addAll(parseAttachments(mp));
+	  }
+	}
+      } else {
+	bundle.addAll(parseAttachments((Multipart)m.getContent()));
+      }
+    } else if (contentType.startsWith("text")) {
+      Attachment attachment = new Attachment((MimeMessage)m);
+      
+      bundle.textPart = attachment;
+    } else {
+      Attachment attachment = new Attachment((MimeMessage)m);
+      bundle.getAttachments().add(attachment);
+    }
+    
+    return bundle;
+  }
+  
+  /**
+   * This parses a Mulitpart object into an AttachmentBundle.
+   */
+  private static AttachmentBundle parseAttachments(Multipart mp) throws MessagingException, java.io.IOException {
+    AttachmentBundle bundle = new AttachmentBundle();
+    for (int i = 0; i < mp.getCount(); i++) {
+      MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
+      ContentType ct = new ContentType(mbp.getContentType());
+      if (ct.getPrimaryType().equalsIgnoreCase("text")) {
+	Attachment current = new Attachment(mbp);
+	if (bundle.textPart == null) {
+	  bundle.textPart = current;
+	} else {
+	  bundle.getAttachments().add(current);
+	}
+      } else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
 	if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	  Multipart mp = (Multipart) m.getContent();
+	  Multipart amp = (Multipart) mbp.getContent();
 	  MimeBodyPart textPart = null;
 	  MimeBodyPart htmlPart = null;
 	  
-	  for (int i = 0; i < mp.getCount(); i++) {
-	    MimeBodyPart current = (MimeBodyPart)mp.getBodyPart(i);
+	  for (int j = 0; j < amp.getCount(); j++) {
+	    MimeBodyPart current = (MimeBodyPart)amp.getBodyPart(j);
 	    ContentType ct2 = new ContentType(current.getContentType());
 	    if (ct2.match("text/plain"))
 	      textPart = current;
@@ -89,90 +148,20 @@ public class MailUtilities {
 	      bundle.textPart = attachment;
 	    } else if (htmlPart != null) {
 	      Attachment attachment = new Attachment(htmlPart);
-	      bundle.textPart = attachment;
+		bundle.textPart = attachment;
 	    } else {
-	      bundle.addAll(parseAttachments(mp));
+	      bundle.addAll(parseAttachments(amp));
 	    }
 	  }
 	} else {
-	  bundle.addAll(parseAttachments((Multipart)m.getContent()));
-	}
-      } else if (contentType.startsWith("text")) {
-	Attachment attachment = new Attachment((MimeMessage)m);
-	
-	bundle.textPart = attachment;
-      } else {
-	Attachment attachment = new Attachment((MimeMessage)m);
-	bundle.getAttachments().add(attachment);
-      }
-      
-      return bundle;
-    } catch (IOException ioe) {
-      throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
-    }
-  }
-  
-  /**
-   * This parses a Mulitpart object into an AttachmentBundle.
-   */
-  private static AttachmentBundle parseAttachments(Multipart mp) throws MessagingException {
-    AttachmentBundle bundle = new AttachmentBundle();
-    for (int i = 0; i < mp.getCount(); i++) {
-      MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
-      ContentType ct = new ContentType(mbp.getContentType());
-      if (ct.getPrimaryType().equalsIgnoreCase("text")) {
-	Attachment current = new Attachment(mbp);
-	if (bundle.textPart == null) {
-	  bundle.textPart = current;
-	} else {
-	  bundle.getAttachments().add(current);
-	}
-      } else if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-	try {
-	  if (ct.getSubType().equalsIgnoreCase("alternative")) {
-	    Multipart amp = (Multipart) mbp.getContent();
-	    MimeBodyPart textPart = null;
-	    MimeBodyPart htmlPart = null;
-	    
-	    for (int j = 0; j < amp.getCount(); j++) {
-	      MimeBodyPart current = (MimeBodyPart)amp.getBodyPart(j);
-	      ContentType ct2 = new ContentType(current.getContentType());
-	      if (ct2.match("text/plain"))
-		textPart = current;
-	      else if (ct2.match("text/html"))
-		htmlPart = current;
-	    }
-	    
-	    if (htmlPart != null && textPart != null) {
-	      Attachment attachment = new AlternativeAttachment(textPart, htmlPart);
-	      bundle.textPart = attachment;
-	    } else {
-	      // hurm
-	      if (textPart != null) {
-		Attachment attachment = new Attachment(textPart);
-		bundle.textPart = attachment;
-	      } else if (htmlPart != null) {
-		Attachment attachment = new Attachment(htmlPart);
-		bundle.textPart = attachment;
-	      } else {
-		bundle.addAll(parseAttachments(amp));
-	      }
-	    }
-	  } else {
-	    bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
-	  }
-	} catch (IOException ioe) {
-	  throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
+	  bundle.addAll(parseAttachments((Multipart)mbp.getContent()));
 	}
 	
       } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
 	bundle.getAttachments().add(new Attachment(mbp));
 	Object msgContent;
-	try {
-	  msgContent = mbp.getContent();
-	} catch (IOException ioe) {
-	  throw new MessagingException (Pooka.getProperty("error.Message.loadingAttachment", "Error loading attachment"), ioe);
-	}
+	msgContent = mbp.getContent();
+	
 	if (msgContent instanceof Message)
 	  bundle.addAll(parseAttachments((Message)msgContent));
 	else if (msgContent instanceof java.io.InputStream)

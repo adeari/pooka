@@ -147,6 +147,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
    * message.
    * 
    * Should only be called from within the FolderThread for the message.
+   *
+   * Also updates the current keybindings.
    */
   public void resetEditorText() throws MessagingException {
     // ok.  here's how this has to go:  we need to load the information from
@@ -305,6 +307,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	});
     }
     
+    keyBindings.setActive(getActions());
+
     SwingUtilities.invokeLater(new Runnable() {
 	public void run() {
 	  ReadMessageDisplayPanel.this.repaint();
