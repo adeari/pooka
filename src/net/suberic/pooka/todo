@@ -7,6 +7,11 @@
 
 -----
 
+*) preview:  fix bug where font reverts for a moment when autopreview is
+	off.
+*) preview:  fix bug where default theme for preview mode is null if
+	messageproxy is null.
+
 *) give spam buttom a keybinding.  
 
 *) printing
