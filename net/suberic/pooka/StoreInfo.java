@@ -212,7 +212,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       String useMaildir = Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset");
 
       if (useMaildir.equals("unset")) {
-	System.err.println(getStoreProperty() + ".useMaildir = unset.  setting.");
 	//File f = new File(Pooka.getProperty() + ".
 	Pooka.setProperty(getStoreProperty() + ".useMaildir", "false");
 	useMaildir="false";
