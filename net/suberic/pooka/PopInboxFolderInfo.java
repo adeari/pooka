@@ -1,7 +1,7 @@
 package net.suberic.pooka;
 import javax.mail.*;
 import javax.mail.internet.*;
-import java.io.File;
+import java.io.*;
 
 /**
  * This represents the Inbox of a Pop3 folder.  It has an mbox backend, but
@@ -154,5 +154,95 @@ public class PopInboxFolderInfo extends FolderInfo {
 	    }
 	} 
 	
+    }
+
+    /**
+     * This retrieves new messages from the pop folder.
+     */
+    public Message[] getNewMessages(Folder f) throws MessagingException {
+	Message[] newMessages = f.getMessages();
+	if (newMessages.length > 0) {
+	    String lastUid = null;
+	    try {
+		lastUid = readLastUid(); 
+	    } catch (IOException ioe) {
+	    }
+
+	    if (lastUid != null) {
+		int offset = newMessages.length - 1;
+		while (offset >= 0 && (getUID(newMessages[offset], f).compareTo(lastUid) < 0)) {
+		    offset--;
+		}
+		
+		if (newMessages.length - 1 - offset == 0)
+		    // no new messages
+		    return new Message[0];
+		else {
+		    Message[] returnValue = new Message[newMessages.length - offset - 1];
+		    System.arraycopy(newMessages, offset, returnValue, 0, newMessages.length - offset - 1);
+		    
+		    try {
+			writeLastUid(getUID(newMessages[newMessages.length - 1], f));
+		    } catch (IOException ioe) {
+		    }
+
+		    return returnValue;
+		}
+	    } else { 
+		// if we don't have a reference to a last uid, then assume
+		// all the messages are new.
+		
+		if (newMessages.length > 0)
+		    try {
+			writeLastUid(getUID(newMessages[newMessages.length - 1], f));
+		    } catch (IOException ioe) {
+		    }
+		return newMessages;
+	    }
+	} else {
+	    // no messages.
+	    return newMessages;
+	}
+    }
+
+    public String readLastUid() throws IOException {
+	String storeID = getParentStore().getStoreID();
+	String mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
+	File uidFile = new File(mailHome + File.separator + ".pooka-lastUid");
+	if (uidFile.exists()) {
+	    BufferedReader br = new BufferedReader(new FileReader(uidFile));
+	    String lastUid = br.readLine();
+	    System.out.println("lastUid is " + lastUid);
+	    
+	    br.close();
+
+	    return lastUid;
+	}
+
+	return null;
+    }
+
+    public void writeLastUid(String lastUid) throws IOException {
+	String storeID = getParentStore().getStoreID();
+	String mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
+	File uidFile = new File(mailHome + File.separator + ".pooka-lastUid");
+	if (uidFile.exists()) {
+	    uidFile.delete();
+	}
+
+	uidFile.createNewFile();
+
+	BufferedWriter bw = new BufferedWriter(new FileWriter(uidFile));
+	
+	bw.write(lastUid);
+	bw.newLine();
+
+	bw.flush();
+	bw.close();
+
+    }
+
+    public String getUID(Message m, Folder f) throws MessagingException {
+	return ((com.sun.mail.pop3.POP3Folder)f).getUID(m);
     }
 }
