@@ -34,8 +34,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
   CryptoStatusDisplay cryptoDisplay = null;
   Container cryptoPanel = null;
 
-  JScrollPane customHeaderScrollPane = null;
   Container customHeaderPane = null;
+  JTable customHeaderTable = null;
   JToggleButton customHeaderButton = null;
 
   /**
@@ -473,12 +473,13 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Creates a new CustomHeaderPane.
    */
   public Container createCustomHeaderPane() {
+    
     JPanel returnValue = new JPanel();
     returnValue.setLayout(new BorderLayout());
 
     Box customInputPanel = new Box(BoxLayout.Y_AXIS);
-    
-    Box inputRow = null;
+
+    customHeaderTable = new JTable(4, 2);
 
     // get the preconfigured properties
 
@@ -535,37 +536,30 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
     Enumeration headerKeys = headers.propertyNames();
 
+    int row = 0;
+    javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) customHeaderTable.getModel();
+
     while(headerKeys.hasMoreElements()) {
-      inputRow = new Box(BoxLayout.X_AXIS);
       currentHeader=(String) headerKeys.nextElement();
       currentValue = (String) headers.get(currentHeader);
       if (currentValue == null)
 	currentValue = "";
 
-      hdrLabel = new JLabel(currentHeader + ":", SwingConstants.RIGHT);
-      hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
-      inputRow.add(hdrLabel);
-      
-      EntryTextArea inputField = new net.suberic.util.swing.EntryTextArea(currentValue, 1, 50);
-    
-      inputField.setLineWrap(true);
-      inputField.setWrapStyleWord(true);
-      inputField.setBorder(BorderFactory.createEtchedBorder());
-      inputField.addKeyListener(new KeyAdapter() {
-	  public void keyTyped(KeyEvent e) {
-	    setModified(true);
-	  }
-	});
-      
-      inputRow.add(inputField);
-      
-      customInputPanel.add(inputRow);
+      if (model.getRowCount() <= row) {
+	model.addRow(new Vector());
+      }
+      model.setValueAt(currentHeader, row, 0);
+      model.setValueAt(currentValue, row, 1);
+
+      row++;
     }
+
+    customInputPanel.add(new JScrollPane(customHeaderTable));
 
     returnValue.add(customInputPanel, BorderLayout.CENTER);
 
     JPanel buttonPanel = new JPanel();
-    buttonPanel.setLayout(new FlowLayout());
+    buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
     java.net.URL headerURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.image", "/org/javalobby/icons/20x20png/Plus.png"));
 
@@ -573,29 +567,38 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
     if (headerURL != null) {
       headerButton = new JButton(new ImageIcon(headerURL));
-      headerButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
+      headerButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
+      headerButton.setSize(new java.awt.Dimension(10,10));
     } else {
       headerButton = new JButton();
     }
 
-    buttonPanel.add(headerButton);
-    buttonPanel.setMargin(new java.awt.Insets(0, 0, 0, 0));
+    headerButton.addActionListener(new AbstractAction() {
+	public void actionPerformed(ActionEvent e) {
+	  javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) customHeaderTable.getModel();
+	  model.addRow(new Vector());
+	}
+      });
 
+    buttonPanel.add(new JLabel("Add Header"));
+    buttonPanel.add(headerButton);
+    buttonPanel.setBorder(BorderFactory.createEmptyBorder());
+
+    buttonPanel.setSize(buttonPanel.getMinimumSize());
     returnValue.add(buttonPanel, BorderLayout.SOUTH);
     return returnValue;
 
   }
-
+  
   /**
    * Selects the custom header pane.
    */
   public void selectCustomHeaderPane() {
     if (customHeaderPane == null) {
       customHeaderPane = createCustomHeaderPane();
-      customHeaderScrollPane = new JScrollPane(customHeaderPane);
-      tabbedPane.add(Pooka.getProperty("MessageWindow.CustomHeaderTab", "Custom"), customHeaderScrollPane);
+      tabbedPane.add(Pooka.getProperty("MessageWindow.CustomHeaderTab", "Custom"), customHeaderPane);
     }
-    tabbedPane.setSelectedComponent(customHeaderScrollPane);
+    tabbedPane.setSelectedComponent(customHeaderPane);
   }
 
   /**
@@ -605,10 +608,9 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     if (customHeaderPane != null) {
       tabbedPane.setSelectedComponent(headerScrollPane);
 
-      tabbedPane.remove(customHeaderScrollPane);
+      tabbedPane.remove(customHeaderPane);
     }
     customHeaderPane = null;
-    customHeaderScrollPane = null;
   }
 
   /**

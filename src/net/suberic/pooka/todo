@@ -10,6 +10,8 @@
 -----
 
 *) add a way to put in custom headers into a new message.
+	started.  make it a table.
+	
 
 *) printing
 	timing--jtextpane creation should happen after dialog
@@ -20,6 +22,7 @@
 *) fix notification settings.  my spam folder shouldn't show a star when
 	new messages come in.
 	-- test
+	-- tested.  does happen even when settings are correct. fix.
 
 *) fix error display with exception so that you can see the stack trace.
 
