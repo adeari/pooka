@@ -439,6 +439,19 @@ MessageWindow.Input.CC.MIMEHeader=CC
 MessageWindow.Input.BCC.MIMEHeader=BCC
 MessageWindow.Input.Subject.MIMEHeader=Subject
 
+UIConfig.editableFields.font.propertyType=Font
+UIConfig.editableFields.font._enabledBox=true
+UIConfig.editableFields.background.propertyType=Color
+UIConfig.editableFields.background._enabledBox=true
+UIConfig.editableFields.foreground.propertyType=Color
+UIConfig.editableFields.foreground._enabledBox=true
+UIConfig.editableFields.disabledText.propertyType=Color
+UIConfig.editableFields.disabledText._enabledBox=true
+UIConfig.editableFields.select.propertyType=Color
+UIConfig.editableFields.select._enabledBox=true
+UIConfig.editableFields.focus.propertyType=Color
+UIConfig.editableFields.focus._enabledBox=true
+
 UserProfile.mailHeaders.fields=From:FromPersonal:ReplyTo:ReplyToPersonal:Organization
 UserProfile.mailHeaders.fields.From.value=From
 UserProfile.mailHeaders.fields.FromPerseonal.value=FromPersonal
@@ -450,7 +463,7 @@ UserProfile.propertyType=Multi
 UserProfile.editableFields.scoped=true
 UserProfile.editableFields=editor
 
-UserProfile.editableFields.editor=user:config
+UserProfile.editableFields.editor=user:config:uiConfig
 UserProfile.editableFields.editor.propertyType=Tabbed
 UserProfile.editableFields.editor.propertyScoped=true
 UserProfile.editableFields.editor.addSubProperty=false
@@ -465,6 +478,11 @@ UserProfile.editableFields.editor.config.scoped=true
 UserProfile.editableFields.editor.config.scopeRoot=UserProfile.editableFields
 UserProfile.editableFields.editor.config.propertyType=Composite
 UserProfile.editableFields.editor.config.signatureFile.propertyType=File
+
+UserProfile.editableFields.editor.uiConfig.scoped=true
+UserProfile.editableFields.editor.uiConfig.addSubProperty=true
+UserProfile.editableFields.editor.uiConfig.scopeRoot=UIConfig.editableFields
+UserProfile.editableFields.editor.uiConfig=font:background:foreground:disabledText:select:focus
 
 UserProfile.editableFields.sentFolder.propertyType=Folder
 UserProfile.editableFields.sentFolder.selectionRoot=allStores
@@ -564,7 +582,7 @@ Folder.editableFields.templateScoped=true
 Folder.editableFields.propertyType=Tabbed
 Folder.editableFields.propertyScoped=true
 Folder.editableFields.templateScoped=true
-Folder.editableFields=config:display:backend
+Folder.editableFields=config:display:backend:uiConfig
 Folder.editableFields.config=defaultProfile:useTrashFolder:notifyNewMessagesMain:notifyNewMessagesNode
 Folder.editableFields.config.scoped=true
 Folder.editableFields.config.scopeRoot=Folder.editableFields
@@ -591,6 +609,11 @@ Folder.editableFields.backendFilters.editableFields=searchTerm:action
 Folder.editableFields.backendFilters.editableFields.searchTerm.propertyType=SearchTerm
 Folder.editableFields.backendFilters.editableFields.action.propertyType=Filter
 Folder.editableFields.backendFilters.editableFields.action.filterType=backend
+
+Folder.editableFields.uiConfig.scoped=true
+Folder.editableFields.uiConfig.addSubProperty=true
+Folder.editableFields.uiConfig.scopeRoot=UIConfig.editableFields
+Folder.editableFields.uiConfig=font:background:foreground:disabledText:select:focus
 
 Folder.editableFields.defaultProfile.propertyType=List
 Folder.editableFields.defaultProfile.allowedValues=UserProfile

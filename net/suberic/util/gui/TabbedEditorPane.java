@@ -70,8 +70,14 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
       
       //System.err.println("TEP:  getting editor for " + currentProperty);
       if (propertyScoped) {
-	//System.err.println("TEP:  propScoped; getting editor for " + property + ", " + currentProperty);
-	currentEditor = createEditorPane(property, currentProperty);
+	//System.err.println("TEP:  propScoped");
+	if (sourceBundle.getProperty(currentProperty + ".addSubProperty", "false").equalsIgnoreCase("true")) {
+	  //System.err.println("TEP:  addSubProperty = true; getting editor for " + property + "." + propsToEdit.elementAt(i) + "," + currentProperty);
+	  currentEditor = createEditorPane(property + "." + (String) propsToEdit.elementAt(i), currentProperty);
+	} else {
+	  //System.err.println("TWP:  addSubProperty = false.  getting editor for " + property + ", " + currentProperty);
+	  currentEditor = createEditorPane(property, currentProperty);
+	}
       } else {
 	//System.err.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
 	currentEditor = createEditorPane(currentProperty, currentProperty);

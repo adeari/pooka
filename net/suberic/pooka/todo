@@ -4,8 +4,6 @@ top todo:
 
 *) add more font support
 
-*) add pgp/gpg support.
-
 *)  check on file->exit to make sure that there are no unsent messages,
 and give an option on what you want to do with each one if there are any.
 
@@ -47,6 +45,8 @@ that there are cases where it doesn't display properly.
 
 
 ------------
+
+*) add pgp/gpg support.
 
 *) queuing of outgoing mails
 	todo on this:

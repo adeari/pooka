@@ -105,14 +105,20 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
       Vector templateNames = bundle.getPropertyAsVector(template, "");
       //System.out.println("templateNames = getProp(" + template + ") = " + bundle.getProperty(template, ""));
       for (int i = 0; i < templateNames.size() ; i++) {
+	String propToEdit = null;
 	String currentSubProperty =  (String) templateNames.elementAt(i);
-	if (bundle.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false"))
-	  properties.add(property);
-	else
-	  properties.add(property + "." + (String) templateNames.elementAt(i));
-
-	templates.add(scopeRoot + "." + (String) templateNames.elementAt(i));
-	//System.out.println("adding " + (String) templateNames.elementAt(i) + ", template " + (String) templateNames.elementAt(i));
+	if (bundle.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false")) {
+	  propToEdit = property;
+	  //properties.add(property);
+	} else {
+	  propToEdit = property + "." + (String) templateNames.elementAt(i);
+	  //properties.add(property + "." + (String) templateNames.elementAt(i));
+	}
+	String templateToEdit = scopeRoot + "." + (String) templateNames.elementAt(i);
+	properties.add(propToEdit);
+	templates.add(templateToEdit);
+	//templates.add(scopeRoot + "." + (String) templateNames.elementAt(i));
+	//System.out.println("adding " + propToEdit + ", template " + templateToEdit);
       }
     } else {
       //System.out.println("creating prop list for Composite EP using " + property + ", " + template);
