@@ -98,6 +98,11 @@ public class StoreInfo implements ValueChangeListener {
 	defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
 
 	updateChildren();
+	
+	String trashFolderName = Pooka.getProperty(getStoreProperty() + ".trashFolder", "");
+	if (trashFolderName.length() > 0) {
+	    trashFolder = getChild(trashFolderName);
+	}
     }	
     
     /**
@@ -134,15 +139,29 @@ public class StoreInfo implements ValueChangeListener {
      * yet, or if this is a leaf node, then this method returns null.
      */
     public FolderInfo getChild(String childName) {
+	FolderInfo childFolder = null;
+	String folderName  = null, subFolderName = null;
+
 	if (children != null) {
+	    int divider = childName.indexOf('/');
+	    if (divider > 0) {
+		folderName = childName.substring(0, divider);
+		if (divider < childName.length() - 1)
+		    subFolderName = childName.substring(divider + 1);
+	    } else 
+		folderName = childName;
+	    
 	    for (int i = 0; i < children.size(); i++)
-		if (((FolderInfo)children.elementAt(i)).getFolderName().equals(childName))
-		    return (FolderInfo)children.elementAt(i);
+		if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
+		    childFolder = (FolderInfo)children.elementAt(i);
 	}
 	
-	// no match.
-	return null;
+	if (childFolder != null && subFolderName != null)
+	    return childFolder.getChild(subFolderName);
+	else
+	    return childFolder;
     }
+
     /**
      * This handles the changes if the source property is modified.
      *
