@@ -83,4 +83,11 @@ public class BounceFilterEditor extends FilterEditor {
 
   }
   
+  /**
+   * Returns the class that will be set for this FilterEditor.
+   */
+  public String getFilterClassValue() {
+    return FILTER_CLASS;
+  }
+
 }

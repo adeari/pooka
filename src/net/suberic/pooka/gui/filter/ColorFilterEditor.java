@@ -75,6 +75,13 @@ public class ColorFilterEditor extends FilterEditor implements java.awt.event.Ac
     if (!oldClassName.equals(FILTER_CLASS))
       manager.setProperty(property + ".class", FILTER_CLASS);
   }
+
+  /**
+   * Returns the class that will be set for this FilterEditor.
+   */
+  public String getFilterClassValue() {
+    return FILTER_CLASS;
+  }
   
 }
 

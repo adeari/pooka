@@ -1,3 +1,5 @@
+fixed FilterEditor so that the correct filter is shown. 
+
 messages are now only saved to the sent folder after the send succeeds.
 
 fixed DeleteFilter so it doesn't throw an error on configuration.

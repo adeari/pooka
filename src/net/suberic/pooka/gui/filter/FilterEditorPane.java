@@ -52,6 +52,9 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
     
     // create the filterConfigPanel.
     
+    String currentClassValue = manager.getProperty(property + ".action.class", "");
+    String selectedLabel = null;
+
     filterConfigPanel = new JPanel();
     layout = new java.awt.CardLayout();
     filterConfigPanel.setLayout(layout);
@@ -62,8 +65,14 @@ public class FilterEditorPane extends SwingPropertyEditor implements java.awt.ev
       
       filterConfigPanel.add(label, currentEditor);
       editorTable.put(label, currentEditor);
+
+      if (selectedLabel == null && currentClassValue == currentEditor.getFilterClassValue())
+	selectedLabel = label;
     }
-    
+
+    if (selectedLabel != null)
+      typeCombo.setSelectedItem(selectedLabel);
+
     JPanel valuePanel = new JPanel();
     
     valuePanel.add(typeCombo);

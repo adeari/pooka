@@ -29,4 +29,8 @@ public abstract class FilterEditor extends javax.swing.Box {
    */
   public abstract void setValue();
   
+  /**
+   * Returns the class that will be set for this FilterEditor.
+   */
+  public abstract String getFilterClassValue();
 }

@@ -51,4 +51,11 @@ public class MoveFilterEditor extends FilterEditor {
       manager.setProperty(property + ".class", FILTER_CLASS);
   }
   
+  /**
+   * Returns the class that will be set for this FilterEditor.
+   */
+  public String getFilterClassValue() {
+    return FILTER_CLASS;
+  }
+
 }

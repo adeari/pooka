@@ -15,7 +15,9 @@ public class DeleteFilterEditor extends FilterEditor {
    */
   public void configureEditor(net.suberic.util.gui.propedit.PropertyEditorManager newManager, String propertyName) {
     manager = newManager;
+    property = propertyName;
     // there really isn't anything to do here, is there?
+
   }
   
   /**
@@ -40,4 +42,10 @@ public class DeleteFilterEditor extends FilterEditor {
       manager.setProperty(property + ".class", FILTER_CLASS);
   }
   
+  /**
+   * Returns the class that will be set for this FilterEditor.
+   */
+  public String getFilterClassValue() {
+    return FILTER_CLASS;
+  }
 }

@@ -10,11 +10,14 @@
 *) make it so a move filter for a given folder defaults to that store,
 	at least, or possibly no store at all.
 
+*) finish fixing filter editor so proper editor is selected.
+
 *) outgoing mailserver improvements:
 	*) network connections - come up with a way to autotest that doesn't
 		take lots of time.
 	*) sending mail should try to autodetect mailserver to use
 		*) each server has a connection list, or 'any'
+		*) each user has a connection list, or 'any'
 		*) each server for the user checks the connections in order.
 		*) try to use the first available server
 	*) on failure to send
