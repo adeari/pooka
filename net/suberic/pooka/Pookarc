@@ -136,7 +136,7 @@ MenuBar.Mail.AddSignature.Action=message-add-signature
 MenuBar.Mail.SearchFolder.Action=folder-search
 MenuBar.Mail.Subscribe.Action=folder-subscribe
 
-MenuBar.Config=Preferences:StoreConfig:UserConfig:OutgoingConfig:ConnectionConfig:AddressBook:Folders
+MenuBar.Config=Preferences:StoreConfig:UserConfig:OutgoingConfig:ConnectionConfig:AddressBook:InterfaceStyle:Folders
 MenuBar.Config.Preferences.Action=cfg-prefs
 MenuBar.Config.UserConfig.Action=cfg-users
 MenuBar.Config.StoreConfig.Action=cfg-stores
@@ -144,6 +144,7 @@ MenuBar.Config.OutgoingConfig.Action=cfg-outgoing
 MenuBar.Config.ConnectionConfig.Action=cfg-connection
 MenuBar.Config.Folders.Action=folder-subscribe
 MenuBar.Config.AddressBook.Action=cfg-address-book
+MenuBar.Config.InterfaceStyle.Action=cfg-interface-style
 
 MenuBar.Window=Tile:Cascade
 MenuBar.Window.Tile.Action=window-tile
@@ -678,7 +679,7 @@ Store.editableFields.mailDirectory=Pooka.cacheDirectory
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
-Preferences=UI:Reply:Startup:Signature:HTML:SSL:Color
+Preferences=UI:Reply:Startup:Signature:HTML:SSL
 Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
@@ -689,11 +690,31 @@ Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:P
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
 Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.SSL=Pooka.sslCertFile
-Preferences.Color=Pooka.background
 
 Pooka.sslCertFile.propertyType=File
 
-Pooka.background.propertyType=Color
+Pooka.uiConfig=messagePanel:folderPanel:messageWindow:newMessageWindow:folderTable:Button:ToggleButton:RadioButton:CheckBox:ColorChooser:ComboBox:Label:List:MenuBar:MenuItem:RadioButtonMenuItem:CheckBoxMeuItem:Menu:PopupMenu:OptionPane:Panel:ProgressBar:ScrollPane:Viewport:TabbedPane:Table:TableHeader:TextField:PasswordField:TextArea:TextPane:EditorPane:TitledBorder:ToolBar:ToolTip:Tree
+
+Pooka.uiConfig.propertyType=Multi
+Pooka.uiConfig._fixed=true
+Pooka.uiConfig.editableFields.scoped=true
+Pooka.uiConfig.editableFields=font:background:foreground:disabledText:select:focus
+
+Pooka.uiConfig.editableFields.font.propertyType=Font
+Pooka.uiConfig.editableFields.font._enabledBox=true
+Pooka.uiConfig.editableFields.background.propertyType=Color
+Pooka.uiConfig.editableFields.background._enabledBox=true
+Pooka.uiConfig.editableFields.foreground.propertyType=Color
+Pooka.uiConfig.editableFields.foreground._enabledBox=true
+Pooka.uiConfig.editableFields.disabledText.propertyType=Color
+Pooka.uiConfig.editableFields.disabledText._enabledBox=true
+Pooka.uiConfig.editableFields.select.propertyType=Color
+Pooka.uiConfig.editableFields.select._enabledBox=true
+Pooka.uiConfig.editableFields.focus.propertyType=Color
+Pooka.uiConfig.editableFields.focus._enabledBox=true
+
+Pooka.looknfeel.propertyType=List
+Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunstoff
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v

@@ -3,12 +3,20 @@ import net.suberic.util.gui.*;
 import net.suberic.util.VariableBundle;
 import java.awt.Color;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 
 
 /**
  * This displays the currently selected file (if any), along with a 
  * button which will bring up a JColorChooser to choose any other file(s).
+ *
+ * If property._enabledBox is set to true, then this also adds a 
+ * checkbox to show whether or not to use this property, or just to use
+ * the defaults.
+ * 
+ * Note that the value that gets set is actually property.rgb (which is
+ * the rgb value of the color selected), and, if the enabled checkbox is
+ * there, property.enabled.  the property value itself is not set.
  */
 
 public class ColorSelectorPane extends DefaultPropertyEditor {
@@ -24,6 +32,10 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
 
   int originalRgb = NO_VALUE;
   Color currentColor;
+
+  boolean useEnabledBox = false;
+  JCheckBox enabledBox = null;
+  boolean origEnabled = false;
 
   /**
    * This creates a new ColorSelectorPane.
@@ -69,9 +81,7 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
     else
       defaultLabel = property.substring(dotIndex+1);
     
-    origValue = sourceBundle.getProperty(property, "");
-    
-    origValue = sourceBundle.getProperty(property, Integer.toString(NO_VALUE));
+    origValue = sourceBundle.getProperty(property + ".rgb", Integer.toString(NO_VALUE));
     originalRgb = Integer.parseInt(origValue);
 
     label = new JLabel(sourceBundle.getProperty(propertyTemplate + ".label", defaultLabel));
@@ -81,20 +91,34 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
     if (originalRgb != NO_VALUE) {
       setCurrentColor(new Color(originalRgb));
     } else {
-      setCurrentColor(Color.blue);
+      setCurrentColor(inputButton.getBackground());
     }
+    
     
     inputButton.setPreferredSize(new java.awt.Dimension(150, label.getMinimumSize().height));
     
     this.add(label);
     labelComponent = label;
+    
     JPanel tmpPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0,0));
     tmpPanel.add(inputButton);
-    valueComponent = tmpPanel;
-    //this.add(valueDisplay);
-    //this.add(inputButton);
-    this.add(tmpPanel);
     
+    useEnabledBox = sourceBundle.getProperty(propertyTemplate + "._enabledBox", "false").equalsIgnoreCase("true");
+    if (useEnabledBox) {
+      enabledBox = new JCheckBox();
+      origEnabled = sourceBundle.getProperty(property + "._enabled", "false").equalsIgnoreCase("true");
+      enabledBox.setSelected(origEnabled);
+      enabledBox.addItemListener(new ItemListener() {
+	  public void itemStateChanged(ItemEvent e) {
+	    enabledBoxUpdated(enabledBox.isSelected());
+	  }
+	});
+      tmpPanel.add(enabledBox);
+    }
+
+    valueComponent = tmpPanel;
+    this.add(tmpPanel);
+
     this.setEnabled(isEnabled);
     
   }
@@ -137,15 +161,27 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
     //  as defined in net.suberic.util.gui.PropertyEditorUI
   
   public void setValue() {
-    if (isEnabled() && isChanged())
-      sourceBundle.setProperty(property, Integer.toString(currentColor.getRGB()));
+    if (isEnabled() && isChanged()) {
+      sourceBundle.setProperty(property + ".rgb", Integer.toString(currentColor.getRGB()));
+      if (useEnabledBox) {
+      if (enabledBox.isSelected())
+	sourceBundle.setProperty(property + "._enabled", "true");
+      else
+	sourceBundle.setProperty(property + "._enabled", "false");
+      }
+    }
   }
   
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
     
-    retProps.setProperty(property, Integer.toString(currentColor.getRGB()));
-    
+    retProps.setProperty(property + ".rgb", Integer.toString(currentColor.getRGB()));
+    if (useEnabledBox) {
+      if (enabledBox.isSelected())
+	retProps.setProperty(property + "._enabled", "true");
+      else
+	retProps.setProperty(property + "._enabled", "false");
+    }
     return retProps;
   }
 
@@ -155,17 +191,33 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
     } else {
       setCurrentColor(Color.blue);
     }
+    if (useEnabledBox)
+      enabledBox.setSelected(origEnabled);
   }
   
   public boolean isChanged() {
-    return (!(origValue.equals(Integer.toString(currentColor.getRGB()))));
+    if (useEnabledBox)
+      return (! (enabledBox.isSelected() == origEnabled && origValue.equals(Integer.toString(currentColor.getRGB()))));
+    else
+      return (!(origValue.equals(Integer.toString(currentColor.getRGB()))));
   }
   
   public void setEnabled(boolean newValue) {
+    if (useEnabledBox) {
+      enabledBox.setEnabled(newValue);
+      inputButton.setEnabled(newValue && enabledBox.isSelected());
+    }
     if (inputButton != null) {
       inputButton.setEnabled(newValue);
-      enabled=newValue;
     }
+    enabled=newValue;
+  }
+
+  /**
+   * Called when the enabledBox's value is updated.
+   */
+  private void enabledBoxUpdated(boolean newValue) {
+    inputButton.setEnabled(newValue);
   }
   
 }

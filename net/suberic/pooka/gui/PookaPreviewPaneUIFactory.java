@@ -15,17 +15,27 @@ import javax.swing.JOptionPane;
  */
 public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    
-    PreviewContentPanel contentPanel = null;
-    PropertyEditorFactory editorFactory = null;
+  PreviewContentPanel contentPanel = null;
+  PropertyEditorFactory editorFactory = null;
 
-    public boolean showing = false;
+  PookaUIManager pookaUIManager = null;
+
+  public boolean showing = false;
 
     /**
      * Constructor.
      */
     public PookaPreviewPaneUIFactory() {
-	editorFactory = new PookaExternalPropertyEditorFactory(Pooka.getResources());
+      editorFactory = new PookaExternalPropertyEditorFactory(Pooka.getResources());
+      pookaUIManager = new PookaUIManager();
     }
+
+  /**
+   * Returns the PookaUIManager for fonts and colors.
+   */
+  public PookaUIManager getPookaUIManager() {
+    return pookaUIManager;
+  }
 
     /**
      * Creates an appropriate MessageUI object for the given MessageProxy.

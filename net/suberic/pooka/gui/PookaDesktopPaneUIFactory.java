@@ -12,19 +12,28 @@ import javax.mail.MessagingException;
  * objects on a JDesktopPane.
  */
 public class PookaDesktopPaneUIFactory implements PookaUIFactory {
-   
-    MessagePanel messagePanel = null;
-    PropertyEditorFactory editorFactory = null;
+  
+  MessagePanel messagePanel = null;
+  PropertyEditorFactory editorFactory = null;
+  PookaUIManager pookaUIManager = null;
 
-    public boolean showing = false;
+  public boolean showing = false;
     
     /**
      * Constructor.
      */
     public PookaDesktopPaneUIFactory() {
-	
-	editorFactory = new PookaDesktopPropertyEditorFactory(Pooka.getResources());
+      pookaUIManager = new PookaUIManager();
+ 
+      editorFactory = new PookaDesktopPropertyEditorFactory(Pooka.getResources());
     }
+
+  /**
+   * Returns the PookaUIManager for fonts and colors.
+   */
+  public PookaUIManager getPookaUIManager() {
+    return pookaUIManager;
+  }
 
     /**
      * Creates an appropriate MessageUI object for the given MessageProxy.

@@ -166,7 +166,9 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     optionList.addListSelectionListener(this);
     JScrollPane listScrollPane = new JScrollPane(optionList);
     optBox.add(listScrollPane);
-    optBox.add(createButtonBox());
+    
+    if (! sourceBundle.getProperty(property + "._fixed", "false").equalsIgnoreCase("true"))
+      optBox.add(createButtonBox());
     
     return optBox;
   }
