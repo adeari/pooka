@@ -61,7 +61,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   // AddressMatcher
 
   /**
-   * Returns all of the AddressBookEntryes which match the given String.
+   * Returns all of the AddressBookEntries which match the given String.
    */
   public AddressBookEntry[] match(String matchString) {
     // create the search string.
@@ -77,14 +77,14 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
-   * Returns all of the AddressBookEntryes which match the given String.
+   * Returns all of the AddressBookEntries which match the given String.
    */
   public AddressBookEntry[] matchExactly(String matchString) {
     return match(matchString);
   }
 
   /**
-   * Returns all of the AddressBookEntryes whose FirstName matches the given 
+   * Returns all of the AddressBookEntries whose FirstName matches the given 
    * String.
    */
   public AddressBookEntry[] matchFirstName(String matchString) {
@@ -101,7 +101,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
-   * Returns all of the AddressBookEntryes whose LastName matches the given 
+   * Returns all of the AddressBookEntries whose LastName matches the given 
    * String.
    */
   public AddressBookEntry[] matchLastName(String matchString) {
@@ -118,7 +118,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
-   * Returns all of the AddressBookEntryes whose email addresses match the
+   * Returns all of the AddressBookEntries whose email addresses match the
    * given String.
    */
   public AddressBookEntry[] matchEmailAddress(String matchString) {

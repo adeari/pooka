@@ -7,9 +7,9 @@ import java.util.*;
 
 /**
  * This class holds the information about the Messages in a Folder.
- * It actually uses a Vector of MessageProxys, but, for the Row information,
+ * It actually uses a List of MessageProxys, but, for the Row information,
  * just returns the values from MessageProxy.getTableInformation().
- * It also uses a Vector of column names.
+ * It also uses a List of column names.
  *
  */
 
@@ -17,20 +17,19 @@ public class FolderTableModel extends AbstractTableModel {
   static int ADD_MESSAGES = 0;
   static int REMOVE_MESSAGES = 1;
 
-  private Vector data;
-  private Vector columnNames;
-  private Vector columnSizes;
+  private List data;
+  private List columnNames;
+  private List columnSizes;
   private int currentSortColumn = -1;
   private boolean currentAscending = true;
-  //private Vector displayData;
-  private Vector columnKeys;
+  //private List displayData;
+  private List columnKeys;
   
-  public FolderTableModel(Vector newData, Vector newColumnNames, Vector newColumnSizes, Vector newColumnKeys) {
+  public FolderTableModel(List newData, List newColumnNames, List newColumnSizes, List newColumnKeys) {
     data=newData;
     columnNames = newColumnNames;
     columnSizes = newColumnSizes;
     columnKeys = newColumnKeys;
-    //displayData = new Vector(newData);
   }
   
   public int getColumnCount() {
@@ -42,7 +41,7 @@ public class FolderTableModel extends AbstractTableModel {
   }
   
   public String getColumnName(int col) {
-    return (String)columnNames.elementAt(col);
+    return (String)columnNames.get(col);
   }
   
   /**
@@ -55,7 +54,7 @@ public class FolderTableModel extends AbstractTableModel {
    */
   public Object getValueAt(int row, int col) {
     try {
-      MessageProxy mp = (MessageProxy) data.elementAt(row);
+      MessageProxy mp = (MessageProxy) data.get(row);
       if (mp == null)
 	return "null";
       else {
@@ -63,11 +62,11 @@ public class FolderTableModel extends AbstractTableModel {
 	  return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
 	} else {
 	  Object key = columnKeys.get(col);
-	  Object returnValue = ((MessageProxy)data.elementAt(row)).getTableInfo().get(key);
+	  Object returnValue = ((MessageProxy)data.get(row)).getTableInfo().get(key);
 	  // FIXME this is making us load stuff on the display thread.
 	  if (returnValue == null) {
 	    try {
-	      MessageProxy proxy = (MessageProxy)data.elementAt(row);
+	      MessageProxy proxy = (MessageProxy)data.get(row);
 	      HashMap tableInfo = proxy.getTableInfo();
 	      Set keySet = tableInfo.keySet();
 	      if (! keySet.contains(key)) {
@@ -91,7 +90,7 @@ public class FolderTableModel extends AbstractTableModel {
 		  tableInfo.put(key, key);
 		}
 		
-		returnValue = ((MessageProxy)data.elementAt(row)).getTableInfo().get(key);
+		returnValue = ((MessageProxy)data.get(row)).getTableInfo().get(key);
 	      }
 	    } catch (Exception e) {
 	      // ignore.
@@ -114,7 +113,7 @@ public class FolderTableModel extends AbstractTableModel {
    */
   public MessageProxy getMessageProxy(int rowNumber) {
     try {
-      return (MessageProxy)(data.elementAt(rowNumber));
+      return (MessageProxy)(data.get(rowNumber));
     } catch (ArrayIndexOutOfBoundsException ae) {
       return null;
     }
@@ -130,16 +129,16 @@ public class FolderTableModel extends AbstractTableModel {
   }
   
   /**
-   * This adds a Vector of new MessageProxys to the FolderTableModel.
+   * This adds a List of new MessageProxys to the FolderTableModel.
    */
-  public void addRows(Vector newRows) {
+  public void addRows(List newRows) {
     addOrRemoveRows(newRows, FolderTableModel.ADD_MESSAGES);
   }
   
   /**
-   * This removes a Vector of MessageProxys from the FolderTableModel.
+   * This removes a List of MessageProxys from the FolderTableModel.
    */
-  public void removeRows(Vector rowsDeleted) {
+  public void removeRows(List rowsDeleted) {
     
     addOrRemoveRows(rowsDeleted, FolderTableModel.REMOVE_MESSAGES);
   }
@@ -150,7 +149,7 @@ public class FolderTableModel extends AbstractTableModel {
    * from addRows() or removeRows().
    */
   
-  public synchronized void addOrRemoveRows(Vector changedMsg, int addOrRem) {
+  public synchronized void addOrRemoveRows(List changedMsg, int addOrRem) {
     final int firstRow, lastRow;
     
     if (changedMsg != null && changedMsg.size() > 0) {
@@ -173,9 +172,9 @@ public class FolderTableModel extends AbstractTableModel {
 	
       } else if (addOrRem == FolderTableModel.REMOVE_MESSAGES) {
 	for (int i = 0; i < changedMsg.size() ; i++) {
-	  final int rowNumber = data.indexOf(changedMsg.elementAt(i));
+	  final int rowNumber = data.indexOf(changedMsg.get(i));
 	  if (rowNumber > -1) {
-	    data.removeElement(changedMsg.elementAt(i));
+	    data.remove(changedMsg.get(i));
 	    
 	    if ( ! SwingUtilities.isEventDispatchThread())
 	      try {
@@ -206,7 +205,7 @@ public class FolderTableModel extends AbstractTableModel {
   
     public int getColumnSize(int columnIndex) {
       try {
-	return Integer.parseInt((String)columnSizes.elementAt(columnIndex));
+	return Integer.parseInt((String)columnSizes.get(columnIndex));
       } catch (Exception e) {
 	return 0;
       }
@@ -355,7 +354,7 @@ public class FolderTableModel extends AbstractTableModel {
   }
   
   /**
-   * This sorts the data Vector by the value of the given column.
+   * This sorts the data List by the value of the given column.
    */
     public void sortByColumn(int column, boolean ascending) {
       if (ascending)
@@ -385,7 +384,7 @@ public class FolderTableModel extends AbstractTableModel {
   /**
    * Returns all of the MessageProxies in this FolderTableModel.
    */
-  public Vector getAllProxies() {
+  public List getAllProxies() {
     return new Vector(data);
   }
 }

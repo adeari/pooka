@@ -6,6 +6,7 @@ import javax.mail.event.MessageChangedEvent;
 import javax.mail.event.ConnectionEvent;
 import net.suberic.pooka.*;
 import java.util.Vector;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.HashMap;
 import java.util.Set;
@@ -13,7 +14,7 @@ import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderTableModel;
 
 /**
- * A FolderInfo which keeps track of its messages' UID's.  This allows
+ * A FolderInfo which keeps track of its messages' UIDs.  This allows
  * it to recover if the connection to the server is lost.
  */
 
@@ -33,92 +34,57 @@ public class UIDFolderInfo extends FolderInfo {
   }
   
   /**
-   * Loads all Messages into a new FolderTableModel, sets this 
-   * FolderTableModel as the current FolderTableModel, and then returns
-   * said FolderTableModel.  This is the basic way to populate a new
-   * FolderTableModel.
+   * Loads the MessageInfos and MesageProxies.  Returns a List of 
+   * newly created MessageProxies.
    */
-  public synchronized void loadAllMessages() throws MessagingException {
-    if (folderTableModel == null) {
-      Vector messageProxies = new Vector();
-      
-      fetchProfile = createColumnInformation();
-      // fetchProfile.add(UIDFolder.FetchProfileItem.UID);
-      
-      if (loaderThread == null) 
-	loaderThread = createLoaderThread();
-      
-      if (!isConnected()) {
-	openFolder(Folder.READ_WRITE);
-      }
-      
-      // get the UID's first.
-      FetchProfile uidProfile = new FetchProfile();
-      uidProfile.add(UIDFolder.FetchProfileItem.UID);
-      
-      int fetchBatchSize = 50;
-      try {
-	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
-      } catch (NumberFormatException nfe) {
-      }
-      
-      Message[] msgs = getFolder().getMessages();
-      
-      getFolder().fetch(msgs, uidProfile);
-      
-      Message[] toFetch = msgs;
-      
-      // go ahead and fetch the first set of messages; the rest will be
-      // taken care of by the loaderThread.
-      if (msgs.length > fetchBatchSize) {
-	toFetch = new Message[fetchBatchSize];
-	System.arraycopy(msgs, msgs.length - fetchBatchSize, toFetch, 0, fetchBatchSize);
-      }
-      
-      getFolder().fetch(toFetch, fetchProfile);
-      
-      int firstFetched = Math.max(msgs.length - fetchBatchSize, 0);
-      
-      MessageInfo mi;
-      
-      for (int i = 0; i < msgs.length; i++) {
-	long uid = getUID(msgs[i]);
-	UIDMimeMessage newMessage = new UIDMimeMessage(this, uid);
-	mi = new MessageInfo(newMessage, this);
-	
-	if ( i >= firstFetched)
-	  mi.setFetched(true);
-	
-	messageProxies.add(new MessageProxy(getColumnValues() , mi));
-	messageToInfoTable.put(newMessage, mi);
-	uidToInfoTable.put(new Long(uid), mi);
-      }
-      
-      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
-      
-      setFolderTableModel(ftm);
-      
-      Vector loadImmediately = null;
-      
-      if (messageProxies.size() > 25) {
-	loadImmediately = new Vector();
-	for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
-	  loadImmediately.add(messageProxies.get(i));
-	}
-      } else {
-	loadImmediately = new Vector(messageProxies);
-      }
-      
-      loadMessageTableInfos(loadImmediately);
-      
-      loaderThread.loadMessages(messageProxies);
-      
-      if (!loaderThread.isAlive())
-	loaderThread.start();
-      
+  protected List createInfosAndProxies() throws MessagingException {
+    int fetchBatchSize = 50;
+    try {
+      fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+    } catch (NumberFormatException nfe) {
     }
-  }
+      
+    Vector messageProxies = new Vector();
     
+    Message[] msgs = getFolder().getMessages();
+    
+    // get the UIDs first.
+    FetchProfile uidProfile = new FetchProfile();
+    uidProfile.add(UIDFolder.FetchProfileItem.UID);
+    
+    getFolder().fetch(msgs, uidProfile);
+    
+    Message[] toFetch = msgs;
+    
+    // go ahead and fetch the first set of messages; the rest will be
+    // taken care of by the loaderThread.
+    if (msgs.length > fetchBatchSize) {
+      toFetch = new Message[fetchBatchSize];
+      System.arraycopy(msgs, msgs.length - fetchBatchSize, toFetch, 0, fetchBatchSize);
+    }
+    
+    getFolder().fetch(toFetch, fetchProfile);
+    
+    int firstFetched = Math.max(msgs.length - fetchBatchSize, 0);
+    
+    MessageInfo mi;
+    
+    for (int i = 0; i < msgs.length; i++) {
+      long uid = getUID(msgs[i]);
+      UIDMimeMessage newMessage = new UIDMimeMessage(this, uid);
+      mi = new MessageInfo(newMessage, this);
+      
+      if ( i >= firstFetched)
+	mi.setFetched(true);
+      
+      messageProxies.add(new MessageProxy(getColumnValues() , mi));
+      messageToInfoTable.put(newMessage, mi);
+      uidToInfoTable.put(new Long(uid), mi);
+    }
+      
+    return messageProxies;
+  }
+
   /**
    * This just checks to see if we can get a NewMessageCount from the
    * folder.  As a brute force method, it also accesses the folder

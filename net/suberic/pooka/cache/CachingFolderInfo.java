@@ -5,6 +5,7 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.event.MessageChangedEvent;
 import javax.mail.event.ConnectionEvent;
 import java.util.Vector;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.HashMap;
 import java.io.File;
@@ -218,7 +219,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    */
   protected void rematchFilters() {
     if (folderTableModel != null) {
-      Vector allProxies = folderTableModel.getAllProxies();
+      List allProxies = folderTableModel.getAllProxies();
       for (int i = 0; i < allProxies.size(); i++) {
 	((MessageProxy) allProxies.get(i)).clearMatchedFilters();
       }
@@ -227,142 +228,121 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   }
 
   /**
-   * Loads all Messages into a new FolderTableModel, sets this 
-   * FolderTableModel as the current FolderTableModel, and then returns
-   * said FolderTableModel.  This is the basic way to populate a new
-   * FolderTableModel.
+   * During loadAllMessages, updates the display to say that we're loading
+   * messages.
    */
-  public synchronized void loadAllMessages() throws MessagingException {
-    if (folderTableModel == null) {
-      if (getFolderDisplayUI() != null) {
+  protected void updateDisplay(boolean start) {
+    if (getFolderDisplayUI() != null) {
+      if (start) {
 	getFolderDisplayUI().setBusy(true);
 	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.starting", "Loading messages."));
-      }
-      
-      if (!isLoaded())
-	loadFolder();
-
-      Vector messageProxies = new Vector();
-      
-      fetchProfile = createColumnInformation();
-      if (loaderThread == null) 
-	loaderThread = createLoaderThread();
-      
-      try {
-		
-	if (preferredStatus < DISCONNECTED && !(isConnected() && getParentStore().getConnection().getStatus() == NetworkConnection.CONNECTED )) {
-	  try {
-	    openFolder(Folder.READ_WRITE);
-	  } catch (MessagingException me) {
-	    uidValidity = cache.getUIDValidity();
-	    preferredStatus = DISCONNECTED;
-	  }
-	}
-
-	if (getStatus() > CONNECTED) {
-	  uidValidity = cache.getUIDValidity();
-	}
-	
-	if (isConnected()) {
-	  try {
-	    // load the list of uid's.
-	    
-	    FetchProfile uidFetchProfile = new FetchProfile();
-	    uidFetchProfile.add(UIDFolder.FetchProfileItem.UID);
-	    if (Pooka.isDebug())
-	      System.out.println("getting messages.");
-	    
-	    Message[] messages = getFolder().getMessages();
-	    if (Pooka.isDebug())
-	      System.out.println("fetching messages.");
-	    getFolder().fetch(messages, uidFetchProfile);
-	    if (Pooka.isDebug())
-	      System.out.println("done fetching messages.  getting uid's");
-	    
-	    long[] uids = new long[messages.length];
-	    
-	    for (int i = 0; i < messages.length; i++) {
-	      uids[i] = getUID(messages[i]);
-	    }
-      
-	    MessageInfo mi;
-	    
-	    for (int i = 0; i < uids.length; i++) {
-	      Message m = new CachingMimeMessage(this, uids[i]);
-	      mi = new MessageInfo(m, this);
-	      
-	      messageProxies.add(new MessageProxy(getColumnValues() , mi));
-	      messageToInfoTable.put(m, mi);
-	      uidToInfoTable.put(new Long(uids[i]), mi);
-	    }
-	    
-	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
-	    
-	    setFolderTableModel(ftm);
-	    
-	    synchronizeCache();
-	  } catch (Exception e) {
-	    final Exception fe = e;
-	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		  if (getFolderDisplayUI() != null) {
-		    getFolderDisplayUI().showError(Pooka.getProperty("error.CachingFolder.synchronzing", "Error synchronizing with folder"), Pooka.getProperty("error.CachingFolder.synchronzing.title", "Error synchronizing with folder"), fe);
-		  } else {
-		    Pooka.getUIFactory().showError(Pooka.getProperty("error.CachingFolder.synchronzing", "Error synchronizing with folder"), Pooka.getProperty("error.CachingFolder.synchronzing.title", "Error synchronizing with folder"), fe);
-		    
-		  }
-		}
-	      });
-	  }
-	} else {
-	  long[] uids = cache.getMessageUids();
-	  MessageInfo mi;
-	  
-	  for (int i = 0; i < uids.length; i++) {
-	    Message m = new CachingMimeMessage(this, uids[i]);
-	    mi = new MessageInfo(m, this);
-	    MessageProxy mp = new MessageProxy(getColumnValues() , mi);
-	    mp.setRefresh(true);
-	    messageProxies.add(mp);
-	    messageToInfoTable.put(m, mi);
-	    uidToInfoTable.put(new Long(uids[i]), mi);
-	  }
-	  
-	  FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
-	  
-	  setFolderTableModel(ftm);
-	  
-	  
-	}
-	
-	Vector loadImmediately = null;
-	
-	if (messageProxies.size() > 25) {
-	  loadImmediately = new Vector();
-	  for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
-	    loadImmediately.add(messageProxies.get(i));
-	  }
-	} else {
-	  loadImmediately = new Vector(messageProxies);
-	}
-	
-	loadMessageTableInfos(loadImmediately);
-	
-	loaderThread.loadMessages(messageProxies);
-	
-	if (!loaderThread.isAlive())
-	  loaderThread.start();
-	
-      } finally {
-	if (getFolderDisplayUI() != null) {
-	  getFolderDisplayUI().setBusy(false);
-	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.finished", "Done loading messages."));
-	}
-	
+      } else {
+	getFolderDisplayUI().setBusy(false);
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.CachingFolder.loading.finished", "Done loading messages."));
       }
     }
   }
+
+  /**
+   * While loading messages, attempts to update the folder status.
+   */
+  protected void updateFolderStatusForLoading() throws MessagingException {
+    if (preferredStatus < DISCONNECTED && !(isConnected() && getParentStore().getConnection().getStatus() == NetworkConnection.CONNECTED )) {
+      try {
+	openFolder(Folder.READ_WRITE);
+      } catch (MessagingException me) {
+	uidValidity = cache.getUIDValidity();
+	preferredStatus = DISCONNECTED;
+      }
+    }
+  }
+
+  /**
+   * Loads the MessageInfos and MesageProxies.  Returns a List of 
+   * newly created MessageProxies.
+   */
+  protected List createInfosAndProxies() throws MessagingException {
     
+    List messageProxies = new Vector();
+
+    if (getStatus() > CONNECTED) {
+      uidValidity = cache.getUIDValidity();
+    }
+    
+    if (isConnected()) {
+      try {
+	// load the list of uid's.
+	
+	FetchProfile uidFetchProfile = new FetchProfile();
+	uidFetchProfile.add(UIDFolder.FetchProfileItem.UID);
+	if (Pooka.isDebug())
+	  System.out.println("getting messages.");
+	
+	Message[] messages = getFolder().getMessages();
+	if (Pooka.isDebug())
+	  System.out.println("fetching messages.");
+	getFolder().fetch(messages, uidFetchProfile);
+	if (Pooka.isDebug())
+	  System.out.println("done fetching messages.  getting uid's");
+	
+	long[] uids = new long[messages.length];
+	
+	for (int i = 0; i < messages.length; i++) {
+	  uids[i] = getUID(messages[i]);
+	}
+	
+	MessageInfo mi;
+	
+	for (int i = 0; i < uids.length; i++) {
+	  Message m = new CachingMimeMessage(this, uids[i]);
+	  mi = new MessageInfo(m, this);
+	  
+	  messageProxies.add(new MessageProxy(getColumnValues() , mi));
+	  messageToInfoTable.put(m, mi);
+	  uidToInfoTable.put(new Long(uids[i]), mi);
+	}
+
+	return messageProxies;
+      } catch (Exception e) {
+	final Exception fe = e;
+	javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+	      if (getFolderDisplayUI() != null) {
+		getFolderDisplayUI().showError(Pooka.getProperty("error.CachingFolder.synchronzing", "Error synchronizing with folder"), Pooka.getProperty("error.CachingFolder.synchronzing.title", "Error synchronizing with folder"), fe);
+	      } else {
+		Pooka.getUIFactory().showError(Pooka.getProperty("error.CachingFolder.synchronzing", "Error synchronizing with folder"), Pooka.getProperty("error.CachingFolder.synchronzing.title", "Error synchronizing with folder"), fe);
+		
+	      }
+	    }
+	  });
+      }
+    }
+      
+    long[] uids = cache.getMessageUids();
+    MessageInfo mi;
+      
+    for (int i = 0; i < uids.length; i++) {
+      Message m = new CachingMimeMessage(this, uids[i]);
+      mi = new MessageInfo(m, this);
+      MessageProxy mp = new MessageProxy(getColumnValues() , mi);
+      mp.setRefresh(true);
+      messageProxies.add(mp);
+      messageToInfoTable.put(m, mi);
+      uidToInfoTable.put(new Long(uids[i]), mi);
+    }
+    
+    return messageProxies;
+  }
+  
+  /**
+   * Updates any caching information, if necessary.
+   */
+  protected void updateCache() throws MessagingException {
+    if (isConnected()) {
+      synchronizeCache();
+    }
+  }
+
   /**
    * Fetches the information for the given messages using the given
    * FetchProfile.

@@ -417,7 +417,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  else { 
 	    folder.close(false);
 	    openFolder(mode);
-	    }
+	    updateFolderOpenStatus(true);
+	    resetMessageCounts();
+	  }
 	} else {
 	  folder.open(mode);
 	  updateFolderOpenStatus(true);
@@ -425,7 +427,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
       } else if (status == INVALID) {
 	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
-	}
+      }
       
     }
   
@@ -680,6 +682,103 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   /**
+   * During loadAllMessages, updates the display to say that we're loading
+   * messages.
+   */
+  protected void updateDisplay(boolean start) {
+    if (getFolderDisplayUI() != null) {
+      if (start) {
+	getFolderDisplayUI().setBusy(true);
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.Folder.loading.starting", "Loading messages."));
+      } else {
+	getFolderDisplayUI().setBusy(false);
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.Folder.loading.finished", "Done loading messages."));
+      }
+    }
+  }
+
+  /**
+   * While loading messages, attempts to update the folder status.
+   */
+  protected void updateFolderStatusForLoading() throws MessagingException {
+    if (! isConnected() ) {
+      openFolder(Folder.READ_WRITE);
+    }
+  }
+
+  /**
+   * Loads the MessageInfos and MesageProxies.  Returns a List of 
+   * newly created MessageProxies.
+   */
+  protected List createInfosAndProxies() throws MessagingException {
+    int fetchBatchSize = 50;
+    try {
+      fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+    } catch (NumberFormatException nfe) {
+    }
+      
+    Vector messageProxies = new Vector();
+      
+    Message[] msgs = folder.getMessages();
+    
+    Message[] toFetch = msgs;
+    
+    // go ahead and fetch the first set of messages; the rest will be
+    // taken care of by the loaderThread.
+    if (msgs.length > fetchBatchSize) {
+      toFetch = new Message[fetchBatchSize];
+      System.arraycopy(msgs, msgs.length - fetchBatchSize, toFetch, 0, fetchBatchSize);
+    }
+    
+    folder.fetch(toFetch, fetchProfile);
+    
+    int firstFetched = Math.max(msgs.length - fetchBatchSize, 0);
+    
+    MessageInfo mi;
+    
+    for (int i = 0; i < msgs.length; i++) {
+      mi = new MessageInfo(msgs[i], this);
+      
+      if ( i >= firstFetched)
+	mi.setFetched(true);
+      
+      messageProxies.add(new MessageProxy(getColumnValues() , mi));
+      messageToInfoTable.put(msgs[i], mi);
+    }
+
+    return messageProxies;
+  }
+
+  /**
+   * Applies message filters to the new messages.
+   */
+  public void runFilters(List proxies) throws MessagingException {
+    if (isConnected()) {
+      Folder current = getFolder();
+      if (current != null && current.isOpen()) {
+	int newCount = current.getNewMessageCount();
+
+	if (newCount > 0) {
+	  int numProxies = proxies.size();
+	  List newProxies = new ArrayList();
+	  for (int i = 0; i < newCount; i++) {
+	    newProxies.add(proxies.get((numProxies - newCount) + i));
+	  }
+	  proxies.removeAll(applyFilters(newProxies));
+	}
+      }
+    }
+    
+  }
+
+  /**
+   * Updates any caching information, if necessary.
+   */
+  protected void updateCache() throws MessagingException {
+    // no-op by default.
+  }
+
+  /**
    * Loads all Messages into a new FolderTableModel, sets this 
    * FolderTableModel as the current FolderTableModel, and then returns
    * said FolderTableModel.  This is the basic way to populate a new
@@ -687,73 +786,51 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public synchronized void loadAllMessages() throws MessagingException {
     if (folderTableModel == null) {
-      Vector messageProxies = new Vector();
-      
-      fetchProfile = createColumnInformation();
-      if (loaderThread == null) 
-	loaderThread = createLoaderThread();
-      
+      updateDisplay(true);
+
       if (! isLoaded())
 	loadFolder();
       
-      if (! isConnected() ) {
-	openFolder(Folder.READ_WRITE);
-      }
+      fetchProfile = createColumnInformation();
 
-      int fetchBatchSize = 50;
+      if (loaderThread == null) 
+	loaderThread = createLoaderThread();
+      
       try {
-	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
-      } catch (NumberFormatException nfe) {
-      }
-      
-      Message[] msgs = folder.getMessages();
-
-      Message[] toFetch = msgs;
-
-      // go ahead and fetch the first set of messages; the rest will be
-      // taken care of by the loaderThread.
-      if (msgs.length > fetchBatchSize) {
-	toFetch = new Message[fetchBatchSize];
-	System.arraycopy(msgs, msgs.length - fetchBatchSize, toFetch, 0, fetchBatchSize);
-      }
-
-      folder.fetch(toFetch, fetchProfile);
-      
-      int firstFetched = Math.max(msgs.length - fetchBatchSize, 0);
-
-      MessageInfo mi;
-      
-      for (int i = 0; i < msgs.length; i++) {
-	mi = new MessageInfo(msgs[i], this);
+	updateFolderStatusForLoading();
 	
-	if ( i >= firstFetched)
-	  mi.setFetched(true);
+	List messageProxies = createInfosAndProxies();
+	
+	runFilters(messageProxies);
 
-	messageProxies.add(new MessageProxy(getColumnValues() , mi));
-	messageToInfoTable.put(msgs[i], mi);
-      }
-      
-      FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
-      
-      setFolderTableModel(ftm);
-      
-      Vector loadImmediately = null;
+	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
+	
+	setFolderTableModel(ftm);
+	
+	updateCache();
 
-      if (messageProxies.size() > 25) {
-	loadImmediately = new Vector();
-	for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
-	  loadImmediately.add(messageProxies.get(i));
+	Vector loadImmediately = null;
+	
+	if (messageProxies.size() > 25) {
+	  loadImmediately = new Vector();
+	  for (int i = messageProxies.size() - 1; i > messageProxies.size() - 26; i--) {
+	    loadImmediately.add(messageProxies.get(i));
+	  }
+	} else {
+	  loadImmediately = new Vector(messageProxies);
 	}
-      } else {
-	loadImmediately = new Vector(messageProxies);
+	
+	loadMessageTableInfos(loadImmediately);
+	
+	loaderThread.loadMessages(messageProxies);
+	
+	if (!loaderThread.isAlive())
+	  loaderThread.start();
+	
+      } finally {
+	updateDisplay(false);
       }
 
-      loadMessageTableInfos(loadImmediately);
-
-      loaderThread.loadMessages(messageProxies);
-      
-      if (!loaderThread.isAlive())
-	loaderThread.start();
     }
   }
 
@@ -854,9 +931,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public void unloadTableInfos() {
     if (folderTableModel != null) {
-      Vector allProxies = folderTableModel.getAllProxies();
+      List allProxies = folderTableModel.getAllProxies();
       for (int i = 0; i < allProxies.size(); i++) {
-	MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+	MessageProxy mp = (MessageProxy) allProxies.get(i);
 	mp.unloadTableInfo();
       }
       
@@ -871,9 +948,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
   public void unloadMatchingFilters() {
     if (folderTableModel != null) {
-      Vector allProxies = folderTableModel.getAllProxies();
+      List allProxies = folderTableModel.getAllProxies();
       for (int i = 0; i < allProxies.size(); i++) {
-	MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+	MessageProxy mp = (MessageProxy) allProxies.get(i);
 	mp.clearMatchedFilters();
       }
       
@@ -1939,7 +2016,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    *
    * @return a Vector containing the removed MessageInfo objects.
    */
-  public Vector applyFilters(Vector messages) {
+  public Vector applyFilters(List messages) {
     Vector notRemovedYet = new Vector(messages);
     Vector removed = new Vector();
     if (backendFilters != null) 

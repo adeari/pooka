@@ -265,10 +265,10 @@ public class LoadMessageThread extends Thread {
   /**
    * Adds the MessageProxy(s) to the loadQueue.
    */
-  public synchronized void loadMessages(Vector mp) {
+  public synchronized void loadMessages(List mp) {
     if (mp != null && mp.size() > 0) 
       for (int i = 0; i < mp.size(); i++)
-	loadQueue.add(mp.elementAt(i));
+	loadQueue.add(mp.get(i));
     
     if (this.isSleeping())
       this.interrupt();

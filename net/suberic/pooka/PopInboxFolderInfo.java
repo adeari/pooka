@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.Vector;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 import net.suberic.pooka.cache.ChangeCache;
 import net.suberic.pooka.gui.MessageProxy;
 
@@ -120,9 +121,9 @@ public class PopInboxFolderInfo extends FolderInfo {
    */
   void populateUidMap() {
     if (folderTableModel != null) {
-      Vector v = folderTableModel.getAllProxies();
+      List v = folderTableModel.getAllProxies();
       for (int i = 0; i < v.size(); i++) {
-	MessageProxy mp = (MessageProxy) v.elementAt(i);
+	MessageProxy mp = (MessageProxy) v.get(i);
 	try {
 	  String uid = (String) mp.getMessageInfo().getMessageProperty(UID_HEADER);
 	  uidsRead.add(uid);
