@@ -1,8 +1,11 @@
 top todo:
 
-*) add color support
-
-*) add more font support
+*) add color and font support
+	begun.  todo:
+	*) color chooser needs to disable the color button when the checkbox
+		isn't checked.
+	*) make it so we can actually change all of the appropriate 
+		color settings.
 
 *) have Pooka itself change its icon if you get new messages, in addition to 
 changing the title bar.
@@ -128,6 +131,8 @@ use it--or at least so it doesn't matter if it does.  -- only on unix.
 
 *) a nested message which is of type text/html doesn't get shown on the
 	display.
+
+*) need a way for forward/include html-only messages.
 
 *) enable voice control
 

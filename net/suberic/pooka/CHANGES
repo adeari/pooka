@@ -1,3 +1,7 @@
+fixed a bug where the StoreNode and FolderNode were each updating their
+gui components on the mail thread, rather than on the swint eventdispatcher
+thread.
+
 added a new default mailcap file, either '.pooka_mailcap' or 
 'pooka_mailcap.txt'.  set it up so this file is the one written to by
 default.  also reset the 'make command default' so that it actually works

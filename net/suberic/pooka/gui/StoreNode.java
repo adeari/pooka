@@ -80,46 +80,66 @@ public class StoreNode extends MailTreeNode {
      * This loads or updates the top-level children of the Store.
      */
     public void loadChildren() {
-	
-	if (Pooka.isDebug())
-	    System.out.println("calling loadChildren() for " + getStoreInfo().getStoreID());
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    doLoadChildren();
+	  }
+	};
 
-	Enumeration origChildren = super.children();
-	Vector origChildrenVector = new Vector();
-	while (origChildren.hasMoreElements())
-	    origChildrenVector.add(origChildren.nextElement());
+      if (SwingUtilities.isEventDispatchThread())
+	doLoadChildren();
+      else {
+	try {
+	  SwingUtilities.invokeAndWait(runMe);
+	} catch (Exception ie) {
+	}
+      }
+    }
 
-	if (Pooka.isDebug())
-	    System.out.println(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
-
-	Vector storeChildren = getStoreInfo().getChildren();
-	
-	if (Pooka.isDebug())
-	    System.out.println(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
-
-	if (storeChildren != null) {
-	    for (int i = 0; i < storeChildren.size(); i++) {
-		FolderNode node = popChild(((FolderInfo)storeChildren.elementAt(i)).getFolderName(), origChildrenVector);
-		if (node == null) {
-		    node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
-		    // we used insert here, since add() would mak
-		    // another recursive call to getChildCount();
-		    insert(node, 0);
-		}
-	    }
-	    
+  /**
+   * Does the actual work for loading the children.  performed on the swing
+   * gui thread.
+   */
+  private void doLoadChildren() {
+    if (Pooka.isDebug())
+      System.out.println("calling loadChildren() for " + getStoreInfo().getStoreID());
+    
+    Enumeration origChildren = super.children();
+      Vector origChildrenVector = new Vector();
+      while (origChildren.hasMoreElements())
+	origChildrenVector.add(origChildren.nextElement());
+      
+      if (Pooka.isDebug())
+	System.out.println(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
+      
+      Vector storeChildren = getStoreInfo().getChildren();
+      
+      if (Pooka.isDebug())
+	System.out.println(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
+      
+      if (storeChildren != null) {
+	for (int i = 0; i < storeChildren.size(); i++) {
+	  FolderNode node = popChild(((FolderInfo)storeChildren.elementAt(i)).getFolderName(), origChildrenVector);
+	  if (node == null) {
+	    node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
+	    // we used insert here, since add() would mak
+	    // another recursive call to getChildCount();
+	    insert(node, 0);
+	  }
 	}
 	
-	removeChildren(origChildrenVector);
-	
-	hasLoaded=true;
-	
-
-	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
-	    ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
-	}
-
+      }
+      
+      removeChildren(origChildrenVector);
+      
+      hasLoaded=true;
+      
+      
+      javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+      if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+	((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
+      }
+      
 	/*
 	java.util.Vector storeChildren = getStoreInfo().getChildren();
     

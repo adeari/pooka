@@ -135,8 +135,28 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
      * the list of Children on the FolderInfo.
      */
     public void loadChildren() {
-
-	Enumeration origChildren = super.children();
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    doLoadChildren();
+	  }
+	};
+      
+      if (SwingUtilities.isEventDispatchThread())
+	doLoadChildren();
+      else {
+	try {
+	  SwingUtilities.invokeAndWait(runMe);
+	} catch (Exception ie) {
+	}
+      }
+    }
+  
+  /**
+   * Does the actual work for loading the children.  performed on the swing
+   * gui thread.
+   */
+  private void doLoadChildren() {
+    Enumeration origChildren = super.children();
 	Vector origChildrenVector = new Vector();
 	while (origChildren.hasMoreElements())
 	    origChildrenVector.add(origChildren.nextElement());
