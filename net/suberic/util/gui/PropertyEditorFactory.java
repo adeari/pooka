@@ -69,6 +69,17 @@ public class PropertyEditorFactory {
 	jf.show();
     }
 
+  /**
+   * Creates and displays an editor window.  
+   */
+  public void showNewEditorWindow(String title, DefaultPropertyEditor editor) {
+    JFrame jf = new JFrame(title);
+    jf.getContentPane().add(new PropertyEditorPane(this, editor, jf));
+    jf.setSize(200,200);
+    jf.pack();
+    jf.show();
+  }
+
 
     /**
      * This returns a DefaultPropertyEditor for the property passed.

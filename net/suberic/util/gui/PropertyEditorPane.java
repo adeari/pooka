@@ -64,6 +64,27 @@ public class PropertyEditorPane extends Box implements PropertyEditorUI {
 	    this.addButtons();
     }
 
+    /**
+     * This contructor creates a PropertyEditor using the given 
+     * DefaultPropertyEditor.
+     */     
+    public PropertyEditorPane(PropertyEditorFactory newFactory, 
+			      DefaultPropertyEditor newEditor,
+                              Container newContainer) {
+      super(BoxLayout.Y_AXIS);
+      
+      factory = newFactory;
+      container = newContainer;
+      
+      editors = new Vector();
+      
+      editors.add(newEditor);
+      this.add(newEditor);
+      
+      if (container != null)
+	this.addButtons();
+    }
+
     public void configureEditor(PropertyEditorFactory newFactory, String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
 	
     }

@@ -41,8 +41,8 @@ import net.suberic.util.VariableBundle;
  *
  */
 public class CompositeEditorPane extends DefaultPropertyEditor {
-  Vector editors;
-  PropertyEditorFactory factory;
+  protected Vector editors;
+  protected PropertyEditorFactory factory;
   String property;
   String template;
   
@@ -69,6 +69,13 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
     super(BoxLayout.X_AXIS);
     configureEditor(newFactory, newProperty, newTemplate, newFactory.getBundle(), isEnabled);
     
+  }
+
+  /**
+   * ...Constructor.
+   */
+  public CompositeEditorPane(int axis) {
+    super(axis);
   }
   
   /**

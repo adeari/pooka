@@ -67,6 +67,22 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     }
     
     /**
+     * Creates and displays an editor window.  
+     */
+    public void showNewEditorWindow(String title, DefaultPropertyEditor editor) {
+      JInternalFrame jif = new JInternalFrame(title, false, false, false, false);
+      jif.getContentPane().add(new PropertyEditorPane(this, editor, jif));
+      jif.setSize(100,100);
+      jif.pack();
+      desktop.add(jif);
+      jif.setVisible(true);
+      try {
+	jif.setSelected(true);
+      } catch (java.beans.PropertyVetoException pve) {
+      }
+    }
+
+    /**
      * This method returns an EditorWindow (a JInternalFrame in this 
      * implementation) which has an editor for each property in the
      * properties Vector.  The title string is the title of the 
