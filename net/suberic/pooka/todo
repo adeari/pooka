@@ -1,82 +1,69 @@
-1)  Make MessageProxy a real proxy--make a loaded flag and go ahead and
-create the Proxies, then load them lazily/in the background.
+*)  Make it so that there is some sort of alert (even just bolding the folder
+nodes in the tree on the left) when a folder has new messages.  
 
-2)  Make the FolderTable load last message first, and start out at the
-bottom of the table.
+*)  Make sure that the stores and folders stay open--right now, if you leave
+them alone for long enough, they close and aren't reopened.
 
-3)  Make a proper listener and updater so that you can get new messages and
-have deleted messages update properly.
+*)  StatusBar on the FolderWindow should get updated when messages come in
+or are deleted.
 
-4)  Fix the display of the MultiPropertyEditor.
+*)  Fix the display of the MultiPropertyEditor.
 
-5)  Add the ability to subscribe to/add new folders.
+*)  Add the ability to subscribe to/add new folders in the GUI.
 
-6)  add ability to attach files to the sent messages.
+*)  add ability to attach files to the sent messages.
 
-7)  add context-sensitive menus (right-click menus)
+*)  add context-sensitive menus (right-click menus)
 
-8)  add send buttons and other appropriate commands to MessageWindow.
+*)  add send buttons and other appropriate commands to MessageWindow.
 
-9)  enable cut & paste
+*)  make the GUI Authenticator (which should come up when you don't enter
+your password in the Store Configuration) works--right now it doesn't.
 
-10)  make the windows detachable.
+*)  enable cut & paste
 
-11)  implement a way to make a custom FolderCellRenderer for a property.
+*)  make the windows detachable.
 
-12)  implement (likely similar) way to put constraints/checks on the values
+*)  implement a way to make a custom FolderCellRenderer for a property.
+
+*)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
 
+*)  currently can't delete multiple messages at once.
 
 open messages from the FolderWindow
 	can do.  todo on this:
 	customize settings--headers, window size.
-	the window size just isn't right--if you have too many to's, or
-	  if the message is too long, it doesn't fit the window.
+	check the window size if there are lots of 'to' or 'cc' entries.
 
 create and send message
 	can do.  todo on this:
 	fix the signature
 	add ability of setting return values by hand (not by UserProfile)
-	make a sent folder?
-	add ability to attach files (should be easy)	
+	make a sent folder
 	make it so that if there are any errors sending the message, that it's
 		saved and editable.  not quite sure what to do there with a 
 		send thread, but....
 
-move messages between folders
-	can do.  todo on this:
-		update tables correctly--currently, table isn't redrawn after
-			message is expunged.
-
-indications for unread messages (bold the folders on the right?)
-
-delete message
-	can do.  todo on this:
-		make it work properly.  i get exceptions all the time.
-
 user profiles/information
 	can do.  todo:
 	make it actually get the correct default profile.
-	make entry lists the right size.
 	make entry list defaults not editable.
 	make sure that the sendMailURL is properly updated as soon as it's
-		entered.
+		entered.  i think right now you have to restart, or reopen
+		folders, or something like that.
 
 Editing Profiles/Stores
 	can do.  todo:
 		make things update dynamically--FolderPane and input
 			boxes.	
 		make required fields.
-		make it so the forms show up correctly the first time--
-			specifically the empty field size.
 
 auth fails isn't caught
 
 closing the window doesn't exit program.
 
 make an update Thread -- sort of done.  need to institute update time.
-
-messages should have send buttons on them.
 
 attachments available from message list.
 
@@ -86,24 +73,16 @@ the Spice is life
 
 add Font stuff.
 
-ui:
-	new folder
-
-hourglass for blocking actions.
+hourglass for blocking actions--fix it.
 
 BUGS
 ---------
-tables aren't updated properly when messages are removed or added.  same for
-the tree of folders.
-
 Send is enabled for read (non-editable) messages.
 
 actions on messageProxy aren't available for MessageWindow--and ones on 
 MessageWindow aren't available for the selected message in the table.
 
 updates of pkamailrc aren't handled correctly--some lines aren't deleted.
-
-downloading a large folder takes a hell of a long time.
 
 actions on FolderPanel are always available in the menu.
 
