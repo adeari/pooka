@@ -1,8 +1,4 @@
 
-*) make address book editable as soon as you create it.
-	-- specifically, make it so you can hit 'apply' and then have
-	   the entry editors be enabled.
-
 *) support windows registry attachment associations.
 	-- check icemail
 
@@ -303,7 +299,7 @@ window at -5, -5.
 *) add color support for replies (i.e. > in one color, >> in another, etc.)
 
 *) add ability to edit received messages, so you can do things like remove
-attachments that you don't want to keep (?)
+attachments that you don't want to keep (?) -- and change the subject.
 
 *) name all of your threads.
 

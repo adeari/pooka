@@ -15,6 +15,7 @@ import javax.swing.Action;
 public class AddressBookEditorPane extends SwingPropertyEditor {
   
   AddressBook book;
+  String bookName;
   JPanel editPanel;
   JPanel searchEntryPanel;
   JTextField searchEntryField;
@@ -48,7 +49,7 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
 
     // we're going to have "AddressBook." at the beginning, and 
     // ".addressListEditor" at the end...
-    String bookName = property.substring(12, property.length() - 18);
+    bookName = property.substring(12, property.length() - 18);
     book = Pooka.getAddressBookManager().getAddressBook(bookName);
 
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -259,6 +260,18 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
 	Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
 	e.printStackTrace();
       }
+    } else {
+      // if we're setting the value on this editor, then we might also be
+      // creating the edited AddressBook.  see if that's true.
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    AddressBook newBook = Pooka.getAddressBookManager().getAddressBook(bookName);
+	    if (newBook != null) {
+	      book = newBook;
+	      setEnabled(true);
+	    }
+	  }
+	});
     }
   }
   

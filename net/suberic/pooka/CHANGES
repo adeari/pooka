@@ -1,3 +1,7 @@
+fixed the AddressBookEditor so that newly created AddressBooks are 
+editable.  you still have to hit 'apply' first to create the address book,
+though.
+
 made it so the outbox and sent folder are both properly configured when
 you start up the first time.  otherwise, though, they still require a 
 restart for changes to be made.  this fix only applies to the first time
