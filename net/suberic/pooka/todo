@@ -6,6 +6,25 @@ can make an InternetHeaders object.  2)  cache full messages so we can get
 all the information we need off the Message.  3)  effectively have a 'real'
 message which is what you make changes on.  4)  searches won't work in 
 disconnected mode.
+	-- started.  todo:
+	   *)  order the messages.  right now, messages seem to be cached
+	       in a random order.  we need to save that order.
+	   *)  make the cache editable so that we can work properly in 
+	       disconnected mode.
+	   *)  messages that are seen aren't automatically marked as such
+	       when the cache is populated.  possible that the problem is
+	       that we're not properly loading the messages enough when we
+	       intially cache them.  fix that--maybe optimize with a 
+	       fetch.
+	   *)  fix it so it actually works in disconnected mode--make a log
+	       file for changes that are made, and then make the changes when
+	       we reconnect to the server.
+	   *)  add a ui for configuring caching.
+	   *)  add a ui for seeing the caching mode for each message, and for
+	       explicitly caching the messages themselves.
+	   *)  (connected)  make a UIDFolderInfo / UIDMessageInfo (or possibly
+	       even UIDMimeMessage??) to support automatic connection
+	       restoration in the case of a lost connection.)
 
 *) add pop3/local mail spool support.
 	in progress.  todo:
@@ -14,8 +33,6 @@ disconnected mode.
 	     other processes.
 	 *)  need to add support for keeping the messages in the mailbox
 	     while you have them on disk.
-	 *)  bug:  messages currently aren't being deleted off the pop
-	     server. -- fixed?
 	 *)  update the ui so that you can properly configure pop/mbox/imap
 	     store separately.
 
