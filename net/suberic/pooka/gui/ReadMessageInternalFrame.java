@@ -34,72 +34,85 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 
     }
 
-    public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
-	parentContainer = newParentContainer;
-    	messageDisplay = source.getMessageDisplay();
-	messageDisplay.setMessageUI(this);
-	msg = source.getMessageProxy();
-	toolbar = source.getToolbar();
-	keyBindings = source.getKeyBindings();
-
-	try {
-	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
-	} catch (MessagingException me) {
-	    this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
+  public ReadMessageInternalFrame(MessagePanel newParentContainer, ReadMessageFrame source) {
+    parentContainer = newParentContainer;
+    messageDisplay = source.getMessageDisplay();
+    messageDisplay.setMessageUI(this);
+    msg = source.getMessageProxy();
+    toolbar = source.getToolbar();
+    keyBindings = source.getKeyBindings();
+    
+    try {
+      this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+    } catch (MessagingException me) {
+      this.setTitle(Pooka.getProperty("Pooka.messageFrame.messageTitle.noSubject", "<no subject>"));
+    }
+    
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", messageDisplay);
+    
+    toolbar.setActive(this.getActions());
+    
+    Point loc = source.getLocationOnScreen();
+    SwingUtilities.convertPointFromScreen(loc, parentContainer);
+    this.setLocation(loc);
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (getMessageDisplay() != null)
+	    getMessageDisplay().requestFocus();
 	}
-	
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", messageDisplay);
-	
-	toolbar.setActive(this.getActions());
+      });
+    
+    this.addInternalFrameListener(new InternalFrameAdapter() {
+	public void internalFrameClosed(InternalFrameEvent e) {
+	  if (getMessageProxy().getMessageUI() == ReadMessageInternalFrame.this)
+	    getMessageProxy().setMessageUI(null);
+	}
+      });
+    
+    configureInterfaceStyle();
+  }
+  
+  /**
+   * Configures the MessageInteralFrame.
+   */
+  public void configureMessageInternalFrame() throws MessagingException {
+    try {
+      this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
+    } catch (MessagingException me) {
+      this.setTitle(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.noSubject", "<no subject>"));
+    }
+    
+    messageDisplay = new ReadMessageDisplayPanel(this);
+    messageDisplay.configureMessageDisplay();
+    
+    toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
+    
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", messageDisplay);
+    
+    toolbar.setActive(this.getActions());
 
-	Point loc = source.getLocationOnScreen();
-	SwingUtilities.convertPointFromScreen(loc, parentContainer);
-	this.setLocation(loc);
+    // check to see if there are any DisplayStyleComboBoxes in the toolbar
+    java.awt.Component[] toolbarComponents = toolbar.getComponents();
+    for (int i = 0; i < toolbarComponents.length; i++) {
+      if (toolbarComponents[i] instanceof DisplayStyleComboBox) {
+	DisplayStyleComboBox dscb = (DisplayStyleComboBox) toolbarComponents[i];
+	if (dscb.displayStyle)
+	  ((ReadMessageDisplayPanel)messageDisplay).setDisplayCombo(dscb);
 
-	this.addFocusListener(new FocusAdapter() {
-	    public void focusGained(FocusEvent e) {
-	      if (getMessageDisplay() != null)
-		getMessageDisplay().requestFocus();
-	    }
-	  });
-
-	this.addInternalFrameListener(new InternalFrameAdapter() {
-	    public void internalFrameClosed(InternalFrameEvent e) {
-	      if (getMessageProxy().getMessageUI() == ReadMessageInternalFrame.this)
-		getMessageProxy().setMessageUI(null);
-	    }
-	  });
-
-	configureInterfaceStyle();
+	if (dscb.headerStyle)
+	  ((ReadMessageDisplayPanel)messageDisplay).setHeaderCombo(dscb);
+      }
     }
 
-    /**
-     * Configures the MessageInteralFrame.
-     */
-    public void configureMessageInternalFrame() throws MessagingException {
-	try {
-	    this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
-	} catch (MessagingException me) {
-	    this.setTitle(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.noSubject", "<no subject>"));
-	}
-	
-	messageDisplay = new ReadMessageDisplayPanel(this);
-	messageDisplay.configureMessageDisplay();
-	
-	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
-	
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", messageDisplay);
-	
-	toolbar.setActive(this.getActions());
-	
-	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
-	keyBindings.setActive(getActions());
-
-	configureInterfaceStyle();
-	
-    }
+    keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
+    keyBindings.setActive(getActions());
+    
+    configureInterfaceStyle();
+    
+  }
 
  /**
    * Gets the Theme object from the ThemeManager which is appropriate

@@ -559,7 +559,6 @@ public class MessageProxy {
    * this opens a MessageUI for this Message.
    */
   public void openWindow(int newDisplayMode, int newHeaderMode) {
-    System.err.println("opening window with mode " + newDisplayMode + ", " + newHeaderMode);
 
     try {
       if (getMessageUI() == null) {
@@ -1028,7 +1027,6 @@ public class MessageProxy {
    * change take effect.
    */
   public void setHeaderMode(int newHeaderMode) {
-    System.err.println("setting header mode to " + newHeaderMode);
     headerMode = newHeaderMode;
   }
 
@@ -1110,8 +1108,6 @@ public class MessageProxy {
 	newHeaderMode = headerModeValue;
       else
 	newHeaderMode = getHeaderMode();
-
-      System.err.println("getHeaderMode() = " + getHeaderMode());
 
       openWindow(newDisplayMode, newHeaderMode);
 

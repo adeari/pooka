@@ -24,7 +24,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   private static String WITHOUT_ATTACHMENTS = "without";
   
   private String editorStatus = WITHOUT_ATTACHMENTS;
-  
+
+  private DisplayStyleComboBox displayCombo = null;
+  private DisplayStyleComboBox headerCombo = null;
+
   Action[] defaultActions = new Action[] {
     new AttachmentPanelAction()
   };
@@ -163,15 +166,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
       // figure out html vs. text
       if (Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true")) {
-	System.err.println("we do display html...");
-	System.err.println("isHtml()?  " + getMessageProxy().getMessageInfo().isHtml() + "; containsHtml()? " +  getMessageProxy().getMessageInfo().isHtml() + "; msgDisplayMode = " + msgDisplayMode);
 	if (getMessageProxy().getMessageInfo().isHtml()) {
-	  System.err.println("and the message is html.");
 	  if (msgDisplayMode > MessageProxy.TEXT_ONLY) 
 	    displayHtml = true;
 	  
 	} else if (getMessageProxy().getMessageInfo().containsHtml()) {
-	  System.err.println("and the message contains html.");
 	  if (msgDisplayMode >= MessageProxy.HTML_PREFERRED)
 	    displayHtml = true;
 	  
@@ -179,8 +178,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	  // if we don't have any html, just display as text.
 	}
       }
-
-      System.err.println("redisplaying; displayHtml = " + displayHtml);
 
       // set the content
       if (msgDisplayMode == MessageProxy.RFC_822) {
@@ -212,42 +209,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	  }
 	}
       }
-	    
-      /*
-      if ((Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().isHtml()) || (Pooka.getProperty("Pooka.displayHtmlAsDefault", "").equalsIgnoreCase("true") && getMessageProxy().getMessageInfo().containsHtml())) {
-	
-	if (getMessageProxy().getDisplayMode() == RFC822_STYLE) {
-	  content = getMessageProxy().getMessageInfo().getRawText();
-	} else if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	  content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
-	} else {
-	  content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
-	}
-	
-	contentType = "text/html";
-	
-      } else {
-	
-	if (getMessageProxy().getDisplayMode() == RFC822_STYLE) {
-	  content = getMessageProxy().getMessageInfo().getRawText();
-	} else if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	  // Is there only an HTML part?  Regardless, we will still display it as text.
-	  if (getMessageProxy().getMessageInfo().isHtml())
-	    content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
-	  else
-	    content = getMessageProxy().getMessageInfo().getTextAndTextInlines(true, showFullHeaders());
-	} else {
-	  // Is there only an HTML part?  Regardless, we will still display it as text.
-	  if (getMessageProxy().getMessageInfo().isHtml())
-	    content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
-	  else
-	    content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders());
-	}
-
-	contentType = "text/plain";
-      }
-      */
-
+      
       if (content != null)
 	messageText.append(content);
 
@@ -258,6 +220,13 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
+	    if (getDisplayCombo() != null)
+	      getDisplayCombo().styleUpdated(getMessageProxy().getDisplayMode(), getMessageProxy().getHeaderMode());
+	    
+	    if (getHeaderCombo() != null && getHeaderCombo() != getDisplayCombo()) {
+	      getHeaderCombo().styleUpdated(getMessageProxy().getDisplayMode(), getMessageProxy().getHeaderMode());
+	    }
+	    
 	    if (! contentIsNull) {
 	      if (hasAttachments) {
 		try {
@@ -447,6 +416,21 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
     
   }
+
+  public DisplayStyleComboBox getDisplayCombo() {
+    return displayCombo;
+  };
+  public void setDisplayCombo(DisplayStyleComboBox dscb) {
+    displayCombo = dscb;
+  }
+  public DisplayStyleComboBox getHeaderCombo() {
+    return headerCombo;
+  };
+  public void setHeaderCombo(DisplayStyleComboBox dscb) {
+    headerCombo = dscb;
+  }
+
+
   
   //------- Actions ----------//
   

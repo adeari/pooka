@@ -3,15 +3,13 @@
 	the button action be to popup a window.  do it that way.
 	--also have the MessageProxy have a link to it.  go ahead and
 	  make it so setting the actions in the ConfigurableUI will
-	  transfer the 
-  -- make the button have reasonable images
+	  transfer the action to the button.   - note.  should be done
+	  through the message ui object, not the message proxy.
+  -- make the buttons have reasonable images
   -- make button the correct size
   -- make a subclass that dynamically handles updates.
-  *)   fix containsHtml() to make it so we actually detect nested 
-	multipart/alternative messages - i.e. mpart/mixed containing a 
-	mpart/alternative (containing a text and an html) and an attachment.
-  *)   fix full headers display for html.
-
+  *) make sure we lose our settings for the message whenever the window
+	closes.
 
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.

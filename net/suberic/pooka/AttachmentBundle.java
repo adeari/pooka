@@ -175,10 +175,21 @@ class AttachmentBundle {
       StringBuffer headerText = new StringBuffer();
       
       if (showFullHeaders) {
-	Enumeration allHdrs = headers.getAllHeaderLines();
-	while (allHdrs.hasMoreElements()) {
-	  headerText.append(MailUtilities.decodeText((String) allHdrs.nextElement()));
-	  headerText.append('\n');
+	if (useHtml) {
+	  Enumeration allHdrs = headers.getAllHeaders();
+	  while (allHdrs.hasMoreElements()) {
+	    Header nextHeader = (Header) allHdrs.nextElement();
+	    headerText.append("<b>" + nextHeader.getName() + ":</b><nbsp><nbsp>");
+	    headerText.append(MailUtilities.escapeHtml(nextHeader.getValue()));
+	    
+	    headerText.append("<br>\n");
+	  }
+	} else {
+	  Enumeration allHdrs = headers.getAllHeaderLines();
+	  while (allHdrs.hasMoreElements()) {
+	    headerText.append(MailUtilities.decodeText((String) allHdrs.nextElement()));
+	    headerText.append('\n');
+	  }
 	}		
       } else {
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
