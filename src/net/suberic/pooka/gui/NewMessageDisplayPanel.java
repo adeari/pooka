@@ -473,38 +473,81 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Creates a new CustomHeaderPane.
    */
   public Container createCustomHeaderPane() {
+    JPanel returnValue = new JPanel();
+    returnValue.setLayout(new BorderLayout());
+
     Box customInputPanel = new Box(BoxLayout.Y_AXIS);
     
     Box inputRow = null;
+
+    // get the preconfigured properties
+
+    Properties headers = new Properties();
+
+    Properties mailProperties = getSelectedProfile().getMailProperties();
+    Enumeration keys = mailProperties.propertyNames();
+
+    String fromAddr = null, fromPersonal = null, replyAddr = null, replyPersonal = null;
     
-    // Create Address panel
-    
-    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
+    while (keys.hasMoreElements()) {
+      String key = (String)(keys.nextElement());
+      
+      if (key.equals("FromPersonal")) {
+	fromPersonal = mailProperties.getProperty(key);
+      } else if (key.equals("From")) {
+	fromAddr = mailProperties.getProperty(key);
+      } else if (key.equals("ReplyTo")) {
+	replyAddr = mailProperties.getProperty(key);
+      } else if (key.equals("ReplyToPersonal")) {
+	replyPersonal = mailProperties.getProperty(key);
+      } else {
+	headers.setProperty(key, mailProperties.getProperty(key));
+      }
+      
+      try {
+	if (fromAddr != null) {
+	  if (fromPersonal != null && !(fromPersonal.equals(""))) 
+	    headers.setProperty("From", new InternetAddress(fromAddr, fromPersonal).toString());
+	  else
+	    headers.setProperty("From", new InternetAddress(fromAddr).toString());
+	} else {
+	  headers.setProperty("From", "");
+	}
+
+	if (replyAddr != null && !(replyAddr.equals(""))) {
+	  if (replyPersonal != null)
+	    headers.setProperty("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
+	  else
+	    headers.setProperty("Reply-To", new InternetAddress(replyAddr).toString());
+	} else {
+	  headers.setProperty("Reply-To", "");
+	}
+      } catch (java.io.UnsupportedEncodingException uee) {
+	//don't bother
+      } catch (javax.mail.MessagingException me) {
+	//don't bother
+      }
+    }
+
     String currentHeader = null;
+    String currentValue = null;
     JLabel hdrLabel = null;
-    EntryTextArea inputField = null;
-    
-    while (tokens.hasMoreTokens()) {
+
+    Enumeration headerKeys = headers.propertyNames();
+
+    while(headerKeys.hasMoreElements()) {
       inputRow = new Box(BoxLayout.X_AXIS);
-      currentHeader=tokens.nextToken();
-      hdrLabel = new JLabel(Pooka.getProperty("MessageWindow.Input.." + currentHeader + ".label", currentHeader) + ":", SwingConstants.RIGHT);
+      currentHeader=(String) headerKeys.nextElement();
+      currentValue = (String) headers.get(currentHeader);
+      if (currentValue == null)
+	currentValue = "";
+
+      hdrLabel = new JLabel(currentHeader + ":", SwingConstants.RIGHT);
       hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
       inputRow.add(hdrLabel);
       
-      if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") ) {
-	try {
-	  inputField = new AddressEntryTextArea(getNewMessageUI(), getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
-	} catch (MessagingException me) {
-	  inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
-	}
-      } else {
-	try {
-	  inputField = new net.suberic.util.swing.EntryTextArea(getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
-	} catch (MessagingException me) {
-	  inputField = new net.suberic.util.swing.EntryTextArea(1, 30);
-	}
-      }
-      
+      EntryTextArea inputField = new net.suberic.util.swing.EntryTextArea(currentValue, 1, 50);
+    
       inputField.setLineWrap(true);
       inputField.setWrapStyleWord(true);
       inputField.setBorder(BorderFactory.createEtchedBorder());
@@ -514,20 +557,33 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	  }
 	});
       
-      
       inputRow.add(inputField);
-      if (inputField instanceof AddressEntryTextArea) {
-	//int height = inputField.getPreferredSize().height;
-	JButton addressButton = ((AddressEntryTextArea)inputField).createAddressButton(10, 10);
-	inputRow.add(Box.createHorizontalGlue());
-	inputRow.add(addressButton);
-      }
-      customInputPanel.add(inputRow);
       
-      //proptDict.put(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".value", currentHeader), inputField);
+      customInputPanel.add(inputRow);
     }
-    
-    return customInputPanel;
+
+    returnValue.add(customInputPanel, BorderLayout.CENTER);
+
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new FlowLayout());
+
+    java.net.URL headerURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.image", "/org/javalobby/icons/20x20png/Plus.png"));
+
+    JButton headerButton = null;
+
+    if (headerURL != null) {
+      headerButton = new JButton(new ImageIcon(headerURL));
+      headerButton.setMargin(new java.awt.Insets(2, 2, 2, 2));
+    } else {
+      headerButton = new JButton();
+    }
+
+    buttonPanel.add(headerButton);
+    buttonPanel.setMargin(new java.awt.Insets(0, 0, 0, 0));
+
+    returnValue.add(buttonPanel, BorderLayout.SOUTH);
+    return returnValue;
+
   }
 
   /**

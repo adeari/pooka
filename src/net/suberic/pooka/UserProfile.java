@@ -189,6 +189,9 @@ public class UserProfile extends Object implements ValueChangeListener {
     }
   }
   
+  /**
+   * Filters out this address from the given array of addresses.
+   */
   private Address[] filterAddressArray(Address[] addresses) {
     if (addresses != null && addresses.length > 0) {
       Vector returnVector = new Vector();
@@ -217,7 +220,6 @@ public class UserProfile extends Object implements ValueChangeListener {
   /**
    * This method updates the ProfileList from the UserProfile property.
    */
-  
   static public void updateProfilesFromProperty() {
     Vector currentValues = Pooka.getResources().getPropertyAsVector("UserProfile", "");
     Vector oldValues = new Vector(profileList);
@@ -239,6 +241,9 @@ public class UserProfile extends Object implements ValueChangeListener {
     removeProfilesFromList(Pooka.getResources(), removeValues);
   }
   
+  /**
+   * Creates the profile list from the given VariableBundle.
+   */
   static public void createProfiles(VariableBundle mainProperties) {
     StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile", ""), ":");
     Vector newProfiles = new Vector();
@@ -359,11 +364,10 @@ public class UserProfile extends Object implements ValueChangeListener {
     return mailProperties;
   }
   
-
   public String toString() {
     return name;
   }
-
+  
   public URLName getSendMailURL() {
     return sendMailURL;
   }
