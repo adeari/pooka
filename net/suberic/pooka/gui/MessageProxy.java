@@ -614,7 +614,10 @@ public class MessageProxy {
 	    
 	    for (int i = 0; i < newKeys.length; i++) {
 	      // FIXME check to see if changed.
-	      changedMessage = changedMessage + newKeys[i].toString() + "\n";
+	      if (newKeys[i] instanceof net.suberic.crypto.EncryptionKey)
+		changedMessage = changedMessage + ((net.suberic.crypto.EncryptionKey)newKeys[i]).getDisplayAlias() + "\n";
+	      else
+		changedMessage = changedMessage + newKeys[i].toString() + "\n";
 	    }
 	    
 	    int doImport = JOptionPane.NO_OPTION;
@@ -626,7 +629,10 @@ public class MessageProxy {
 
 	    if (doImport == JOptionPane.YES_OPTION) {
 	      for (int i = 0; i < newKeys.length; i++) {
-		System.err.println("importing key " + newKeys[i]);
+		if (newKeys[i] instanceof net.suberic.crypto.EncryptionKey) {
+		  net.suberic.crypto.EncryptionKey eKey = (net.suberic.crypto.EncryptionKey) newKeys[i];
+		  Pooka.getCryptoManager().addPublicKey(eKey.getDisplayAlias(), eKey, eKey.getEncryptionUtils().getType());
+		}
 	      }
 	    }
 	    

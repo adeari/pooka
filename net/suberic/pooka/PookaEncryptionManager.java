@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.security.Key;
 import java.security.KeyStoreException;
+import java.security.GeneralSecurityException;
 import java.util.HashSet;
 
 import javax.mail.internet.*;
@@ -110,7 +111,32 @@ public class PookaEncryptionManager {
     savePasswordsForSession = Pooka.getProperty(key + ".savePasswordsForSession", "false").equalsIgnoreCase("true");
     
   }
+  
+  /**
+   * Adds the private key to the store.
+   */
+  public void addPrivateKey(String alias, Key privateKey, char[] passphrase, String type) throws GeneralSecurityException {
+    EncryptionKeyManager currentMgr = getKeyMgr(type);
+    if (currentMgr != null) {
+      currentMgr.setPrivateKeyEntry(alias, privateKey, passphrase);
+    } else {
+      throw new KeyStoreException(type + " KeyStore not initialized.");
+    }
+  }
 
+  /**
+   * Adds the public key to the store.
+   */
+  public void addPublicKey(String alias, Key publicKey, String type) 
+  throws GeneralSecurityException {
+    
+    EncryptionKeyManager currentMgr = getKeyMgr(type);
+    if (currentMgr != null) {
+      currentMgr.setPublicKeyEntry(alias, publicKey);
+    } else {
+      throw new KeyStoreException(type + " KeyStore not initialized.");
+    }
+  }
 
   /**
    * Returns the private key(s) for the given email address.
@@ -409,4 +435,15 @@ public class PookaEncryptionManager {
     }
   }
 
+  /**
+   * Returns the EncryptionKeyManager for this type.
+   */
+  EncryptionKeyManager getKeyMgr(String type) {
+    if (type == EncryptionManager.PGP) 
+      return pgpKeyMgr;
+    else if (type == EncryptionManager.SMIME)
+      return smimeKeyMgr;
+    else
+      return null;
+  }
 }
