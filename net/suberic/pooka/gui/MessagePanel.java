@@ -85,10 +85,31 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
 	getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
     }
 
+    /**
+     * This opens up the MessageWindow for MessageProxy m and then sets
+     * it to being the selected window.
+     *
+     * If no MessageWindow exists for the MessageProxy, a new MessageWindow
+     * for it is created.  If one does exist, then that window is
+     * de-iconified (if necessary) and selected.
+     */
     public void openMessageWindow(MessageProxy m) {
-	MessageWindow newMessageWindow = new ReadMessageWindow(this, m);
-	this.add(newMessageWindow);
-	newMessageWindow.setVisible(true);
+	
+	MessageWindow newMessageWindow;
+	newMessageWindow = m.getMessageWindow();
+	if (newMessageWindow == null) {
+	    newMessageWindow = new ReadMessageWindow(this, m);
+	    m.setMessageWindow(newMessageWindow);
+	    this.add(newMessageWindow);
+	    newMessageWindow.setVisible(true);
+	} else {
+	    if (newMessageWindow.isIcon())
+		try {
+		    newMessageWindow.setIcon(false);
+		} catch (java.beans.PropertyVetoException e) {
+		} 
+	}
+
 	try {
 	    newMessageWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
