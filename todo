@@ -1,7 +1,8 @@
 *) "please reopen" message shouldn't come up when you've requested a
 	store/folder close. (caching, maybe normal uid?)
 
-*) make sure non-ascii characters work in email text.
+*) make sure non-ascii characters work in email text. -- and especially
+	non-iso8859.
 
 *) fix tableinfos so that you after a disconnect/reconnect you don't
 	have to re-fetch the headers, only the flags.
@@ -10,7 +11,7 @@
 
 *) fix non-plaintext-password support with imap (logindisabled)
 
-*) update bouncycastle version to latest.
+*) update bouncycastle version to latest.  and cryptix, and javamail-crypto.
 
 *) add support for running without any local files.
    *) big tasks:  
@@ -55,6 +56,11 @@ say, like reacting to a mailto: link.
 	   socket already exists and is valid, it either sends the info 
 	   (mailto link or whatever) to the running instance, or it 
 	   just raises the window or whatever.
+
+*) bug:  profile for new message created from selected item on main panel,
+	even if request for new message came from, say, a MessageFrame.
+	(open message externally, select something different in the 
+	 main frame, go to external message and reply)
 
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:

@@ -50,13 +50,16 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   public MainPanel(JFrame frame) {
     super(JSplitPane.HORIZONTAL_SPLIT);
     
+    /*
     SimpleAuthenticator auth = new SimpleAuthenticator(frame);
     
     session = Session.getDefaultInstance(System.getProperties(), auth);
     
     if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
       session.setDebug(true);
-    
+    */
+    session = Pooka.getDefaultSession();
+
     mailQueue = new MailQueue(Pooka.getDefaultSession());
     
   }

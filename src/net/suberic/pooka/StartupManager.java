@@ -17,10 +17,15 @@ public class StartupManager {
   // the PookaManager that we're using to startup.  for convenience.
   PookaManager mPookaManager = null;
 
+  JFrame mFrame = null;
+
   // settings
   public boolean mOpenFolders = true;
   public boolean mUseHttp = false;
   public boolean mUseLocalFiles = true;
+  public boolean mFullStartup = true;
+  String mToAddress = null;
+  String mFromProfile = null;
 
   /**
    * Creates a new StartupManager.
@@ -54,141 +59,25 @@ public class StartupManager {
       System.exit(-1);
     }
 
+    if (mFullStartup) {
+      startupPooka();
+    } else {
+      startupMinimal();
+    }
+  }
+
+  /**
+   * Does a full startup of Pooka.
+   */
+  public void startupPooka() {
     final net.suberic.pooka.gui.PookaStartup startup = new net.suberic.pooka.gui.PookaStartup();
     startup.show();
 
     updateTime("startup invoked.");
 
-    startup.setStatus("Pooka.startup.ssl");
-    updateTime("loading ssl");
-    StoreManager.setupSSL();
-    updateTime("ssl loaded.");
+    loadManagers(startup);
 
-    try {
-      UIManager.setLookAndFeel(Pooka.getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
-    } catch (Exception e) { System.out.println("Cannot set look and feel...");
-    }
-    
-    updateTime("set looknfeel");
-    startup.setStatus("Pooka.startup.addressBook");
-    mPookaManager.setAddressBookManager(new AddressBookManager());
-    updateTime("loaded address book");
-    
-    mPookaManager.setConnectionManager(new NetworkConnectionManager());
-    updateTime("loaded connections");
-    
-    mPookaManager.setOutgoingMailManager(new OutgoingMailServerManager());
-    updateTime("loaded mailservers");
-
-    mPookaManager.setDateFormatter(new DateFormatter());
-
-    startup.setStatus("Pooka.startup.profiles");
-    UserProfile.createProfiles(mPookaManager.getResources());
-    updateTime("created profiles");
-    
-    Pooka.getResources().addValueChangeListener(UserProfile.vcl, "UserProfile");
-    
-    String mailcapSource = null;
-    if (System.getProperty("file.separator").equals("\\")) {
-      mailcapSource = System.getProperty("user.home") + "\\pooka_mailcap.txt";
-    } else {
-      mailcapSource = System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap";
-    }
-    try {
-      mPookaManager.setMailcap(Pooka.getResourceManager().createMailcap(mailcapSource));
-    } catch (java.io.IOException ioe) {
-      System.err.println("exception loading mailcap:  " + ioe);
-    }
-
-    updateTime("created mailcaps");
-    mPookaManager.setFolderTracker(new net.suberic.pooka.thread.FolderTracker());
-    mPookaManager.getFolderTracker().start();
-    updateTime("started folderTracker");
-    
-    mPookaManager.setSearchThread(new net.suberic.util.thread.ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread ")));
-    mPookaManager.getSearchThread().start();
-    updateTime("started search thread");
-    
-    javax.activation.CommandMap.setDefaultCommandMap(mPookaManager.getMailcap());
-    javax.activation.FileTypeMap.setDefaultFileTypeMap(mPookaManager.getMimeTypesMap());
-    updateTime("set command/file maps");
-
-    startup.setStatus("Pooka.startup.crypto");
-    mPookaManager.setCryptoManager(new PookaEncryptionManager(mPookaManager.getResources(), "EncryptionManager"));
-    updateTime("loaded encryption manager");
-
-    mPookaManager.setSearchManager(new SearchTermManager("Search"));
-    updateTime("created search manager");
-    
-    if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-      mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
-    else
-      mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
-    
-    updateTime("created ui factory");
-    mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
-	public void valueChanged(String changedValue) {
-	  if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
-	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
-	    mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
-	    ContentPanel cp = ((PookaPreviewPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(mp);
-	    Pooka.getMainPanel().setContentPanel(cp);
-	  } else {
-	    PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
-	    mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
-	    ContentPanel mp = ((PookaDesktopPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(pcp);
-	    Pooka.getMainPanel().setContentPanel(mp);
-	  }
-	}
-      }, "Pooka.guiType");
-
-    mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
-	public void valueChanged(String changedValue) {
-	  try {
-	    UIManager.setLookAndFeel(Pooka.getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
-	    javax.swing.SwingUtilities.updateComponentTreeUI(javax.swing.SwingUtilities.windowForComponent(Pooka.getMainPanel()));
-	  } catch (Exception e) { 
-	    System.out.println("Cannot set look and feel..."); }
-	}
-      }, "Pooka.looknfeel");
-    
-    updateTime("created resource listeners");
-    // set up help
-    startup.setStatus("Pooka.startup.help");
-    try {
-      ClassLoader cl = new Pooka().getClass().getClassLoader();
-      java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
-      HelpSet hs = new HelpSet(cl, hsURL);
-      mPookaManager.setHelpBroker(hs.createHelpBroker());
-    } catch (Exception ee) {
-      System.out.println("HelpSet net/suberic/pooka/doc/en/help/merge/Master.hs not found:  " + ee);
-      ee.printStackTrace();
-    }
-    updateTime("loaded help");
-    
-    // create the MessageListener.
-    PookaMessageListener pmlistener= new PookaMessageListener();
-
-    JFrame frame = new JFrame("Pooka");
-    updateTime("created frame");
-
-    mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator(frame));
-    java.util.Properties sysProps = System.getProperties();
-    sysProps.setProperty("mail.mbox.mailspool", mPookaManager.getResources().getProperty("Pooka.spoolDir", "/var/spool/mail"));
-    mPookaManager.setDefaultSession (javax.mail.Session.getDefaultInstance(sysProps, mPookaManager.getDefaultAuthenticator()));
-    if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
-      mPookaManager.getDefaultSession().setDebug(true);
-
-    updateTime("created session.");    
-    startup.setStatus("Pooka.startup.mailboxInfo");
-    mPookaManager.setStoreManager(new StoreManager());
-    updateTime("created store manager.");
-    
-    mPookaManager.getStoreManager().loadAllSentFolders();
-    mPookaManager.getOutgoingMailManager().loadOutboxFolders();
-    updateTime("loaded sent/outbox");
-    
-    final JFrame finalFrame = frame;
+    final JFrame finalFrame = mFrame;
 
     startup.setStatus("Pooka.startup.configuringWindow");
     // do all of this on the awt event thread.
@@ -247,7 +136,166 @@ public class StartupManager {
       e.printStackTrace();
     }
   }
-  
+ 
+  /**
+   * Does a minimal startup of Pooka.
+   */
+  public void startupMinimal() {
+    // first see if we can communicate with another instance of Pooka.
+    if (sendMessageTo(mToAddress, mFromProfile)) {
+      // send succeeded.  exit.
+      System.exit(0);
+    }
+
+    final net.suberic.pooka.gui.PookaStartup startup = new net.suberic.pooka.gui.PookaStartup();
+    startup.show();
+
+    updateTime("startup invoked.");
+
+    loadManagers(startup);
+
+    if (sendMessageTo(mToAddress, mFromProfile)) {
+      System.err.println("send done.");
+    } else {
+      System.err.println("send failed.");
+    }
+  }
+
+  /**
+   * This loads all of the background managers that Pooka uses.
+   */
+  public void loadManagers(net.suberic.pooka.gui.PookaStartup startup) {
+    startup.setStatus("Pooka.startup.ssl");
+    updateTime("loading ssl");
+    StoreManager.setupSSL();
+    updateTime("ssl loaded.");
+
+    try {
+      UIManager.setLookAndFeel(Pooka.getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
+    } catch (Exception e) { System.out.println("Cannot set look and feel...");
+    }
+    updateTime("set looknfeel");
+
+    startup.setStatus("Pooka.startup.addressBook");
+    mPookaManager.setAddressBookManager(new AddressBookManager());
+    updateTime("loaded address book");
+    
+    mPookaManager.setConnectionManager(new NetworkConnectionManager());
+    updateTime("loaded connections");
+    
+    mPookaManager.setOutgoingMailManager(new OutgoingMailServerManager());
+    updateTime("loaded mailservers");
+
+    mPookaManager.setDateFormatter(new DateFormatter());
+
+    startup.setStatus("Pooka.startup.profiles");
+    UserProfile.createProfiles(mPookaManager.getResources());
+    updateTime("created profiles");
+    
+    Pooka.getResources().addValueChangeListener(UserProfile.vcl, "UserProfile");
+    
+    String mailcapSource = null;
+    if (System.getProperty("file.separator").equals("\\")) {
+      mailcapSource = System.getProperty("user.home") + "\\pooka_mailcap.txt";
+    } else {
+      mailcapSource = System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap";
+    }
+    try {
+      mPookaManager.setMailcap(Pooka.getResourceManager().createMailcap(mailcapSource));
+    } catch (java.io.IOException ioe) {
+      System.err.println("exception loading mailcap:  " + ioe);
+    }
+
+    updateTime("created mailcaps");
+    mPookaManager.setFolderTracker(new net.suberic.pooka.thread.FolderTracker());
+    mPookaManager.getFolderTracker().start();
+    updateTime("started folderTracker");
+    
+    mPookaManager.setSearchThread(new net.suberic.util.thread.ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread ")));
+    mPookaManager.getSearchThread().start();
+    updateTime("started search thread");
+    
+    javax.activation.CommandMap.setDefaultCommandMap(mPookaManager.getMailcap());
+    javax.activation.FileTypeMap.setDefaultFileTypeMap(mPookaManager.getMimeTypesMap());
+    updateTime("set command/file maps");
+
+    startup.setStatus("Pooka.startup.crypto");
+    mPookaManager.setCryptoManager(new PookaEncryptionManager(mPookaManager.getResources(), "EncryptionManager"));
+    updateTime("loaded encryption manager");
+
+    mPookaManager.setSearchManager(new SearchTermManager("Search"));
+    updateTime("created search manager");
+
+    if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+      mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+    else
+      mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+    
+    updateTime("created ui factory");
+    mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
+	public void valueChanged(String changedValue) {
+	  if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
+	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+	    mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+	    ContentPanel cp = ((PookaPreviewPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(mp);
+	    Pooka.getMainPanel().setContentPanel(cp);
+	  } else {
+	    PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
+	    mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+	    ContentPanel mp = ((PookaDesktopPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(pcp);
+	    Pooka.getMainPanel().setContentPanel(mp);
+	  }
+	}
+      }, "Pooka.guiType");
+
+    mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
+	public void valueChanged(String changedValue) {
+	  try {
+	    UIManager.setLookAndFeel(Pooka.getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
+	    javax.swing.SwingUtilities.updateComponentTreeUI(javax.swing.SwingUtilities.windowForComponent(Pooka.getMainPanel()));
+	  } catch (Exception e) { 
+	    System.out.println("Cannot set look and feel..."); }
+	}
+      }, "Pooka.looknfeel");
+    
+    updateTime("created resource listeners");
+    // set up help
+    startup.setStatus("Pooka.startup.help");
+    try {
+      ClassLoader cl = new Pooka().getClass().getClassLoader();
+      java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
+      HelpSet hs = new HelpSet(cl, hsURL);
+      mPookaManager.setHelpBroker(hs.createHelpBroker());
+    } catch (Exception ee) {
+      System.out.println("HelpSet net/suberic/pooka/doc/en/help/merge/Master.hs not found:  " + ee);
+      ee.printStackTrace();
+    }
+    updateTime("loaded help");
+    
+    // create the MessageListener.
+    PookaMessageListener pmlistener= new PookaMessageListener();
+    
+    mFrame = new JFrame("Pooka");
+    updateTime("created frame");
+    
+    mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator(mFrame));
+    java.util.Properties sysProps = System.getProperties();
+    sysProps.setProperty("mail.mbox.mailspool", mPookaManager.getResources().getProperty("Pooka.spoolDir", "/var/spool/mail"));
+    mPookaManager.setDefaultSession (javax.mail.Session.getDefaultInstance(sysProps, mPookaManager.getDefaultAuthenticator()));
+    if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
+      mPookaManager.getDefaultSession().setDebug(true);
+    
+    updateTime("created session.");    
+    startup.setStatus("Pooka.startup.mailboxInfo");
+    mPookaManager.setStoreManager(new StoreManager());
+    updateTime("created store manager.");
+    
+    mPookaManager.getStoreManager().loadAllSentFolders();
+    mPookaManager.getOutgoingMailManager().loadOutboxFolders();
+    updateTime("loaded sent/outbox");
+
+  }
+    
   /**
    * This parses any command line arguments, and makes the appropriate
    * changes.
@@ -256,6 +304,9 @@ public class StartupManager {
     if (argv == null || argv.length < 1)
       return;
 
+    String mailAddress = null;
+    String selectedProfile = null;
+    
     for (int i = 0; i < argv.length; i++) {
       if (argv[i] != null) {
 	if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders")) {
@@ -273,21 +324,21 @@ public class StartupManager {
 	  mUseHttp = true;
 	  mUseLocalFiles = false;
 	} else if (argv[i].equals("--newmessage")) {
-	  String mailAddress = argv[++i];
-	  if (mailAddress == null) {
+	  mToAddress = argv[++i];
+	  if (mToAddress == null) {
 	    System.err.println("error:  no address specified.");
 	    printUsage();
 	    System.exit(-1);
 	  }
-	  
-	  // if we have an address, try sending a mail message to it.
-	  if (sendMessageTo(mailAddress)) {
-	    System.err.println("send succeeded.");
-	    System.exit(0);
-	  } else {
-	    //huh
-	    System.err.println("send failed.");
+	  mFullStartup = false;
+	} else if (argv[i].equals("--from")) {
+	  mFromProfile = argv[++i];
+	  if (mFromProfile == null) {
+	    System.err.println("error:  no from profile specified.");
+	    printUsage();
+	    System.exit(-1);
 	  }
+	  mFullStartup = false;
 	} else if (argv[i].equals("--help")) {
 	  printUsage();
 	  System.exit(0);
@@ -340,12 +391,12 @@ public class StartupManager {
   /**
    * Sends a message to the given mail address on startup.
    */
-  public boolean sendMessageTo(String pAddress) {
+  public boolean sendMessageTo(String pAddress, String pProfile) {
     // first see if there's already a pooka instance running.
     net.suberic.pooka.messaging.PookaMessageSender sender = new net.suberic.pooka.messaging.PookaMessageSender();
     try {
       sender.openConnection();
-      sender.sendNewMessage(pAddress, null);
+      sender.sendNewMessage(pAddress, pProfile);
     } catch (Exception e) {
       return false;
     }

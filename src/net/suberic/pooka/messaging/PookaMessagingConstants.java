@@ -9,6 +9,6 @@ public interface PookaMessagingConstants {
   public static String S_NEW_MESSAGE = "new_message";
 
   /** The port to listen on. */
-  public static int S_PORT = 23029;
+  public static int S_PORT = 27029;
 
 }

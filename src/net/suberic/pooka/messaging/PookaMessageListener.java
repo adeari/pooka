@@ -58,7 +58,20 @@ public class PookaMessageListener extends Thread {
    */
   public void createSocket() throws Exception {
     System.err.println("creating new PookaMessageListener socket.");
-    mSocket = new ServerSocket(PookaMessagingConstants.S_PORT);
+    Exception throwMe = null;
+    boolean success = false;
+    for (int port = PookaMessagingConstants.S_PORT; (! success) && port <  PookaMessagingConstants.S_PORT + 25; port++) {
+      try {
+	mSocket = new ServerSocket(PookaMessagingConstants.S_PORT);
+	success = true;
+	Pooka.setProperty("Pooka.messaging.port", Integer.toString(port));
+      } catch (Exception e) {
+	throwMe = e;
+      }
+    }
+
+    if (! success)
+      throw throwMe;
   }
 
   /**
@@ -92,7 +105,7 @@ public class PookaMessageListener extends Thread {
 	  System.err.println("creating new message.");
 	  // create the template first.  this is done so the new message
 	  // opens as a top-level window.
-	  NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getMainPanel().getSession()))));
+	  NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
 
 	  MimeMessage mm = new MimeMessage(Pooka.getMainPanel().getSession());
 	  mm.setRecipients(Message.RecipientType.TO, fAddress);

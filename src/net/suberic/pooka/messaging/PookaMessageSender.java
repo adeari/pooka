@@ -4,6 +4,8 @@ import java.net.*;
 import java.nio.channels.*;
 import java.io.*;
 
+import net.suberic.pooka.Pooka;
+
 /**
  * This class sends messages to a Pooka network client.
  */
@@ -18,7 +20,13 @@ public class PookaMessageSender {
   public void openConnection() throws java.net.UnknownHostException,
 				      java.io.IOException, 
 				      SecurityException {
-    mSocket = new Socket("localhost", PookaMessagingConstants.S_PORT);
+    int port; 
+    try {
+      port = Integer.parseInt(Pooka.getProperty("Pooka.messaging.port", ""));
+    } catch (Exception e) {
+      port = PookaMessagingConstants.S_PORT;
+    }
+    mSocket = new Socket("localhost",port);
   }
 
   /**
