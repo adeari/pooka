@@ -358,28 +358,28 @@ public class SimpleFileCache implements MessageCache {
     }
 
 
-    /**
-     * Adds the messages to the given folder.  Returns the uids for the 
-     * message.  Uses the status to determine how much of the message
-     * is cached.
-     *
-     * This method changes both the client cache as well as the server, if
-     * the server is available.
-     */
-    
-    /*
-    public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException {
-	if (newUidValidity != uidValidity) {
-	    throw new StaleCacheException(uidValidity, newUidValidity);
-	}
-	if (getFolderInfo().shouldBeConnected()) {
-	    getFolderInfo().appendMessages(msgs);
-	} else {
-	    throw new MessagingException("Error:  cannot append to an unavailable folder.");
-	}
+  /**
+   * Adds the messages to the given folder.  Returns the uids for the 
+   * message. 
+   *
+   * This method changes both the client cache as well as the server, if
+   * the server is available.
+   */
+  
+  public long[] appendMessages(MessageInfo[] msgs) throws MessagingException {
+    if (getFolderInfo().shouldBeConnected()) {
+      getFolderInfo().appendMessages(msgs);
+    } else {
+      try {
+	getChangeAdapter().appendMessages(new long[] {});
+      } catch (java.io.IOException ioe) {
+	throw new MessagingException("Error adding message to Cache Adapter.", ioe);
+      }
     }
-    */
 
+    return new long[] {};
+  }
+  
     /**
      * Removes all messages marked as 'DELETED'  from the given folder.  
      * Returns the uids of all the removed messages.
@@ -685,7 +685,7 @@ public class SimpleFileCache implements MessageCache {
      */
     public void writeChangesToServer(Folder f) throws MessagingException {
 	try {
-	    getChangeAdapter().writeChanges((UIDFolder) f);
+	    getChangeAdapter().writeChanges((UIDFolder) f, getFolderInfo());
 	} catch (IOException ioe) {
 	    throw new MessagingException(net.suberic.pooka.Pooka.getProperty("error.couldNotGetChanges", "Error:  could not get cached changes."), ioe);
 	}

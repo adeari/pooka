@@ -80,13 +80,12 @@ public interface MessageCache {
 
     /**
      * Adds the messages to the given folder.  Returns the uids for the 
-     * message.  Uses the status to determine how much of the message
-     * is cached.
+     * message.
      *
      * This method changes both the client cache as well as the server, if
      * the server is available.
      */
-    //public void appendMessages(MessageInfo[] msgs, int status) throws MessagingException;
+  public long[] appendMessages(MessageInfo[] msgs) throws MessagingException;
 
     /**
      * Removes all messages marked as 'DELETED'  from the given folder.  

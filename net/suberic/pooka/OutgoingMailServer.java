@@ -232,6 +232,10 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	  Object runLock = outbox.getFolderThread().getRunLock();
 	  synchronized(runLock) {
 	    try {
+	      if ( ! outbox.isConnected()) {
+		outbox.openFolder(Folder.READ_WRITE);
+	      }
+	      
 	      outbox.appendMessages(new MessageInfo[] { nmi });
 	    
 	      javax.swing.SwingUtilities.invokeLater(new Runnable() {

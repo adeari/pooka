@@ -880,7 +880,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    */
   public void appendMessages(MessageInfo[] msgs) throws MessagingException {
     if (isAvailable()) {
-      super.appendMessages(msgs);
+      if (isConnected()) {
+	super.appendMessages(msgs);
+      } else {
+	getCache().appendMessages(msgs);
+      }
     } else {
       throw new MessagingException("cannot append messages to an unavailable folder.");
     }
