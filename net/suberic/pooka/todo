@@ -10,10 +10,6 @@ a menu option and from the 'open with' dialog.
 
 *) fix the signature
 
-*) add new/unread/urgent/etc flags to the FolderTable.
-	somewhat done.  left todo:
-	1)  fix the open folders twice on startup bug.
-
 *) fix tab navigation in the compose pane.
 
 *) fix sorting of columns:  
