@@ -1,11 +1,3 @@
-*) finish support for headers.  
-  -- make the button have reasonable images
-  -- make button the correct size
-  -- make a subclass that dynamically handles updates.
-
-*) make sure i can make javahelp work properly. -- specifically, make
-	sure that we can include it in the jar file.
-
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
 	topics:
@@ -27,6 +19,12 @@
 	  sent folder
 	  outgoing mail folder
 
+*) add help for config stuff.
+
+*) make sure all help gets included in dist-full
+
+*) make there a build option for help only, so i can switch it in 
+	WebStart.
 
 *) fix up the error messages, and make sure that they look ok.
 
@@ -41,6 +39,8 @@
 *) check for memory leaks
  -- especially w/preview pane mode?
 
+*) make sure that if you close a store, it doesn't reopen it.
+
 -----
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
@@ -51,8 +51,6 @@
 	-- maybe change the toolbars so there's only 1?
 	-- ?? make it so you can compose messages in the main window ??
 
-*) forward to all.
- 
 *) document keybindings
 	-- keybindings for address book
 	-- keybindings for address entry panel
@@ -129,6 +127,18 @@ preview:
    possibly replacing it with the backend to the disconnected imap
    store.
 
+*) forward to all.
+ 
+*) finish support for switching display style and headers.  
+  ...actually, make a subclass of JButton that's a ConfigurableUI.  have
+	the button action be to popup a window.  do it that way.
+	--also have the MessageProxy have a link to it.  go ahead and
+	  make it so setting the actions in the ConfigurableUI will
+	  transfer the 
+  -- make the button have reasonable images
+  -- make button the correct size
+  -- make a subclass that dynamically handles updates.
+  
 *) fix the network connection test so that it doesn't hang if the
 	network is up, but the test host is unreachable.
 
