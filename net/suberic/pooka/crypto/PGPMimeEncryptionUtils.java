@@ -25,7 +25,14 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
       char[] passphrase = pgpKey.getPassphrase();
       
       MessageFactory mf = MessageFactory.getInstance("OpenPGP");
-      cryptix.message.Message msg = mf.generateMessage(encryptedStream);
+      java.util.Collection col = mf.generateMessages(encryptedStream);
+      if (col.isEmpty()) {
+	throw new EncryptionException("no Messages in Input Stream.");
+      }
+
+      java.util.Iterator iter = col.iterator();
+
+      cryptix.message.Message msg = (cryptix.message.Message) iter.next();
 
       EncryptedMessage cryptMsg = (EncryptedMessage) msg;
       
@@ -39,6 +46,7 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
 
       return null;
     } catch (Exception e) {
+      e.printStackTrace();
       throw new EncryptionException(e.getMessage());
     }
 
@@ -63,8 +71,20 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Decrypts a Message.
    */
-  public javax.mail.Message decryptMessage(javax.mail.Message msg, EncryptionKey key) 
+  public javax.mail.internet.MimeMessage decryptMessage(Session s, javax.mail.internet.MimeMessage msg, EncryptionKey key) 
     throws EncryptionException, MessagingException, java.io.IOException {
+    Object o = msg.getContent();
+    if (o instanceof Multipart) {
+      BodyPart decryptedPart = decryptMultipart((Multipart) o, key);
+      MimeMessage m = new MimeMessage(s);
+      java.util.Enumeration enum = msg.getAllHeaderLines();
+      while (enum.hasMoreElements()) {
+	m.addHeaderLine((String) enum.nextElement());
+      }
+      m.setDataHandler(decryptedPart.getDataHandler());
+      return m;
+    }
+
     return null;
   }
 
@@ -92,13 +112,17 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     // ok, our content type is ok.  now we should have a multipart here with
     // two entries:  the first should be of type application/pgp-encrypted 
     // with the content Version: 1
-
     Object content = part.getContent();
-    if (! (content instanceof Multipart)) {
-      throw new EncryptionException ("error in content:  expected javax.mail.Multipart, got " + content.getClass());
-    }
 
     Multipart mpart = (Multipart) content;
+    return decryptMultipart(mpart, key);
+  }
+
+ /**
+   * Decrypts a Multipart.
+   */
+  public BodyPart decryptMultipart(Multipart mpart, EncryptionKey key) 
+    throws EncryptionException, MessagingException, java.io.IOException {
 
     // should have two internal parts.
     if (mpart.getCount() != 2) {
@@ -122,6 +146,15 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
 
     String fileName = secondPart.getFileName();
     java.io.InputStream is = secondPart.getInputStream();
+    /*
+      java.io.InputStreamReader reader = new java.io.InputStreamReader(is);
+    
+      
+      char[] buf = new char[256];
+      for (int i = 0; i > -1; i = reader.read(buf, 0, 256)) {
+      System.out.print(new String(buf));
+      }
+    */
     byte[] value = decrypt(is, key);
     ByteArrayDataSource dataSource = new ByteArrayDataSource(value, fileName, "text/plain");
 

@@ -30,7 +30,7 @@ public abstract class EncryptionUtils {
   /**
    * Decrypts a Message.
    */
-  public abstract Message decryptMessage(Message msg, EncryptionKey key) 
+  public abstract javax.mail.internet.MimeMessage decryptMessage(Session s, javax.mail.internet.MimeMessage msg, EncryptionKey key) 
     throws EncryptionException, MessagingException, IOException;
 
   /**

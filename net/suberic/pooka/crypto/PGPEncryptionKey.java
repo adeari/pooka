@@ -11,6 +11,11 @@ public class PGPEncryptionKey extends EncryptionKey {
   KeyBundle keyBundle = null;
   char[] passphrase = null;
 
+  public PGPEncryptionKey(KeyBundle kb, char[] pphrase) {
+    keyBundle = kb;
+    passphrase = pphrase;
+  }
+
   /**
    * Returns the KeyBundle associated with this EncryptionKey.
    */
