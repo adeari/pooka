@@ -39,12 +39,12 @@ public class ReadMessageWindow extends MessageWindow {
 	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.noSubject", "<no subject>"));
 	}
 
+	editorPane = createMessagePanel(msg);
+
 	toolbar = new ConfigurableToolbar("MessageWindowToolbar", Pooka.getResources());
 	
 	toolbar.setActive(this.getActions());
 	this.getContentPane().add("North", toolbar);
-
-	editorPane = createMessagePanel(msg);
 
 	if (!getMessageProxy().hasLoadedAttachments())
 	    getMessageProxy().loadAttachmentInfo();

@@ -38,10 +38,6 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	this.getContentPane().setLayout(new BorderLayout());
 	
 	this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
-	toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
-	
-	toolbar.setActive(this.getActions());
-	this.getContentPane().add("North", toolbar);
 
 	splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
 	tabbedPane = new JTabbedPane();
@@ -68,6 +64,11 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	this.setSize(Integer.parseInt(Pooka.getProperty("MessageWindow.hsize", "500")), Integer.parseInt(Pooka.getProperty("MessageWindow.vsize", "500")));
 	
 	msg.setMessageWindow(this);
+
+	toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
+	
+	toolbar.setActive(this.getActions());
+	this.getContentPane().add("North", toolbar);
 
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 		public void internalFrameClosed(InternalFrameEvent e) {
@@ -391,16 +392,15 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
     }
 
     public Action[] getActions() {
-	if (msg.getActions() != null) {
-	    return TextAction.augmentList(msg.getActions(), getDefaultActions());
-	} else 
-	    return getDefaultActions();
+	Action[] returnValue = getDefaultActions();
+	
+	if (msg.getActions() != null) 
+	    returnValue = TextAction.augmentList(msg.getActions(), returnValue);
+	    
+	if (getEditorPane() != null && getEditorPane().getActions() != null) 
+	    returnValue = TextAction.augmentList(getEditorPane().getActions(), returnValue);
 
-	/*
-	  if (getSelectedField() != null) 
-	  return TextAction.augmentList(getSelectedField().getActions(), getDefaultActions());
-	  else 
-	*/
+	return returnValue;
     }
 
     public Action[] getDefaultActions() {
@@ -410,11 +410,16 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
     private void createDefaultActions() {
 	// The actions supported by the window itself.
 
-	defaultActions = new Action[] {
+	/*	defaultActions = new Action[] {
 	    new CloseAction(),
 	    new CutAction(),
 	    new CopyAction(),
 	    new PasteAction(),
+	    new TestAction()
+	    };*/
+
+	defaultActions = new Action[] {
+	    new CloseAction(),
 	    new TestAction()
 		};
     }

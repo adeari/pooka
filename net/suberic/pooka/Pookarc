@@ -90,13 +90,23 @@ MainToolbar.MessageOpen.Image=/net/suberic/pooka/gui/images/Open.gif
 MainToolbar.MessageSave.Action=message-save
 MainToolbar.MessageSave.Image=/net/suberic/pooka/gui/images/Save.gif
 MainToolbar.MessageClose.Action=file-close
-MainToolbar.MessageClose.Image=/net/suberic/pooka/gui/images/Delete.gif
+MainToolbar.MessageClose.Image=/net/suberic/pooka/gui/images/Folder.gif
 MainToolbar.Cut.Action=cut-to-clipboard
 MainToolbar.Cut.Image=/net/suberic/pooka/gui/images/Cut.gif
 MainToolbar.Copy.Action=copy-to-clipboard
 MainToolbar.Copy.Image=/net/suberic/pooka/gui/images/Copy.gif
 MainToolbar.Paste.Action=paste-from-clipboard
 MainToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
+
+FolderWindowToolbar=Down:Up:Open:Delete
+FolderWindowToolbar.Down.Action=folder-down
+FolderWindowToolbar.Image=Down.gif
+FolderWindowToolbar.Up.Action=folder-up
+FolderWindowToolbar.Up.Image=Up.gif
+FolderWindowToolbar.Open.Action=message-open
+FolderWindowToolbar.Open.Image=Open.gif
+FolderWindowToolbar.Delete=message-delete
+FolderWindowToolbar.Delete.Image=Delete.gif
 
 NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste
 NewMessageWindowToolbar.Send.Action=message-send

@@ -66,7 +66,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
      */
 
     public FolderWindow(FolderInfo newFolderInfo, MessagePanel newMessagePanel) {
-	super(newFolderInfo.getFolderName(), true, true, true, true);
+	super(newFolderInfo.getFolderName() + " - " + newFolderInfo.getParentStore().getStoreID(), true, true, true, true);
 
 	messagePanel = newMessagePanel;
 

@@ -14,14 +14,10 @@ and basically just fails all over the place.
 
 *)  enable keybindings so they work properly.
 
-*)  make cut & paste work from the Toolbar.
-
 *) add a ValueChangeListener for the UserProfile properties.  right now
 the UserProfile only gets updated at startup.
 
 *) make the mailcap mappings for the attachments work properly.
-
-*) make the MessageWindow honor the inline tag for inlined attachments.
 
 *) add Help->About Pooka.  :)
 

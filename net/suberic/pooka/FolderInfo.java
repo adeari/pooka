@@ -597,6 +597,26 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	folderWindow = newValue;
     }
 
+    /**
+     * This returns the parentFolder.  If this FolderInfo is a direct
+     * child of a StoreInfo, this method will return null.
+     */
+    public FolderInfo getParentFolder() {
+	return parentFolder;
+    }
+
+    /**
+     * This method actually returns the parent StoreInfo.  If this 
+     * particular FolderInfo is a child of another FolderInfo, this
+     * method will call getParentStore() on that FolderInfo.
+     */
+    public StoreInfo getParentStore() {
+	if (parentStore == null)
+	    return parentFolder.getParentStore();
+	else
+	    return parentStore;
+    }
+
     public UserProfile getDefaultProfile() {
 	if (defaultProfile != null) {
 	    return defaultProfile;
