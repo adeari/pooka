@@ -19,7 +19,7 @@ import java.awt.event.*;
 import java.awt.print.*;
 import java.io.*;
 
-public class MessageProxy {
+public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
   class SaveMessageThread extends Thread {
     
@@ -159,9 +159,12 @@ public class MessageProxy {
   // whether this should be displayed as html, text, or raw RFC822.
   int displayMode = getDefaultDisplayMode();
 
+  // a flag indicating that this message is scheduled for deletion
+  boolean mDeleteInProgress = false;
+
   // the default actions for this MessageProxy.
   public Action[] defaultActions = null;
-  
+
   /**
    * This class should make it easy for us to sort subjects correctly.
    * It stores both the subject String itself and a sortingString which
@@ -456,7 +459,12 @@ public class MessageProxy {
     if (folderFilters != null) {
       Vector tmpMatches = new Vector();
       for (int i = 0; i < folderFilters.length; i++) {
-	if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
+	if (folderFilters[i].getSearchTerm() instanceof net.suberic.pooka.filter.DeleteInProgressSearchTerm) {
+	  // big hack.
+	  if (isDeleteInProgress()) {
+	    tmpMatches.add(folderFilters[i].getAction());
+	  }
+	} else if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
 	  tmpMatches.add(folderFilters[i].getAction());
       }
       
@@ -954,6 +962,7 @@ public class MessageProxy {
     // should always be done on FolderThread, not on UI thread.
     try {
       getMessageInfo().deleteMessage(autoExpunge);
+      setDeleteInProgress(true);
       this.close();
     } catch (MessagingException me) {
       if (me instanceof NoTrashFolderException) {
@@ -984,6 +993,26 @@ public class MessageProxy {
     }
   }
   
+  /**
+   * Sets the deleteInProgress flag.
+   */
+  public void setDeleteInProgress(boolean newValue) {
+    boolean orig = mDeleteInProgress;
+    mDeleteInProgress = newValue;
+    if (orig != mDeleteInProgress) {
+      setRefresh(true);
+      refreshMessage();
+    }
+  }
+
+  /**
+   * Returns true if this message is slated for removal, but hasn't actually
+   * been removed yet.
+   */
+  public boolean isDeleteInProgress() {
+    return mDeleteInProgress;
+  }
+
   /**
    * Opens up a dialog to save the message to a file.
    */
@@ -1352,6 +1381,54 @@ public class MessageProxy {
 	return new DisplayFilter[0];
       }
     }
+  }
+
+  int mActionType = TransferHandler.COPY;
+  boolean mImportDone = false;
+
+  /**
+   * Sets move or copy value.
+   */
+  public void setActionType(int pActionType) {
+    mActionType = pActionType;
+  }
+
+  /**
+   * Gets the action type for this Transferable.
+   */
+  public int getActionType() {
+    return mActionType;
+  }
+
+  /**
+   * Returns whether or not the import is done.
+   */
+  public boolean getImportDone() {
+    return mImportDone;
+  }
+
+  /**
+   * Sets whether or not the import is done.
+   */
+  public void setImportDone(boolean pImportDone) {
+    mImportDone = pImportDone;
+  }
+
+  /**
+   * Removes this message if the cut/past/move is complete.
+   */
+  public void removeMessageOnCompletion() {
+    if (mImportDone && mActionType == javax.swing.TransferHandler.MOVE) {
+      deleteMessage();
+    }
+  }
+  
+  /**
+   * indicates that this has been removed from the clipboard.
+   */
+  public void lostOwnership(java.awt.datatransfer.Clipboard clipboard,
+			    java.awt.datatransfer.Transferable contents) {
+    setDeleteInProgress(false);
   }
   
   public Action getAction(String name) {

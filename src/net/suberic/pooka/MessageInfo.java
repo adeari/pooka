@@ -460,15 +460,15 @@ public class MessageInfo {
       getMessageProxy().close();
   }
   
-    /**
-     * A convenience method which sets autoExpunge by the value of 
-     * Pooka.autoExpunge, and then calls deleteMessage(boolean autoExpunge)
-     * with that value.
-     */
-    public void deleteMessage() throws MessagingException {
-	deleteMessage(Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
-    }
-
+  /**
+   * A convenience method which sets autoExpunge by the value of 
+   * Pooka.autoExpunge, and then calls deleteMessage(boolean autoExpunge)
+   * with that value.
+   */
+  public void deleteMessage() throws MessagingException {
+    deleteMessage(Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
+  }
+  
   /**
    * This actually marks the message as deleted, and, if autoexpunge is
    * set to true, expunges the folder.
@@ -488,7 +488,7 @@ public class MessageInfo {
       }
     }
   }
-  
+
   /**
    * This puts the reply prefix 'prefix' in front of each line in the
    * body of the Message.

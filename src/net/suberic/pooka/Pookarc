@@ -1135,6 +1135,8 @@ Search.searchTerms.Cached.class=net.suberic.pooka.filter.CachedSearchTerm
 Search.searchTerms.Cached.type=Boolean
 Search.searchTerms.Available.class=net.suberic.pooka.filter.AvailableSearchTerm
 Search.searchTerms.Available.type=Boolean
+Search.searchTerms.DeleteInProgress.class=net.suberic.pooka.filter.DeleteInProgressSearchTerm
+Search.searchTerms.DeleteInProgress.type=Boolean
 Search.searchTerms.Header.class=javax.mail.search.HeaderTerm
 Search.searchTerms.Header.type=Header
 
@@ -1168,9 +1170,9 @@ FolderFilters.display.ColorFilter.editorClass=net.suberic.pooka.gui.filter.Color
 FolderFilters.display.FontFilter.class=net.suberic.pooka.gui.filter.FontDisplayFilter
 FolderFilters.display.FontFilter.editorClass=net.suberic.pooka.gui.filter.FontFilterEditor
 
-CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
+CachingFolderInfo.defaultDisplayFilters=Unread:Uncached:DeleteInProgress
 CachingFolderInfo.sentFolderDefaultDisplayFilters=Uncached
-FolderInfo.defaultDisplayFilters=Unread
+FolderInfo.defaultDisplayFilters=Unread:DeleteInProgress
 FolderInfo.sentFolderDefaultDisplayFilters=
 
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen
@@ -1182,6 +1184,12 @@ FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTer
 FolderInfo.defaultDisplayFilters.Uncached.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Uncached.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderInfo.defaultDisplayFilters.Uncached.action.rgb=-8648439
+
+FolderInfo.defaultDisplayFilters.DeleteInProgress.searchTerm.searchTerm=Search.searchTerms.DeleteInProgress
+FolderInfo.defaultDisplayFilters.DeleteInProgress.searchTerm.operation=Search.operations.True
+FolderInfo.defaultDisplayFilters.DeleteInProgress.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
+FolderInfo.defaultDisplayFilters.DeleteInProgress.action.rgb=-6710887
+
 
 # colors
 Pooka.background=0

@@ -1,13 +1,11 @@
 *) add drag and drop
-	*) include message
-	*) attach file
-	*) save attachment?
-
-   *) error:  move should be able to tell if move was successful or not.
-	also, fix (error:  proxy) message if you drag a message into a
+   *) make sure that pasting cut message into new message removes the
+	cut message.
+   *) test with desktop/external apps.
+   *) error:  fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
-
-   *) implement a proper cut/paste paradigm
+   *) make sure folderwindow cut/paste is enabled everywhere; add to 
+	keybindings list; give tooltips in toolbar.
 
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.

@@ -30,6 +30,8 @@ public class FolderTransferHandler extends TransferHandler {
 	  mp = (MessageProxy) t.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	  if (mp != null) {
 	    mp.getMessageInfo().copyMessage(fi);
+	    mp.setImportDone(true);
+	    mp.removeMessageOnCompletion();
 	    return true;
 	  }
 	} catch (Exception e) {
@@ -77,7 +79,9 @@ public class FolderTransferHandler extends TransferHandler {
       try {
 	MessageProxy mp = (MessageProxy) data.getTransferData(MessageProxyTransferable.sMessageProxyDataFlavor);
 	if (mp != null) {
-	  mp.deleteMessage(true);
+	  mp.setDeleteInProgress(true);
+	  mp.setActionType(action);
+	  mp.removeMessageOnCompletion();
 	}
       } catch (Exception e) {
 	e.printStackTrace();
@@ -91,6 +95,54 @@ public class FolderTransferHandler extends TransferHandler {
     return returnValue;
   }
 
+  /**
+   * Causes a transfer from the given component to the
+   * given clipboard.  This method is called by the default cut and
+   * copy actions registered in a component's action map.  
+   * <p>
+   * The transfer <em>will</em> have been completed at the
+   * return of this call.  The transfer will take place using the
+   * <code>java.awt.datatransfer</code> mechanism,
+   * requiring no further effort from the developer.
+   * The <code>exportDone</code> method will be called when the
+   * transfer has completed.
+   *
+   * @param comp  the component holding the data to be transferred; this
+   *  argument is provided to enable sharing of <code>TransferHandler</code>s by
+   *  multiple components
+   * @param clip  the clipboard to transfer the data into  
+   * @param action the transfer action requested; this should
+   *  be a value of either <code>COPY</code> or <code>MOVE</code>;
+   *  the operation performed is the intersection  of the transfer
+   *  capabilities given by getSourceActions and the requested action;
+   *  the intersection may result in an action of <code>NONE</code>
+   *  if the requested action isn't supported
+   */
+  public void exportToClipboard(JComponent comp, Clipboard clip, int action) {
+    boolean exportSuccess = false;
+    Transferable t = null;
+    
+    int clipboardAction = getSourceActions(comp) & action;
+    if (clipboardAction != NONE) {
+      t = createTransferable(comp);
+      if (t != null) {
+	if (t instanceof MessageProxyTransferable) {
+	  clip.setContents(t, ((MessageProxyTransferable) t).getMessageProxy());
+	} else {
+	  clip.setContents(t, null);
+	}
+	exportSuccess = true;
+      }
+    }
+    
+    if (exportSuccess) {
+      exportDone(comp, t, clipboardAction);
+    } else {
+      exportDone(comp, null, NONE);
+    }
+  }
+  
+  
   public static Action getCutAction(JComponent pSource) { 
     return new FolderTransferAction("cut-to-clipboard", pSource);
   }

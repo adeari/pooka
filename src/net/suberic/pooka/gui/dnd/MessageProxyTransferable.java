@@ -10,6 +10,11 @@ import java.io.*;
 
 /**
  * A Transferable version of a MessageProxy.
+ *
+ * Note that, since this class requires that the object not get deleted until
+ * a paste is done, we implement a system which delays the removal until 
+ * after the full transfer is completed.  See <code>importDone</code> and
+ * <code>actionType</code>.
  */
 public class MessageProxyTransferable implements Transferable {
 
@@ -25,6 +30,7 @@ public class MessageProxyTransferable implements Transferable {
 
   MessageProxy mMessageProxy = null;
   int mActionType = javax.swing.TransferHandler.COPY;
+  boolean mImportDone = false;
   
   public MessageProxyTransferable(MessageProxy pMessageProxy) {
     setMessageProxy(pMessageProxy);
@@ -96,17 +102,4 @@ public class MessageProxyTransferable implements Transferable {
     mMessageProxy = pMessageProxy;
   }
 
-  /**
-   * Sets move or copy value.
-   */
-  public void setActionType(int pActionType) {
-    mActionType = pActionType;
-  }
-
-  /**
-   * Gets the action type for this Transferable.
-   */
-  public int getActionType() {
-    return mActionType;
-  }
 }
