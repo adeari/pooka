@@ -61,11 +61,20 @@ public class LoadMessageThread extends Thread {
 
     /**
      * This just checks to see if we can get a NewMessageCount from the
-     * folder.  It should keep the connection open for us, though.
+     * folder.  As a brute force method, it also attempts to open the 
+     * folder read_write at every check, catching and throwing away any
+     * Exceptions that happen.  It's nasty, but it _should_ keep the 
+     * Folder open..
      */
     public void checkFolder() {
 	if (Pooka.isDebug())
 	    System.out.println("checking folder " + getFolderInfo().getFolderName());
+	
+	try {
+	    getFolderInfo().getFolder().open(Folder.READ_WRITE);
+	} catch (Exception e) {
+	}
+
 	getFolderInfo().resetUnread();
     }
 
