@@ -131,6 +131,47 @@ public class SearchEntryForm implements java.awt.event.ItemListener {
     }
 
     /**
+     * This generates the Properties for the given SearchTerm.
+     */
+    public java.util.Properties generateSearchTermProperties(String rootProperty) {
+	if (Pooka.isDebug())
+	    System.out.println("SearchEntryForm:  generating SearchTerm property from " + searchFieldCombo.getSelectedItem() + " and " + operationCombo.getSelectedItem() + " using rootProperty " + rootProperty);
+	
+	String searchProperty = (String)(manager.getLabelToPropertyMap().get(searchFieldCombo.getSelectedItem()));
+	String selectedType = Pooka.getProperty(searchProperty + ".type", "");
+	String operationProperty = null;
+	String pattern = null;
+
+	if (selectedType.equalsIgnoreCase(SearchTermManager.STRING_MATCH)) {
+	    operationProperty = (String)(manager.getLabelToOperationMap().get(operationCombo.getSelectedItem()));
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty);
+	    pattern = textField.getText();
+
+	} else 	if (selectedType.equalsIgnoreCase(SearchTermManager.BOOLEAN_MATCH)) {
+	    operationProperty = (String)(manager.getLabelToOperationMap().get(booleanValueCombo.getSelectedItem()));
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty);
+	    pattern = null;
+
+	} else	if (selectedType.equalsIgnoreCase(SearchTermManager.DATE_MATCH)) {
+	    operationProperty = (String)(manager.getLabelToOperationMap().get(dateComparisonCombo.getSelectedItem()));
+	    if (Pooka.isDebug())
+		System.out.println("using " + searchProperty + ", " + operationProperty);
+	    pattern = dateField.getText();
+	}
+	
+	Properties returnValue = new java.util.Properties();
+	returnValue.setProperty(rootProperty, searchProperty);
+	returnValue.setProperty(rootProperty + ".operation", operationProperty);
+	returnValue.setProperty(rootProperty + ".pattern", pattern);
+	returnValue.setProperty(rootProperty + ".type", "single");
+
+	return returnValue;
+    }
+
+
+    /**
      * This handles the switch of the selectionPanel when the searchFieldCombo
      * value changes.
      */

@@ -219,7 +219,13 @@ public class SearchEntryPanel extends JPanel {
      * given rootProperty as the root.
      */
     public java.util.Properties generateSearchTermProperties(String rootProperty) {
-	return new java.util.Properties();
+	java.util.Properties returnValue = new java.util.Properties();
+
+	if (searchTerms.size() > 0) {
+	}
+
+	return returnValue;
     }
+
 
 }
