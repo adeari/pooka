@@ -73,7 +73,11 @@ public class ReadMessageWindow extends MessageWindow {
      */
     public void addNotify() {
 	super.addNotify();
-	editorScrollPane.setPreferredSize(getDefaultEditorPaneSize());
+	Dimension prefSize = getDefaultEditorPaneSize();
+	JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
+	if (vsb != null)
+	    prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
+	editorScrollPane.setPreferredSize(prefSize);
 	this.resizeByWidth();
 	if (splitPane != null && attachmentPanel != null)
 	    splitPane.setDividerLocation((int)(splitPane.getSize().getHeight() - attachmentPanel.getPreferredSize().getHeight()));
