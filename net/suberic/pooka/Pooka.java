@@ -73,16 +73,15 @@ public class Pooka {
 	frame.pack();
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
         frame.show();
-
-	if (panel.getContentPanel() instanceof MessagePanel) {
-
-	    if (getProperty("Store", "").equals("")) {
+	
+	if (getProperty("Store", "").equals("")) {
+	    if (panel.getContentPanel() instanceof MessagePanel) {
 		NewAccountPooka nap = new NewAccountPooka((MessagePanel)panel.getContentPanel());
 		nap.start();
-	    } else if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true"))
-		((MessagePanel)panel.getContentPanel()).openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
+	    }
+	} else if (openFolders && getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true")) {
+	    panel.getContentPanel().openSavedFolders(resources.getPropertyAsVector("Pooka.openFolderList", ""));
 	}
-	
 	panel.refreshActiveMenus();
     }
 

@@ -209,9 +209,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	Pooka.setProperty("Pooka.messagePanel.hsize", Integer.toString(contentPanel.getUIComponent().getWidth()));
 	Pooka.setProperty("Pooka.messagePanel.vsize", Integer.toString(contentPanel.getUIComponent().getHeight()));
 	
-	if (contentPanel instanceof MessagePanel && 
-	    ((MessagePanel)contentPanel).isSavingOpenFolders()) {
-	    ((MessagePanel)contentPanel).saveOpenFolders();
+	if (contentPanel.isSavingOpenFolders()) {
+	    contentPanel.saveOpenFolders();
 	}
 	
 	Pooka.resources.saveProperties(new File(Pooka.localrc));

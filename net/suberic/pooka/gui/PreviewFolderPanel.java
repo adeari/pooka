@@ -15,9 +15,9 @@ import net.suberic.util.thread.*;
 import net.suberic.util.swing.*;
 
 /**
- * This is a JSplitPane which contains both a FolderDisplayPanel for showing
- * the messages in the current folder, as well as a MessageDisplayPanel
- * for previewing messages.
+ * This is a JPanel which contains a FolderDisplayPanel for showing
+ * the messages in the current folder.  It also can be updated dynamically
+ * with a new folder if the selected folder changes.
  */
 
 public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {

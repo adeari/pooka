@@ -28,16 +28,16 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 
     private ListSelectionListener selectionListener;
 
+    private boolean savingOpenFolders;
+
     /**
      * Creates a new PreviewContentPanel.
      */
     public PreviewContentPanel() {
 	folderDisplay = new JPanel();
 	folderDisplay.setLayout(new CardLayout());
+	folderDisplay.add("emptyPanel", new JPanel());
 	
-	messageCardPanel = new JPanel();
-	messageCardPanel.setLayout(new CardLayout());
-
 	messageDisplay = new ReadMessageDisplayPanel();
 
 	try {
@@ -46,9 +46,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 	    // showError();
 	}
 
-	messageCardPanel.add("message", messageDisplay);
-
-	splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageCardPanel);
+	splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
 
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 
@@ -68,23 +66,26 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 		}
 	    };
 
+	this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
+	
     }
 
     /**
      * Shows the PreviewFolderPanel indicated by the given FolderId.
      */
     public void showFolder(String folderId) {
-	System.out.println("showing folder " + folderId);
 	if (current != null) {
 	    current.getFolderDisplay().getMessageTable().getSelectionModel().removeListSelectionListener(selectionListener);
 	}
 	current = (PreviewFolderPanel) cardTable.get(folderId);
+
 	((CardLayout)folderDisplay.getLayout()).show(folderDisplay, folderId);
 	if (current != null) {
 	    current.getFolderDisplay().getMessageTable().getSelectionModel().addListSelectionListener(selectionListener);
 	}
-
+	
 	selectedMessageChanged();
+	folderDisplay.repaint();
     }
 
     /**
@@ -103,22 +104,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 	if (current != null) {
 	    MessageProxy mp = current.getFolderDisplay().getSelectedMessage();
 	    if (! (mp instanceof MultiMessageProxy)) {
-		ReadMessageDisplayPanel newMessageDisplay = new ReadMessageDisplayPanel(mp);
+		messageDisplay.setMessageProxy(mp);
 		try {
-		    newMessageDisplay.configureMessageDisplay();
-		    if (mp != null) {
-			System.out.println("mp text is now " + messageDisplay.getMessageText());
-		    } else {
-			System.out.println("mp is null.");
-		    }
+		    messageDisplay.resetEditorText();
 		    if (mp != null && mp.getMessageInfo() != null)
 			mp.getMessageInfo().setSeen(true);
 		} catch (javax.mail.MessagingException me) {
 		    //showError();
 		}
-		messageCardPanel.add("message", newMessageDisplay);
-		messageCardPanel.remove(messageDisplay);
-		messageDisplay = newMessageDisplay;
 	    }
 	}
     }
@@ -127,7 +120,6 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
      * Registers a PreviewFolderPanel for a particular FolderID.
      */
     public void addPreviewPanel(PreviewFolderPanel newPanel, String folderId) {
-	System.out.println("adding preview panel for " + folderId);
 	cardTable.put(folderId, newPanel);
 	folderDisplay.add(newPanel, folderId);
     }
@@ -141,6 +133,50 @@ public class PreviewContentPanel extends JPanel implements ContentPanel {
 	    folderDisplay.remove(panel);
 	    cardTable.remove(folderId);
 	}
+    }
+
+    
+    /**
+     * This gets the FolderInfo associated with the first name in the
+     * folderList Vector, and attempts to display the FolderPanel for it.
+     *
+     * Normally called at startup if Pooka.openSavedFoldersOnStartup
+     * is set.
+     */
+    public void openSavedFolders(java.util.Vector folderList) {
+	if (folderList != null && folderList.size() > 0) {
+	  net.suberic.pooka.FolderInfo fInfo = Pooka.getStoreManager().getFolderById((String)folderList.elementAt(0));  
+	  if (fInfo != null && fInfo.getFolderNode() != null) {
+	      FolderNode fNode = fInfo.getFolderNode();
+	      fNode.makeVisible(); 
+	      Action a = fNode.getAction("file-open");
+	      a.actionPerformed(new java.awt.event.ActionEvent(this, 0, "file-open"));
+	  }
+	}
+    }
+
+    /**
+     * Saves the open folder.
+     */
+    public void saveOpenFolders() {
+	if (current != null && current.getFolderInfo() != null) {
+	    String folderId = current.getFolderInfo().getFolderID();
+	    Pooka.setProperty("Pooka.openFolderList", folderId);
+	}
+    }
+
+    /**
+     * returns whether or not we're saving open folders.
+     */
+    public boolean isSavingOpenFolders() {
+	return savingOpenFolders;
+    }
+    
+    /**
+     * sets whether or not we're saving open folders.
+     */
+    public void setSavingOpenFolders(boolean newValue) {
+	savingOpenFolders=newValue;
     }
 
     /**

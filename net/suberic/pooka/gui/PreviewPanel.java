@@ -145,7 +145,7 @@ public class PreviewPanel extends JPanel implements FolderDisplayUI, MessageUI {
      * As defined in interface net.suberic.pooka.gui.MessageUI.
      */
     public void closeMessageUI() {
-	getMessageDisplay().clearPanel();
+	//getMessageDisplay().clearPanel();
 	getMessageDisplay().setMessageProxy(null);
 	if (displayedMessage != null && displayedMessage.getMessageUI() == this)
 	    displayedMessage.setMessageUI(null);

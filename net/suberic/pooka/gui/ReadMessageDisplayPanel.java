@@ -46,7 +46,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
      */
     public void configureMessageDisplay() throws MessagingException {
 	if (msg != null) {
-	    editorPane = createMessagePanel(msg);
+	    editorPane = new JTextPane();
+
+	    setDefaultFont(editorPane);
+
+	    resetEditorText();
+	    
 	    editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	    
 	    if (getMessageProxy().getAttachments() != null && getMessageProxy().getAttachments().size() > 0) {
@@ -58,18 +63,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		splitPane.setTopComponent(editorScrollPane);
 		splitPane.setBottomComponent(attachmentScrollPane);
 		this.add("Center", splitPane);
-		if (currentComponent != null) {
-		    System.out.println("removing current rmdp component");
-		    this.remove(currentComponent);
-		}
 		currentComponent = splitPane;
 		this.repaint();
 	    } else {
 		this.add("Center", editorScrollPane);
-		if (currentComponent != null) {
-		    System.out.println("removing current rmdp component");
-		    this.remove(currentComponent);
-		}
 		currentComponent = editorScrollPane;
 		this.repaint();
 	    }
@@ -87,66 +84,37 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 		});
 	} else {
 	    editorPane = new JTextPane();
-	    editorPane.setText("this is a test to see if it makes a difference to have a message there in the beginning.");
 	    editorPane.setEditable(false);
 	    splitPane = null;
 	    editorScrollPane = null;
 	    this.add("Center", editorPane);
-	    if (currentComponent != null) {
-		System.out.println("removing current rmdp component");
-		this.remove(currentComponent);
-	    }
 	    currentComponent=editorPane;
 	}
     }
 	
     /**
-     * This clears the ReadMessageDisplayPanel.
+     * This sets the text of the editorPane to the content of the current
+     * message.
      */
-    public void clearPanel() {
-	if (splitPane != null)
-	    this.remove(splitPane);
-	else
-	    this.remove(editorPane);
-	splitPane = null;
-	editorPane = null;
-	attachmentPanel = null;
-	editorScrollPane = null;
-	hasAttachment = false;
-    }
-
-    /**
-     * This method creates the component that will display the message
-     * itself.
-     *
-     * It returns a JTextPane with the headers and the message body
-     * together.
-     */
-
-    public JTextPane createMessagePanel(MessageProxy aMsg) throws MessagingException {
-	JTextPane retval = new JTextPane();
-
-	setDefaultFont(retval);
-
-	StringBuffer messageText = new StringBuffer();
-	
-	String content = null;
-	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	    content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
-	} else {
-	    content = getMessageProxy().getMessageInfo().getTextPart( showFullHeaders(), true);
+    public void resetEditorText() throws MessagingException {
+	if (getMessageProxy() != null) {
+	    StringBuffer messageText = new StringBuffer();
+	    
+	    String content = null;
+	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+		content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
+	    } else {
+		content = getMessageProxy().getMessageInfo().getTextPart( showFullHeaders(), true);
+	    }
+	    
+	    if (content != null) {
+		messageText.append(content);
+		editorPane.setEditable(false);
+		editorPane.setText(messageText.toString());
+	    } 
 	}
-	
-	if (content != null) {
-	    messageText.append(content);
-	    retval.setEditable(false);
-	    retval.setText(messageText.toString());
-	} 
-	
-	return retval;
-	
     }
-    
+
     public boolean showFullHeaders() {
 	return showFullHeaders;
     }

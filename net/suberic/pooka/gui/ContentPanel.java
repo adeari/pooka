@@ -6,4 +6,10 @@ public interface ContentPanel extends net.suberic.pooka.UserProfileContainer, Ac
     public void setUIComponent(javax.swing.JComponent comp);
 
     public void showHelpScreen(String title, java.net.URL url);
+
+    public void openSavedFolders(java.util.Vector folderList);
+
+    public void saveOpenFolders();
+
+    public boolean isSavingOpenFolders();
 }
