@@ -2,13 +2,10 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import java.util.*;
 import java.awt.print.*;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Dimension;
-import java.awt.Font;
+import java.awt.*;
 import javax.mail.internet.MimeMessage;
 import javax.swing.*;
+import javax.swing.text.View;
 import javax.mail.MessagingException;
 
 public class MessagePrinter implements Printable {
@@ -80,20 +77,138 @@ public class MessagePrinter implements Printable {
     
     mPageCount = (int)Math.ceil(mScale * panelHeight / pageHeight);
     
-    java.util.List breakList = new java.util.ArrayList();
-    
     int counter = 0;
 
+    /*
     mPageBreaks = new double[mPageCount];
 
     for (int i = 0 ; i < mPageCount; i++) {
       mPageBreaks[i] = i*pageHeight;
     }
+    */
+
+    paginate(pageHeight);
+
+    mPageCount = mPageBreaks.length;
 
     if (mDisplay != null) {
       mDisplay.setPageCount(mPageCount);
     }
 
+  }
+
+  /**
+   * Paginates.
+   */
+  /*
+    public void paginate(double pageHeight, double panelHeight) {
+    double minSize = pageHeight * .8;
+
+    java.util.List breakList = new java.util.ArrayList();
+    
+    View view = jtp.getUI().getRootView(jtp);
+
+    double pageBreak = 0;
+    while (pageBreak < panelHeight) {
+      breakList.add(new Double(pageBreak));
+      double minBreak = pageBreak + minSize;
+      pageBreak += pageHeight;
+      double lastExcellent = -1;
+      double lastGood = -1;
+      for (double i = pageBreak; lastExcellent == -1 && i > minBreak; i--) {
+	int breakWeight = 
+      }
+
+    }
+  }
+  */
+
+  Shape allocation = null;
+  
+  double pageEnd = 0;
+  
+  /**
+   * Paginates.
+   */
+  public void paginate(double pageHeight) {
+    java.util.List breakList = new java.util.ArrayList();
+    
+    boolean pageExists = true;
+    double pageStart = 0;
+    pageEnd = 0;
+
+    double scaledPageHeight = pageHeight/mScale;
+    jtp.validate();
+    View view = jtp.getUI().getRootView(jtp);
+    double pageWidth = jtp.getSize().getWidth();
+    
+    while (pageExists) {
+      pageStart += pageEnd;
+      pageEnd = pageStart + scaledPageHeight;
+
+      Rectangle currentPage = new Rectangle();
+      currentPage.setRect(0d, pageStart, pageWidth, scaledPageHeight);
+
+      System.err.println("testing with pageStart = " + pageStart + "; pageEnd = " + pageEnd);
+      pageExists = calculatePageBreak(view, allocation, currentPage);
+      System.err.println("pageExists = " + pageExists);
+
+      if (pageExists) {
+	breakList.add(new Double(pageStart));
+	System.err.println("adding page " + breakList.size());
+	System.err.println("pageStart = " + pageStart + "; pageEnd = " + pageEnd);
+      }
+    }
+
+    mPageBreaks = new double[breakList.size()];
+    for (int i = 0; i < mPageBreaks.length; i++) {
+      mPageBreaks[i] = (double) ((Double)breakList.get(i)).doubleValue();
+    }
+    
+  }
+
+  /**
+   * Calculates the next pageBreak.
+   */
+  public boolean calculatePageBreak(View view, Shape allocation, Rectangle currentPage) {
+    boolean returnValue = false;
+    // only check leaf views--if it's a branch, get the children.
+    if (view.getViewCount() > 0) {
+      for (int i = 0; i < view.getViewCount(); i++) {
+        allocation = view.getChildAllocation(i,allocation);
+        if (allocation != null) {
+          View childView = view.getView(i);
+          if (calculatePageBreak(childView,allocation,currentPage)) {
+	    returnValue = true;
+          }
+        }
+      }
+    } else {
+      //  I
+      System.err.println("allocation.getBounds().getMaxY() = " + allocation.getBounds().getMaxY() + "; currentPage.getY() = " + currentPage.getY());
+      if (allocation.getBounds().getMaxY() >= currentPage.getY()) {
+        returnValue = true;
+	//  II
+        if ((allocation.getBounds().getHeight() > currentPage.getHeight()) &&
+	    (allocation.intersects(currentPage))) {
+        } else {
+	  //  III
+          if (allocation.getBounds().getY() >= currentPage.getY()) {
+            if (allocation.getBounds().getMaxY() <= currentPage.getMaxY()) {
+            } else {
+	      //  IV
+              if (allocation.getBounds().getY() < pageEnd) {
+                pageEnd = allocation.getBounds().getY();
+		System.err.println("changing pageEnd to " + pageEnd);
+              }
+            }
+          }
+        }
+      }
+      
+    }
+
+    return returnValue;
   }
 
   /**
