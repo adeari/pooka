@@ -10,15 +10,15 @@ public abstract class DefaultPropertyEditor extends Box implements PropertyEdito
     }
 
     public void configureEditor(String newProperty, String templateType, VariableBundle bundle, boolean isEnabled) {
-	configureEditor(newProperty, templateType, bundle, isEnabled);
+	configureEditor(null, newProperty, templateType, bundle, isEnabled);
     }
 
     public void configureEditor(String newProperty, VariableBundle bundle, boolean isEnabled) {
-	configureEditor(newProperty, newProperty, bundle, isEnabled);
+	configureEditor(null, newProperty, newProperty, bundle, isEnabled);
     }
 
     public void configureEditor(String newProperty, VariableBundle bundle) {
-	configureEditor(newProperty, newProperty, bundle, true);
+	configureEditor(null, newProperty, newProperty, bundle, true);
     }
 
     public void setValue() {
