@@ -8,7 +8,7 @@ import javax.mail.internet.InternetAddress;
  * This is a JTextArea which uses an AddressMatcher to fill in completed
  * addresses.
  */
-public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea {
+public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea implements java.awt.event.FocusListener {
 
   // the update thread for all AddressEntryTextAreas
   static Thread updateThread;
@@ -35,6 +35,8 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea {
     super(rows, columns);
     messageUI = ui;
     areaList.put(this, null);
+
+    this.addFocusListener(this);
   }
 
   /**
@@ -44,6 +46,8 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea {
     super(text, rows, columns);
     messageUI = ui;
     areaList.put(this, null);
+
+    this.addFocusListener(this);
   }
 
   /**
@@ -52,11 +56,29 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea {
    */
   protected void processComponentKeyEvent(KeyEvent e) {
     super.processComponentKeyEvent(e);
-    lastKeyTime = new java.util.Date().getTime();
-    if (updateThread != null)
-      updateThread.interrupt();
-    else
-      createUpdateThread();
+    int keyCode = e.getKeyCode();
+    switch(keyCode) {
+    case KeyEvent.VK_TAB:
+      break;
+    case KeyEvent.VK_UP:
+      selectNextEntry();
+      break;
+    case KeyEvent.VK_DOWN:
+      selectPreviousEntry();
+      break;
+    case KeyEvent.VK_LEFT:
+      // ignore
+      break;
+    case KeyEvent.VK_RIGHT:
+      // ignore
+      break;
+    default:
+      lastKeyTime = new java.util.Date().getTime();
+      if (updateThread != null)
+	updateThread.interrupt();
+      else
+	createUpdateThread();
+    }
   }
 
   /**
@@ -68,28 +90,43 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea {
     //long currentTime = currentTime
     net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
 
-    String entryString = getAddressText();
-    final InternetAddress[] matchedAddresses = matcher.match(entryString);
+    final String entryString = getAddressText();
 
-    try {
-      SwingUtilities.invokeAndWait(new Runnable() {
-	  public void run() {
-	    // make sure no keys have been pressed since we did the match.
-	    if (lastModifiedTime == lastKeyTime) {
-	      if (matchedAddresses.length > 0) {
-		String newAddress = matchedAddresses[0].toString();
-		updateAddressText(newAddress);
-	      } else {
-		updateAddressText(Pooka.getProperty("error.noMatchingAddresses", "<no matching addresses>"));
+    if (needToMatch(entryString)) {
+      final InternetAddress[] matchedAddresses = matcher.match(entryString);
+      
+      try {
+	SwingUtilities.invokeAndWait(new Runnable() {
+	    public void run() {
+	      // make sure no keys have been pressed since we did the match.
+	      if (lastModifiedTime == lastKeyTime) {
+		if (matchedAddresses.length > 0) {
+		  String newAddress = matchedAddresses[0].toString(); 
+		  System.err.println("checking--newAddress = '" + newAddress + "', while entryString = '" + entryString + "'.");
+		  if (!newAddress.equalsIgnoreCase(entryString))
+		    updateAddressText(newAddress);
+		} else {
+		  updateAddressText(entryString + Pooka.getProperty("error.noMatchingAddresses", "<no matching addresses>"));
+		}
+		
+		lastMatchedTime = new java.util.Date().getTime();
 	      }
-
-	      lastMatchedTime = new java.util.Date().getTime();
 	    }
-	  }
-	});
-    } catch (Exception e) {
+	  });
+      } catch (Exception e) {
+      }
     }
+  }
 
+  /**
+   * This tests to see if the given string needs to be matched or not.
+   */
+  public boolean needToMatch(String entry) {
+    System.err.println("need to match " + entry + "?");
+    if (entry.length() == 0) 
+      return false;
+    else
+      return true;
   }
 
   /**
@@ -144,6 +181,21 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea {
       endOffset = newEnd;
       text = newText;
     }
+  }
+
+  //----------- focus listener ----------------
+  /**
+   * a no-op -- don't do anything on focusGained.
+   */
+  public void focusGained(java.awt.event.FocusEvent e) {
+    
+  }
+
+  /**
+   *
+   */
+  public void focusLost(java.awt.event.FocusEvent e) {
+    lastMatchedTime = new java.util.Date().getTime();
   }
 
   //----------- updater thread ----------------

@@ -30,4 +30,14 @@ public interface AddressMatcher {
    */
   public InternetAddress[] matchEmailAddress(String matchString);
 
+  /**
+   * Returns the InternetAddress which follows the given String alphabetically.
+   */
+  public InternetAddress getNextMatch(String matchString);
+
+  /**
+   * Returns the InternetAddress which precedes the given String 
+   * alphabetically.
+   */
+  public InternetAddress getPreviousMatch(String matchString);
 }

@@ -18,6 +18,8 @@ Pooka.guiType.allowedValues=Desktop:Preview
 
 Pooka.useTrashFolder=true
 
+Pooka.useAddressCompletion=false
+
 Pooka.folderPanel.hsize=180
 Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600
