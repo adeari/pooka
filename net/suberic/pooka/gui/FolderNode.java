@@ -264,29 +264,29 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	    });
     }
 
-    public void closed(ConnectionEvent e) {
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    getParentContainer().repaint();
-		}
-	    });
-    }
-
-    public void opened(ConnectionEvent e) {
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    getParentContainer().repaint();
-		}
-	    });
-    }
-
-    public void disconnected(ConnectionEvent e) {
-	javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		    getParentContainer().repaint();
-		}
-	    });
-    }
+  public void closed(ConnectionEvent e) {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  getParentContainer().repaint();
+	}
+      });
+  }
+  
+  public void opened(ConnectionEvent e) {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  getParentContainer().repaint();
+	}
+      });
+  }
+  
+  public void disconnected(ConnectionEvent e) {
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	public void run() {
+	  getParentContainer().repaint();
+	}
+      });
+  }
 
     
     /**

@@ -862,6 +862,13 @@ public class MessageProxy {
   public void clearMatchedFilters() {
     filtersMatched = false;
   }
+
+  /**
+   * Shows whether or not we need to rematch the filters.
+   */
+  public boolean matchedFilters() {
+    return filtersMatched;
+  }
   
   public MessageUI getMessageUI() {
     return msgWindow;

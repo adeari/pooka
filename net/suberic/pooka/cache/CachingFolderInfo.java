@@ -25,6 +25,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   protected static String disconnectedMessage = "error.CachingFolder.disconnected";
   
   boolean autoCache = false;
+
   public CachingFolderInfo(StoreInfo parent, String fname) {
     super(parent, fname);
     
@@ -124,6 +125,43 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     
   }
 
+  /**
+   * called when the folder is opened.
+   */
+  public void opened (ConnectionEvent e) { 
+    super.opened(e);
+    rematchFilters();
+  }
+
+  /**
+   * Called when the store in disconnected.
+   */
+  public void disconnected(ConnectionEvent e) {
+    super.disconnected(e);
+    rematchFilters();
+  }
+
+  /**
+   * Called when the folder is closed.
+   */
+  public void closed(ConnectionEvent e) {
+    super.closed(e);
+    rematchFilters();
+  }
+
+  /**
+   * gets all of the message proxies associated with this folder info
+   * and notifies them that they need to rematch their filters.
+   */
+  protected void rematchFilters() {
+    if (folderTableModel != null) {
+      Vector allProxies = folderTableModel.getAllProxies();
+      for (int i = 0; i < allProxies.size(); i++) {
+	((MessageProxy) allProxies.get(i)).clearMatchedFilters();
+      }
+      loaderThread.loadMessages(allProxies);
+    }
+  }
 
   /**
    * Loads all Messages into a new FolderTableModel, sets this 
@@ -143,7 +181,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
       Vector messageProxies = new Vector();
       
-      createColumnInformation();
+      fetchProfile = createColumnInformation();
       if (loaderThread == null) 
 	loaderThread = createLoaderThread();
       
@@ -164,15 +202,15 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  try {
 	    // load the list of uid's.
 	    
-	    fetchProfile = new FetchProfile();
-	    fetchProfile.add(UIDFolder.FetchProfileItem.UID);
+	    FetchProfile uidFetchProfile = new FetchProfile();
+	    uidFetchProfile.add(UIDFolder.FetchProfileItem.UID);
 	    if (Pooka.isDebug())
 	      System.out.println("getting messages.");
 	    
 	    Message[] messages = getFolder().getMessages();
 	    if (Pooka.isDebug())
 	      System.out.println("fetching messages.");
-	    getFolder().fetch(messages, fetchProfile);
+	    getFolder().fetch(messages, uidFetchProfile);
 	    if (Pooka.isDebug())
 	      System.out.println("done fetching messages.  getting uid's");
 	    
@@ -218,8 +256,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	  for (int i = 0; i < uids.length; i++) {
 	    Message m = new CachingMimeMessage(this, uids[i]);
 	    mi = new MessageInfo(m, this);
-	    
-	    messageProxies.add(new MessageProxy(getColumnValues() , mi));
+	    MessageProxy mp = new MessageProxy(getColumnValues() , mi);
+	    mp.setRefresh(true);
+	    messageProxies.add(mp);
 	    messageToInfoTable.put(m, mi);
 	    uidToInfoTable.put(new Long(uids[i]), mi);
 	  }
@@ -825,13 +864,19 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	}
     }
 
+  /**
+   * The resource for the default display filters.
+   */
+  protected String getDefaultDisplayFiltersResource() {
+    return "CachingFolderInfo.defaultDisplayFilters";
+  }
 
-    /**
-     * Returns whether or not a given message is fully cached.
-     */
-    public boolean isCached(long uid) {
-	return getCache().isFullyCached(uid);
-    }
+  /**
+   * Returns whether or not a given message is fully cached.
+   */
+  public boolean isCached(long uid) {
+    return getCache().isFullyCached(uid);
+  }
 
     /**
      * This returns the MessageCache associated with this FolderInfo,

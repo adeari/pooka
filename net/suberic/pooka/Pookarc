@@ -829,7 +829,7 @@ NewAccountPooka.type=imap
 
 FolderSelectorPane.inputButton.image=/net/suberic/pooka/gui/images/More.gif
 
-Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent
+Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent:Cached
 Search.searchTerms.Answered.class=javax.mail.search.FlagTerm
 Search.searchTerms.Answered.flag=answered
 Search.searchTerms.Answered.type=Boolean
@@ -865,6 +865,8 @@ Search.searchTerms.Received.class=javax.mail.search.ReceivedDateTerm
 Search.searchTerms.Received.type=Date
 Search.searchTerms.Sent.class=javax.mail.search.SentDateTerm
 Search.searchTerms.Sent.type=Date
+Search.searchTerms.Cached.class=net.suberic.pooka.filter.CachedSearchTerm
+Search.searchTerms.Cached.type=Boolean
 
 Search.operations=Contains:NotContains:True:False:Equals:NotEquals:Before:After
 Search.operationTypes=String:Boolean:Date
@@ -899,9 +901,13 @@ FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Unread.action.class=net.suberic.pooka.gui.filter.FontDisplayFilter
 FolderInfo.defaultDisplayFilters.Unread.action.style=bold
+
 FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTerms.Cached
+FolderInfo.defaultDisplayFilters.Uncached.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Uncached.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderInfo.defaultDisplayFilters.Uncached.action.rgb=28101
+
+CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
 
 # colors
 Pooka.background=0

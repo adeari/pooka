@@ -340,10 +340,3 @@ public class FolderTableModel extends AbstractTableModel {
     return new Vector(data);
   }
 }
-
-
-
-
-
-
-

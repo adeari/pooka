@@ -89,8 +89,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   private Action[] defaultActions;
   
   //filters
-  private BackendMessageFilter[] backendFilters = null;
-  private MessageFilter[] displayFilters = null;
+  protected BackendMessageFilter[] backendFilters = null;
+  protected MessageFilter[] displayFilters = null;
 
   protected LoadMessageThread loaderThread;
   private FolderTracker folderTracker = null;
@@ -294,43 +294,43 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     public void closed(ConnectionEvent e) {
-	synchronized(this) {
-	    if (Pooka.isDebug()) {
-		System.out.println("Folder " + getFolderID() + " closed:  " + e);
-	    }
-	    
-	
-	    if (getFolderDisplayUI() != null) {
-		if (status != CLOSED)
-		    getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
-	    }
-	    
-	    
-	    if (status == CONNECTED) {
-		setStatus(LOST_CONNECTION);
-	    }
-	    
+      synchronized(this) {
+	if (Pooka.isDebug()) {
+	  System.out.println("Folder " + getFolderID() + " closed:  " + e);
 	}
-	fireConnectionEvent(e);
+	
+	
+	if (getFolderDisplayUI() != null) {
+	  if (status != CLOSED)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
+	}
+	
+	
+	if (status == CONNECTED) {
+	  setStatus(LOST_CONNECTION);
+	}
+	
+      }
+      fireConnectionEvent(e);
     }
     
     public void disconnected(ConnectionEvent e) {
-	synchronized(this) {
-	    if (Pooka.isDebug()) {
-		System.out.println("Folder " + getFolderID() + " disconnected.");
-		Thread.dumpStack();
-	    }
-	    
-	    if (getFolderDisplayUI() != null) {
-		if (status != CLOSED)
-		    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
-	    }
-	    
-	    if (status == CONNECTED) {
-		setStatus(LOST_CONNECTION);
-	    }
+      synchronized(this) {
+	if (Pooka.isDebug()) {
+	  System.out.println("Folder " + getFolderID() + " disconnected.");
+	  Thread.dumpStack();
 	}
-	fireConnectionEvent(e);
+	
+	if (getFolderDisplayUI() != null) {
+	  if (status != CLOSED)
+	    getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
+	}
+	
+	if (status == CONNECTED) {
+	  setStatus(LOST_CONNECTION);
+	}
+      }
+      fireConnectionEvent(e);
     }
 
 
@@ -704,16 +704,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * the display rules have changed.
      */
     public void unloadTableInfos() {
-	if (folderTableModel != null) {
-	    Vector allProxies = folderTableModel.getAllProxies();
-	    for (int i = 0; i < allProxies.size(); i++) {
-		MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
-		mp.unloadTableInfo();
-	    }
-
-	    if (loaderThread != null)
-		loaderThread.loadMessages(allProxies);
+      if (folderTableModel != null) {
+	Vector allProxies = folderTableModel.getAllProxies();
+	for (int i = 0; i < allProxies.size(); i++) {
+	  MessageProxy mp = (MessageProxy) allProxies.elementAt(i);
+	  mp.unloadTableInfo();
 	}
+	
+	if (loaderThread != null)
+	  loaderThread.loadMessages(allProxies);
+      }
     }
 
     /**
@@ -1016,29 +1016,29 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
 
     public void fireConnectionEvent(ConnectionEvent e) {
-	// from the EventListenerList javadoc, including comments.
-
+      // from the EventListenerList javadoc, including comments.
+      
+      if (Pooka.isDebug())
+	System.out.println("firing connection event.");
+      // Guaranteed to return a non-null array
+      Object[] listeners = eventListeners.getListenerList();
+      // Process the listeners last to first, notifying
+      // those that are interested in this event
+      for (int i = listeners.length-2; i>=0; i-=2) {
 	if (Pooka.isDebug())
-	    System.out.println("firing connection event.");
-	// Guaranteed to return a non-null array
-	Object[] listeners = eventListeners.getListenerList();
-	// Process the listeners last to first, notifying
-	// those that are interested in this event
-	for (int i = listeners.length-2; i>=0; i-=2) {
-	    if (Pooka.isDebug())
-		System.out.println("listeners[" + i + "] is " + listeners[i] );
-	    if (listeners[i]==ConnectionListener.class) {
-		if (Pooka.isDebug())
-		    System.out.println("check.  it's a connection listener.");
-		ConnectionListener listener = (ConnectionListener) listeners[i+1];
-		if (e.getType() == ConnectionEvent.CLOSED)
-		    listener.closed(e);
-		else if (e.getType() == ConnectionEvent.DISCONNECTED)
-		    listener.disconnected(e);
-		else if (e.getType() == ConnectionEvent.OPENED)
-		    listener.opened(e);
-	    }  
-	}
+	  System.out.println("listeners[" + i + "] is " + listeners[i] );
+	if (listeners[i]==ConnectionListener.class) {
+	  if (Pooka.isDebug())
+	    System.out.println("check.  it's a connection listener.");
+	  ConnectionListener listener = (ConnectionListener) listeners[i+1];
+	  if (e.getType() == ConnectionEvent.CLOSED)
+	    listener.closed(e);
+	  else if (e.getType() == ConnectionEvent.DISCONNECTED)
+	    listener.disconnected(e);
+	  else if (e.getType() == ConnectionEvent.OPENED)
+	    listener.opened(e);
+	}  
+      }
     }  
 
     /**
@@ -1590,6 +1590,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return returnValue;
     }
 
+  /**
+   * The resource for the default display filters.
+   */
+  protected String getDefaultDisplayFiltersResource() {
+    return "FolderInfo.defaultDisplayFilters";
+  }
+
     /**
      * This takes the FolderProperty.backendFilters and 
      * FolderProperty.displayFilters properties and uses them to populate
@@ -1612,10 +1619,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
 
 	Vector foundFilters = new Vector();
-	Vector defaultFilterNames = Pooka.getResources().getPropertyAsVector("FolderInfo.defaultDisplayFilters", "");
+	Vector defaultFilterNames = Pooka.getResources().getPropertyAsVector(getDefaultDisplayFiltersResource(), "");
 	
 	for (int i = 0; i < defaultFilterNames.size(); i++) {
-	    foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
+	  foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
 	}
 
 	Vector displayFilterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".displayFilters", "");

@@ -4,16 +4,19 @@
 messages appeared, but the ones that had been read since were sitll marked
 as unread.  a bit later, they were marked as read.
 	-- make it so on first load, we do both a load and refresh.
-
-*) each loading of the FolderTableInfo rechecks the unread message
-	count, which sucks for performance.  improvements with new
-	caching system???
+	-- done?
 
 *) fully cached filter doesn't work anymore.
 
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
 
+*) we're getting a weird flash of 'loading', probably when we're caching
+	the message.
+
+*) each loading of the FolderTableInfo rechecks the unread message
+	count, which sucks for performance.  improvements with new
+	caching system???
 ---
 
 *) make it so the connection objects actually have a clue as to whether
@@ -27,6 +30,8 @@ or not they're actually connected, instead of relying on the user.
 	-- make it so it doesn't automatically display the first new message.
 
 *) make it so the default text/image viewer actually works.
+
+*) _really_ fix the window resizing problem.
 
 ---
 *) queuing of outgoing mails

@@ -708,32 +708,32 @@ public class SimpleFileCache implements MessageCache {
     }
 
     private class CacheFilenameFilter implements FilenameFilter {
-	long uid;
-	int status;
-
-	public CacheFilenameFilter(long newUid, int newStatus) {
-	    uid = newUid;
-	    status = newStatus;
+      long uid;
+      int status;
+      
+      public CacheFilenameFilter(long newUid, int newStatus) {
+	uid = newUid;
+	status = newStatus;
+      }
+      
+      public boolean accept(File dir, String name) {
+	if (status == MESSAGE || status == CONTENT) {
+	  if (name.startsWith(uid + DELIMETER + CONTENT_EXT))
+	    return true;
 	}
 	
-	public boolean accept(File dir, String name) {
-	    if (status == MESSAGE || status == CONTENT) {
-		if (name.startsWith(uid + DELIMETER + CONTENT_EXT))
-		    return true;
-	    }
-
-	    if (status == FLAGS || status == FLAGS_AND_HEADERS || status == MESSAGE) {
-		if (name.startsWith(uid + DELIMETER + FLAG_EXT))
-		    return true;
-	    }
-
-	    if (status == HEADERS || status == FLAGS_AND_HEADERS || status == MESSAGE) {
-		if (name.startsWith(uid + DELIMETER + HEADER_EXT))
-		    return true;
-	    }
-
-	    return false;
+	if (status == FLAGS || status == FLAGS_AND_HEADERS || status == MESSAGE) {
+	  if (name.startsWith(uid + DELIMETER + FLAG_EXT))
+	    return true;
 	}
+	
+	if (status == HEADERS || status == FLAGS_AND_HEADERS || status == MESSAGE) {
+	  if (name.startsWith(uid + DELIMETER + HEADER_EXT))
+	    return true;
+	}
+	
+	return false;
+      }
     }
 
     /**

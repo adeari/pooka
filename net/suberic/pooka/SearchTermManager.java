@@ -214,92 +214,92 @@ public class SearchTermManager {
      *
      */
     public SearchTerm generateSearchTerm(String searchProperty, String operationProperty, String pattern) throws java.text.ParseException {
-	SearchTerm term = null;
-	try {
-	    String className = Pooka.getProperty(searchProperty + ".class", "");
-	    Class stClass = Class.forName(className);
+      SearchTerm term = null;
+      try {
+	String className = Pooka.getProperty(searchProperty + ".class", "");
+	Class stClass = Class.forName(className);
+	
+	// ****** Create a StringTerm.
+	
+	if (stringTermClass.isAssignableFrom(stClass)) {
+	  
+	  boolean ignoreCase = Pooka.getProperty(searchProperty + ".ignoreCase", "false").equals("true");
+	  
+	  // check for the special cases.
+	  if (className.equals("javax.mail.search.RecipientStringTerm")) {
+	    String recipientType = Pooka.getProperty(searchProperty + ".recipientType", "to");
+	    if (recipientType.equalsIgnoreCase("to"))
+	      term = new RecipientStringTerm(javax.mail.Message.RecipientType.TO, pattern);
+	    else if (recipientType.equalsIgnoreCase("cc"))
+	      term = new RecipientStringTerm(javax.mail.Message.RecipientType.CC, pattern);
+	    else if (recipientType.equalsIgnoreCase("toorcc"))
+	      term = new OrTerm(new RecipientStringTerm(javax.mail.Message.RecipientType.CC, pattern), new RecipientStringTerm(javax.mail.Message.RecipientType.TO, pattern));
 	    
-	    // ****** Create a StringTerm.
 	    
-	    if (stringTermClass.isAssignableFrom(stClass)) {
-		
-		boolean ignoreCase = Pooka.getProperty(searchProperty + ".ignoreCase", "false").equals("true");
-		
-		// check for the special cases.
-		if (className.equals("javax.mail.search.RecipientStringTerm")) {
-		    String recipientType = Pooka.getProperty(searchProperty + ".recipientType", "to");
-		    if (recipientType.equalsIgnoreCase("to"))
-		    term = new RecipientStringTerm(javax.mail.Message.RecipientType.TO, pattern);
-		    else if (recipientType.equalsIgnoreCase("cc"))
-		    term = new RecipientStringTerm(javax.mail.Message.RecipientType.CC, pattern);
-		    else if (recipientType.equalsIgnoreCase("toorcc"))
-			term = new OrTerm(new RecipientStringTerm(javax.mail.Message.RecipientType.CC, pattern), new RecipientStringTerm(javax.mail.Message.RecipientType.TO, pattern));
-		    
-		    
-		} else if (className.equals("javax.mail.search.HeaderTerm")) {
-		    
-		    term = new HeaderTerm(Pooka.getProperty(searchProperty + ".header", ""), pattern);
-		    
-		} else {
-		    // default case for StringTerms
-		    
-		    java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Class.forName("java.lang.String")});
-		    term = (SearchTerm) termConst.newInstance(new Object[] { pattern});
-		    
-		}
+	  } else if (className.equals("javax.mail.search.HeaderTerm")) {
+	    
+	    term = new HeaderTerm(Pooka.getProperty(searchProperty + ".header", ""), pattern);
+	    
+	  } else {
+	    // default case for StringTerms
+	    
+	    java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Class.forName("java.lang.String")});
+	    term = (SearchTerm) termConst.newInstance(new Object[] { pattern});
+	    
+	  }
 	} 
-	    
-	    // ********** Create a FlagTerm
-	    
+	
+	// ********** Create a FlagTerm
+	
 	else if (flagTermClass.isAssignableFrom(stClass)) {
-	    term = new FlagTerm(getFlags(Pooka.getProperty(searchProperty + ".flag", "")), Pooka.getProperty(searchProperty + ".value", "true").equalsIgnoreCase("true"));
+	  term = new FlagTerm(getFlags(Pooka.getProperty(searchProperty + ".flag", "")), Pooka.getProperty(searchProperty + ".value", "true").equalsIgnoreCase("true"));
 	} 
 	
-	    // ********** Create a DateTerm
+	// ********** Create a DateTerm
 	
-	    else if (dateTermClass.isAssignableFrom(stClass)) {
-		
-		java.util.Date compareDate = dateFormat.parse(pattern);
-		
-		int comparison = 0;
-		
-		String operationPropertyType = Pooka.getProperty(operationProperty, "");
-		if (operationPropertyType.equalsIgnoreCase("equals") || operationPropertyType.equalsIgnoreCase("notEquals"))
-		comparison = DateTerm.EQ;
-		else if (operationPropertyType.equalsIgnoreCase("before"))
-		    comparison = DateTerm.LT;
-		else if (operationPropertyType.equalsIgnoreCase("after"))
-		    comparison = DateTerm.GT;
-
-		java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Integer.TYPE , Class.forName("java.util.Date")});
-		term = (SearchTerm) termConst.newInstance(new Object[] { new Integer(comparison), compareDate });
-	    } 
-	    
-	    // ********** Default Case, no term known.
-	    
-	    else {
-		// default case for any term.
-		term = (SearchTerm) stClass.newInstance();
-	    }
-	    
-	    // *********** Handles not cases.
+	else if (dateTermClass.isAssignableFrom(stClass)) {
+	  
+	  java.util.Date compareDate = dateFormat.parse(pattern);
+	  
+	  int comparison = 0;
+	  
+	  String operationPropertyType = Pooka.getProperty(operationProperty, "");
+	  if (operationPropertyType.equalsIgnoreCase("equals") || operationPropertyType.equalsIgnoreCase("notEquals"))
+	    comparison = DateTerm.EQ;
+	  else if (operationPropertyType.equalsIgnoreCase("before"))
+	    comparison = DateTerm.LT;
+	  else if (operationPropertyType.equalsIgnoreCase("after"))
+	    comparison = DateTerm.GT;
+	  
+	  java.lang.reflect.Constructor termConst = stClass.getConstructor(new Class[] {Integer.TYPE , Class.forName("java.util.Date")});
+	  term = (SearchTerm) termConst.newInstance(new Object[] { new Integer(comparison), compareDate });
+	} 
 	
-	    String operationPropertyValue = Pooka.getProperty(operationProperty, "");
-	    if (operationPropertyValue.equalsIgnoreCase("not") || operationPropertyValue.equalsIgnoreCase("notEquals"))
-		term = new NotTerm(term);
-	} catch (ClassNotFoundException cnfe) {
-	    showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), cnfe);
-	} catch (NoSuchMethodException nsme) {
-	    showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), nsme);
-	} catch (InstantiationException ie) {
-	    showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), ie);
-	} catch (IllegalAccessException iae) {
-	    showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), iae);
-	} catch (java.lang.reflect.InvocationTargetException ite) {
-	    showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), ite);
+	// ********** Default Case, no term known.
+	
+	else {
+	  // default case for any term.
+	  term = (SearchTerm) stClass.newInstance();
 	}
-
-	return term;
+	
+	// *********** Handles not cases.
+	
+	String operationPropertyValue = Pooka.getProperty(operationProperty, "");
+	if (operationPropertyValue.equalsIgnoreCase("not") || operationPropertyValue.equalsIgnoreCase("notEquals"))
+	  term = new NotTerm(term);
+      } catch (ClassNotFoundException cnfe) {
+	showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), cnfe);
+      } catch (NoSuchMethodException nsme) {
+	showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), nsme);
+      } catch (InstantiationException ie) {
+	showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), ie);
+      } catch (IllegalAccessException iae) {
+	showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), iae);
+      } catch (java.lang.reflect.InvocationTargetException ite) {
+	showError(Pooka.getProperty("error.search.generatingSearchTerm", "Error generating SearchTerm:  "), ite);
+      }
+      
+      return term;
     }
     
     /**
