@@ -202,7 +202,9 @@ public class AttachmentPane extends JPanel {
 	    JFileChooser saveChooser = new JFileChooser();
 
 	    try {
-		saveChooser.setSelectedFile(new File(mbp.getFileName()));
+		String fileName = mbp.getFileName();
+		if (fileName != null)
+		    saveChooser.setSelectedFile(new File(fileName));
 	    } catch (MessagingException me) {
 	    }
 
