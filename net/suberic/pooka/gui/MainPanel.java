@@ -15,7 +15,7 @@ import net.suberic.util.gui.*;
  * The main panel for PookaMail
  * 
  * @author  Allen Petersen
- * @version 0.3 12/15/99
+ * @version 0.7 02/28/2000
  */
 
 public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelectionListener {
@@ -229,31 +229,6 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	    }
 	}
     }
-
-    private void removeActiveMenuItems(JMenu men) {
-	for (int j = 0; j < men.getItemCount(); j++) {
-	    if ((men.getItem(j)) instanceof JMenu) {
-		removeActiveMenuItems((JMenu)(men.getItem(j)));
-	    } else {
-		JMenuItem mi = men.getItem(j);
-		Action a = getAction(mi.getActionCommand());
-		if (a != null) {
-		    //                    mi.removeActionListener(a);
-		    mi.removeActionListener(a);
-		} else {
-		    mi.setEnabled(false);
-		}
-	    }
-	    
-	}
-    }
-    
-    private void removeActionListeners(JMenuBar menuBar) {
-	for (int i = 0; i < menuBar.getMenuCount(); i++) {
-	    removeActiveMenuItems(menuBar.getMenu(i));
-	}
-    }
-
 
     /* Called by ExtendedDesktopManager every time the focus on the windows
        changes.  Resets the Actions associated with the menu items and toolbar
