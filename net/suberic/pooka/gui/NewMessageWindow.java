@@ -395,6 +395,17 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
     }
 
+    /**
+     * Overrides JComponent.addNotify().
+     *
+     * We override addNotify() here to set the proper splitPane location.
+     */
+
+    public void addNotify() {
+        super.addNotify();
+        splitPane.setDividerLocation(Math.min(tabbedPane.getPreferredSize().height + 1, Integer.parseInt(Pooka.getProperty("MessageWindow.headerPanel.vsize", "500"))));
+    }
+
     public boolean isEditable() {
 	return true;
     }
