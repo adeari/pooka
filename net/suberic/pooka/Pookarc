@@ -854,11 +854,12 @@ Pooka.theme._default.propertyType=List
 Pooka.theme._default.allowedValues=Pooka.theme
 
 Pooka.looknfeel.propertyType=List
-Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunststoff
+Pooka.looknfeel.allowedValues=Metal:Motif:Windows:Kunststoff:GTK
 Pooka.looknfeel.listMapping.Metal.value=javax.swing.plaf.metal.MetalLookAndFeel
 Pooka.looknfeel.listMapping.Motif.value=com.sun.java.swing.plaf.motif.MotifLookAndFeel
 Pooka.looknfeel.listMapping.Windows.value=com.sun.java.swing.plaf.windows.WindowsLookAndFeel
 Pooka.looknfeel.listMapping.Kunststoff.value=com.incors.plaf.kunststoff.KunststoffLookAndFeel
+Pooka.looknfeel.listMapping.GTK.value=com.sun.java.swing.plaf.gtk.GTKLookAndFeel
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v
