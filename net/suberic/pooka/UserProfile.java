@@ -44,6 +44,8 @@ public class UserProfile extends Object {
 	    sentFolderName=mainProperties.getProperty("UserProfile." + name + ".sentFolder", "");
 
 	    sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
+	    sigGenerator=createSignatureGenerator();
+
 	    profileList.addElement(this);
 	}
     }
@@ -270,8 +272,17 @@ public class UserProfile extends Object {
      * Creates the signatureGenerator for this Profile.
      */
     public SignatureGenerator createSignatureGenerator() {
-	String classname = Pooka.getProperty("UserProfile." + name + ".sigClass", Pooka.getProperty("Pooka.defaultSigGenerator", "net.suberic.pooka.StringSignatureGenerator"));
-	
+	try {
+	    String classname = Pooka.getProperty("UserProfile." + name + ".sigClass", Pooka.getProperty("Pooka.defaultSigGenerator", "net.suberic.pooka.StringSignatureGenerator"));
+	    Class sigClass = Class.forName(classname);
+	    SignatureGenerator sigGen = (SignatureGenerator) sigClass.newInstance();
+	    sigGen.setProfile(this);
+	    return sigGen;
+	} catch (Exception e) {
+	    SignatureGenerator sigGen = new StringSignatureGenerator();
+	    sigGen.setProfile(this);
+	    return sigGen;
+	}
     }
 
     /**
@@ -279,7 +290,7 @@ public class UserProfile extends Object {
      */
     public String getSignature(String text) {
 	if (sigGenerator != null)
-	    return sigGenerator.generateSignature(this, text);
+	    return sigGenerator.generateSignature(text);
 	else
 	    return null;
     }
@@ -290,7 +301,7 @@ public class UserProfile extends Object {
      */
     public String getSignature() {
 	if (sigGenerator != null)
-	    return sigGenerator.generateSignature(this, null);
+	    return sigGenerator.generateSignature(null);
 	else
 	    return null;
 	//return (Pooka.getProperty("UserProfile." + name + ".signature", null));

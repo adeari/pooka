@@ -108,6 +108,8 @@ too much date info, not enough Subject.
 *) add ability to edit received messages, so you can do things like remove
 attachments that you don't want to keep (?)
 
+*) fix sorting of the from field--make it case-insensitive.
+
 -------
 
 open messages from the FolderWindow
