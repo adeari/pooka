@@ -36,7 +36,7 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
 			int msgNum = Integer.parseInt(e.getActionCommand());
 			if (getFolderInfo() != null) {
 			    FolderDisplayUI fdui = getFolderInfo().getFolderDisplayUI();
-			    fdui.selectMessage(msgNum);
+			    fdui.selectMessage(msgNum - 1);
 			}
 		    } catch (NumberFormatException nfe) {
 			

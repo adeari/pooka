@@ -148,6 +148,8 @@ public class MessageProxy {
 		    } else if (newProperty instanceof SearchTermIconManager) {
 			SearchTermIconManager stm = (SearchTermIconManager) newProperty;
 			tableInfo.addElement(new SearchTermIcon(stm, this));
+		    } else if (newProperty instanceof RowCounter) {
+			tableInfo.addElement(newProperty);
 		    }
 		}
 		

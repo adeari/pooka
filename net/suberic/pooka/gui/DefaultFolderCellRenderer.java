@@ -35,9 +35,9 @@ public class DefaultFolderCellRenderer extends DefaultTableCellRenderer {
 	    return icon;
 	} else if (value instanceof RowCounter) {
 	    if (returnValue instanceof JLabel)
-		((JLabel)returnValue).setText(Integer.toString(row));
+		((JLabel)returnValue).setText(Integer.toString(row + 1));
 	    else {
-		JLabel label = new JLabel(Integer.toString(row));
+		JLabel label = new JLabel(Integer.toString(row + 1));
 		label.setBackground(returnValue.getBackground());
 		label.setForeground(returnValue.getForeground());
 		label.setFont(returnValue.getFont());
