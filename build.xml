@@ -1,6 +1,8 @@
 <project name="Pooka" default="compile" basedir=".">
   <property name="builddir" value="Build"/>
   <property name="sourcedir" value="net"/>
+  <property name="imagesdir" value="images"/>
+  <property name="helpdir" value="help"/>
   <property name="distdir" value="Dist"/>
   <property name="docdir" value="Docs"/>
   <property name="importdir" value="Imported"/>
@@ -10,16 +12,17 @@
      So dynamicaly loaded classes aren't listed here. -->
   <property name="activation_cp" value="${importdir}/activation.jar"/>
   <property name="mail_cp" value="${importdir}/mail.jar"/>
-  <property name="jsse_cp" value="${importdir}/jsse.jar"/>
-  <property name="jcert_cp" value="${importdir}/jcert.jar"/>
-  <property name="jnet_cp" value="${importdir}/jnet.jar"/>
   <property name="javahelp_cp" value="${importdir}/jh.jar"/>
-  <property name="javahelp_dist_cp" value="${importdir}/jh_dist.jar"/>
-  <property name="mbox_cp" value="${importdir}/mbox.jar"/>
-  <property name="kunststoff_cp" value="${importdir}/kunststoff.jar"/>
   <property name="icejni_cp" value="${importdir}/icejni.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${jsse_cp}:{jcert_cp}:${jnet_cp}:${javahelp_cp}:${mbox_cp}:${kunststoff_cp}:${icejni_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}"/> 
+
+<!-- libaries that will get included in the distribution -->
+  <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
+  <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
+  <property name="mbox_lib" value="${importdir}/mbox.jar"/>
+  <property name="mail_dist_lib" value="${importdir}/mail.jar"/>
+  <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -32,6 +35,30 @@
     <mkdir dir="${builddir}"/>
     <mkdir dir="${distdir}"/>
     <mkdir dir="${docdir}"/>
+  </target>
+
+  <target name="clean-images">
+    <delete dir="${imagesdir}"/>
+  </target>
+
+  <target name="init-images">
+    <mkdir dir="${imagesdir}"/>
+  </target>
+
+  <target name="clean-help">
+    <delete dir="${helpdir}"/>
+  </target>
+
+  <target name="init-help">
+    <mkdir dir="${helpdir}"/>
+  </target>
+
+  <target name="docs" depends="init">
+    <javadoc sourcepath="." 
+             destdir="${docdir}" 
+             windowtitle="Pooka Documentation"
+             classpath="${full_cp}"
+ 	     packagenames="net.suberic.*"/>
   </target>
 
   <target name="compile" depends="init">
@@ -69,14 +96,6 @@
     </copy>
   </target>
 
-  <target name="docs" depends="init">
-    <javadoc sourcepath="." 
-             destdir="${docdir}" 
-             windowtitle="Pooka Documentation"
-             classpath="${full_cp}"
- 	     packagenames="net.suberic.*"/>
-  </target>
-
   <target name="dist" depends="compile">
     <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"/> 
     <copy todir="${distdir}">
@@ -92,14 +111,16 @@
     </tstamp>
     <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka_full.manifest"> 
       <zipfileset src="${activation_cp}"/>
-      <zipfileset src="${jcert_cp}"/>
-      <zipfileset src="${jnet_cp}"/>
-      <zipfileset src="${jsse_cp}"/>
-      <zipfileset src="${javahelp_dist_cp}"/>
-      <zipfileset src="${mail_cp}"/>
-      <zipfileset src="${mbox_cp}"/>
-      <zipfileset src="${kunststoff_cp}"/>
+      <zipfileset src="${javahelp_dist_lib}"/>
+      <zipfileset src="${mail_dist_lib}"/>
+      <zipfileset src="${mbox_lib}"/>
+      <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
+    </jar>
+  </target>
+
+  <target name="dist-jnlp" depends="compile-jnlp">
+    <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
     </jar>
   </target>
 
@@ -108,4 +129,61 @@
     <jar jarfile="${distdir}/pooka_src_${today}.jar" basedir="." includes="net/**"/>
   </target>
 
+  <target name="compile-jnlp" depends="clean,init">
+    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}"/>
+    <copy todir="${builddir}/net/suberic/pooka">
+      <fileset dir="${sourcedir}/suberic/pooka">
+        <include name="Pookarc"/>
+        <include name="*.properties"/>
+      </fileset>
+    </copy>
+    <copy file="${sourcedir}/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+  </target>
+
+  <target name="images-jnlp" depends="clean-images,init-images">
+    <copy todir="${imagesdir}/net/suberic/pooka/gui/images">
+      <fileset dir="${sourcedir}/suberic/pooka/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${imagesdir}/net/suberic/util/gui/propedit/images">
+      <fileset dir="${sourcedir}/suberic/util/gui/propedit/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${imagesdir}/net/suberic/util/gui/images">
+      <fileset dir="${sourcedir}/suberic/util/gui/images">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${imagesdir}/org/javalobby/icons/20x20png">
+      <fileset dir="${iconsdir}/javalobby/icons/20x20png">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <jar jarfile="${distdir}/pooka_images.jar" basedir="${imagesdir}"/>
+
+  </target>
+
+  <target name="icejni-jnlp">
+    <jar jarfile="${distdir}/icejnidde.jar" basedir="${importdir}" includes="ICE_JNIDDE.dll"/>
+  </target>
+
+  <target name="help-jnlp" depends="clean-help,init-help">
+    <copy todir="${helpdir}/net/suberic/pooka/doc">
+      <fileset dir="${sourcedir}/suberic/pooka/doc"/>
+    </copy>
+    <jar jarfile="${distdir}/pooka_help.jar" basedir="${helpdir}"/> 
+  </target>
+
+  <target name="jnlp" depends="dist-jnlp,images-jnlp,help-jnlp,icejni-jnlp"/>
+
+  <!--
+  <target name="sign" depends="jnlp">
+    <signjar jar="${basedir}/pooka.jar" alias="pooka" storepass=""/>
+    <signjar jar="${basedir}/pooka_help.jar" alias="pooka" storepass=""/>
+    <signjar jar="${basedir}/pooka_images.jar" alias="pooka" storepass=""/>
+    <signjar jar="${basedir}/icejnidde.jar" alias="pooka" storepass=""/>
+  </target>
+  -->
 </project>
