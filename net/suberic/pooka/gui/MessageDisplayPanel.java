@@ -105,6 +105,14 @@ public abstract class MessageDisplayPanel extends JPanel {
 	    jep.setFont(f);
     }
 
+    /**
+     * This sets the size of the MessageDisplayPanel to a reasonable
+     * default value.
+     *
+     * This method should be implemented by subclasses.
+     */
+    public abstract void sizeToDefault();
+
     public UserProfile getDefaultProfile() {
 	return getMessageProxy().getDefaultProfile();
     }

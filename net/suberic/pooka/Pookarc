@@ -9,6 +9,8 @@ Message.sendImmediately=true
 Pooka.hsize = 800
 Pooka.vsize = 600
 
+Pooka.guiType=Desktop
+
 Pooka.folderPanel.hsize=180
 Pooka.folderPanel.vsize=570
 Pooka.messagePanel.hsize=600

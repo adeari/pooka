@@ -28,7 +28,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 	
 	MessageUI mui;
 	if (mp instanceof NewMessageProxy) {
-	    mui = new NewMessageWindow(getMessagePanel(), (NewMessageProxy) mp);
+	    mui = new NewMessageFrame((NewMessageProxy) mp);
 	} else
 	    mui = new ReadMessageFrame(mp);
 	

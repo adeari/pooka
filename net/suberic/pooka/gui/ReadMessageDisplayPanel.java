@@ -21,7 +21,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
     int headerStyle = ReadMessageWindow.HEADERS_DEFAULT;
     boolean showFullHeaders = false;
-
     
     /**
      * Creates a MessageDisplayPanel from the given Message.
@@ -154,6 +153,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	
     }
 
+    /**
+     * This sets the size of the MessageDisplayPanel to a reasonable
+     * default value.
+     */
     public void sizeToDefault() {
 	Dimension prefSize = getDefaultEditorPaneSize();
 	JScrollBar vsb = editorScrollPane.getVerticalScrollBar();

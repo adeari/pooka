@@ -64,7 +64,7 @@ public class ReadMessageFrame extends MessageFrame {
     public void addNotify() {
 	super.addNotify();
 	if (firstShow) {
-	    ((ReadMessageDisplayPanel)messageDisplay).sizeToDefault();
+	    getMessageDisplay().sizeToDefault();
 	    resizeByWidth();
 	    firstShow = false;
 	}

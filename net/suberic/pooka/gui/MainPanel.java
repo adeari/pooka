@@ -487,7 +487,9 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    messagePanel.createNewMessage();
+	    MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
+	    nmu.openMessageUI();
+	    
 	}
 
     }

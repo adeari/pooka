@@ -51,7 +51,13 @@ public class MessageInfo {
      */
 
     public void loadAttachmentInfo() throws MessagingException {
-	attachments = MailUtilities.getAttachments(getMessage(), false);
+	try {
+	    if (getMessage().getContent() != null)
+		attachments = MailUtilities.getAttachments(getMessage(), false);
+	} catch (java.io.IOException ioe) {
+	}
+
+	attachmentsLoaded = true;
     }
 
     /**

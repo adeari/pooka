@@ -25,7 +25,10 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 
 	configureMessageInternalFrame();
     }
-    
+
+    /**
+     * Configures the MessageInteralFrame.
+     */
     protected void configureMessageInternalFrame() {
 	try {
 	    try {
@@ -64,7 +67,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     public void addNotify() {
 	super.addNotify();
 	if (firstShow) {
-	    ((ReadMessageDisplayPanel)messageDisplay).sizeToDefault();
+	    getMessageDisplay().sizeToDefault();
 	    resizeByWidth();
 	    firstShow = false;
 	}
@@ -81,7 +84,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
      */
 
     public void registerKeyboardAction(ActionListener anAction,
-       	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
+	        String aCommand, KeyStroke aKeyStroke, int aCondition) {
 	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
 
 	if (messageDisplay != null)

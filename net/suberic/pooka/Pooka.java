@@ -69,7 +69,10 @@ public class Pooka {
 	frame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
         frame.show();
 
-	uiFactory = new PookaDesktopPaneUIFactory(panel.getMessagePanel());
+	if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+	    uiFactory=new PookaPreviewPaneUIFactory(panel.getMessagePanel());
+	else
+	    uiFactory = new PookaDesktopPaneUIFactory(panel.getMessagePanel());
 
 	if (getProperty("Store", "").equals("")) {
 	    NewAccountPooka nap = new NewAccountPooka(panel.getMessagePanel());
@@ -157,13 +160,4 @@ public class Pooka {
 	return uiFactory;
     }
 }
-
-
-
-
-
-
-
-
-
 
