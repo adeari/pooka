@@ -182,4 +182,5 @@ Store.defaultProfile.allowedValues=UserProfile
 ExternalLauncher.cmdWrapper./=sh -c "%v;rm %s"
 
 NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
+NewAccountPooka.password.propertyType=Password
 
