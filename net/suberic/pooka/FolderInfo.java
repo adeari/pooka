@@ -487,8 +487,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (isOpen()) {
 	    Store s = getParentStore().getStore();
 	    try {
-		Folder f = s.getFolder("nfdsaf238sa");
-		f.exists();
+		//Folder f = s.getFolder("nfdsaf238sa");
+		//f.exists();
+		Folder current = getFolder();
+		if (current != null && current.isOpen()) {
+		    current.getNewMessageCount();
+		    current.getUnreadMessageCount();
+		}
 	    } catch ( MessagingException me ) {
 		try {
 		    if ( ! s.isConnected() )
@@ -1384,6 +1389,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	    unreadCount = getFolder().getUnreadMessageCount();
 	    messageCount = getFolder().getMessageCount();
+	    int newMessageCount = getFolder().getNewMessageCount();
 	} catch (MessagingException me) {
 	    // if we lose the connection to the folder, we'll leave the old
 	    // messageCount and set the unreadCount to zero.
