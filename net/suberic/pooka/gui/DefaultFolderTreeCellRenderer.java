@@ -40,6 +40,7 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	    setForeground(getTextSelectionColor());
 	else
 	    setForeground(getTextNonSelectionColor());
+
 	// There needs to be a way to specify disabled icons.
 	if (!tree.isEnabled()) {
 	    setEnabled(false);
@@ -71,32 +72,15 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	if (tp != null && tp.getLastPathComponent() instanceof FolderNode) {
 	    FolderNode node = (FolderNode)tp.getLastPathComponent();
 	    
-	    try {
-		if (isSpecial(node))
-		    setFontToSpecial();
-		else {
-		    setFontToDefault();
-		}
-	    } catch (MessagingException me) {
-		// if we can't connect, do something silly like turn the
-		// node red.
-		
-		this.setFontToDefault();
-		this.setForeground(Color.getColor(Pooka.getProperty("MailTreeNode.color.error", "red")));
-		return this;
-	    } catch (NullPointerException npe) {
-		// the IMAP implementation seems to have some bugs in it when
-		// it comes to closed connections...
-		this.setFontToDefault();
-		this.setForeground(Color.getColor(Pooka.getProperty("MailTreeNode.color.error", "red")));
-		return this;
+	    if (isSpecial(node)) {
+		setFontToSpecial(node);
+	    } else {
+		setFontToDefault();
 	    }
         } else {
 	    setFontToDefault();
 	}
 
-	this.setForeground(Color.getColor(Pooka.getProperty("MailTreeNode.color", "black")));
-	
         return this;
     }
 
@@ -126,9 +110,10 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	    setDefaultFont(f);
 	    this.setFont(f);
 	}
+
     }
 
-    public void setFontToSpecial() {
+    public void setFontToSpecial(MailTreeNode mtn) {
 	if (getSpecialFont() != null) {
 	    setFont(getSpecialFont());
 	} else {
@@ -142,6 +127,8 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 		f = this.getFont().deriveFont(Font.BOLD);
 	    else if (fontStyle.equalsIgnoreCase("ITALIC"))
 		f = this.getFont().deriveFont(Font.ITALIC);
+	    else if (fontStyle.equalsIgnoreCase("PLAIN"))
+		f = this.getFont().deriveFont(Font.PLAIN);
 	    
 	    if (f == null)
 		f = this.getFont();
@@ -149,14 +136,18 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 	    setSpecialFont(f);
 	    this.setFont(f);
 	}
+
     }
 
     /**
      * Returns whether or not we should render the default style or a 
      * special style.
      */
-    public boolean isSpecial (FolderNode node) throws MessagingException {
-	return (node != null && node.getFolderInfo().getFolder().getUnreadMessageCount() > 0);
+    public boolean isSpecial (MailTreeNode node) {
+	if (node instanceof FolderNode) 
+	    return (node != null && ((FolderNode)node).getFolderInfo().hasUnread());
+	else
+	    return false;
     }
 
     public Font getSpecialFont() {

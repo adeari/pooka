@@ -16,6 +16,7 @@ import net.suberic.util.ValueChangeListener;
  */
 
 public class FolderInfo implements MessageCountListener, ValueChangeListener, UserProfileContainer {
+
     private Folder folder;
 
     // The is the folder ID: storeName.parentFolderName.folderName
@@ -41,8 +42,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private LoadMessageThread loaderThread;
     private FolderWindow folderWindow;
 
-    private boolean open;
-    private boolean available;
+    private boolean loaded = false;
+    private boolean available = true;
+    private boolean open = false;
+    private boolean unread = false;
 
     private FolderInfo parentFolder = null;
     private StoreInfo parentStore = null;
@@ -57,25 +60,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	parentFolder = parent;
 	setFolderID(parent.getFolderID() + "." + fname);
 	folderName = fname;
-	
-	try {
-	    Folder parentFolder = parent.getFolder();
-	    Folder[] tmpFolder = parentFolder.list(fname);
-	    if (tmpFolder.length > 0) {
-		folder = tmpFolder[0];
-		available = true;
-	    } else {
-		available = false;
-		folder = null;
-	    }
-	} catch (MessagingException me) {
-	    available = false;
-	    folder = null;
-	}
-		
-	if (folder != null) {
-	    initializeFolderInfo();
-	}
+
+	if (parent.isAvailable() && parent.isLoaded())
+	    loadFolder();
+
+	updateChildren();
     }
 
 
@@ -88,26 +77,65 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	parentStore = parent;
 	setFolderID(parent.getStoreID() + "." + fname);
 	folderName = fname;
+
+	if (parent.isConnected())
+	    loadFolder();
+
+	updateChildren();
+    }
+    
+    /**
+     * This actually loads up the Folder object itself.  This is used so 
+     * that we can have a FolderInfo even if we're not connected to the
+     * parent Store.
+     */
+    public void loadFolder() {
+	if (isLoaded())
+	    return;
+
+	Folder[] tmpFolder;
+	Folder tmpParentFolder;
 	
 	try {
-	    Store store = parent.getStore();
-	    Folder parentFolder = store.getDefaultFolder();
-	    Folder[] tmpFolder = parentFolder.list(fname);
+	    if (parentStore != null) {
+		try {
+		    if (!parentStore.isConnected())
+			parentStore.connectStore();
+		    Store store = parentStore.getStore();
+		    tmpParentFolder = store.getDefaultFolder();
+		    tmpFolder = tmpParentFolder.list(folderName);
+		} catch (MessagingException me) {
+		    tmpFolder =null;
+		}
+	    } else {
+		if (!parentFolder.isLoaded())
+		    parentFolder.loadFolder();
+		if (!parentFolder.isLoaded()) {
+		    tmpFolder = null;
+		} else {
+		    tmpParentFolder = parentFolder.getFolder();
+		    tmpFolder = tmpParentFolder.list(folderName);
+		}
+	    }
 	    if (tmpFolder != null && tmpFolder.length > 0) {
 		folder = tmpFolder[0];
 		available = true;
 	    } else {
 		available = false;
+		open = false;
 		folder = null;
 	    }
+	    loaded = true;
 	} catch (MessagingException me) {
-	    available = false;
+	    loaded = false;
+	    open = false;
 	    folder = null;
-	}
-		
+	} 
+	
 	if (folder != null) {
 	    initializeFolderInfo();
 	}
+	
     }
 
     /**
@@ -155,8 +183,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
 	if (!defProfile.equals(""))
 	    defaultProfile = UserProfile.getProfile(defProfile);
-
-	updateChildren();
 
     }
     
@@ -266,34 +292,30 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
 
     public void updateChildren() {
-	try {
-	    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) == 0) {
-		return;
-	    }
-	} catch (MessagingException me) { }
-
 	Vector newChildren = new Vector();
 
-	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getFolderProperty() + ".folderList", "INBOX"), ":");
-	
-	String newFolderName;
-
-	for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-	    newFolderName = (String)tokens.nextToken();
-	    FolderInfo childFolder = getChild(newFolderName);
-	    if (childFolder == null) {
-		childFolder = new FolderInfo(this, newFolderName);
-		newChildren.add(childFolder);
-	    } else {
-		newChildren.add(childFolder);
-	    }
-	}
-	
-	children = newChildren;
-	
-	if (folderNode != null) 
-	    folderNode.loadChildren();
+	String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
+	if (childList != "") {
+	    StringTokenizer tokens = new StringTokenizer(childList, ":");
 	    
+	    String newFolderName;
+	
+	    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
+		newFolderName = (String)tokens.nextToken();
+		FolderInfo childFolder = getChild(newFolderName);
+		if (childFolder == null) {
+		    childFolder = new FolderInfo(this, newFolderName);
+		    newChildren.add(childFolder);
+		} else {
+		    newChildren.add(childFolder);
+		}
+	    }
+       
+	    children = newChildren;
+	    
+	    if (folderNode != null) 
+		folderNode.loadChildren();
+	}
     }
 
     /**
@@ -443,6 +465,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	    getFolderTableModel().addRows(addedProxies);
 	}
+	resetUnread();
 	fireMessageCountEvent(e);
     }
 
@@ -468,6 +491,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    }
 	    getFolderTableModel().removeRows(removedProxies);
 	}
+	resetUnread();
 	fireMessageCountEvent(e);
     }
 
@@ -482,18 +506,23 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * opened folder.
      */
     public void openFolder(int mode) throws MessagingException {
-	if (folder.isOpen()) {
-	    if (folder.getMode() == mode)
-		return;
-	    else { 
-		closeFolder(false);
-		openFolder(mode);
+	if (! isLoaded())
+	    loadFolder();
+	
+	if (isLoaded() && isAvailable()) {
+	    if (folder.isOpen()) {
+		if (folder.getMode() == mode)
+		    return;
+		else { 
+		    closeFolder(false);
+		    openFolder(mode);
+		}
+	    } else {
+		folder.open(mode);
+		open=true;
+		resetUnread();
 	    }
-	} else {
-	    folder.open(mode);
-	    open=true;
 	}
-	    
     }
 
     /**
@@ -503,11 +532,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * FolderInfo will try to reopen the folder.
      */
     public void closeFolder(boolean expunge) throws MessagingException {
-	if (!(folder.isOpen()))
-	    return;
-	else {
-	    open=false;
-	    folder.close(expunge);
+	if (isLoaded()) {
+	    if (!(folder.isOpen()))
+		return;
+	    else {
+		open=false;
+		folder.close(expunge);
+	    }
 	}
     }
     
@@ -595,6 +626,33 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void setFolderWindow(FolderWindow newValue) {
 	folderWindow = newValue;
+    }
+
+    public boolean isOpen() {
+	return open;
+    }
+
+    public boolean isAvailable() {
+	return available;
+    }
+
+    public boolean isLoaded() {
+	return loaded;
+    }
+
+    public boolean hasUnread() {
+	return unread;
+    }
+
+    private void resetUnread() {
+	try {
+	    if (Pooka.isDebug())
+		System.out.println("running resetUnread.  unread message count is " + getFolder().getUnreadMessageCount());
+
+	    unread = (getFolder().getUnreadMessageCount() > 0);
+	} catch (MessagingException me) {
+	    unread = false;
+	}
     }
 
     /**

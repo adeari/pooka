@@ -21,6 +21,7 @@ public class StoreNode extends MailTreeNode {
 	store = newStore;
 	displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
 	setCommands();
+	loadChildren();
     }
     
     /**
@@ -36,20 +37,20 @@ public class StoreNode extends MailTreeNode {
      * time this method is called we load up all of the folders
      * under the store's defaultFolder
      */
-
+    /**
     public int getChildCount() {
 	if (hasLoaded == false) {
 	    loadChildren();
 	}
 	return super.getChildCount();
     }
-    
+    */
     /**
      * returns the children of this folder node.  The first
      * time this method is called we load up all of the folders
      * under the store's defaultFolder
      */
-    
+    /*
     public java.util.Enumeration children() {
 	if (hasLoaded == false) {
 	    loadChildren();
@@ -57,14 +58,18 @@ public class StoreNode extends MailTreeNode {
 	return super.children();
     }
 
+    */
+
     /**
      * This loads or updates the top-level children of the Store.
      */
     public void loadChildren() {
-	// connect to the Store if we need to
+	/*
+	//   connect to the Store if we need to
 	
 	if (!store.isConnected()) 
 	    return; 
+	*/
 	
 	String folderName;
     
@@ -81,9 +86,10 @@ public class StoreNode extends MailTreeNode {
 	hasLoaded=true;
 
 	javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	if (folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+	/*	if (folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
 	    ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
 	}
+	*/
     }
 
     public String getStoreID() {

@@ -53,6 +53,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	});
 	
 	folderInfo.addMessageChangedListener(this);
+	loadChildren();
 
     }
 
@@ -61,15 +62,10 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
      * a Folder is a leaf if it cannot contain sub folders
      */
     public boolean isLeaf() {
-	try {
-	    if (getFolder() == null || (getFolder().getType() & Folder.HOLDS_FOLDERS) == 0) {
-	    	return true;
-	    }
-	} catch (MessagingException me) { }
-	
-	// otherwise it does hold folders, and therefore not
-	// a leaf
-	return false;
+	if (getChildCount() < 1)
+	    return true;
+	else
+	    return false;
     }
    
     /**
@@ -87,12 +83,14 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
      * under the store's defaultFolder
      */
 
+    /**
     public int getChildCount() {
 	if (!hasLoaded) {
 	    loadChildren();
 	}
 	return super.getChildCount();
     }
+    */
 
     /**
      * returns the children of this folder node.  The first
@@ -100,6 +98,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
      * under the store's defaultFolder
      */
     
+    /*
     public java.util.Enumeration children() {
 	if (!hasLoaded) {
 	    loadChildren();
@@ -107,16 +106,13 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 	return super.children();
     }
 
+    */
+
     /**
      * This loads (or reloads) the children of the FolderNode from
      * the list of Children on the FolderInfo.
      */
     public void loadChildren() {
-	// if it is a leaf, just say we have loaded them
-	if (isLeaf()) {
-	    hasLoaded = true;
-	    return;
-	}
 
 	Enumeration origChildren = super.children();
 	Vector origChildrenVector = new Vector();
@@ -230,11 +226,16 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 
 	public void actionPerformed(ActionEvent e) {
 	    try {
-		if ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0)
-		    ((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel().openFolderWindow(folderInfo);
-		if ((getFolder().getType() & Folder.HOLDS_FOLDERS) != 0) {
-		    javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-		    folderTree.expandPath(folderTree.getSelectionPath());
+		if (!getFolderInfo().isOpen())
+		    getFolderInfo().openFolder(Folder.READ_ONLY);
+
+		if (getFolderInfo().isOpen()) {
+		    if ((getFolder().getType() & Folder.HOLDS_MESSAGES) != 0)
+			((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel().openFolderWindow(folderInfo);
+		    if ((getFolder().getType() & Folder.HOLDS_FOLDERS) != 0) {
+			javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+			folderTree.expandPath(folderTree.getSelectionPath());
+		    }
 		}
 	    } catch (MessagingException me) {
 	    }

@@ -208,6 +208,14 @@ Store.defaultProfile.allowedValues=UserProfile
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v
 
+FolderTree.readStyle=PLAIN
+FolderTree.unreadStyle=BOLD
+Fp;derTree.openStyle=ITALIC
+FolderTree.openColor=blue
+FolderTree.closedColor=black
+FolderTree.defaultColor=black
+FolderTree.unavailableColor=red
+
 NewAccountPooka=introMessage:introMessage.title:entryWindowMessage:entryWindowMessage.title:userName:fullName:password:serverName:type
 NewAccountPooka.password.propertyType=Password
 

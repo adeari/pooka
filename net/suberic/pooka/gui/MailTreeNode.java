@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.util.Hashtable;
 
 public class MailTreeNode extends DefaultMutableTreeNode {
+
     public Action[] defaultActions = null;
 
     public Hashtable commands;
