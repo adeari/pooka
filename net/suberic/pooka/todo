@@ -1,12 +1,7 @@
 *) change over from mbox to maildir or something like it.
-	-- tag new messages as recent. -- sent to az
-	-- test for large mailboxes.
-	    -- make Pop3FolderInfo put up info about loading large numbers
-		of messages.
+	-- tag new messages as recent. -- send to az
 
 *) add at least one more piece of documentation.
-
-*) check why the bcc field sometimes doesn't show the address book icon.
 
 --
 
@@ -16,6 +11,9 @@
 
 *) fix the problem with things like MissingStartBoundary by getting the
 raw input stream.
+
+*) make sure that backend filters are run on new message loaded at 
+startup (i.e. not just on messagesAdded).
 
 ------
 
@@ -203,6 +201,9 @@ preview:
 		whether or not it's up.
 			-- started.  make sure it's enough.
 
+*) add a dependent button/menu item.  so that that way instead of having
+	a separate Caching popup menu, you can just say "if caching,
+	add this menu item; if not, don't."
 
 *)  network on AWTEventThread:
     i think that i did this for a reason.  possible that in 1.4 original

@@ -130,6 +130,8 @@ public class NewAccountPooka {
 
       setupFolders(props);
 
+      setupAddressBook(props);
+
       saveProperties(props);
 
       Pooka.getStoreManager().loadAllSentFolders();
@@ -371,6 +373,22 @@ public class NewAccountPooka {
     props.setProperty("Pooka.defaultMailSubDir", pookaDirName);
 
     props.setProperty("Pooka.sslCertFile", sslFileName);
+
+  }
+
+  /**
+   * Sets up a default address book.
+   */
+  public void setupAddressBook(Properties props) throws java.io.IOException {
+    String pookaDirName = manager.getProperty("NewAccountPooka.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
+
+    String addressBookFileName = pookaDirName + File.separatorChar + "defaultAddressBook";
+    File addressBookFile = new File(addressBookFileName);
+    addressBookFile.createNewFile();  
+    
+    props.setProperty("AddressBook", "defaultBook");
+    props.setProperty("AddressBook.defaultBook.type", "file");
+    props.setProperty("AddressBook.defaultBook.filename", addressBookFileName);
 
   }
 

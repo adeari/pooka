@@ -239,7 +239,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       hdrLabel.setPreferredSize(new Dimension(75,hdrLabel.getPreferredSize().height));
       inputRow.add(hdrLabel);
       
-      if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") && Pooka.getProperty("Pooka.useAddressCompletion", "false").equalsIgnoreCase("true")) {
+      if (currentHeader.equalsIgnoreCase("To") || currentHeader.equalsIgnoreCase("CC") || currentHeader.equalsIgnoreCase("BCC") ) {
 	try {
 	  inputField = new AddressEntryTextArea(getNewMessageUI(), getNewMessageProxy().getNewMessageInfo().getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 	} catch (MessagingException me) {

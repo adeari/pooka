@@ -19,6 +19,9 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   // the update thread for all AddressEntryTextAreas
   static Thread updateThread;
 
+  // whether or not we're using keyboard completion.
+  boolean useCompletion = false;
+
   // the list of all AddressEntryTextAreas
   static java.util.WeakHashMap areaList = new java.util.WeakHashMap();
 
@@ -86,6 +89,8 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     messageProxy = ui.getMessageProxy();
     areaList.put(this, null);
 
+    useCompletion = Pooka.getProperty("Pooka.useAddressCompletion", "false").equalsIgnoreCase("true");
+
     this.addFocusListener(this);
   }
 
@@ -95,34 +100,36 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   protected void processComponentKeyEvent(KeyEvent e) {
     super.processComponentKeyEvent(e);
-    if (e.getID() == KeyEvent.KEY_PRESSED) {
-      int keyCode = e.getKeyCode();
-      switch(keyCode) {
-      case KeyEvent.VK_TAB:
-	break;
-      case KeyEvent.VK_UP:
-	selectNextEntry();
-	break;
-      case KeyEvent.VK_DOWN:
-	selectPreviousEntry();
-	break;
-      case KeyEvent.VK_LEFT:
-	// ignore
-	break;
-      case KeyEvent.VK_RIGHT:
-	// ignore
-	break;
-      default:
-	// we're just going to have to look at updating the text area
-	// all the freakin' time.  :)
-	lastKeyTime = System.currentTimeMillis();
-	if (updateThread != null)
-	  updateThread.interrupt();
-	else
-	  createUpdateThread();
-
-	if (keyCode == completionKey.getKeyCode() && e.getModifiers() == completionKey.getModifiers()) {
-	  completeNow = true;
+    if (useCompletion) {
+      if (e.getID() == KeyEvent.KEY_PRESSED) {
+	int keyCode = e.getKeyCode();
+	switch(keyCode) {
+	case KeyEvent.VK_TAB:
+	  break;
+	case KeyEvent.VK_UP:
+	  selectNextEntry();
+	  break;
+	case KeyEvent.VK_DOWN:
+	  selectPreviousEntry();
+	  break;
+	case KeyEvent.VK_LEFT:
+	  // ignore
+	  break;
+	case KeyEvent.VK_RIGHT:
+	  // ignore
+	  break;
+	default:
+	  // we're just going to have to look at updating the text area
+	  // all the freakin' time.  :)
+	  lastKeyTime = System.currentTimeMillis();
+	  if (updateThread != null)
+	    updateThread.interrupt();
+	  else
+	    createUpdateThread();
+	  
+	  if (keyCode == completionKey.getKeyCode() && e.getModifiers() == completionKey.getModifiers()) {
+	    completeNow = true;
+	  }
 	}
       }
     }
@@ -321,7 +328,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     } else {
       StyleConstants.setForeground(sas, incompleteColor);
     }
-    doc.setCharacterAttributes(beginOffset, (endOffset - beginOffset + 1), sas, false);
+    doc.setCharacterAttributes(beginOffset, (endOffset - beginOffset), sas, false);
     */
   }
 
@@ -371,8 +378,14 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
 
     // get the area bounded by commas, or by the beginning and end of 
     // the text.
-    int beginOffset = currentText.lastIndexOf(',', caretPosition) +1;
-    int endOffset = currentText.indexOf(',', caretPosition) -1;
+    int beginOffset = 0;
+    if (caretPosition > 0)
+      beginOffset = currentText.lastIndexOf(',', caretPosition - 1) +1;
+    else 
+      beginOffset = 0;
+    int endOffset = currentText.indexOf(',', caretPosition);
+    if (beginOffset < 0)
+      beginOffset = 0;
     if (endOffset < 0)
       endOffset = currentText.length();
     
@@ -413,7 +426,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     // the text should always match the newAddress.  really.  :)
     //this.replaceRange(newAddress, current.beginOffset, current.endOffset);
     try {
-      getDocument().remove(current.beginOffset, current.endOffset - current.beginOffset + 1);
+      getDocument().remove(current.beginOffset, current.endOffset - current.beginOffset);
       getDocument().insertString(current.beginOffset, newAddress, null);
     } catch (BadLocationException ble) {
       ble.printStackTrace();
