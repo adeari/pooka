@@ -43,6 +43,7 @@ public class CompositeEditorPane extends DefaultPropertyEditor {
      */
     public void configureEditor(PropertyEditorFactory newFactory, String newProperty, String newTemplate, VariableBundle bundle, boolean isEnabled) {
 
+	this.setBorder(BorderFactory.createEtchedBorder());
 	factory = newFactory;
 	property = newProperty;
 	template = newTemplate;
