@@ -306,6 +306,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	Vector messageProxies = new Vector();
 
+	FetchProfile fp = new FetchProfile();
+
 	if (columnValues == null) {
 	    Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
 	    Vector colvals = new Vector();
@@ -316,7 +318,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	    while (tokens.hasMoreElements()) {
 		tmp = (String)tokens.nextElement();
-		colvals.addElement(Pooka.getProperty(tableType + "." + tmp + ".value", tmp));
+		String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
+		colvals.addElement(value);
+		fp.add(value);
 		colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
 		colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
 	    }	    
@@ -333,6 +337,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		openFolder(Folder.READ_WRITE);
 	    }
 	    Message[] msgs = folder.getMessages();
+	    folder.fetch(msgs, fp);
 	    MessageInfo mi;
 
 	    for (int i = 0; i < msgs.length; i++) {
@@ -852,17 +857,17 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    Message[] removedMessages = mce.getMessages();
 		    if (Pooka.isDebug())
 			System.out.println("removedMessages was of size " + removedMessages.length);
-		    MessageInfo mp;
+		    MessageInfo mi;
 		    Vector removedInfos=new Vector();
 		    for (int i = 0; i < removedMessages.length; i++) {
 			if (Pooka.isDebug())
 			    System.out.println("checking for existence of message.");
-			mp = getMessageInfo(removedMessages[i]);
-			if (mp != null) {
+			mi = getMessageInfo(removedMessages[i]);
+			if (mi != null) {
 			    if (Pooka.isDebug())
 				System.out.println("message exists--removing");
-			    removedInfos.add(mp);
-			    messageToInfoTable.remove(mp);
+			    removedInfos.add(mi.getMessageProxy());
+			    messageToInfoTable.remove(mi);
 			}
 		    }
 		    getFolderTableModel().removeRows(removedInfos);

@@ -475,8 +475,7 @@ public class MessageProxy {
 	    if (fw != null)
 		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    try {
-		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().getMessage().reply(false);
-		getMessageInfo().populateReply(m);
+		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().populateReply(false);
 		getMessagePanel().createNewMessage(m);
 
 	    } catch (MessagingException me) {
@@ -502,9 +501,8 @@ public class MessageProxy {
 	    if (fw != null)
 		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    try {
-		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().getMessage().reply(true);
+		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().populateReply(true);
 
-		getMessageInfo().populateReply(m);
 		getMessagePanel().createNewMessage(m);
 
 	    } catch (MessagingException me) {
@@ -530,9 +528,7 @@ public class MessageProxy {
 	    if (fw != null)
 		fw.setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 	    try {
-		javax.mail.internet.MimeMessage m = new MimeMessage(getMessagePanel().getMainPanel().getSession());
-
-		getMessageInfo().populateForward(m);
+		javax.mail.internet.MimeMessage m = (MimeMessage) getMessageInfo().populateForward();
 		getMessagePanel().createNewMessage(m);
 
 	    } catch (MessagingException me) {

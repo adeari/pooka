@@ -261,9 +261,13 @@ public class MessageInfo {
      * This populates a message which is a reply to the current
      * message.
      */
-    public void populateReply(MimeMessage mMsg) 
+    public Message populateReply(boolean replyAll) 
 	throws MessagingException {
-	String textPart = MailUtilities.getTextPart(message, false);
+	MimeMessage newMsg = (MimeMessage) getRealMessage().reply(replyAll);
+
+	MimeMessage mMsg = (MimeMessage) getMessage();
+
+	String textPart = MailUtilities.getTextPart(mMsg, false);
 	UserProfile up = getDefaultProfile();
 
 	String parsedText;
@@ -279,16 +283,20 @@ public class MessageInfo {
 	    parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:"), true);
 	}
 	parsedText = prefixMessage(textPart, replyPrefix, parsedIntro);
-	mMsg.setText(parsedText);
+	newMsg.setText(parsedText);
 	
+	return newMsg;
     }
 
     /**
      * This populates a new message which is a forwarding of the
      * current message.
      */
-    public void populateForward(MimeMessage mMsg) 
+    public Message populateForward() 
 	throws MessagingException {
+	MimeMessage mMsg = (MimeMessage) getMessage();
+	MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
+
 	String textPart = MailUtilities.getTextPart(message, false);
 	UserProfile up = getDefaultProfile();
 
@@ -308,8 +316,10 @@ public class MessageInfo {
 	    parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
 	}
 
-	    mMsg.setText(parsedText);
-	    mMsg.setSubject(parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
+	    newMsg.setText(parsedText);
+	    newMsg.setSubject(parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s"), false));
+
+	    return newMsg;
     }
 
     /**
