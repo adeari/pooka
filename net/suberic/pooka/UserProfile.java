@@ -129,6 +129,11 @@ public class UserProfile extends Object {
 	return store.getDefaultProfile();
     }
 
+    /**
+     * returns the default Profile object as defined by the 
+     * "UserProfile.default" property, or null if there are no Profiles
+     * defined.
+     */
     static public UserProfile getDefaultProfile() {
 	UserProfile defaultProfile;
 
@@ -136,7 +141,10 @@ public class UserProfile extends Object {
 	    defaultProfile = UserProfile.getProfile(Pooka.getProperty("UserProfile.default"));
 	    return defaultProfile;
 	} catch (Exception e) {
-	    return (UserProfile)(profileList.firstElement());
+	    if (profileList.isEmpty())
+		return null;
+	    else
+		return (UserProfile)(profileList.firstElement());
 	}
     }
 
