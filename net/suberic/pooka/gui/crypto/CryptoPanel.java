@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 import net.suberic.util.VariableBundle;
 import net.suberic.pooka.Pooka;
 
+/**
+ * Displays the current cryptography status for this Message.
+ */
 public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
   
   JButton encryptionButton;

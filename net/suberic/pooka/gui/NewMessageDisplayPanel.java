@@ -2,6 +2,8 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
 import net.suberic.util.gui.*;
 import net.suberic.util.swing.EntryTextArea;
+import net.suberic.pooka.gui.crypto.*;
+
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.awt.*;
@@ -29,6 +31,9 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
   
   private Action[] defaultActions;
   
+  CryptoStatusDisplay cryptoDisplay = null;
+  Container cryptoPanel = null;
+
   /**
    * Creates a NewMessageDisplayPanel from the given Message.
    */
@@ -355,163 +360,187 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
       return returnValue;
     }
   
-    /**
-     * This notifies the MessageDisplayPanel that an attachment has been added
-     * at the provided index.  This does not actually add an attachment,
-     * but rather should be called by the MessageProxy when an attachment
-     * has been added.
-     *
-     * If an AttachmentPane does not currently exist for this 
-     * MessageDisplayPanel, this method will call addAttachmentPane() to 
-     * create one.
-     */
-    public void attachmentAdded(int index) {
-	if (getAttachmentPanel() == null)
-	    addAttachmentPane();
-	else
-	    getAttachmentPanel().getTableModel().fireTableRowsInserted(index, index);
-    }
-
-    /**
-     * This notifies the MessageDisplayPanel that the attachment at the 
-     * provided index has been removed.  This does not actually remove
-     * the attachment, but rather should be called by the MessageProxy
-     * when an attachment has been removed.
-     *
-     * If this removes the last attachment, the entire AttachmentPane
-     * is removed from the MessageDisplayPanel.
-     */
-    public void attachmentRemoved(int index) {
-	try {
-	    Vector attach = getNewMessageProxy().getAttachments();
-	    if (attach == null || attach.size() == 0) {
-		removeAttachmentPane();
-	    } else {
-		getAttachmentPanel().getTableModel().fireTableRowsDeleted(index, index);
-	    }
-	} catch (MessagingException me) {
-	}
-    }
-
-    /**
-     * This creates the JComponent which shows the attachments, and then
-     * adds it to the JTabbedPane.
-     *
-     */
-    public void addAttachmentPane() {
-      attachmentPanel = new AttachmentPane(getMessageProxy());
-      attachmentDisplayPanel = new JPanel();
-      attachmentDisplayPanel.add(attachmentPanel);
-      
-      NewMessageUI nmui = getNewMessageUI();
-      if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
-	try {
-	  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentDisplayPanel, true);
-	} catch (Exception e) {
-	  System.err.println("error setting theme:  " + e);
-	}
+  /**
+   * This notifies the MessageDisplayPanel that an attachment has been added
+   * at the provided index.  This does not actually add an attachment,
+   * but rather should be called by the MessageProxy when an attachment
+   * has been added.
+   *
+   * If an AttachmentPane does not currently exist for this 
+   * MessageDisplayPanel, this method will call addAttachmentPane() to 
+   * create one.
+   */
+  public void attachmentAdded(int index) {
+    if (getAttachmentPanel() == null)
+      addAttachmentPane();
+    else
+      getAttachmentPanel().getTableModel().fireTableRowsInserted(index, index);
+  }
+  
+  /**
+   * This notifies the MessageDisplayPanel that the attachment at the 
+   * provided index has been removed.  This does not actually remove
+   * the attachment, but rather should be called by the MessageProxy
+   * when an attachment has been removed.
+   *
+   * If this removes the last attachment, the entire AttachmentPane
+   * is removed from the MessageDisplayPanel.
+   */
+  public void attachmentRemoved(int index) {
+    try {
+      Vector attach = getNewMessageProxy().getAttachments();
+      if (attach == null || attach.size() == 0) {
+	removeAttachmentPane();
+      } else {
+	getAttachmentPanel().getTableModel().fireTableRowsDeleted(index, index);
       }
-      tabbedPane.add(Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), attachmentDisplayPanel);
+    } catch (MessagingException me) {
     }
+  }
 
-    /**
-     * This removes the AttachmentPane from the JTabbedPane.
-     */
-
-    public void removeAttachmentPane() {
-      if (attachmentPanel != null) {
-	tabbedPane.setSelectedComponent(headerScrollPane);
-	tabbedPane.remove(attachmentDisplayPanel);
-      }
-      attachmentPanel = null;
-      attachmentDisplayPanel = null;
-    }
-
-    /**
-     * This registers the Keyboard action not only for the FolderWindow
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
-     *            String aCommand, KeyStroke aKeyStroke, int aCondition)
-     */
-
-    public void registerKeyboardAction(ActionListener anAction,
-       	       String aCommand, KeyStroke aKeyStroke, int aCondition) {
-	super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-
-	if (attachmentPanel != null)
-	    attachmentPanel.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	editorPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	editorScrollPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-
-	splitPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-    }
+  /**
+   * This creates the JComponent which shows the attachments, and then
+   * adds it to the JTabbedPane.
+   *
+   */
+  public void addAttachmentPane() {
+    attachmentPanel = new AttachmentPane(getMessageProxy());
+    attachmentDisplayPanel = new JPanel();
+    attachmentDisplayPanel.add(attachmentPanel);
     
-    /**
-     * This unregisters the Keyboard action not only for the FolderWindow
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
-     */
+    NewMessageUI nmui = getNewMessageUI();
+    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+      try {
+	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentDisplayPanel, true);
+      } catch (Exception e) {
+	System.err.println("error setting theme:  " + e);
+      }
+    }
+    tabbedPane.add(attachmentDisplayPanel, Pooka.getProperty("MessageWindow.AttachmentTab", "Attachments"), 1);
+  }
+  
+  /**
+   * This creates the JComponent which shows the encryption status, and then
+   * adds it to the JTabbedPane.
+   *
+   */
+  public void addEncryptionPane() {
+    cryptoPanel = new JPanel();
+    NewMessageCryptoDisplay nmcd = new NewMessageCryptoDisplay(getNewMessageProxy());
+    cryptoDisplay = nmcd;
 
-    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
-	super.unregisterKeyboardAction(aKeyStroke);
-
-	if (attachmentPanel != null)
-	    attachmentPanel.unregisterKeyboardAction(aKeyStroke);
-	editorPane.unregisterKeyboardAction(aKeyStroke);
-	editorScrollPane.unregisterKeyboardAction(aKeyStroke);
-	splitPane.unregisterKeyboardAction(aKeyStroke);
+    cryptoPanel.add(nmcd);
+    
+    NewMessageUI nmui = getNewMessageUI();
+    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+      try {
+	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, attachmentDisplayPanel, true);
+      } catch (Exception e) {
+	System.err.println("error setting theme:  " + e);
+      }
     }
 
-    /**
-     * This creates and shows a PopupMenu for this component.  
-     */
-    public void showPopupMenu(JComponent component, MouseEvent e) {
-	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
-	popupMenu.configureComponent("NewMessageWindow.popupMenu", Pooka.getResources());	
-	popupMenu.setActive(getActions());
-	NewMessageUI nmui = getNewMessageUI();
-	if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
-	  try {
-	    Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, popupMenu, true);
-	  } catch (Exception etwo) {
-	    System.err.println("error setting theme:  " + etwo);
-	  }
-	}
-	popupMenu.show(component, e.getX(), e.getY());
-	    
+    tabbedPane.add(Pooka.getProperty("MessageWindow.EncryptionTab", "Encryption"), cryptoPanel);
+  }
+  
+  /**
+   * This removes the AttachmentPane from the JTabbedPane.
+   */
+  
+  public void removeAttachmentPane() {
+    if (attachmentPanel != null) {
+      tabbedPane.setSelectedComponent(headerScrollPane);
+      tabbedPane.remove(attachmentDisplayPanel);
     }
-
-    /**
-     * As specified by interface net.suberic.pooka.UserProfileContainer.
-     *
-     * This implementation returns the DefaultProfile of the associated
-     * MessageProxy if the MessageDisplayPanel is not editable.  If the 
-     * MessageDisplayPanel is editable, it returns the currently selected 
-     * UserProfile object.
-     */
-
-    public UserProfile getDefaultProfile() {
-	if (isEditable())
-	    return getSelectedProfile();
-	else
-	    return getMessageProxy().getDefaultProfile();
+    attachmentPanel = null;
+    attachmentDisplayPanel = null;
+  }
+  
+  /**
+   * This registers the Keyboard action not only for the FolderWindow
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
+   *            String aCommand, KeyStroke aKeyStroke, int aCondition)
+   */
+  
+  public void registerKeyboardAction(ActionListener anAction,
+				     String aCommand, KeyStroke aKeyStroke, int aCondition) {
+    super.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    
+    if (attachmentPanel != null)
+      attachmentPanel.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    editorPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    editorScrollPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    
+    splitPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+  }
+  
+  /**
+   * This unregisters the Keyboard action not only for the FolderWindow
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+   */
+  
+  public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+    super.unregisterKeyboardAction(aKeyStroke);
+    
+    if (attachmentPanel != null)
+      attachmentPanel.unregisterKeyboardAction(aKeyStroke);
+    editorPane.unregisterKeyboardAction(aKeyStroke);
+    editorScrollPane.unregisterKeyboardAction(aKeyStroke);
+    splitPane.unregisterKeyboardAction(aKeyStroke);
+  }
+  
+  /**
+   * This creates and shows a PopupMenu for this component.  
+   */
+  public void showPopupMenu(JComponent component, MouseEvent e) {
+    ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
+    popupMenu.configureComponent("NewMessageWindow.popupMenu", Pooka.getResources());	
+    popupMenu.setActive(getActions());
+    NewMessageUI nmui = getNewMessageUI();
+    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
+      try {
+	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, popupMenu, true);
+      } catch (Exception etwo) {
+	System.err.println("error setting theme:  " + etwo);
+      }
     }
-
-
-    /**
-     * This method returns the UserProfile currently selected in the 
-     * drop-down menu.
-     */
-
-    public UserProfile getSelectedProfile() {
-	return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
-    }
+    popupMenu.show(component, e.getX(), e.getY());
+    
+  }
+  
+  /**
+   * As specified by interface net.suberic.pooka.UserProfileContainer.
+   *
+   * This implementation returns the DefaultProfile of the associated
+   * MessageProxy if the MessageDisplayPanel is not editable.  If the 
+   * MessageDisplayPanel is editable, it returns the currently selected 
+   * UserProfile object.
+   */
+  
+  public UserProfile getDefaultProfile() {
+    if (isEditable())
+      return getSelectedProfile();
+    else
+      return getMessageProxy().getDefaultProfile();
+  }
+  
+  
+  /**
+   * This method returns the UserProfile currently selected in the 
+   * drop-down menu.
+   */
+  
+  public UserProfile getSelectedProfile() {
+    return (UserProfile)(((JComboBox)(inputTable.get("UserProfile"))).getSelectedItem());
+  }
   
   /**
    * sets the currently selected Profile.
@@ -564,7 +593,11 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Shows the current display of the encryption status.
    */
   public net.suberic.pooka.gui.crypto.CryptoStatusDisplay getCryptoStatusDisplay() { 
-    return null;
+    if (cryptoDisplay == null) {
+      addEncryptionPane();
+    }
+
+    return cryptoDisplay;
   }
 
    //------- Actions ----------//

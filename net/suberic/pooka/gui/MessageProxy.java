@@ -502,23 +502,25 @@ public class MessageProxy {
 	    }
 	    // check the encryption
 	    
-	    try {
-	      cInfo.decryptMessage(key, true);
-	    } catch (Exception e) {
-	      showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
-	    }
-	  
-	    MessageUI ui = getMessageUI();
-	    if (ui != null) {
-	    
-	      CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
-	      
-	      if (csd != null)
-		csd.cryptoUpdated(cInfo);
+	    if (key != null) {
 	      try {
-		ui.refreshDisplay();
-	      } catch (MessagingException me) {
-		showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
+		cInfo.decryptMessage(key, true);
+	      } catch (Exception e) {
+		showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
+	      }
+	      
+	      MessageUI ui = getMessageUI();
+	      if (ui != null) {
+		
+		CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
+		
+		if (csd != null)
+		  csd.cryptoUpdated(cInfo);
+		try {
+		  ui.refreshDisplay();
+		} catch (MessagingException me) {
+		  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
+		}
 	      }
 	    }
 	  }
