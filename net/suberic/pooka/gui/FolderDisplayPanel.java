@@ -248,11 +248,11 @@ public class FolderDisplayPanel extends JPanel {
      */
     public int selectFirstUnread() {
 	int firstUnread = getFolderInfo().getFirstUnreadMessage();
-	if (firstUnread < 0)
+	if (firstUnread < 0) {
 	    firstUnread = messageTable.getRowCount();
-	else 
+	} else {
 	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
-
+	}
 	return firstUnread;
     }
 

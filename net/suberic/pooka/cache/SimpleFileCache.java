@@ -574,8 +574,7 @@ public class SimpleFileCache implements MessageCache {
 			bw.write("Flagged");
 			bw.newLine();
 		    } else if (systemFlags[i] == Flags.Flag.RECENT) {
-			bw.write("Recent");
-			bw.newLine();
+			// let's not cache the recent flag, eh?
 		    } else if (systemFlags[i] == Flags.Flag.SEEN) {
 			bw.write("Seen");
 			bw.newLine();
@@ -722,7 +721,7 @@ public class SimpleFileCache implements MessageCache {
 	int unreadCount = 0;
 	for (int i = 0; i < cachedMessages.size(); i++) {
 	    Flags f = getFlags(((Long) cachedMessages.elementAt(i)).longValue(), uidValidity, false);
-	    if (f.contains(Flags.Flag.SEEN))
+	    if (! f.contains(Flags.Flag.SEEN))
 		unreadCount++;
 	}
 
