@@ -3,15 +3,7 @@ alpha 2
 
 *) enable voice control
 
-*) make MailUtilities handle nested attachments properly.  also honour
-multipart/alternative content.
-
 *) fix the attachment pop up on windows.
-
-*) fix the FolderChooser so that it updates the menu properly and so it 
-   handles the INBOX properly--right now, for some reason, when you go to
-   the FolderChooser the first time, it doesn't show up as subscribed.
-   of course, it also messes up in various other places....
 
 *)  Do a simple encryption of the password fields in the
 .pookarc file so that you can read .pookarc and not have everyone see your
