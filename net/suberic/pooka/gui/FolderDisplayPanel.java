@@ -194,7 +194,7 @@ public class FolderDisplayPanel extends JPanel {
 	if (selectedProxy != null)  {
 	    boolean found = false;
 	    Message currentMsg = selectedProxy.getMessageInfo().getMessage();
-	    for (int i = 0; (found == false && i < removedMsgs.length); i++) {
+	    for (int i = 0; (currentMsg != null && found == false && i < removedMsgs.length); i++) {
 		if (currentMsg.equals(removedMsgs[i])) {
 		    found = true;
 		}
