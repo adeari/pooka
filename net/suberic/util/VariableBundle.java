@@ -202,7 +202,8 @@ public class VariableBundle extends Object {
 		Enumeration propsLeft = writableProperties.keys();
 		while (propsLeft.hasMoreElements()) {
 		    String nextKey = (String)propsLeft.nextElement();
-		    writeSaveFile.write(nextKey + "=" + writableProperties.getProperty(nextKey, ""));
+		    String nextKeyEscaped = escapeWhiteSpace(nextKey);
+		    writeSaveFile.write(nextKeyEscaped + "=" + writableProperties.getProperty(nextKey, ""));
 		    writeSaveFile.newLine();
 		    properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
 		    writableProperties.remove(nextKey);
@@ -231,6 +232,23 @@ public class VariableBundle extends Object {
 	    }
 
 	}
+    }
+
+    /**
+     * Escapes whitespace in a string by putting a '\' in front of each
+     * whitespace character.
+     */
+    public String escapeWhiteSpace(String sourceString) {
+	char[] origString = sourceString.toCharArray();
+	StringBuffer returnString = new StringBuffer();
+	for (int i = 0; i < origString.length; i++) {
+	    char currentChar = origString[i];
+	    if (Character.isWhitespace(currentChar))
+		returnString.append('\\');
+	    returnString.append(currentChar);
+	}
+
+	return returnString.toString();
     }
 
     /**
