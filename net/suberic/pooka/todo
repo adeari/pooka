@@ -1,11 +1,3 @@
-*) document keybindings
-	-- keybindings for address book
-	-- keybindings for saving attachments.
-	-- keybindings for opening folders.
-	-- keybindings for search
-	-- keybindings for get new messages
-	-- keybindings for detachwindow
-
 *) disconnected:  
 	*)  make an option for caching everything.
 	*)  check sent folder with disconnected / especially not using
@@ -23,6 +15,12 @@ to use "'s correctly.
 
 *) fix reverse sorting.
 --------
+
+*) document keybindings
+	-- keybindings for address book
+	-- keybindings for saving attachments.
+	-- keybindings for opening folders.
+	-- keybindings for detachwindow
 
 *) threading of attachment actions.
 

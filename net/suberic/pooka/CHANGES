@@ -1,3 +1,7 @@
+added keybindings for lots of stuff, including searches, printing, selecting
+the next unread message, etc.  added a page showing the keybindings, 
+available through the help menu or by pressing Alt-K.
+
 fixed the keybindings on top-level message frames.  those should work now.
 
 selecting a NewMessageWindow now selects either the to: field, the subject:

@@ -51,6 +51,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
       new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
       new NextMessageAction(),
       new PreviousMessageAction(),
+      new NextUnreadMessageAction(),
       new GotoMessageAction(),
       new SearchAction(),
       new SelectAllAction()
@@ -295,22 +296,26 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	return getFolderDisplay().selectMessage(messageNumber);
     }
 
-    /**
-     * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
-     * 
-     * This makes the given row visible.
-     */
-    public void makeSelectionVisible(int messageNumber) {
-      getFolderDisplay().makeSelectionVisible(messageNumber);
-    }
+  /**
+   * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
+   * 
+   * This makes the given row visible.
+   */
+  public void makeSelectionVisible(int messageNumber) {
+    getFolderDisplay().makeSelectionVisible(messageNumber);
+  }
+  
+  public int selectNextMessage() {
+    return getFolderDisplay().selectNextMessage();
+  }
+  
+  public int selectPreviousMessage() {
+    return getFolderDisplay().selectPreviousMessage();
+  }
 
-    public int selectNextMessage() {
-	return getFolderDisplay().selectNextMessage();
-    }
-
-    public int selectPreviousMessage() {
-	return getFolderDisplay().selectPreviousMessage();
-    }
+  public int selectNextUnreadMessage() {
+    return getFolderDisplay().selectNextUnreadMessage();
+  }
 
     /**
      * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
@@ -689,83 +694,94 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
     }
 
-    public Action[] getDefaultActions() {
-	return defaultActions;
+  public Action[] getDefaultActions() {
+    return defaultActions;
+  }
+  
+  //-----------actions----------------
+  
+  // The actions supported by the window itself.
+  
+  private Action[] defaultActions;
+  
+  class CloseAction extends AbstractAction {
+    
+    CloseAction() {
+      super("file-close");
     }
-
-    //-----------actions----------------
-
-    // The actions supported by the window itself.
-
-    private Action[] defaultActions;
-
-    class CloseAction extends AbstractAction {
-
-	CloseAction() {
-	    super("file-close");
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      closeFolderDisplay();
+    }
+  }
+  
+  public class ExpungeAction extends AbstractAction {
+    
+    ExpungeAction() {
+      super("message-expunge");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      expungeMessages();
+    }
+  }
+  
+  
+  public class NextMessageAction extends AbstractAction {
+    
+    NextMessageAction() {
+      super("message-next");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      selectNextMessage();
+    }
+  }
+  
+  public class PreviousMessageAction extends AbstractAction {
+    
+    PreviousMessageAction() {
+      super("message-previous");
+    }
 	
-        public void actionPerformed(ActionEvent e) {
-	    closeFolderDisplay();
-	}
+    public void actionPerformed(ActionEvent e) {
+      selectPreviousMessage();
     }
-
-    public class ExpungeAction extends AbstractAction {
-
-	ExpungeAction() {
-	    super("message-expunge");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    expungeMessages();
-	}
+  }
+  
+  public class NextUnreadMessageAction extends AbstractAction {
+    
+    NextUnreadMessageAction() {
+      super("message-next-unread");
     }
-
-
-    public class NextMessageAction extends AbstractAction {
-
-	NextMessageAction() {
-	    super("message-next");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    selectNextMessage();
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      selectNextUnreadMessage();
     }
+  }
 
-    public class PreviousMessageAction extends AbstractAction {
-
-	PreviousMessageAction() {
-	    super("message-previous");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    selectPreviousMessage();
-	}
+  public class GotoMessageAction extends AbstractAction {
+    
+    GotoMessageAction() {
+      super("message-goto");
     }
-
-    public class GotoMessageAction extends AbstractAction {
-
-	GotoMessageAction() {
-	    super("message-goto");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    getFolderStatusBar().activateGotoDialog();
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      getFolderStatusBar().activateGotoDialog();
     }
-
-    public class SearchAction extends AbstractAction {
-
-	SearchAction() {
-	    super("folder-search");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    searchFolder();
-	}
+  }
+  
+  public class SearchAction extends AbstractAction {
+    
+    SearchAction() {
+      super("folder-search");
     }
-
+    
+    public void actionPerformed(ActionEvent e) {
+      searchFolder();
+    }
+  }
+  
   public class SelectAllAction extends AbstractAction {
     
     SelectAllAction() {

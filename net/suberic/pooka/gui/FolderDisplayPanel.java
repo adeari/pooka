@@ -493,6 +493,17 @@ public class FolderDisplayPanel extends JPanel {
     return selectMessage(nextSelectable);
   }
 
+  /**
+   * This selects the next unread message.  If no message is selected, then
+   * the first unread message is selected.  If no unread messages exist, this
+   * does nothing.
+   */
+  public int selectNextUnreadMessage() {
+    int selectedRow = messageTable.getSelectedRow();
+    int nextSelectable = getNextSelectableMessage(selectedRow, null, true);
+    return selectMessage(nextSelectable);
+  }
+
 
   /**
    * Determines which message is the next selectable message.  If no 
@@ -505,13 +516,27 @@ public class FolderDisplayPanel extends JPanel {
    * should be done on the AWTEventThread.
    */
   public int getNextSelectableMessage(int selectedRow, Vector removedProxies) {
+    return getNextSelectableMessage(selectedRow, removedProxies, false);
+  }
+
+  /**
+   * Determines which message is the next selectable message.  If no 
+   * messages past this one are selectable (i.e. not deleted or about to
+   * be deleted), returns messageTable.getRowCount() (i.e. an unused
+   * row.
+   *
+   * Since we're polling flags on the Messages, this probably should be
+   * called on the FolderThread.  The change of selection itself, of course,
+   * should be done on the AWTEventThread.
+   */
+  public int getNextSelectableMessage(int selectedRow, Vector removedProxies, boolean unread) {
     int newRow = selectedRow + 1;
     boolean done = false;
     while (! done && newRow < messageTable.getRowCount() ) {
       MessageProxy mp = getFolderInfo().getMessageProxy(newRow);
       try {
 
-	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED)) {
+	if ((removedProxies != null && removedProxies.contains(mp)) || mp.getMessageInfo().getFlags().contains(Flags.Flag.DELETED) || (unread && mp.getMessageInfo().getFlags().contains(Flags.Flag.SEEN))) {
 	  newRow ++;
 	} else {
 	  done = true;

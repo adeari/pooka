@@ -69,6 +69,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	    new ExpungeAction(),
 	    new NextMessageAction(),
 	    new PreviousMessageAction(),
+	    new NextUnreadMessageAction(),
 	    new GotoMessageAction(),
 	    new SearchAction(),
 	    new SelectAllAction()
@@ -237,6 +238,9 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     return getFolderDisplay().selectPreviousMessage();
   }
   
+  public int selectNextUnreadMessage() {
+    return getFolderDisplay().selectNextUnreadMessage();
+  }
   
   /**
    * As specified by interface net.suberic.pooka.gui.FolderDisplayUI.
@@ -466,39 +470,39 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
      *
      * As defined in interface net.suberic.pooka.gui.ActionContainer.
      */
-    public Action[] getActions() {
-	if (enabled) {
-	    Action[] returnValue = defaultActions;
-
-	    if (getFolderDisplay() != null) {
-		if (returnValue == null) {
-		    returnValue = getFolderDisplay().getActions();
-		} else {
-		    returnValue = TextAction.augmentList(returnValue, getFolderDisplay().getActions());
-		}
-	    } 
-
-	    return returnValue;
-
-	} else {
-	    return null;
-	}
-    }
-
-    public FolderDisplayPanel getFolderDisplay() {
-	return folderDisplay;
-    }
-
-    public class ExpungeAction extends AbstractAction {
-
-      ExpungeAction() {
-	super("message-expunge");
-      }
+  public Action[] getActions() {
+    if (enabled) {
+      Action[] returnValue = defaultActions;
       
-      public void actionPerformed(ActionEvent e) {
-	// we can't have a normal action wrapper because the underlying
-	// folder (and therefore folder thread) can change...
-	
+      if (getFolderDisplay() != null) {
+	if (returnValue == null) {
+	  returnValue = getFolderDisplay().getActions();
+	} else {
+	  returnValue = TextAction.augmentList(returnValue, getFolderDisplay().getActions());
+	}
+      } 
+      
+      return returnValue;
+      
+    } else {
+      return null;
+    }
+  }
+  
+  public FolderDisplayPanel getFolderDisplay() {
+    return folderDisplay;
+  }
+
+  public class ExpungeAction extends AbstractAction {
+
+    ExpungeAction() {
+      super("message-expunge");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      // we can't have a normal action wrapper because the underlying
+      // folder (and therefore folder thread) can change...
+      
 	if (displayedFolder != null) {
 	  displayedFolder.getFolderThread().addToQueue(new AbstractAction() {
 	      public void actionPerformed(ActionEvent e) {
@@ -507,9 +511,9 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
 	      }
 	    }, e);
 	}
-
-      }
+	
     }
+  }
   
   public class NextMessageAction extends AbstractAction {
     
@@ -521,7 +525,7 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
       selectNextMessage();
     }
   }
-
+  
   public class PreviousMessageAction extends AbstractAction {
     
     PreviousMessageAction() {
@@ -533,6 +537,17 @@ public class PreviewFolderPanel extends JPanel implements FolderDisplayUI {
     }
     }
   
+  public class NextUnreadMessageAction extends AbstractAction {
+    
+    NextUnreadMessageAction() {
+      super("message-next-unread");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      selectNextUnreadMessage();
+    }
+  }
+
   public class GotoMessageAction extends AbstractAction {
 
     GotoMessageAction() {
