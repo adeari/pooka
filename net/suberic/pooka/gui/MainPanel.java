@@ -85,7 +85,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 		    setNewMessageFlag(false);
 		}
 		
-		public void windowClosed(WindowEvent e) {
+		public void windowClosing(WindowEvent e) {
 		    exitPooka(1);
 		}
 	    });
