@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import javax.mail.*;
 import javax.mail.internet.*;
 import javax.swing.*;
+import javax.activation.*;
 import java.util.Hashtable;
 import java.util.Vector;
 import net.suberic.pooka.Pooka;
@@ -124,20 +125,29 @@ public class NewMessageProxy extends MessageProxy {
      * to true.
      */
     public void attachFile(File f) {
-	System.out.println("attaching file.");
 	try {
-	    /*FileInputStream fis = new FileInputStream(f);
-	      MimeBodyPart mbp = new MimeBodyPart(fis);*/
-	    
+
+	    // borrowing liberally from ICEMail here.
+
 	    MimeBodyPart mbp = new MimeBodyPart();
-	    mbp.setContent(f, Pooka.getMimeTypesMap().getContentType(f));
 	    
-	    System.out.println("set filename to " + f.getName());
+	    FileDataSource fds = new FileDataSource(f);
+
+	    DataHandler dh = new DataHandler(fds);
+	    
 	    mbp.setFileName(f.getName());
+
+	    if (Pooka.getMimeTypesMap().getContentType(f).startsWith("text"))
+		mbp.setDisposition(Part.ATTACHMENT);
+	    else
+		mbp.setDisposition(Part.INLINE);
+	    
+	    mbp.setDescription(f.getName());
+	    
+	    mbp.setDataHandler( dh );
+	    
 	    if (attachments == null)
 		attachments = new Vector();
-	    System.out.println("attached filename is " + mbp.getFileName());
-	    System.out.println("attached content type is " + mbp.getContentType());
 	    
 	    attachments.add(mbp);
 	    
