@@ -39,16 +39,16 @@ public class HyperlinkMouseHandler extends MouseInputAdapter {
 	JEditorPane editor = (JEditorPane) e.getSource();
 	if (!editor.isEditable()) {
 	    Point pt = new Point(e.getX(), e.getY());
-	    URLSelection selection = getIndicatedURL(pt, editor);
-	    if (selection != currentSelection) {
+	    URLSelection newSelection = getIndicatedURL(pt, editor);
+	    if (newSelection != currentSelection) {
 		if (currentSelection != null) {
-		    editor.fireHyperlinkUpdate(new HyperlinkEvent(selection, HyperlinkEvent.EventType.EXITED, selection.url));
+		    editor.fireHyperlinkUpdate(new HyperlinkEvent(currentSelection, HyperlinkEvent.EventType.EXITED, currentSelection.url));
 		}
 		
-		if (selection != null) {
-		    currentSelection = selection;
-		    editor.fireHyperlinkUpdate(new HyperlinkEvent(selection, HyperlinkEvent.EventType.ENTERED, selection.url));
+		if (newSelection != null) {
+		    editor.fireHyperlinkUpdate(new HyperlinkEvent(newSelection, HyperlinkEvent.EventType.ENTERED, newSelection.url));
 		}
+		currentSelection = newSelection;
 	    }
 	}
     }
@@ -78,7 +78,7 @@ public class HyperlinkMouseHandler extends MouseInputAdapter {
 		    String possibleText = doc.getText(startOffset, relativePosition);
 		    char[] charArray = possibleText.toCharArray();
 		    for (int i = relativePosition - 1; (! startFound && i >= 0 ) ; i--) {  
-			if (Character.isWhitespace(charArray[i])) {
+			if (Character.isWhitespace(charArray[i]) || charArray[i] == '(' || charArray[i] == ')' || charArray[i] == '<' || charArray[i] == '>') {
 			    startFound = true;
 			    wordStart = startOffset + i + 1;
 			}
@@ -103,7 +103,7 @@ public class HyperlinkMouseHandler extends MouseInputAdapter {
 		    String possibleText = doc.getText(startOffset, length);
 		    char[] charArray = possibleText.toCharArray();
 		    for (int i = 0; (! endFound && i < length ) ; i++) {  
-			if (Character.isWhitespace(charArray[i])) {
+			if (Character.isWhitespace(charArray[i]) || charArray[i] == '(' || charArray[i] == ')' || charArray[i] == '<' || charArray[i] == '>') {
 			    endFound = true;
 			    wordEnd = startOffset + i - 1;
 			}
@@ -116,12 +116,10 @@ public class HyperlinkMouseHandler extends MouseInputAdapter {
 		int wordLength = wordEnd - wordStart + 1;
 		if (wordLength > 3) {
 		    String word = doc.getText(wordStart, wordLength);
-		    System.out.println("word is " + word);
 		    if (word.indexOf("://") != -1) {
 			try {
 			    URL urlSelected = new URL(word);
 			    
-			    System.out.println("url is " + urlSelected);
 			    return new URLSelection(editor, urlSelected, wordStart, wordEnd);
 			} catch (MalformedURLException mue) {
 			}
