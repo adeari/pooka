@@ -1039,7 +1039,11 @@ FolderFilters.display.ColorFilter.editorClass=net.suberic.pooka.gui.filter.Color
 FolderFilters.display.FontFilter.class=net.suberic.pooka.gui.filter.FontDisplayFilter
 FolderFilters.display.FontFilter.editorClass=net.suberic.pooka.gui.filter.FontFilterEditor
 
+CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
+CachingFolderInfo.sentFolderDefaultDisplayFilters=Uncached
 FolderInfo.defaultDisplayFilters=Unread
+FolderInfo.sentFolderDefaultDisplayFilters=Unread
+
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.searchTerm=Search.searchTerms.Seen
 FolderInfo.defaultDisplayFilters.Unread.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Unread.action.class=net.suberic.pooka.gui.filter.FontDisplayFilter
@@ -1049,8 +1053,6 @@ FolderInfo.defaultDisplayFilters.Uncached.searchTerm.searchTerm=Search.searchTer
 FolderInfo.defaultDisplayFilters.Uncached.searchTerm.operation=Search.operations.False
 FolderInfo.defaultDisplayFilters.Uncached.action.class=net.suberic.pooka.gui.filter.ColorDisplayFilter
 FolderInfo.defaultDisplayFilters.Uncached.action.rgb=-8648439
-
-CachingFolderInfo.defaultDisplayFilters=Unread:Uncached
 
 # colors
 Pooka.background=0

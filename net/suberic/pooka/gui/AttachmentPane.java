@@ -515,19 +515,26 @@ public class AttachmentPane extends JPanel {
   public void saveAttachment() {
     Attachment attachment = getSelectedAttachment();
     if (attachment != null) {
-      JFileChooser saveChooser = new JFileChooser();
+      JFileChooser saveChooser;
+      String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+      if (currentDirectoryPath == "")
+	saveChooser = new JFileChooser();
+      else
+	saveChooser = new JFileChooser(currentDirectoryPath);
       
       String fileName = attachment.getName();
       if (fileName != null)
 	saveChooser.setSelectedFile(new File(fileName));
       
       int saveConfirm = saveChooser.showSaveDialog(this);
-      if (saveConfirm == JFileChooser.APPROVE_OPTION) 
+      Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", saveChooser.getCurrentDirectory().getPath(), true);
+      if (saveConfirm == JFileChooser.APPROVE_OPTION) {
 	try {
 	  saveFileAs(attachment, saveChooser.getSelectedFile());
 	} catch (IOException exc) {
 	  message.getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
 	}
+      }
     }
   }
   

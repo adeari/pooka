@@ -18,21 +18,20 @@ import net.suberic.pooka.gui.FolderTableModel;
  */
 
 public class UIDFolderInfo extends FolderInfo {
-    protected HashMap uidToInfoTable = new HashMap();
-    protected long uidValidity;
-
-    // the resource for the folder disconnected message
-    protected static String disconnectedMessage = "error.UIDFolder.disconnected";
-
-    public UIDFolderInfo(StoreInfo parent, String fname) {
-	super(parent, fname);
-	
-    }
-
-    public UIDFolderInfo(FolderInfo parent, String fname) {
-	super(parent, fname);
-    }
-
+  protected HashMap uidToInfoTable = new HashMap();
+  protected long uidValidity;
+  
+  // the resource for the folder disconnected message
+  protected static String disconnectedMessage = "error.UIDFolder.disconnected";
+  
+  public UIDFolderInfo(StoreInfo parent, String fname) {
+    super(parent, fname);
+  }
+  
+  public UIDFolderInfo(FolderInfo parent, String fname) {
+    super(parent, fname);
+  }
+  
   /**
    * Loads all Messages into a new FolderTableModel, sets this 
    * FolderTableModel as the current FolderTableModel, and then returns
@@ -319,11 +318,13 @@ public class UIDFolderInfo extends FolderInfo {
 	    mi = new MessageInfo(newMsg, this);
 	    // this has already been fetched; no need to do so again.
 	    mi.setFetched(true);
+	    
 	    addedProxies.add(new MessageProxy(getColumnValues(), mi));
 	    messageToInfoTable.put(newMsg, mi);
 	    uidToInfoTable.put(new Long(uid), mi);
 	  }
 	}
+	
 	addedProxies.removeAll(applyFilters(addedProxies));
 	if (addedProxies.size() > 0) {
 	  getFolderTableModel().addRows(addedProxies);

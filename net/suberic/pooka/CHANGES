@@ -1,3 +1,8 @@
+attachment file choosers now remember your last directory, instead of always
+starting in your home directory.
+
+messages in Sent folders are no longer shown as new.
+
 fixed theme support in preview pane mode.
 
 changed the way we load the sun ssl class so that pooka will work on 
@@ -6,7 +11,7 @@ ibm's jdk 1.4.
 made it so you get a warning message if you try to start with an unsupported
 JDK.
 
-add a find in page feature for the Read Messages.
+add a find in page feature for Read Messages.
 
 fixed a problem with the focus not always returning to the correct component.
 

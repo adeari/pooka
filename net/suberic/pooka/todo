@@ -3,6 +3,9 @@
 *) make there a build option for help only, so i can switch it in 
 	WebStart.
 
+*) make sure that if we lose the server connection while loading/caching the
+message, that we don't actually cache the partially-loaded message.
+
 *) regexp? (add search/replace to editor)
   -- started.  todo:
 	*) add feature to NewMessage
@@ -16,8 +19,6 @@
 *) check why the bcc field sometimes doesn't show the address book icon.
 
 *) more doc
-
-*) fix sent folders to ignore new message tags.
 
 *) fix key focus in preview pane.
 
@@ -49,6 +50,7 @@
 *) fix up the error messages, and make sure that they look ok.
 
 *) status messages:  make them appear and disappear at appropriate times.
+	-- Comparing new messages to current list... never goes away.
 
 *) document keybindings
 	-- keybindings for address book

@@ -439,10 +439,15 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    */
   
   public int getFirstUnreadMessage() {
+
+    
     // one part brute, one part force, one part ignorance.
     
     if (Pooka.isDebug())
       System.out.println("getting first unread message");
+    
+    if (! tracksUnreadMessages()) 
+      return -1;
     
     if (getFolderTableModel() == null)
       return -1;
@@ -482,18 +487,25 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   }
 
   public boolean hasUnread() {
-    return (getUnreadCount() > 0);
+    if (! tracksUnreadMessages()) 
+      return false;
+    else
+      return (getUnreadCount() > 0);
   }
 
   /*
   public int getUnreadCount() {
-    try {
-      if (getCache() != null) 
-	unreadCount = getCache().getUnreadMessageCount();
-    } catch (MessagingException me) {
+    if (! tracksUnreadMessages()) 
+      return -1;
+    else {
+      try {
+        if (getCache() != null) 
+	  unreadCount = getCache().getUnreadMessageCount();
+      } catch (MessagingException me) {
       
+      } 
+      return unreadCount;
     }
-    return unreadCount;
   }
   
   public int getMessageCount() {
@@ -519,11 +531,13 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       }
 
       if (isConnected()) {
-	unreadCount = getFolder().getUnreadMessageCount();
+	if (tracksUnreadMessages()) 
+	  unreadCount = getFolder().getUnreadMessageCount();
 	messageCount = getFolder().getMessageCount();
       } else if (getCache() != null) { 
 	messageCount = getCache().getMessageCount();
-	unreadCount = getCache().getUnreadMessageCount();
+	if (! tracksUnreadMessages()) 
+	  unreadCount = getCache().getUnreadMessageCount();
       } else {
 	// if there's no cache and no connection, don't do anything.
       }
@@ -1030,7 +1044,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * The resource for the default display filters.
    */
   protected String getDefaultDisplayFiltersResource() {
-    return "CachingFolderInfo.defaultDisplayFilters";
+    if (isSentFolder())
+      return "CachingFolderInfo.sentFolderDefaultDisplayFilters";
+    else
+      return "CachingFolderInfo.defaultDisplayFilters";
   }
 
   /**

@@ -493,6 +493,7 @@ public class MessageProxy {
       for (int i = 0; i < tmpMatches.size(); i++) {
 	newMatchingFilters[i] = (DisplayFilter) tmpMatches.elementAt(i);
       }
+
       return newMatchingFilters;
     }
 
@@ -756,10 +757,16 @@ public class MessageProxy {
    * Opens up a dialog to save the message to a file.
    */
   public void saveMessageToFile() {
-    JFileChooser saveChooser = new JFileChooser();
+    JFileChooser saveChooser;
+    String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+    if (currentDirectoryPath == "")
+      saveChooser = new JFileChooser();
+    else
+      saveChooser = new JFileChooser(currentDirectoryPath);
     
     int saveConfirm = saveChooser.showSaveDialog(Pooka.getMainPanel().getContentPanel().getUIComponent());
-    
+    Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", saveChooser.getCurrentDirectory().getPath(), true);
+
     if (saveConfirm == JFileChooser.APPROVE_OPTION) 
       try {
 	getMessageInfo().saveMessageAs(saveChooser.getSelectedFile());

@@ -74,8 +74,12 @@ public class MessageInfo {
       return getMessage().isSet(Flags.Flag.FLAGGED);
     else if (flagName.equals("FLAG.RECENT"))
       return getMessage().isSet(Flags.Flag.RECENT);
-    else if (flagName.equals("FLAG.SEEN"))
-      return getMessage().isSet(Flags.Flag.SEEN);
+    else if (flagName.equals("FLAG.SEEN")) {
+      if (folderInfo != null && ! folderInfo.tracksUnreadMessages())
+	return true;
+      else
+	return getMessage().isSet(Flags.Flag.SEEN);
+    }
     
     return false;
   }
@@ -736,11 +740,15 @@ public class MessageInfo {
    * seen.
    */
   public boolean isSeen() {
-    try {
-      return flagIsSet("FLAG.SEEN");
-    } catch (MessagingException me) {
+   
+    if (folderInfo != null && ! folderInfo.tracksUnreadMessages()) {
       return true;
-    }
+    } else
+      try {
+	return flagIsSet("FLAG.SEEN");
+      } catch (MessagingException me) {
+	return true;
+      }
   }
 
   /**
@@ -748,11 +756,16 @@ public class MessageInfo {
    * setFlag(Flags.Flag.SEEN, newValue) on the wrapped Message.
    */
   public void setSeen(boolean newValue) throws MessagingException {
-    boolean seen = isSeen();
-    if (newValue != seen) {
-      Message m = getRealMessage();
-      m.setFlag(Flags.Flag.SEEN, newValue);
-      getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
+    
+    if (folderInfo != null && ! folderInfo.tracksUnreadMessages())
+      return;
+    else {
+      boolean seen = isSeen();
+      if (newValue != seen) {
+	Message m = getRealMessage();
+	m.setFlag(Flags.Flag.SEEN, newValue);
+	getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
+      }
     }
   }
   

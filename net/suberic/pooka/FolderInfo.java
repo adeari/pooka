@@ -110,6 +110,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   
   private boolean notifyNewMessagesMain = true;
   private boolean notifyNewMessagesNode = true;
+  private boolean tracksUnreadMessages = true;
   
   protected FetchProfile fetchProfile = null;
 
@@ -896,74 +897,77 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
 
 
-    /**
-     * This just checks to see if we can get a NewMessageCount from the
-     * folder.  As a brute force method, it also accesses the folder
-     * at every check.  It's nasty, but it _should_ keep the Folder open..
-     */
-    public void checkFolder() throws javax.mail.MessagingException {
-      if (Pooka.isDebug())
-	System.out.println("checking folder " + getFolderName());
-      
-      // i'm taking this almost directly from ICEMail; i don't know how
-      // to keep the stores/folders open, either.  :)
-      
-      if (isConnected()) {
-	//try {
-	//Store s = getParentStore().getStore();
-	Folder current = getFolder();
-	if (current != null && current.isOpen()) {
-	  current.getNewMessageCount();
-	  current.getUnreadMessageCount();
-	}
-	//} catch ( MessagingException me ) {
-	//  if ( ! s.isConnected() )
-	//    s.connect();
-	//}
-	
-	resetMessageCounts();
-      }
-    }
-
-    /**
-     * Gets the row number of the first unread message.  Returns -1 if
-     * there are no unread messages, or if the FolderTableModel is not
-     * set or empty.
-     */
+  /**
+   * This just checks to see if we can get a NewMessageCount from the
+   * folder.  As a brute force method, it also accesses the folder
+   * at every check.  It's nasty, but it _should_ keep the Folder open..
+   */
+  public void checkFolder() throws javax.mail.MessagingException {
+    if (Pooka.isDebug())
+      System.out.println("checking folder " + getFolderName());
     
-    public int getFirstUnreadMessage() {
-	if (Pooka.isDebug())
- 	    System.out.println("getting first unread message");
-	
- 	if (getFolderTableModel() == null)
- 	    return -1;
-	
- 	try {
- 	    int countUnread = 0;
- 	    int i;
- 	    if (unreadCount > 0) {
-		
-		// one part brute, one part force, one part ignorance.
-		
-		Message[] messages = getFolder().getMessages();
-		for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
-		    if (!(messages[i].isSet(Flags.Flag.SEEN))) 
-			countUnread++;
-		}
-		if (Pooka.isDebug())
-		    System.out.println("Returning " + i);
-		return i + 1;
-	    } else { 
-		if (Pooka.isDebug())
-		    System.out.println("Returning -1");
-		return -1;
-	    }
-	} catch (MessagingException me) {
-	    if (Pooka.isDebug())
-		System.out.println("Messaging Exception.  Returning -1");
-	    return -1;
-	}
+    // i'm taking this almost directly from ICEMail; i don't know how
+    // to keep the stores/folders open, either.  :)
+    
+    if (isConnected()) {
+      //try {
+      //Store s = getParentStore().getStore();
+      Folder current = getFolder();
+      if (current != null && current.isOpen()) {
+	current.getNewMessageCount();
+	current.getUnreadMessageCount();
+      }
+      //} catch ( MessagingException me ) {
+      //  if ( ! s.isConnected() )
+      //    s.connect();
+      //}
+      
+      resetMessageCounts();
     }
+  }
+  
+  /**
+   * Gets the row number of the first unread message.  Returns -1 if
+   * there are no unread messages, or if the FolderTableModel is not
+   * set or empty.
+   */
+  
+  public int getFirstUnreadMessage() {
+    if (Pooka.isDebug())
+      System.out.println("getting first unread message");
+    
+    if (! tracksUnreadMessages()) 
+      return -1;
+    
+    if (getFolderTableModel() == null)
+      return -1;
+    
+    try {
+      int countUnread = 0;
+      int i;
+      if (unreadCount > 0) {
+	
+	// one part brute, one part force, one part ignorance.
+	
+	Message[] messages = getFolder().getMessages();
+	for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
+	  if (!(messages[i].isSet(Flags.Flag.SEEN))) 
+	    countUnread++;
+	}
+	if (Pooka.isDebug())
+	  System.out.println("Returning " + i);
+	return i + 1;
+      } else { 
+	if (Pooka.isDebug())
+	  System.out.println("Returning -1");
+	return -1;
+      }
+    } catch (MessagingException me) {
+      if (Pooka.isDebug())
+	System.out.println("Messaging Exception.  Returning -1");
+      return -1;
+    }
+  }
     
   /**
    * This updates the children of the current folder.  Generally called
@@ -1831,7 +1835,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * The resource for the default display filters.
    */
   protected String getDefaultDisplayFiltersResource() {
-    return "FolderInfo.defaultDisplayFilters";
+    if (isSentFolder())
+      return "FolderInfo.sentFolderDefaultDisplayFilters";
+    else
+      return "FolderInfo.defaultDisplayFilters";
   }
   
   List filterHeaders = null;
@@ -2110,11 +2117,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
 
   public boolean hasUnread() {
-    return (unreadCount > 0);
+    return (tracksUnreadMessages() && unreadCount > 0);
   }
 
   public int getUnreadCount() {
-    return unreadCount;
+    if (!tracksUnreadMessages())
+      return 0;
+    else
+      return unreadCount;
   }
     
   public int getMessageCount() {
@@ -2154,6 +2164,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       getFolderNode().popupMenu = null;
   }
   
+  
   public boolean isSentFolder() {
     return sentFolder;
   }
@@ -2163,7 +2174,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     sentFolder = newValue;
     setNotifyNewMessagesMain(! newValue);
     setNotifyNewMessagesNode(! newValue);
-  
+    setTracksUnreadMessages (! newValue);
+    createFilters();
   }
 
   /**
@@ -2184,25 +2196,33 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     resetDefaultActions();
   }
 
-    public boolean notifyNewMessagesMain() {
-	return notifyNewMessagesMain;
-    }
-
-    public void setNotifyNewMessagesMain(boolean newValue) {
-	notifyNewMessagesMain = newValue;
-    }
-
-    public boolean notifyNewMessagesNode() {
-	return notifyNewMessagesNode;
-    }
-
-    public void setNotifyNewMessagesNode(boolean newValue) {
-	notifyNewMessagesNode = newValue;
-    }
-
-    public MessageFilter[] getDisplayFilters() {
-	return displayFilters;
-    }
+  public boolean notifyNewMessagesMain() {
+    return notifyNewMessagesMain;
+  }
+  
+  public void setNotifyNewMessagesMain(boolean newValue) {
+    notifyNewMessagesMain = newValue;
+  }
+  
+  public boolean notifyNewMessagesNode() {
+    return notifyNewMessagesNode;
+  }
+  
+  public void setTracksUnreadMessages(boolean newValue) {
+    tracksUnreadMessages = newValue;
+  }
+  
+  public boolean tracksUnreadMessages() {
+    return tracksUnreadMessages;
+  }
+  
+  public void setNotifyNewMessagesNode(boolean newValue) {
+    notifyNewMessagesNode = newValue;
+  }
+  
+  public MessageFilter[] getDisplayFilters() {
+    return displayFilters;
+  }
 
   /**
    * This forces an update of both the total and unread message counts.
@@ -2217,7 +2237,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	  System.out.println("running resetMessageCounts.  getFolder() is null.");
       }
       
-      unreadCount = getFolder().getUnreadMessageCount();
+      if (tracksUnreadMessages())
+	unreadCount = getFolder().getUnreadMessageCount();
+
       messageCount = getFolder().getMessageCount();
     } catch (MessagingException me) {
       // if we lose the connection to the folder, we'll leave the old

@@ -266,12 +266,20 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
    * single entry in the File array.
    */
   public File[] getFiles(String title, String buttonText) {
-    JFileChooser jfc = new JFileChooser();
+    JFileChooser jfc;
+    String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+    if (currentDirectoryPath == "")
+      jfc = new JFileChooser();
+    else
+      jfc = new JFileChooser(currentDirectoryPath);
+      
     jfc.setDialogTitle(title);
     jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
     jfc.setMultiSelectionEnabled(false);
     int a = jfc.showDialog(this, buttonText);
     
+    Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", jfc.getCurrentDirectory().getPath(), true);
+
     if (a == JFileChooser.APPROVE_OPTION)
       return new File[] {jfc.getSelectedFile()};
     else

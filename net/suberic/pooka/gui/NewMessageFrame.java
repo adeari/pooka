@@ -20,26 +20,26 @@ import java.io.File;
  */
 public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 
-    public boolean firstShow = true;
-
-    /**
-     * Creates a NewMessageFrame from the given Message.
-     */
-
-    public NewMessageFrame(NewMessageProxy newMsgProxy) {
-	super(newMsgProxy);
-
-	configureMessageFrame();
-
-	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	this.addWindowListener(new WindowAdapter() {
-	    public void windowClosing(WindowEvent we) {
-	      handleClose();
-	    }
-	  });
+  public boolean firstShow = true;
+  
+  /**
+   * Creates a NewMessageFrame from the given Message.
+   */
+  
+  public NewMessageFrame(NewMessageProxy newMsgProxy) {
+    super(newMsgProxy);
+    
+    configureMessageFrame();
+    
+    this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    this.addWindowListener(new WindowAdapter() {
+	public void windowClosing(WindowEvent we) {
+	  handleClose();
+	}
+      });
 	
-    }
-
+  }
+  
   public NewMessageFrame(NewMessageInternalFrame source) {
     this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
     messageDisplay = source.getMessageDisplay();
@@ -66,43 +66,43 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
     
   }
 
-    /**
-     * This configures the MessageFrame.  This means that here is 
-     * where we create the headerPanel and editorPane and add them to the 
-     * splitPane.
-     */
-    protected void configureMessageFrame() {
-
-	try {
-	    this.createDefaultActions();
-	    
-	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
-	    
-	    messageDisplay = new NewMessageDisplayPanel(this);
-	    messageDisplay.configureMessageDisplay();
-	    
-	    toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
-	    
-	    this.getContentPane().add("North", toolbar);
-	    this.getContentPane().add("Center", messageDisplay);
-	    
-	    toolbar.setActive(this.getActions());
-	    
-	    keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "NewMessageWindow.keyBindings", Pooka.getResources());
-	    //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
-	    
-	    keyBindings.setActive(getActions());
-	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
-	    me.printStackTrace();
-	}
-	
-	configureInterfaceStyle();
-
+  /**
+   * This configures the MessageFrame.  This means that here is 
+   * where we create the headerPanel and editorPane and add them to the 
+   * splitPane.
+   */
+  protected void configureMessageFrame() {
+    
+    try {
+      this.createDefaultActions();
+      
+      this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
+      
+      messageDisplay = new NewMessageDisplayPanel(this);
+      messageDisplay.configureMessageDisplay();
+      
+      toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
+      
+      this.getContentPane().add("North", toolbar);
+      this.getContentPane().add("Center", messageDisplay);
+      
+      toolbar.setActive(this.getActions());
+      
+      keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "NewMessageWindow.keyBindings", Pooka.getResources());
+      //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+      
+      keyBindings.setActive(getActions());
+    } catch (MessagingException me) {
+      showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
+      me.printStackTrace();
     }
     
-
- /**
+    configureInterfaceStyle();
+    
+  }
+  
+  
+  /**
    * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
@@ -119,17 +119,17 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
   }   
 
 
-    /**
-     * Closes the message window.  This checks to see if the underlying
-     * message is modified, and if so, pops up a dialog to make sure that
-     * you really want to close the window.
-     *
-     * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
-     */
-    public void closeMessageUI() {
-      this.dispose();
-    }
-
+  /**
+   * Closes the message window.  This checks to see if the underlying
+   * message is modified, and if so, pops up a dialog to make sure that
+   * you really want to close the window.
+   *
+   * Currently, saveDraft isn't implemented, so 'yes' acts as 'cancel'.
+   */
+  public void closeMessageUI() {
+    this.dispose();
+  }
+  
   private void handleClose() {
     // first, make sure this is still a valid NewMessageUI.
     NewMessageProxy nmp = (NewMessageProxy)getMessageProxy();
@@ -186,87 +186,95 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
     }
   }
 
-    /**
-     * This returns the values in the MesssageWindow as a set of 
-     * InternetHeaders.
-     */
-    public InternetHeaders getMessageHeaders() throws MessagingException {
-	return getNewMessageDisplay().getMessageHeaders();
-    }
+  /**
+   * This returns the values in the MesssageWindow as a set of 
+   * InternetHeaders.
+   */
+  public InternetHeaders getMessageHeaders() throws MessagingException {
+    return getNewMessageDisplay().getMessageHeaders();
+  }
+  
+  /**
+   * This registers the Keyboard action not only for the FolderWindow
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
+   *            String aCommand, KeyStroke aKeyStroke, int aCondition)
+   */
+  
+  public void registerKeyboardAction(ActionListener anAction,
+				     String aCommand, KeyStroke aKeyStroke, int aCondition) {
+    if (messageDisplay != null)
+      messageDisplay.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+  }
+  
+  /**
+   * This unregisters the Keyboard action not only for the FolderWindow
+   * itself, but also for pretty much all of its children, also.  This
+   * is to work around something which I think is a bug in jdk 1.2.
+   * (this is not really necessary in jdk 1.3.)
+   *
+   * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
+   */
+  
+  public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
+    if (messageDisplay != null)
+      messageDisplay.unregisterKeyboardAction(aKeyStroke);
+    toolbar.unregisterKeyboardAction(aKeyStroke);
+  }
 
-    /**
-     * This registers the Keyboard action not only for the FolderWindow
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.registerKeyboardAction(ActionListener anAction,
-     *            String aCommand, KeyStroke aKeyStroke, int aCondition)
-     */
-
-    public void registerKeyboardAction(ActionListener anAction,
-		    String aCommand, KeyStroke aKeyStroke, int aCondition) {
-	if (messageDisplay != null)
-	    messageDisplay.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-	toolbar.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-    }
+  /**
+   * This notifies the NewMessageUI that the attachment at the 
+   * provided index has been removed.  This does not actually remove
+   * the attachment, but rather should be called by the MessageProxy
+   * when an attachment has been removed.
+   */
+  public void attachmentRemoved(int index) {
+    getNewMessageDisplay().attachmentRemoved(index);
+  }
+  
+  /**
+   * This notifies the NewMessageUI that an attachment has been added
+   * at the provided index.  This does not actually add an attachment,
+   * but rather should be called by the MessageProxy when an attachment
+   * has been added.
+   */
+  public void attachmentAdded(int index) {
+    getNewMessageDisplay().attachmentAdded(index);
+  }
+  
+  /**
+   * Pops up a JFileChooser and returns the results.
+   *
+   * Note:  i'd like to have this working so that you can attach multiple
+   * files at once, but it seems that the JFileChooser really doesn't 
+   * want to return an array with anything in it for getSelectedFiles().  
+   * So for now, I'll leave the Pooka API as is, but only ever return a 
+   * single entry in the File array.
+   */
+  public File[] getFiles(String title, String buttonText) {
+    JFileChooser jfc;
+    String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+    if (currentDirectoryPath == "")
+      jfc = new JFileChooser();
+    else
+      jfc = new JFileChooser(currentDirectoryPath);
+      
+    jfc.setDialogTitle(title);
+    jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+    jfc.setMultiSelectionEnabled(false);
+    int a = jfc.showDialog(this, buttonText);
     
-    /**
-     * This unregisters the Keyboard action not only for the FolderWindow
-     * itself, but also for pretty much all of its children, also.  This
-     * is to work around something which I think is a bug in jdk 1.2.
-     * (this is not really necessary in jdk 1.3.)
-     *
-     * Overrides JComponent.unregisterKeyboardAction(KeyStroke aKeyStroke)
-     */
+    Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", jfc.getCurrentDirectory().getPath(), true);
 
-    public void unregisterKeyboardAction(KeyStroke aKeyStroke) {
-	if (messageDisplay != null)
-	    messageDisplay.unregisterKeyboardAction(aKeyStroke);
-	toolbar.unregisterKeyboardAction(aKeyStroke);
-    }
-
-    /**
-     * This notifies the NewMessageUI that the attachment at the 
-     * provided index has been removed.  This does not actually remove
-     * the attachment, but rather should be called by the MessageProxy
-     * when an attachment has been removed.
-     */
-    public void attachmentRemoved(int index) {
-	getNewMessageDisplay().attachmentRemoved(index);
-    }
-
-    /**
-     * This notifies the NewMessageUI that an attachment has been added
-     * at the provided index.  This does not actually add an attachment,
-     * but rather should be called by the MessageProxy when an attachment
-     * has been added.
-     */
-    public void attachmentAdded(int index) {
-	getNewMessageDisplay().attachmentAdded(index);
-    }
-
-    /**
-     * Pops up a JFileChooser and returns the results.
-     *
-     * Note:  i'd like to have this working so that you can attach multiple
-     * files at once, but it seems that the JFileChooser really doesn't 
-     * want to return an array with anything in it for getSelectedFiles().  
-     * So for now, I'll leave the Pooka API as is, but only ever return a 
-     * single entry in the File array.
-     */
-    public File[] getFiles(String title, String buttonText) {
-	JFileChooser jfc = new JFileChooser();
-	jfc.setDialogTitle(title);
-	jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-	jfc.setMultiSelectionEnabled(false);
-	int a = jfc.showDialog(this, buttonText);
-
-	if (a == JFileChooser.APPROVE_OPTION)
-	    return new File[] {jfc.getSelectedFile()};
-	else
-	    return null;
-    }
+    if (a == JFileChooser.APPROVE_OPTION)
+      return new File[] {jfc.getSelectedFile()};
+    else
+      return null;
+  }
   
   /**
    * Shows an Address Selection form for the given AddressEntryTextArea.

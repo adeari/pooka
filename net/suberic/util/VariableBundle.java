@@ -17,6 +17,7 @@ import java.io.*;
 public class VariableBundle extends Object {
   private Properties properties;
   private Properties writableProperties;
+  private Properties temporaryProperties = new Properties();
   private ResourceBundle resources;
   private VariableBundle parentProperties;
   private File saveFile;
@@ -76,90 +77,106 @@ public class VariableBundle extends Object {
     properties = new Properties();
     resources = null;
   }
-    public String getProperty(String key, String defaultValue) {
-	String returnValue;
-
-	returnValue = writableProperties.getProperty(key, "");
+  public String getProperty(String key, String defaultValue) {
+    String returnValue;
+    
+    returnValue = temporaryProperties.getProperty(key, "");
+    if (returnValue == "") {
+      returnValue = writableProperties.getProperty(key, "");
+      if (returnValue == "") {
+	returnValue = properties.getProperty(key, "");
 	if (returnValue == "") {
-	    returnValue = properties.getProperty(key, "");
-	    if (returnValue == "") {
-		returnValue=getParentProperty(key, "");
-		if (returnValue == "") {
-		    if (resources != null)
-			try {
-			    returnValue = resources.getString(key);
-			} catch (MissingResourceException mre) {
-			    returnValue=defaultValue;
-			} 
-		    else
-			returnValue = defaultValue;
-		}
-	    }
+	  returnValue=getParentProperty(key, "");
+	  if (returnValue == "") {
+	    if (resources != null)
+	      try {
+		returnValue = resources.getString(key);
+	      } catch (MissingResourceException mre) {
+		returnValue=defaultValue;
+	      } 
+	    else
+	      returnValue = defaultValue;
+	  }
 	}
-	return returnValue;
+      }
     }
+    return returnValue;
+  }
 
-    public String getProperty(String key) throws MissingResourceException {
-	String returnValue;
-
-	returnValue = getProperty(key, "");
-	if (returnValue == "") {
-	    throw new MissingResourceException(key, "", key);
-	}
-	return returnValue;
+  public String getProperty(String key) throws MissingResourceException {
+    String returnValue;
+    
+    returnValue = getProperty(key, "");
+    if (returnValue == "") {
+      throw new MissingResourceException(key, "", key);
     }
-
-
-
-    private String getParentProperty(String key, String defaultValue) {
-	if (parentProperties==null) {
-	    return defaultValue;
-	} else {
-	    return parentProperties.getProperty(key, defaultValue);
-	}
+    return returnValue;
+  }
+  
+  
+  
+  private String getParentProperty(String key, String defaultValue) {
+    if (parentProperties==null) {
+      return defaultValue;
+    } else {
+      return parentProperties.getProperty(key, defaultValue);
     }
+  }
+  
+  
+  public ResourceBundle getResources() {
+    return resources;
+  }
+  
+  public void setResourceBundle (ResourceBundle newResources) {
+    resources = newResources;
+  }
+  
+  public Properties getProperties() {
+    return properties;
+  }
+  
+  public void setProperties(Properties newProperties) {
+    properties = newProperties;
+  }
 
-
-    public ResourceBundle getResources() {
-	return resources;
+  public VariableBundle getParentProperties() {
+    return parentProperties;
+  }
+  
+  public Properties getWritableProperties() {
+    return writableProperties;
+  }
+  
+  public void setProperty(String propertyName, String propertyValue) {
+    temporaryProperties.remove(propertyName);
+    writableProperties.setProperty(propertyName, propertyValue);
+    unRemoveProperty(propertyName);
+    fireValueChanged(propertyName);
+  }
+  
+  /**
+   * sets a property as temporary (so it won't be saved).
+   */
+  public void setProperty(String propertyName, String propertyValue, boolean temporary) {
+    if (temporary) {
+      temporaryProperties.setProperty(propertyName, propertyValue);
+      fireValueChanged(propertyName);
+    } else {
+      setProperty(propertyName, propertyValue);
     }
-
-    public void setResourceBundle (ResourceBundle newResources) {
-	resources = newResources;
-    }
-
-    public Properties getProperties() {
-	return properties;
-    }
-
-    public void setProperties(Properties newProperties) {
-	properties = newProperties;
-    }
-
-    public VariableBundle getParentProperties() {
-	return parentProperties;
-    }
-
-    public Properties getWritableProperties() {
-	return writableProperties;
-    }
-
-    public void setProperty(String propertyName, String propertyValue) {
-	writableProperties.setProperty(propertyName, propertyValue);
-	unRemoveProperty(propertyName);
-	fireValueChanged(propertyName);
-    }
-
-    /**
-     * Returns a property which has multiple values separated by a ':' (colon)
-     * as a java.util.Enumeration.
-     */
-
-    public Enumeration getPropertyAsEnumeration(String propertyName, String defaultValue) {
-	StringTokenizer tokens = new StringTokenizer(getProperty(propertyName, defaultValue), ":");
-	return tokens;
-    }
-
+  }
+  
+  /**
+   * Returns a property which has multiple values separated by a ':' (colon)
+   * as a java.util.Enumeration.
+   */
+  
+  public Enumeration getPropertyAsEnumeration(String propertyName, String defaultValue) {
+    StringTokenizer tokens = new StringTokenizer(getProperty(propertyName, defaultValue), ":");
+    return tokens;
+  }
+  
   /**
    * Converts a value which has multiple values separated by a ':' (colon)
    * to a java.util.Vector.
