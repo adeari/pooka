@@ -107,6 +107,8 @@ public class MessageProxy {
 	    new ActionWrapper(new MoveAction(), folderThread),
 	    new ActionWrapper(new ReplyAction(), folderThread),
 	    new ActionWrapper(new ReplyAllAction(), folderThread),
+	    new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
+	    new ActionWrapper(new ReplyAllWithAttachmentsAction(), folderThread),
 	    new ActionWrapper(new ForwardAction(), folderThread),
 	    new ActionWrapper(new DeleteAction(), folderThread),
 	    new ActionWrapper(new PrintAction(), folderThread)
@@ -237,6 +239,27 @@ public class MessageProxy {
 	}
     }
 
+    private void replyToMessage(boolean replyAll, boolean withAttachments) {
+	if (getMessageUI() != null)
+	    getMessageUI().setBusy(true);
+	
+	FolderDisplayUI fw = getFolderDisplayUI();
+	if (fw != null)
+	    fw.setBusy(true);;
+	try {
+	    NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateReply(replyAll, withAttachments));
+	    MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
+	    nmui.openMessageUI();
+	} catch (MessagingException me) {
+	    showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
+	}
+	if (fw != null)
+	    fw.setBusy(false);
+	if (getMessageUI() != null)
+	    getMessageUI().setBusy(true);;
+	
+    }
+    
     /**
      * Deletes the Message from the current Folder.  If a Trash folder is
      * set, this method moves the message into the Trash folder.  If no
@@ -264,7 +287,10 @@ public class MessageProxy {
     }
 
     public void showError(String message, Exception ex) {
-	getMessageUI().showError(message + ex.getMessage());
+	if (getMessageUI() != null) 
+	    getMessageUI().showError(message + ex.getMessage());
+	else
+	    Pooka.getUIFactory().showError(message + ex.getMessage());
     }
 
     /**
@@ -499,24 +525,18 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageUI() != null)
-		getMessageUI().setBusy(true);
+	    replyToMessage(false, false);
+	}
+    }
 
-	    FolderDisplayUI fw = getFolderDisplayUI();
-	    if (fw != null)
-		fw.setBusy(true);;
-	    try {
-		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().populateReply(false);
-		NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
-		MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
-		nmui.openMessageUI();
-	    } catch (MessagingException me) {
-		showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
-	    }
-	    if (fw != null)
-		fw.setBusy(false);
-	    if (getMessageUI() != null)
-		getMessageUI().setBusy(true);;
+    public class ReplyWithAttachmentsAction extends AbstractAction {
+
+	ReplyWithAttachmentsAction() {
+	    super("message-reply-with-attachments");
+	}
+
+	public void actionPerformed(ActionEvent e) {
+	    replyToMessage(false, true);
 	}
     }
 
@@ -527,26 +547,19 @@ public class MessageProxy {
 	}
 
 	public void actionPerformed(ActionEvent e) {
-	    if (getMessageUI() != null)
-		getMessageUI().setBusy(true);
-	    FolderDisplayUI fw = getFolderDisplayUI();
-	    if (fw != null)
-		fw.setBusy(true);;
-	    try {
-		javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage)getMessageInfo().populateReply(true);
+	    replyToMessage(true, false);
+	}  
+    }
+    
+    public class ReplyAllWithAttachmentsAction extends AbstractAction {
 
-		NewMessageProxy nmp = new NewMessageProxy(new NewMessageInfo(m));
-		MessageUI nmui = getPookaUIFactory().createMessageUI(nmp);
-		nmui.openMessageUI();
-
-	    } catch (MessagingException me) {
-		showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
-	    }
-	    if (fw != null)
-		fw.setBusy(false);
-	    if (getMessageUI() != null)
-		getMessageUI().setBusy(true);;
+	ReplyAllWithAttachmentsAction() {
+	    super("message-reply-all-with-attachments");
 	}
+
+	public void actionPerformed(ActionEvent e) {
+	    replyToMessage(true, true);
+	}	
     }
 
     public class ForwardAction extends AbstractAction {

@@ -403,7 +403,7 @@ public class MessageInfo {
      * This populates a message which is a reply to the current
      * message.
      */
-    public Message populateReply(boolean replyAll) 
+    public NewMessageInfo populateReply(boolean replyAll, boolean withAttachments) 
 	throws MessagingException {
 	MimeMessage newMsg = (MimeMessage) getRealMessage().reply(replyAll);
 
@@ -431,9 +431,25 @@ public class MessageInfo {
 	    getDefaultProfile().removeFromAddress(newMsg); 
 	}
 
-	return newMsg;
+	NewMessageInfo returnValue = new NewMessageInfo(newMsg);
+
+	if (withAttachments) {
+	    returnValue.attachments = new AttachmentBundle();
+	    returnValue.attachments.addAll(attachments);
+	    returnValue.attachmentsLoaded=true;
+	}
+
+	return returnValue;
     }
 
+    /**
+     * This populates a message which is a reply to the current
+     * message.
+     */
+    public NewMessageInfo populateReply(boolean replyAll)
+	throws MessagingException {
+	return populateReply(replyAll, false);
+    }
     /**
      * This populates a new message which is a forwarding of the
      * current message.
