@@ -1,4 +1,9 @@
 *) document keybindings
+	-- keybinding for undo/redo
+	-- keybindings for message frame(s)
+	-- keybindings for address book
+	-- keybindings for saving attachments.
+	-- keybindings for opening folders.
 
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
