@@ -336,13 +336,13 @@ public class MessageProxy {
 	// first, tag this so we won't need to be refereshed again.
 	
 	refresh = false;
-
+	
 	// second, refresh the MessageInfo itself.
-
+	
 	getMessageInfo().refreshFlags();
 	
 	// third, compare.
-
+	
 	Vector newTableInfo = createTableInfo();
 	
 	// check to see if anything has actually changed

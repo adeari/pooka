@@ -109,13 +109,12 @@ public class LoadMessageThread extends Thread {
 	      
 	      if (! mp.getMessageInfo().hasBeenFetched()) {
 		try {
-		  int fetchCount = 0;
 		  Vector fetchVector = new Vector();
-		  for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+		  for (int j = i; fetchVector.size() < fetchBatchSize && j >= 0; j--) {
 		    MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
 		    if (! fetchInfo.hasBeenFetched()) {
-		    fetchVector.add(fetchInfo);
-		    fetchInfo.setFetched(true);
+		      fetchVector.add(fetchInfo);
+		      fetchInfo.setFetched(true);
 		    }
 		  }
 		  
@@ -155,9 +154,8 @@ public class LoadMessageThread extends Thread {
 	    
 	    if (! mp.getMessageInfo().hasBeenFetched()) {
 	      try {
-		int fetchCount = 0;
 		Vector fetchVector = new Vector();
-		for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+		for (int j = i; fetchVector.size() < fetchBatchSize && j >= 0; j--) {
 		  MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
 		  if (! fetchInfo.hasBeenFetched()) {
 		    fetchVector.add(fetchInfo);
@@ -181,9 +179,9 @@ public class LoadMessageThread extends Thread {
 	      synchronized(folderInfo.getFolderThread().getRunLock()) {
 		if (! mp.isLoaded())
 		  mp.loadTableInfo();
-		if (mp.needsRefresh())
+		if (mp.needsRefresh()) {
 		  mp.refreshMessage();
-		else if (! mp.matchedFilters()) {
+		} else if (! mp.matchedFilters()) {
 		  mp.matchFilters();
 		}
 	      } // end synchronized

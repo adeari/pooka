@@ -578,8 +578,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       
       // load the list of uid's.
 
-      fetchProfile = new FetchProfile();
-      fetchProfile.add(UIDFolder.FetchProfileItem.UID);
+      FetchProfile fp = new FetchProfile();
+      fp.add(UIDFolder.FetchProfileItem.UID);
       if (Pooka.isDebug())
 	System.out.println("getting messages.");
 
@@ -587,7 +587,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
       if (Pooka.isDebug())
 	System.out.println("fetching messages.");
-      getFolder().fetch(messages, fetchProfile);
+      getFolder().fetch(messages, fp);
       if (Pooka.isDebug())
 	System.out.println("done fetching messages.  getting uid's");
       

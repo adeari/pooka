@@ -13,7 +13,8 @@ import javax.swing.JTree;
 public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRenderer {
 
   protected boolean hasFocus;
-  
+
+  Icon rootIcon;
   Icon connectedIcon;
   Icon disconnectedIcon;
   Icon closedFolderIcon;
@@ -126,6 +127,8 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	  setIconToDisconnectedStore();
 	
 	setFontToDefault();
+      } else {
+	setIconToRoot();
       }
     }
     return this;
@@ -276,6 +279,19 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     }
   }
   
+  public void setIconToRoot() {
+    if (getRootIcon() != null)
+      setIcon(getRootIcon());
+    else {
+      // create the new Icon.
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.rootIcon", "images/PookaFolderIcon.gif"));
+      if (url != null) {
+	setRootIcon(new ImageIcon(url));
+	setIcon(getRootIcon());
+      }
+    }
+  }
+  
   public Icon getConnectedIcon() {
     return connectedIcon;
   }
@@ -353,6 +369,14 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
   
   public void setSubfolderIcon(Icon newIcon) {
     subfolderIcon = newIcon;
+  }
+
+  public Icon getRootIcon() {
+    return rootIcon;
+  }
+  
+  public void setRootIcon(Icon newIcon) {
+    rootIcon = newIcon;
   }
 }
 

@@ -1,5 +1,9 @@
+removed several excess communications with the mail store.
+
 added a disconnected icon so that it looks different if you're browsing
 messages in connected vs. disconnected imap.
+
+added an icon for the root node in the folder tree.
 
 updated the NewAccountPooka so that you can set a better variety of choices
 during setup.

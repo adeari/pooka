@@ -830,6 +830,7 @@ Pooka.urlHandler=netscape %s
 
 FolderTree.readStyle=PLAIN
 FolderTree.unreadStyle=BOLD
+FolderTree.rootIcon=images/PookaFolderIcon.gif
 FolderTree.connectedIcon=images/Plus.gif
 FolderTree.connectedWithNewIcon=images/PlusNew.gif
 FolderTree.disconnectedIcon=images/PlusMinus.gif

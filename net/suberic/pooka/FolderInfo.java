@@ -1093,27 +1093,32 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
 
     public void fireMessageChangedEvent(MessageChangedEvent mce) {
-	// from the EventListenerList javadoc, including comments.
-
+      // from the EventListenerList javadoc, including comments.
+      
+      if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
 	resetMessageCounts();
-
+      }
+      
+      if (Pooka.isDebug())
+	System.out.println("firing message changed event.");
+      // Guaranteed to return a non-null array
+      Object[] listeners = eventListeners.getListenerList();
+      // Process the listeners last to first, notifying
+      // those that are interested in this event
+      for (int i = listeners.length-2; i>=0; i-=2) {
 	if (Pooka.isDebug())
-	    System.out.println("firing message changed event.");
-	// Guaranteed to return a non-null array
-	Object[] listeners = eventListeners.getListenerList();
-	// Process the listeners last to first, notifying
-	// those that are interested in this event
-	for (int i = listeners.length-2; i>=0; i-=2) {
-	    if (Pooka.isDebug())
-		System.out.println("listeners[" + i + "] is " + listeners[i] );
-	    if (listeners[i]==MessageChangedListener.class) {
-		if (Pooka.isDebug())
-		    System.out.println("check.  running messageChanged on listener.");
-		((MessageChangedListener)listeners[i+1]).messageChanged(mce);
-	    }              
-	}
-    }  
+	  System.out.println("listeners[" + i + "] is " + listeners[i] );
+	if (listeners[i]==MessageChangedListener.class) {
+	  if (Pooka.isDebug())
+	    System.out.println("check.  running messageChanged on listener.");
+	  ((MessageChangedListener)listeners[i+1]).messageChanged(mce);
+	}              
+      }
 
+      if (Pooka.isDebug())
+	System.out.println("done handing event " + mce);
+    }  
+  
     public void addConnectionListener(ConnectionListener newListener) {
 	eventListeners.add(ConnectionListener.class, newListener);
     }
@@ -2035,6 +2040,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This forces an update of both the total and unread message counts.
    */
   public void resetMessageCounts() {
+
     try {
       if (Pooka.isDebug()) {
 	if (getFolder() != null)

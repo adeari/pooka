@@ -1,15 +1,5 @@
-*) make a way to reopen folders that have been disconnected other than
-	closing and reopening the store.
-	-- make a disconnected icon.  -- red plus?
-
-*) splashscreen?
-
-*) run a debug log on the communications with the imap server; make sure
-that we get all of the important information in the body tag.  -- ?? check
-the filters, especially.
-
-*) add icons for connecting to folder/store, for disconnected, and for
-	the root node.
+*) check the redraw for both the messages in the table and (especially)
+	the FolderTree.
 
 --------
 
@@ -101,6 +91,11 @@ preview:
 
 *)  ?? if network connection goes down, pooka hangs on exit.
 
+*) make a way to reopen folders that have been disconnected other than
+	closing and reopening the store. -- get testcase?
+
+*) splashscreen?
+
 +++++++
 
 *) add support for jdk1.4
@@ -132,6 +127,8 @@ preview:
 *) add support for saved searches.
 
 *) add 'filter by message'
+
+*) add icons for connecting to folder/store
 
 *) fix:java.lang.NullPointerException
 	at net.suberic.pooka.MessageInfo.remove(Unknown Source)
