@@ -137,18 +137,19 @@ public class AddressBookManager implements ValueChangeListener {
     while (tokens.hasMoreTokens()) {
       addressBookID = tokens.nextToken();
       AddressBook currentAddressBook = getAddressBook(addressBookID);
-      if (currentAddressBook != null)
+      if (currentAddressBook != null) {
 	newAddressBookList.add(currentAddressBook);
-      else {
+      } else {
 	currentAddressBook = createAddressBook(addressBookID);
-	newAddressBookList.add(createAddressBook(addressBookID));
-
-	if (Pooka.getProperty("AddressBook._default", "").equalsIgnoreCase(""))
-	  Pooka.setProperty("AddressBook._default", addressBookID);
+	if (currentAddressBook != null) {
+	  newAddressBookList.add(currentAddressBook);
+	  
+	  if (Pooka.getProperty("AddressBook._default", "").equalsIgnoreCase(""))
+	    Pooka.setProperty("AddressBook._default", addressBookID);
+	}
 	
       }
     }
-    
     
     if (! newAddressBookList.equals(addressBookList)) {
       addressBookList = newAddressBookList;
@@ -179,7 +180,7 @@ public class AddressBookManager implements ValueChangeListener {
 
     for (int i = 0; i < addressBookList.size(); i++) {
       AddressBook currentBook = (AddressBook) addressBookList.elementAt(i);
-      if (currentBook.getAddressBookID().equals(name))
+      if (currentBook != null && currentBook.getAddressBookID().equals(name))
 	return currentBook;
     }
 

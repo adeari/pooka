@@ -272,7 +272,20 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
     if (isConnected()) {
       try {
 	// load the list of uid's.
-	
+
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
+      else
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.CachingFolder.synchronizing.writingChanges", "Writing local changes to server..."));
+      
+      // first write all the changes that we made back to the server.
+      getCache().writeChangesToServer(getFolder());
+      
+      if (getFolderDisplayUI() != null)
+	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
+      else
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing.loading", "Loading messages from folder..."));
+      
 	FetchProfile uidFetchProfile = new FetchProfile();
 	uidFetchProfile.add(UIDFolder.FetchProfileItem.UID);
 	if (Pooka.isDebug())

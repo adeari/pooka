@@ -497,7 +497,7 @@ public class NewAccountPooka {
     Enumeration names = props.propertyNames();
     while (names.hasMoreElements()) {
       String propertyName = (String) names.nextElement();
-      if (propertyName.equals("UserProfile") || propertyName.equals("Store") || propertyName.equals("OutgoingServer")) {
+      if (propertyName.equals("UserProfile") || propertyName.equals("Store") || propertyName.equals("OutgoingServer") || propertyName.equals("AddressBook")) {
 	// skip
       } else {
 	transferProperty(props, propertyName);
@@ -509,6 +509,8 @@ public class NewAccountPooka {
     transferProperty(props, "Store");
 
     transferProperty(props, "OutgoingServer");
+
+    transferProperty(props, "AddressBook");
   }
 
   /**

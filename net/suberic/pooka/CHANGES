@@ -1,3 +1,13 @@
+030611 release
+--------------
+
+fixed a bug in the new acount configuration (and AddressBookManager) that 
+resulted in being unable to send mail or edit the AddressBook on the first 
+startup.
+
+fixed some more cache synchronization bugs in disconnected mode.
+
+
 030530 release
 --------------
 

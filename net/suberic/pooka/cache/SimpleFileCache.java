@@ -262,6 +262,10 @@ public class SimpleFileCache implements MessageCache {
     if (newUidValidity != uidValidity) {
       throw new StaleCacheException(uidValidity, newUidValidity);
     }
+
+    if (m == null)
+      return false;
+
     try {
       if (status == CONTENT || status == MESSAGE) {
 	// we have to reset the seen flag if it's not set, since getting
