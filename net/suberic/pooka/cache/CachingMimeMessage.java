@@ -177,7 +177,13 @@ public class CachingMimeMessage extends MimeMessage {
      */
     public synchronized boolean isSet(Flags.Flag flag)
 				throws MessagingException {
-	return (getFlags().contains(flag));
+	try {
+	    return getFlags().contains(flag);
+	} catch (MessagingException me) {
+	    System.out.println("caught exception:  " + me);
+	    me.printStackTrace();
+	    throw me;
+	}
     }
 
     /**

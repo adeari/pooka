@@ -78,7 +78,6 @@ public class CachingFolderInfo extends FolderInfo {
 	
 	setFolderTableModel(ftm);
 	
-	
 	loaderThread.loadMessages(messageProxies);
 	
 	if (!loaderThread.isAlive())
@@ -213,10 +212,7 @@ public class CachingFolderInfo extends FolderInfo {
 	    System.out.println("synchronizing--addedUids.length = " + addedUids.length);
 
 	if (addedUids.length > 0) {
-	    Message[] addedMsgs = new Message[addedUids.length];
-	    for (int i = 0 ; i < addedUids.length; i++) {
-		addedMsgs[i] = new CachingMimeMessage(this, addedUids[i]);
-	    }
+	    Message[] addedMsgs = ((UIDFolder)getFolder()).getMessagesByUID(addedUids);
 	    MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.ADDED, false, addedMsgs);
 	    messagesAdded(mce);
 	}    
@@ -239,7 +235,6 @@ public class CachingFolderInfo extends FolderInfo {
     
     protected void runMessagesAdded(MessageCountEvent mce) {
 	Message[] addedMessages = mce.getMessages();
-	System.out.println("running messages added on " + addedMessages.length + " messages.");
 	MessageInfo mp;
 	Vector addedProxies = new Vector();
 	for (int i = 0; i < addedMessages.length; i++) {
@@ -249,7 +244,6 @@ public class CachingFolderInfo extends FolderInfo {
 		messageToInfoTable.put(addedMessages[i], mp);
 		uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
 		try {
-		    System.out.println("caching message for uid " + ((CachingMimeMessage)addedMessages[i]).getUID());
 		    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.HEADERS);
 		} catch (MessagingException me) {
 		    System.out.println("caught exception:  " + me);
@@ -272,7 +266,6 @@ public class CachingFolderInfo extends FolderInfo {
 		messageToInfoTable.put(newMsg, mp);
 		uidToInfoTable.put(new Long(uid), mp);
 		try {
-		    System.out.println("caching message for uid " + uid);
 		    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.HEADERS);
 		} catch (MessagingException me) {
 		    System.out.println("caught exception:  " + me);
@@ -474,13 +467,19 @@ public class CachingFolderInfo extends FolderInfo {
 	return (MessageInfo) uidToInfoTable.get(new Long(uid));
     }
 
+    /**
+     * Returns the "real" message from the underlying folder that matches up
+     * to the given UID.
+     */
     public javax.mail.internet.MimeMessage getRealMessageById(long uid) throws MessagingException {
 	Folder f = getFolder();
 	if (f != null && f instanceof UIDFolder) {
-	    javax.mail.internet.MimeMessage m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
+	    javax.mail.internet.MimeMessage m = null;
+	    m = (javax.mail.internet.MimeMessage) ((UIDFolder) f).getMessageByUID(uid);
 	    return m;
+	} else {
+	    return null;
 	}
-	return null;
     }
 
     public long getUIDValidity() {
