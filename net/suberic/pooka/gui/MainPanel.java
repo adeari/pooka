@@ -70,7 +70,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MenuBar", ""), ":");
 	while (tokens.hasMoreTokens()) {
-	  JMenu m = createMenu(tokens.nextToken());
+	  JMenu m = createMenu("MenuBar." + tokens.nextToken());
 	  if (m != null) {
 	    mBar.add(m);
 	  }
@@ -210,7 +210,7 @@ public class MainPanel extends JSplitPane implements javax.swing.event.TreeSelec
 	// TODO:  fix this.  Currently we just recreate the Windows menu
 	// every time.  It works, and doesn't seem all that slow, but still....
 
-	JMenu clearWindowMenu = createMenu("Window");
+	JMenu clearWindowMenu = createMenu("MenuBar.Window");
 	int origCount = clearWindowMenu.getMenuComponentCount();
 
 	for (int i = menuBar.getMenuCount() - 1; i >= 0; i--) {
