@@ -153,7 +153,7 @@ public class GPGEncryptionKeyManager implements EncryptionKeyManager {
    * algorithm could not be found
    */
   public void store(OutputStream stream, char[] password)
-    throws KeyStoreException, IOException {
+    throws EncryptionException, IOException {
     // again, we'll actually store all keys directly, so this has no
     // effect.
     return;

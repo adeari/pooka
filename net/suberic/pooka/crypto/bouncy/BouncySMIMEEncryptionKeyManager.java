@@ -4,7 +4,12 @@ import net.suberic.pooka.*;
 import net.suberic.pooka.crypto.*;
 import net.suberic.util.*;
 
-import java.security.*;
+import java.security.cert.*;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchProviderException;
+import java.security.NoSuchAlgorithmException;
 import java.io.*;
 import java.util.*;
 
@@ -12,6 +17,17 @@ import java.util.*;
  * This manages a set of Encryption keys for use with PGP or S/MIME.
  */
 public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
+
+  KeyStore pkcsKeyStore = null;
+
+  public BouncySMIMEEncryptionKeyManager() throws EncryptionException {
+    try {
+      pkcsKeyStore = KeyStore.getInstance("PKCS12", "BC");
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }
+
+  }
 
   /*
    * Loads this KeyStore from the given input stream.
@@ -38,8 +54,16 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    * the integrity of the keystore cannot be found
    */
   public void load(InputStream stream, char[] password)
-    throws IOException {
+    throws IOException, EncryptionException {
 
+    try {
+      pkcsKeyStore.load(stream, password);
+    } catch (IOException ioe) {
+      throw ioe;
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }
+    
   }
   
   /**
@@ -56,8 +80,14 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    * algorithm could not be found
    */
   public void store(OutputStream stream, char[] password)
-    throws KeyStoreException, IOException {
-
+    throws IOException, EncryptionException {
+    try {
+      pkcsKeyStore.store(stream, password);
+    } catch (IOException ioe) {
+      throw ioe;
+    } catch (Exception e) {
+      throw new EncryptionException(e);
+    }
   }
   
   /**
@@ -70,7 +100,7 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public int size()
     throws KeyStoreException {
-    return -1;
+    return pkcsKeyStore.size();
   }
   
   /**
@@ -92,6 +122,13 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public EncryptionKey getPublicKey(String alias)
     throws KeyStoreException {
+    if (pkcsKeyStore.isKeyEntry(alias)) {
+      BouncySMIMEEncryptionKey ek = new BouncySMIMEEncryptionKey();
+      Certificate[] chain = pkcsKeyStore.getCertificateChain(alias);
+      ek.setCertificate((X509Certificate)chain[0]);
+      return ek;
+    }
+
     return null;
   }
 
@@ -114,6 +151,13 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public EncryptionKey getPrivateKey(String alias, char[] password)
     throws KeyStoreException {
+    if (pkcsKeyStore.isKeyEntry(alias)) {
+      BouncySMIMEEncryptionKey ek = new BouncySMIMEEncryptionKey();
+      Certificate[] chain = pkcsKeyStore.getCertificateChain(alias);
+      ek.setCertificate((X509Certificate)chain[0]);
+      return ek;
+    }
+
     return null;
   }  
   
@@ -209,7 +253,14 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public Set publicKeyAliases()
     throws KeyStoreException {
-    return null;
+    Enumeration enum = pkcsKeyStore.aliases();
+    HashSet returnValue = new HashSet();
+    while (enum.hasMoreElements()) {
+      String alias = (String) enum.nextElement();
+      if (pkcsKeyStore.isCertificateEntry(alias))
+	returnValue.add(alias);
+    }
+    return returnValue;
   }
 
   /**
@@ -222,7 +273,15 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public Set privateKeyAliases()
     throws KeyStoreException {
-    return null;
+    Enumeration enum = pkcsKeyStore.aliases();
+    HashSet returnValue = new HashSet();
+    while (enum.hasMoreElements()) {
+      String alias = (String) enum.nextElement();
+      if (pkcsKeyStore.isKeyEntry(alias))
+	returnValue.add(alias);
+    }
+
+    return returnValue;
   }
   
   
@@ -238,7 +297,7 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public boolean containsPublicKeyAlias(String alias)
     throws KeyStoreException {
-    return false;
+    return pkcsKeyStore.isCertificateEntry(alias);
   }
 
   /**
@@ -253,7 +312,7 @@ public class BouncySMIMEEncryptionKeyManager implements EncryptionKeyManager {
    */
   public boolean containsPrivateKeyAlias(String alias)
     throws KeyStoreException {
-    return false;
+    return pkcsKeyStore.isKeyEntry(alias);
 
   }
   

@@ -327,7 +327,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    * Creates an empty EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
-  public  EncryptionKeyManager createKeyManager() {
+  public  EncryptionKeyManager createKeyManager() throws EncryptionException {
     return new BouncySMIMEEncryptionKeyManager();
   }
 
@@ -335,7 +335,7 @@ public class SMIMEEncryptionUtils extends EncryptionUtils {
    * Creates and loads an EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
-  public  EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] passwd) throws java.io.IOException {
+  public  EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] passwd) throws java.io.IOException, EncryptionException {
     BouncySMIMEEncryptionKeyManager mgr = new BouncySMIMEEncryptionKeyManager();
     mgr.load(inputStream, passwd);
     return mgr;

@@ -74,13 +74,13 @@ public abstract class EncryptionUtils {
    * Creates an empty EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
-  public abstract EncryptionKeyManager createKeyManager();
+  public abstract EncryptionKeyManager createKeyManager() throws EncryptionException;
 
   /**
    * Creates and loads an EncryptionKeyManager that's appropriate for this
    * Encryption provider.
    */
-  public abstract EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] passwd) throws java.io.IOException;
+  public abstract EncryptionKeyManager createKeyManager(java.io.InputStream inputStream, char[] passwd) throws java.io.IOException, EncryptionException;
 
   /**
    * Returns whether or not this email is encrypted.

@@ -37,7 +37,7 @@ public interface EncryptionKeyManager {
    * the integrity of the keystore cannot be found
    */
   public void load(InputStream stream, char[] password)
-    throws IOException;
+    throws IOException, EncryptionException;
   
   /**
    * Stores this keystore to the given output stream, and protects its
@@ -53,7 +53,7 @@ public interface EncryptionKeyManager {
    * algorithm could not be found
    */
   public void store(OutputStream stream, char[] password)
-    throws KeyStoreException, IOException;
+    throws IOException, EncryptionException;
   
   /**
    * Retrieves the number of entries in this keystore.

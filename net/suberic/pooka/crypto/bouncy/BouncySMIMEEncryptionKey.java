@@ -23,6 +23,13 @@ public class BouncySMIMEEncryptionKey extends EncryptionKey {
   public KeyPair getKeyPair() {
     return mKeyPair;
   }
+  /**
+   * Sets the KeyPair for this key.
+   */
+  public void setKeyPair(KeyPair pKeyPair) {
+    mKeyPair = pKeyPair;
+  }
+
 
   /**
    * Returns the certificate for this key.
@@ -30,6 +37,11 @@ public class BouncySMIMEEncryptionKey extends EncryptionKey {
   public X509Certificate getCertificate() {
     return mCertificate;
   }
-
+  /**
+   * Sets the certificate for this key.
+   */
+  public void setCertificate(X509Certificate pCertificate) {
+    mCertificate = pCertificate;
+  }
 
 }
