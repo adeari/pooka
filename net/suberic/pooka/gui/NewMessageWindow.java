@@ -164,7 +164,7 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Input.DefaultFields", "To:CC:BCC:Subject"), ":");
 	String currentHeader = null;
 	JLabel hdrLabel = null;
-	JTextField inputField = null;
+	JTextArea inputField = null;
 
 	while (tokens.hasMoreTokens()) {
 	    inputRow = new Box(BoxLayout.X_AXIS);
@@ -176,14 +176,18 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	    if (aMsg.getMessage() instanceof MimeMessage) {
 		MimeMessage mMsg = (MimeMessage)aMsg.getMessage();
 		try {
-		    inputField = new JTextField(mMsg.getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","));
+		    inputField = new JTextArea(mMsg.getHeader(Pooka.getProperty("MessageWindow.Input." + currentHeader + ".MIMEHeader", "") , ","), 1, 30);
 		} catch (MessagingException me) {
-		    inputField = new JTextField();
+		    inputField = new JTextArea(1, 30);
 		}
 	    } else {
-		inputField = new JTextField();
+		inputField = new JTextArea(1, 30);
 	    }
-		inputRow.add(inputField);
+	    inputField.setLineWrap(true);
+	    inputField.setWrapStyleWord(true);
+	    //inputField.setBorder(new javax.swing.plaf.basic.BasicBorders.FieldBorder(Color.black, Color.black, Color.black, Color.black));
+	    inputField.setBorder(BorderFactory.createEtchedBorder());
+	    inputRow.add(inputField);
 	    
 	    inputPanel.add(inputRow);
 
