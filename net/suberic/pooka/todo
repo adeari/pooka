@@ -14,8 +14,6 @@ a menu option and from the 'open with' dialog.
 
 *) fix sorting of columns:  
 	1) make the same row be selected after the sort
-	2) fix the sorting of Subject lines, both to ignore case (aigh!) and
-	   to ignore re: and fwd: prefixes.
 
 ?????? alpha 2 or not ??????
 ----------------------------
