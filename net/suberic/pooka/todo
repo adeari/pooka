@@ -32,6 +32,8 @@
 
 *) add support for viewing messages as raw (rfc822 format).
 
+*) check for memory leaks
+
 -----
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
@@ -116,11 +118,12 @@ preview:
 		whether or not it's up.
 			-- started.  make sure it's enough.
 
+*) make the local file store backend (currently mbox) more efficient,
+   possibly replacing it with the backend to the disconnected imap
+   store.
 
 *) fix the network connection test so that it doesn't hang if the
 	network is up, but the test host is unreachable.
-
-*) support java jnlp (?)
 
 *) come up with a wrapper for spawning external editors on windows.
 

@@ -178,6 +178,7 @@ class AttachmentBundle {
 	Enumeration allHdrs = headers.getAllHeaderLines();
 	while (allHdrs.hasMoreElements()) {
 	  headerText.append(MailUtilities.decodeText((String) allHdrs.nextElement()));
+	  headerText.append('\n');
 	}		
       } else {
 	StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");

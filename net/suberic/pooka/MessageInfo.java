@@ -294,12 +294,17 @@ public class MessageInfo {
    */
   public String getRawText() throws MessagingException {
     try {
-      InputStream is = getMessage().getInputStream();
+      /*
       StringWriter writer = new StringWriter();
       for (int i = 0; i > -1; i = is.read()) {
 	writer.write(i);
       }
       return writer.toString();
+      */
+      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      MimeMessage mm = (MimeMessage) getMessage();
+      mm.writeTo(baos);
+      return baos.toString();
     } catch (IOException ioe) {
       throw new MessagingException("Error reading Message Stream", ioe);
     }

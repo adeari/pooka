@@ -91,113 +91,113 @@ public class UIDMimeMessage extends MimeMessage {
 	}
     }
 
-    public String getHeader(String name, String delimiter)
-				throws MessagingException {
+  public String getHeader(String name, String delimiter)
+    throws MessagingException {
+    try {
+      return getMessage().getHeader(name, delimiter);
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    return getMessage().getHeader(name, delimiter);
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		return getMessage().getHeader(name, delimiter);
-		
-	    } else {
-		throw fce;
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
 	}
+	
+	return getMessage().getHeader(name, delimiter);
+	
+      } else {
+	throw fce;
+      }
     }
-
-   public void setHeader(String name, String value)
-       throws MessagingException {
-       try {
-	   getMessage().setHeader(name, value);
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		getMessage().setHeader(name, value);
-		
-	    } else {
-		throw fce;
-	    }
-	}
-   }
-
-    public void addHeader(String name, String value)
-                                throws MessagingException {
+  }
+  
+  public void setHeader(String name, String value)
+    throws MessagingException {
+    try {
+      getMessage().setHeader(name, value);
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    getMessage().addHeader(name, value);
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		getMessage().addHeader(name, value);
-		
-	    } else {
-		throw fce;
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
 	}
+	
+	getMessage().setHeader(name, value);
+	
+      } else {
+	throw fce;
+      }
     }
-
-    public void removeHeader(String name)
-                                throws MessagingException {
+  }
+  
+  public void addHeader(String name, String value)
+    throws MessagingException {
+    try {
+      getMessage().addHeader(name, value);
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    getMessage().removeHeader(name);
-	} catch (FolderClosedException fce) {
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
-		    throw fce;
-		}
-
-		getMessage().removeHeader(name);
-		
-	    } else {
-		throw fce;
-	    }
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
 	}
+	
+	getMessage().addHeader(name, value);
+	
+      } else {
+	throw fce;
+      }
     }
+  }
 
-    public Enumeration getAllHeaders() throws MessagingException {
+  public void removeHeader(String name)
+    throws MessagingException {
+    try {
+      getMessage().removeHeader(name);
+    } catch (FolderClosedException fce) {
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
 	try {
-	    return getMessage().getAllHeaders();	
-	} catch (FolderClosedException fce) {
-	    if (Pooka.isDebug())
-		System.err.println("debug:  caught FolderClosedException.");
-	    int status = parent.getStatus();
-	    if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
-		if (Pooka.isDebug())
-		    System.err.println("debug:  folder should be open.  trying to re-open folder.");
-		try {
-		    parent.openFolder(Folder.READ_WRITE);
-		} catch (MessagingException me) {
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
 		    throw fce;
-		}
-
-		return getMessage().getAllHeaders();	
-		
-	    } else {
-		throw fce;
-	    }
 	}
+
+	getMessage().removeHeader(name);
+	
+      } else {
+	throw fce;
+      }
     }
+  }
+  
+  public Enumeration getAllHeaders() throws MessagingException {
+    try {
+      return getMessage().getAllHeaders();	
+    } catch (FolderClosedException fce) {
+      if (Pooka.isDebug())
+	System.err.println("debug:  caught FolderClosedException.");
+      int status = parent.getStatus();
+      if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
+	if (Pooka.isDebug())
+	  System.err.println("debug:  folder should be open.  trying to re-open folder.");
+	try {
+	  parent.openFolder(Folder.READ_WRITE);
+	} catch (MessagingException me) {
+	  throw fce;
+	}
+	
+	return getMessage().getAllHeaders();	
+	
+      } else {
+	throw fce;
+      }
+    }
+  }
 
     public Enumeration getMatchingHeaders(String[] names)
 			throws MessagingException {

@@ -33,8 +33,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
   Action[] defaultActions = new Action[] {
     new AttachmentPanelAction(),
-    new EditorPanelAction()
-      };
+    new EditorPanelAction(),
+    new RawStreamDisplayModeAction(),
+    new DefaultDisplayModeAction(),
+    new FullDisplayModeAction()
+  };
 
   /**
    * Creates an empty MessageDisplayPanel.
@@ -449,4 +452,60 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
   }
 
+  /**
+   * Abstract action which changes the display mode.
+   */
+  public abstract class DisplayModeAction extends AbstractAction {
+    protected int newDisplayMode;
+
+    public DisplayModeAction(String id) {
+      super(id);
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      if (displayMode != newDisplayMode) {
+	displayMode = newDisplayMode;
+	try {
+	  resetEditorText();
+	} catch (MessagingException me) {
+	  final Exception finalE = me;
+	  SwingUtilities.invokeLater(new Runnable() {
+	      public void run() {
+		msgUI.showError("Error changing display", finalE);
+	      }
+	    });
+	}
+      }
+    }
+  }
+
+  /**
+   * Abstract action which changes the display mode.
+   */
+  public class RawStreamDisplayModeAction extends DisplayModeAction {
+    public RawStreamDisplayModeAction() {
+      super("message-display-raw");
+      newDisplayMode=RFC822_STYLE;
+    }
+  }
+
+  /**
+   * Abstract action which changes the display mode.
+   */
+  public class DefaultDisplayModeAction extends DisplayModeAction {
+    public DefaultDisplayModeAction() {
+      super("message-display-default");
+      newDisplayMode=HEADERS_DEFAULT;
+    }
+  }
+
+  /**
+   * Abstract action which changes the display mode.
+   */
+  public class FullDisplayModeAction extends DisplayModeAction {
+    public FullDisplayModeAction() {
+      super("message-display-full");
+      newDisplayMode=HEADERS_FULL;
+    }
+  }
 }
