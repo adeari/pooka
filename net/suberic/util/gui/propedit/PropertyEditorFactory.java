@@ -163,6 +163,7 @@ public class PropertyEditorFactory {
    */
   public PropertyEditorUI createEditor(String property, String editorTemplate, String type, PropertyEditorManager mgr, boolean enabled) {
 
+    System.err.println("creating editor for prop " + property + ", editorTemplate " + editorTemplate);
     Class editorClass = (Class) typeToClassMap.get(type);
     if (editorClass == null) {
       editorClass = (Class) typeToClassMap.get("String");
@@ -172,6 +173,7 @@ public class PropertyEditorFactory {
     try {
       returnValue = (PropertyEditorUI) editorClass.newInstance();
     } catch (Exception e) {
+      System.err.println("error creating editor for property " + property + ":  " + e);
       returnValue = new StringEditorPane();
     }
     returnValue.configureEditor(property, editorTemplate, mgr, enabled);

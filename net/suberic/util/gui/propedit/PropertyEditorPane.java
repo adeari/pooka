@@ -175,4 +175,5 @@ public class PropertyEditorPane extends Box {
   public void resizeEditor() {
     container.setSize(container.getPreferredSize());
   }
+
 }

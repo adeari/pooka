@@ -949,9 +949,9 @@ PropertyEditor.Password.class=net.suberic.util.gui.propedit.PasswordEditorPane
 PropertyEditor.Directory.class=net.suberic.util.gui.propedit.FileSelectorPane
 PropertyEditor.Tabbed.class=net.suberic.util.gui.propedit.TabbedEditorPane
 PropertyEditor.Folder.class=net.suberic.pooka.gui.propedit.FolderSelectorPane
-PropertyEditor.Filter.class=net.suberic.util.gui.propedit.StringEditorPane
-PropertyEditor.SearchTerm.class=net.suberic.util.gui.propedit.StringEditorPane
-PropertyEditor.AddressList.class=net.suberic.pooka.gui.propedit.AddressEntryEditor
+PropertyEditor.Filter.class=net.suberic.pooka.gui.filter.FilterEditorPane
+PropertyEditor.SearchTerm.class=net.suberic.pooka.gui.search.SearchEditorPane
+PropertyEditor.AddressList.class=net.suberic.pooka.gui.propedit.AddressBookEditorPane
 
 PropertyEditor.filter.portFilter.class=net.suberic.util.gui.propedit.NumberFilter
 PropertyEditor.filter.portFilter.min=0

@@ -1,4 +1,4 @@
-package net.suberic.pooka.gui;
+package net.suberic.pooka.gui.propedit;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
 import net.suberic.util.gui.propedit.*;

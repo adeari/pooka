@@ -61,26 +61,24 @@ public class NewAccountPooka {
     propertyVector.add("NewAccountPooka.firstPanel");
     
     JInternalFrame firstEntryWindow = new JInternalFrame(Pooka.getProperty("NewAccountPooka.entryWindowMessage.title", "Enter Email Account Information"), false, false, false, false);
-    JComponent contentPane = 
-      (JComponent) firstEntryWindow.getContentPane();
+    JComponent contentPane = (JComponent) firstEntryWindow.getContentPane();
     contentPane.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
     
     // is there a way to make this wrap automatically, without adding
     // explicit newlines?
     JTextArea jta = new JTextArea(Pooka.getProperty("NewAccountPooka.entryWindowMessage", "Please enter the following \ninformation in order\nto configure your client."));
-    JLabel jl = new JLabel("test");
+
     jta.setBackground(jl.getBackground());
     //jta.setForeground(jl.getForeground());
     jta.setFont(jl.getFont());
     contentPane.add(jta);
     
-
     PropertyEditorManager mgr = new PropertyEditorManager(getProperties(), factory);
     contentPane.add(new PropertyEditorPane(mgr,
 					   propertyVector,
 					   propertyVector,
 					   firstEntryWindow));
-    
+    contentPane.add(new JLabel("foo"));
     firstEntryWindow.pack();
     firstEntryWindow.show();
     firstEntryWindow.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
@@ -101,6 +99,7 @@ public class NewAccountPooka {
       firstEntryWindow.setSelected(true);
     } catch (java.beans.PropertyVetoException pve) {
     }
+    
   }
   
   public VariableBundle initializeProperties() {

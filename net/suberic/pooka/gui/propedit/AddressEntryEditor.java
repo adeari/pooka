@@ -19,6 +19,7 @@ public class AddressEntryEditor extends CompositeEditorPane {
    * VariableBundle.
    */
   public AddressEntryEditor(PropertyEditorManager newManager, AddressBookEntry newEntry) {
+    System.err.println("creating an AddressEntryEditor.");
     entry = newEntry;
 
     Properties props = entry.getProperties();
