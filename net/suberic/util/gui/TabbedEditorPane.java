@@ -42,7 +42,8 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
    * This configures this editor with the following values.
    */
   public void configureEditor(PropertyEditorFactory newFactory, String propertyName, String templateType, VariableBundle bundle, boolean isEnabled) {
-    
+
+    //System.err.println("configuring editor with property " + propertyName + ", templateType " + templateType);
     property=propertyName;
     template=templateType;
     factory = newFactory;
@@ -56,28 +57,28 @@ public class TabbedEditorPane extends DefaultPropertyEditor {
     
     // first, get the strings that we're going to edit.
     
-    //System.out.println("creating prop from " + template + "=" + bundle.getProperty(template, ""));
+    //System.err.println("creating prop from " + template + "=" + bundle.getProperty(template, ""));
     Vector propsToEdit = bundle.getPropertyAsVector(template, "");
     
     DefaultPropertyEditor currentEditor;
     
     editors = new Vector();
     
-    //System.out.println("adding editors to tabbed pane.");
+    //System.err.println("adding editors to tabbed pane.");
     for (int i = 0; i < propsToEdit.size(); i++) {
       String currentProperty = template + "." + (String)propsToEdit.elementAt(i);
       
-      //System.out.println("TEP:  getting editor for " + currentProperty);
+      //System.err.println("TEP:  getting editor for " + currentProperty);
       if (propertyScoped) {
-	//System.out.println("TEP:  propScoped; getting editor for " + property + ", " + currentProperty);
+	//System.err.println("TEP:  propScoped; getting editor for " + property + ", " + currentProperty);
 	currentEditor = createEditorPane(property, currentProperty);
       } else {
-	//System.out.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
+	//System.err.println("TEP:  notPropScoped; getting editor for " + currentProperty + ", " + currentProperty);
 	currentEditor = createEditorPane(currentProperty, currentProperty);
       }
       
-      //System.out.println("adding " + currentEditor);
-      //System.out.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+      //System.err.println("adding " + currentEditor);
+      //System.err.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
       editors.add(currentEditor);
       tabbedPane.add(factory.getBundle().getProperty(currentProperty + ".label", currentProperty), currentEditor);
     }

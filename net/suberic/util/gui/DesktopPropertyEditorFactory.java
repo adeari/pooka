@@ -33,7 +33,7 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
      * JInternalFrame.
      */
     public Container createEditorWindow(String title, Vector properties) {
-	JInternalFrame jif = new JInternalFrame(title, false, false, false, false);
+	JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
 	jif.getContentPane().add(new PropertyEditorPane(this, properties, jif));
 	jif.setSize(100,100);
 	jif.pack();
@@ -70,7 +70,7 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
      * Creates and displays an editor window.  
      */
     public void showNewEditorWindow(String title, DefaultPropertyEditor editor) {
-      JInternalFrame jif = new JInternalFrame(title, false, false, false, false);
+      JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
       jif.getContentPane().add(new PropertyEditorPane(this, editor, jif));
       jif.setSize(100,100);
       jif.pack();
@@ -89,7 +89,7 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
      * JInternalFrame.
      */
     public Container createEditorWindow(String title, Vector properties, Vector templateTypes) {
-	JInternalFrame jif = new JInternalFrame(title, false, false, false, false);
+	JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
 	jif.getContentPane().add(new PropertyEditorPane(this, properties, templateTypes, jif));
 	jif.setSize(100,100);
 	jif.pack();
