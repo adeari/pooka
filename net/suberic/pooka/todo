@@ -30,12 +30,6 @@ on the main i/o thread.
 
 *)  make cut & paste work from the Toolbar.
 
-*)  make the FolderChooser less clunky.  add the ability to create and
-remove Folders.
-
-*)  make the subscribe/unsubscribe folder functionality more easilty 
-available.
-
 *) add a ValueChangeListener for the UserProfile properties.  right now
 the UserProfile only gets updated at startup.
 
@@ -48,9 +42,11 @@ the UserProfile only gets updated at startup.
 
 after release
 -------------
+*)  make the FolderChooser less clunky.  add the ability to create and
+remove Folders.
 
-*)  make the default folder change for a new message after you change the
-drop-down menu.
+*)  make the subscribe/unsubscribe folder functionality more easilty
+available.
 
 *)  make the windows detachable.
 
