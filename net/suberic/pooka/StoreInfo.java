@@ -340,6 +340,20 @@ public class StoreInfo implements ValueChangeListener {
 	} else {
 	    connected=false;
 	    store.close();
+	    closeAllFolders(false);
+	}
+    }
+
+    /**
+     * Closes all of the Store's children.
+     */
+    public void closeAllFolders(boolean expunge) throws MessagingException {
+	System.out.println("closing all folders of store " + getStoreID());
+	Vector folders = getChildren();
+	if (folders != null) {
+	    for (int i = 0; i < folders.size(); i++) {
+		((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
+	    }
 	}
     }
 

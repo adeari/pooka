@@ -1033,6 +1033,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	    setFolderTracker(null);
 	}
     }
+
+    /**
+     * This closes the curernt Folder as well as all subfolders.
+     */
+    public void closeAllFolders(boolean expunge) throws MessagingException {
+	Vector folders = getChildren();
+	if (folders != null) {
+	    for (int i = 0; i < folders.size(); i++) {
+		((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge);
+	    }
+	}  
+
+	closeFolder(expunge);
+    }
     
     // Accessor methods.
 
