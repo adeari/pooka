@@ -7,6 +7,7 @@ import javax.mail.*;
 import java.util.*;
 import java.awt.*;
 import javax.swing.tree.*;
+import java.awt.event.*;
 
 public class FolderChooser {
 
@@ -31,13 +32,41 @@ public class FolderChooser {
 	tree = new JTree(treeModel);
 	tree.setCellRenderer(new DefaultFolderTreeCellRenderer(DefaultFolderTreeCellRenderer.SUBSCRIBED_FOLDER));
 
+	tree.addMouseListener(new MouseAdapter() {
+		public void mouseClicked(MouseEvent e) {
+		    if (e.getClickCount() == 2) {
+			MailTreeNode tmpNode = getSelectedNode();
+			if (tmpNode != null && tmpNode instanceof FolderNode)
+			    toggleSubscribed((FolderNode)tmpNode);
+		    } 
+		    
+		}
+
+	    });
+
+
 	JScrollPane jsp = new JScrollPane();
 	jsp.getViewport().add(tree);
 
-	frame.getContentPane().add(jsp);
-
+	frame.getContentPane().setLayout(new BorderLayout());
+	frame.getContentPane().add("Center", jsp);
+	frame.getContentPane().add("South", createButtonBar());
     }
 
+
+    /**
+     * Gets the currently selected node.
+     */
+
+    public MailTreeNode  getSelectedNode() {
+	TreePath tp = tree.getSelectionPath();
+
+	if (tp != null) {
+	    return (MailTreeNode)tp.getLastPathComponent();
+	} else {
+	    return null;
+	}
+    }
 
     /**
      * creates the tree root.
@@ -69,11 +98,107 @@ public class FolderChooser {
     }
 
     /**
+     * This toggles the Subscribed field for the given FolderNode.
+     */
+
+    public void toggleSubscribed(FolderNode node) {
+	if (node.isSubscribed())
+	    unsubscribeFolder(node);
+	else
+	    subscribeFolder(node);
+    }
+
+    /**
      * This saves the subscribed list described in the FolderChooser to
      * the main Pooka configuration.  Called by the 'Ok' button.
      */
     public void saveSubscribedList() {
+	Properties p = new Properties();
+	FolderNode node;
+
+	Enumeration children = ((MailTreeNode)treeModel.getRoot()).children();
+
+	Vector subscribed = new Vector();
+
+	String prefix = "Store." + storeID;
+
+	while (children.hasMoreElements()) {
+	    node = (FolderNode)children.nextElement();
+	    if (node.isLeaf()) {
+		if (node.isSubscribed())
+		    subscribed.add(node.getFolder().getName());
+	    } else {
+		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), p))
+		    subscribed.add(node.getFolder().getName());
+	    }
+	}    
+
+	if (!subscribed.isEmpty()) {
+	    String propValue = new String();
+	    
+	    for (int i = 0; i < subscribed.size(); i++) {
+		propValue = propValue.concat((String)subscribed.elementAt(i) + ":");
+	    }
+	    
+
+	    if (propValue.endsWith(":"))
+		propValue=propValue.substring(0, propValue.length() - 1);
+
+	    p.setProperty(prefix + ".folderList", propValue);
+	}
+
+	// at this point, i should really go through and make sure to
+	// remove all the old properties.  i'll do that later.
+
+	Enumeration propsSet = p.propertyNames();
+	String propName;
+	while (propsSet.hasMoreElements()) {
+	    propName = (String)propsSet.nextElement();
+	    Pooka.setProperty(propName, p.getProperty(propName));
+	}
+	    
+    }
+
+    /**
+     * This method take a FolderNode which has children and then sets the
+     * appropriate properties.  If the FolderNode is not a leaf node and
+     * has 
+     */
+    private boolean readSubscribedTree(FolderNode parentNode, String prefix, Properties properties) {
+
+	FolderNode node;
+
+	Enumeration children = parentNode.children();
+
+	Vector subscribed = new Vector();
+
+	while (children.hasMoreElements()) {
+	    node = (FolderNode)children.nextElement();
+	    if (node.isLeaf()) {
+		if (node.isSubscribed())
+		    subscribed.add(node.getFolder().getName());
+	    } else {
+		if (readSubscribedTree(node, prefix + "." + node.getFolder().getName(), properties))
+		    subscribed.add(node.getFolder().getName());
+	    }
+	}    
 	
+	if (!subscribed.isEmpty()) {
+	    String propValue = new String();
+	    
+	    for (int i = 0; i < subscribed.size(); i++) {
+		propValue = propValue.concat((String)subscribed.elementAt(i) + ":");
+	    }
+	    
+
+	    if (propValue.endsWith(":"))
+		propValue=propValue.substring(0, propValue.length() - 1);
+	    
+	    properties.setProperty(prefix + ".folderList", propValue);
+
+	    return true;
+	} else
+	    return false;
     }
 
     /**
@@ -125,6 +250,52 @@ public class FolderChooser {
 	}
 
 	return null;
+    }
+
+    /**
+     * This creates the buttonbar.  Sigh.
+     */
+
+    private Box createButtonBar() {
+	
+	Box buttonBox = new Box(BoxLayout.X_AXIS);
+	
+	buttonBox.add(createButton("Ok", new AbstractAction() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    saveSubscribedList();
+		    try {
+			frame.setClosed(true);
+		    } catch (java.beans.PropertyVetoException pve) {
+		    }
+		}
+	    }, true));
+
+	buttonBox.add(createButton("Cancel", new AbstractAction() {
+		public void actionPerformed(java.awt.event.ActionEvent e) {
+		    try {
+			frame.setClosed(true);
+		    } catch (java.beans.PropertyVetoException pve) {
+		    }
+		}
+	    }, true));
+
+	return buttonBox;
+    }
+
+    private JButton createButton(String label, Action e, boolean isDefault) {
+	JButton thisButton;
+	
+        thisButton = new JButton(Pooka.getProperty("label." + label, label));
+	try {
+	    thisButton.setMnemonic(Pooka.getProperty("label." + label + ".mnemonic").charAt(0));
+	} catch (java.util.MissingResourceException mre) {
+	}
+	
+	thisButton.setSelected(isDefault);
+	
+	thisButton.addActionListener(e);
+	
+	return thisButton;
     }
 
     /**
