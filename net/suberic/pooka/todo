@@ -1,4 +1,5 @@
-*)  Fix the display of the MultiPropertyEditor.
+*)  Fix the display of the MultiPropertyEditor.--especially the 'don't show
+the password on the screen' part.
 
 *)  Add the ability to subscribe to/add new folders in the GUI.
 
@@ -9,7 +10,10 @@
 *)  add send buttons and other appropriate commands to MessageWindow.
 
 *)  make the GUI Authenticator (which should come up when you don't enter
-your password in the Store Configuration) work--right now it doesn't.
+your password in the Store Configuration) work--right now it doesn't.  note:
+it actually works ok (just ok) when you start it up from scratch--but when
+you make a new Store without a password, it shows up lots and lots of times
+and basically just fails all over the place.
 
 *)  enable cut & paste
 
@@ -77,6 +81,10 @@ add Font stuff.
 
 hourglass for blocking actions--fix it.
 
+implement the signatures properly.  
+
+write profile changes to disk immediately on setting (?)
+
 BUGS
 ---------
 Send is enabled for read (non-editable) messages.
@@ -89,4 +97,7 @@ updates of pkamailrc aren't handled correctly--some lines aren't deleted.
 actions on FolderPanel are always available in the menu.
 
 none of the window sizings are right.
+
+adding a new UserProfile isn't noticed by the new message window--you still get
+only the old choices until you restart.
 
