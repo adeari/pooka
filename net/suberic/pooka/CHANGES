@@ -1,3 +1,7 @@
+fixed a bug where the copy button on messages wasn't getting enabled.
+
+made it so imap connections time out more quickly.
+
 fixed the build information so that we now include the kunststoff files.
 
 modified the toolbars and the images some.

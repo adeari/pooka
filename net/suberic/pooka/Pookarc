@@ -81,6 +81,9 @@ Pooka.autoExpunge.propertyType=Boolean
 Pooka.checkUnsentMessages=true
 Pooka.checkUnsentMessages.propertyType=Boolean
 
+Pooka.timeout=30000
+Pooka.connectionTimeout=30000
+
 Pooka.fetchBatchSize=50
 
 Pooka.xmailer=Pooka
@@ -305,8 +308,8 @@ FolderTable.Flagged.value=FLAG.FLAGGED
 FolderTable.Flagged.icon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
 FolderTable.Flagged.size=15
 FolderTable.New.value=FLAG.NEW
-FolderTable.New.justUnseenIcon=/org/javalobby/icons/20x20png/SmallBlueCircle.gif
-FolderTable.New.recentAndUnseenIcon=/org/javalobby/icons/20x20png/SmallRedCircle.gif
+FolderTable.New.justUnseenIcon=/net/suberic/pooka/gui/images/SmallBlueCircle.gif
+FolderTable.New.recentAndUnseenIcon=/net/suberic/pooka/gui/images/SmallRedCircle.gif
 FolderTable.New.size=15
 FolderTable.Attachments.value=attachments
 FolderTable.Attachments.profileItems=Content-Type
@@ -862,16 +865,20 @@ Pooka.urlHandler=netscape %s
 FolderTree.readStyle=PLAIN
 FolderTree.unreadStyle=BOLD
 FolderTree.rootIcon=images/PookaFolderIcon.gif
-FolderTree.connectedIcon=images/Plus.gif
-FolderTree.connectedWithNewIcon=images/PlusNew.gif
-FolderTree.disconnectedIcon=images/PlusMinus.gif
-FolderTree.disconnectedWithNewIcon=images/PlusMinusNew.gif
-FolderTree.closedFolderIcon=images/Minus.gif
-FolderTree.unavailableIcon=images/Delete.gif
-FolderTree.connectedStoreIcon=images/mailbox.gif
-FolderTree.disconnectedStoreIcon=images/mailbox.gif
+FolderTree.connectedIcon=/org/javalobby/icons/20x20png/Plus.png
+FolderTree.connectedWithNewIcon=/net/suberic/pooka/gui/images/PlusNew.gif
+FolderTree.disconnectedIcon=/org/javalobby/icons/20x20png/PlusMinus.png
+FolderTree.disconnectedWithNewIcon=/net/suberic/pooka/gui/images/PlusMinusNew.gif
+FolderTree.closedFolderIcon=/org/javalobby/icons/20x20png/Minus.png
+FolderTree.unavailableIcon=/org/javalobby/icons/20x20png/Delete.png
+FolderTree.connectedStoreIcon=/net/suberic/pooka/gui/images/mailbox.gif
+FolderTree.disconnectedStoreIcon=/net/suberic/pooka/gui/images/mailbox.gif
+FolderTree.subfolderIcon=/org/javalobby/icons/20x20png/Folder.png
+FolderTree.subfolderWithNewIcon=/net/suberic/pooka/gui/images/FolderNew.png
 
-AddressBook.button.image=images/User.gif
+AddressBook.button.image=/org/javalobby/icons/20x20png/Book.png
+AddressBook.selectionPanel.addImage=/org/javalobby/icons/20x20png/Right.png
+AddressBook.selectionPanel.removeImage=/org/javalobby/icons/20x20png/Left.png
 
 NewAccountPooka.firstPanel=userName:fullName:password:serverName:protocol:smtpServer
 NewAccountPooka.firstPanel.propertyType=Composite

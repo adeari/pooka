@@ -259,7 +259,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderIcon", "images/Folder.gif"));
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderIcon", "/org/javalobby/icons/20x20png/Folder.png"));
       if (url != null) {
 	setSubfolderIcon(new ImageIcon(url));
 	setIcon(getSubfolderIcon());
@@ -272,7 +272,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderWithNewIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderWithNewIcon", "images/FolderNew.gif"));
+      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderWithNewIcon", "images/FolderNew.png"));
       if (url != null) {
 	setSubfolderWithNewIcon(new ImageIcon(url));
 	setIcon(getSubfolderWithNewIcon());

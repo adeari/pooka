@@ -132,7 +132,7 @@ public class AddressBookSelectionPanel extends JPanel {
 
     returnValue.add(Box.createVerticalGlue());
 
-    java.net.URL url = this.getClass().getResource("images/Right.gif");
+    java.net.URL url = this.getClass().getResource(Pooka.getProperty("AddressBook.selectionPanel.addImage", "/org/javalobby/icons/20x20png/Right.png"));
     JButton addButton = new JButton(new ImageIcon(url));
     addButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
@@ -143,7 +143,7 @@ public class AddressBookSelectionPanel extends JPanel {
 
     returnValue.add(Box.createVerticalGlue());
 
-    url = this.getClass().getResource("images/Left.gif");
+    url = this.getClass().getResource(Pooka.getProperty("AddressBook.selectionPanel.removeImage", "/org/javalobby/icons/20x20png/Left.png"));
     JButton removeButton = new JButton(new ImageIcon(url));
     removeButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {

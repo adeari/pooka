@@ -444,11 +444,21 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     Action[] subActions = null;
     Component focusOwner = SwingUtilities.findFocusOwner(this);
     if (focusOwner != null) {
+
       if (editorPane != null && SwingUtilities.isDescendingFrom(focusOwner, editorPane)) {
 	subActions = editorPane.getActions();
+      } else if (otherEditorPane != null && SwingUtilities.isDescendingFrom(focusOwner, otherEditorPane)) {
+	subActions = otherEditorPane.getActions();
       } else if (attachmentPanel != null &&SwingUtilities.isDescendingFrom(focusOwner, attachmentPanel)) {
+
 	subActions = attachmentPanel.getActions();
       }
+    } else {
+      // if nothing's focused, then use the editor pane's actions, if they
+      // exist.
+      if (editorPane != null)
+	subActions = editorPane.getActions();
+
     }
     if (subActions != null)
       return TextAction.augmentList(actionList, subActions);

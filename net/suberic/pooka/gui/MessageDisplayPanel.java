@@ -19,41 +19,41 @@ import java.io.File;
  * or full frame), and as part of a preview pane.
  */
 public abstract class MessageDisplayPanel extends JPanel {
-    protected MessageUI msgUI;
-    protected JSplitPane splitPane = null;
-    protected AttachmentPane attachmentPanel = null;
-    protected JTextPane editorPane = null;
-    protected JScrollPane editorScrollPane = null;
-    protected boolean hasAttachment = false;
-    protected ConfigurableKeyBinding keyBindings;
-
-    //<sigh>
-    JScrollPane attachmentScrollPane;
-
-    /**
-     * Creates an empty MessageDisplayPanel.
-     */
-    public MessageDisplayPanel() {
-	this.setLayout(new CardLayout());
-    }
-
-    /**
-     * Creates a MessageDisplayPanel for the given MessageUI.
-     */
-    public MessageDisplayPanel(MessageUI newMsgUI) {
-      msgUI = newMsgUI;
-      
-      this.setLayout(new BorderLayout());
-
-    }
-
-    /**
-     * This method is expected to do all the implementation-specific
-     * duties, like setting the editorPane, etc.
-     */
+  protected MessageUI msgUI;
+  protected JSplitPane splitPane = null;
+  protected AttachmentPane attachmentPanel = null;
+  protected JTextPane editorPane = null;
+  protected JScrollPane editorScrollPane = null;
+  protected boolean hasAttachment = false;
+  protected ConfigurableKeyBinding keyBindings;
+  
+  //<sigh>
+  JScrollPane attachmentScrollPane;
+  
+  /**
+   * Creates an empty MessageDisplayPanel.
+   */
+  public MessageDisplayPanel() {
+    this.setLayout(new CardLayout());
+  }
+  
+  /**
+   * Creates a MessageDisplayPanel for the given MessageUI.
+   */
+  public MessageDisplayPanel(MessageUI newMsgUI) {
+    msgUI = newMsgUI;
     
-    public abstract void configureMessageDisplay() throws MessagingException;
-
+    this.setLayout(new BorderLayout());
+    
+  }
+  
+  /**
+   * This method is expected to do all the implementation-specific
+   * duties, like setting the editorPane, etc.
+   */
+  
+  public abstract void configureMessageDisplay() throws MessagingException;
+  
   /**
    * This calculates the default size for the EditorPane.
    * 
