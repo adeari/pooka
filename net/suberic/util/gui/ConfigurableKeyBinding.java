@@ -43,7 +43,7 @@ public class ConfigurableKeyBinding implements ConfigurableUI {
 		String keyAction = vars.getProperty(keyID + ".Action" , "");
 		KeyStroke keyStroke = getKeyStroke(keyID, vars);
 		if (keyAction != "" && keyStroke != null) {
-		    keyTable.put(keyAction, keyStroke);
+		    putInKeyTable(keyAction, keyStroke);
 		}
 	    }
 	}
@@ -65,15 +65,18 @@ public class ConfigurableKeyBinding implements ConfigurableUI {
      */
     public void setActive(Hashtable newCommands) {
 	commands = newCommands;
-	Enumeration hashKeys = keyTable.keys();
+	Enumeration hashKeys = getKeyTableKeys();
 	while (hashKeys.hasMoreElements()) {
 	    String actionCmd = (String)hashKeys.nextElement();
-	    KeyStroke keyStroke = (KeyStroke)keyTable.get(actionCmd);
+	    Vector keyStrokeVector = getFromKeyTable(actionCmd);
 	    Action a = getAction(actionCmd);
-	    if (a != null) {
-		currentComponent.registerKeyboardAction(a, actionCmd, keyStroke, getCondition() );
-	    } else {
-		currentComponent.unregisterKeyboardAction(keyStroke);
+	    for (int i = 0; keyStrokeVector != null && i < keyStrokeVector.size(); i++) {
+		KeyStroke keyStroke = (KeyStroke)keyStrokeVector.elementAt(i);
+		if (a != null) {
+		    currentComponent.registerKeyboardAction(a, actionCmd, keyStroke, getCondition() );
+		} else {
+		    currentComponent.unregisterKeyboardAction(keyStroke);
+		}
 	    }
 	}
     }
@@ -95,6 +98,27 @@ public class ConfigurableKeyBinding implements ConfigurableUI {
 	setActive(tmpHash);
     }
 
+    public void putInKeyTable(Object key, Object value) {
+	Vector valueList = (Vector) keyTable.get(key);
+	if (valueList != null) {
+	    if (!valueList.contains(value))
+		valueList.add(value);
+	} else {
+	    valueList = new Vector();
+	    valueList.add(value);
+	    keyTable.put(key, valueList);
+	}
+	    
+    }
+
+    public Vector getFromKeyTable(Object key) {
+	return (Vector) keyTable.get(key);
+    }
+
+    public Enumeration getKeyTableKeys() {
+	return keyTable.keys();
+    }
+
     private Action getAction(String key) {
 	try {
 	    return (Action)commands.get(key);
@@ -110,5 +134,7 @@ public class ConfigurableKeyBinding implements ConfigurableUI {
     public int getCondition() {
 	return condition;
     }
+
+    
 
 }
