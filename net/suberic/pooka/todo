@@ -67,6 +67,8 @@ for a while, your connection to your Store can go down.
 *) fix the display of the messages in the FolderWindow--right now, you get
 too much date info, not enough Subject.
 
+*) add pop3/local mail spool support.
+
 *) add an optional preview pane.
 
 *) add a search and replace for the message editors.
@@ -98,6 +100,8 @@ too much date info, not enough Subject.
 *) add address book and alias support
 
 *) add ldap support
+
+*) add pgp/gpg support.
 
 -------
 
