@@ -11,32 +11,6 @@ import java.io.*;
 public abstract class EncryptionUtils {
 
   /**
-   * Decrypts a section of text using an EncryptionKey.
-   */
-  public abstract byte[] decrypt(InputStream encryptedStream, EncryptionKey key)
-    throws EncryptionException;
-
-  /**
-   * Encrypts a section of text using an EncryptionKey.
-   */
-  public abstract byte[] encrypt(InputStream rawStream, EncryptionKey key)
-    throws EncryptionException;
-
-  /**
-   * Signs a section of text.
-   */
-  public abstract byte[] sign(InputStream rawStream, EncryptionKey key)
-    throws EncryptionException;
-
-  /**
-   * Checks a signature against a section of text.
-   */
-  public abstract boolean checkSignature(InputStream rawStream, 
-					 byte[] signature, EncryptionKey key)
-    throws EncryptionException;
-
-
-  /**
    * Encrypts a Message.
    */
   public abstract MimeMessage encryptMessage(Session s, MimeMessage msg, EncryptionKey key) 
