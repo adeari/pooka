@@ -84,6 +84,7 @@ public class StoreInfo implements ValueChangeListener {
 		    public void disconnected(ConnectionEvent e) {
 			if (Pooka.isDebug())
 			    System.out.println("Store " + getStoreID() + " disconnected.");
+			/*
 			if (connected == true) {
 			    try {
 				if (!(store.isConnected()))
@@ -92,6 +93,15 @@ public class StoreInfo implements ValueChangeListener {
 				System.out.println("Store " + getStoreID() + " disconnected and unable to reconnect:  " + me.getMessage());
 			    }
 			}
+			*/
+
+			try {
+			    disconnectStore();
+			} catch (MessagingException me) {
+			    if (Pooka.isDebug())
+				System.out.println("error disconnecting Store:  " + me.getMessage());
+			}
+			
 		    }
 		});
 	}

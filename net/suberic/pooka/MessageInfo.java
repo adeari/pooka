@@ -129,6 +129,25 @@ public class MessageInfo {
     }
 
     /**
+     * Gets the Content and inline text content for the Message.
+     */
+    public String getTextAndTextInlines(String attachmentSeparator, boolean showFullHeaders, boolean withHeaders) throws MessagingException {
+	try {
+	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders);
+	} catch (FolderClosedException fce) {
+	    getFolderInfo().openFolder(Folder.READ_WRITE);
+	    return MailUtilities.getTextAndTextInlines(getMessage(), attachmentSeparator, showFullHeaders, withHeaders);
+	}
+    }
+
+    /**
+     * Gets the Text part of the Content of this Message.
+     */
+    public String getTextPart(boolean showFullHeaders, boolean withHeaders) throws MessagingException {
+	return MailUtilities.getTextPart(getMessage(), showFullHeaders, withHeaders);
+    }
+
+    /**
      * Moves the Message into the target Folder.
      */
     public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {

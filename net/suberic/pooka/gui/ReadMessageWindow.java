@@ -75,6 +75,7 @@ public class ReadMessageWindow extends MessageWindow {
 		});
 	} catch (MessagingException me) {
 	    showError(Pooka.getProperty("error.MessageWindow.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageWindow.errorLoadingMessage.title", "Error loading message."));
+	    me.printStackTrace();
 	}
 	
     }
@@ -119,11 +120,12 @@ public class ReadMessageWindow extends MessageWindow {
 	
 	
 	String content = null;
-	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true"))
-	    content = net.suberic.pooka.MailUtilities.getTextAndTextInlines(getMessageProxy().getMessageInfo().getMessage(), Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
-	else
-	    content = net.suberic.pooka.MailUtilities.getTextPart(getMessageProxy().getMessageInfo().getMessage(), showFullHeaders(), true);
-	
+	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	    content = getMessageProxy().getMessageInfo().getTextAndTextInlines(Pooka.getProperty("Pooka.attachmentSeparator", "\n\n"), showFullHeaders(), true);
+	} else {
+	    content = getMessageProxy().getMessageInfo().getTextPart( showFullHeaders(), true);
+	}
+
 	if (content != null) {
 	    messageText.append(content);
 	    retval.setEditable(false);
