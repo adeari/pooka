@@ -9,8 +9,15 @@ import java.util.Vector;
  */
 public class PropertyEditorFactory {
   
+  // the VariableBundle that holds both the properties and the editor
+  // definitions.
+
   VariableBundle sourceBundle;
 
+  /**
+   * Creates a PropertyEditorFactory using the given VariableBundle as
+   * a source.
+   */
   public PropertyEditorFactory(VariableBundle bundle) {
     sourceBundle = bundle;
   }

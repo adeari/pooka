@@ -23,24 +23,34 @@ public interface PropertyEditorUI {
    * "UserProfile.userOne.showHeaders", "UserProfile.showHeaders", mgr,
    * true)
    *
+   * @param propertyName The property to be edited.  
+   * @param template The property that will define the layout of the 
+   *                 editor.
+   * @param manager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default. 
    */
-  public void configureEditor(PropertyEditorFactory factory, String propertyName, String template, PropertyEditorManager mgr, boolean isEnabled);
+  public void configureEditor(String propertyName, String template, PropertyEditorManager manager, boolean isEnabled);
   
   /**
    * This configures an editor for the given propertyName in the 
    * PropertyEditorManager mgr.
-   */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager mgr, boolean isEnabled);
-  
-  /**
-   * This configures an editor for the given propertyName in the 
-   * PropertyEditorManager mgr.
+   * @param propertyName The property to be edited.  This will also be
+   *                     used for the editor layout.
+   * @param manager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default. 
    */
   public void configureEditor(String propertyName, PropertyEditorManager mgr, boolean isEnabled);
   
   /**
    * This configures an editor for the given propertyName in the 
    * PropertyEditorManager mgr.
+   *
+   * @param propertyName The property to be edited.  This will also be
+   *                     used for the editor layout.
+   * @param manager The PropertyEditorManager that will manage the
+   *                   changes.
    */
   public void configureEditor(String propertyName, PropertyEditorManager mgr);
   

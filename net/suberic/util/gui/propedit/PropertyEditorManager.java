@@ -11,6 +11,8 @@ public class PropertyEditorManager {
 
   protected VariableBundle sourceBundle;
 
+  protected PropertyEditorFactory propertyFactory;
+
   /**
    * Creates a new PropertyEditorManager.
    */
@@ -18,10 +20,12 @@ public class PropertyEditorManager {
   }
 
   /**
-   * Creates a PropertyEditorManager using the given VariableBundle.
+   * Creates a PropertyEditorManager using the given VariableBundle and
+   * PropertyEditorFactory.
    */
-  public PropertyEditorManager(VariableBundle vb) {
+  public PropertyEditorManager(VariableBundle vb, PropertyEditorFactory factory) {
     sourceBundle = vb;
+    propertyFactory = factory;
   }
 
   /**
@@ -37,5 +41,26 @@ public class PropertyEditorManager {
    */
   public void registerPropertyEditor(String property, PropertyEditorUI peui) {
     editorMap.put(property, peui);
+  }
+
+  /**
+   * Gets the PropertyEditorFactory for this manager.
+   */
+  public PropertyEditorFactory getFactory() {
+    return propertyFactory;
+  }
+  
+  /**
+   * Gets the value of the given property.
+   */
+  public String getProperty(String property, String defaultValue) {
+    return sourceBundle.getProperty(property, defaultValue);
+  }
+
+  /**
+   * Sets the given property to the given value.
+   */
+  public void setProperty(String property, String value) {
+    sourceBundle.setProperty(property, value);
   }
 }

@@ -8,12 +8,24 @@ import java.util.LinkedList;
 /**
  * A Swing implementation of the PropertyEditorUI.
  */
-public abstract class DefaultPropertyEditor extends JPanel implements PropertyEditorUI {
+public abstract class SwingPropertyEditor extends JPanel implements PropertyEditorUI {
   // debug flag
   protected boolean debug = false;
   
   // shows whether or not this component is enabled.
   protected boolean enabled;
+
+  // the property being edited.
+  protected String property;
+
+  // the template to use
+  protected String editorTemplate;
+
+  // the original value of the property.
+  protected String originalValue;
+
+  // the PorpertyEditorManager for this instance.
+  protected PropertyEditorManager manager;
   
   // the label component.  this is used for a default implementation
   // of the sizing code we have below.
@@ -27,44 +39,65 @@ public abstract class DefaultPropertyEditor extends JPanel implements PropertyEd
   protected List listenerList = new LinkedList();
 
   /**
-   * Creates a new DefaultPropertyEditor, in this case a Box with an
-   * X_AXIS layout.
+   * Creates a new SwingPropertyEditor, in this case a JPanel with a 
+   * GridBagLayout.  Note that configureEditor() will need to get called
+   * on this component in order to make it useful.
    */
-  public DefaultPropertyEditor() {
+  public SwingPropertyEditor() {
     super();
     this.setLayout(new java.awt.GridBagLayout());
   }
   
   /**
-   * Creates a new DefaultPropertyEditor, with the axis as given.
+   * Creates a SwingPropertyEditor using the given property and manager.
+   *
+   * @param propertyName The property to be edited.  This property will
+   *        also be used to define the layout of this Editor.
+   * @param newManager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default. 
    */
-  public DefaultPropertyEditor(int axis) {
-    super();
-    this.setLayout(new java.awt.GridBagLayout());
+  public SwingPropertyEditor(String propertyName, PropertyEditorManager newManager, boolean isEnabled) {
+    configureEditor(propertyName, propertyName, newManager, isEnabled);
   }
   
   /**
-   * This configures an editor for the given propertyName in the 
-   * VariableBundle bundle.
+   * Creates a SwingPropertyEditor using the given property and manager.
+   *
+   * @param propertyName The property to be edited.  
+   * @param template The property that will define the layout of the 
+   *                 editor.
+   * @param newManager The PropertyEditorManager that will manage the
+   *                   changes.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager mgr, boolean isEnabled) {
-    configureEditor(null, propertyName, template, mgr, isEnabled);
+  public SwingPropertyEditor(String propertyName, String template, PropertyEditorManager newManager ) {
+    configureEditor(propertyName, template, newManager, true);
+  }
+  
+  
+  /**
+   * Creates a SwingPropertyEditor using the given property and manager.
+   *
+   * @param propertyName The property to be edited.  This property will
+   *        also be used to define the layout of this Editor.
+   * @param newManager The PropertyEditorManager that will manage the
+   *                   changes.
+   */
+  public void configureEditor(String propertyName, PropertyEditorManager newManager) {
+    configureEditor(propertyName, propertyName, newManager, true);
   }
   
   /**
-   * This configures an editor for the given propertyName in the 
-   * VariableBundle bundle.
+   * Creates a SwingPropertyEditor using the given property and manager.
+   *
+   * @param propertyName The property to be edited.  This property will
+   *        also be used to define the layout of this Editor.
+   * @param newManager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default. 
    */
-  public void configureEditor(String propertyName, PropertyEditorManager mgr, boolean isEnabled) {
-    configureEditor(null, propertyName, propertyName, mgr, isEnabled);
-  }
-  
-  /**
-   * This configures an editor for the given propertyName in the 
-   * VariableBundle bundle.
-   */
-  public void configureEditor(String propertyName, PropertyEditorManager mgr) {
-    configureEditor(null, propertyName, propertyName, mgr, true);
+  public void configureEditor(String propertyName, PropertyEditorManager newManager, boolean isEnabled) {
+    configureEditor(propertyName, propertyName, newManager, isEnabled);
   }
 
   /**
@@ -191,4 +224,5 @@ public abstract class DefaultPropertyEditor extends JPanel implements PropertyEd
       current.propertyChanged(newValue);
     }
   }
+
 }

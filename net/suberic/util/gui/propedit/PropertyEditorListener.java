@@ -1,7 +1,7 @@
 package net.suberic.util.gui.propedit;
 
 /**
- * This listens to a DefaultPropertyEditor and reacts to changes.
+ * This listens to a PropertyEditorUI and reacts to changes.
  */
 public interface PropertyEditorListener {
 
