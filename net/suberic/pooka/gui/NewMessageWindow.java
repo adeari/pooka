@@ -80,6 +80,15 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 		}
 	    });
 
+	editorPane.addMouseListener(new MouseAdapter() {
+		
+		public void mousePressed(MouseEvent e) {
+		    if (e.isPopupTrigger()) {
+			showPopupMenu(editorPane, e);
+		    }
+		}
+	    });
+
 	this.sizeWindow();
     }
 
@@ -347,6 +356,17 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	editorScrollPane.unregisterKeyboardAction(aKeyStroke);
 	toolbar.unregisterKeyboardAction(aKeyStroke);
 	splitPane.unregisterKeyboardAction(aKeyStroke);
+    }
+
+    /**
+     * This creates and shows a PopupMenu for this component.  
+     */
+    public void showPopupMenu(JComponent component, MouseEvent e) {
+	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
+	popupMenu.configureComponent("NewMessageWindow.popupMenu", Pooka.getResources());	
+	popupMenu.setActive(getActions());
+	popupMenu.show(component, e.getX(), e.getY());
+	    
     }
 
     /**

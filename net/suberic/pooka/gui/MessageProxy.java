@@ -1,12 +1,13 @@
 package net.suberic.pooka.gui;
+import net.suberic.pooka.*;
+import net.suberic.util.gui.ConfigurablePopupMenu;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
 import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
-import net.suberic.pooka.*;
-import java.awt.event.ActionEvent;
+import java.awt.event.*;
 
 public class MessageProxy {
     // the underlying message
@@ -318,6 +319,17 @@ public class MessageProxy {
 	    mMsg.setSubject(parseMsgString(Pooka.getProperty("Pooka.forwardSubject", "Fwd:  %s")));
     }
 
+    /**
+     * This creates and shows a PopupMenu for this component.  
+     */
+    public void showPopupMenu(JComponent component, MouseEvent e) {
+	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
+	popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
+	popupMenu.setActive(getActions());
+	popupMenu.show(component, e.getX(), e.getY());
+	    
+    }
+    
     /**
      * As specified by interface net.suberic.pooka.UserProfileContainer.
      *

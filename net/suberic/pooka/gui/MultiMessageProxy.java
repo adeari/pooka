@@ -3,8 +3,10 @@ import javax.mail.*;
 import javax.swing.*;
 import java.util.Hashtable;
 import java.util.Vector;
+import java.awt.event.MouseEvent;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.Pooka;
+import net.suberic.util.gui.ConfigurablePopupMenu;
 
 /**
  * This class represents a group of Messages all selected.
@@ -85,6 +87,14 @@ public class MultiMessageProxy extends MessageProxy{
 		if (Pooka.isDebug())
 		    me.printStackTrace();
 	    }		
+    }
+
+    public void showPopupMenu(JComponent component, MouseEvent e) {
+	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
+	popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());	
+	popupMenu.setActive(getActions());
+	popupMenu.show(component, e.getX(), e.getY());
+	    
     }
 
     /**

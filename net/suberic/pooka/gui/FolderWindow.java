@@ -128,6 +128,20 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 		    }
 		}
 	    }
+
+	    public void mousePressed(MouseEvent e) {
+		if (e.isPopupTrigger()) {
+		    // see if anything is selected
+		    int rowIndex = getMessageTable().rowAtPoint(e.getPoint());
+		    if (rowIndex == -1 || !getMessageTable().isRowSelected(rowIndex) ) {
+			getMessageTable().setRowSelectionInterval(rowIndex, rowIndex);
+		    }
+		    
+		    MessageProxy selectedMessage = getSelectedMessage();
+		    if (selectedMessage != null)
+			selectedMessage.showPopupMenu(getMessageTable(), e);
+		}
+	    }
 	});
 
 	messageTable.getSelectionModel().addListSelectionListener(new SelectionListener());

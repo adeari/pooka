@@ -64,6 +64,15 @@ public class ReadMessageWindow extends MessageWindow {
 
 	keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
 	keyBindings.setActive(getActions());
+
+	editorPane.addMouseListener(new MouseAdapter() {
+		
+		public void mousePressed(MouseEvent e) {
+		    if (e.isPopupTrigger()) {
+			showPopupMenu(editorPane, e);
+		    }
+		}
+	    });
     }
 
     /**
@@ -169,6 +178,18 @@ public class ReadMessageWindow extends MessageWindow {
 	toolbar.unregisterKeyboardAction(aKeyStroke);
 	splitPane.unregisterKeyboardAction(aKeyStroke);
     }
+
+    /**
+     * This creates and shows a PopupMenu for this component.  
+     */
+    public void showPopupMenu(JComponent component, MouseEvent e) {
+	ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
+	popupMenu.configureComponent("ReadMessageWindow.popupMenu", Pooka.getResources());	
+	popupMenu.setActive(getActions());
+	popupMenu.show(component, e.getX(), e.getY());
+	
+    }
+
 
     //------- Actions ----------//
 

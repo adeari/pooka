@@ -47,6 +47,16 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 
 		public void mousePressed(MouseEvent e) {
 		    if (e.isPopupTrigger()) {
+			// see if anything is selected
+			TreePath path = folderTree.getClosestPathForLocation(e.getX(), e.getY());
+			if (folderTree.getPathBounds(path).contains(e.getX(), e.getY())) {
+			    // this means that we're clicking on a node.  make
+			    // sure that it's selected.
+
+			    if (!folderTree.isPathSelected(path))
+				folderTree.setSelectionPath(path);
+			}
+
 			MailTreeNode tmpNode = getSelectedNode();
 			if (tmpNode != null) {
 			    tmpNode.showPopupMenu(FolderPanel.this, e);
