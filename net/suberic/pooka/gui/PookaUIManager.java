@@ -102,6 +102,7 @@ public class PookaUIManager implements ValueChangeListener {
 	      if (updateUI) {
 		if (Pooka.getMainPanel() != null)
 		  javax.swing.SwingUtilities.updateComponentTreeUI(Pooka.getMainPanel());
+		updateUI = false;
 	      }
 	    }
 	  });

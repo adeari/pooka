@@ -188,6 +188,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
     Vector propList;
     Vector templateList;
     
+    /*
     for (int i = 0; i < itemList.size(); i++) {
       rootProp = new String(property + "." + (String)(itemList.elementAt(i)));
       
@@ -205,6 +206,7 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
       entryPanel.add((String)itemList.elementAt(i), pep);
       
     }
+    */
     
     // create the default 
     
@@ -273,14 +275,38 @@ public class MultiEditorPane extends DefaultPropertyEditor implements ListSelect
   }
   
   
+  /**
+   * Called when the selected value changed.  should result in the 
+   * entryPane changing.
+   */
   public void valueChanged(ListSelectionEvent e) {
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
     
     String selectedId = (String)((JList)e.getSource()).getSelectedValue();
     
-    if (selectedId != null)
+    if (selectedId != null) {
+      Object newSelected = currentPanels.get(selectedId);
+      if (newSelected == null) {
+	String rootProp = new String(property + "." + selectedId);
+	
+	CompositeEditorPane pep = new CompositeEditorPane(factory, rootProp, template);;
+
+	/*
+	if (original == true) {
+	  originalPanels.put(itemList.elementAt(i), pep);
+	}
+      
+	//	    pep.setEnabled(false);
+	*/
+
+	// save reference to new pane in hash table
+	currentPanels.put(selectedId, pep);
+	
+	entryPanel.add(selectedId, pep);
+
+      }
       entryLayout.show(entryPanel, selectedId);
-    else
+    } else
       entryLayout.show(entryPanel, "___default");
     
   }

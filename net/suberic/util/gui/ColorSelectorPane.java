@@ -188,10 +188,15 @@ public class ColorSelectorPane extends DefaultPropertyEditor {
   }
   
   public boolean isChanged() {
-    if (useEnabledBox)
+    if (useEnabledBox) {
+      //System.err.println("checking isChanged() for " + property);
+      //System.err.println("oldEnabled = " + origEnabled + "; enabledBox.isSelected() == " + enabledBox.isSelected());
+      //System.err.println("origValue = " + origValue + "; currentColor.getRGB = " + currentColor.getRGB());
+      //System.err.println("isChanged() = " + (! (enabledBox.isSelected() == origEnabled && origValue.equals(Integer.toString(currentColor.getRGB())))));
       return (! (enabledBox.isSelected() == origEnabled && origValue.equals(Integer.toString(currentColor.getRGB()))));
-    else
+    } else {
       return (!(origValue.equals(Integer.toString(currentColor.getRGB()))));
+    }
   }
   
   public void setEnabled(boolean newValue) {

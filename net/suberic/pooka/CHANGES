@@ -1,3 +1,10 @@
+improved the startup time for Multi Editor panes.
+
+added support for custom colors and components for most (if not all) 
+components.
+
+added a Color selector and a Font selector.
+
 made file->exit check for unsent messages and offer you a chance to send
 them.  (BUG:  doesn't work properly under jdk1.2)
 

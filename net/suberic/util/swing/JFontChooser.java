@@ -77,6 +77,10 @@ public class JFontChooser extends JComponent {
     returnValue.getContentPane().setLayout(new BoxLayout(returnValue.getContentPane(), BoxLayout.Y_AXIS));
     returnValue.getContentPane().add(chooserPane);
     returnValue.getContentPane().add(chooserPane.createButtonPanel(okListener, cancelListener, returnValue));
+    Container cp = returnValue.getContentPane();
+    if (cp instanceof JComponent) {
+      ((JComponent) cp).setBorder(BorderFactory.createEtchedBorder());
+    }
     return returnValue;
   }
 
@@ -101,7 +105,7 @@ public class JFontChooser extends JComponent {
    */
   public static String encodeFont(Font f) {
     StringBuffer returnBuffer = new StringBuffer();
-    returnBuffer.append(f.getFamily());
+    returnBuffer.append(f.getName());
     returnBuffer.append('-');
     returnBuffer.append(getFontStyle(f));
     returnBuffer.append('-');
@@ -115,27 +119,29 @@ public class JFontChooser extends JComponent {
   public void setFont(Font newFont) {
     changing = true;
 
-    if (newFont != null) {
-      if (fontList != null) {
-	String family = newFont.getFamily();
-	fontList.setSelectedValue(family, true);
-      }
-      
-      if (styleList != null) {
-	String style = getFontStyle(newFont);
-	if (style != null && style == "BoldItalic")
-	  fontList.setSelectedValue("Bold Italic", true);
-	else 
-	  fontList.setSelectedValue(style, true);
-      }
-      
-      if (sizeList != null) {
-	String size = Integer.toString(newFont.getSize());
-	sizeList.setSelectedValue(size, true);
-      }
-      
-      previewTextArea.setFont(newFont);
+    if (previewTextArea != null) {
+      if (newFont != null) {
+	if (fontList != null) {
+	  String fontName = newFont.getName();
+	  fontList.setSelectedValue(fontName, true);
+	}
+	
+	if (styleList != null) {
+	  String style = getFontStyle(newFont);
+	  if (style != null && style == "BoldItalic")
+	    styleList.setSelectedValue("Bold Italic", true);
+	  else 
+	    styleList.setSelectedValue(style, true);
+	}
+	
+	if (sizeList != null) {
+	  String size = Integer.toString(newFont.getSize());
+	  sizeList.setSelectedValue(size, true);
+	}
+	
+	previewTextArea.setFont(newFont);
     
+      }
     }
     changing = false;
     
@@ -148,15 +154,15 @@ public class JFontChooser extends JComponent {
     int style = f.getStyle();
 
     if (style == Font.PLAIN)
-      return ("Plain");
+      return (allowedFontStyles[0]);
     else if (style == Font.BOLD)
-      return ("Bold");
+      return (allowedFontStyles[1]);
     else if (style == Font.ITALIC)
-      return ("Italic");
+      return (allowedFontStyles[2]);
     else if (style == Font.BOLD + Font.ITALIC)
-      return ("BoldItalic");
+      return (allowedFontStyles[3]);
     else
-      return("plain");
+      return(allowedFontStyles[0]);
   }
 
   /**
@@ -218,7 +224,9 @@ public class JFontChooser extends JComponent {
     originalFont = f;
     Box mainBox = Box.createVerticalBox();
     mainBox.add(createChooserPanel(f));
+    mainBox.add(Box.createVerticalStrut(10));
     mainBox.add(createPreviewPanel(f, previewString));
+    setFont(f);
     this.setLayout(new BorderLayout());
     this.add(mainBox, BorderLayout.CENTER);
     //this.pack();
@@ -228,6 +236,8 @@ public class JFontChooser extends JComponent {
    * Creates the Chooser panel.
    */
   private Component createChooserPanel(Font f) {
+    JPanel returnValue = new JPanel();
+
     ListSelectionListener changeListener = new ListSelectionListener() {
 	public void valueChanged(ListSelectionEvent lse) {
 	  if (! changing)
@@ -245,7 +255,7 @@ public class JFontChooser extends JComponent {
     fontBox.add(fontNameScroller);
 
     chooser.add(fontBox);
-    chooser.add(Box.createHorizontalStrut(10));
+    chooser.add(Box.createHorizontalStrut(15));
 
     Box styleBox = Box.createVerticalBox();
     styleBox.add(new JLabel("Font Style"));
@@ -255,7 +265,7 @@ public class JFontChooser extends JComponent {
     styleBox.add(styleScroller);
 
     chooser.add(styleBox);
-    chooser.add(Box.createHorizontalStrut(10));
+    chooser.add(Box.createHorizontalStrut(15));
 
     Box sizeBox = Box.createVerticalBox();
     sizeBox.add(new JLabel("Size"));
@@ -266,9 +276,10 @@ public class JFontChooser extends JComponent {
 
     chooser.add(sizeBox);
 
-    setFont(f);
+    returnValue.add(chooser);
+    returnValue.setBorder(BorderFactory.createEtchedBorder());
 
-    return chooser;
+    return returnValue;
   }
 
   /**
@@ -277,8 +288,11 @@ public class JFontChooser extends JComponent {
   private Component createPreviewPanel(Font f, String previewText) {
     previewTextArea = new JTextArea(previewText);
     previewTextArea.setFont(f);
-    Box returnValue = Box.createVerticalBox();
+    JPanel returnValue = new JPanel();
     returnValue.add(previewTextArea);
+
+    returnValue.setBorder(BorderFactory.createEtchedBorder());
+    returnValue.setMinimumSize(new java.awt.Dimension(50,50));
 
     return returnValue;
   }
@@ -321,6 +335,8 @@ public class JFontChooser extends JComponent {
 
     getRootPane().setDefaultButton(okButton);
 
+    returnValue.setBorder(BorderFactory.createEtchedBorder());
+
     return returnValue;
   }
 
@@ -337,12 +353,12 @@ public class JFontChooser extends JComponent {
   protected void fontSelectionChanged() {
     Font currentFont = previewTextArea.getFont();
 
-    String family = (String) fontList.getSelectedValue();
+    String fontName = (String) fontList.getSelectedValue();
     String styleString = (String) styleList.getSelectedValue();
     String sizeString = (String) sizeList.getSelectedValue();
 
-    if (family == null || family.length() == 0) {
-      family = currentFont.getFamily();
+    if (fontName == null || fontName.length() == 0) {
+      fontName = currentFont.getFontName();
     }
 
     int style = currentFont.getStyle();
@@ -365,9 +381,10 @@ public class JFontChooser extends JComponent {
       }
     }
 
-    Font newFont = new Font(family, style, size);
+    Font newFont = new Font(fontName, style, size);
 
     previewTextArea.setFont(newFont);
+    SwingUtilities.windowForComponent(this).pack();
   }
 
   /**
