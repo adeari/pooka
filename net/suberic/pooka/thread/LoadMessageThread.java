@@ -98,22 +98,23 @@ public class LoadMessageThread extends Thread {
 	  
 	  if (! mp.getMessageInfo().hasBeenFetched()) {
 	    try {
-	      int firstToFetch = Math.max(1 + i - fetchBatchSize, 0);
-	      // we need to fetch the next batch.
-	      
-	      Message[] toFetch = new Message[ 1 + i - firstToFetch];
-	      
-	      for (int j = 0; j < toFetch.length; j++) {
-		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(firstToFetch + j)).getMessageInfo();
+	      int fetchCount = 0;
+	      Vector fetchVector = new Vector();
+	      for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+		if (! fetchInfo.hasBeenFetched()) {
+		  Message currentMsg = fetchInfo.getRealMessage();
+		  if (currentMsg instanceof UIDMimeMessage)
+		    currentMsg = ((UIDMimeMessage)currentMsg).getMessage();
 		
-		Message currentMsg = fetchInfo.getRealMessage();
-		if (currentMsg instanceof UIDMimeMessage)
-		  currentMsg = ((UIDMimeMessage)currentMsg).getMessage();
-		
-		toFetch[j] = currentMsg;
-		
-		fetchInfo.setFetched(true);
+		  fetchVector.add(currentMsg);
+		  
+		  fetchInfo.setFetched(true);
+		}
 	      }
+	      
+	      Message[] toFetch = new Message[fetchVector.size()];
+	      toFetch = (Message[]) fetchVector.toArray(toFetch);
 	      getFolderInfo().fetch(toFetch, fetchProfile);
 	    } catch(MessagingException me) {
 	      System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
