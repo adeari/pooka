@@ -1,6 +1,8 @@
 *) make it so we only get one connection failed message for a store.
 	- test.
 
+*) make address book editable as soon as you create it.
+
 *) search doesn't work properly for sent folders.
 	-- started, at least.
 *) make search window look different than normal window.
@@ -8,16 +10,10 @@
 *) startup:
 	--make sure that the outbox gets configured correctly as an outbox
 	--see why we got two INBOX entries
-	
+
 *) support windows registry attachment associations.
 
-*) make address book editable as soon as you create it.
-
 *) check disconnection/reconnection on network removal/restoral.
-
-*) bringing up a disconnected folder with no new messages shows the
-	top of the folder rather than the bottom.
-	-- also, 0 messages, 0 unread?
 
 -------
 

@@ -146,7 +146,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    */
   public void openFolder(int mode) throws MessagingException {
     try {
-      
       if (Pooka.isDebug())
 	System.out.println(this + ":  checking parent store.");
       
@@ -193,6 +192,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       //me.printStackTrace();
       setStatus(DISCONNECTED);
       throw me;
+    } finally {
+      resetMessageCounts();
     }
   }
   
@@ -486,22 +487,22 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
   /*
   public int getUnreadCount() {
-  try {
-  if (getCache() != null) 
-  unreadCount = getCache().getUnreadMessageCount();
-  } catch (MessagingException me) {
-  
-  }
-  return unreadCount;
+    try {
+      if (getCache() != null) 
+	unreadCount = getCache().getUnreadMessageCount();
+    } catch (MessagingException me) {
+      
+    }
+    return unreadCount;
   }
   
   public int getMessageCount() {
-  try {
-  if (getCache() != null) 
-  messageCount = getCache().getMessageCount();
-  } catch (MessagingException me) {
-  }
-  return messageCount;
+    try {
+      if (getCache() != null) 
+	messageCount = getCache().getMessageCount();
+    } catch (MessagingException me) {
+    }
+    return messageCount;
   }
   */
 
@@ -531,6 +532,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       // messageCount and set the unreadCount to zero.
       unreadCount = 0;
     }
+
   }
 
   /**

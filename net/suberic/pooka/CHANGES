@@ -1,3 +1,6 @@
+bringing up folders in disconnected mode shows the correct number of
+read and unread messages again.
+
 fixed the display of the folders in the folder tree.
 
 made it so new external frames don't end up all going at 0,0.
