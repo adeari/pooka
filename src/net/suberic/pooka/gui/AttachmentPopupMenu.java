@@ -128,12 +128,13 @@ public class AttachmentPopupMenu extends JPopupMenu {
     }
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
+      AttachmentHandler ah = new AttachmentHandler(mProxy);
       if (actionType == SAVE) {
-	// AttachmentUtils.saveAttachment(mAttachment);
+	ah.saveAttachment(mAttachment, AttachmentPopupMenu.this);
       } else if (actionType == OPEN_WITH) {
-	// AttachmentUtils.openWith(mAttachment);
+	ah.openWith(mAttachment);
       } else {
-	// AttachmentUtils.open(mAttachment);
+	ah.openAttachment(mAttachment);
       }
     }
   }

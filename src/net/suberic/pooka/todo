@@ -7,6 +7,10 @@
 
 -----
 *) make attachments openable from the messge panel.
+	-- started.  make it so we can save them from the message panel
+	also, plus show the file type.
+	-- make it so we see an error if we try to do a bogus open with.
+
 *) windows attachments associated with correct item (icemail lib)
 
 *) queuing of outgoing mails
