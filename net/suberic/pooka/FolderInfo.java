@@ -1300,15 +1300,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      */
     public MessageInfo[] search(javax.mail.search.SearchTerm term) 
     throws MessagingException {
+	if (folderTableModel == null)
+	    loadAllMessages();
+
 	Message[] matchingMessages = folder.search(term);
 	MessageInfo returnValue[] = new MessageInfo[matchingMessages.length];
 	for (int i = 0; i < matchingMessages.length; i++) {
-	    returnValue[i] = getMessageInfo(matchingMessages[i]);
+	    if (Pooka.isDebug())
+		System.out.println("match " + i + " = " + matchingMessages[i]);
+	    MessageInfo info = getMessageInfo(matchingMessages[i]);
+	    if (Pooka.isDebug())
+		System.out.println("messageInfo " + i + " = " + info);
+	    returnValue[i] = info;
 	}
 	if (Pooka.isDebug())
 	    System.out.println("got " + returnValue.length + " results.");
 	return returnValue;
-
     }
 
     /**
