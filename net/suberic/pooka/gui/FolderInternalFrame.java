@@ -1,8 +1,10 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
+import net.suberic.pooka.gui.search.SearchForm;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
+import javax.mail.search.SearchTerm;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -35,7 +37,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      */
 
     public FolderInternalFrame(FolderInfo newFolderInfo, MessagePanel newMessagePanel) {
-	super(newFolderInfo.getFolderName() + " - " + newFolderInfo.getParentStore().getStoreID(), true, true, true, true);
+	super(newFolderInfo.getFolderName() + " - " + ((newFolderInfo.getParentStore() != null) ? newFolderInfo.getParentStore().getStoreID() : " "), true, true, true, true);
 
 	this.getContentPane().setLayout(new BorderLayout());
 	
@@ -61,6 +63,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	setFolderStatusBar(new FolderStatusBar(this.getFolderInfo()));
 	
 	folderDisplay = new FolderDisplayPanel(getFolderInfo());
+
 	toolbar = new ConfigurableToolbar("FolderWindowToolbar", Pooka.getResources());
 	this.getContentPane().add("North", toolbar);
 	this.getContentPane().add("Center", folderDisplay);
@@ -166,11 +169,65 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
      * the search term.
      */
     public void searchFolder() {
-	javax.mail.search.SearchTerm term = new javax.mail.search.SubjectTerm("info");
-	try {
-	    MessageInfo[] matches = getFolderInfo().search(term);
-	} catch (Exception e) {
-	    System.out.println("caught exception.");
+	SearchForm sf = new SearchForm(new FolderInfo[] { getFolderInfo() }, false);
+	int returnValue = Pooka.getUIFactory().showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
+	if (returnValue == JOptionPane.OK_OPTION) {
+	    final Vector selectedFolders = sf.getSelectedFolders();
+	    final javax.mail.search.SearchTerm searchTerm = sf.getSearchTerm();
+
+	    getFolderInfo().getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+		    public void actionPerformed(ActionEvent e) {
+			Vector matchingValues = new Vector();
+			if (Pooka.isDebug()) 
+			    System.out.println("init:  matchingValues.size() = " + matchingValues.size());
+			for (int i = 0; i < selectedFolders.size(); i++) {
+			    if (Pooka.isDebug())
+				System.out.println("trying selected folder number " + i);
+			    
+			    try {
+				net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
+				if (Pooka.isDebug())
+				    System.out.println("matches.length = " + matches.length);
+				for (int j = 0; j < matches.length; j++) {
+				    matchingValues.add(matches[j]);
+				    if (Pooka.isDebug())
+					System.out.println("adding " + matches[j] + " to matchingValues.");
+				}
+				
+			    } catch (MessagingException me) {
+				System.out.println("caught exception " + me);
+			    }
+			}
+			
+			if (Pooka.isDebug())
+			    System.out.println("got " + matchingValues.size() + " matches.");
+			
+			FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
+			for (int i = 0; i < selectedFolders.size(); i++) {
+			    parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
+			}
+
+			MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
+			for (int i = 0; i < matchingValues.size(); i++) {
+			    if (Pooka.isDebug())
+				System.out.println("matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
+			    matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
+			}
+			
+			final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
+			
+			Runnable runMe = new Runnable() {
+				public void run() {
+				    FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
+				    fdui.openFolderDisplay();
+				}
+			    };
+			
+			SwingUtilities.invokeLater(runMe);
+			
+		    }
+		}, getFolderInfo().getFolderThread()), new java.awt.event.ActionEvent(this, 1, "search"));
+	    
 	}
     }
 

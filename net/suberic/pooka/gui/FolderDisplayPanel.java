@@ -98,7 +98,6 @@ public class FolderDisplayPanel extends JPanel {
      */
     public void createMessageTable() {
 	messageTable=new JTable(getFolderInfo().getFolderTableModel());
-	//getFolderInfo().getFolderTableModel().addTableModelListener(messageTable);
 
 	if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
 	    messageTable.setShowVerticalLines(false);

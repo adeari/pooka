@@ -137,12 +137,15 @@ public class SearchEntryPanel extends JPanel {
      * Returns the SearchTerm specified by this SearchEntryPanel.
      */
     public SearchTerm getSearchTerm() {
-	System.out.println("calling SearchEntryPanel.getSearchTerm()");
+	if (Pooka.isDebug())
+	    System.out.println("calling SearchEntryPanel.getSearchTerm()");
 	if (searchTerms.size() > 0) {
-	    System.out.println("SearchEntryPanel:  searchTerms.size() > 0.");
+	    if (Pooka.isDebug())
+		System.out.println("SearchEntryPanel:  searchTerms.size() > 0.");
 	    SearchEntryPair pair = (SearchEntryPair) searchTerms.elementAt(0);
 	    SearchTerm term = pair.form.generateSearchTerm();
-	    System.out.println("SearchEntryPanel:  setting term to " + term);
+	    if (Pooka.isDebug())
+		System.out.println("SearchEntryPanel:  setting term to " + term);
 	    for (int i = 1; i < searchTerms.size(); i++) {
 		SearchEntryPair newPair = (SearchEntryPair) searchTerms.elementAt(i);
 		SearchTerm newTerm = newPair.form.generateSearchTerm();

@@ -477,8 +477,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	if (isSentFolder())
 	    tableType="SentFolderTable";
-	else if (this instanceof VirtualFolderInfo)
-	    tableType="SearchResultsTable";
+	//else if (this instanceof VirtualFolderInfo)
+	//    tableType="SearchResultsTable";
 	else 
 	    tableType="FolderTable";
 
@@ -1303,9 +1303,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	Message[] matchingMessages = folder.search(term);
 	MessageInfo returnValue[] = new MessageInfo[matchingMessages.length];
 	for (int i = 0; i < matchingMessages.length; i++) {
-	    returnValue[i] = (MessageInfo) messageToInfoTable.get(matchingMessages[i]);
+	    returnValue[i] = getMessageInfo(matchingMessages[i]);
 	}
-	System.out.println("got " + returnValue.length + " results.");
+	if (Pooka.isDebug())
+	    System.out.println("got " + returnValue.length + " results.");
 	return returnValue;
 
     }
@@ -1436,7 +1437,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	return folderDisplayUI;
     }
 
-    private void removeFromListeners(FolderDisplayUI display) {
+     protected void removeFromListeners(FolderDisplayUI display) {
 	if (display != null) {
 	    removeMessageChangedListener(display);
 	    removeMessageCountListener(display);
@@ -1444,7 +1445,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
-    private void addToListeners(FolderDisplayUI display) {
+    protected void addToListeners(FolderDisplayUI display) {
 	if (display != null) {
 	    addMessageChangedListener(display);
 	    addMessageCountListener(display);

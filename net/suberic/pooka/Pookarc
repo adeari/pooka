@@ -156,7 +156,7 @@ MainToolbar.Paste.Image=/net/suberic/pooka/gui/images/Paste.gif
 MainToolbar.Print.Action=file-print
 MainToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
 
-FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Print
+FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Print:Search
 FolderWindowToolbar.Down.Action=message-next
 FolderWindowToolbar.Down.Image=/net/suberic/pooka/gui/images/Down.gif
 FolderWindowToolbar.Up.Action=message-previous
@@ -171,6 +171,8 @@ FolderWindowToolbar.Delete.Action=message-delete
 FolderWindowToolbar.Delete.Image=/net/suberic/pooka/gui/images/Delete.gif
 FolderWindowToolbar.Print.Action=file-print
 FolderWindowToolbar.Print.Image=/net/suberic/pooka/gui/images/Print.gif
+FolderWindowToolbar.Search.Action=folder-search
+FolderWindowToolbar.Search.Image=/net/suberic/pooka/gui/images/Binocular.gif
 
 NewMessageWindowToolbar=Send:AttachFile:|:Cut:Copy:Paste:Print:|:Detach
 NewMessageWindowToolbar.Send.Action=message-send
@@ -248,10 +250,10 @@ FolderTable.showLines=true
 SentFolderTable=SentDate:To:Subject
 SentFolderTable.SentDate.value=Date
 SentFolderTable.SentDate.size=100
-FolderTable.To.value=To
-FolderTable.To.size=210
-FolderTable.Subject.value=Subject
-FolderTable.Subject.size=260
+SentFolderTable.To.value=To
+SentFolderTable.To.size=210
+SentFolderTable.Subject.value=Subject
+SentFolderTable.Subject.size=260
 
 # -- Popup menus.
 FolderNode.popupMenu=Open:Update:Close:Edit:Unsubscribe

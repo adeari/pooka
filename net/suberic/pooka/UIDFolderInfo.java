@@ -393,21 +393,6 @@ public class UIDFolderInfo extends FolderInfo {
     }
 
     
-
-    public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
-	if (m instanceof UIDMimeMessage)
-	    return (UIDMimeMessage) m;
-
-	// it's not a UIDMimeMessage, so it must be a 'real' message.
-	long uid = ((UIDFolder)getFolder()).getUID(m);
-	MessageInfo mi = getMessageInfoByUid(uid);
-	if (mi != null)
-	    return (UIDMimeMessage) mi.getMessage();
-	
-	// doesn't already exist.  just create a new one.
-	return new UIDMimeMessage(this, uid);
-    }
-
     /**
      * This updates the children of the current folder.  Generally called
      * when the folderList property is changed.
@@ -507,11 +492,41 @@ public class UIDFolderInfo extends FolderInfo {
 	fireConnectionEvent(e);
     }
 
+    public UIDMimeMessage getUIDMimeMessage(Message m) throws MessagingException {
+	if (m instanceof UIDMimeMessage)
+	    return (UIDMimeMessage) m;
+
+	// it's not a UIDMimeMessage, so it must be a 'real' message.
+	long uid = ((UIDFolder)getFolder()).getUID(m);
+	MessageInfo mi = getMessageInfoByUid(uid);
+	if (mi != null)
+	    return (UIDMimeMessage) mi.getMessage();
+	
+	// doesn't already exist.  just create a new one.
+	return new UIDMimeMessage(this, uid);
+    }
+
     /**
      * gets the 'real' message for the given MessageInfo.
      */
     public Message getRealMessage(MessageInfo mi) throws MessagingException {
 	return ((UIDMimeMessage)mi.getMessage()).getMessage();
+    }
+
+    /**
+     * gets the MessageInfo for the given Message.
+     */
+    public MessageInfo getMessageInfo(Message m) {
+	if (m instanceof UIDMimeMessage)
+	    return (MessageInfo) messageToInfoTable.get(m);
+	else {
+	    try {
+		long uid = ((UIDFolder)getFolder()).getUID(m);
+		return getMessageInfoByUid(uid);
+	    } catch (MessagingException me) {
+		return null;
+	    }
+	}
     }
 
     /**

@@ -20,6 +20,8 @@ import net.suberic.util.thread.ActionThread;
 public class VirtualFolderInfo extends FolderInfo {
     FolderInfo[] parents;
     MessageInfo[] originalMessages;
+    ActionThread folderThread;
+
     /**
      * Creates a new VirtualFolderInfo from the list of messageInfos,
      * which in turn should belong to the FolderInfos in parents.
@@ -48,6 +50,10 @@ public class VirtualFolderInfo extends FolderInfo {
 	    parents[i].addMessageCountListener(this);
 	    parents[i].addMessageChangedListener(this);
 	}
+
+	folderThread = new ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread "));
+
+	loadAllMessages();
     }
 
     /**
@@ -58,6 +64,8 @@ public class VirtualFolderInfo extends FolderInfo {
 	    parents[i].removeMessageCountListener(this);
 	    parents[i].removeMessageChangedListener(this);
 	}
+
+	folderThread.setStop(true);
     }
 
     /**
@@ -66,11 +74,21 @@ public class VirtualFolderInfo extends FolderInfo {
     public synchronized void loadAllMessages() {
 	if (folderTableModel == null) {
 	    Vector messageProxies = new Vector();
+	    createColumnInformation();
+
 	    for (int i = 0 ; i < originalMessages.length; i++) {
+		if (Pooka.isDebug())
+		    System.out.println("originalMessages[" + i + "] = " + originalMessages[i]);
 		messageProxies.add(originalMessages[i].getMessageProxy());
 		messageToInfoTable.put(originalMessages[i].getMessage(), originalMessages[i]);
 	    }
 
+	    if (Pooka.isDebug()) {
+		System.out.println("originalMessages.length = " + originalMessages.length + "; messageProxies.size() = " + messageProxies.size() + "; getColumnNames() = " + getColumnNames() + "; getColumnSizes() = " + getColumnSizes());
+		for (int i = 0 ; i < getColumnNames().size() ; i++) {
+		    System.out.println("column name " + i + " = " + getColumnNames().elementAt(i));
+		}
+	    }
 	    FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes());
 	    setFolderTableModel(ftm);
 	}
@@ -81,7 +99,7 @@ public class VirtualFolderInfo extends FolderInfo {
      */
     
     public int getFirstUnreadMessage() {
-	return 0;
+	return -1;
     }
 
     /**
@@ -189,4 +207,27 @@ public class VirtualFolderInfo extends FolderInfo {
 	return returnValue;
     }
 
+    protected void removeFromListeners(FolderDisplayUI display) {
+	if (display != null) {
+	    removeMessageChangedListener(display);
+	    removeMessageCountListener(display);
+	}
+    }
+
+    protected void addToListeners(FolderDisplayUI display) {
+	if (display != null) {
+	    addMessageChangedListener(display);
+	    addMessageCountListener(display);
+	}
+    }
+
+    public ActionThread getFolderThread() {
+	return folderThread;
+    }
+
+    public StoreInfo getParentStore() {
+
+	return null;
+
+    }
 }
