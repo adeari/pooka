@@ -76,8 +76,9 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 		MailcapMap mc = (MailcapMap)mailcapMaps.elementAt(i);
 		CommandInfo[] cis = mc.getAllCommands(mimeType);
 		if (cis != null)
-		    for (int j = 0; j < cis.length; j++)
+		    for (int j = 0; j < cis.length; j++) {
 			foundCommands.add(cis[j]);
+		    }
 	    }
 
 	
@@ -142,7 +143,6 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
 			String key = currentLine.substring(0, equalsLoc);
 
 			if (!mimeType.equalsIgnoreCase(key)) {
-			    System.out.println("mimeType does not equal key.");
 			    writeSourceFile.write(currentLine);
 			    writeSourceFile.newLine();
 			}

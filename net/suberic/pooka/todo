@@ -1,20 +1,12 @@
 alpha 2
 ----------
 
-*)  add a way to edit the mailcap file.  this should be doable both from
-a menu option and from the 'open with' dialog.
-
-*) fix the signature -- started, anyway.  need to add a keybinding for 
-	inserting the sig, support for signature as a file, support for
-	signature as a generator....  lots of stuff, i suppose.
-
 *) bug:  fix what happens if you try sending out a bad email.  also, while
 	we're at it, make sure that the from: and smtp: information get 
 	updated live.
 
 *)  get JFileChooser to work with the mail stores.  sort of done; still
 	need to deal with disconnection issues.
-	 -- disconnection:  might be fixed.  test it out and see.
 
 -- final checks before alpha 2 release.
 
@@ -41,9 +33,16 @@ after alpha 2
 
 *) add pop3/local mail spool support.
 
+*) make a way to edit the mailcap bindings other than just the 'make default'
+option.
+
 *) add disconnected imap support.
 
 *) add something to search through all messages in the folder.
+
+*) currently, we only really support a signature file, though the ability
+is there to do all kinds of signature generators.  implement support for
+alternate signature methods.
 
 *) revamp the UserProfile, Store, and Folder editing process.  make a full
 screen for each with all the possible information (update time, colors,
