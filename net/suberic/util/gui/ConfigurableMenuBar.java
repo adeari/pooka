@@ -21,7 +21,7 @@ public class ConfigurableMenuBar extends JMenuBar implements ConfigurableUI {
 
     /**
      * This creates a new ConfigurableMenuBar using the menubarID as the
-     * configuration key, and vars as the source forthe values of all the
+     * configuration key, and vars as the source for the values of all the
      * properties.
      *
      * If menubarID doesn't exist in vars, then this returns an empty 
@@ -45,98 +45,31 @@ public class ConfigurableMenuBar extends JMenuBar implements ConfigurableUI {
 	if ((menubarID != null) && (vars.getProperty(menubarID, "") != "")) {
 	    StringTokenizer tokens = new StringTokenizer(vars.getProperty(menubarID, ""), ":");
 	    while (tokens.hasMoreTokens()) {
-		JMenu m = createMenu(menubarID + "." + tokens.nextToken(), vars);
+		String currentMenu = tokens.nextToken();
+		ConfigurableMenu m;
+		if (vars.getProperty(menubarID + "." + currentMenu + ".class", "").equals("")) {
+		    m = new ConfigurableMenu(menubarID + "." + currentMenu, vars);
+		} else {
+		    // this means we're using a custom Menu.
+
+		    try {
+			Class menuClass = Class.forName(vars.getProperty(menubarID + "." + currentMenu + ".class", "net.suberic.util.gui.ConfigurableMenu"));
+			m = (ConfigurableMenu) menuClass.newInstance();
+			m.configureComponent(menubarID + "." + currentMenu, vars);
+		    } catch (Exception e) {
+			// if we get any errors, just create a plain 
+			// ConfigurableMenu.
+			m = new ConfigurableMenu(menubarID + "." + currentMenu, vars);
+		    }
+		}
 		if (m != null) {
-		    this.add(m);
+			this.add(m);
 		}
 	    }
 	}
     }    
     
     
-      /**
-   * Create a menu for the app.  By default this pulls the
-   * definition of the menu from the associated resource file.
-   */
-
-    protected JMenu createMenu(String key, VariableBundle vars) {
-	StringTokenizer iKeys = null;
-	try {
-	    iKeys = new StringTokenizer(vars.getProperty(key), ":");
-	} catch (MissingResourceException mre) {
-	    try {
-		System.err.println(vars.getProperty("error.NoSuchResource") + " " + mre.getKey());
-	    } catch (MissingResourceException mretwo) {
-		System.err.println("Unable to load resource " + mre.getKey());
-	    } finally {
-	      return null;
-	    }
-	}
-	String currentToken;
-	JMenu menu;
-	
-	try {
-	    menu = new JMenu(vars.getProperty(key + ".Label"));
-	} catch (MissingResourceException mre) {
-	    menu = new JMenu(key);
-    }
-	
-    while (iKeys.hasMoreTokens()) {
-	currentToken=iKeys.nextToken();
-	if (currentToken.equals("-")) {
-	    menu.addSeparator();
-	} else {
-	    JMenuItem mi = createMenuItem(key, currentToken, vars);
-	    menu.add(mi);
-	}
-    }
-    return menu;
-    }
-    /**
-     * And this actually creates the menu items themselves.
-     */
-    protected JMenuItem createMenuItem(String menuID, String menuItemID, VariableBundle vars) {
-	// TODO:  should also make these undo-able.
-	
-	/*	
-		when we become able to do custom menus again.
-		if (vars.getProperty(menuID + "." + menuItemID, "") == "") { 
-	*/
-
-	JMenuItem mi;
-	try {
-	    mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
-	} catch (MissingResourceException mre) {
-	    mi = new JMenuItem(menuItemID);
-	}
-	
-	java.net.URL url = null;
-	
-	try {
-	    url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
-	} catch (MissingResourceException mre) {
-	}
-
-	if (url != null) {
-	    mi.setHorizontalTextPosition(JButton.RIGHT);
-	    mi.setIcon(new ImageIcon(url));
-	}
-	
-	String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
-	
-	mi.setActionCommand(cmd);	
-	
-	return mi;
-	/*	
-		}
-		if (vars.getProperty(menuID + "." + menuItemID, "").equals("folderList")) {
-		return new FolderMenu(menuID + "." + menuItemID, getFolderPanel());
-		}
-		else
-		return createMenu(menuID + "." + menuItemID );
-	*/
-    }
-
     /**
      * As defined in net.suberic.util.gui.ConfigurableUI
      */
@@ -155,61 +88,13 @@ public class ConfigurableMenuBar extends JMenuBar implements ConfigurableUI {
      * As defined in net.suberic.util.gui.ConfigurableUI
      */
     public void setActive(Hashtable newCommands) {
-	clearListeners();
 	commands = newCommands;
-	setActiveMenus(this);
+	setActiveMenus();
     }
 
-    private void setActiveMenuItems(JMenu men) {
-	if (men instanceof net.suberic.util.DynamicMenu) {
-	    ((net.suberic.util.DynamicMenu)men).setActiveMenus(this);
-	} else {
-	    for (int j = 0; j < men.getItemCount(); j++) {
-		if ((men.getItem(j)) instanceof JMenu) {
-		    setActiveMenuItems((JMenu)(men.getItem(j)));
-		} else {
-		    JMenuItem mi = men.getItem(j);
-		    Action a = getAction(mi.getActionCommand());
-		    if (a != null) {
-			//mi.removeActionListener(a);
-			mi.addActionListener(a);
-			mi.setEnabled(true);
-		    } else {
-			mi.setEnabled(false);
-		    }
-		}
-	    }
-	}
-    }	    
-
-    private void setActiveMenus(JMenuBar menuBar) {
-	for (int i = 0; i < menuBar.getMenuCount(); i++) {
-	    setActiveMenuItems(menuBar.getMenu(i));
-	}
-    }
-
-
-    /**
-     * This clears all of the current listeners on the Menu.
-     */
-    
-    private void clearListeners() {
-	for (int i = 0; i < this.getMenuCount(); i++) {
-	    removeActiveMenuItems(getMenu(i));
-	}
-    }
-
-    private void removeActiveMenuItems(JMenu men) {
-	for (int j = 0; j < men.getItemCount(); j++) {
-	    if ((men.getItem(j)) instanceof JMenu) {
-		removeActiveMenuItems((JMenu)(men.getItem(j)));
-	    } else {
-		JMenuItem mi = men.getItem(j);
-		Action a = getAction(mi.getActionCommand());
-		if (a != null) {
-		    mi.removeActionListener(a);
-		}
-	    }
+    private void setActiveMenus() {
+	for (int i = 0; i < getMenuCount(); i++) {
+	    ((ConfigurableMenu)getMenu(i)).setActive(commands);
 	}
     }
 
