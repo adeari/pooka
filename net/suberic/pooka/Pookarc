@@ -353,7 +353,7 @@ Store.editableFields.protocol.allowedValues=imap:pop3
 Store.editableFields.protocol=imap
 Store.editableFields.password.propertyType=Password
 Store.editableFields.defaultProfile.propertyType=List
-Store.edtiableFields.defaultProfile.allowedValues=UserProfile
+Store.editableFields.defaultProfile.allowedValues=UserProfile
 Store.editableFields.trashFolder.propertyType=Folder
 Store.editableFields.trashFolder.selectionRoot=currentStore
 
