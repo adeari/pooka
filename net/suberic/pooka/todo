@@ -11,13 +11,13 @@ just for the current store/folder.
 *) there's a bug with the email address removal.  fix it.
 	-- test.  there might not actually be one.
 
-*) test to see what happens when you have a message with no text part.
-
 *) bug:  messages that are new for the session (i.e. showed up between the
 last time you ran the client and this time) aren't marked as recent--only
 ones that come in while you're already connected are labelled like that.
 
 *) add address book and alias support -- jph
+
+*) support receiving html mail.
 
 --
 

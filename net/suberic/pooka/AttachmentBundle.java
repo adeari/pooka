@@ -1,6 +1,9 @@
 package net.suberic.pooka;
-import java.util.Vector;
+import java.util.*;
 import java.io.IOException;
+import javax.mail.internet.*;
+import javax.mail.*;
+
 
 /**
  * This class is here for my convenience so that I can have a single
@@ -11,11 +14,20 @@ class AttachmentBundle {
     Attachment textPart = null;
     Vector allAttachments = new Vector();
     Vector attachmentsAndTextPart = null;
-    
+    HashMap headers = null;
+    Vector headerLines = null;
+
     AttachmentBundle() {
+    }
+
+    AttachmentBundle(MimePart m) throws MessagingException {
+	setHeaderSource(m);
     }
     
     void addAll(AttachmentBundle subBundle) {
+	if (subBundle.textPart != null)
+	    subBundle.textPart.setHeaderSource(subBundle);
+
 	if (textPart == null)
 	    textPart = subBundle.textPart;
 	else if (subBundle.textPart != null)
@@ -30,10 +42,15 @@ class AttachmentBundle {
      * to display just the 'body' of the message without the attachments.
      */
     public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
+	StringBuffer retVal = new StringBuffer();
+
+	if (withHeaders)
+	    retVal.append(getHeaderInformation(showFullHeaders));
+
 	if (textPart != null)
-	    return textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	else
-	    return null;
+	    retVal.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
+
+	return retVal.toString();
     }
 
     /**
@@ -70,6 +87,10 @@ class AttachmentBundle {
      */
     public String getTextAndTextInlines(String separator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws IOException {
 	StringBuffer returnValue = new StringBuffer();
+
+	if (withHeaders)
+	    returnValue.append(getHeaderInformation(showFullHeaders));
+
 	if (textPart != null)
 	    returnValue.append(textPart.getText(withHeaders, showFullHeaders, maxLength, truncationMessage));
 	
@@ -86,4 +107,72 @@ class AttachmentBundle {
 	return returnValue.toString();
     }	
     
+    public void setHeaderSource(MimePart headerSource) throws MessagingException {
+	headers = parseHeaders(headerSource.getAllHeaders());
+	headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
+    }
+
+    /**
+     * This returns the formatted header information for a message.
+     */
+    public StringBuffer getHeaderInformation (boolean showFullHeaders) {
+	if (headers != null) {
+	    StringBuffer headerText = new StringBuffer();
+	    
+	    if (showFullHeaders) {
+		for (int i = 0; i < headers.size(); i++) {
+		    headerText.append((String) headerLines.elementAt(i));
+		}
+	    } else {
+		StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
+		String hdrLabel,currentHeader = null;
+		String hdrValue = null;
+		
+		while (tokens.hasMoreTokens()) {
+		    currentHeader=tokens.nextToken();
+		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
+		    hdrValue = (String) headers.get(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
+		    if (hdrValue != null) {
+			headerText.append(hdrLabel + ":  ");
+			headerText.append(hdrValue);
+			
+			headerText.append("\n");
+		    }
+		}
+	    } 
+	    String separator = Pooka.getProperty("MessageWindow.separator", "");
+	    if (separator.equals(""))
+		headerText.append("\n\n");
+	    else
+		headerText.append(separator);
+	    
+	    return headerText;
+	} else {
+	    return new StringBuffer();
+	}
+    }
+
+    /**
+     * Parses the Enumeration of Header objects into a HashMap.
+     */
+    private HashMap parseHeaders(Enumeration enum) {
+	HashMap retVal = new HashMap();
+	while (enum.hasMoreElements()) {
+	    Header hdr = (Header) enum.nextElement();
+	    retVal.put(hdr.getName(), hdr.getValue());
+	}
+
+	return retVal;
+    }
+
+    /**
+     * Parses the Enumeration of header lines into a Vector.
+     */
+    private Vector parseHeaderLines(Enumeration enum) {
+	Vector retVal = new Vector();
+	while (enum.hasMoreElements())
+	    retVal.add(enum.nextElement());
+	return retVal;
+    }
+
 }

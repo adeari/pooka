@@ -11,8 +11,8 @@ public class Attachment {
     ContentType mimeType;
     int size;
     String encoding;
-    HashMap headers;
-    Vector headerLines;
+    HashMap headers = null;
+    Vector headerLines = null;
 
     /**
      * Creates an Attachment out of a MimeBodyPart.
@@ -23,8 +23,6 @@ public class Attachment {
 	mimeType = new ContentType(mbp.getContentType());
 	size = mbp.getSize();
 	encoding = mbp.getEncoding();
-	headers = parseHeaders(mbp.getAllHeaders());
-	headerLines = parseHeaderLines(mbp.getAllHeaderLines());
     }
     
     /**
@@ -53,13 +51,16 @@ public class Attachment {
 	mimeType  = new ContentType(msg.getContentType());
 	size = msg.getSize();
 	encoding = msg.getEncoding();
-	headers = parseHeaders(msg.getAllHeaders());
-	headerLines = parseHeaderLines(msg.getAllHeaderLines());
     }
 
     public void setHeaderSource(MimePart headerSource) throws MessagingException {
 	headers = parseHeaders(headerSource.getAllHeaders());
 	headerLines = parseHeaderLines(headerSource.getAllHeaderLines());
+    }
+
+    public void setHeaderSource(AttachmentBundle bundle) {
+	headers = bundle.headers;
+	headerLines = bundle.headerLines;
     }
 
     // accessor methods.
@@ -232,37 +233,40 @@ public class Attachment {
      * This returns the formatted header information for a message.
      */
     public StringBuffer getHeaderInformation (boolean showFullHeaders) {
-	StringBuffer headerText = new StringBuffer();
-	
-	if (showFullHeaders) {
-	    for (int i = 0; i < headers.size(); i++) {
-		headerText.append((String) headerLines.elementAt(i));
-	    }
-	} else {
-	    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
-	    String hdrLabel,currentHeader = null;
-	    String hdrValue = null;
+	if (headers != null) {
+	    StringBuffer headerText = new StringBuffer();
 	    
-	    while (tokens.hasMoreTokens()) {
-		currentHeader=tokens.nextToken();
-		hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
-		hdrValue = (String) headers.get(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
-		if (hdrValue != null) {
-		    headerText.append(hdrLabel + ":  ");
-		    headerText.append(hdrValue);
-		    
-		    headerText.append("\n");
+	    if (showFullHeaders) {
+		for (int i = 0; i < headers.size(); i++) {
+		    headerText.append((String) headerLines.elementAt(i));
 		}
-	    }
+	    } else {
+		StringTokenizer tokens = new StringTokenizer(Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject"), ":");
+		String hdrLabel,currentHeader = null;
+		String hdrValue = null;
+		
+		while (tokens.hasMoreTokens()) {
+		    currentHeader=tokens.nextToken();
+		    hdrLabel = Pooka.getProperty("MessageWindow.Header." + currentHeader + ".label", currentHeader);
+		    hdrValue = (String) headers.get(Pooka.getProperty("MessageWindow.Header." + currentHeader + ".MIMEHeader", currentHeader));
+		    if (hdrValue != null) {
+			headerText.append(hdrLabel + ":  ");
+			headerText.append(hdrValue);
+			
+			headerText.append("\n");
+		    }
+		}
+	    } 
+	    String separator = Pooka.getProperty("MessageWindow.separator", "");
+	    if (separator.equals(""))
+		headerText.append("\n\n");
+	    else
+		headerText.append(separator);
+	    
+	    return headerText;
+	} else {
+	    return new StringBuffer();
 	}
-	
-	String separator = Pooka.getProperty("MessageWindow.separator", "");
-	if (separator.equals(""))
-	    headerText.append("\n\n");
-	else
-	    headerText.append(separator);
-	
-	return headerText;
     }
 
 
