@@ -31,6 +31,10 @@ public class NewMessageWindow extends MessageWindow implements ItemListener {
 	configureMessageWindow();
     }
 
+    /**
+     * This configures the MessageWindow.  This means that here is where we
+     * create the headerPanel and editorPane and add them to the splitPane.
+     */
     protected void configureMessageWindow() {
 
 	this.createDefaultActions();

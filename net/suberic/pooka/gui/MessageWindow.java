@@ -165,7 +165,7 @@ public abstract class MessageWindow extends JInternalFrame implements UserProfil
      * component to that of the current preferred width.
      */
     public void resizeByWidth() {
-	int width = (int)this.getPreferredSize().getWidth();
+	int width = (int)editorScrollPane.getPreferredSize().getWidth();
 	this.setPreferredSize(new Dimension(width, width));
 	this.setSize(this.getPreferredSize());
     }
