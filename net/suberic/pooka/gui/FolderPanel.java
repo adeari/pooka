@@ -17,7 +17,6 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
     JTree folderTree;
     DefaultTreeModel folderModel;
     Session session;
-    FolderInfo trashFolder = null;
     
     public FolderPanel(MainPanel newMainPanel) {
 	mainPanel=newMainPanel;
@@ -193,14 +192,6 @@ public class FolderPanel extends JScrollPane implements ValueChangeListener, Use
 	    return ((UserProfileContainer)selectedNode).getDefaultProfile();
 	else
 	    return null;
-    }
-
-    public FolderInfo getTrashFolder() {
-	return trashFolder;
-    }
-
-    public void setTrashFolder(FolderInfo f) {
-	trashFolder = f;
     }
 
     public Action[] getActions() {

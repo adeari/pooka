@@ -830,4 +830,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     public ActionThread getFolderThread() {
 	return getParentStore().getStoreThread();
     }
+
+    public FolderInfo getTrashFolder() {
+	return getParentStore().getTrashFolder();
+    }
 }

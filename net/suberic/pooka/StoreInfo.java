@@ -41,6 +41,9 @@ public class StoreInfo implements ValueChangeListener {
     // the Thread for connections to this Store.
     private ActionThread storeThread;
 
+    // the Trash folder for this Store, if any.
+    private FolderInfo trashFolder;
+
     /**
      * Creates a new StoreInfo from a Store ID.
      */
@@ -262,5 +265,13 @@ public class StoreInfo implements ValueChangeListener {
 
     public void setStoreThread(ActionThread newValue) {
 	storeThread=newValue;
+    }
+
+    public FolderInfo getTrashFolder() {
+	return trashFolder;
+    }
+
+    public void setTrashFolder(FolderInfo newValue) {
+	trashFolder = newValue;
     }
 }

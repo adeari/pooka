@@ -288,11 +288,25 @@ public class MessageProxy {
      * the message from the mailbox.
      */
     public void deleteMessage(boolean autoExpunge) {
+	boolean removed = false;
 
-	FolderInfo trashFolder = getMessagePanel().getMainPanel().getFolderPanel().getTrashFolder();
-	if ((trashFolder != null) && (trashFolder != getFolderInfo()))
-	    moveMessage(trashFolder);
-	else {
+	FolderInfo trashFolder = getFolderInfo().getTrashFolder();
+	if ((trashFolder != null) && (trashFolder != getFolderInfo())) {
+	    if (trashFolder.isAvailable()) {
+		moveMessage(trashFolder);
+		removed = true;
+	    } else {
+		if (folderInfo != null && folderInfo.getFolderWindow() != null) {
+		    
+		    if (JOptionPane.showInternalConfirmDialog(folderInfo.getFolderWindow(), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.NO_OPTION)
+		    return;
+		}
+	    }
+	} 
+	
+	// actually remove the message, if we haven't already moved it.
+
+	if (!removed) {
 	    try {
 		message.setFlag(Flags.Flag.DELETED, true);
 		if ( autoExpunge )
