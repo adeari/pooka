@@ -226,7 +226,8 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 
 	public void valueChanged(javax.swing.event.ListSelectionEvent e) {
 	    getMessagePanel().getMainPanel().refreshActiveMenus(getMessagePanel().getMainPanel().getMainMenu());
-	    toolbar.setActive(getActions());
+	    if (toolbar != null)
+		toolbar.setActive(getActions());
 	}
     }
 
