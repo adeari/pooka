@@ -25,16 +25,20 @@ import java.util.*;
 
 public class LoadMessageThread extends Thread {
   private FolderInfo folderInfo;
-  private Vector loadedMessageInfo = new Vector();
-  private Vector columnValues;
-  private Vector loadQueue = new Vector();
-  private Vector messageLoadedListeners = new Vector();
+  private List loadedMessageInfo = new LinkedList();
+  private List columnValues;
+  private List loadQueue = new LinkedList();
+  private List priorityLoadQueue = new LinkedList();
+  private List messageLoadedListeners = new LinkedList();
   private int updateCheckMilliseconds = 60000;
   private int updateMessagesCount = 10;
   private int loadedMessageCount = 0;
   private boolean sleeping = false;
 
   private boolean stopped = false;
+
+  public int NORMAL = 5;
+  public int HIGH = 10;
 
   /**
    * This creates a new LoadMessageThread from a FolderInfo object.
@@ -73,7 +77,7 @@ public class LoadMessageThread extends Thread {
   
   public void loadWaitingMessages() {
     
-    Vector messages = retrieveLoadQueue();
+    List messages = retrieveLoadQueue();
     int numMessages = messages.size();
     MessageProxy mp;
     
@@ -105,21 +109,21 @@ public class LoadMessageThread extends Thread {
 	if (Pooka.getProperty("Pooka.openFoldersInBackGround", "false").equalsIgnoreCase("true")) {
 	  synchronized(folderInfo.getFolderThread().getRunLock()) {
 	    for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
-	      mp=(MessageProxy)messages.elementAt(i);
+	      mp=(MessageProxy)messages.get(i);
 	      
 	      if (! mp.getMessageInfo().hasBeenFetched()) {
 		try {
-		  Vector fetchVector = new Vector();
-		  for (int j = i; fetchVector.size() < fetchBatchSize && j >= 0; j--) {
-		    MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+		  List fetchList = new ArrayList();
+		  for (int j = i; fetchList.size() < fetchBatchSize && j >= 0; j--) {
+		    MessageInfo fetchInfo = ((MessageProxy) messages.get(j)).getMessageInfo();
 		    if (! fetchInfo.hasBeenFetched()) {
-		      fetchVector.add(fetchInfo);
+		      fetchList.add(fetchInfo);
 		      fetchInfo.setFetched(true);
 		    }
 		  }
 		  
-		  MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
-		  toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
+		  MessageInfo[] toFetch = new MessageInfo[fetchList.size()];
+		  toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
 		  getFolderInfo().fetch(toFetch, fetchProfile);
 		} catch(MessagingException me) {
 		  System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
@@ -150,21 +154,21 @@ public class LoadMessageThread extends Thread {
 	  } // end synchronized
 	} else {
 	  for (int batchCount = 0; ! stopped && i >=0 && batchCount < loadBatchSize; batchCount++) {
-	    mp=(MessageProxy)messages.elementAt(i);
+	    mp=(MessageProxy)messages.get(i);
 	    
 	    if (! mp.getMessageInfo().hasBeenFetched()) {
 	      try {
-		Vector fetchVector = new Vector();
-		for (int j = i; fetchVector.size() < fetchBatchSize && j >= 0; j--) {
-		  MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+		List fetchList = new ArrayList();
+		for (int j = i; fetchList.size() < fetchBatchSize && j >= 0; j--) {
+		  MessageInfo fetchInfo = ((MessageProxy) messages.get(j)).getMessageInfo();
 		  if (! fetchInfo.hasBeenFetched()) {
-		    fetchVector.add(fetchInfo);
+		    fetchList.add(fetchInfo);
 		    //fetchInfo.setFetched(true);
 		  }
 		}
 		
-		MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
-		toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
+		MessageInfo[] toFetch = new MessageInfo[fetchList.size()];
+		toFetch = (MessageInfo[]) fetchList.toArray(toFetch);
 		synchronized(folderInfo.getFolderThread().getRunLock()) {
 		  getFolderInfo().fetch(toFetch, fetchProfile);
 		} // end synchronized
@@ -216,7 +220,7 @@ public class LoadMessageThread extends Thread {
   
   public void fireMessageLoadedEvent(int type, int numMessages, int max) {
     for (int i = 0; i < messageLoadedListeners.size(); i ++) {
-      ((MessageLoadedListener)messageLoadedListeners.elementAt(i)).handleMessageLoaded(new MessageLoadedEvent(this, type, numMessages, max));
+      ((MessageLoadedListener)messageLoadedListeners.get(i)).handleMessageLoaded(new MessageLoadedEvent(this, type, numMessages, max));
     }
   }
   
@@ -242,7 +246,18 @@ public class LoadMessageThread extends Thread {
    * Adds the MessageProxy(s) to the loadQueue.
    */
   public synchronized void loadMessages(MessageProxy mp) {
-    loadQueue.add(mp);
+    loadMessages(mp, NORMAL);
+  }
+
+  /**
+   * Adds the MessageProxy(s) to the loadQueue.
+   */
+  public synchronized void loadMessages(MessageProxy mp, int pPriority) {
+    if (pPriority > NORMAL) {
+      priorityLoadQueue.add(mp);
+    } else {
+      loadQueue.add(mp);
+    }
     
     if (this.isSleeping())
       this.interrupt();
@@ -253,9 +268,18 @@ public class LoadMessageThread extends Thread {
    * Adds the MessageProxy(s) to the loadQueue.
    */
   public synchronized void loadMessages(MessageProxy[] mp) {
+    loadMessages(mp, NORMAL);
+  }
+
+  /**
+   * Adds the MessageProxy(s) to the loadQueue.
+   */
+  public synchronized void loadMessages(MessageProxy[] mp, int pPriority) {
     if (mp != null && mp.length > 0) {
-      for (int i = 0; i < mp.length; i++) 
-	loadQueue.add(mp[i]);
+      if (pPriority > NORMAL) 
+	priorityLoadQueue.addAll(Arrays.asList(mp));
+      else
+	loadQueue.addAll(Arrays.asList(mp));
     }
     
     if (this.isSleeping())
@@ -266,9 +290,19 @@ public class LoadMessageThread extends Thread {
    * Adds the MessageProxy(s) to the loadQueue.
    */
   public synchronized void loadMessages(List mp) {
-    if (mp != null && mp.size() > 0) 
-      for (int i = 0; i < mp.size(); i++)
-	loadQueue.add(mp.get(i));
+    loadMessages(mp, NORMAL);
+  }
+
+  /**
+   * Adds the MessageProxy(s) to the loadQueue.
+   */
+  public synchronized void loadMessages(List mp, int pPriority) {
+    if (mp != null && mp.size() > 0) {
+      if (pPriority > NORMAL) 
+	priorityLoadQueue.addAll(mp);
+      else
+	loadQueue.addAll(mp);
+    }
     
     if (this.isSleeping())
       this.interrupt();
@@ -276,14 +310,66 @@ public class LoadMessageThread extends Thread {
   
   /**
    * retrieves all the messages from the loadQueue, and resets that
-   * Vector to 0 (an empty Vector).
+   * List to 0 (an empty List).
+   *
+   * generally, use retrieveNextBatch() instead.
    */
-  public synchronized Vector retrieveLoadQueue() {
-    Vector returnValue = loadQueue;
-    loadQueue = new Vector();
+  public synchronized List retrieveLoadQueue() {
+    List returnValue = new LinkedList();
+    returnValue.addAll(priorityLoadQueue);
+    returnValue.addAll(loadQueue);
+    loadQueue = new LinkedList();
+    priorityLoadQueue = new LinkedList();
     return returnValue;
   }
   
+  /**
+   * Retrieves the next pCount messages from the queue, or returns null
+   * if there are no entries in the queue.
+   */
+  public synchronized List retrieveNextBatch(int pCount) {
+    int plqLength = priorityLoadQueue.size();
+    int lqLength = loadQueue.size();
+
+    // check to see if we actually have anything in the queue.
+    if (plqLength + lqLength > 0) {
+      List returnValue = new LinkedList();
+
+      // adding the priority queue first
+      if (plqLength > 0) {
+	// if the priority queue is larger than (or the same size as) the 
+	// requested count, then just return it.
+	if (plqLength >= pCount) {
+	  List subList = priorityLoadQueue.subList(0, pCount - 1);
+	  returnValue.addAll(subList);
+	  subList.clear();
+	  return returnValue;
+	} else {
+	  // just add of the priority queue, and go on.
+	  returnValue.addAll(priorityLoadQueue);
+	  priorityLoadQueue.clear();
+	}
+      }
+
+      // add in the normal queue now.
+      if (lqLength > 0) {
+	int newCount = pCount - plqLength;
+	if (lqLength >= newCount) {
+	  List subList = loadQueue.subList(0, newCount -1);
+	  returnValue.addAll(subList);
+	  subList.clear();
+	} else {
+	  returnValue.addAll(loadQueue);
+	  loadQueue.clear();
+	}
+      }
+      
+      return returnValue;
+    } else {
+      return null;
+    }
+  }
+
   public int getUpdateMessagesCount() {
     return updateMessagesCount;
   }
@@ -292,11 +378,11 @@ public class LoadMessageThread extends Thread {
     updateMessagesCount = newValue;
   }
   
-  public Vector getColumnValues() {
+  public List getColumnValues() {
     return columnValues;
   }
   
-  public void setColumnValues(Vector newValue) {
+  public void setColumnValues(List newValue) {
     columnValues=newValue;
   }
   
