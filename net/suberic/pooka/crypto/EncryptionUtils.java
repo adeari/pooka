@@ -2,7 +2,7 @@ package net.suberic.pooka.crypto;
 
 import net.suberic.pooka.*;
 import javax.mail.*;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Utilities for encrypting/decrypting messages.
@@ -12,7 +12,7 @@ public abstract class EncryptionUtils {
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
-  public abstract byte[] decryptText(String encryptedText, EncryptionKey key)
+  public abstract byte[] decrypt(InputStream encryptedStream, EncryptionKey key)
     throws EncryptionException;
 
   /**

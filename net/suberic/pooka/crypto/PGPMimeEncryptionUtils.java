@@ -17,16 +17,19 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Decrypts a section of text using an EncryptionKey.
    */
-  public byte[] decryptText(String encryptedText, EncryptionKey key)
+  public byte[] decrypt(java.io.InputStream encryptedStream, EncryptionKey key)
     throws EncryptionException {
     try {
       PGPEncryptionKey pgpKey = (PGPEncryptionKey) key;
       KeyBundle bundle = pgpKey.getKeyBundle();
       char[] passphrase = pgpKey.getPassphrase();
       
-      EncryptedMessage cryptMsg = new EncryptedMessage(encryptedText);
+      MessageFactory mf = MessageFactory.getInstance("OpenPGP");
+      cryptix.message.Message msg = mf.generateMessage(encryptedStream);
+
+      EncryptedMessage cryptMsg = (EncryptedMessage) msg;
       
-      Message decryptedMessage = cryptMsg.decrypt(bundle, passphrase);
+      cryptix.message.Message decryptedMessage = cryptMsg.decrypt(bundle, passphrase);
       
       if (decryptedMessage instanceof LiteralMessage) {
 	LiteralMessage litMsg = (LiteralMessage) decryptedMessage;
@@ -35,10 +38,8 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
       }
 
       return null;
-    } catch (NotEncryptedToParameterException netpe) {
-      throw new EncryptionException(netpe.getMessage());
-    } catch (MessageException netpe) {
-      throw new MessageException(netpe.getMessage());
+    } catch (Exception e) {
+      throw new EncryptionException(e.getMessage());
     }
 
   }
@@ -54,7 +55,7 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Encrypts a Message.
    */
-  public Message encryptMessage(Message msg, EncryptionKey key) 
+  public javax.mail.Message encryptMessage(javax.mail.Message msg, EncryptionKey key) 
     throws EncryptionException, MessagingException {
     return null;
   }
@@ -62,7 +63,7 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
   /**
    * Decrypts a Message.
    */
-  public Message decryptMessage(Message msg, EncryptionKey key) 
+  public javax.mail.Message decryptMessage(javax.mail.Message msg, EncryptionKey key) 
     throws EncryptionException, MessagingException, java.io.IOException {
     return null;
   }
@@ -120,11 +121,15 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     }
 
     String fileName = secondPart.getFileName();
-    String pgpMsg = (String) secondPart.getContent();
-    String value = decryptText(pgpMsg, key);
+    java.io.InputStream is = secondPart.getInputStream();
+    byte[] value = decrypt(is, key);
+    ByteArrayDataSource dataSource = new ByteArrayDataSource(value, fileName, "text/plain");
+
+    javax.activation.DataHandler dh = new javax.activation.DataHandler(dataSource);
+
     BodyPart returnValue = new MimeBodyPart();
     returnValue.setFileName(fileName);
-    returnValue.setContent(value, "text/plain");
+    returnValue.setDataHandler(dh);
     return returnValue;
   }
 
