@@ -38,7 +38,7 @@ public class Pooka {
   static public SearchTermManager searchManager;
   static public NetworkConnectionManager connectionManager;
   static public OutgoingMailServerManager outgoingMailManager;
-
+  static public EncryptionManager cryptoManager;
   static public net.suberic.pooka.resource.ResourceManager resourceManager;
 
   // the main Pooka panel.
@@ -104,6 +104,8 @@ public class Pooka {
     }
 
     StoreManager.setupSSL();
+
+    cryptoManager = new EncryptionManager();
 
     try {
       UIManager.setLookAndFeel(getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
@@ -494,6 +496,14 @@ public class Pooka {
    */
   static public OutgoingMailServerManager getOutgoingMailManager() {
     return outgoingMailManager;
+  }
+
+  /**
+   * The EncryptionManager, not surprisingly, manages Pooka's encryption
+   * facilities.
+   */
+  public static EncryptionManager getCryptoManager() {
+    return cryptoManager;
   }
 
   /**

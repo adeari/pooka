@@ -399,25 +399,32 @@ public class MessageProxy {
     HashMap returnValue = new HashMap();
     
     for(int j=0; j < columnCount; j++) {
-      Object newProperty = columnHeaders.elementAt(j);
-      if (newProperty instanceof String) {
-	String propertyName = (String)newProperty;
-	
-	if (propertyName.startsWith("FLAG")) 
-	  returnValue.put(newProperty, getMessageFlag(propertyName));
-	else if (propertyName.equals("attachments"))
-	  returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
-	else if (propertyName.equalsIgnoreCase("subject")) 
-	  returnValue.put(newProperty, new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
-	else if (propertyName.equalsIgnoreCase("from")) 
-	  returnValue.put(newProperty, new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
-	else
-	  returnValue.put(newProperty, getMessageInfo().getMessageProperty(propertyName));
-      } else if (newProperty instanceof SearchTermIconManager) {
-	SearchTermIconManager stm = (SearchTermIconManager) newProperty;
-	returnValue.put(newProperty, new SearchTermIcon(stm, this));
-      } else if (newProperty instanceof RowCounter) {
-	returnValue.put(newProperty, newProperty);
+      try {
+	Object newProperty = columnHeaders.elementAt(j);
+	if (newProperty instanceof String) {
+	  String propertyName = (String)newProperty;
+	  
+	  if (propertyName.startsWith("FLAG")) 
+	    returnValue.put(newProperty, getMessageFlag(propertyName));
+	  else if (propertyName.equals("attachments"))
+	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
+	  else if (propertyName.equals("crypto"))
+	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "")));
+	  else if (propertyName.equalsIgnoreCase("subject")) 
+	    returnValue.put(newProperty, new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
+	  else if (propertyName.equalsIgnoreCase("from")) 
+	    returnValue.put(newProperty, new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
+	  else
+	    returnValue.put(newProperty, getMessageInfo().getMessageProperty(propertyName));
+	} else if (newProperty instanceof SearchTermIconManager) {
+	  SearchTermIconManager stm = (SearchTermIconManager) newProperty;
+	  returnValue.put(newProperty, new SearchTermIcon(stm, this));
+	} else if (newProperty instanceof RowCounter) {
+	  returnValue.put(newProperty, newProperty);
+	}
+      } catch (Exception e) {
+	// if we catch an exception, keep going for the rest.
+	e.printStackTrace();
       }
     }
 

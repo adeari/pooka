@@ -40,6 +40,21 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	for that.  slimpgp or cyptix.  s/mime is available from together
 	(@ sourceforge).  -- use rfc3156.
 
+	-- started.  todo on api:
+		- key management
+			- including importing keys from emails.
+		- sign and encrypt
+		- more checks, proper excpetions
+	-- todo on pooka
+		- key management
+		- way to show encryption information (ui)
+		  -- thought:  show decrypted or encrypted.  which by default
+			       is configurable.  when decryption is attempted,
+			       there's a ui, though it will probably try the
+			       default for the user, first.
+			       - sigs auto-verified?
+	-- mozilla does s/mime.
+
 -----
 
 *) add drag and drop

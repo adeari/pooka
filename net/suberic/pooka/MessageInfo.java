@@ -25,15 +25,15 @@ public class MessageInfo {
   
   // if the attachments have been loaded yet.
   boolean attachmentsLoaded = false;
-  
+
   // the MessageProxy associated with this MessageInfo
   MessageProxy messageProxy;
   
   // the attachments on the message.
   AttachmentBundle attachments;
-  
+
   // the CryptoInfo for this Message.
-  net.suberic.pooka.crypto.MessageCryptoInfo cryptoInfo = null;
+  net.suberic.pooka.crypto.MessageCryptoInfo cryptoInfo = new net.suberic.pooka.crypto.MessageCryptoInfo(this);
 
   // if the Message itself has been loaded via fetch()
   boolean fetched = false;
@@ -870,74 +870,104 @@ public class MessageInfo {
     return mHasAttachments;
   }
   
-    /**
-     * Returns the attachments for this MessageInfo.  If the attachments
-     * have not yet been loaded, attempts to load the attachments.
-     */
-    public Vector getAttachments() throws MessagingException {
-	if (hasLoadedAttachments())
-	    return attachments.getAttachments(getMaxMessageDisplayLength());
-	else {
-	    loadAttachmentInfo();
-	    return attachments.getAttachments(getMaxMessageDisplayLength());
-	}
-	    
+  /**
+   * Returns whether or not this message has encryption on it.
+   */
+  public boolean hasEncryption() {
+    try {
+      return (cryptoInfo.isEncrypted() || cryptoInfo.isSigned());
+    } catch (MessagingException me) {
+      System.out.println("caught exception while checking encryption:  " + me.getMessage());
+      me.printStackTrace();
+      return false;
     }
+  }
 
-    public MessageProxy getMessageProxy() {
-	return messageProxy;
+  /**
+   * Returns the attachments for this MessageInfo.  If the attachments
+   * have not yet been loaded, attempts to load the attachments.
+   */
+  public Vector getAttachments() throws MessagingException {
+    if (hasLoadedAttachments())
+      return attachments.getAttachments(getMaxMessageDisplayLength());
+    else {
+      loadAttachmentInfo();
+      return attachments.getAttachments(getMaxMessageDisplayLength());
     }
-
-    public void setMessageProxy(MessageProxy newMp) {
-	messageProxy = newMp;
+    
+  }
+  
+  /**
+   * Returns the MessageProxy for this MessageInfo, if any.
+   */
+  public MessageProxy getMessageProxy() {
+    return messageProxy;
+  }
+  
+  /**
+   * Sets the primary MessageProxy for this MessageInfo.
+   */
+  public void setMessageProxy(MessageProxy newMp) {
+    messageProxy = newMp;
+  }
+  
+  /**
+   * Returns the default maximum display length for this MessageInfo.
+   */
+  public int getMaxMessageDisplayLength() {
+    int displayLength = 10000;
+    try {
+      displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
+    } catch (NumberFormatException nfe) {
     }
+    return displayLength;
+  }
 
-    public int getMaxMessageDisplayLength() {
-	int displayLength = 10000;
-	try {
-	    displayLength = Integer.parseInt(Pooka.getProperty("Pooka.attachmentDisplayMaxLength", "100000"));
-	} catch (NumberFormatException nfe) {
-	}
-	return displayLength;
-    }
+  /**
+   * Returns the message to use if the message is displayed truncated (if the
+   * MaxMessageDisplayLenght is exceeded.
+   */
+  public String getTruncationMessage() {
+    return Pooka.getProperty("Pooka.messageTruncation", "------ Message truncated ------");
+  }
 
-    public String getTruncationMessage() {
-	return Pooka.getProperty("Pooka.messageTruncation", "------ Message truncated ------");
-    }
+  /**
+   * Returns the message to use if the message is displayed truncated (if the
+   * MaxMessageDisplayLenght is exceeded.
+   */
+  public String getHtmlTruncationMessage() {
+    return Pooka.getProperty("Pooka.html.messageTruncation", "<br><br><b>------ Message truncated ------</b><br><br>");
+  }
+  
+  public String getAttachmentSeparator() {
+    return Pooka.getProperty("Pooka.attachmentSeparator", "\n\n");
+  }
 
-    public String getHtmlTruncationMessage() {
-	return Pooka.getProperty("Pooka.html.messageTruncation", "<br><br><b>------ Message truncated ------</b><br><br>");
-    }
-
-    public String getAttachmentSeparator() {
-	return Pooka.getProperty("Pooka.attachmentSeparator", "\n\n");
-    }
-
-    public String getHtmlAttachmentSeparator() {
-	return Pooka.getProperty("Pooka.html.attachmentSeparator", "<br><hr><br>");
-    }
-
-    /**
-     * Returns whether or not this message has an HTML version available.
-     */
-    public boolean containsHtml() throws MessagingException {
-	if (!hasLoadedAttachments())
-	    loadAttachmentInfo();
-
-	return attachments.containsHtml();
-    }
-
-    /**
-     * Returns true if the main content of this message exists only as
-     * HTML.
-     */
-    public boolean isHtml() throws MessagingException {
-	if (!hasLoadedAttachments())
-	    loadAttachmentInfo();
-
-	return attachments.isHtml();
-    }
-
+  public String getHtmlAttachmentSeparator() {
+    return Pooka.getProperty("Pooka.html.attachmentSeparator", "<br><hr><br>");
+  }
+  
+  /**
+   * Returns whether or not this message has an HTML version available.
+   */
+  public boolean containsHtml() throws MessagingException {
+    if (!hasLoadedAttachments())
+      loadAttachmentInfo();
+    
+    return attachments.containsHtml();
+  }
+  
+  /**
+   * Returns true if the main content of this message exists only as
+   * HTML.
+   */
+  public boolean isHtml() throws MessagingException {
+    if (!hasLoadedAttachments())
+      loadAttachmentInfo();
+    
+    return attachments.isHtml();
+  }
+  
   /**
    * Returns whether or not the underlying Message object has been 
    * fetch()ed from the server yet.

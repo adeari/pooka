@@ -77,7 +77,9 @@ public class FolderTableModel extends AbstractTableModel {
 		    tableInfo.put(propertyName, proxy.getMessageFlag(propertyName));
 		  else if (propertyName.equals("attachments"))
 		    tableInfo.put(propertyName, new BooleanIcon(proxy.getMessageInfo().hasAttachments(), net.suberic.pooka.Pooka.getProperty("FolderTable.Attachments.icon", "")));
-		  else if (propertyName.equalsIgnoreCase("subject")) 
+		  else if (propertyName.equals("crypto"))
+		    tableInfo.put(propertyName, new BooleanIcon(proxy.getMessageInfo().hasEncryption(), net.suberic.pooka.Pooka.getProperty("FolderTable.Crypto.icon", "")));
+		  else if (propertyName.equalsIgnoreCase("subject"))
 		    tableInfo.put(propertyName, proxy.new SubjectLine((String) proxy.getMessageInfo().getMessageProperty(propertyName)));
 		  else if (propertyName.equalsIgnoreCase("from")) 
 		    tableInfo.put(key, proxy.new AddressLine((String) proxy.getMessageInfo().getMessageProperty(propertyName)));

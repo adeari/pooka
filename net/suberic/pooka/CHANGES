@@ -1,3 +1,6 @@
+modified the laoding of table display infos so that we now don't fail 
+totally if a particular field gets an exception.
+
 added a search/filter for arbitrary message headers.
 
 if a folder becomes disconnected, we now pre-emptively check the store to
