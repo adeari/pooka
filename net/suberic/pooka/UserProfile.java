@@ -153,7 +153,6 @@ public class UserProfile extends Object implements ValueChangeListener {
      * given message's to fields.
      */
     public void removeFromAddress(Message m) {
-	System.out.println("removing from address.");
 	try {
 	    Address[] toRecs = m.getRecipients(Message.RecipientType.TO);
 	    Address[] ccRecs = m.getRecipients(Message.RecipientType.CC);
