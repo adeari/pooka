@@ -9,117 +9,155 @@ import java.io.*;
  */
 public class VcardAddressBook implements AddressBook, AddressMatcher {
 
-    String fileName;
-    ArrayList orderedList = new ArrayList();
+  String fileName;
+  Vcard[] orderedList;
+  ArrayList arrayList = new ArrayList();
 
-    int sortingMethod;
-    
-    /**
-     * Creates a new VcardAddressBook from the given Vcard.  It uses the
-     * file represented by the given pFileName as the source for the 
-     * addresses.
-     */
+  int sortingMethod;
+  
+  /**
+   * Creates a new VcardAddressBook from the given Vcard.  It uses the
+   * file represented by the given pFileName as the source for the 
+   * addresses.
+   */
     public VcardAddressBook(String pFileName) throws java.text.ParseException, java.io.IOException {
-	fileName = pFileName;
-	loadAddressBook();
+      fileName = pFileName;
+      loadAddressBook();
+    }
+  
+  /**
+   * Loads the AddressBook from the saved filename.
+   */
+  protected void loadAddressBook() throws java.text.ParseException, java.io.IOException {
+    File f = new File(fileName);
+    if (f.exists()) {
+      BufferedReader reader = new BufferedReader(new FileReader(f));
+      for(Vcard newCard = Vcard.parse(reader); newCard != null; newCard = Vcard.parse(reader)) {
+	insertIntoList(newCard);
+      }
     }
     
-    /**
-     * Loads the AddressBook from the saved filename.
-     */
-    protected void loadAddressBook() throws java.text.ParseException, java.io.IOException {
-	File f = new File(fileName);
-	if (f.exists()) {
-	    BufferedReader reader = new BufferedReader(new FileReader(f));
-	    for(Vcard newCard = Vcard.parse(reader); newCard != null; newCard = Vcard.parse(reader)) {
-		insertIntoList(newCard);
-	    }
+    sortList();
+  }
+  
+  /**
+   * Inserts the given Vcard into the ordered list.
+   */
+  protected void insertIntoList(Vcard newCard) {
+    arrayList.add(newCard);
+  }
+  
+  /**
+   * Sorts the list.
+   */
+  protected void sortList() {
+    orderedList = new Vcard[arrayList.size()];
+    orderedList = (Vcard[]) arrayList.toArray(orderedList);
+    java.util.Arrays.sort(orderedList);
+  }
+  
+  /**
+   * Uses a binary search to find a matching Vcard.
+   */
+  /*
+  protected InternetAddress[] binarySearch(String matchString, int minimum, int maximum) {
+    boolean matched = false;
+    InternetAddress[] returnValue = null;
+
+    while (! matched) {
+      if ( maximum - minimum < 2) {
+	int choice = minimum + maximum / 2;
+	Vcard current = (Vcard) orderedList.get(choice);
+	int comparison = current.compareTo(matchString);
+	if (comparison < 0)
+	  maximum = choice;
+	else if (comparison > 0)
+	  minimum = choice;
+	else {
+	  // match has been found.
+	  matched = true;
+	  // get all the matches.
+
 	}
+      }
+    }
+    
+    return null;
+  }
+  */
+  
+  /**
+   * Gets the AddressMatcher for this AddressBook.
+   */
+  public AddressMatcher getAddressMatcher() {
+    return this;
+  }
+  
+  /**
+   * Returns all of the InternetAddresses which match the given String.
+   */
+  public InternetAddress[] match(String matchString) {
+    int value = java.util.Arrays.binarySearch(orderedList, matchString);
+    // now get all the matches, if any.
+    if (orderedList[value].compareTo(matchString) == 0) {
+      // get all the matches.
+      int minimum = value;
+      while (minimum > 0 && (orderedList[minimum - 1].compareTo(matchString) == 0))
+	minimum--;
 
-	sortList();
-    }
+      int maximum = value;
+      while (maximum < orderedList.length -1 && (orderedList[maximum + 1].compareTo(matchString) == 0))
+	maximum++;
 
-    /**
-     * Inserts the given Vcard into the ordered list.
-     */
-    protected void insertIntoList(Vcard newCard) {
-	orderedList.add(newCard);
-    }
+      InternetAddress[] returnValue = new InternetAddress[minimum - maximum + 1];
+      for(int i = 0; i < returnValue.length; i++) {
+	returnValue[i] = orderedList[minimum + i].getAddress();
+      }
 
-    /**
-     * Sorts the list.
-     */
-    protected void sortList() {
-	
+      return returnValue;
+    } else {
+      return new InternetAddress[0];
     }
-
-    /**
-     * Uses a binary search to find a matching Vcard.
-     */
-    protected InternetAddress[] binarySearch(String matchString, int minimum, int maximum) {
-	boolean matched = false;
-	while (! matched) {
-	    if ( maximum - minimum < 2) {
-		int choice = minimum + maximum / 2;
-		Vcard current = (Vcard) orderedList.get(choice);
-		// FIXME
-	    }
-	}
-
-	return null;
-    }
-
-    /**
-     * Gets the AddressMatcher for this AddressBook.
-     */
-    public AddressMatcher getAddressMatcher() {
-	return this;
-    }
-    
-    /**
-     * Returns all of the InternetAddresses which match the given String.
-     */
-    public InternetAddress[] match(String matchString) {
-	return binarySearch(matchString, 0, orderedList.size());
-    }
-    
-    /**
-     * Returns all of the InternetAddresses whose FirstName matches the given 
-     * String.
-     */
-    public InternetAddress[] matchFirstName(String matchString) {
-	return match(matchString);
-    }
-    
-    /**
-     * Returns all of the InternetAddresses whose LastName matches the given 
-     * String.
-     */
-    public InternetAddress[] matchLastName(String matchString) {
-	return match(matchString);
-    }
-    
-    /**
-     * Returns all of the InternetAddresses whose email addresses match the
-     * given String.
-     */
-    public InternetAddress[] matchEmailAddress(String matchString) {
-	return match(matchString);
-    }
-    
-    /**
-     * Returns the InternetAddress which follows the given String alphabetically.
-     */
-    public InternetAddress getNextMatch(String matchString) {
-	return null;
-    }
-    
-    /**
-     * Returns the InternetAddress which precedes the given String 
-     * alphabetically.
-     */
-    public InternetAddress getPreviousMatch(String matchString) {
-	return null;
-    }
-    
+    //return binarySearch(matchString, 0, orderedList.size());
+  }
+  
+  /**
+   * Returns all of the InternetAddresses whose FirstName matches the given 
+   * String.
+   */
+  public InternetAddress[] matchFirstName(String matchString) {
+    return match(matchString);
+  }
+  
+  /**
+   * Returns all of the InternetAddresses whose LastName matches the given 
+   * String.
+   */
+  public InternetAddress[] matchLastName(String matchString) {
+    return match(matchString);
+  }
+  
+  /**
+   * Returns all of the InternetAddresses whose email addresses match the
+   * given String.
+   */
+  public InternetAddress[] matchEmailAddress(String matchString) {
+    return match(matchString);
+  }
+  
+  /**
+   * Returns the InternetAddress which follows the given String alphabetically.
+   */
+  public InternetAddress getNextMatch(String matchString) {
+    return null;
+  }
+  
+  /**
+   * Returns the InternetAddress which precedes the given String 
+   * alphabetically.
+   */
+  public InternetAddress getPreviousMatch(String matchString) {
+    return null;
+  }
+  
 }
