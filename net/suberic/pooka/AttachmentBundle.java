@@ -105,6 +105,20 @@ class AttachmentBundle {
     } else
       return allAttachments;
   }
+
+  /**
+   * Returns all attachments, including the text part.
+   */
+  public Vector getAttachmentsAndTextPart() {
+    if (attachmentsAndTextPart != null)
+      return attachmentsAndTextPart;
+    else {
+      attachmentsAndTextPart = new Vector();
+      attachmentsAndTextPart.add(textPart);
+      attachmentsAndTextPart.addAll(allAttachments);
+      return attachmentsAndTextPart;
+    }
+  }
   
   /**
    * This method returns the Message Text plus the text inline attachments.

@@ -61,6 +61,12 @@ public abstract class EncryptionUtils {
     throws EncryptionException, MessagingException, IOException;
 
   /**
+   * Decrypts a Multipart.
+   */
+  public abstract BodyPart decryptMultipart(Multipart mpart, EncryptionKey key) 
+    throws EncryptionException, MessagingException, IOException;
+
+  /**
    * Signs a Part.
    */
   public abstract BodyPart signBodyPart(BodyPart p, EncryptionKey key)

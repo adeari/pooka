@@ -33,7 +33,7 @@ public class MessageInfo {
   AttachmentBundle attachments;
 
   // the CryptoInfo for this Message.
-  net.suberic.pooka.crypto.MessageCryptoInfo cryptoInfo = new net.suberic.pooka.crypto.MessageCryptoInfo(this);
+  MessageCryptoInfo cryptoInfo = new MessageCryptoInfo(this);
 
   // if the Message itself has been loaded via fetch()
   boolean fetched = false;
@@ -895,6 +895,18 @@ public class MessageInfo {
       return attachments.getAttachments(getMaxMessageDisplayLength());
     }
     
+  }
+
+  /**
+   * Returns the AttachmentBundle for this MessageInfo.
+   */
+  AttachmentBundle getAttachmentBundle() throws MessagingException {
+    if (hasLoadedAttachments())
+      return attachments;
+    else {
+      loadAttachmentInfo();
+      return attachments;
+    }
   }
   
   /**

@@ -68,14 +68,10 @@ public class CryptoAttachment extends Attachment {
     super(msg);
   }
 
-  // accessor methods.
-  
   /**
-   * Returns the decrypted version of the wrapped attachment, or null 
-   * if the attachment is either not actually encrypted, or cannot be 
-   * decrypted.
+   * Tries to decrypt this Attachment.
    */
-  protected BodyPart getDecryptedBodyPart() 
+  public BodyPart decryptAttachment(EncryptionUtils utils, EncryptionKey key)
     throws EncryptionException, MessagingException, java.io.IOException {
     if (decryptedBodyPart != null)
       return decryptedBodyPart;
@@ -83,15 +79,29 @@ public class CryptoAttachment extends Attachment {
       // we should always be wrapping a Multipart object here.
       Object o = super.getDataHandler().getContent();
       if (o instanceof Multipart) {
-	PGPMimeEncryptionUtils utils = new PGPMimeEncryptionUtils();
-	utils.setPGPProviderImpl(new net.suberic.pooka.crypto.gpg.GPGPGPProviderImpl());
-	decryptedBodyPart = utils.decryptMultipart((Multipart)o, new net.suberic.pooka.crypto.gpg.GPGEncryptionKey("allen", "biteme"));
-
+	decryptedBodyPart = utils.decryptMultipart((Multipart)o, key);
+	
 	return decryptedBodyPart;
       } else {
 	return null;
       }
     }
+    
+  }
+
+  // accessor methods.
+  
+  /**
+   * Returns the decrypted version of the wrapped attachment, or null 
+   * if the attachment is either not actually encrypted, or cannot be 
+   * decrypted.
+   */
+  public BodyPart getDecryptedBodyPart() 
+    throws EncryptionException, MessagingException, java.io.IOException {
+    if (decryptedBodyPart != null)
+      return decryptedBodyPart;
+
+    throw new EncryptionException("not decrypted yet.");
   }
 
   /**

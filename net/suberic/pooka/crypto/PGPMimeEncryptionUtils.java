@@ -166,12 +166,12 @@ public class PGPMimeEncryptionUtils extends EncryptionUtils {
     return decryptMultipart(mpart, key);
   }
 
- /**
+  /**
    * Decrypts a Multipart.
    */
   public BodyPart decryptMultipart(Multipart mpart, EncryptionKey key) 
     throws EncryptionException, MessagingException, java.io.IOException {
-
+    
     // should have two internal parts.
     if (mpart.getCount() != 2) {
       throw new EncryptionException ("error in content:  expected 2 parts, got " + mpart.getCount()); 

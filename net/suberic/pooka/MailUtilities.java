@@ -158,7 +158,7 @@ public class MailUtilities {
   /**
    * This parses a Mulitpart object into an AttachmentBundle.
    */
-  private static AttachmentBundle parseAttachments(Multipart mp) throws MessagingException, java.io.IOException {
+  public static AttachmentBundle parseAttachments(Multipart mp) throws MessagingException, java.io.IOException {
     AttachmentBundle bundle = new AttachmentBundle();
     for (int i = 0; i < mp.getCount(); i++) {
       MimeBodyPart mbp = (MimeBodyPart)mp.getBodyPart(i);
