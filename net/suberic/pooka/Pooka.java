@@ -85,7 +85,19 @@ public class Pooka {
     
     resources.addValueChangeListener(UserProfile.vcl, "UserProfile");
     
-    mailcap = new FullMailcapCommandMap();
+    String mailcapSource = null;
+    if (System.getProperty("file.separator").equals("\\")) {
+      mailcapSource = System.getProperty("user.home") + "\\pooka_mailcap.txt";
+    } else {
+      mailcapSource = System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap";
+    }
+
+    try {
+      mailcap = new FullMailcapCommandMap(mailcapSource);
+    } catch (java.io.IOException ioe) {
+      System.err.println("exception loading mailcap:  " + ioe);
+    }
+
     folderTracker = new net.suberic.pooka.thread.FolderTracker();
     folderTracker.start();
     

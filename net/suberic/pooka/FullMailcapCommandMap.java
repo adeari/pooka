@@ -7,79 +7,112 @@ import java.io.*;
 /**
  * FullMailcapCommandMap accepts both x-java-* type mailcap entries
  * as well as standard, external-to-java entries.
+ *
+ * It uses the following resources as the sources:
+ *
+ * The file .mailcap (or mailcap.txt) in the user's home directory. 
+ * The file <java.home>/lib/mailcap. 
+ * The file or resource named META-INF/mailcap. 
+ * The file or resource named META-INF/mailcap.default 
+ * (usually found only in the activation.jar file). 
  */
 
 public class FullMailcapCommandMap extends MailcapCommandMap {
-    private Vector mailcapMaps;
-    private static String externalLauncher = "net.suberic.pooka.ExternalLauncher";
-    private File sourceFile = null;;
-    
-    public FullMailcapCommandMap() {
-	/**
-	 * this adds the following files/resources, in order:
-	 * The file or resource named META-INF/mailcap.default 
-	 * (usually found only in the activation.jar file). 
-	 *
-	 * The file .pooka_mailcap (or pooka_mailcap.txt) in the user's home
-	 *    directory. 
-	 * The file .mailcap (or mailcap.txt) in the user's home directory. 
-	 * The file <java.home>/lib/mailcap. 
-	 * The file or resource named META-INF/mailcap. 
-	 */
-
-	mailcapMaps = new Vector();
-
-	InputStream is;
-
-	try {
-	  if (System.getProperty("file.separator").equals("\\")) {
-	    sourceFile = new File(System.getProperty("user.home") + "\\pooka_mailcap.txt");
-	    addMailcapFile(System.getProperty("user.home") + "\\pooka_mailcap.txt");
-	  } else {
-	    sourceFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap");
-	    addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap");
-	  }
-	}  catch (IOException ioe) {
-	  // if it doesn't exist, it's ok.
-	}
-	
-	try {
-	  if (System.getProperty("file.separator").equals("\\")) {
-	    addMailcapFile(System.getProperty("user.home") + "\\mailcap.txt");
-	  } else {
-	    addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
-	  }
-	}  catch (IOException ioe) {
-	  // if it doesn't exist, it's ok.
-	}
-
-	try {
-	    addMailcapFile(System.getProperty("java.home") + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + "mailcap");
-	} catch (IOException ioe) {
-	    // if it doesn't exist, it's ok.
-	}
-	
-	is = new Object().getClass().getResourceAsStream("/META-INF/mailcap");
-	if (is != null)
-	  addMailcapFile(is);
-
-	is = new Object().getClass().getResourceAsStream("/META-INF/mailcap.default");
-	if (is != null)
-	  addMailcapFile(is);
-
-    }
-
-    public FullMailcapCommandMap(String mailcapFilename) throws java.io.IOException {
-      this();
-      addMailcapFile(mailcapFilename);
-    }
+  private Vector mailcapMaps;
+  private static String externalLauncher = "net.suberic.pooka.ExternalLauncher";
+  private File sourceFile = null;;
   
-  public FullMailcapCommandMap(InputStream is) {
-    this();
-    addMailcapFile(is);
+  /**
+   * Creates a FullMailcapCommandMap.
+   */
+  public FullMailcapCommandMap() {
+    initializeMailcap(null);
   }
+  
+  /**
+   * Create a FullMailcapCommandMap that uses the file represented by
+   * localMailcap as the top-most entry in the mailcap list.
+   */
+  public FullMailcapCommandMap(String localMailcap) throws java.io.IOException {
+    initializeMailcap(localMailcap);
+  }
+  /*
+    try {
+      if (System.getProperty("file.separator").equals("\\")) {
+	sourceFile = new File(System.getProperty("user.home") + "\\pooka_mailcap.txt");
+	addMailcapFile(System.getProperty("user.home") + "\\pooka_mailcap.txt");
+      } else {
+	sourceFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap");
+	addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap");
+      }
+    }  catch (IOException ioe) {
+      // if it doesn't exist, it's ok.
+    }
+  */
+  
+  /**
+   * this adds the following files/resources, in order:
+   *
+   * The file localMailcap.
+   * The file .mailcap (or mailcap.txt) in the user's home directory. 
+   * The file <java.home>/lib/mailcap. 
+   * The file or resource named META-INF/mailcap. 
+   * The file or resource named META-INF/mailcap.default 
+   * (usually found only in the activation.jar file). 
+   */
+  public void initializeMailcap(String localMailcap) {
+    
+    mailcapMaps = new Vector();
+    
+    InputStream is;
+    
+    try {
+      if (localMailcap != null) {
+	sourceFile = new File(localMailcap);
+	
+	addMailcapFile(localMailcap);
+      }
+    } catch (IOException ioe) {
+      // if it doesn't exist, it's ok.
+    }
+    
+    try {
+      if (System.getProperty("file.separator").equals("\\")) {
+	if (sourceFile == null) 
+	  sourceFile = new File(System.getProperty("user.home") + "\\mailcap.txt");
 
-    public CommandInfo[] getAllCommands(java.lang.String mimeType) {
+	addMailcapFile(System.getProperty("user.home") + "\\mailcap.txt");
+      } else {
+	if (sourceFile == null) 
+	  sourceFile = new File(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
+
+	addMailcapFile(System.getProperty("user.home") + System.getProperty("file.separator") + ".mailcap");
+      }
+    }  catch (IOException ioe) {
+      // if it doesn't exist, it's ok.
+    }
+    
+    try {
+      addMailcapFile(System.getProperty("java.home") + System.getProperty("file.separator") + "lib" + System.getProperty("file.separator") + "mailcap");
+    } catch (IOException ioe) {
+      // if it doesn't exist, it's ok.
+    }
+    
+    is = new Object().getClass().getResourceAsStream("/META-INF/mailcap");
+    if (is != null)
+      addMailcapFile(is);
+    
+    is = new Object().getClass().getResourceAsStream("/META-INF/mailcap.default");
+    if (is != null)
+      addMailcapFile(is);
+    
+  }
+  
+
+  /**
+   * Gets all of the commands associated with the given mimeType.
+   */
+  public CommandInfo[] getAllCommands(java.lang.String mimeType) {
 
     /*
      * this just goes through the list of mailcap objects stored
@@ -192,8 +225,8 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
     }
 
     public void addMailcapFile(java.lang.String mailcapFileName) throws IOException {
-	FileInputStream fis = new FileInputStream(mailcapFileName);
-	addMailcapFile(fis);
+      FileInputStream fis = new FileInputStream(mailcapFileName);
+      addMailcapFile(fis);
     }
 
     public void addMailcapFile(InputStream is) {

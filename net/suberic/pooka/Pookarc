@@ -738,7 +738,7 @@ Store.editableFields.mailDirectory=Pooka.cacheDirectory
 Store.trashFolder.namePrefix=Store.
 Store.trashFolder.nameSuffix=.trashFolder
 
-Preferences=UI:Reply:Startup:Signature:HTML:SSL
+Preferences=UI:Reply:Startup:Signature:HTML:Files
 Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
@@ -748,8 +748,9 @@ Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
 Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
 Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
-Preferences.SSL=Pooka.sslCertFile
+Preferences.Files=Pooka.defaultMailSubDir:Pooka.sslCertFile
 
+Pooka.defaultMailSubDir.propertyType=Directory
 Pooka.sslCertFile.propertyType=File
 
 Pooka.messagePanel.theme.propertyType=List
