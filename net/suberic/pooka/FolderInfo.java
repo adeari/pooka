@@ -39,7 +39,8 @@ public class FolderInfo implements MessageCountListener {
 	folderID=fid;
 	f.addConnectionListener(new ConnectionAdapter() { 
 		public void closed(ConnectionEvent e) {
-		    System.out.println("Folder " + getFolderID() + " closed.");
+		    if (Pooka.isDebug())
+			System.out.println("Folder " + getFolderID() + " closed.");
 		    if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
@@ -53,7 +54,8 @@ public class FolderInfo implements MessageCountListener {
 		}
 		
 		public void disconnected(ConnectionEvent e) {
-		    System.out.println("Folder " + getFolderID() + " disconnected.");
+		    if (Pooka.isDebug())
+			System.out.println("Folder " + getFolderID() + " disconnected.");
 		    if (open == true) {
 			try {
 			    Store store = getFolder().getStore();
@@ -192,15 +194,18 @@ public class FolderInfo implements MessageCountListener {
     public void fireMessageChangedEvent(MessageChangedEvent mce) {
 	// from the EventListenerList javadoc, including comments.
 
-	System.out.println("firing message changed event.");
+	if (Pooka.isDebug())
+	    System.out.println("firing message changed event.");
 	// Guaranteed to return a non-null array
 	Object[] listeners = messageChangedListeners.getListenerList();
 	// Process the listeners last to first, notifying
 	// those that are interested in this event
 	for (int i = listeners.length-2; i>=0; i-=2) {
-	    System.out.println("listeners[" + i + "] is " + listeners[i] );
+	    if (Pooka.isDebug())
+		System.out.println("listeners[" + i + "] is " + listeners[i] );
 	    if (listeners[i]==MessageChangedListener.class) {
-		System.out.println("check.  running messageChanged on listener.");
+		if (Pooka.isDebug())
+		    System.out.println("check.  running messageChanged on listener.");
 		((MessageChangedListener)listeners[i+1]).messageChanged(mce);
 	    }              
 	}
@@ -260,7 +265,8 @@ public class FolderInfo implements MessageCountListener {
     // as defined in javax.mail.event.MessageCountListener
 
     public void messagesAdded(MessageCountEvent e) {
-	System.out.println("Messages added.");
+	if (Pooka.isDebug())
+	    System.out.println("Messages added.");
 	if (folderTableModel != null) {
 	    Message[] addedMessages = e.getMessages();
 	    MessageProxy mp;
@@ -276,17 +282,21 @@ public class FolderInfo implements MessageCountListener {
     }
 
     public void messagesRemoved(MessageCountEvent e) {
-	System.out.println("Messages Removed.");
+	if (Pooka.isDebug())
+	    System.out.println("Messages Removed.");
 	if (folderTableModel != null) {
 	    Message[] removedMessages = e.getMessages();
-	    System.out.println("removedMessages was of size " + removedMessages.length);
+	    if (Pooka.isDebug())
+		System.out.println("removedMessages was of size " + removedMessages.length);
 	    MessageProxy mp;
 	    Vector removedProxies=new Vector();
 	    for (int i = 0; i < removedMessages.length; i++) {
-		System.out.println("checking for existence of message.");
+		if (Pooka.isDebug())
+		    System.out.println("checking for existence of message.");
 		mp = getMessageProxy(removedMessages[i]);
 		if (mp != null) {
-		    System.out.println("message exists--removing");
+		    if (Pooka.isDebug())
+			System.out.println("message exists--removing");
 		    removedProxies.add(mp);
 		    messageToProxyTable.remove(mp);
 		}
