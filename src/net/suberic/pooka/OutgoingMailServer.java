@@ -255,13 +255,13 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 		});
 	      ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
 	    } catch(MessagingException nme) {
-	      ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(nme);	  
+	      ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
 	    }
 	  }
 	} else {
 	  me.printStackTrace();
 	  MessagingException nme = new MessagingException("Connection unavailable, and no Outbox specified.");
-	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(nme);	  
+	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
 	}
 	
       }
@@ -295,7 +295,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	    
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
 	  } catch (MessagingException me) {
-	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(me);	  
+	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);	  
 	  }
 	  // whether or not the send failed. try sending all the other 
 	  // messages in the queue, too.

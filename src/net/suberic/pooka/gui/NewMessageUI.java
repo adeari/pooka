@@ -25,4 +25,6 @@ public interface NewMessageUI extends MessageUI {
 
   public void showAddressWindow(AddressEntryTextArea aeta);
 
+  public SendFailedDialog showSendFailedDialog(net.suberic.pooka.OutgoingMailServer pServer, javax.mail.MessagingException me);
+
 }

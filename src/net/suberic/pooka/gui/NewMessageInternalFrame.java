@@ -349,6 +349,16 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
   }
   
   /**
+   * Shows a SendFailedDialog.
+   */
+  public SendFailedDialog showSendFailedDialog(OutgoingMailServer server, javax.mail. MessagingException sfe) {
+    SendFailedDialog sfd = new SendFailedDialog(server, sfe);
+    sfd.configureComponent();
+    Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);
+    return sfd;
+  }
+
+  /**
    * Overrides JComponent.addNotify().
    *
    * We override addNotify() here to set the proper splitPane location.

@@ -124,17 +124,23 @@ public class NewMessageProxy extends MessageProxy {
   /**
    * Called when the send fails.
    */
-  public void sendFailed(Exception e) {
+  public void sendFailed(OutgoingMailServer pMailServer, Exception e) {
     sendLock=false;
     Pooka.getUIFactory().clearStatus();
+    final OutgoingMailServer mailServer = pMailServer;
     final Exception me = e;
     final NewMessageUI nmui = getNewMessageUI();
     if (nmui != null) {
       Runnable runMe = new Runnable() {
 	  public void run() {
-	    if (me instanceof SendFailedException) {
-	      getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
-	      me.printStackTrace(System.out);
+	    if (me instanceof MessagingException) {
+	      if (mailServer != null) {
+		SendFailedDialog sfd = getNewMessageUI().showSendFailedDialog(mailServer, (MessagingException) me);
+		System.err.println("done.");
+	      } else {
+		getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
+		me.printStackTrace(System.out);
+	      }
 	    } else {
 	      getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + me.getMessage());
 	      me.printStackTrace(System.out);

@@ -288,7 +288,6 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
    * MessageFrame is editable, it returns the currently selected 
    * UserProfile object.
    */
-  
   public UserProfile getDefaultProfile() {
     if (isEditable())
       return getSelectedProfile();
@@ -300,7 +299,6 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
    * This method returns the UserProfile currently selected in the 
    * drop-down menu.
    */
-  
   public UserProfile getSelectedProfile() {
     return getNewMessageDisplay().getSelectedProfile();
   }
@@ -312,39 +310,47 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
     getNewMessageDisplay().setSelectedProfile(newProfile);
   }
 
-    /**
-     * Overrides JComponent.addNotify().
-     *
-     * We override addNotify() here to set the proper splitPane location.
-     */
-
-    public void addNotify() {
-        super.addNotify();
-	
-	if (firstShow) {
-	    messageDisplay.sizeToDefault();
-	    resizeByWidth();
-	    firstShow = false;
-	    
-	}
+  /**
+   * Overrides JComponent.addNotify().
+   *
+   * We override addNotify() here to set the proper splitPane location.
+   */
+  public void addNotify() {
+    super.addNotify();
+    
+    if (firstShow) {
+      messageDisplay.sizeToDefault();
+      resizeByWidth();
+      firstShow = false;
     }
+  }
 
-    public boolean isEditable() {
-	return true;
-    }
+  /**
+   * Shows a SendFailedDialog.
+   */
+  public SendFailedDialog showSendFailedDialog(OutgoingMailServer server, javax.mail. MessagingException sfe) {
+    SendFailedDialog sfd = new SendFailedDialog(server, sfe);
+    sfd.configureComponent();
+    Pooka.getUIFactory().showConfirmDialog(new Object[] { sfd }, "Error sending message", 1);
+    return sfd;
+  }
 
-    public boolean isModified() {
-	return getNewMessageDisplay().isModified();
-    }
-
-    public void setModified(boolean mod) {
-	getNewMessageDisplay().setModified(mod);
-    }
-
-    public NewMessageDisplayPanel getNewMessageDisplay() {
-	return (NewMessageDisplayPanel) messageDisplay;
-    }
-
+  public boolean isEditable() {
+    return true;
+  }
+  
+  public boolean isModified() {
+    return getNewMessageDisplay().isModified();
+  }
+  
+  public void setModified(boolean mod) {
+    getNewMessageDisplay().setModified(mod);
+  }
+  
+  public NewMessageDisplayPanel getNewMessageDisplay() {
+    return (NewMessageDisplayPanel) messageDisplay;
+  }
+  
     //------- Actions ----------//
 
     /**

@@ -183,7 +183,7 @@ public class NewMessageInfo extends MessageInfo {
 	throw new MessagingException(Pooka.getProperty("error.noSMTPServer", "Error sending Message:  No mail server configured."));
       }
     } catch (MessagingException me) {
-      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(me);	  
+      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(null, me);	  
     } catch (Throwable t) {
       String cause = t.getMessage();
       if (cause == null)
@@ -191,7 +191,7 @@ public class NewMessageInfo extends MessageInfo {
       
       MessagingException me = new MessagingException(cause);
       me.initCause(t);
-      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(me);	  
+      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(mailServer, me);	  
     }
   }
 
