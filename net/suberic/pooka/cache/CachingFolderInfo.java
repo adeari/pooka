@@ -239,6 +239,7 @@ public class CachingFolderInfo extends FolderInfo {
     
     protected void runMessagesAdded(MessageCountEvent mce) {
 	Message[] addedMessages = mce.getMessages();
+	System.out.println("running messages added on " + addedMessages.length + " messages.");
 	MessageInfo mp;
 	Vector addedProxies = new Vector();
 	for (int i = 0; i < addedMessages.length; i++) {
@@ -248,8 +249,12 @@ public class CachingFolderInfo extends FolderInfo {
 		messageToInfoTable.put(addedMessages[i], mp);
 		uidToInfoTable.put(new Long(((CachingMimeMessage) addedMessages[i]).getUID()), mp);
 		try {
+		    System.out.println("caching message for uid " + ((CachingMimeMessage)addedMessages[i]).getUID());
 		    getCache().cacheMessage((MimeMessage)addedMessages[i], ((CachingMimeMessage)addedMessages[i]).getUID(), getUIDValidity(), SimpleFileCache.HEADERS);
 		} catch (MessagingException me) {
+		    System.out.println("caught exception:  " + me);
+		    me.printStackTrace();
+
 		}
 
 	    } else {
@@ -267,8 +272,11 @@ public class CachingFolderInfo extends FolderInfo {
 		messageToInfoTable.put(newMsg, mp);
 		uidToInfoTable.put(new Long(uid), mp);
 		try {
+		    System.out.println("caching message for uid " + uid);
 		    getCache().cacheMessage((MimeMessage)addedMessages[i], uid, getUIDValidity(), SimpleFileCache.HEADERS);
 		} catch (MessagingException me) {
+		    System.out.println("caught exception:  " + me);
+		    me.printStackTrace();
 		}
 	    }
 	}

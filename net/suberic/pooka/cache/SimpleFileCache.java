@@ -226,7 +226,9 @@ public class SimpleFileCache implements MessageCache {
 	    throw new StaleCacheException(uidValidity, newUidValidity);
 	}
 	try {
+	    System.out.println("in sfc.cacheMessage(" + uid + ")");
 	    if (status == CONTENT) {
+		System.out.println("content is set--writing message out.");
 		File outFile = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
 		if (outFile.exists())
 		    outFile.delete();
@@ -239,17 +241,23 @@ public class SimpleFileCache implements MessageCache {
 	    }
 	    
 	    Flags flags = m.getFlags();
+	    System.out.println("saving flags for " + uid);
 	    saveFlags(uid, uidValidity, flags);
 	    
 	    File outFile = new File(cacheDir, uid + DELIMETER + HEADER_EXT);
 	    if (outFile.exists())
 		outFile.delete();
 	    
+	    outFile.createNewFile();
+
+	    System.out.println("writing headers for " + uid);
 	    FileWriter fos = new FileWriter(outFile);
 	    java.util.Enumeration enum = m.getAllHeaderLines();
 	    BufferedWriter bos = new BufferedWriter(fos);
 	    
+	    int foo = 0;
 	    while (enum.hasMoreElements()) {
+		System.out.println("writing out header # " + foo++ + " for uid " + uid);
 		bos.write((String) enum.nextElement());
 		bos.newLine();
 	    }
@@ -258,12 +266,15 @@ public class SimpleFileCache implements MessageCache {
 	    bos.flush();
 	    bos.close();
 	    
+	    System.out.println("seeing if cachedMessages contains the uid " + uid);
 	    if (! cachedMessages.contains(new Long(uid))) {
 		cachedMessages.add(new Long(uid));
 		System.out.println("writing message file; caching a new message.");
 		writeMsgFile();
-	    }
+	    } else {
+		System.out.println("uid " + uid + " already exists.");
 	    
+	    }
 	} catch (IOException ioe) {
 	    throw new MessagingException(ioe.getMessage(), ioe);
 	}
