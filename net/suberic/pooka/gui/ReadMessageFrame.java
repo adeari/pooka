@@ -31,7 +31,7 @@ public class ReadMessageFrame extends MessageFrame {
     }
 
   /**
-   * Creates a ReadMessageFrame from an existing ReadMessageInternalFrame.
+   * Creates a ReadMessageFrameFrame from an existing ReadMessageInternalFrame.
    */
   ReadMessageFrame(ReadMessageInternalFrame source) {
     messageDisplay = source.getMessageDisplay();
@@ -129,18 +129,18 @@ public class ReadMessageFrame extends MessageFrame {
     
   }
 
-    /**
-     * Attaches the window to a MessagePanel.
-     */
-    public void attachWindow() {
-	if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
-	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
-	    ReadMessageInternalFrame rmif = new ReadMessageInternalFrame(mp, this);
-	    getMessageProxy().setMessageUI(rmif);
-	    rmif.openMessageUI();
-	    this.dispose();
-	}
+  /**
+   * Attaches the window to a MessagePanel.
+   */
+  public void attachWindow() {
+    if (Pooka.getMainPanel().getContentPanel() instanceof MessagePanel) {
+      MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+      ReadMessageInternalFrame rmif = new ReadMessageInternalFrame(mp, this);
+      getMessageProxy().setMessageUI(rmif);
+      rmif.openMessageUI();
+      this.dispose();
     }
+  }
 
     /**
      * Overrides JComponent.addNotify().

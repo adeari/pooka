@@ -55,10 +55,16 @@ public class MessageProxy {
 	jd.dispose();
 	
       } catch (IOException ioe) {
-	getPookaUIFactory().showError("Error saving file:  " + ioe.getMessage());
+	if (getMessageUI() != null)
+	  getMessageUI().showError("Error saving file:  " + ioe.getMessage());
+	else
+	  Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
 	cancelSave();
       } catch (MessagingException me) {
-	getPookaUIFactory().showError("Error saving file:  " + me.getMessage());
+	if (getMessageUI() != null)
+	  getMessageUI().showError("Error saving file:  " + me.getMessage());
+	else
+	  Pooka.getUIFactory().showError("Error saving file:  " + me.getMessage());
 	cancelSave();
       } finally {
 	if (outStream != null) {
@@ -546,7 +552,7 @@ public class MessageProxy {
       NewMessageInfo nmi = new NewMessageInfo(newMessage);
       NewMessageProxy nmp = new NewMessageProxy(nmi);
       
-      final MessageUI nmu = getPookaUIFactory().createMessageUI(nmp, getMessageUI());
+      final MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
 
       nmp.matchUserProfile();
 
@@ -603,7 +609,7 @@ public class MessageProxy {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateReply(replyAll, withAttachments));
-      final MessageUI nmui = getPookaUIFactory().createMessageUI(nmp, this.getMessageUI());
+      final MessageUI nmui = Pooka.getUIFactory().createMessageUI(nmp, this.getMessageUI());
 
       // if this has a messageui up, then make the reply 
       SwingUtilities.invokeLater(new Runnable() {
@@ -639,7 +645,7 @@ public class MessageProxy {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateForward(withAttachments, method));
-      final MessageUI nmui = getPookaUIFactory().createMessageUI(nmp, getMessageUI());
+      final MessageUI nmui = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
       SwingUtilities.invokeLater(new Runnable() {
 	public void run() {
 	  nmui.openMessageUI();
@@ -946,16 +952,6 @@ public class MessageProxy {
   }
   
   /**
-   * Returns the UI Factory currently being used by this MessageProxy.
-   */
-  public PookaUIFactory getPookaUIFactory() {
-    if (getMessageUI() != null)
-      return getMessageUI().getPookaUIFactory();
-    else
-      return Pooka.getUIFactory();
-  }
-
-  /**
    * Returns the matching filters for this MessageProxy.
    */
   public net.suberic.pooka.gui.filter.DisplayFilter[] getMatchingFilters() {
@@ -1006,7 +1002,7 @@ public class MessageProxy {
       if (fw != null)
 	fw.setBusy(true);;
       openWindow();
-      getPookaUIFactory().doDefaultOpen(MessageProxy.this);
+      Pooka.getUIFactory().doDefaultOpen(MessageProxy.this);
       if (fw != null)
 	fw.setBusy(false);
     }

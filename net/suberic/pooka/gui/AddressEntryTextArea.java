@@ -47,8 +47,8 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   // if by keystroke, the key that is used to request address completion
   javax.swing.KeyStroke completionKey = javax.swing.KeyStroke.getKeyStroke(net.suberic.pooka.Pooka.getProperty("Pooka.addressComplete", "control D"));
 
-  // the underlying NewMessageInfo
-  NewMessageUI messageUI;
+  // the underlying MessageProxy
+  MessageProxy messageProxy;
 
   // the last time this field got a key hit
   long lastKeyTime = 0;
@@ -70,7 +70,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   public AddressEntryTextArea(NewMessageUI ui, int rows, int columns) {
     super(rows, columns);
-    messageUI = ui;
+    messageProxy = ui.getMessageProxy();
     areaList.put(this, null);
 
     this.addFocusListener(this);
@@ -84,7 +84,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   public AddressEntryTextArea(NewMessageUI ui, String text, int rows, int columns) {
     super(text, rows, columns);
-    messageUI = ui;
+    messageProxy = ui.getMessageProxy();
     areaList.put(this, null);
 
     this.addFocusListener(this);
@@ -135,7 +135,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   protected void updateTextValue() {
     final long lastModifiedTime = lastKeyTime;
-    net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+    net.suberic.pooka.AddressMatcher matcher = getNewMessageUI().getSelectedProfile().getAddressMatcher();
 
     if (matcher != null) {
       final String entryString = getAddressText();
@@ -237,7 +237,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
       SelectionStatus status = null;
 
       // first see if we're an address book entry.
-      net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+      net.suberic.pooka.AddressMatcher matcher = getNewMessageUI().getSelectedProfile().getAddressMatcher();
       if (matcher != null) {
 	AddressBookEntry[] matchedEntries = matcher.matchExactly(addressText);
 	if (matchedEntries != null && matchedEntries.length > 0) {
@@ -428,7 +428,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   public void selectNextEntry() {
     Selection currentSelection = getCurrentSelection();
-    net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+    net.suberic.pooka.AddressMatcher matcher = getNewMessageUI().getSelectedProfile().getAddressMatcher();
     AddressBookEntry newValue = matcher.getNextMatch(currentSelection.text);
     if (newValue != null) {
       replaceAddressText(currentSelection, newValue.getID());
@@ -441,7 +441,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    */
   public void selectPreviousEntry() {
     Selection currentSelection = getCurrentSelection();
-    net.suberic.pooka.AddressMatcher matcher = messageUI.getSelectedProfile().getAddressMatcher();
+    net.suberic.pooka.AddressMatcher matcher = getNewMessageUI().getSelectedProfile().getAddressMatcher();
     if (matcher != null) {
       AddressBookEntry newValue = matcher.getPreviousMatch(currentSelection.text);
       if (newValue != null) {
@@ -505,7 +505,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     JButton returnValue = new JButton(addressIcon);
     returnValue.addActionListener(new AbstractAction() {
 	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  Pooka.getUIFactory().showAddressWindow(AddressEntryTextArea.this);
+	  getNewMessageUI().showAddressWindow(AddressEntryTextArea.this);
 	}
       });
 
@@ -518,7 +518,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
    * Returns the parent MessageUI.
    */
   public NewMessageUI getNewMessageUI() {
-    return messageUI;
+    return (NewMessageUI) messageProxy.getMessageUI();
   }
 
   private class Selection {

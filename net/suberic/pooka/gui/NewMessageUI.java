@@ -23,4 +23,6 @@ public interface NewMessageUI extends MessageUI {
 
   public int promptSaveDraft();
 
+  public void showAddressWindow(AddressEntryTextArea aeta);
+
 }

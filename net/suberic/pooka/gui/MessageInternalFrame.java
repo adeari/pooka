@@ -261,6 +261,13 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   }
   
   /**
+   * Creates a ProgressDialog using the given values.
+   */
+  public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
+    return new ProgressInternalDialog(min, max, initialValue, title, content, getParentContainer());
+  }
+
+  /**
    * As specified by interface net.suberic.pooka.gui.MessageUI.
    * 
    * This implementation sets the cursor to either Cursor.WAIT_CURSOR
@@ -322,62 +329,45 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     return keyBindings;
   }
 
-  /**
-   * Sets the PookaUIFactory for this MessageInternalFrame. 
-   */
-  public void setPookaUIFactory(PookaUIFactory puif) {
-    uiFactory = puif;
+  //------- Actions ----------//
+  
+  public Action[] getActions() {
+    return defaultActions;
+  }
+  
+  public Action[] getDefaultActions() {
+    return defaultActions;
   }
 
-  /**
-   * Gets the PookaUIFactory that should be used by this MessageInternalFrame.
-   */
-  public PookaUIFactory getPookaUIFactory() {
-    if (uiFactory != null)
-      return uiFactory;
-    else
-      return Pooka.getUIFactory();
+  //-----------actions----------------
+
+  // The actions supported by the window itself.
+  
+  public Action[] defaultActions = {
+    new CloseAction(),
+    new DetachAction()
+      };
+  
+  class CloseAction extends AbstractAction {
+    
+    CloseAction() {
+      super("file-close");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      closeMessageUI();
+    }
   }
-
-    //------- Actions ----------//
-
-    public Action[] getActions() {
-	return defaultActions;
+  
+  class DetachAction extends AbstractAction {
+    DetachAction() {
+      super("window-detach");
     }
-
-    public Action[] getDefaultActions() {
-	return defaultActions;
+    
+    public void actionPerformed(ActionEvent e) {
+      detachWindow();
     }
-
-    //-----------actions----------------
-
-    // The actions supported by the window itself.
-
-    public Action[] defaultActions = {
-	new CloseAction(),
-	new DetachAction()
-    };
-
-    class CloseAction extends AbstractAction {
-
-	CloseAction() {
-	    super("file-close");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    closeMessageUI();
-	}
-    }
-
-    class DetachAction extends AbstractAction {
-	DetachAction() {
-	    super("window-detach");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    detachWindow();
-	}
-    }
+  }
 }
 
 

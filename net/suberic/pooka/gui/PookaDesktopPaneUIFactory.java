@@ -63,9 +63,9 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
       else
 	mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
     } else {
-      if (createExternal)
+      if (createExternal) {
 	mui = new ReadMessageFrame(mp);
-      else {
+      } else {
 	mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
 	((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
       }
@@ -354,28 +354,11 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     } 
 
   /**
-   * Shows an Address Selection form for the given AddressEntryTextArea.
-   */
-  public void showAddressWindow(AddressEntryTextArea aeta) {
-    JInternalFrame jif = new JInternalFrame("Choose Address", true, true, true, true);
-    jif.getContentPane().add(new AddressBookSelectionPanel(aeta, jif));
-    jif.pack();
-    getMessagePanel().add(jif);
-    jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
-    
-    jif.setVisible(true);
-    try {
-      jif.setSelected(true);
-    } catch (java.beans.PropertyVetoException pve) {
-    }
-    
-  }
-
-  /**
    * This tells the factory whether or not its ui components are showing
    * yet or not.
    */
   public void setShowing(boolean newValue) {
     showing=newValue;
   }
+
 }

@@ -125,16 +125,20 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     return tm.getDefaultTheme();
   }
 
-    public void detachWindow() {
-      ReadMessageFrame rmf = new ReadMessageFrame(this);
-      getMessageProxy().setMessageUI(rmf);
-      
-      rmf.show();
-      try {
-	this.setClosed(true);
-      } catch (java.beans.PropertyVetoException pve) {
-      }
+  /**
+   * Detaches this window from the desktop panel.  Actually creates a new
+   * top-level frame and copies the contents to that frame.
+   */
+  public void detachWindow() {
+    ReadMessageFrame rmf = new ReadMessageFrame(this);
+    getMessageProxy().setMessageUI(rmf);
+  
+    rmf.show();
+    try {
+      this.setClosed(true);
+    } catch (java.beans.PropertyVetoException pve) {
     }
+  }
   
     /**
      * Overrides JComponent.addNotify().

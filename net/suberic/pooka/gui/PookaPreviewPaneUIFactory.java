@@ -225,55 +225,55 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 	e.printStackTrace();
     }
 
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(String inputMessage, String title) {
-	return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * This shows an Input window.  We include this so that the 
-     * MessageProxy can call the method without caring about the actual
-     * implementation of the dialog.
-     */
-    public String showInputDialog(Object[] inputPanes, String title) {
-	return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
-    }
-
-    /**
-     * Returns the PropertyEditorFactory used by this component.
-     */
-    public PropertyEditorFactory getEditorFactory() {
-	return editorFactory;
-    }
-
-    /**
-     * Shows a message.
-     */
-    public void showMessage(String newMessage, String title) {
-      JOptionPane.showMessageDialog(contentPanel.getUIComponent(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
-    }
-
-    /**
-     * Shows a status message.
-     */
-    public void showStatusMessage(String newMessage) {
-      final String msg = newMessage;
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
-	  }
-	};
-      if (SwingUtilities.isEventDispatchThread())
-	runMe.run();
-      else
-	SwingUtilities.invokeLater(runMe);
-
-    }
-
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(String inputMessage, String title) {
+    return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputMessage, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * This shows an Input window.  We include this so that the 
+   * MessageProxy can call the method without caring about the actual
+   * implementation of the dialog.
+   */
+  public String showInputDialog(Object[] inputPanes, String title) {
+    return JOptionPane.showInputDialog(contentPanel.getUIComponent(), inputPanes, title, JOptionPane.QUESTION_MESSAGE);
+  }
+  
+  /**
+   * Returns the PropertyEditorFactory used by this component.
+   */
+  public PropertyEditorFactory getEditorFactory() {
+    return editorFactory;
+  }
+  
+  /**
+   * Shows a message.
+   */
+  public void showMessage(String newMessage, String title) {
+    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), newMessage, title, JOptionPane.PLAIN_MESSAGE);
+  }
+  
+  /**
+   * Shows a status message.
+   */
+  public void showStatusMessage(String newMessage) {
+    final String msg = newMessage;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  Pooka.getMainPanel().getInfoPanel().setMessage(msg);
+	}
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
+    
+  }
+  
   /**
    * Creates a ProgressDialog using the given values.
    */

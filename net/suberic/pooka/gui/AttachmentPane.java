@@ -147,7 +147,7 @@ public class AttachmentPane extends JPanel {
 	}
 	
       } catch (IOException ioe) {
-	Pooka.getUIFactory().showError("Error saving file:  " + ioe.getMessage());
+	getMessageUI().showError("Error saving file:  " + ioe.getMessage());
 	cancelSave();
       } finally {
 	if (outStream != null) {
@@ -161,8 +161,13 @@ public class AttachmentPane extends JPanel {
       }
     }
     
+    /**
+     * Creates a progress dialog to show the downloading of an attachment.
+     */
     public ProgressDialog createDialog(int attachmentSize) {
-      ProgressDialog dlg = Pooka.getUIFactory().createProgressDialog(0, attachmentSize, 0, saveFile.getName(), saveFile.getName());
+      ProgressDialog dlg;
+      dlg = getMessageUI().createProgressDialog(0, attachmentSize, 0, saveFile.getName(), saveFile.getName());
+
       dlg.addCancelListener(new ProgressDialogListener() {
 	  public void dialogCancelled() {
 	    cancelSave();
@@ -446,7 +451,7 @@ public class AttachmentPane extends JPanel {
       Object[] messageArray = new Object[2];
       messageArray[0] = inputMessage;
       messageArray[1] = togglePanel;
-      String cmd = Pooka.getUIFactory().showInputDialog(messageArray, inputTitle);
+      String cmd = getMessageUI().showInputDialog(messageArray, inputTitle);
       
       if (cmd != null) {
 	if (cmd.indexOf("%s") == -1)
@@ -604,6 +609,10 @@ public class AttachmentPane extends JPanel {
     return defaultActions;
   }
   
+  public MessageUI getMessageUI() {
+    return message.getMessageUI();
+  }
+
   //------------------------------------//
   
   class OpenAction extends AbstractAction {

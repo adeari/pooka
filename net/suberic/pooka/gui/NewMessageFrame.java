@@ -267,31 +267,41 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	else
 	    return null;
     }
+  
+  /**
+   * Shows an Address Selection form for the given AddressEntryTextArea.
+   */
+  public void showAddressWindow(AddressEntryTextArea aeta) {
+    JFrame jf = new JFrame("Choose Address");
+    jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
+    jf.pack();
+    jf.show();
+  }
 
-    /**
-     * As specified by interface net.suberic.pooka.UserProfileContainer.
-     *
-     * This implementation returns the DefaultProfile of the associated
-     * MessageProxy if the MessageFrame is not editable.  If the 
-     * MessageFrame is editable, it returns the currently selected 
-     * UserProfile object.
-     */
-
-    public UserProfile getDefaultProfile() {
-	if (isEditable())
-	    return getSelectedProfile();
-	else
-	    return getMessageProxy().getDefaultProfile();
-    }
-
-    /**
-     * This method returns the UserProfile currently selected in the 
-     * drop-down menu.
-     */
-
-    public UserProfile getSelectedProfile() {
-	return getNewMessageDisplay().getSelectedProfile();
-    }
+  /**
+   * As specified by interface net.suberic.pooka.UserProfileContainer.
+   *
+   * This implementation returns the DefaultProfile of the associated
+   * MessageProxy if the MessageFrame is not editable.  If the 
+   * MessageFrame is editable, it returns the currently selected 
+   * UserProfile object.
+   */
+  
+  public UserProfile getDefaultProfile() {
+    if (isEditable())
+      return getSelectedProfile();
+    else
+      return getMessageProxy().getDefaultProfile();
+  }
+  
+  /**
+   * This method returns the UserProfile currently selected in the 
+   * drop-down menu.
+   */
+  
+  public UserProfile getSelectedProfile() {
+    return getNewMessageDisplay().getSelectedProfile();
+  }
   
   /**
    * sets the currently selected Profile.

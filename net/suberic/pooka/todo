@@ -3,8 +3,6 @@
 *) address book:  make it so you can bring up your address book while 
 	addressing messages, and pull choices from there into your
 	address field.
-	-- check to make sure that we get the correct ui factory for
-	each message window.
 	-- make the button actually be the right size.
 	-- make it so you can add to the address book from the selection
 		panel.
@@ -65,6 +63,8 @@
 
 *) disconnected from store (like if the server goes down) doesn't result in 
 icons changing?  test.
+
+*) status messages:  make them appear and disappear at appropriate times.
 
 preview:
 	check what happens when we switch from desktop to preview and

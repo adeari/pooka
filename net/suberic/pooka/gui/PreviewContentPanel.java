@@ -358,7 +358,15 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void closeMessageUI() {
     // no-op here.
   }
+  
+  /**
+   * Creates a ProgressDialog using the given values.
+   */
+  public net.suberic.util.swing.ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
+    return Pooka.getUIFactory().createProgressDialog(min, max, initialValue, title, content);
+  }
 
+  
   public void setBusy(boolean newValue) {
     // no-op here.
   }

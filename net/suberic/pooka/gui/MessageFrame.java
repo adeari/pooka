@@ -27,8 +27,6 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   protected ConfigurableKeyBinding keyBindings;
   protected ConfigurableMenuBar menuBar;
   
-  protected PookaUIFactory uiFactory;
-  
   protected javax.swing.plaf.metal.MetalTheme currentTheme = null;
   
   /**
@@ -90,7 +88,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
      Runnable runMe = new Runnable() {
 	public void run() {
 	  try {
-	    getPookaUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
+	    Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
 	    getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
 	    getMessageDisplay().sizeToDefault();
 	    MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
@@ -137,7 +135,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    try {
-	      getPookaUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
+	      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
 	      getMessageDisplay().setDefaultFont(getMessageDisplay().getEditorPane());
 	      getMessageDisplay().sizeToDefault();
               MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
@@ -261,6 +259,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   }
   
   /**
+   * Creates a ProgressDialog using the given values.
+   */
+  public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
+    return new ProgressDialogImpl(min, max, initialValue, title, content);
+  }
+
+
+  /**
    * As specified by interface net.suberic.pooka.gui.MessageUI.
    * 
    * This implementation sets the cursor to either Cursor.WAIT_CURSOR
@@ -316,23 +322,6 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   
   public ConfigurableKeyBinding getKeyBindings() {
     return keyBindings;
-  }
-
-  /**
-   * Sets the PookaUIFactory for this MessageFrame. 
-   */
-  public void setPookaUIFactory(PookaUIFactory puif) {
-    uiFactory = puif;
-  }
-
-  /**
-   * Gets the PookaUIFactory that should be used by this MessageFrame.
-   */
-  public PookaUIFactory getPookaUIFactory() {
-    if (uiFactory != null)
-      return uiFactory;
-    else
-      return Pooka.getUIFactory();
   }
 
   //------- Actions ----------//

@@ -19,97 +19,97 @@ import java.io.File;
  * A window for entering new messages.
  */
 public class NewMessageInternalFrame extends MessageInternalFrame implements NewMessageUI {
-
-    public boolean firstShow = true;
-
-    /**
-     * Creates a NewMessageInternalFrame from the given Message.
-     */
-
-    public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageProxy newMsgProxy) {
-	super(newParentContainer, newMsgProxy);
-
-	configureMessageInternalFrame();
-
-	/*
-	this.addFocusListener(new FocusAdapter() {
-	    public void focusGained(FocusEvent e) {
-	      if (getMessageDisplay() != null)
-		getMessageDisplay().requestFocus();
-	    }
-	  });
-	*/
-
-	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	this.addInternalFrameListener(new InternalFrameAdapter() {
-	    public void internalFrameClosing(InternalFrameEvent ife) {
-	      handleClose();
-	    }
-	  });
-    }
-
-    public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageFrame source) {
-	parentContainer = newParentContainer;
-    	messageDisplay = source.getMessageDisplay();
-	messageDisplay.setMessageUI(this);
-	msg = source.getMessageProxy();
-	toolbar = source.getToolbar();
-	keyBindings = source.getKeyBindings();
-
-	this.getContentPane().add("North", toolbar);
-	this.getContentPane().add("Center", messageDisplay);
-	
-	toolbar.setActive(this.getActions());
-
-	Point loc = source.getLocationOnScreen();
-	SwingUtilities.convertPointFromScreen(loc, parentContainer);
-	this.setLocation(loc);
-
-	configureInterfaceStyle();
-
-	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-	this.addInternalFrameListener(new InternalFrameAdapter() {
-	    public void internalFrameClosing(InternalFrameEvent ife) {
-	      handleClose();
-	    }
-	  });
-				      
-    }
-
-    /**
-     * This configures the MessageInternalFrame.  This means that here is 
-     * where we create the headerPanel and editorPane and add them to the 
-     * splitPane.
-     */
-    protected void configureMessageInternalFrame() {
-
-	try {
-	    this.createDefaultActions();
-	    
-	    this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
-	    
-	    messageDisplay = new NewMessageDisplayPanel(this);
-	    messageDisplay.configureMessageDisplay();
-	    
-	    toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
-	    
-	    this.getContentPane().add("North", toolbar);
-	    this.getContentPane().add("Center", messageDisplay);
-	    
-	    toolbar.setActive(this.getActions());
-	    
-	    keyBindings = new ConfigurableKeyBinding(this, "NewMessageWindow.keyBindings", Pooka.getResources());
-	    keyBindings.setActive(getActions());
-	} catch (MessagingException me) {
-	    showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."));
-	    me.printStackTrace();
-	}
-
-	configureInterfaceStyle();
-
-    }
   
- /**
+  public boolean firstShow = true;
+  
+  /**
+   * Creates a NewMessageInternalFrame from the given Message.
+   */
+  
+  public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageProxy newMsgProxy) {
+    super(newParentContainer, newMsgProxy);
+    
+    configureMessageInternalFrame();
+    
+    /*
+      this.addFocusListener(new FocusAdapter() {
+      public void focusGained(FocusEvent e) {
+      if (getMessageDisplay() != null)
+      getMessageDisplay().requestFocus();
+      }
+      });
+    */
+    
+    this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    this.addInternalFrameListener(new InternalFrameAdapter() {
+	public void internalFrameClosing(InternalFrameEvent ife) {
+	  handleClose();
+	}
+      });
+  }
+
+  public NewMessageInternalFrame(MessagePanel newParentContainer, NewMessageFrame source) {
+    parentContainer = newParentContainer;
+    messageDisplay = source.getMessageDisplay();
+    messageDisplay.setMessageUI(this);
+    msg = source.getMessageProxy();
+    toolbar = source.getToolbar();
+    keyBindings = source.getKeyBindings();
+    
+    this.getContentPane().add("North", toolbar);
+    this.getContentPane().add("Center", messageDisplay);
+    
+    toolbar.setActive(this.getActions());
+    
+    Point loc = source.getLocationOnScreen();
+    SwingUtilities.convertPointFromScreen(loc, parentContainer);
+    this.setLocation(loc);
+    
+    configureInterfaceStyle();
+    
+    this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+    this.addInternalFrameListener(new InternalFrameAdapter() {
+	public void internalFrameClosing(InternalFrameEvent ife) {
+	  handleClose();
+	}
+      });
+    
+  }
+  
+  /**
+   * This configures the MessageInternalFrame.  This means that here is 
+   * where we create the headerPanel and editorPane and add them to the 
+   * splitPane.
+   */
+  protected void configureMessageInternalFrame() {
+    
+    try {
+      this.createDefaultActions();
+      
+      this.setTitle(Pooka.getProperty("Pooka.messageWindow.messageTitle.newMessage", "New Message"));
+      
+      messageDisplay = new NewMessageDisplayPanel(this);
+      messageDisplay.configureMessageDisplay();
+      
+      toolbar = new ConfigurableToolbar("NewMessageWindowToolbar", Pooka.getResources());
+      
+      this.getContentPane().add("North", toolbar);
+      this.getContentPane().add("Center", messageDisplay);
+      
+      toolbar.setActive(this.getActions());
+      
+      keyBindings = new ConfigurableKeyBinding(this, "NewMessageWindow.keyBindings", Pooka.getResources());
+      keyBindings.setActive(getActions());
+    } catch (MessagingException me) {
+      showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."));
+      me.printStackTrace();
+    }
+    
+    configureInterfaceStyle();
+    
+  }
+  
+  /**
    * Gets the Theme object from the ThemeManager which is appropriate
    * for this UI.
    */
@@ -294,154 +294,173 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	    return getMessageProxy().getDefaultProfile();
     }
 
-    /**
-     * This method returns the UserProfile currently selected in the 
-     * drop-down menu.
-     */
+  /**
+   * Shows an Address Selection form for the given AddressEntryTextArea.
+   */
+  public void showAddressWindow(AddressEntryTextArea aeta) {
+    JInternalFrame jif = new JInternalFrame("Choose Address", true, true, true, true);
+    jif.getContentPane().add(new AddressBookSelectionPanel(aeta, jif));
+    jif.pack();
 
-    public UserProfile getSelectedProfile() {
-	return getNewMessageDisplay().getSelectedProfile();
+    getParentContainer().add(jif);
+    jif.setLocation(getParentContainer().getNewWindowLocation(jif, true));
+    
+    jif.setVisible(true);
+    try {
+      jif.setSelected(true);
+    } catch (java.beans.PropertyVetoException pve) {
     }
+    
+  }
 
+  /**
+   * This method returns the UserProfile currently selected in the 
+   * drop-down menu.
+   */
+  
+  public UserProfile getSelectedProfile() {
+    return getNewMessageDisplay().getSelectedProfile();
+  }
+  
   /**
    * sets the currently selected Profile.
    */
   public void setSelectedProfile(UserProfile newProfile) {
     getNewMessageDisplay().setSelectedProfile(newProfile);
   }
-
-    /**
-     * Overrides JComponent.addNotify().
-     *
-     * We override addNotify() here to set the proper splitPane location.
-     */
-
-    public void addNotify() {
-        super.addNotify();
-
-	if (firstShow) {
-	    getMessageDisplay().sizeToDefault();
-	    resizeByWidth();
-	    firstShow = false;
-	}
-    }
-
-    public boolean isEditable() {
-	return true;
-    }
-
-    public boolean isModified() {
-	return getNewMessageDisplay().isModified();
-    }
-
-    public void setModified(boolean mod) {
-	getNewMessageDisplay().setModified(mod);
-    }
-
-    public NewMessageDisplayPanel getNewMessageDisplay() {
-	return (NewMessageDisplayPanel) messageDisplay;
-    }
-
-    //------- Actions ----------//
-
-    /**
-     * performTextAction grabs the focused component on the 
-     * MessageInternalFrame and, if it is a JTextComponent, tries to get it 
-     * to perform the appropriate ActionEvent.
-     */
-    public void performTextAction(String name, ActionEvent e) {
-	getNewMessageDisplay().performTextAction(name, e);
-    }
-
-    public Action[] getActions() {
-	Action[] returnValue = getDefaultActions();
-	
-	if (getMessageDisplay() != null && getMessageDisplay().getActions() != null) 
-	    returnValue = TextAction.augmentList(getMessageDisplay().getActions(), returnValue);
-
-	return returnValue;
-    }
-
-    public Action[] getDefaultActions() {
-	return defaultActions;
-    }
-
+  
+  /**
+   * Overrides JComponent.addNotify().
+   *
+   * We override addNotify() here to set the proper splitPane location.
+   */
+  
+  public void addNotify() {
+    super.addNotify();
     
-    private void createDefaultActions() {
-	// The actions supported by the window itself.
-
-	/*	defaultActions = new Action[] {
-	    new CloseAction(),
-	    new CutAction(),
-	    new CopyAction(),
-	    new PasteAction(),
-	    new TestAction()
-	    };
-
+    if (firstShow) {
+      getMessageDisplay().sizeToDefault();
+      resizeByWidth();
+      firstShow = false;
+    }
+  }
+  
+  public boolean isEditable() {
+    return true;
+  }
+  
+  public boolean isModified() {
+    return getNewMessageDisplay().isModified();
+  }
+  
+  public void setModified(boolean mod) {
+    getNewMessageDisplay().setModified(mod);
+  }
+  
+  public NewMessageDisplayPanel getNewMessageDisplay() {
+    return (NewMessageDisplayPanel) messageDisplay;
+  }
+  
+  //------- Actions ----------//
+  
+  /**
+   * performTextAction grabs the focused component on the 
+   * MessageInternalFrame and, if it is a JTextComponent, tries to get it 
+   * to perform the appropriate ActionEvent.
+   */
+  public void performTextAction(String name, ActionEvent e) {
+    getNewMessageDisplay().performTextAction(name, e);
+  }
+  
+  public Action[] getActions() {
+    Action[] returnValue = getDefaultActions();
+    
+    if (getMessageDisplay() != null && getMessageDisplay().getActions() != null) 
+      returnValue = TextAction.augmentList(getMessageDisplay().getActions(), returnValue);
+    
+    return returnValue;
+  }
+  
+  public Action[] getDefaultActions() {
+    return defaultActions;
+  }
+  
+  
+  private void createDefaultActions() {
+    // The actions supported by the window itself.
+    
+    /*	defaultActions = new Action[] {
+	new CloseAction(),
+	new CutAction(),
+	new CopyAction(),
+	new PasteAction(),
+	new TestAction()
+	};
+	
 	defaultActions = new Action[] {
-	    new CloseAction(),
-	    };
-	*/
+	new CloseAction(),
+	};
+    */
+  }
+  
+  //-----------actions----------------
+  
+  
+  class CloseAction extends AbstractAction {
+    
+    CloseAction() {
+      super("file-close");
     }
-
-    //-----------actions----------------
-
-
-    class CloseAction extends AbstractAction {
-
-	CloseAction() {
-	    super("file-close");
-	}
-	
-        public void actionPerformed(ActionEvent e) {
-	    closeMessageUI();
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      closeMessageUI();
     }
-
-    class CutAction extends AbstractAction {
-	
-	CutAction() {
-	    super("cut-to-clipboard");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    performTextAction((String)getValue(Action.NAME), e);
-	}
+  }
+  
+  class CutAction extends AbstractAction {
+    
+    CutAction() {
+      super("cut-to-clipboard");
     }
-
-    class CopyAction extends AbstractAction {
-	
-	CopyAction() {
-	    super("copy-to-clipboard");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    performTextAction((String)getValue(Action.NAME), e);
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      performTextAction((String)getValue(Action.NAME), e);
     }
-
-    class PasteAction extends AbstractAction {
-	
-	PasteAction() {
-	    super("paste-from-clipboard");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    performTextAction((String)getValue(Action.NAME), e);
-	}
+  }
+  
+  class CopyAction extends AbstractAction {
+    
+    CopyAction() {
+      super("copy-to-clipboard");
     }
-
-    class TestAction extends AbstractAction {
-	
-	TestAction() {
-	    super("test");
-	}
-
-	public void actionPerformed(ActionEvent e) {
-	    System.out.println(net.suberic.pooka.MailUtilities.wrapText(getMessageText()));
-	}
+    
+    public void actionPerformed(ActionEvent e) {
+      performTextAction((String)getValue(Action.NAME), e);
     }
-
+  }
+  
+  class PasteAction extends AbstractAction {
+    
+    PasteAction() {
+      super("paste-from-clipboard");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      performTextAction((String)getValue(Action.NAME), e);
+    }
+  }
+  
+  class TestAction extends AbstractAction {
+    
+    TestAction() {
+      super("test");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.out.println(net.suberic.pooka.MailUtilities.wrapText(getMessageText()));
+    }
+  }
+  
 }
 
 
