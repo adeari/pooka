@@ -33,29 +33,45 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
      * Creates a MessageFrame from the given Message.
      */
 
-    public MessageFrame(MessageProxy newMsgProxy) {
-      super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"));
-      
-      msg=newMsgProxy;
-      
-      this.getContentPane().setLayout(new BorderLayout());
-      
-      java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
-      if (standardUrl != null) {
-	ImageIcon standardIcon = new ImageIcon(standardUrl);
-	setIconImage(standardIcon.getImage());
-      }
-
+  public MessageFrame(MessageProxy newMsgProxy) {
+    super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"));
+    
+    msg=newMsgProxy;
+    
+    this.getContentPane().setLayout(new BorderLayout());
+    
+    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+    if (standardUrl != null) {
+      ImageIcon standardIcon = new ImageIcon(standardUrl);
+      setIconImage(standardIcon.getImage());
+    }
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (getMessageDisplay() != null)
+	    getMessageDisplay().requestFocus();
+	}
+      });
+    
+    
     }
 
-    protected MessageFrame() {
-	this.getContentPane().setLayout(new BorderLayout());
-
-      java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
-      if (standardUrl != null) {
-	ImageIcon standardIcon = new ImageIcon(standardUrl);
-	setIconImage(standardIcon.getImage());
-      }
+  protected MessageFrame() {
+    this.getContentPane().setLayout(new BorderLayout());
+    
+    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+    if (standardUrl != null) {
+      ImageIcon standardIcon = new ImageIcon(standardUrl);
+      setIconImage(standardIcon.getImage());
+    }
+    
+    this.addFocusListener(new FocusAdapter() {
+	public void focusGained(FocusEvent e) {
+	  if (getMessageDisplay() != null)
+	    getMessageDisplay().requestFocus();
+	}
+      });
+      
     }
 
     /**

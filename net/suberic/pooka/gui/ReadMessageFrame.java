@@ -28,12 +28,6 @@ public class ReadMessageFrame extends MessageFrame {
 
 	configureMessageFrame();
 
-	this.addFocusListener(new FocusAdapter() {
-	    public void focusGained(FocusEvent e) {
-	      if (getMessageDisplay() != null)
-		getMessageDisplay().requestFocus();
-	    }
-	  });
     }
 
   /**
@@ -59,13 +53,6 @@ public class ReadMessageFrame extends MessageFrame {
     
     this.setLocation(source.getLocationOnScreen());
     
-    this.addFocusListener(new FocusAdapter() {
-	public void focusGained(FocusEvent e) {
-	  if (getMessageDisplay() != null)
-	    getMessageDisplay().requestFocus();
-	}
-      });
-    
     configureInterfaceStyle();
   }
   
@@ -88,6 +75,8 @@ public class ReadMessageFrame extends MessageFrame {
       toolbar.setActive(this.getActions());
       
       keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "ReadMessageWindow.keyBindings", Pooka.getResources());
+
+      keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
       keyBindings.setActive(getActions());
       
     } catch (MessagingException me) {

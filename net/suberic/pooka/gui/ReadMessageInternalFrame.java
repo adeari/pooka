@@ -25,12 +25,14 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     public ReadMessageInternalFrame(MessagePanel newParentContainer, MessageProxy newMsgProxy) {
 	super(newParentContainer, newMsgProxy);
 
+	/*
 	this.addFocusListener(new FocusAdapter() {
 	    public void focusGained(FocusEvent e) {
 	      if (getMessageDisplay() != null)
 		getMessageDisplay().requestFocus();
 	    }
 	  });
+	*/
 
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 	    public void internalFrameClosed(InternalFrameEvent e) {

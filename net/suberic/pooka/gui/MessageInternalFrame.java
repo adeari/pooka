@@ -43,6 +43,14 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 
 	this.getContentPane().setLayout(new BorderLayout());
 
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (getMessageDisplay() != null)
+		getMessageDisplay().requestFocus();
+	    }
+	  });
+
+
     }
 
     /**

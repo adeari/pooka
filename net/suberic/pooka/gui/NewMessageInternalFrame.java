@@ -31,6 +31,15 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 
 	configureMessageInternalFrame();
 
+	/*
+	this.addFocusListener(new FocusAdapter() {
+	    public void focusGained(FocusEvent e) {
+	      if (getMessageDisplay() != null)
+		getMessageDisplay().requestFocus();
+	    }
+	  });
+	*/
+
 	this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	this.addInternalFrameListener(new InternalFrameAdapter() {
 	    public void internalFrameClosing(InternalFrameEvent ife) {

@@ -89,6 +89,8 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 	    toolbar.setActive(this.getActions());
 	    
 	    keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "NewMessageWindow.keyBindings", Pooka.getResources());
+	    keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+	    
 	    keyBindings.setActive(getActions());
 	} catch (MessagingException me) {
 	    showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
