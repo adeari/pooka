@@ -197,16 +197,19 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
+	    JInternalFrame jif = new JInternalFrame();
+	    SearchEntryForm sef = new SearchEntryForm(Pooka.getSearchManager());
+	    jif.getContentPane().add(sef.getPanel());
+
+	    MessagePanel mp = ((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel();
+	    jif.pack();
+	    mp.add(jif);
+	    jif.setVisible(true);
 	    try {
-		Folder[] folders = getStoreInfo().getStore().getDefaultFolder().list();
-		for (int i = 0; i < folders.length; i++) {
-		    folders[i].list();
-		}
-	    } catch (Exception ex) {
-		System.out.println("caught exception: " + ex.getMessage());
-	    }
+		jif.setSelected(true);
+	    } catch (java.beans.PropertyVetoException pve) { }
 	}
     }
-
+    
 }
 

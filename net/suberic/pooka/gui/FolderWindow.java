@@ -84,7 +84,7 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	defaultActions = new Action[] {
 	    new CloseAction(),
 	    new ActionWrapper(new ExpungeAction(), getFolderInfo().getFolderThread()),
-	    new ActionWrapper(new SearchAction(), getFolderInfo().getFolderThread())
+	    new SearchAction()
 		};
 
 	initWindow();

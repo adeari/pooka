@@ -30,7 +30,7 @@ public class SearchEntryForm {
 	searchFieldCombo = new JComboBox(manager.getTermLabels());
 	Vector operationFields = manager.getOperationLabels();
 	operationCombo = new JComboBox(operationFields);
-	textField = new JTextField();
+	textField = new JTextField(20);
 	
 	panel.add(searchFieldCombo);
 	panel.add(operationCombo);
