@@ -1,5 +1,5 @@
 package net.suberic.pooka;
-import net.suberic.pooka.*;
+import net.suberic.pooka.filter.FilterAction;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.util.thread.*;
 import javax.mail.*;
@@ -674,6 +674,18 @@ public class MessageInfo {
     java.util.LinkedList list = new java.util.LinkedList();
     list.add(getMessageProxy());
     fi.applyFilters(list);
+  }
+
+  /**
+   * Runs the configured spam action on this message.
+   */
+  public void runSpamAction() {
+    FilterAction spamFilter = MessageFilter.generateFilterAction("Pooka.spamAction");
+    if (spamFilter != null) {
+      Vector v = new Vector();
+      v.add(this);
+      spamFilter.performFilter(v);
+    }
   }
 
   /**

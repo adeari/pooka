@@ -1,3 +1,8 @@
+added a configurable spam button.
+
+changed the default action of the FolderSelectorPane to be only subscribed
+folders.
+
 040128 release
 --------------
 

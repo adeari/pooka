@@ -476,7 +476,6 @@ public class MessageProxy {
       info.runBackendFilters();
   }
 
-
   /**
    * Attempts to decrypt the given message.
    */
@@ -1250,7 +1249,8 @@ public class MessageProxy {
 	new ActionWrapper(new CacheMessageAction(), folderThread),
 	new ActionWrapper(new SaveAddressAction(), folderThread),
 	new ActionWrapper(new OpenAsNewAction(), folderThread),
-	new ActionWrapper(new FilterAction(), folderThread),
+	new ActionWrapper(new MessageFilterAction(), folderThread),
+	new ActionWrapper(new SpamAction(), folderThread),
 	new ActionWrapper(new DecryptAction(), folderThread),
 	new ActionWrapper(new CheckSignatureAction(), folderThread),
 	new ActionWrapper(new ImportKeysAction(), folderThread),
@@ -1667,8 +1667,8 @@ public class MessageProxy {
     }
   }
 
-  public class FilterAction extends AbstractAction {
-    FilterAction() {
+  public class MessageFilterAction extends AbstractAction {
+    MessageFilterAction() {
       super("message-filter");
     }
     
@@ -1680,6 +1680,30 @@ public class MessageProxy {
 	fw.setBusy(true);;
 	
       runBackendFilters();
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class SpamAction extends AbstractAction {
+    SpamAction() {
+      super("message-spam");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      MessageInfo info = getMessageInfo();
+      if (info != null) {
+	info.runSpamAction();
+      }
       
       if (fw != null)
 	fw.setBusy(false);

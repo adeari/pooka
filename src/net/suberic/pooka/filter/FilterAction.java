@@ -1,6 +1,6 @@
 package net.suberic.pooka.filter;
 import net.suberic.pooka.gui.MessageProxy;
-import java.util.Vector;
+import java.util.List;
 
 public interface FilterAction {
 
@@ -14,7 +14,7 @@ public interface FilterAction {
      * @return messages which are removed from their original folder
      * by the filter.
      */
-    public Vector performFilter(Vector filteredMessages);
+    public List performFilter(List filteredMessages);
 
     /**
      * Initializes the FilterAction from the sourceProperty given.

@@ -143,7 +143,7 @@ public class FolderSelectorPane extends SwingPropertyEditor {
   public FileSystemView createFileSystemView() {
     
     FileSystemView returnValue = null;
-    boolean justSubscribed = manager.getProperty(editorTemplate + ".onlySubscribed", "false").equalsIgnoreCase("true");
+    boolean justSubscribed = manager.getProperty(editorTemplate + ".onlySubscribed", "true").equalsIgnoreCase("true");
 
     if (manager.getProperty(editorTemplate + ".selectionRoot", "allStores").equals("allStores")) {
       if (justSubscribed) 

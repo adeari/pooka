@@ -44,7 +44,8 @@ public class MultiMessageProxy extends MessageProxy {
 		new ActionWrapper(new CopyAction(), storeThread),
 		new ActionWrapper(new PrintAction(), storeThread),
 		new ActionWrapper(new CacheMessageAction(), storeThread),
-		new ActionWrapper(new FilterAction(), storeThread)
+		new ActionWrapper(new MessageFilterAction(), storeThread),
+		new ActionWrapper(new SpamAction(), storeThread)
 		    };
 	} else {
 	    defaultActions = new Action[] {
@@ -53,7 +54,8 @@ public class MultiMessageProxy extends MessageProxy {
 		new MoveAction(),
 		new CopyAction(),
 		new PrintAction(),
-		new FilterAction()
+		new MessageFilterAction(),
+		new SpamAction()
 		    };
 	}	    
 
@@ -95,46 +97,45 @@ public class MultiMessageProxy extends MessageProxy {
 	popupMenu.show(component, e.getX(), e.getY());
 	    
     }
-
-    /**
-     * This sends the message to the printer, first creating an appropriate
-     * print dialog, etc.
-     */
-
-    public void printMessage() {
-	PrinterJob job = PrinterJob.getPrinterJob ();
-	Book book = new Book ();
-	PageFormat pf = job.pageDialog (job.defaultPage ());
-	MultiMessageInfo multi = getMulti();
-	for (int i = 0; i < getMulti().getMessageCount(); i++) {
-	    MessagePrinter printer = new MessagePrinter(multi.getMessageInfo(i), book.getNumberOfPages());
-	    book.append (printer, pf);
-	}
-	job.setPageable (book);
-	final PrinterJob externalJob = job;
-	if (job.printDialog ()) {
-	    Thread printThread = new Thread(new Runnable() {
-		public void run() {
-		    try {
-			externalJob.print ();
-		    }
-		    catch (PrinterException ex) {
-			ex.printStackTrace ();
-		    }
-		}
-	    }, "printing thread");
-	    printThread.start();
-	    
-	}
+  
+  /**
+   * This sends the message to the printer, first creating an appropriate
+   * print dialog, etc.
+   */
+  
+  public void printMessage() {
+    PrinterJob job = PrinterJob.getPrinterJob ();
+    Book book = new Book ();
+    PageFormat pf = job.pageDialog (job.defaultPage ());
+    MultiMessageInfo multi = getMulti();
+    for (int i = 0; i < getMulti().getMessageCount(); i++) {
+      MessagePrinter printer = new MessagePrinter(multi.getMessageInfo(i), book.getNumberOfPages());
+      book.append (printer, pf);
     }
-
-    /**
-     * Returns the messageInfo attribute as a MultiMessageInfo.
-     */
-
-    public MultiMessageInfo getMulti() {
-	return (MultiMessageInfo)messageInfo;
+    job.setPageable (book);
+    final PrinterJob externalJob = job;
+    if (job.printDialog ()) {
+      Thread printThread = new Thread(new Runnable() {
+	  public void run() {
+	    try {
+	      externalJob.print ();
+	    }
+	    catch (PrinterException ex) {
+	      ex.printStackTrace ();
+	    }
+	  }
+	}, "printing thread");
+      printThread.start();
+      
     }
-
+  }
+  
+  /**
+   * Returns the messageInfo attribute as a MultiMessageInfo.
+   */
+  public MultiMessageInfo getMulti() {
+    return (MultiMessageInfo)messageInfo;
+  }
+  
 }
 

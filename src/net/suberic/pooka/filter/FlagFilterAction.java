@@ -2,40 +2,44 @@ package net.suberic.pooka.filter;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.Pooka;
-import java.util.Vector;
+import java.util.List;
+import java.util.LinkedList;
 import javax.mail.*;
 
+/**
+ * A FilterAction which sets or unsets a given flag on message(s).
+ */
 public class FlagFilterAction implements FilterAction {
-
-    private String folderName = null;
-    private Flags flagToSet;
-    private boolean flagValue;
-
-    public FlagFilterAction() {
+  
+  private String folderName = null;
+  private Flags flagToSet;
+  private boolean flagValue;
+  
+  public FlagFilterAction() {
+  }
+  
+  /**
+   * Runs the filterAction on each MessageProxy in the filteredMessages
+   * List.
+   *
+   * @param filteredMessages messages which have met the filter condition
+   * and need to have the FilterAction performed on them.
+   *
+   * @return messages which are removed from their original folder
+   * by the filter.
+   */
+  public List performFilter(List filteredMessages) {
+    for (int i = 0; i < filteredMessages.size(); i++) {
+      try {
+	MessageProxy current = (MessageProxy) filteredMessages.get(i);
+	current.getMessageInfo().getRealMessage().setFlags(flagToSet, flagValue);
+      } catch (MessagingException me) {
+      }
+      
     }
-
-    /**
-     * Runs the filterAction on each MessageProxy in the filteredMessages
-     * Vector.
-     *
-     * @param filteredMessages messages which have met the filter condition
-     * and need to have the FilterAction performed on them.
-     *
-     * @return messages which are removed from their original folder
-     * by the filter.
-     */
-    public Vector performFilter(Vector filteredMessages) {
-	for (int i = 0; i < filteredMessages.size(); i++) {
-	    try {
-		MessageProxy current = (MessageProxy) filteredMessages.elementAt(i);
-		current.getMessageInfo().getRealMessage().setFlags(flagToSet, flagValue);
-	    } catch (MessagingException me) {
-	    }
-
-	}
-
-	return new Vector();
-    }
+    
+    return new LinkedList();
+  }
 
     /**
      * Initializes the FilterAction from the sourceProperty given.

@@ -2,7 +2,7 @@ package net.suberic.pooka;
 import javax.mail.*;
 import javax.mail.search.SearchTerm;
 import net.suberic.pooka.filter.FilterAction;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * This represents a MessageFilter.  It contains a SearchTerm and an Action
@@ -41,7 +41,7 @@ public class MessageFilter {
    * Generates a FilterAction from the given property.
    */
   
-  public FilterAction generateFilterAction(String actionProperty) {
+  public static FilterAction generateFilterAction(String actionProperty) {
     String className = Pooka.getProperty(actionProperty + ".class", "");
     try {
       Class filterClass = Class.forName(className);

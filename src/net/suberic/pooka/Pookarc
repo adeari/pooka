@@ -138,7 +138,6 @@ MenuBar.File.EmptyTrash.Action=folder-empty
 MenuBar.File.Exit.Action=file-exit
 #MenuBar.File.Exit.Image=/org/javalobby/icons/20x20png/Exit.png
 
-#MenuBar.Edit=UserConfig:StoreConfig:OutgoingConfig:ConnectionConfig:Folders:Undo:Select All:Cut:Copy:Paste:SelectAll:Find:FindNext
 MenuBar.Edit=Cut:Copy:Paste:Undo:Redo:SelectAll:Find:FindNext
 MenuBar.Edit.Undo.Action=edit-undo
 #MenuBar.Edit.Undo.Image=/org/javalobby/icons/20x20png/Undo.png
@@ -240,7 +239,7 @@ MainToolbar.Paste.Image=/org/javalobby/icons/20x20png/Paste.png
 MainToolbar.Print.Action=file-print
 MainToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 
-FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Print:Update:Search
+FolderWindowToolbar=Down:Up:Open:Reply:ReplyAll:Delete:Spam:Print:Update:Search
 FolderWindowToolbar.Down.Action=message-next
 FolderWindowToolbar.Down.Image=/org/javalobby/icons/20x20png/Down.png
 FolderWindowToolbar.Up.Action=message-previous
@@ -253,6 +252,8 @@ FolderWindowToolbar.ReplyAll.Action=message-reply-all
 FolderWindowToolbar.ReplyAll.Image=/org/javalobby/icons/20x20png/ReplyAll.png
 FolderWindowToolbar.Delete.Action=message-delete
 FolderWindowToolbar.Delete.Image=/org/javalobby/icons/20x20png/DeleteEnvelope.png
+FolderWindowToolbar.Spam.Action=message-spam
+FolderWindowToolbar.Spam.Image=/org/javalobby/icons/20x20png/Bomb.png
 FolderWindowToolbar.Print.Action=file-print
 FolderWindowToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 FolderWindowToolbar.Update.Action=folder-update
@@ -873,7 +874,7 @@ Store.editableFields.useMaildir=true
 Store.editableFields.trashFolder.namePrefix=Store.
 Store.editableFields.trashFolder.nameSuffix=.trashFolder
 
-Preferences=UI:Reply:Startup:Signature:HTML:Files
+Preferences=UI:Reply:Startup:Signature:HTML:Files:Spam
 Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
@@ -884,10 +885,13 @@ Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:P
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage
 Preferences.HTML=Pooka.displayHtml:Pooka.displayHtmlAsDefault:Pooka.urlHandler
 Preferences.Files=Pooka.defaultMailSubDir:Pooka.sslCertFile
+Preferences.Spam=Pooka.spamAction
 
 Pooka.defaultMailSubDir.propertyType=Directory
 Pooka.sslCertFile.propertyType=File
 
+Pooka.spamAction.propertyType=Filter
+Pooka.spamAction.filterType=backend
 Pooka.SSL.useSecureRandom=false
 
 Pooka.messagePanel.theme.propertyType=List

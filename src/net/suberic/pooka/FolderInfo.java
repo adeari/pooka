@@ -2064,7 +2064,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (backendFilters != null) 
       for (int i = 0; i < backendFilters.length; i++) {
 	if (backendFilters[i] != null) {
-	  Vector justRemoved = backendFilters[i].filterMessages(notRemovedYet);
+	  List justRemoved = backendFilters[i].filterMessages(notRemovedYet);
 	  removed.addAll(justRemoved);
 	  notRemovedYet.removeAll(justRemoved);
 	}
