@@ -109,12 +109,27 @@ public abstract class MessageDisplayPanel extends JPanel {
      * nothing should happen, but i'm not sure.  :)
      */
     public void setDefaultFont(JEditorPane jep) {
+      Font f = null;
+      try {
+	net.suberic.util.swing.ThemeSupporter ts = (net.suberic.util.swing.ThemeSupporter)getMessageProxy().getMessageUI();
+	net.suberic.util.swing.ConfigurableMetalTheme cmt = (net.suberic.util.swing.ConfigurableMetalTheme) ts.getTheme(Pooka.getUIFactory().getPookaThemeManager());
+	if (cmt != null) {
+	  f = cmt.getMonospacedFont();
+	}
+      } catch (Exception e) {
+	// if we get an exception, just ignore it and use the default.
+      }
+
+      if (f == null) {
 	String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
 	int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
+	
+	f = new Font(fontName, Font.PLAIN, fontSize);
+      }
 
-	Font f = new Font(fontName, Font.PLAIN, fontSize);
-	if (f != null)
-	    jep.setFont(f);
+      if (f != null)
+	jep.setFont(f);
+      
     }
 
     /**

@@ -4,8 +4,10 @@ top todo:
 	begun.  todo:
 	*) Folder -- read messages need to honor the font and font color.
 	*) The font for new messages doesn't update using the themes.
+	   -- somewhat fixed, though there are still cases where it doesn't
+		work, as well as a problem with not resizing the window.
 	*) Add places to configure all of these settings. -- and check
-	  the labels for these properties.
+	  the labels for these properties. -- should be done?
 	
 *) fix the UserProfile editor display.  (linux, jdk1.3.x)
 

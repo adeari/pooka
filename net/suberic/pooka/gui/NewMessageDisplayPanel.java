@@ -116,6 +116,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    if (nmui instanceof net.suberic.util.swing.ThemeSupporter) {
 	      try {
 		Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) nmui, (java.awt.Component) nmui);
+		setDefaultFont(editorPane);
 	      } catch (Exception e) {
 		System.err.println("error setting theme:  " + e);
 	      }
