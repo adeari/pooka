@@ -79,6 +79,8 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
 
 			System.out.println("cnse hit.");
 		    }
+		} else {
+		    System.out.println("action is not a DynamicAbstractAction.");
 		}
 		newAction.putValue("target", getTargetFolder(j));
 		Object o = oldCommands.get(mi);
@@ -95,9 +97,15 @@ public class FolderMenu extends net.suberic.util.gui.ConfigurableMenu {
 	}
     }
 
-    protected FolderInfo getTargetFolder(int folderNumber) {
-	return (FolderInfo)((FolderNode)folderList.elementAt(folderNumber)).getFolderInfo();
-    }
+	protected FolderInfo getTargetFolder(int folderNumber) {
+		/*
+			System.out.println("calling getTargetFolder(" + folderNumber + ")");
+			for (int i = 0; i < folderList.size(); i++) {
+			System.out.println("folderList " + i + " = " + folderList.elementAt(i));
+			}
+		*/
+		return (FolderInfo)((FolderNode)folderList.elementAt(folderNumber)).getFolderInfo();
+	}
 }
 
 

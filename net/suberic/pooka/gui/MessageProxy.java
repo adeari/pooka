@@ -200,6 +200,7 @@ public class MessageProxy {
 	defaultActions = new Action[] {
 	    new ActionWrapper(new OpenAction(), folderThread),
 	    new ActionWrapper(new MoveAction(), folderThread),
+	    new ActionWrapper(new CopyAction(), folderThread),
 	    new ActionWrapper(new ReplyAction(), folderThread),
 	    new ActionWrapper(new ReplyAllAction(), folderThread),
 	    new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
@@ -363,6 +364,19 @@ public class MessageProxy {
     public void moveMessage(FolderInfo targetFolder) {
 	try {
 	    messageInfo.moveMessage(targetFolder);
+	} catch (MessagingException me) {
+	    showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+	    if (Pooka.isDebug())
+		me.printStackTrace();
+	}
+    }
+
+    /**
+     * Copies the Message to the target Folder.
+     */
+    public void copyMessage(FolderInfo targetFolder) {
+	try {
+	    messageInfo.copyMessage(targetFolder);
 	} catch (MessagingException me) {
 	    showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
 	    if (Pooka.isDebug())
@@ -726,6 +740,27 @@ public class MessageProxy {
 	}
 
     }
+
+    public class CopyAction extends net.suberic.util.DynamicAbstractAction {
+	CopyAction() {
+	    super("message-copy");
+	}
+
+	public void actionPerformed(java.awt.event.ActionEvent e) {
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);
+	    FolderDisplayUI fw = getFolderDisplayUI();
+	    if (fw != null)
+		fw.setBusy(true);;
+	    copyMessage((FolderInfo)getValue("target"));
+	    if (fw != null)
+		fw.setBusy(false);
+	    if (getMessageUI() != null)
+		getMessageUI().setBusy(true);;
+	}
+
+    }
+
 
     public class ReplyAction extends AbstractAction {
 

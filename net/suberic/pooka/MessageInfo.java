@@ -302,6 +302,18 @@ public class MessageInfo {
     }
 
     /**
+     * Copies the Message into the target Folder.
+     */
+    public void copyMessage(FolderInfo targetFolder) throws MessagingException {
+	try {
+	    folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
+	} catch (MessagingException me) {
+	    throw new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
+	}
+
+    }
+
+    /**
      * A convenience method which sets autoExpunge by the value of 
      * Pooka.autoExpunge, and then calls moveMessage(targetFolder, autoExpunge)
      * with that value.
