@@ -13,6 +13,7 @@ import net.suberic.util.gui.*;
 import net.suberic.util.event.*;
 import net.suberic.util.thread.*;
 import net.suberic.util.swing.*;
+import net.suberic.pooka.gui.dnd.FolderTransferHandler;
 
 /**
  * This is a JPanel which contains a JTable which displays the messages in
@@ -96,7 +97,7 @@ public class FolderDisplayPanel extends JPanel {
     
     Pooka.getHelpBroker().enableHelpKey(this, "ui.folderWindow", Pooka.getHelpBroker().getHelpSet());
 
-    setTransferHandler(new net.suberic.pooka.gui.dnd.FolderTransferHandler());
+    setTransferHandler(new FolderTransferHandler());
 
   }
   
@@ -136,7 +137,7 @@ public class FolderDisplayPanel extends JPanel {
       messageTable.setRowSelectionAllowed(true);
       addListeners();
 
-      messageTable.setTransferHandler(new net.suberic.pooka.gui.dnd.FolderTransferHandler());
+      messageTable.setTransferHandler(new FolderTransferHandler());
 
       messageTable.setDragEnabled(true);
 
@@ -816,6 +817,19 @@ public class FolderDisplayPanel extends JPanel {
 	}
       }
       
+      if (messageTable != null) {
+	Action[] defaultActions = new Action[] {
+	  FolderTransferHandler.getCutAction(messageTable),
+	  FolderTransferHandler.getCopyAction(messageTable),
+	  FolderTransferHandler.getPasteAction(messageTable)
+	};
+	if (returnValue != null) {
+	  returnValue = TextAction.augmentList(defaultActions, returnValue);
+	} else {
+	  returnValue = defaultActions;
+	}
+      }
+
       return returnValue;
     } else {
       return null;

@@ -726,28 +726,44 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     getFolderDisplay().removeRows(removedProxies);
   }
 
-    /**
-     * Gets the Actions for this component.
-     */
-    public Action[] getActions() {
-	if (isEnabled()) {
-	    Action[] returnValue;
-	    MessageProxy m = getSelectedMessage();
-	    
-	    if (m != null) 
-		returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
-	    else 
-		returnValue = getDefaultActions();
-	    
-	    if (folderInfo.getActions() != null)
-		returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
-	    
-	    return returnValue;
-	} else {
-	    return null;
-	}
+  /**
+   * Gets the Actions for this component.
+   */
+  public Action[] getActions() {
+    if (isEnabled()) {
+      Action[] returnValue = defaultActions;
+
+      if (getFolderDisplay() != null) {
+	returnValue = TextAction.augmentList(getFolderDisplay().getActions(), returnValue);
+      }
+
+      return returnValue;
+    } else {
+      return null;
     }
 
+    /*
+    if (isEnabled()) {
+      Action[] returnValue;
+      MessageProxy m = getSelectedMessage();
+      
+      if (m != null) 
+	returnValue = TextAction.augmentList(m.getActions(), getDefaultActions());
+      else 
+	returnValue = getDefaultActions();
+      
+      if (folderInfo.getActions() != null)
+	returnValue = TextAction.augmentList(folderInfo.getActions(), returnValue);
+      
+      return returnValue;
+    } else {
+      return null;
+    }
+    */
+
+    
+  }
+  
   public Action[] getDefaultActions() {
     return defaultActions;
   }

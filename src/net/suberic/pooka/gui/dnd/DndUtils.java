@@ -87,20 +87,17 @@ public class DndUtils {
   public static FolderInfo getFolderInfo(JComponent c) {
     try {
       if (c instanceof FolderDisplayPanel) {
-	System.err.println("it's a FolderDisplayPanel.");
 	return ((FolderDisplayPanel) c).getFolderInfo();
       }
 
       Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
       if (o != null) {
-	System.err.println("got a FolderDisplayPanel.");
 	return ((net.suberic.pooka.gui.FolderDisplayPanel) o).getFolderInfo();
       } 
       
       // check for the folder tree.
       o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderPanel"), c);
       if (o != null) {
-	System.err.println("got a FolderTree.");
 	Object selected = ((net.suberic.pooka.gui.FolderPanel) o).getSelectedNode();
 	if (selected instanceof FolderNode) {
 	  return ((FolderNode) selected).getFolderInfo();

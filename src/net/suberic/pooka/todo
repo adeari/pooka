@@ -7,6 +7,8 @@
 	also, fix (error:  proxy) message if you drag a message into a
 	imap-disconnected closed folder (mailtest inbox).
 
+   *) implement a proper cut/paste paradigm
+
 *) test l&f selection and make sure it saves all of them (esp kunst and gtk)
 	correctly.
 

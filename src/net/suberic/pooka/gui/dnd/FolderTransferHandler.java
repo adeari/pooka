@@ -91,4 +91,110 @@ public class FolderTransferHandler extends TransferHandler {
     return returnValue;
   }
 
+  public static Action getCutAction(JComponent pSource) { 
+    return new FolderTransferAction("cut-to-clipboard", pSource);
+  }
+  
+  public static Action getCopyAction(JComponent pSource) { 
+    return new FolderTransferAction("copy-to-clipboard", pSource);
+  }
+  
+  public static Action getPasteAction(JComponent pSource) { 
+    return new FolderTransferAction("paste-from-clipboard", pSource);
+  }
+  
+  static class FolderTransferAction extends AbstractAction implements javax.swing.plaf.UIResource {
+    
+    JComponent mSource = null;
+
+    FolderTransferAction(String name, JComponent pSource) {
+      super(name);
+      mSource = pSource;
+      // Will cause the system clipboard state to be updated.
+      canAccessSystemClipboard = true;
+      canAccessSystemClipboard();
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      Object src = mSource;
+
+      if (src instanceof JComponent) {
+	JComponent c = (JComponent) src;
+	TransferHandler th = c.getTransferHandler();
+	Clipboard clipboard = getClipboard(c);
+	String name = (String) getValue(Action.NAME);
+	if ((clipboard != null) && (th != null) && (name != null)) {
+	  if ("cut-to-clipboard".equals(name)) {
+	    th.exportToClipboard(c, clipboard, MOVE);
+	  } else if ("copy-to-clipboard".equals(name)) {
+	    th.exportToClipboard(c, clipboard, COPY);
+	  } else if ("paste-from-clipboard".equals(name)) {
+	    Transferable trans = clipboard.getContents(null);
+	    if (trans != null) {
+	      th.importData(c, trans);
+	    }
+	  }
+	}
+      }
+    }
+    
+    /**
+     * Returns the clipboard to use for cut/copy/paste.
+     */
+    private Clipboard getClipboard(JComponent c) {
+      if (canAccessSystemClipboard()) {
+	return c.getToolkit().getSystemClipboard();
+      }
+      Clipboard clipboard = (Clipboard)sun.awt.AppContext.getAppContext().
+		get(SandboxClipboardKey);
+      if (clipboard == null) {
+	clipboard = new Clipboard("Sandboxed Component Clipboard");
+	sun.awt.AppContext.getAppContext().put(SandboxClipboardKey,
+					       clipboard);
+      }
+      return clipboard;
+    }
+    
+    /**
+     * Returns true if it is safe to access the system Clipboard.
+     * If the environment is headless or the security manager
+     * does not allow access to the system clipboard, a private
+     * clipboard is used.
+     */
+    private boolean canAccessSystemClipboard() {
+      if (canAccessSystemClipboard) {
+	if (GraphicsEnvironment.isHeadless()) {
+	  canAccessSystemClipboard = false;
+	  return false;
+	}
+	
+	SecurityManager sm = System.getSecurityManager();
+	if (sm != null) {
+	  try {
+	    sm.checkSystemClipboardAccess();
+	    return true;
+	  } catch (SecurityException se) {
+	    canAccessSystemClipboard = false;
+	    return false;
+	  }
+	}
+	return true;
+      }
+      return false;
+    }
+    
+    /**
+     * Indicates if it is safe to access the system clipboard. Once false,
+     * access will never be checked again.
+     */
+    private boolean canAccessSystemClipboard;
+    
+    /**
+     * Key used in app context to lookup Clipboard to use if access to
+     * System clipboard is denied.
+     */
+    private static Object SandboxClipboardKey = new Object();
+    
+    }
+  
 }
