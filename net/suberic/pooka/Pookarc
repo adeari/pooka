@@ -282,17 +282,22 @@ UserProfile.mailHeaders.fields.Organization.value=Organization
 UserProfile.editableFields=mailHeaders.From:mailHeaders.FromPersonal:mailHeaders.ReplyTo:mailHeaders.ReplyToPersonal:mailHeaders.Organization:sendMailURL:signature:sentFolder
 UserProfile.propertyType=Multi
 UserProfile.sentFolder.propertyType=Folder
+UserProfile.sentFolder.selectionRoot=allStores
 
 UserProfile.default.propertyType=List
 UserProfile.default.allowedValues=UserProfile
 
 Store.propertyType=Multi
-Store.editableFields=server:protocol:user:password:defaultProfile
+Store.editableFields=server:protocol:user:password:trashFolder:defaultProfile
 Store.protocol.propertyType=List
 Store.protocol=imap
 Store.password.propertyType=Password
 Store.defaultProfile.propertyType=List
 Store.defaultProfile.allowedValues=UserProfile
+Store.trashFolder.propertyType=Folder
+Store.trashFolder.selectionRoot=currentStore
+Store.trashFolder.namePrefix=Store.
+Store.trashFolder.nameSuffix=.trashFolder
 
 ExternalLauncher.fileHandler./=%v; rm %s
 ExternalLauncher.cmdWrapper./=sh -c %v
@@ -310,4 +315,6 @@ NewAccountPooka.password.propertyType=Password
 NewAccountPooka.type.propertyType=List
 NewAccountPooka.type.allowedValues=imap
 NewAccountPooka.type=imap
+
+FolderSelectorPane.inputButton.image=images/More.gif
 
