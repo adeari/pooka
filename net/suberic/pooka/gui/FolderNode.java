@@ -50,11 +50,20 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 
 	folderInfo.addMessageCountListener(new MessageCountAdapter() {
 	    public void messagesAdded(MessageCountEvent e) {
-		getParentContainer().repaint();
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    getParentContainer().repaint();
+			    Pooka.getMainPanel().setNewMessageFlag(true);
+			}
+		    });
 	    }
 	    
 	    public void messagesRemoved(MessageCountEvent e) {
-		getParentContainer().repaint();
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+			    getParentContainer().repaint();
+			}
+		    });
 	    }
 	});
 	

@@ -30,6 +30,9 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     private UserProfile currentUser = null;
     private PropertyEditorFactory editorFactory = new PropertyEditorFactory(Pooka.getResources());
     private ConfigurableKeyBinding keyBindings;
+    private boolean newMessageFlag = false;
+    private String standardTitle = Pooka.getProperty("Title", "Pooka");
+    private String newMessageTitle = Pooka.getProperty("Title.withNewMessages", "* Pooka *");
 
     public MainPanel(JFrame frame) {
 	super(JSplitPane.HORIZONTAL_SPLIT);
@@ -42,6 +45,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    session.setDebug(true);
 
 	mailQueue = new MailQueue(Pooka.getDefaultSession());
+
     }
     
     /**
@@ -75,6 +79,16 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	//mainMenu.setActive(getActions());
 	//mainToolbar.setActive(getActions());
 	//keyBindings.setActive(getActions());
+	
+	getParentFrame().addWindowListener(new WindowAdapter() {
+		public void windowActivated(WindowEvent e) {
+		    setNewMessageFlag(false);
+		}
+		
+		public void windowClosed(WindowEvent e) {
+		    exitPooka(1);
+		}
+	    });
 	
 	// set the initial currentUser
 	refreshCurrentUser();
@@ -163,6 +177,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	mainMenu.setActive(getActions());
 	mainToolbar.setActive(getActions());
 	keyBindings.setActive(getActions());
+	setNewMessageFlag(false);
     }
 
     /**
@@ -179,6 +194,21 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	    currentUser = selectedProfile;
 	} else {
 	    currentUser = UserProfile.getDefaultProfile();
+	}
+    }
+
+    /**
+     * This resets the title of the main Frame to have the newMessageFlag
+     * or not, depending on if there are any new messages or not.
+     */
+    protected void resetFrameTitle() {
+	String currentTitle = getParentFrame().getTitle();
+	if (getNewMessageFlag()) {
+	    if (!currentTitle.equals(newMessageTitle))
+		getParentFrame().setTitle(newMessageTitle);
+	} else {
+	    if (!currentTitle.equals(standardTitle))
+		getParentFrame().setTitle(standardTitle);
 	}
     }
 
@@ -215,11 +245,19 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      */
     
     public void exitPooka(int exitValue) {
-	if (messagePanel.isSavingWindowLocations())
+	if (messagePanel.isSavingWindowLocations()) {
 	    messagePanel.saveWindowLocations();
+	    Pooka.setProperty("Pooka.hsize", Integer.toString(this.getParentFrame().getWidth()));
+	    Pooka.setProperty("Pooka.vsize", Integer.toString(this.getParentFrame().getHeight()));
+	    Pooka.setProperty("Pooka.folderPanel.hsize", Integer.toString(folderPanel.getWidth()));
+	    Pooka.setProperty("Pooka.folderPanel.vsize", Integer.toString(folderPanel.getHeight()));
+	    Pooka.setProperty("Pooka.messagePanel.hsize", Integer.toString(messagePanel.getWidth()));
+	    Pooka.setProperty("Pooka.messagePanel.vsize", Integer.toString(messagePanel.getHeight()));
+	}
 	if (messagePanel.isSavingOpenFolders())
 	    messagePanel.saveOpenFolders();
 	
+
 	Pooka.resources.saveProperties(new File(Pooka.localrc));
 	System.exit(exitValue);
 
@@ -276,23 +314,25 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	return editorFactory;
     }
 
+    public boolean getNewMessageFlag() {
+	return newMessageFlag;
+    }
+
+    public void setNewMessageFlag(boolean newValue) {
+	newMessageFlag = newValue;
+	resetFrameTitle();
+    }
+
     public Action[] getDefaultActions() {
 	return defaultActions;
     }
 
-
     /**
      * Find the hosting frame, for the file-chooser dialog.
      */
-    protected Frame getFrame() {
-	for (Container p = getParent(); p != null; p = p.getParent()) {
-	    if (p instanceof Frame) {
-		return (Frame) p;
-	    }
-	}
-	return null;
+    public JFrame getParentFrame() {
+	return (JFrame) getTopLevelAncestor();
     }
-
 
     //-----------actions----------------
     // Actions supported by the main Panel itself.  These should always
