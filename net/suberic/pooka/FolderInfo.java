@@ -623,6 +623,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    getFolderTableModel().addRows(addedProxies);
 		}
 		resetMessageCounts();
+		setNewMessages(true);
 		fireMessageCountEvent(mce);
 	    }
 	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
@@ -654,7 +655,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 		    }
 		    getFolderTableModel().removeRows(removedProxies);
 		}
-		setNewMessages(true);
 		resetMessageCounts();
 		fireMessageCountEvent(mce);
 	    }
