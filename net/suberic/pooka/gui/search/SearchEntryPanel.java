@@ -1,6 +1,10 @@
 package net.suberic.pooka.gui.search;
 import net.suberic.pooka.*;
 import javax.swing.*;
+import java.util.Vector;
+import java.awt.event.*;
+import java.awt.FlowLayout;
+import javax.mail.search.SearchTerm;
 
 /**
  * This is a full panel for making search options.  This panel combines lots
@@ -10,29 +14,55 @@ import javax.swing.*;
  */
 public class SearchEntryPanel extends JPanel {
 
+    public static int FIRST = -1;
     public static int AND = 0;
     public static int OR = 1;
 
+    public static String AND_LABEL = Pooka.getProperty("Search.button.and.label", "And");
+    public static String OR_LABEL = Pooka.getProperty("Search.button.or.label", "Or");
+    
     JPanel conditionPanel;
     JPanel entryPanel;
     JScrollPane entryScrollPane;
-    Vector searchTerms;
+    Vector searchTerms = new Vector();
     SearchTermManager manager;
 
     class SearchEntryPair {
 	SearchEntryForm form;
-	int type;
+	SearchConnector connector;
 
 	public SearchEntryPair(SearchEntryForm newForm, int newType) {
 	    form = newForm;
-	    type = newType;
+	    connector = new SearchConnector(newType);
+	}
+    }
+
+    class SearchConnector extends JPanel {
+	
+	JComboBox list;
+	SearchConnector(int newType) {
+	    String[] choices = new String[2];
+	    choices[0] = AND_LABEL;
+	    choices[1] = OR_LABEL;
+	    list = new JComboBox(choices);
+
+	    if (newType < 2)
+		list.setSelectedIndex(newType);
+	    else
+		list.setSelectedIndex(0);
+
+	    this.add(list);
+	}
+
+	public int getType() {
+	    return list.getSelectedIndex();
 	}
     }
 
     /**
-     * Creates a new SearchTermPanel.
+     * Creates a new SearchEntryPanel.
      */
-    public SearchTermPanel(SearchTermManager newManager) {
+    public SearchEntryPanel(SearchTermManager newManager) {
 	manager = newManager;
 	populatePanel();
     }
@@ -42,12 +72,18 @@ public class SearchEntryPanel extends JPanel {
      * the constructor.
      */
     public void populatePanel() {
+	JPanel basePanel = new JPanel();
 	entryPanel = new JPanel();
 	entryPanel.setLayout(new BoxLayout(entryPanel, BoxLayout.Y_AXIS));
 
-	addSearchEntryForm(AND);
+	addSearchEntryForm(FIRST);
 
-	entryScrollPane = new JScrollPane(entryPanel);
+	createConditionPanel();
+
+	basePanel.setLayout(new java.awt.BorderLayout());
+	basePanel.add(conditionPanel, java.awt.BorderLayout.SOUTH);
+	basePanel.add(entryPanel, java.awt.BorderLayout.CENTER);
+	entryScrollPane = new JScrollPane(basePanel);
 	this.add(entryScrollPane);
     }
 
@@ -81,13 +117,37 @@ public class SearchEntryPanel extends JPanel {
     }
 
     public void addSearchEntryForm(int type) {
-	SearchEntryForm sef = new SearchEntryForm(manager);
-	
-	searchTerms.add(new SearchEntryPair(sef, type));
-	
+	if (type == FIRST) {
+	    SearchEntryForm sef = new SearchEntryForm(manager);
+	    searchTerms.add(new SearchEntryPair(sef, AND));
+	    entryPanel.add(sef.getPanel());
+	} else {
+	    SearchEntryForm sef = new SearchEntryForm(manager);
+	    SearchEntryPair pair = new SearchEntryPair(sef, AND);
+	    searchTerms.add(pair);
+	    entryPanel.add(pair.connector);
+	    entryPanel.add(sef.getPanel());
+	    entryPanel.revalidate();
+	    //entryPanel.repaint();
+	}
     }
 
     public SearchTerm getSearchTerm() {
-	
+	if (searchTerms.size() > 0) {
+	    SearchEntryPair pair = (SearchEntryPair) searchTerms.elementAt(0);
+	    SearchTerm term = pair.form.generateSearchTerm();
+	    for (int i = 1; i < searchTerms.size(); i++) {
+		SearchEntryPair newPair = (SearchEntryPair) searchTerms.elementAt(i);
+		SearchTerm newTerm = newPair.form.generateSearchTerm();
+		if (newPair.connector.getType() == AND) {
+		    term = new javax.mail.search.AndTerm(term, newTerm);
+		} else if (newPair.connector.getType() == OR) {
+		    term = new javax.mail.search.OrTerm(term, newTerm);
+		}
+	    }
+
+	    return term;
+	} else
+	    return null;
     }
 }

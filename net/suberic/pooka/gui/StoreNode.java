@@ -288,50 +288,20 @@ public class StoreNode extends MailTreeNode {
         }
 	
         public void actionPerformed(java.awt.event.ActionEvent e) {
-	    MailFileSystemView mfsv = new net.suberic.pooka.gui.filechooser.MailFileSystemView(getStoreInfo());
-	    File f = mfsv.createFileObject("/");
-	    File[] files = mfsv.getFiles(f, false);
 
-	    /*
-	    try {
-		
-		Store s = Pooka.getStoreManager().getStoreInfo("mailtest").getStore();
-		System.out.println("got store.");
-		if (!s.isConnected()) {
-		    if (Pooka.isDebug()) {
-			System.out.println("store is disconnected.  reconnecting.");
-			s.connect();
-		    }
-		}
-		if (!s.isConnected()) {
-		    if (Pooka.isDebug()) {
-			System.out.println("store is disconnected.  reconnecting.");
-			s.connect();
-		    }
-		}
-		Folder defaultFolder = s.getDefaultFolder();
-		System.out.println("got default folder.");
-		defaultFolder.list();
-	    } catch (MessagingException me) {
-		System.out.println("got messaging exception.");
-		me.printStackTrace();
-	    }
-	    */
-
-	    /*
 	    JInternalFrame jif = new JInternalFrame();
 	    
-	    SearchEntryForm sef = new SearchEntryForm(Pooka.getSearchManager());
-	    jif.getContentPane().add(sef.getPanel());
+	    SearchForm sf = new SearchForm();Pooka.getSearchManager());
+		    
+	    jif.getContentPane().add(sf);
 
-	    MessagePanel mp = ((FolderPanel)getParentContainer()).getMainPanel().getMessagePanel();
+	    MessagePanel mp = (MessagePanel)((FolderPanel)getParentContainer()).getMainPanel().getContentPanel();
 	    jif.pack();
 	    mp.add(jif);
 	    jif.setVisible(true);
 	    try {
 		jif.setSelected(true);
 	    } catch (java.beans.PropertyVetoException pve) { }
-	    */
 	}
     }
 
