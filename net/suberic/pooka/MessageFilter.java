@@ -11,9 +11,21 @@ public class MessageFilter {
     private SearchTerm searchTerm;
     private FilterAction action;
 
+    /**
+     * Create a MessageFilter from a SearchTerm and a FilterAction.
+     */
     public MessageFilter(SearchTerm newSearchTerm, FilterAction newAction) {
 	searchTerm = newSearchTerm;
 	action = newAction;
+    }
+
+    /**
+     * Create a MessageFilter from a String which represents a Pooka
+     * property.  
+     *
+     */
+    public MessageFilter(String sourceProperty) {
+	
     }
 
     /**

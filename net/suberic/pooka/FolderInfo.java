@@ -47,6 +47,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     private FolderWindow folderWindow;
     private Action[] defaultActions;
 
+    //filters
+    private MessageFilter[] filters = null;
+
     private LoadMessageThread loaderThread;
     private FolderTracker folderTracker = null;
 
@@ -80,9 +83,33 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 	updateChildren();
 
+	createFilters();
+
 	resetDefaultActions();
+
     }
 
+
+    /**
+     * Creates a new FolderInfo from a parent StoreInfo and a Folder 
+     * name.
+     */
+    
+    public FolderInfo(StoreInfo parent, String fname) {
+	parentStore = parent;
+	setFolderID(parent.getStoreID() + "." + fname);
+	folderName = fname;
+
+	if (parent.isConnected())
+	    loadFolder();
+
+	updateChildren();
+
+	createFilters();
+
+	resetDefaultActions();
+    }
+    
     /**
      * This resets the defaultActions.  Useful when this goes to and from
      * being a trashFolder, since only trash folders have emptyTrash
@@ -103,23 +130,19 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
 
     /**
-     * Creates a new FolderInfo from a parent StoreInfo and a Folder 
-     * name.
+     * This takes the FolderProperty.filters property and uses it to populate
+     * the messageFilters array.
      */
-    
-    public FolderInfo(StoreInfo parent, String fname) {
-	parentStore = parent;
-	setFolderID(parent.getStoreID() + "." + fname);
-	folderName = fname;
-
-	if (parent.isConnected())
-	    loadFolder();
-
-	updateChildren();
-
-	resetDefaultActions();
+    public void createFilters() {
+	Vector filterNames=Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".filters", "");
+	if (filterNames != null && filterNames.size() > 0) {
+	    filters = new MessageFilter[filterNames.size()];
+	    for (int i = 0; i < filterNames.size(); i++) {
+		filters[i] = new MessageFilter(getFolderProperty() + ".filters." + (String) filterNames.elementAt(i));
+	    }
+	}
     }
-    
+
     /**
      * This actually loads up the Folder object itself.  This is used so 
      * that we can have a FolderInfo even if we're not connected to the
@@ -179,7 +202,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     /**
-     * this is called by the constructors if a proper Folder object 
+     * this is called by loadFolders if a proper Folder object 
      * is returned.
      */
     private void initializeFolderInfo() {
