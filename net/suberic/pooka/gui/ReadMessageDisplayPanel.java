@@ -31,6 +31,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   int headerStyle = ReadMessageDisplayPanel.HEADERS_DEFAULT;
   boolean showFullHeaders = false;
   
+  Action[] defaultActions = new Action[] {
+    new AttachmentPanelAction(),
+    new EditorPanelAction()
+      };
+
   /**
    * Creates an empty MessageDisplayPanel.
    */
@@ -386,18 +391,60 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   
   public Action[] getActions() {
     
-    Action[] actionList = null;
-	
-    if (getMessageProxy() != null)
-      actionList = getMessageProxy().getActions();
+    Action[] actionList = defaultActions;
     
-    if (actionList != null) {
-      if (editorPane != null && editorPane.getActions() != null) 
-	return TextAction.augmentList(actionList, editorPane.getActions());
-      else
-	return editorPane.getActions();
+    if (getMessageProxy() != null)
+      actionList = TextAction.augmentList(actionList, getMessageProxy().getActions());
+    
+    Action[] subActions = null;
+    Component focusOwner = SwingUtilities.findFocusOwner(this);
+    if (focusOwner != null) {
+      if (editorPane != null && SwingUtilities.isDescendingFrom(focusOwner, editorPane)) {
+	subActions = editorPane.getActions();
+      } else if (attachmentPanel != null &&SwingUtilities.isDescendingFrom(focusOwner, attachmentPanel)) {
+	subActions = attachmentPanel.getActions();
+      }
     }
-    return actionList;
-    }
+    if (subActions != null)
+      return TextAction.augmentList(actionList, subActions);
+    else
+      return actionList;
+  }
   
+  /**
+   * Selects the Attachment panel.
+   */
+  public class AttachmentPanelAction extends AbstractAction {
+    AttachmentPanelAction() {
+      super("message-select-attachment");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.err.println("selecting attachment");
+      if (attachmentPanel != null) {
+	attachmentPanel.requestFocus();
+      }
+    }
+  }
+
+  /**
+   * Selects the Editor panel.
+   */
+  public class EditorPanelAction extends AbstractAction {
+    EditorPanelAction() {
+      super("message-select-editor");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.err.println("selecting editor");
+      if (editorStatus == WITHOUT_ATTACHMENTS) {
+	if (editorPane != null)
+	  editorPane.requestFocus();
+      } else if (editorStatus == WITH_ATTACHMENTS) {
+	if (otherEditorPane != null)
+	  otherEditorPane.requestFocus();
+      }
+    }
+  }
+
 }

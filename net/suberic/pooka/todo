@@ -3,6 +3,30 @@
 	-- keybindings for saving attachments.
 	-- keybindings for opening folders.
 
+*) disconnected:  
+	*)  make an option for caching everything.
+	*)  check sent folder with disconnected / especially not using
+		the NetworkConnection object.
+
+*) fix the connection order.  it's too painful right now.
+
+*) preview pane: 
+	-- make it so it doesn't automatically display the first new message.
+	  -- make that an option
+	  -- add a keybinding for 'go to next unread message'
+
+*) fix the launcher (specifically the html launcher, but maybe all of them)
+to use "'s correctly.
+
+*) fix reverse sorting.
+--------
+
+*) preview pane: 
+	--make it so the status bar is at the bottom, underneath
+	the readmessagedisplaypanel--or possibly on the status pane.
+	-- maybe change the toolbars so there's only 1?
+	-- ?? make it so you can compose messages in the main window ??
+
 *) make a way to reopen folders that have been disconnected other than
 	closing and reopening the store.
 	-- make a disconnected icon.
@@ -11,15 +35,6 @@
 
 *) NPE -- is that from switching from preview to desktop?
 	-- check window menu from switching preview to desktop.
-
-*) preview pane: 
-	--make it so the status bar is at the bottom, underneath
-	the readmessagedisplaypanel--or possibly on the status pane.
-	-- maybe change the toolbars so there's only 1?
-	-- ?? make it so you can compose messages in the main window ??
-	-- make it so it doesn't automatically display the first new message.
-	  -- make that an option
-	  -- add a keybinding for 'go to next unread message'
 
 	-- search --
 
@@ -33,11 +48,6 @@ icons changing?  test.
 
 *) check:  reference kept by a MessageProxy to its MessageUI after you close
 the MessageUI.  seems to happen with externals, but not with internals.
-
-*) fix the launcher (specifically the html launcher, but maybe all of them)
-to use "'s correctly.
-
---------
 
 *) make it so you can stop html displays from showing non-local images.
  	-- support RFC-2557??

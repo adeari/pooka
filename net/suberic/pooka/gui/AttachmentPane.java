@@ -267,6 +267,7 @@ public class AttachmentPane extends JPanel {
     if (prefSize.getHeight() > defaultHeight)
       this.setPreferredSize(new Dimension((int)prefSize.getWidth(), defaultHeight));
     
+    createKeyBindings();
   }
   
   
@@ -502,7 +503,6 @@ public class AttachmentPane extends JPanel {
   /**
    * This removes the Attachment from the message.
    */
-  
   public void removeAttachment() {
     int selectedIndex = getTable().getSelectedRow();
     Attachment attachmentToRemove = getSelectedAttachment();
@@ -513,10 +513,16 @@ public class AttachmentPane extends JPanel {
     return tableModel;
   }
   
+  /**
+   * Gets the table with all of the attachment entries.
+   */
   public JTable getTable() {
     return table;
   }
   
+  /**
+   * Creates the popup menu for this component.
+   */
   protected JPopupMenu createPopupMenu() {
     net.suberic.util.gui.ConfigurablePopupMenu popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
     String key;
@@ -537,37 +543,25 @@ public class AttachmentPane extends JPanel {
     return popupMenu;
   }
   
-  protected JMenuItem createMenuItem(String menuID, String menuItemID) {
-    JMenuItem mi;
-    try {
-      mi = new JMenuItem(Pooka.getProperty(menuID + "." + menuItemID + ".Label"));
-    } catch (MissingResourceException mre) {
-      mi = new JMenuItem(menuItemID);
-    }
+  /**
+   * Creates the ConfigurableKeyBindings for this component.
+   */
+  protected void createKeyBindings() {
+    String key;
+    if (message instanceof NewMessageProxy)
+      key = "AttachmentPane.newMsgKeyBindings";
+    else 
+      key = "AttachmentPane.keyBindings";
     
-    java.net.URL url = null;
-    
-    try {
-      url = this.getClass().getResource(Pooka.getProperty(menuID + "." + menuItemID + ".Image"));
-    } catch (MissingResourceException mre) {
-    }
-    if (url != null) {
-      mi.setHorizontalTextPosition(JButton.RIGHT);
-      mi.setIcon(new ImageIcon(url));
-    }
-    
-    String cmd = Pooka.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
-    
-    mi.setActionCommand(cmd);
-    
-    Action itemAction = getActionByName(cmd);
-    if (itemAction != null) {
-      mi.addActionListener(itemAction);
-      mi.setEnabled(true);
-    }
-    return mi;
+    net.suberic.util.gui.ConfigurableKeyBinding keyBindings = new net.suberic.util.gui.ConfigurableKeyBinding(getTable(), key, Pooka.getResources());
+    keyBindings.setActive(getActions());
+
   }
   
+
+  /**
+   * Returns the given Action.
+   */
   public Action getActionByName(String actionName) {
     Action[] actionList = getActions();
     for (int i = 0; i < actionList.length; i++) {
@@ -579,6 +573,9 @@ public class AttachmentPane extends JPanel {
     
   }
   
+  /**
+   * Creates the default actions for this pane.
+   */
   public Action[] createDefaultActions() {
     if (message instanceof NewMessageProxy)
       return new Action[] {
@@ -610,6 +607,8 @@ public class AttachmentPane extends JPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
+      System.err.println("open.");
+
       openSelectedAttachment();
     }
   }
@@ -620,6 +619,7 @@ public class AttachmentPane extends JPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
+      System.err.println("open with.");
       openWith();
     }
   }
@@ -630,6 +630,7 @@ public class AttachmentPane extends JPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
+      System.err.println("save as.");
       saveAttachment();
     }
   }

@@ -121,29 +121,32 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
      * This sets the font of the displayed component to the special font.
      */
     public void setFontToSpecial() {
-	if (getSpecialFont() != null) {
-	    setFont(getSpecialFont());
-	} else {
-	    // create the new font.
-	    String fontStyle;
-	    fontStyle = Pooka.getProperty("FolderTree.UnreadStyle", "BOLD");
-
-	    Font f = null;
-	    
-	    if (fontStyle.equalsIgnoreCase("BOLD"))
-		f = this.getFont().deriveFont(Font.BOLD);
-	    else if (fontStyle.equalsIgnoreCase("ITALIC"))
-		f = this.getFont().deriveFont(Font.ITALIC);
-	    else if (fontStyle.equalsIgnoreCase("PLAIN"))
-		f = this.getFont().deriveFont(Font.PLAIN);
-	    
-	    if (f == null)
-		f = this.getFont();
-	    
-	    setSpecialFont(f);
-	    this.setFont(f);
+      if (getSpecialFont() != null) {
+	setFont(getSpecialFont());
+      } else {
+	// create the new font.
+	String fontStyle;
+	fontStyle = Pooka.getProperty("FolderTree.UnreadStyle", "BOLD");
+	
+	Font f = null;
+	
+	Font thisFont = this.getFont();
+	if (thisFont != null) {
+	  if (fontStyle.equalsIgnoreCase("BOLD"))
+	    f = thisFont.deriveFont(Font.BOLD);
+	  else if (fontStyle.equalsIgnoreCase("ITALIC"))
+	    f = thisFont.deriveFont(Font.ITALIC);
+	  else if (fontStyle.equalsIgnoreCase("PLAIN"))
+	    f = thisFont.deriveFont(Font.PLAIN);
+	  
+	  if (f == null)
+	    f = thisFont;
+	  
+	  setSpecialFont(f);
+	  this.setFont(f);
 	}
-
+      }
+      
     }
 
     /**

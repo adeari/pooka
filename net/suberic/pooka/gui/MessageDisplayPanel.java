@@ -54,52 +54,52 @@ public abstract class MessageDisplayPanel extends JPanel {
     
     public abstract void configureMessageDisplay() throws MessagingException;
 
-    /**
-     * This calculates the default size for the EditorPane.
-     * 
-     * Here, we use the MessageWindow.editorPane.* properties to determine
-     * the size.  Specifically, we check for the hsizeByCharLength
-     * property.  If this is set to true, then we dynamically determine
-     * the appropriate width using the current font of the editorPane 
-     * along with the charLength property.  
-
-     * If hsizeByCharLength is set to false, or if for whatever reason we 
-     * find that we're unable to determine an appropriate size, then we just 
-     * use the vsize and hsize properties.
-     */
-    public Dimension getDefaultEditorPaneSize() {
-	int hsize = 500;
-	int vsize = 500;
-	
-	try {
-	    vsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "500"));
-	} catch (NumberFormatException nfe) {
-	    vsize=500;
-	}
-	
-	try {
-	    if (Pooka.getProperty("MessageWindow.editorPane.hsizeByCharLength", "false").equalsIgnoreCase("true") && editorPane != null) {
-		int charLength = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.charLength", "80"));
-		Font currentFont = editorPane.getFont();
-		if (currentFont != null) {
-		    FontMetrics fm = this.getFontMetrics(currentFont);
-		    Insets margin = editorPane.getMargin();
-		    int scrollBarWidth = 0;
-		    if (editorScrollPane != null && editorScrollPane.getVerticalScrollBar() != null) {
-			scrollBarWidth = editorScrollPane.getVerticalScrollBar().getPreferredSize().width;
-		    }
-		    hsize = ((int)(charLength * fm.getStringBounds("Remember when you were young?  You shone like the sun.  Shine on you crazy diamo", editorPane.getGraphics()).getWidth() / 80)) + margin.left + margin.right + scrollBarWidth;
-		}
-	    } else {
-		hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.hsize", "500"));
-	    }
-	} catch (NumberFormatException nfe) {
-	    hsize=500;
-	}
-
-	Dimension retval = new Dimension(hsize, vsize);
-	return retval;
+  /**
+   * This calculates the default size for the EditorPane.
+   * 
+   * Here, we use the MessageWindow.editorPane.* properties to determine
+   * the size.  Specifically, we check for the hsizeByCharLength
+   * property.  If this is set to true, then we dynamically determine
+   * the appropriate width using the current font of the editorPane 
+   * along with the charLength property.  
+   *
+   * If hsizeByCharLength is set to false, or if for whatever reason we 
+   * find that we're unable to determine an appropriate size, then we just 
+   * use the vsize and hsize properties.
+   */
+  public Dimension getDefaultEditorPaneSize() {
+    int hsize = 500;
+    int vsize = 500;
+    
+    try {
+      vsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.vsize", "500"));
+    } catch (NumberFormatException nfe) {
+      vsize=500;
     }
+    
+    try {
+      if (Pooka.getProperty("MessageWindow.editorPane.hsizeByCharLength", "false").equalsIgnoreCase("true") && editorPane != null) {
+	int charLength = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.charLength", "80"));
+	Font currentFont = editorPane.getFont();
+	if (currentFont != null) {
+	  FontMetrics fm = this.getFontMetrics(currentFont);
+	  Insets margin = editorPane.getMargin();
+	  int scrollBarWidth = 0;
+	  if (editorScrollPane != null && editorScrollPane.getVerticalScrollBar() != null) {
+	    scrollBarWidth = editorScrollPane.getVerticalScrollBar().getPreferredSize().width;
+	  }
+	  hsize = ((int)(charLength * fm.getStringBounds("Remember when you were young?  You shone like the sun.  Shine on you crazy diamo", editorPane.getGraphics()).getWidth() / 80)) + margin.left + margin.right + scrollBarWidth;
+	}
+      } else {
+	hsize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.hsize", "500"));
+      }
+    } catch (NumberFormatException nfe) {
+      hsize=500;
+    }
+    
+    Dimension retval = new Dimension(hsize, vsize);
+    return retval;
+  }
 
     /**
      * This sets the default font for the editorPane to a font determined

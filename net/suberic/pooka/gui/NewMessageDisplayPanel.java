@@ -649,6 +649,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 
 	defaultActions = new Action[] {
 	    new AddSignatureAction(),
+	    new EditorPanelAction(),
+	    new AttachmentPanelAction(),
 	    new TestAction()
 		};
     }
@@ -709,6 +711,42 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	    System.out.println(net.suberic.pooka.MailUtilities.wrapText(getMessageText()));
 	}
     }
+
+    /**
+   * Selects the Attachment panel.
+   */
+  public class AttachmentPanelAction extends AbstractAction {
+    AttachmentPanelAction() {
+      super("message-select-attachment");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.err.println("selecting attachment");
+      if (attachmentPanel != null) {
+	attachmentPanel.requestFocus();
+      }
+    }
+  }
+
+  /**
+   * Selects the Editor panel.
+   */
+  public class EditorPanelAction extends AbstractAction {
+    EditorPanelAction() {
+      super("message-select-editor");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.err.println("selecting editor");
+      if (editorStatus == WITHOUT_ATTACHMENTS) {
+	if (editorPane != null)
+	  editorPane.requestFocus();
+      } else if (editorStatus == WITH_ATTACHMENTS) {
+	if (otherEditorPane != null)
+	  otherEditorPane.requestFocus();
+      }
+    }
+  }
 
 }
 
