@@ -304,6 +304,8 @@ public class MessageProxy {
 	
 	getMessageInfo().isSeen();
 	
+	matchFilters();
+	
 	loaded=true;
 	
 	// notify the JTable that this proxy has loaded.
@@ -320,7 +322,6 @@ public class MessageProxy {
       }
     }
     
-    matchFilters();
     
   } 
 

@@ -133,6 +133,65 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   }
 
   /**
+   * This method opens the Folder, and sets the FolderInfo to know that
+   * the Folder should be open.  You should use this method instead of
+   * calling getFolder().open(), because if you use this method, then
+   * the FolderInfo will try to keep the Folder open, and will try to
+   * reopen the Folder if it gets closed before closeFolder is called.
+   *
+   * This method can also be used to reset the mode of an already 
+   * opened folder.
+   */
+  public void openFolder(int mode) throws MessagingException {
+    try {
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  checking parent store.");
+      
+      
+      if (!getParentStore().isConnected()) {
+	if (Pooka.isDebug())
+	  System.out.println(this + ":  parent store isn't connected.  trying connection.");
+	getParentStore().connectStore();
+      }
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  loading folder.");
+      
+      if (! isLoaded() && status != CACHE_ONLY)
+	loadFolder();
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  folder loaded.  status is " + status);
+      
+      if (Pooka.isDebug())
+	System.out.println(this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
+      
+      if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
+	if (Pooka.isDebug())
+	  System.out.println(this + ":  isLoaded() and isAvailable().");
+	if (getFolder().isOpen()) {
+	  if (getFolder().getMode() == mode)
+	    return;
+	  else { 
+	    getFolder().close(false);
+	    openFolder(mode);
+	  }
+	} else {
+	  getFolder().open(mode);
+	  updateFolderOpenStatus(true);
+	  resetMessageCounts();
+	}
+      } else if (status == INVALID) {
+	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
+      }
+    } catch (MessagingException me) {
+      setStatus(DISCONNECTED);
+    }
+  }
+  
+  
+  /**
    * Called when the store in disconnected.
    */
   public void disconnected(ConnectionEvent e) {
@@ -193,7 +252,9 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	    uidValidity = cache.getUIDValidity();
 	    preferredStatus = DISCONNECTED;
 	  }
-	} else {
+	}
+
+	if (getStatus() > CONNECTED) {
 	  uidValidity = cache.getUIDValidity();
 	}
 	

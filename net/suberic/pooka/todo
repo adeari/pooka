@@ -8,18 +8,10 @@ preview:
 	*)  check sent folder with disconnected / especially not using
 		the NetworkConnection object. -- note:  ok with the
 		NetworkConnection.
-	*)  make a progress dialog for caching lots of messages, since
-		it seems to take a while.
 	*)  disconnected:  think that you're still connected.  lose connection.
 	    get new messages.  doesn't work properly.
-	*)  open disconnected folder when connection is unavailable?
 
 *) fix the connection order.  it's too painful right now.
-
-*) display filters can end up being determined on the awt event thread:
-	at net.suberic.pooka.gui.MessageProxy.getMatchingFilters(MessageProxy.java:971)
-	at net.suberic.pooka.gui.FilterFolderCellRenderer.getTableCellRendererComponent(FilterFolderCellRenderer.java:83)
-	at javax.swing.JTable.prepareRenderer(JTable.java:3535)
 
 --------
 
