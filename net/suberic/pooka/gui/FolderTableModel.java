@@ -56,7 +56,11 @@ public class FolderTableModel extends AbstractTableModel {
     }
 
     public MessageProxy getMessageProxy(int rowNumber) {
-	return (MessageProxy)(data.elementAt(rowNumber));
+	try {
+	    return (MessageProxy)(data.elementAt(rowNumber));
+	} catch (ArrayIndexOutOfBoundsException ae) {
+	    return null;
+	}
     }
 
 
