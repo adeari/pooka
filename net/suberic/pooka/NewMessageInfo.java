@@ -16,67 +16,69 @@ public class NewMessageInfo extends MessageInfo {
 	attachments = new AttachmentBundle();
     }
 
-    /**
-     * Sends the new message, using the given Profile, the given 
-     * InternetHeaders, the given messageText, the given ContentType, and 
-     * the attachments already set for this object.
-     */
-    public void sendMessage(UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException {
-
-	MimeMessage mMsg = (MimeMessage) message;
-
-	URLName urlName = null;
-	
-	if (profile != null) {
-	    profile.populateMessage(mMsg);
-	    urlName = profile.getSendMailURL();
-	}
-
-	Enumeration individualHeaders = headers.getAllHeaders();
-	while(individualHeaders.hasMoreElements()) {
-	    Header currentHeader = (Header) individualHeaders.nextElement();
-	    message.setHeader(currentHeader.getName(), currentHeader.getValue());
-	}
-	
-	if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
-	    messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
-	
-	if (urlName != null) {
-	    if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
-		MimeBodyPart mbp = new MimeBodyPart();
-		mbp.setContent(messageText, messageContentType);
-		MimeMultipart multipart = new MimeMultipart();
-		multipart.addBodyPart(mbp);
-		for (int i = 0; i < attachments.getAttachments().size(); i++) 
-		    multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
-		multipart.setSubType("mixed");
-		getMessage().setContent(multipart);
-		getMessage().saveChanges();
-	    } else {
-		getMessage().setContent(messageText, messageContentType);
-	    }
-	    
-	    Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName);
-	    
-	    if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
-		getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
-		profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
-	    }
-	} else {
-	    throw new MessagingException(Pooka.getProperty("error.noMailURL", "Error sending Message:  No mail URL."));
-	}
+  /**
+   * Sends the new message, using the given Profile, the given 
+   * InternetHeaders, the given messageText, the given ContentType, and 
+   * the attachments already set for this object.
+   */
+  public void sendMessage(UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException {
+    
+    MimeMessage mMsg = (MimeMessage) message;
+    
+    URLName urlName = null;
+    
+    if (profile != null) {
+      profile.populateMessage(mMsg);
+      urlName = profile.getSendMailURL();
     }
-
-    /**
-     * Saves the NewMessageInfo to the sentFolder associated with the 
-     * given Profile, if any.
-     */
-    public void saveToSentFolder(UserProfile profile) throws MessagingException {
-	if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
-	    getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
-	    profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
-	}
+    
+    Enumeration individualHeaders = headers.getAllHeaders();
+    while(individualHeaders.hasMoreElements()) {
+      Header currentHeader = (Header) individualHeaders.nextElement();
+      message.setHeader(currentHeader.getName(), currentHeader.getValue());
     }
+    
+    if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
+      messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
+    
+    if (urlName != null) {
+      if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
+	MimeBodyPart mbp = new MimeBodyPart();
+	mbp.setContent(messageText, messageContentType);
+	MimeMultipart multipart = new MimeMultipart();
+	multipart.addBodyPart(mbp);
+	for (int i = 0; i < attachments.getAttachments().size(); i++) 
+	  multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
+	multipart.setSubType("mixed");
+	getMessage().setContent(multipart);
+	getMessage().saveChanges();
+      } else {
+	getMessage().setContent(messageText, messageContentType);
+      }
+      
+      Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName);
+  
+      /*
+      if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
+	getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
+	profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
+      }
+      */
+    } else {
+      throw new MessagingException(Pooka.getProperty("error.noMailURL", "Error sending Message:  No mail URL."));
+    }
+  }
+
+  /**
+   * Saves the NewMessageInfo to the sentFolder associated with the 
+   * given Profile, if any.
+   */
+  public void saveToSentFolder(UserProfile profile) throws MessagingException {
+    if (profile.getSentFolder() != null && profile.getSentFolder().getFolder() != null) {
+      getMessage().setSentDate(java.util.Calendar.getInstance().getTime());
+      profile.getSentFolder().getFolder().appendMessages(new Message[] {getMessage()});
+    }
+  }
 
     /**
      * Adds an attachment to this message.
