@@ -1,3 +1,6 @@
+in preview pane mode, when you open up a folder, the keyboard focus now
+shifts to the message table.
+
 added a progress dialog to caching multiple messages during disconnected
 operation.  
 

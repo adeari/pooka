@@ -141,6 +141,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     
     selectedMessageChanged();
     folderDisplay.repaint();
+    selectFolderDisplay();
   }
   
   /**
