@@ -579,7 +579,7 @@ UserProfile.propertyType=Multi
 UserProfile.editableFields.scoped=true
 UserProfile.editableFields=editor
 
-UserProfile.editableFields.editor=user:config:uiConfig
+UserProfile.editableFields.editor=user:config:crypto:uiConfig
 UserProfile.editableFields.editor.propertyType=Tabbed
 UserProfile.editableFields.editor.propertyScoped=true
 UserProfile.editableFields.editor.templateScoped=true
@@ -595,6 +595,19 @@ UserProfile.editableFields.editor.config.scoped=true
 UserProfile.editableFields.editor.config.scopeRoot=UserProfile.editableFields
 UserProfile.editableFields.editor.config.propertyType=Composite
 UserProfile.editableFields.editor.config.signatureFile.propertyType=File
+
+UserProfile.editableFields.editor.crypto=cryptPolicy:sigPolicy:smimeKey:pgpKey
+UserProfile.editableFields.editor.crypto.scoped=true
+UserProfile.editableFields.editor.crypto.scopeRoot=UserProfile.editableFields
+UserProfile.editableFields.editor.crypto.propertyType=Composite
+UserProfile.editableFields.sigPolicy.propertyType=List
+UserProfile.editableFields.sigPolicy.allowedValues=Manual:PGP:SMIME
+UserProfile.editableFields.cryptPolicy.propertyType=List
+UserProfile.editableFields.cryptPolicy.allowedValues=Manual:MatchingKey
+UserProfile.editableFields.pgpKey.propertyType=Manual
+UserProfile.editableFields.pgpKey.keyType=PGP
+UserProfile.editableFields.smimeKey.propertyType=Key
+UserProfile.editableFields.smimeKey.keyType=SMIME
 
 UserProfile.editableFields.editor.uiConfig.scoped=true
 UserProfile.editableFields.editor.uiConfig.scopeRoot=UserProfile.editableFields.uiConfig
