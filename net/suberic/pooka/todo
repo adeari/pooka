@@ -1,11 +1,12 @@
+alpha release
+-------------
+
 *)  Fix the display of the MultiPropertyEditor.--especially the 'don't show
 the password on the screen' part.
 
-*)  make the subscribe/unsubscribe folders actually update the live folders,
-instead of just setting the properties.  should just be able to set the
-FolderNodes as PropertyChangeListeners for their respective properties to 
-make that work.  also need to make the FolderChooser less clunky and more
-efficient.
+*)  While we're at it, do a simple encryption of the password fields in the
+.pookarc file so that you can read .pookarc and not have everyone see your
+password.
 
 *)  make the default profile for each folder work properly.  right now it
 just gives you the default profile for the system, rather than making it 
@@ -21,7 +22,30 @@ and basically just fails all over the place.
 
 *)  add the ability to forward messages (oops)
 
+*)  fix the MessageWindow sizes--they're way too big now.
+
+*)  make the editor for new messages wrap properly at 75 (or user configurable)
+characters.
+
 *)  make cut & paste work from the Toolbar.
+
+*)  make the FolderChooser less clunky.  add the ability to create and
+remove Folders.
+
+*)  make the subscribe/unsubscribe folder functionality more easilty 
+available.
+
+*) add a ValueChangeListener for the UserProfile properties.  right now
+the UserProfile only gets updated at startup.
+
+*) make the mailcap mappings for the attachments work properly.
+
+*) make the MessageWindow honor the inline tag for inlined attachments.
+
+*) add Help->About Pooka.  :)
+
+after release
+-------------
 
 *)  make the windows detachable.
 
@@ -36,16 +60,10 @@ entered through a propertyEditor.
 a FolderWindow.  so if you just start up the program and don't open any windows
 for a while, your connection to your Store can go down.
 
-*) add a ValueChangeListener for the UserProfile properties.  right now
-the UserProfile only gets updated at startup.
-
-*) make the mailcap mappings for the attachments work properly.
-
 *) delete for multiple messages takes way too long.
 
 *) takes too long to open a window where there are a lot of new messages.
 
-*) make the MessageWindow honor the inline tag for inlined attachments.
 
 -------
 
