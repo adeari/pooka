@@ -97,14 +97,23 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
 
     }
     
-  /**
-   * Configures the InterfaceStyle for this component.
+
+ /**
+   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * for this UI.
    */
-  public void configureInterfaceStyle() {
-    HashMap editorUiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowEditorStyle(this);
-    HashMap labelUiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowLabelStyle(this);
-    getNewMessageDisplay().configureInterfaceStyle(editorUiStyle, labelUiStyle);
+  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
+    UserProfile up = getSelectedProfile();
+    if (up != null) {
+      String id = Pooka.getProperty(up.getUserProperty() + ".uiConfig", "");
+      if (id != null && ! id.equals("")) {
+	return uuim.getUIConfig(id);
+      } 
+    }
+     
+    return null;
   }
+
 
     /**
      * Closes the message window.  This checks to see if the underlying

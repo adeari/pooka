@@ -19,7 +19,7 @@ import javax.swing.border.*;
  *
  */
 
-public class MessagePanel extends JDesktopPane implements ContentPanel {
+public class MessagePanel extends JDesktopPane implements ContentPanel, net.suberic.util.swing.UpdatableUI {
   /**
    * ExtendedDesktopManager is just a Desktop Manager which also
    * calls refreshActiveMenus() and refreshCurrentUser()  when the 
@@ -501,14 +501,25 @@ public class MessagePanel extends JDesktopPane implements ContentPanel {
   }
   
   /**
-   * Configures the colors for this Pane.
+   * Configures the interfaceStyle for this Pane.
    */
   public void configureInterfaceStyle() {
-    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessagePanelStyle();
-    // only pay attention to the background.
-    Color c = (Color) uiStyle.get("background");
-    if (c != null)
-      this.setBackground(c);
+        
+    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
+
+  }
+
+ /**
+   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * for this UI.
+   */
+  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
+    String id = Pooka.getProperty("Pooka.messagePanel.uiConfig", "");
+    if (id != null && ! id.equals("")) {
+      return uuim.getUIConfig(id);
+    } 
+    
+    return null;
   }
 
   /**

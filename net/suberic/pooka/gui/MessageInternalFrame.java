@@ -17,7 +17,7 @@ import java.io.File;
  * 
  * This class should be used in conjunction with a MessagePanel.
  */
-public abstract class MessageInternalFrame extends JInternalFrame implements MessageUI {
+public abstract class MessageInternalFrame extends JInternalFrame implements MessageUI, net.suberic.util.swing.UpdatableUI {
 
     protected MessagePanel parentContainer;
 
@@ -60,6 +60,13 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
      */
 
     protected abstract void configureMessageInternalFrame() throws MessagingException;
+
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
+  }
 
     /**
      * This opens the MessageInternalFrame by calling 

@@ -97,23 +97,23 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 	configureInterfaceStyle();
 
     }
-    
-  /**
-   * Configures the InterfaceStyle for this component.
-   */
-  public void configureInterfaceStyle() {
-    
-    /*
-    HashMap editorUiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowEditorStyle(this);
-    HashMap labelUiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowLabelStyle(this);
-    getNewMessageDisplay().configureInterfaceStyle(editorUiStyle, labelUiStyle);
-    */
-
-    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getNewMessageWindowEditorStyle(this);
-
-    Pooka.getUIFactory().getPookaUIManager().applyUI(uiStyle, this);
-  }
   
+ /**
+   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * for this UI.
+   */
+  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
+    UserProfile up = getSelectedProfile();
+    if (up != null) {
+      String id = Pooka.getProperty(up.getUserProperty() + ".uiConfig", "");
+      if (id != null && ! id.equals("")) {
+	return uuim.getUIConfig(id);
+      } 
+    }
+     
+    return null;
+  }
+
   /**
    * Closes the message window.  This checks to see if the underlying
    * message is modified, and if so, pops up a dialog to make sure that

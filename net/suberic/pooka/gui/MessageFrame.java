@@ -15,7 +15,7 @@ import java.io.File;
 /**
  * A top-level window for displaying a message.
  */
-public abstract class MessageFrame extends JFrame implements MessageUI {
+public abstract class MessageFrame extends JFrame implements MessageUI, net.suberic.util.swing.UpdatableUI {
 
     protected MessageProxy msg;
     protected MessageDisplayPanel messageDisplay;
@@ -50,6 +50,13 @@ public abstract class MessageFrame extends JFrame implements MessageUI {
      */
 
     protected abstract void configureMessageFrame();
+
+  /**
+   * Configures the InterfaceStyle for this component.
+   */
+  public void configureInterfaceStyle() {
+    Pooka.getUIFactory().getPookaUIManager().updateUI(this, this);
+  }
 
     /**
      * This opens the MessageFrame.

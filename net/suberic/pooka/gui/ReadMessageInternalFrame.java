@@ -106,12 +106,28 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
 	
     }
 
-  /**
-   * Configures the InterfaceStyle for this component.
+ /**
+   * Gets the UIConfig object from the UpdatableUIManager which is appropriate
+   * for this UI.
    */
-  public void configureInterfaceStyle() {
-    HashMap uiStyle = Pooka.getUIFactory().getPookaUIManager().getMessageWindowStyle(this);
-    ((ReadMessageDisplayPanel)messageDisplay).configureInterfaceStyle(uiStyle);
+  public net.suberic.util.swing.UIConfig getUIConfig(net.suberic.util.swing.UpdatableUIManager uuim) {
+    MessageProxy mp = getMessageProxy();
+    if (mp == null)
+      return null;
+
+    MessageInfo mi = mp.getMessageInfo();
+    if (mi == null)
+      return null;
+
+    FolderInfo fi = mi.getFolderInfo();
+    if (fi != null) {
+      String id = Pooka.getProperty(fi.getFolderProperty() + ".uiConfig", "");
+      if (id != null && ! id.equals("")) {
+	return uuim.getUIConfig(id);
+      } 
+    } 
+
+    return null;
   }
 
     public void detachWindow() {
