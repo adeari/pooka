@@ -18,84 +18,57 @@ import javax.mail.event.*;
 
 
 public class StoreNode extends MailTreeNode {
+  
+  protected StoreInfo store = null;
+  protected String displayName = null;
+  protected boolean hasLoaded = false;
+  
+  public StoreNode(StoreInfo newStore, JComponent parent) {
+    super(newStore, parent);
+    store = newStore;
+    newStore.setStoreNode(this);
+    displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
+    setCommands();
+    loadChildren();
+    defaultActions = new Action[] {
+      new ActionWrapper(new OpenAction(), getStoreInfo().getStoreThread()),
+      new SubscribeAction(),
+      new TestAction(),
+      new NewFolderAction(),
+      new ActionWrapper(new DisconnectAction(), getStoreInfo().getStoreThread()),
+      new EditAction()
+    };
     
-    protected StoreInfo store = null;
-    protected String displayName = null;
-    protected boolean hasLoaded = false;
-
-    public StoreNode(StoreInfo newStore, JComponent parent) {
-	super(newStore, parent);
-	store = newStore;
-	newStore.setStoreNode(this);
-	displayName=Pooka.getProperty("Store." + store.getStoreID() + ".displayName", store.getStoreID());
-	setCommands();
-	loadChildren();
-	defaultActions = new Action[] {
-	    new ActionWrapper(new OpenAction(), getStoreInfo().getStoreThread()),
-	    new SubscribeAction(),
-	    new TestAction(),
-	    new ActionWrapper(new DisconnectAction(), getStoreInfo().getStoreThread()),
-	    new EditAction()
-		};
-	
-    }
+  }
+  
+  /**
+   * this method returns false--a store is never a leaf.
+   */
+  public boolean isLeaf() {
+    return false;
+  }
+  
+  
+  /**
+   * This loads or updates the top-level children of the Store.
+   */
+  public void loadChildren() {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  doLoadChildren();
+	}
+      };
     
-    /**
-     * this method returns false--a store is never a leaf.
-     */
-    public boolean isLeaf() {
-	return false;
-    }
-   
-
-    /**
-     * return the number of children for this store node. The first
-     * time this method is called we load up all of the folders
-     * under the store's defaultFolder
-     */
-    /**
-    public int getChildCount() {
-	if (hasLoaded == false) {
-	    loadChildren();
-	}
-	return super.getChildCount();
-    }
-    */
-    /**
-     * returns the children of this folder node.  The first
-     * time this method is called we load up all of the folders
-     * under the store's defaultFolder
-     */
-    /*
-    public java.util.Enumeration children() {
-	if (hasLoaded == false) {
-	    loadChildren();
-	}
-	return super.children();
-    }
-
-    */
-
-    /**
-     * This loads or updates the top-level children of the Store.
-     */
-    public void loadChildren() {
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    doLoadChildren();
-	  }
-	};
-
-      if (SwingUtilities.isEventDispatchThread())
-	doLoadChildren();
-      else {
-	try {
-	  SwingUtilities.invokeAndWait(runMe);
-	} catch (Exception ie) {
-	}
+    if (SwingUtilities.isEventDispatchThread())
+      doLoadChildren();
+    else {
+      try {
+	SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception ie) {
       }
     }
-
+  }
+  
   /**
    * Does the actual work for loading the children.  performed on the swing
    * gui thread.
@@ -160,115 +133,171 @@ public class StoreNode extends MailTreeNode {
 	*/
     }
 
-    /**
-     * This goes through the Vector of FolderNodes provided and 
-     * returns the FolderNode for the given childName, if one exists.
-     * It will also remove the Found FolderNode from the childrenList
-     * Vector.
-     *
-     * If a FolderNode that corresponds with the given childName does
-     * not exist, this returns null.
-     *
-     */
-    public FolderNode popChild(String childName, Vector childrenList) {
-	if (children != null) {
-	    for (int i = 0; i < childrenList.size(); i++)
-		if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
-		    FolderNode fn = (FolderNode)childrenList.elementAt(i);
-		    childrenList.remove(fn);
-		    return fn;
-		}
-	}
-	
-	// no match.
-	return null;
-    }
-
-    /**
-     * This removes all the items in removeList from the list of this 
-     * node's children.
-     */
-    public void removeChildren(Vector removeList) {
-	for (int i = 0; i < removeList.size(); i++) {
-	    if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
-		this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
+  /**
+   * This goes through the Vector of FolderNodes provided and 
+   * returns the FolderNode for the given childName, if one exists.
+   * It will also remove the Found FolderNode from the childrenList
+   * Vector.
+   *
+   * If a FolderNode that corresponds with the given childName does
+   * not exist, this returns null.
+   *
+   */
+  public FolderNode popChild(String childName, Vector childrenList) {
+    if (children != null) {
+      for (int i = 0; i < childrenList.size(); i++)
+	if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
+	  FolderNode fn = (FolderNode)childrenList.elementAt(i);
+	  childrenList.remove(fn);
+	  return fn;
 	}
     }
     
-    /**
-     * This  creates the current PopupMenu if there is not one.  It then
-     * will configure the PopupMenu with the current actions.
-     *
-     * Overrides MailTreeNode.configurePopupMenu();
-     */
-
-    public void configurePopupMenu() {
-	if (popupMenu == null) {
-	    popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
-	    popupMenu.configureComponent("StoreNode.popupMenu", Pooka.getResources());
-	    updatePopupTheme();
-	}
-
-	popupMenu.setActive(getActions());
-	
+    // no match.
+    return null;
+  }
+  
+  /**
+   * This removes all the items in removeList from the list of this 
+   * node's children.
+   */
+  public void removeChildren(Vector removeList) {
+    for (int i = 0; i < removeList.size(); i++) {
+      if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
+	this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
     }
-
-    public String getStoreID() {
-	if (store != null)
-	    return store.getStoreID();
-	else
-	    return null;
-    }
-
-    public StoreInfo getStoreInfo() {
-	return store;
-    }
-
-    /**
-     * We override toString() so we can display the store URLName
-     * without the password.
-     */
-
-    public String toString() {
-	return displayName;
-    }
-
-    public boolean isConnected() {
-	if (store != null) {
-	    return store.isConnected();
-	} else 
-	    return false;
-    }
-
-    public Action[] defaultActions;
-
-    public Action[] getDefaultActions() {
-	return defaultActions;
+  }
+  
+  /**
+   * This  creates the current PopupMenu if there is not one.  It then
+   * will configure the PopupMenu with the current actions.
+   *
+   * Overrides MailTreeNode.configurePopupMenu();
+   */
+  
+  public void configurePopupMenu() {
+    if (popupMenu == null) {
+      popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
+      popupMenu.configureComponent("StoreNode.popupMenu", Pooka.getResources());
+      updatePopupTheme();
     }
     
-    class OpenAction extends AbstractAction {
-	
-        OpenAction() {
-            super("file-open");
-        }
-	
-        OpenAction(String nm) {
-            super(nm);
-        }
-	
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-	    if (!store.isConnected())
-		try {
-		    store.connectStore();
-		} catch (MessagingException me) {
-		    // I should make this easier.
-		    Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store.") + "\n" + Pooka.getProperty("error.sourceException", "The underlying exception reads:  ") + "\n" + me.getMessage());
-		}
-	    javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	    folderTree.expandPath(folderTree.getSelectionPath());
-	}
+    popupMenu.setActive(getActions());
+    
+  }
+  
+  /**
+   * This opens up a dialog asking if the user wants to subscribe to a 
+   * subfolder.
+   */
+  public void newFolder() {
+    String message = Pooka.getProperty("Folder.newFolder", "Subscribe/create new subfolder of") + " " + getStoreInfo().getStoreID();
+    
+    JLabel messageLabel = new JLabel(message);
+    
+    JPanel typePanel = new JPanel();
+    typePanel.setBorder(BorderFactory.createEtchedBorder());
+    
+    JRadioButton messagesButton = new JRadioButton(Pooka.getProperty("Folder.new.messages.label", "Contains Messages"), true);
+    JRadioButton foldersButton = new JRadioButton(Pooka.getProperty("Folder.new.folders.label", "Contains Folders"));
+    
+    ButtonGroup bg = new ButtonGroup();
+    bg.add(messagesButton);
+    bg.add(foldersButton);
+    
+    typePanel.add(messagesButton);
+    typePanel.add(foldersButton);
+    
+    Object[] inputPanels = new Object[] {
+      messageLabel,
+      typePanel
+    };
+    
+    final String response = Pooka.getUIFactory().showInputDialog(inputPanels, Pooka.getProperty("Folder.new.title", "Create new Folder"));
+    
+    int type = javax.mail.Folder.HOLDS_MESSAGES;
+    if (foldersButton.isSelected()) {
+      type = javax.mail.Folder.HOLDS_FOLDERS;
     }
-
+    
+    final int finalType = type;
+    
+    if (response != null && response.length() > 0) {
+      getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent e) {
+	    try {
+	      getStoreInfo().createSubFolder(response, finalType);
+	    } catch (MessagingException me) {
+	      final Exception fme = me;
+	      SwingUtilities.invokeLater(new Runnable() {
+		  public void run() {
+		    Pooka.getUIFactory().showError(fme.getMessage());
+		  }
+		});
+	      
+	      me.printStackTrace();
+	    }
+	  }
+	} , new java.awt.event.ActionEvent(this, 0, "folder-new"));
+    }
+  }
+  
+  public String getStoreID() {
+    if (store != null)
+      return store.getStoreID();
+    else
+      return null;
+  }
+  
+  public StoreInfo getStoreInfo() {
+    return store;
+  }
+  
+  /**
+   * We override toString() so we can display the store URLName
+   * without the password.
+   */
+  
+  public String toString() {
+    return displayName;
+  }
+  
+  public boolean isConnected() {
+    if (store != null) {
+      return store.isConnected();
+    } else 
+      return false;
+  }
+  
+  public Action[] defaultActions;
+  
+  public Action[] getDefaultActions() {
+    return defaultActions;
+  }
+  
+  class OpenAction extends AbstractAction {
+    
+    OpenAction() {
+      super("file-open");
+    }
+    
+    OpenAction(String nm) {
+      super(nm);
+    }
+    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      if (!store.isConnected())
+	try {
+	  store.connectStore();
+	} catch (MessagingException me) {
+	  // I should make this easier.
+	  Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store.") + "\n" + Pooka.getProperty("error.sourceException", "The underlying exception reads:  ") + "\n" + me.getMessage());
+	}
+      javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+      folderTree.expandPath(folderTree.getSelectionPath());
+    }
+  }
+  
   class SubscribeAction extends AbstractAction {
     
     SubscribeAction() {
@@ -346,12 +375,24 @@ public class StoreNode extends MailTreeNode {
       }
     }
   }
+
+  class NewFolderAction extends AbstractAction {
+    
+    NewFolderAction() {
+      super("folder-new");
+    }
+    
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      newFolder();
+    }
+    
+  }
   
   class EditAction extends AbstractAction {
     
-        EditAction() {
-	  super("file-edit");
-        }
+    EditAction() {
+      super("file-edit");
+    }
     
     EditAction(String nm) {
       super(nm);

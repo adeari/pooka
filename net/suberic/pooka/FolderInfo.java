@@ -968,8 +968,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   /**
    * This updates the children of the current folder.  Generally called
    * when the folderList property is changed.
+   *
+   * Should be called on the folder thread.
    */
-  
   public void updateChildren() {
     Vector newChildren = new Vector();
     
@@ -1243,6 +1244,32 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     } else if (changedValue.equals(getFolderProperty() + ".displayFilters")) {
       createFilters();
       unloadMatchingFilters();
+    }
+  }
+
+  /**
+   * This creates a folder if it doesn't exist already.  If it does exist,
+   * but is not of the right type, or if there is a problem in creating the
+   * folder, throws an error.
+   */
+  public void createSubFolder(String subFolderName, int type) throws MessagingException {
+    if ( ! isLoaded()) {
+      loadFolder();
+    }
+
+    if (folder != null) {
+      Folder subFolder = folder.getFolder(subFolderName);
+      
+      if (subFolder == null) {
+	throw new MessagingException("Store returned null for subfolder " + subFolderName + " of folder " + getFolderName());
+      }
+
+      if (! subFolder.exists())
+	subFolder.create(type);
+
+      subscribeFolder(subFolderName);
+    } else {
+      throw new MessagingException("Failed to open folder " + getFolderName() + " to create subfolder " + subFolderName);
     }
   }
 
@@ -2041,97 +2068,97 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	}
     }
 
-    /**
-     * This sets the given FolderDisplayUI to be the UI for this
-     * FolderInfo.
-     * 
-     * It automatically registers that FolderDisplayUI to be a listener
-     * to MessageCount, MessageChanged, and Connection events.
-     */
-    public void setFolderDisplayUI(FolderDisplayUI newValue) {
-	removeFromListeners(folderDisplayUI);
-	folderDisplayUI = newValue;
-	addToListeners(folderDisplayUI);
-    }
-
-    public int getType() {
-	return type;
-    }
-
-    public boolean isConnected() {
-	return (status == CONNECTED);
-    }
-
-    public boolean shouldBeConnected() {
-	return (status < PASSIVE);
-    }
-
-    public boolean isSortaOpen() {
-	return (status < CLOSED);
-    }
-
-    public boolean isAvailable() {
-	return (status < NOT_LOADED);
-    }
-
-    public boolean isLoaded() {
-	return (folder != null);
-    }
-
-    public boolean isValid() {
-	return (status != INVALID);
-    }
-
-    public boolean hasUnread() {
-	return (unreadCount > 0);
-    }
-
-    public int getUnreadCount() {
-	return unreadCount;
-    }
-    
-    public int getMessageCount() {
-	return messageCount;
-    }
-
-    public boolean hasNewMessages() {
-	return newMessages;
-    }
-
-    public void setNewMessages(boolean newValue) {
-	newMessages = newValue;
-    }
-
-    public FolderTracker getFolderTracker() {
-	return folderTracker;
-    }
-
-    public void setFolderTracker(FolderTracker newTracker) {
-	folderTracker = newTracker;
-    }
-
-    public boolean isTrashFolder() {
-	return trashFolder;
-    }
-
-    /**
-     * This sets the trashFolder value.  it also resets the defaultAction
-     * list and erases the FolderNode's popupMenu, if there is one.
-     */
-    public void setTrashFolder(boolean newValue) {
-	trashFolder = newValue;
-	setNotifyNewMessagesMain(! newValue);
-	setNotifyNewMessagesNode(! newValue);
-	resetDefaultActions();
-	if (getFolderNode() != null)
-	    getFolderNode().popupMenu = null;
-    }
-
-    public boolean isSentFolder() {
-	return sentFolder;
-    }
+  /**
+   * This sets the given FolderDisplayUI to be the UI for this
+   * FolderInfo.
+   * 
+   * It automatically registers that FolderDisplayUI to be a listener
+   * to MessageCount, MessageChanged, and Connection events.
+   */
+  public void setFolderDisplayUI(FolderDisplayUI newValue) {
+    removeFromListeners(folderDisplayUI);
+    folderDisplayUI = newValue;
+    addToListeners(folderDisplayUI);
+  }
   
+  public int getType() {
+    return type;
+  }
+  
+  public boolean isConnected() {
+    return (status == CONNECTED);
+  }
+  
+  public boolean shouldBeConnected() {
+    return (status < PASSIVE);
+  }
 
+  public boolean isSortaOpen() {
+    return (status < CLOSED);
+  }
+
+  public boolean isAvailable() {
+    return (status < NOT_LOADED);
+  }
+
+  public boolean isLoaded() {
+    return (folder != null);
+  }
+
+  public boolean isValid() {
+    return (status != INVALID);
+  }
+
+  public boolean hasUnread() {
+    return (unreadCount > 0);
+  }
+
+  public int getUnreadCount() {
+    return unreadCount;
+  }
+    
+  public int getMessageCount() {
+    return messageCount;
+  }
+
+  public boolean hasNewMessages() {
+    return newMessages;
+  }
+
+  public void setNewMessages(boolean newValue) {
+    newMessages = newValue;
+  }
+
+  public FolderTracker getFolderTracker() {
+    return folderTracker;
+  }
+
+  public void setFolderTracker(FolderTracker newTracker) {
+    folderTracker = newTracker;
+  }
+
+  public boolean isTrashFolder() {
+    return trashFolder;
+  }
+
+  /**
+   * This sets the trashFolder value.  it also resets the defaultAction
+   * list and erases the FolderNode's popupMenu, if there is one.
+   */
+  public void setTrashFolder(boolean newValue) {
+    trashFolder = newValue;
+    setNotifyNewMessagesMain(! newValue);
+    setNotifyNewMessagesNode(! newValue);
+    resetDefaultActions();
+    if (getFolderNode() != null)
+      getFolderNode().popupMenu = null;
+  }
+  
+  public boolean isSentFolder() {
+    return sentFolder;
+  }
+  
+  
   public void setSentFolder(boolean newValue) {
     sentFolder = newValue;
     setNotifyNewMessagesMain(! newValue);

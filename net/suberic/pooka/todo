@@ -1,9 +1,7 @@
 *) finish support for switching display style and headers.  
   -- make the buttons have reasonable images
-  *) make sure we lose our settings for the message whenever the window
-	closes.
 
-*) fix new folder dialog
+*) fix synch w/subscribed folders and INBOX problem.
 
 *) add documentation and online help.
   -- general info, plus more detailed configuration information.
@@ -35,20 +33,6 @@
 
 *) fix up the error messages, and make sure that they look ok.
 
-*) fix:
-        at com.sun.mail.imap.IMAPFolder.getMessageByUID(IMAPFolder.java:1479)
-        at net.suberic.pooka.UIDFolderInfo.getRealMessageById(UIDFolderInfo.java:588)
-        at net.suberic.pooka.UIDMimeMessage.getMessage(UIDMimeMessage.java:521)
-        at net.suberic.pooka.UIDMimeMessage.getFlags(UIDMimeMessage.java:378)
-        at net.suberic.pooka.MessageInfo.getFlags(MessageInfo.java:87)
-        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:532)
-        at net.suberic.pooka.gui.FolderDisplayPanel.getNextSelectableMessage(FolderDisplayPanel.java:512)
-        at net.suberic.pooka.gui.FolderDisplayPanel.selectNextMessage(FolderDisplayPanel.java:485)
-        at net.suberic.pooka.gui.FolderInternalFrame.selectNextMessage(FolderInternalFrame.java:316)
-        at net.suberic.pooka.gui.FolderDisplayPanel$7.actionPerformed(FolderDisplayPanel.java:372)
-        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:2372)
-
-
 *) -- windows --
   *) support windows registry attachment associations.
 	-- check icemail
@@ -62,6 +46,10 @@
 
 *) make sure that if you close a store, it doesn't reopen it.
 
+*) fix protocol timeout for imap/ssl? -- update this todo with more
+	specifics.  -- i think it's that if we lose our connection but 
+	don't notice, then we try to restore the connection and wait a 
+	long long time.
 -----
 
 *) fix connection failed message for ssl stores -- only fixable by sun?
@@ -87,8 +75,6 @@ icons changing?  test.
 
 *) status messages:  make them appear and disappear at appropriate times.
 
-*) fix protocol timeout for imap/ssl? -- update this todo with more
-	specifics.
 *) check disconnection/reconnection on network removal/restoral.
 
 preview:
@@ -153,6 +139,9 @@ preview:
 	network is up, but the test host is unreachable.
 
 *) come up with a wrapper for spawning external editors on windows.
+
+*) make it so folders that can contain folders but have no subfolders have
+	the correct icon.
 
 *) get some decent pooka icons.
 	

@@ -1,8 +1,5 @@
 package net.suberic.pooka.gui;
-import javax.swing.JComponent;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.Cursor;
 import java.awt.event.ActionEvent;
 import javax.swing.tree.*;
@@ -13,7 +10,6 @@ import java.util.*;
 import net.suberic.pooka.*;
 import net.suberic.util.thread.*;
 import javax.mail.FolderNotFoundException;
-import javax.swing.JOptionPane;
 import net.suberic.pooka.FolderInfo;
 import javax.mail.event.*;
 
@@ -40,7 +36,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     defaultActions = new Action[] {
       new ActionWrapper(new OpenAction(), folderInfo.getFolderThread()),
       new ActionWrapper(new CloseAction(), folderInfo.getFolderThread()),
-      new ActionWrapper(new UnsubscribeAction(), folderInfo.getFolderThread())
+      new UnsubscribeAction(),
+      new NewFolderAction()
     };
     
     Action[] actions = defaultActions;
@@ -134,6 +131,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   /**
    * This loads (or reloads) the children of the FolderNode from
    * the list of Children on the FolderInfo.
+   *
+   * Runs on the event dispatch thread, but is safe to be called from anywhere.
    */
   public void loadChildren() {
     Runnable runMe = new Runnable() {
@@ -323,8 +322,71 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     int response = Pooka.getUIFactory().showConfirmDialog(message + "\n" + getFolderInfo().getFolderName(), Pooka.getProperty("Folder.unsubscribeConfirm.title", "Unsubscribe from Folder"), JOptionPane.YES_NO_OPTION);
     
-    if (response == JOptionPane.YES_OPTION)
-      getFolderInfo().unsubscribe();
+    if (response == JOptionPane.YES_OPTION) {
+      getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	  public void actionPerformed(java.awt.event.ActionEvent e) {
+	    getFolderInfo().unsubscribe();
+	  }
+	} , new java.awt.event.ActionEvent(this, 0, "folder-unsubscribe"));
+    }
+  }
+  
+  /**
+   * This opens up a dialog asking if the user wants to subscribe to a 
+   * subfolder.
+   */
+  public void newFolder() {
+    if ((getFolderInfo().getType() & Folder.HOLDS_FOLDERS) != 0) {
+      String message = Pooka.getProperty("Folder.newFolder", "Subscribe/create new subfolder of") + " " + getFolderInfo().getFolderName();
+      
+      JLabel messageLabel = new JLabel(message);
+
+      JPanel typePanel = new JPanel();
+      typePanel.setBorder(BorderFactory.createEtchedBorder());
+
+      JRadioButton messagesButton = new JRadioButton(Pooka.getProperty("Folder.new.messages.label", "Contains Messages"), true);
+      JRadioButton foldersButton = new JRadioButton(Pooka.getProperty("Folder.new.folders.label", "Contains Folders"));
+
+      ButtonGroup bg = new ButtonGroup();
+      bg.add(messagesButton);
+      bg.add(foldersButton);
+
+      typePanel.add(messagesButton);
+      typePanel.add(foldersButton);
+
+      Object[] inputPanels = new Object[] {
+	messageLabel,
+	typePanel
+      };
+
+      final String response = Pooka.getUIFactory().showInputDialog(inputPanels, Pooka.getProperty("Folder.new.title", "Create new Folder"));
+
+      int type = javax.mail.Folder.HOLDS_MESSAGES;
+      if (foldersButton.isSelected()) {
+	type = javax.mail.Folder.HOLDS_FOLDERS;
+      }
+      
+      final int finalType = type;
+
+      if (response != null && response.length() > 0) {
+	getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	    public void actionPerformed(java.awt.event.ActionEvent e) {
+	      try {
+		getFolderInfo().createSubFolder(response, finalType);
+	      } catch (MessagingException me) {
+		final Exception fme = me;
+		SwingUtilities.invokeLater(new Runnable() {
+		    public void run() {
+		      Pooka.getUIFactory().showError(fme.getMessage());
+		    }
+		  });
+
+		me.printStackTrace();
+	      }
+	  }
+	  } , new java.awt.event.ActionEvent(this, 0, "folder-new"));
+      }
+    }
   }
   
   /**
@@ -461,6 +523,18 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     public void actionPerformed(ActionEvent e) {
       unsubscribeFolder();
+    }
+    
+  }
+  
+  class NewFolderAction extends AbstractAction {
+    
+    NewFolderAction() {
+      super("folder-new");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      newFolder();
     }
     
   }

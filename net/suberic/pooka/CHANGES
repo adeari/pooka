@@ -1,3 +1,5 @@
+added an easier interface for adding new folders.
+
 fixed a bug where multipart/alternative messages with additional attachments
 weren't getting parsed properly.
 
