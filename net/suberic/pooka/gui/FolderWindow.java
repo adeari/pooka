@@ -148,6 +148,13 @@ public class FolderWindow extends JInternalFrame implements UserProfileContainer
 	}
 	
 	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+	this.addInternalFrameListener(new javax.swing.event.InternalFrameAdapter() {
+		public void internalFrameClosed(javax.swing.event.InternalFrameEvent e) {
+		    getFolderInfo().setFolderWindow(null);
+		}
+	    });
+
     }
 
     public MessageProxy getSelectedMessage() {

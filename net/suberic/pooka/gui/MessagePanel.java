@@ -61,10 +61,22 @@ public class MessagePanel extends JDesktopPane implements UserProfileContainer {
     public void openFolderWindow(FolderInfo f) {
 
 	getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	FolderWindow newFolderWindow = new FolderWindow(f, this);
-	newFolderWindow.pack();
-	this.add(newFolderWindow);
-	newFolderWindow.setVisible(true);
+	FolderWindow newFolderWindow;
+	newFolderWindow = f.getFolderWindow();
+	if (newFolderWindow == null) {
+	    newFolderWindow = new FolderWindow(f, this);
+	    f.setFolderWindow(newFolderWindow);
+	    newFolderWindow.pack();
+	    this.add(newFolderWindow);
+	    newFolderWindow.setVisible(true);
+	} else {
+	    if (newFolderWindow.isIcon())
+		try {
+		    newFolderWindow.setIcon(false);
+		} catch (java.beans.PropertyVetoException e) {
+		} 
+	}
+
 	try {
 	    newFolderWindow.setSelected(true);
 	} catch (java.beans.PropertyVetoException e) {
