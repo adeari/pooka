@@ -738,12 +738,16 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
 
       final FolderInfo current = fi;
-      getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+      javax.swing.AbstractAction openFoldersAction = new javax.swing.AbstractAction() {
 	  public void actionPerformed(java.awt.event.ActionEvent e) {
 	    current.openAllFolders(Folder.READ_WRITE);
 	  }
-	}, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);   
- }
+	};
+      
+      openFoldersAction.putValue(javax.swing.Action.NAME, "file-open");
+      openFoldersAction.putValue(javax.swing.Action.SHORT_DESCRIPTION, "file-open on folder " + fi.getFolderID());
+      getStoreThread().addToQueue(openFoldersAction, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);   
+    }
     else {
       fi.openAllFolders(Folder.READ_WRITE);
     }
@@ -940,7 +944,14 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	java.util.List queue = storeThread.getQueue();
 	for (int i = 0; i < queue.size(); i++) {
 	  net.suberic.util.thread.ActionThread.ActionEventPair current = (net.suberic.util.thread.ActionThread.ActionEventPair) queue.get(i);
-	  String queueString = "  queue[" + i + "]:  " + current.action.getValue(javax.swing.Action.NAME); 
+	  String queueString = "  queue[" + i + "]:  ";
+	  String entryDescription = (String) current.action.getValue(javax.swing.Action.SHORT_DESCRIPTION);
+	  if (entryDescription == null)
+	    entryDescription = (String) current.action.getValue(javax.swing.Action.NAME);
+	  if (entryDescription == null)
+	    entryDescription = "Unknown action";
+
+	  queueString = queueString + entryDescription;
 	  System.out.println(queueString);
 	  statusBuffer.append(queueString + "\r\n");
 	}

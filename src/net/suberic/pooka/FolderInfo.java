@@ -435,68 +435,68 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
 
-   /**
-     * Invoked when a Store/Folder/Transport is opened.
-     * 
-     * As specified in javax.mail.event.ConnectionListener.
-     */
-    public void opened (ConnectionEvent e) {
-	fireConnectionEvent(e);
+  /**
+   * Invoked when a Store/Folder/Transport is opened.
+   * 
+   * As specified in javax.mail.event.ConnectionListener.
+   */
+  public void opened (ConnectionEvent e) {
+    fireConnectionEvent(e);
+  }
+  
+  /**
+   * This method opens the Folder, and sets the FolderInfo to know that
+   * the Folder should be open.  You should use this method instead of
+   * calling getFolder().open(), because if you use this method, then
+   * the FolderInfo will try to keep the Folder open, and will try to
+   * reopen the Folder if it gets closed before closeFolder is called.
+   *
+   * This method can also be used to reset the mode of an already 
+   * opened folder.
+   */
+  public void openFolder(int mode) throws MessagingException {
+    //System.err.println("timing:  opening folder " + getFolderID());
+    //long currentTime = System.currentTimeMillis();
+    
+    getLogger().log(Level.FINE, this + ":  checking parent store.");
+    
+    if (!getParentStore().isConnected()) {
+      getLogger().log(Level.FINE, this + ":  parent store isn't connected.  trying connection.");
+      getParentStore().connectStore();
     }
     
-    /**
-     * This method opens the Folder, and sets the FolderInfo to know that
-     * the Folder should be open.  You should use this method instead of
-     * calling getFolder().open(), because if you use this method, then
-     * the FolderInfo will try to keep the Folder open, and will try to
-     * reopen the Folder if it gets closed before closeFolder is called.
-     *
-     * This method can also be used to reset the mode of an already 
-     * opened folder.
-     */
-    public void openFolder(int mode) throws MessagingException {
-      //System.err.println("timing:  opening folder " + getFolderID());
-      //long currentTime = System.currentTimeMillis();
-
-      getLogger().log(Level.FINE, this + ":  checking parent store.");
-      
-      if (!getParentStore().isConnected()) {
-	getLogger().log(Level.FINE, this + ":  parent store isn't connected.  trying connection.");
-	getParentStore().connectStore();
-      }
-      
-      getLogger().log(Level.FINE, this + ":  loading folder.");
-      
-      if (! isLoaded() && status != CACHE_ONLY)
-	loadFolder();
-      
-      getLogger().log(Level.FINE, this + ":  folder loaded.  status is " + status);
-      
-      getLogger().log(Level.FINE, this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
-      
-      if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
-	getLogger().log(Level.FINE, this + ":  isLoaded() and isAvailable().");
-	if (folder.isOpen()) {
-	  if (folder.getMode() == mode)
-	    return;
-	  else { 
-	    folder.close(false);
-	    openFolder(mode);
-	    updateFolderOpenStatus(true);
-	    resetMessageCounts();
-	  }
-	} else {
-	  folder.open(mode);
+    getLogger().log(Level.FINE, this + ":  loading folder.");
+    
+    if (! isLoaded() && status != CACHE_ONLY)
+      loadFolder();
+    
+    getLogger().log(Level.FINE, this + ":  folder loaded.  status is " + status);
+    
+    getLogger().log(Level.FINE, this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
+    
+    if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
+      getLogger().log(Level.FINE, this + ":  isLoaded() and isAvailable().");
+      if (folder.isOpen()) {
+	if (folder.getMode() == mode)
+	  return;
+	else { 
+	  folder.close(false);
+	  openFolder(mode);
 	  updateFolderOpenStatus(true);
 	  resetMessageCounts();
 	}
-      } else if (status == INVALID) {
-	throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
+      } else {
+	folder.open(mode);
+	updateFolderOpenStatus(true);
+	resetMessageCounts();
       }
-      
-      //System.err.println("timing:  opening folder " + getFolderID() + " took " + (System.currentTimeMillis() - currentTime) + " milliseconds.");
-
+    } else if (status == INVALID) {
+      throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
     }
+    
+    //System.err.println("timing:  opening folder " + getFolderID() + " took " + (System.currentTimeMillis() - currentTime) + " milliseconds.");
+    
+  }
   
   /**
    * Actually records that the folde has been opened or closed.  
@@ -540,11 +540,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
       final FolderInfo current = fi;
       final int finalMode = mode;
-      getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+
+      javax.swing.AbstractAction openFoldersAction =new javax.swing.AbstractAction() {
 	  public void actionPerformed(java.awt.event.ActionEvent e) {
 	    current.openAllFolders(finalMode);
 	  }
-	}, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
+	};
+      
+      openFoldersAction.putValue(javax.swing.Action.NAME, "file-open");
+      openFoldersAction.putValue(javax.swing.Action.SHORT_DESCRIPTION, "file-open on folder " + fi.getFolderID());
+      getFolderThread().addToQueue(openFoldersAction, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);   
     } else {
       fi.openAllFolders(mode);
     }

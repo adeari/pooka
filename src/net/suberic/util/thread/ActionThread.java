@@ -71,10 +71,12 @@ public class ActionThread extends Thread {
       while (pair != null) {
 	try {
 	  synchronized(runLock) {
-	    try {
+	    mCurrentActionName = (String)pair.action.getValue(Action.SHORT_DESCRIPTION);
+	    if (mCurrentActionName == null) {
 	      mCurrentActionName = (String)pair.action.getValue(Action.NAME);
-	    } catch (Exception e) {
-	      mCurrentActionName = "Unknown action";
+	      if (mCurrentActionName == null) {
+		mCurrentActionName = "Unknown action";
+	      }
 	    }
 	    pair.action.actionPerformed(pair.event);
 	  }

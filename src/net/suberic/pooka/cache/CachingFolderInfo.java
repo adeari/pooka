@@ -809,7 +809,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
 	  MessageInfo mi =  getMessageInfoByUid(removedUids[i]);
 	  if (mi != null)
-	    removedMsgs[i] = mi.getRealMessage();
+	    removedMsgs[i] = mi.getMessage();
 
 	  if (removedMsgs[i] == null) {
 	    removedMsgs[i] = new CachingMimeMessage(this, removedUids[i]);

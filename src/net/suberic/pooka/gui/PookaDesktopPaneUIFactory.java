@@ -6,6 +6,7 @@ import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
 import javax.swing.JInternalFrame;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.mail.MessagingException;
@@ -376,7 +377,12 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 
     Runnable runMe = new Runnable() {
 	public void run() {
-	  JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+	  JTextArea displayPanel = new JTextArea(displayMessage);
+	  JScrollPane scrollPane = new JScrollPane(displayPanel);
+	  scrollPane.setMaximumSize(new java.awt.Dimension(400,400));
+
+	  JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
+	  //JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
 	}
       };
 

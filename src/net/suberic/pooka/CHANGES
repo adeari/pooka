@@ -1,3 +1,6 @@
+fixed a bug where offline changes might not get caught after reconnection
+to imap store.
+
 added some support for the jdk 1.5 Ocean theme.
 
 modified date display to use dd/MM/yy for non-US English.

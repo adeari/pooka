@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 import java.util.HashMap;
 import java.util.Set;
+import java.util.logging.Level;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderTableModel;
 
@@ -93,8 +94,7 @@ public class UIDFolderInfo extends FolderInfo {
    * at every check.  It's nasty, but it _should_ keep the Folder open..
    */
   public void checkFolder() throws javax.mail.MessagingException {
-    if (Pooka.isDebug())
-      System.out.println("checking folder " + getFolderName());
+    getLogger().log(Level.FINE, "checking folder " + getFolderName());
     
     // i'm taking this almost directly from ICEMail; i don't know how
     // to keep the stores/folders open, either.  :)
@@ -139,8 +139,7 @@ public class UIDFolderInfo extends FolderInfo {
    * Folder.
    */
   public void synchronizeCache() throws MessagingException {
-    if (Pooka.isDebug())
-      System.out.println("synchronizing cache.");
+    getLogger().log(Level.FINE, "synchronizing cache.");
     
     if (getFolderDisplayUI() != null)
       getFolderDisplayUI().showStatusMessage(Pooka.getProperty("message.UIDFolder.synchronizing", "Re-synchronizing with folder..."));
@@ -177,12 +176,10 @@ public class UIDFolderInfo extends FolderInfo {
 	uids[i] = getUID(messages[i]);
       }
       
-      if (Pooka.isDebug())
-	System.out.println("synchronizing--uids.length = " + uids.length);
+      getLogger().log(Level.FINE, "synchronizing--uids.length = " + uids.length);
       
       long[] addedUids = getAddedMessages(uids, uidValidity);
-      if (Pooka.isDebug())
-	System.out.println("synchronizing--addedUids.length = " + addedUids.length);
+      getLogger().log(Level.FINE, "synchronizing--addedUids.length = " + addedUids.length);
       
       if (addedUids.length > 0) {
 	Message[] addedMsgs = ((UIDFolder)getFolder()).getMessagesByUID(addedUids);
@@ -191,13 +188,14 @@ public class UIDFolderInfo extends FolderInfo {
       }    
       
       long[] removedUids = getRemovedMessages(uids, uidValidity);
-      if (Pooka.isDebug())
-	System.out.println("synchronizing--removedUids.length = " + removedUids.length);
+      getLogger().log(Level.FINE, "synchronizing--removedUids.length = " + removedUids.length);
       
       if (removedUids.length > 0) {
 	Message[] removedMsgs = new Message[removedUids.length];
 	for (int i = 0 ; i < removedUids.length; i++) {
-	  removedMsgs[i] = getMessageInfoByUid(removedUids[i]).getRealMessage();
+	  // messagesRemoved() will handle moving between UIDMimeMessages
+	  // and real messages.
+	  removedMsgs[i] = getMessageInfoByUid(removedUids[i]).getMessage();
 	}
 	MessageCountEvent mce = new MessageCountEvent(getFolder(), MessageCountEvent.REMOVED, false, removedMsgs);
 	messagesRemoved(mce);
@@ -260,6 +258,8 @@ public class UIDFolderInfo extends FolderInfo {
       proxies.add(mp);
     }
     
+    getLogger().log(Level.FINE, "updating flags for " + proxies.size() + " messages.");
+
     loaderThread.loadMessages(proxies);
     
   }
@@ -276,9 +276,7 @@ public class UIDFolderInfo extends FolderInfo {
 	*/
 
 	showStatusMessage(getFolderDisplayUI(), Pooka.getProperty("message.UIDFolder.synchronizing.fetchingMessages", "Fetching") + " " + addedMessages.length + " " + Pooka.getProperty("message.UIDFolder.synchronizing.messages", "messages."));
-	if (Pooka.isDebug()) {
-	  System.out.println("UIDFolderInfo:  runMessagesAdded().  getting " + addedMessages.length + " messages.");
-	}
+	getLogger().log(Level.FINE, "UIDFolderInfo:  runMessagesAdded().  getting " + addedMessages.length + " messages.");
 
 	if (fetchProfile != null) {
 	  FetchProfile fp = null;
@@ -320,8 +318,7 @@ public class UIDFolderInfo extends FolderInfo {
 	  UIDMimeMessage newMsg = getUIDMimeMessage(addedMessages[i]);
 	  long uid = newMsg.getUID();
 	  if (getMessageInfoByUid(uid) != null) {
-	    if (Pooka.isDebug())
-	      System.out.println(getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
+	    getLogger().log(Level.FINE, getFolderID() + ":  this is a duplicate.  not making a new messageinfo for it.");
 	  } else {
 	    mi = new MessageInfo(newMsg, this);
 	    // this has already been fetched; no need to do so again.
@@ -333,14 +330,10 @@ public class UIDFolderInfo extends FolderInfo {
 	  }
 	}
 	
-	if (Pooka.isDebug()) {
-	  System.out.println("filtering proxies.");
-	}
+	getLogger().log(Level.FINE, "filtering proxies.");
 	addedProxies.removeAll(applyFilters(addedProxies));
-
-	if (Pooka.isDebug()) {
-	  System.out.println("filters run; adding " + addedProxies.size() + " messages.");
-	}
+	
+	getLogger().log(Level.FINE, "filters run; adding " + addedProxies.size() + " messages.");
 	if (addedProxies.size() > 0) {
 	  getFolderTableModel().addRows(addedProxies);
 	  setNewMessages(true);
@@ -373,25 +366,23 @@ public class UIDFolderInfo extends FolderInfo {
    * This does the real work when messages are removed.
    */
   protected void runMessagesRemoved(MessageCountEvent mce) {
-    if (Pooka.isDebug())
-      System.out.println("running MessagesRemoved on " + getFolderID());
+    getLogger().log(Level.FINE, "running MessagesRemoved on " + getFolderID());
     
     MessageCountEvent newMce = null;
     if (folderTableModel != null) {
       Message[] removedMessages = mce.getMessages();
       Message[] uidRemovedMessages = new Message[removedMessages.length];
       
-      if (Pooka.isDebug())
-	System.out.println("removedMessages was of size " + removedMessages.length);
+      getLogger().log(Level.FINE, "removedMessages was of size " + removedMessages.length);
       
       MessageInfo mi;
       Vector removedProxies=new Vector();
       for (int i = 0; i < removedMessages.length; i++) {
-	if (Pooka.isDebug())
-	  System.out.println("checking for existence of message.");
+	getLogger().log(Level.FINE, "checking for existence of message " + removedMessages[i]);
 	
 	try {
 	  UIDMimeMessage removedMsg = getUIDMimeMessage(removedMessages[i]);
+
 	  if (removedMsg != null)
 	    uidRemovedMessages[i] = removedMsg;
 	  else
@@ -402,13 +393,15 @@ public class UIDFolderInfo extends FolderInfo {
 	    mi.getMessageProxy().close();
 	  
 	  if (mi != null) {
-	    if (Pooka.isDebug())
-	      System.out.println("message exists--removing");
+	    getLogger().log(Level.FINE, "message exists--removing");
 	    removedProxies.add(mi.getMessageProxy());
 	    messageToInfoTable.remove(mi);
 	    uidToInfoTable.remove(new Long(removedMsg.getUID()));
-		    }
+	  } else {
+	    getLogger().log(Level.FINE, "message with uid " + removedMessages[i] + " not found; not removing.");
+	  }
 	} catch (MessagingException me) {
+	  getLogger().log(Level.FINE, "caught exception running messagesRemoved on " + removedMessages[i] + ":  " + me.getMessage());
 	}
       }
       newMce = new MessageCountEvent(getFolder(), mce.getType(), mce.isRemoved(), uidRemovedMessages);
@@ -510,12 +503,10 @@ public class UIDFolderInfo extends FolderInfo {
    * FetchProfile.
    */
   public void fetch(MessageInfo[] messages, FetchProfile profile) throws MessagingException  {
-    if (Pooka.isDebug()) {
-      if (messages == null)
-	System.out.println("UIDFolderInfo:  fetching with null messages.");
-      else
-	System.out.println("UIDFolderInfo:  fetching " + messages.length + " messages.");
-    }
+    if (messages == null)
+      getLogger().log(Level.FINE, "UIDFolderInfo:  fetching with null messages.");
+    else
+      getLogger().log(Level.FINE, "UIDFolderInfo:  fetching " + messages.length + " messages.");
 
     // check the messages first; make sure we're just fetching 'real'
     // messages.
@@ -531,14 +522,11 @@ public class UIDFolderInfo extends FolderInfo {
 
     Message[] realMsgs = (Message[]) realMsgList.toArray(new Message[0]);
     
-    if (Pooka.isDebug()) {
-      if (realMsgs == null)
-	System.out.println("UIDFolderInfo:  running fetch with null real messages.");
-      else
-	System.out.println("UIDFolderInfo:  fetching " + realMsgs.length + " messages.");
-      
-    }
-
+    if (realMsgs == null)
+      getLogger().log(Level.FINE, "UIDFolderInfo:  running fetch with null real messages.");
+    else
+      getLogger().log(Level.FINE, "UIDFolderInfo:  fetching " + realMsgs.length + " messages.");
+    
     getFolder().fetch(realMsgs, profile);
     
     for (int i = 0 ; i < messages.length; i++) {
@@ -568,6 +556,15 @@ public class UIDFolderInfo extends FolderInfo {
     
     if (closeDisplay && getFolderDisplayUI() != null)
       getFolderDisplayUI().closeFolderDisplay();
+
+    /*
+      // should this be here?  should we remove closed folders from
+      // the FolderTracker?
+      if (getFolderTracker() != null) {
+      getFolderTracker().removeFolder(this);
+      setFolderTracker(null);
+      }
+    */
     
     if (isLoaded() && isAvailable()) {
       if (isConnected()) {
@@ -579,6 +576,7 @@ public class UIDFolderInfo extends FolderInfo {
       }
       setStatus(CLOSED);
     }
+
     
   }
 

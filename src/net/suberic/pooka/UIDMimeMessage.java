@@ -568,7 +568,12 @@ public class UIDMimeMessage extends MimeMessage {
   }
   
   public MimeMessage getMessage() throws MessagingException {
-    return parent.getRealMessageById(uid);
+    MimeMessage returnValue = parent.getRealMessageById(uid);
+    if (returnValue == null) {
+      throw new MessageRemovedException("Message with UID " + uid + " does not exist in Folder " + parent.getFolderID());
+    } else {
+      return returnValue;
+    }
   }
   
   public UIDFolderInfo getParent() {

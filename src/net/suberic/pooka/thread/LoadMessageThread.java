@@ -88,6 +88,8 @@ public class LoadMessageThread extends Thread {
     int queueSize = getQueueSize();    
     int totalMessageCount = queueSize;
     if (! stopped && queueSize > 0) {
+      folderInfo.getLogger().log(java.util.logging.Level.FINE, folderInfo.getFolderID() + " loading " + queueSize + " messages.");
+      
       MessageLoadedListener display = getFolderInfo().getFolderDisplayUI();
       if (display != null)
 	this.addMessageLoadedListener(display);

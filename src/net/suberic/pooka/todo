@@ -3,7 +3,7 @@
 	the closing, the previously-loaded messages all go to 'loading'.
 
 *) store.showStatus() should go on a JScrollPane or something.  it's too
-long right now.
+long right now. -- started on Desktop; add on Preview.
 
 *) check out situation with multiple connections.  see if we can speed
    up things that way.  possibilities:
@@ -41,11 +41,11 @@ testing:
    -) ?:  when you close the store, should we notify all of the folders
 	that they're closing, too?
 
-*) AttachmentPane:  test on windows to make sure that we're using the
-   correct defaults.  maybe test with PDF?
-
 next release
 -----------
+
+*) "please reopen" message shouldn't come up when you've requested a
+	store/folder close. (caching, maybe normal uid?)
 
 *) add an option to build.xml for compiling with deprecation enabled.
 
@@ -174,6 +174,9 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	see pooka_problems blob
 
 *) add color support for replies (i.e. > in one color, >> in another, etc.)
+
+*) MessageRemovedException from UIDMimeMessage.getMessage() should result in 
+	message getting removed from display. (? does this ever happen?)
 
 -----
 

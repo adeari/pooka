@@ -280,6 +280,7 @@ public class StoreNode extends MailTreeNode {
     
     OpenAction() {
       super("file-open");
+      this.putValue(Action.SHORT_DESCRIPTION, "file-open on Store " + getStoreInfo().getStoreID());
     }
     
     OpenAction(String nm) {
@@ -303,6 +304,7 @@ public class StoreNode extends MailTreeNode {
     
     SubscribeAction() {
       super("folder-subscribe");
+
     }
     
     public void actionPerformed(java.awt.event.ActionEvent e) {
