@@ -21,6 +21,7 @@ public class FolderWindow extends JInternalFrame {
     JScrollPane scrollPane = null;
     FolderInfo folderInfo = null;
     StatusBar statusBar = null;
+    MessagePanel messagePanel = null;
 
     public class StatusBar extends JPanel implements MessageCountListener, MessageChangedListener {
 	JLabel folderLabel;
@@ -64,8 +65,10 @@ public class FolderWindow extends JInternalFrame {
      * Creates a Folder window from the given Folder.
      */
 
-    public FolderWindow(FolderInfo newFolderInfo) {
+    public FolderWindow(FolderInfo newFolderInfo, MessagePanel newMessagePanel) {
 	super(newFolderInfo.getFolder().getName(), true, true, true, true);
+
+	messagePanel = newMessagePanel;
 
 	setFolderInfo(newFolderInfo);
 
@@ -123,6 +126,18 @@ public class FolderWindow extends JInternalFrame {
 	messageTable.setDefaultRenderer(Number.class, new DefaultFolderCellRenderer());
 
 	scrollPane.getViewport().add(messageTable);
+
+	int firstUnread = getFolderInfo().getFirstUnreadMessage();
+	if (firstUnread > -1) {
+	    messageTable.setRowSelectionInterval(firstUnread, firstUnread);
+
+	    // this is an estimation--hopefully it will work.
+	    System.out.println("default value for scrollbar is " + scrollPane.getVerticalScrollBar().getValue());
+	    System.out.println("firstUnread is " + firstUnread + "; Maximum is " + scrollPane.getVerticalScrollBar().getMaximum() + "; rowCount is " + messageTable.getRowCount());
+	    scrollPane.getVerticalScrollBar().setValue(scrollPane.getVerticalScrollBar().getMaximum() * messageTable.getRowCount() / firstUnread);
+	    System.out.println("set value of vertical scroll bar to " + scrollPane.getVerticalScrollBar().getValue());
+	}
+	
 	this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
@@ -164,7 +179,7 @@ public class FolderWindow extends JInternalFrame {
     // Accessor methods.
 
     public MessagePanel getMessagePanel() {
-	return (MessagePanel)(this.getParent());
+	return messagePanel;
     }
 
     public JTable getMessageTable() {
