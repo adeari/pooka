@@ -4,8 +4,10 @@
    *) make keystores get updated if you change them while running.  in other
 	words, don't require a restart for encryption the first time.
 	  -- done.  make update only happen once per change, though.
-
+   *) make sure disabling encryption and signatures actually works.
    *) add documentation
+	*) need to document versions, including webstart crypix info
+	*) need to document unlimited strength jce info
    *) test autodecrypt/auto sig check.  requires keys synched to email address.
 	test
    *) test auto sign/auto encrypt.

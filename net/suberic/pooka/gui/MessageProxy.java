@@ -307,7 +307,6 @@ public class MessageProxy {
 	}
 
       } catch (MessagingException me) {
-	System.err.println("caught exception loading message:  " + me);
 	me.printStackTrace();
       }
     }
@@ -384,7 +383,6 @@ public class MessageProxy {
 	  }
 	}
       } catch (MessagingException me) {
-	System.err.println("caught exception refreshing message:  " + me);
 	me.printStackTrace();
       }
     }
@@ -494,6 +492,14 @@ public class MessageProxy {
 	    
 	    java.security.Key key = getDefaultProfile().getEncryptionKey(cInfo.getEncryptionType());
 
+	    if (key != null) {
+	      try {
+		cInfo.decryptMessage(key, true);
+	      } catch (Exception e) {
+		// ignore here.
+	      } 
+	    }
+	    
 	    if (key == null) {
 	      try {
 		key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());

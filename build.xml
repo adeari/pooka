@@ -70,7 +70,7 @@
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}"/>
+    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true"/>
     <copy todir="${builddir}/net/suberic/pooka">
       <fileset dir="${sourcedir}/suberic/pooka">
         <include name="Pookarc"/>
@@ -185,7 +185,7 @@
   </target>
 
   <target name="compile-jnlp" depends="clean,init">
-    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}"/>
+    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true"/>
     <copy todir="${builddir}/net/suberic/pooka">
       <fileset dir="${sourcedir}/suberic/pooka">
         <include name="Pookarc"/>

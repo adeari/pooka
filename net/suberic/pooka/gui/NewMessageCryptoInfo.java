@@ -165,7 +165,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   /**
    * Returns the encrypted and/or signed message(s), as appropriate.
    */
-  public List createEncryptedMessages(MimeMessage mm) throws MessagingException {
+  public List createEncryptedMessages(MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     List returnValue = new LinkedList();
     
     List recipientInfoList = getCryptoRecipientInfos();
@@ -311,7 +311,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
      * Creates a new MimeMessage using the given recipients and encryption.
      */
     public MimeMessage handleMessage(MimeMessage mm) 
-    throws MessagingException {
+    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
       MimeMessage returnValue = new MimeMessage(mm);
 
       returnValue.setRecipients(Message.RecipientType.TO, getRecipients(Message.RecipientType.TO));
@@ -328,19 +328,12 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       }
 
       if (getSignatureKey() != null) {
-	try {
-	  returnValue = Pooka.getCryptoManager().signMessage(returnValue, null, getSignatureKey());
-	} catch (Exception e) {
-	  e.printStackTrace();
-	}
+	returnValue = Pooka.getCryptoManager().signMessage(returnValue, null, getSignatureKey());
+
       }
     
       if (getEncryptionKey() != null) {
-	try {
-	  returnValue = Pooka.getCryptoManager().encryptMessage(returnValue, getEncryptionKey());
-	} catch (Exception e) {
-	  e.printStackTrace();
-	}
+	returnValue = Pooka.getCryptoManager().encryptMessage(returnValue, getEncryptionKey());
       }
 
       return returnValue;
