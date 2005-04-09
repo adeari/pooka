@@ -84,10 +84,20 @@ public class PookaMessageListener extends Thread {
       System.err.println("it's a new message command.");
       // see if there's an address to send to.
       String address = null;
+      UserProfile profile = null;
       if (pMessage.length() > PookaMessagingConstants.S_NEW_MESSAGE.length()) {
-	address = pMessage.substring(PookaMessagingConstants.S_NEW_MESSAGE.length() + 1);
+	// go to the next space
+	int toAddressEnd = pMessage.indexOf(' ', PookaMessagingConstants.S_NEW_MESSAGE.length() + 1);
+	if (toAddressEnd == -1)
+	  toAddressEnd = pMessage.length();
+
+	address = pMessage.substring(PookaMessagingConstants.S_NEW_MESSAGE.length() + 1, toAddressEnd);
+	if (toAddressEnd != pMessage.length() && toAddressEnd != pMessage.length() + 1) {
+	  String profileString = pMessage.substring(toAddressEnd + 1);
+	  profile = UserProfile.getProfile(profileString);
+	}
       }
-      sendMessage(address, null);
+      sendMessage(address, profile);
     }
 
   }
@@ -107,10 +117,13 @@ public class PookaMessageListener extends Thread {
 	  // opens as a top-level window.
 	  NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
 
-	  MimeMessage mm = new MimeMessage(Pooka.getMainPanel().getSession());
+	  MimeMessage mm = new MimeMessage(Pooka.getDefaultSession());
 	  mm.setRecipients(Message.RecipientType.TO, fAddress);
 	  
 	  NewMessageInfo info = new NewMessageInfo(mm);
+	  if (fProfile != null)
+	    info.setDefaultProfile(fProfile);
+
 	  NewMessageProxy proxy = new NewMessageProxy(info);
 	  
 	  MessageUI nmu = Pooka.getUIFactory().createMessageUI(proxy, template);

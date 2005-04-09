@@ -190,7 +190,8 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    */
   public void itemStateChanged(ItemEvent ie) {
     if (ie.getStateChange() == ItemEvent.SELECTED) {
-      Pooka.getMainPanel().refreshCurrentUser();
+      if (Pooka.getMainPanel() != null)
+	Pooka.getMainPanel().refreshCurrentUser();
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    NewMessageUI nmui = getNewMessageUI();
@@ -225,7 +226,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * Creates the panel in which the addressing will be done, such as
    * the To: field, Subject: field, etc.
    */
-  public Container createHeaderInputPanel(MessageProxy aMsg, Hashtable proptDict) {
+  public Container createHeaderInputPanel(MessageProxy pProxy, Hashtable proptDict) {
     
     Box inputPanel = new Box(BoxLayout.Y_AXIS);
     
@@ -268,8 +269,15 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     inputRow.add(userProfileLabel);
     inputRow.add(profileCombo);
     inputRow.add(customHeaderButton);
+    
+    UserProfile selectedProfile = null;
+    selectedProfile = pProxy.getDefaultProfile();
+    if (selectedProfile == null) 
+      if (Pooka.getMainPanel() != null)
+	selectedProfile = Pooka.getMainPanel().getCurrentUser();
 
-    UserProfile selectedProfile = Pooka.getMainPanel().getCurrentUser();
+    if (selectedProfile == null)
+      selectedProfile = UserProfile.getDefaultProfile();
     
     if (selectedProfile != null)
       profileCombo.setSelectedItem(selectedProfile);
@@ -378,7 +386,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * This creates a new JTextPane for the main text part of the new 
    * message.  It will also include the current text of the message.
    */
-  public JTextPane createMessagePanel(MessageProxy aMsg) {
+  public JTextPane createMessagePanel(MessageProxy pProxy) {
     JTextPane retval = new net.suberic.util.swing.ExtendedEditorPane();
     retval.setEditorKit(new MailEditorKit());
     
@@ -831,7 +839,6 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    * MessageDisplayPanel is editable, it returns the currently selected 
    * UserProfile object.
    */
-  
   public UserProfile getDefaultProfile() {
     if (isEditable())
       return getSelectedProfile();

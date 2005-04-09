@@ -16,7 +16,11 @@ import java.security.Key;
  */
 public class NewMessageInfo extends MessageInfo {
 
+  // the full map of messages to be sent, if there are different versions
+  // of the message that go to different recipients.
   Map mSendMessageMap = null;
+  // the default UserProfile for this Message, if there is one.
+  UserProfile mProfile = null;
 
   /**
    * Creates a NewMessageInfo to wrap the given Message.
@@ -362,4 +366,27 @@ public class NewMessageInfo extends MessageInfo {
     mSendMessageMap = pSendMessageMap;
   }
 
+  /**
+   * As specified by interface net.suberic.pooka.UserProfileContainer.
+   *
+   * If 
+   */
+  public UserProfile getDefaultProfile() {
+    if (mProfile == null)
+      return super.getDefaultProfile();
+    else
+      return mProfile;
+  }
+
+  /**
+   * Sets the default UserProfile for this NewMessageInfo.  Note that 
+   * this UserProfile is not necessarily the one that the message will be
+   * sent using; rather, it's the one that will be selected in the UI
+   * by default.
+   */
+  public void setDefaultProfile(UserProfile pProfile) {
+    mProfile = pProfile;
+  }
+  
+  
 }

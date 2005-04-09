@@ -1181,7 +1181,6 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * DefaultProfile of that getMessageInfo().getFolderInfo().  If the getMessageInfo().getFolderInfo() isn't set
    * (should that happen?), this returns null.
    */
-  
   public UserProfile getDefaultProfile() {
     return getMessageInfo().getDefaultProfile();
   }

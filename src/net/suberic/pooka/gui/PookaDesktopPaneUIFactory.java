@@ -414,7 +414,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     final String msg = newMessage;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  Pooka.getMainPanel().getInfoPanel().setMessage(msg);
+	  if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
+	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
 	}
       };
     if (SwingUtilities.isEventDispatchThread()) {
@@ -429,7 +430,8 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   public void clearStatus() {
     Runnable runMe = new Runnable() {
 	public void run() {
-	  Pooka.getMainPanel().getInfoPanel().clear();
+	  if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
+	    Pooka.getMainPanel().getInfoPanel().clear();
 	}
       };
     if (SwingUtilities.isEventDispatchThread())

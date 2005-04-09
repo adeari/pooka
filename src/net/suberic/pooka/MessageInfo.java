@@ -64,7 +64,11 @@ public class MessageInfo {
       attachments = MailUtilities.parseAttachments(getMessage());
       attachmentsLoaded = true;
       if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && cryptoInfo.isEncrypted()) {
-	if (cryptoInfo.autoDecrypt(getDefaultProfile())) {
+	UserProfile p = getDefaultProfile();
+	if (p == null)
+	  p = UserProfile.getDefaultProfile();
+	
+	if (cryptoInfo.autoDecrypt(p)) {
 	  //attachments = MailUtilities.parseAttachments(getMessage());
 	}
       }
@@ -74,7 +78,7 @@ public class MessageInfo {
 	  //attachments = MailUtilities.parseAttachments(getMessage());
 	}
       }
-
+      
     } catch (MessagingException me) {
       // if we can't parse the message, try loading it as a single text
       // file.
@@ -468,6 +472,9 @@ public class MessageInfo {
     final NewMessageInfo final_nmi = nmi;
 
     UserProfile p = getDefaultProfile();
+    if (p == null)
+      p = UserProfile.getDefaultProfile();
+
     if (p != null && p.getMailServer() != null) {
       final OutgoingMailServer mailServer = p.getMailServer();
       mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
@@ -625,13 +632,14 @@ public class MessageInfo {
     }
     
     UserProfile up = getDefaultProfile();
-    
+    if (up == null)
+      up = UserProfile.getDefaultProfile();
+
     String parsedText;
     String replyPrefix;
     String parsedIntro;
     
     if (up != null && up.getMailProperties() != null) {
-      
       replyPrefix = up.getMailProperties().getProperty("replyPrefix", Pooka.getProperty("Pooka.replyPrefix", "> "));
       parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("replyIntro", Pooka.getProperty("Pooka.replyIntro", "On %d, %n wrote:")), true);
     } else { 
@@ -642,7 +650,7 @@ public class MessageInfo {
     newMsg.setText(parsedText);
     
     if (replyAll && Pooka.getProperty("Pooka.excludeSelfInReply", "true").equalsIgnoreCase("true")) {
-      getDefaultProfile().removeFromAddress(newMsg); 
+      up.removeFromAddress(newMsg); 
     }
     
     NewMessageInfo returnValue = new NewMessageInfo(newMsg);
@@ -680,6 +688,9 @@ public class MessageInfo {
       String textPart = getTextPart(false, false, getMaxMessageDisplayLength(), getTruncationMessage());
       
       UserProfile up = getDefaultProfile();
+      if (up == null) {
+	up = UserProfile.getDefaultProfile();
+      }
       
       String forwardPrefix;
       String parsedIntro;
@@ -721,7 +732,7 @@ public class MessageInfo {
 	for (int i = 0; i < fromAttachments.size(); i++) {
 	  Attachment current = (Attachment) fromAttachments.elementAt(i);
 	  Attachment newAttachment = null;
-
+	  
 	  javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
 	  mbp.setDataHandler(current.getDataHandler());
 	  newAttachment = new MBPAttachment(mbp);
@@ -730,10 +741,10 @@ public class MessageInfo {
 	returnValue.attachmentsLoaded=true;
       }
     }
-
+    
     return returnValue;
   }
-
+  
   /**
    * This populates a new message which is a forwarding of the
    * current message.
@@ -799,16 +810,14 @@ public class MessageInfo {
   /**
    * As specified by interface net.suberic.pooka.UserProfileContainer.
    *
-   * If the MessageProxy's folderInfo is set, this returns the 
-   * DefaultProfile of that folderInfo.  If not, returns the default 
-   * UserProfile, if any.
+   * If the MessageInfo's folderInfo is set, this returns the 
+   * DefaultProfile of that folderInfo.  If not, returns null.
    */
-  
   public UserProfile getDefaultProfile() {
     if (getFolderInfo() != null) {
       return getFolderInfo().getDefaultProfile();
     } else 
-      return UserProfile.getDefaultProfile();
+      return null;
   }
   
   /**
@@ -941,7 +950,7 @@ public class MessageInfo {
   }
 
   /**
-   * This sets the loaded value for the MessageProxy to false.   This 
+   * This sets the loaded value for the MessageInfo to false.   This 
    * should be called only if the TableInfo of the Message has been 
    * changed and needs to be reloaded.
    */
