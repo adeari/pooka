@@ -9,38 +9,42 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowAdapter;
+import java.util.*;
+
 
 /**
- * This is an implementation of PookaUIFactory which creates a single
- * panel which shows the list of messages in the folder and a preview
- * pane which shows the message itself.  You should also be able to
- * open messages in individual Frames.  New messages go into individual
- * Frames, also.
+ * This is an implementation of PookaUIFactory which is used when Pooka
+ * is started up just to send an email.
  */
-public class PookaPreviewPaneUIFactory implements PookaUIFactory {
+public class PookaMinimalUIFactory implements PookaUIFactory {
    
-  PreviewContentPanel contentPanel = null;
-  PropertyEditorFactory editorFactory = null;
+  PropertyEditorFactory mEditorFactory = null;
 
-  ThemeManager pookaThemeManager = null;
+  ThemeManager mThemeManager = null;
 
-  public boolean showing = false;
+  public boolean mShowing = false;
 
-  int maxErrorLine = 50;
+  int mMaxErrorLine = 50;
+
+  java.util.List mNewMessages = new LinkedList();
+
+  InfoPanel mInfoPanel = null;
 
   /**
    * Constructor.
    */
-  public PookaPreviewPaneUIFactory() {
-    editorFactory = new PropertyEditorFactory(Pooka.getResources());
-    pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+  public PookaMinimalUIFactory() {
+    mEditorFactory = new PropertyEditorFactory(Pooka.getResources());
+    mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
   }
   
   /**
    * Returns the ThemeManager for fonts and colors.
    */
   public ThemeManager getPookaThemeManager() {
-    return pookaThemeManager;
+    return mThemeManager;
   }
 
   /**
@@ -54,7 +58,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * Creates an appropriate MessageUI object for the given MessageProxy, 
    * using the provided MessageUI as a guideline.
    *
-   * Note that this implementation ignores the mui component.
+   * Note that this implementation ignores the templateMui component.
    */
   public MessageUI createMessageUI(MessageProxy mp, MessageUI templateMui) {
     // each MessageProxy can have exactly one MessageUI.
@@ -63,7 +67,23 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     
     MessageUI mui;
     if (mp instanceof NewMessageProxy) {
-      mui = new NewMessageFrame((NewMessageProxy) mp);
+      NewMessageFrame nmf = new NewMessageFrame((NewMessageProxy) mp);
+      mNewMessages.add(nmf);
+      nmf.addWindowListener(new WindowAdapter() {
+	public void windowClosed(WindowEvent we) {
+	  System.err.println("window closed.");
+	  Window window = we.getWindow();
+	  if (window instanceof NewMessageFrame) {
+	    System.err.println("window is a NMF.  removing.");
+	    mNewMessages.remove(window);
+	    if (mNewMessages.isEmpty()) {
+	      System.err.println("exiting.");
+	      System.exit(0);
+	    }
+	  }
+	}
+      });
+      mui = nmf;
     } else
       mui = new ReadMessageFrame(mp);
     
@@ -81,57 +101,25 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    *
    */
   public void doDefaultOpen(MessageProxy mp) {
-    if (contentPanel.getAutoPreview()) {
-      if (mp != null)
-	mp.openWindow();
-    } else {
-      SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    contentPanel.refreshCurrentMessage();
-	  }
-	});
-    }
   }
 
   /**
    * Creates an appropriate FolderDisplayUI object for the given
    * FolderInfo.
+   *
+   * Returns null; this implementation doesn't allow for folder views.
    */
   public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
-    // a FolderInfo can only have one FolderDisplayUI.
-    
-    if (fi.getFolderDisplayUI() != null)
-      return fi.getFolderDisplayUI();
-
-    PreviewFolderPanel fw = new PreviewFolderPanel(contentPanel, fi);
-    contentPanel.addPreviewPanel(fw, fi.getFolderID());
-    return fw;
-    
+    return null;
   }
   
   /**
    * Creates a JPanel which will be used to show messages and folders.
    *
-   * This implementation creates an instance of PreviewContentPanel.
+   * This implementation returns null.
    */
   public ContentPanel createContentPanel() {
-    contentPanel = new PreviewContentPanel();
-    contentPanel.setSize(1000,1000);
-	
-    return contentPanel;
-  }
-  
-  /**
-   * Creates a JPanel which will be used to show messages and folders.
-   *
-   * This implementation creates an instance PreviewConentPanel from a
-   * given MessagePanel.
-   */
-  public ContentPanel createContentPanel(MessagePanel mp) {
-    contentPanel = new PreviewContentPanel(mp);
-    contentPanel.setSize(1000,1000);
-    
-    return contentPanel;
+    return null;
   }
   
   /**
@@ -192,7 +180,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     final int fType = type;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fDisplayMessage, fTitle, fType));
+	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fDisplayMessage, fTitle, fType));
 	}
       };
     
@@ -219,7 +207,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     final int fType = type;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fMessageComponents, fTitle, fType));
+	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fMessageComponents, fTitle, fType));
 	}
       };
     
@@ -244,10 +232,10 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     final String displayErrorMessage = formatMessage(errorMessage);
     final String fTitle = title;
 
-    if (showing) {
+    if (mShowing) {
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
-	    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
+	    JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
 	  }
 	});
     } else
@@ -283,10 +271,10 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     final String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
     final Exception fE = e;
     final String fTitle = title;
-    if (showing) {
+    if (mShowing) {
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
-	    JOptionPane.showMessageDialog(contentPanel.getUIComponent(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
+	    JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
 	  }
 	});
     } else
@@ -299,7 +287,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * This formats a display message.
    */
   public String formatMessage(String message) {
-    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
+    return net.suberic.pooka.MailUtilities.wrapText(message, mMaxErrorLine, "\r\n", 5);
   }
   
   /**
@@ -314,7 +302,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 
     Runnable runMe = new Runnable() {
 	public void run() {
-	  fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
+	  fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
 	}
       };
     
@@ -342,7 +330,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 
     Runnable runMe = new Runnable() {
 	public void run() {
-	  fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
+	  fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
 	}
       };
     
@@ -363,7 +351,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * Returns the PropertyEditorFactory used by this component.
    */
   public PropertyEditorFactory getEditorFactory() {
-    return editorFactory;
+    return mEditorFactory;
   }
   
   /**
@@ -386,8 +374,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 	  //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
 	  //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
 	  
-	  JOptionPane.showMessageDialog(contentPanel.getUIComponent(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
-	  //JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+	  JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
+	  //JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
 	}
       };
 
@@ -409,9 +397,19 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     final String msg = newMessage;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  Pooka.getMainPanel().getInfoPanel().setMessage(msg);
+	  synchronized(this) {
+	    if (mInfoPanel == null) {
+	      mInfoPanel = new InfoPanel();
+	      JFrame panelFrame = new JFrame();
+	      panelFrame.getContentPane().add(mInfoPanel);
+	      panelFrame.pack();
+	      panelFrame.setVisible(true);
+	    }
+	    mInfoPanel.setMessage(msg);
+	  }
 	}
       };
+
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
     else
@@ -432,7 +430,17 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
     public void clearStatus() {
       Runnable runMe = new Runnable() {
 	  public void run() {
-	    Pooka.getMainPanel().getInfoPanel().clear();
+	    synchronized(this) {
+	      if (mInfoPanel != null) {
+		System.err.println("clearing infoPanel.");
+		Window infoWindow = SwingUtilities.getWindowAncestor(mInfoPanel);
+		if (infoWindow != null) {
+		  System.err.println("removing infoPanel window.");
+		  infoWindow.dispose();
+		}
+		mInfoPanel = null;
+	      }
+	    }
 	  }
 	};
       if (SwingUtilities.isEventDispatchThread())
@@ -445,45 +453,17 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
   /**
    * Shows a SearchForm with the given FolderInfos selected from the list
    * of the given allowedValues.
+   *
+   * Not implemented.
    */
   public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
-    // note that this should always be invoked on the AWTEventThread.
-
-    SearchForm sf = null;
-    if (allowedValues != null)
-      sf = new SearchForm(selectedFolders, allowedValues);
-    else
-      sf = new SearchForm(selectedFolders);
-    
-    boolean ok = false;
-    int returnValue = -1;
-    java.util.Vector tmpSelectedFolders = null;
-    javax.mail.search.SearchTerm tmpSearchTerm = null;
-    
-    while (! ok ) {
-      returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
-      if (returnValue == JOptionPane.OK_OPTION) {
-	tmpSelectedFolders = sf.getSelectedFolders();
-	try {
-	  tmpSearchTerm = sf.getSearchTerm();
-	  ok = true;
-	} catch (java.text.ParseException pe) {
-	  showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
-	  ok = false;
-	}
-      } else {
-	ok = true;
-      }
-    }
-    
-    if (returnValue == JOptionPane.OK_OPTION) {
-      FolderInfo.searchFolders(tmpSelectedFolders, tmpSearchTerm);
-    }
   }
   
   /**
    * Shows a SearchForm with the given FolderInfos selected.  The allowed
    * values will be the list of all available Folders.
+   *
+   * Not implemented.
    */
   public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
     showSearchForm(selectedFolders, null);
@@ -505,7 +485,7 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    * yet or not.
    */
   public void setShowing(boolean newValue) {
-    showing=newValue;
+    mShowing=newValue;
   }
 
   /**

@@ -154,6 +154,8 @@ public class StartupManager {
 
     loadManagers(startup);
 
+    mPookaManager.setUIFactory(new PookaMinimalUIFactory());
+    
     if (sendMessageTo(mToAddress, mFromProfile)) {
       System.err.println("send done.");
     } else {
@@ -226,12 +228,15 @@ public class StartupManager {
     mPookaManager.setSearchManager(new SearchTermManager("Search"));
     updateTime("created search manager");
 
-    if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-      mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
-    else
-      mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+    if (mFullStartup) {
+      if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+      else
+	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
     
-    updateTime("created ui factory");
+      updateTime("created ui factory");
+    }
+
     mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
 	public void valueChanged(String changedValue) {
 	  if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
@@ -351,7 +356,7 @@ public class StartupManager {
    * Prints the usage information.
    */
   public void printUsage() {
-    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  --newmessage ADDRESS         sends a new message to ADDRESS.\n  --help                       shows these options.\n"));
+    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  --newmessage ADDRESS         sends a new message to ADDRESS.\n    [--from USER]           [from user USER].\n  --help                       shows these options.\n"));
   }
 
   /**
