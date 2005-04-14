@@ -7,15 +7,13 @@ say, like reacting to a mailto: link.
 	*) add way to start up full pooka
 	*) add way to recognize running pooka on normal startup and
 		bring it to the front.
-	*) make sure correct pooka is recognized depending on localrc.
-	   	-- requires checking the pookarc file.
 	*) add way to work with webstart.
 	*) test with errors
 	*) test with sent folder -- esp with sent folder combined with
 		exit (i.e. make sure it doesn't send, begin save to sent,
 		then exit out before save completes)
 		-- fails.
-	*) remove startup window.
+	*) remove startup window from minimal startup.
 
 *) update bouncycastle version to latest.  and cryptix, and javamail-crypto.
 
@@ -28,6 +26,8 @@ say, like reacting to a mailto: link.
 	we'll need to do some work on that, because as of now, 
 	you end up waiting on the AwtEventThread, so no ui updates are
 	allowed.  
+
+*) make it so sorting when all the messages aren't loaded yet fails.
 
 -----
 

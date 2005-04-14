@@ -375,6 +375,13 @@ public class Pooka {
   static public PookaLogManager getLogManager() {
     return sManager.getLogManager();
   }
+
+  /**
+   * The Pooka configuration manager itself.
+   */
+  static public PookaManager getPookaManager() {
+    return sManager;
+  }
   
 }
 

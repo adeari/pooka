@@ -329,12 +329,12 @@ public class StartupManager {
 	  mUseHttp = true;
 	  mUseLocalFiles = false;
 	} else if (argv[i].equals("--newmessage")) {
-	  mToAddress = argv[++i];
-	  if (mToAddress == null) {
+	  if (argv.length < i + 2) {
 	    System.err.println("error:  no address specified.");
 	    printUsage();
 	    System.exit(-1);
 	  }
+	  mToAddress = argv[++i];
 	  mFullStartup = false;
 	} else if (argv[i].equals("--from")) {
 	  mFromProfile = argv[++i];
@@ -401,9 +401,16 @@ public class StartupManager {
     net.suberic.pooka.messaging.PookaMessageSender sender = new net.suberic.pooka.messaging.PookaMessageSender();
     try {
       sender.openConnection();
-      sender.sendNewMessage(pAddress, pProfile);
+      // check to make sure that we're connected to a correct version of Pooka.
+      if (sender.checkVersion())
+	sender.openNewEmail(pAddress, pProfile);
+      else
+	return false;
     } catch (Exception e) {
       return false;
+    } finally {
+      if (sender.isConnected())
+	sender.closeConnection();
     }
 
     return true;

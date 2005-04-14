@@ -4,6 +4,7 @@ import java.net.*;
 import java.nio.channels.*;
 
 import java.io.*;
+import java.util.*;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
@@ -20,11 +21,13 @@ public class PookaMessageListener extends Thread {
   
   ServerSocket mSocket = null;
   boolean mStopped = false;
+  java.util.List mActiveHandlers = new java.util.LinkedList();
   
   /**
    * Creates a new PookaMessageListener.
    */
   public PookaMessageListener() {
+    super("PookaMessageListener Thread");
     System.err.println("creating new PookaMessageListener.");
     start();
   }
@@ -40,14 +43,15 @@ public class PookaMessageListener extends Thread {
       while (! mStopped) {
 	System.err.println("accepting connection.");
 	Socket currentSocket = mSocket.accept();
-	System.err.println("got connection.");
-	BufferedReader reader = new BufferedReader(new InputStreamReader(currentSocket.getInputStream()));
-	handleMessage(reader.readLine());
-	currentSocket.close();
-	System.err.println("closing socket.");
+	if (! mStopped) {
+	  System.err.println("got connection.");
+	  PookaMessageHandler handler = new PookaMessageHandler(this, currentSocket);
+	  mActiveHandlers.add(handler);
+	  handler.start();
+	}
       }
     } catch (Exception e) {
-      System.out.println("error in MessagingListener.");
+      System.out.println("error in MessagingListener -- exiting.");
       e.printStackTrace();
     }
   }
@@ -62,7 +66,7 @@ public class PookaMessageListener extends Thread {
     boolean success = false;
     for (int port = PookaMessagingConstants.S_PORT; (! success) && port <  PookaMessagingConstants.S_PORT + 25; port++) {
       try {
-	mSocket = new ServerSocket(PookaMessagingConstants.S_PORT);
+	mSocket = new ServerSocket(port);
 	success = true;
 	Pooka.setProperty("Pooka.messaging.port", Integer.toString(port));
       } catch (Exception e) {
@@ -75,66 +79,36 @@ public class PookaMessageListener extends Thread {
   }
 
   /**
-   * Handles the received message.
+   * Stops this MessageListener.
    */
-  public void handleMessage(String pMessage) {
-    System.err.println("handling message:  '" + pMessage + "'.");
+  public void stopMessageListener() {
+    mStopped = true;
 
-    if (pMessage != null && pMessage.startsWith(PookaMessagingConstants.S_NEW_MESSAGE)) {
-      System.err.println("it's a new message command.");
-      // see if there's an address to send to.
-      String address = null;
-      UserProfile profile = null;
-      if (pMessage.length() > PookaMessagingConstants.S_NEW_MESSAGE.length()) {
-	// go to the next space
-	int toAddressEnd = pMessage.indexOf(' ', PookaMessagingConstants.S_NEW_MESSAGE.length() + 1);
-	if (toAddressEnd == -1)
-	  toAddressEnd = pMessage.length();
-
-	address = pMessage.substring(PookaMessagingConstants.S_NEW_MESSAGE.length() + 1, toAddressEnd);
-	if (toAddressEnd != pMessage.length() && toAddressEnd != pMessage.length() + 1) {
-	  String profileString = pMessage.substring(toAddressEnd + 1);
-	  profile = UserProfile.getProfile(profileString);
-	}
-      }
-      sendMessage(address, profile);
+    try {
+      closeServerSocket();
+    } catch (Exception e) {
+      // ignore--we're stopping.
     }
 
+    Iterator iter = mActiveHandlers.iterator();
+    while(iter.hasNext()) {
+      ((PookaMessageHandler) iter.next()).stopHandler();
+    }
   }
-  
+
   /**
-   * Sends a message.
+   * Closes the server socket.
    */
-  public void sendMessage(String pAddress, UserProfile pProfile) {
-    final String fAddress = pAddress;
-    final UserProfile fProfile = pProfile;
-
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-	try {
-	  System.err.println("creating new message.");
-	  // create the template first.  this is done so the new message
-	  // opens as a top-level window.
-	  NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
-
-	  MimeMessage mm = new MimeMessage(Pooka.getDefaultSession());
-	  mm.setRecipients(Message.RecipientType.TO, fAddress);
-	  
-	  NewMessageInfo info = new NewMessageInfo(mm);
-	  if (fProfile != null)
-	    info.setDefaultProfile(fProfile);
-
-	  NewMessageProxy proxy = new NewMessageProxy(info);
-	  
-	  MessageUI nmu = Pooka.getUIFactory().createMessageUI(proxy, template);
-	  nmu.openMessageUI();
-	} catch (MessagingException me) {
-	  Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
-	}
-      }
-      });
-
-    
+  void closeServerSocket() throws java.io.IOException {
+    if (mSocket != null) {
+      mSocket.close();
+    }
   }
 
+  /**
+   * Removes the handler from the active list.
+   */
+  public void removeHandler(PookaMessageHandler pHandler) {
+    mActiveHandlers.remove(pHandler);
+  }
 }

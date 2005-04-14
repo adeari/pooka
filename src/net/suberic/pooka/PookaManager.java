@@ -13,7 +13,7 @@ import java.util.logging.*;
  * This keeps track of all of the various managers and settings for an
  * instance of Pooka.
  */
-class PookaManager {
+public class PookaManager {
 
   // the resources for Pooka
 
