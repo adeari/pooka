@@ -59,10 +59,13 @@ public class StartupManager {
       System.exit(-1);
     }
 
-    if (mFullStartup) {
-      startupPooka();
-    } else {
-      startupMinimal();
+    // check to see if there's already a Pooka instance running.
+    if (!checkRunningInstance()) {
+      if (mFullStartup) {
+	startupPooka();
+      } else {
+	startupMinimal();
+      }
     }
   }
 
@@ -70,16 +73,34 @@ public class StartupManager {
    * Does a full startup of Pooka.
    */
   public void startupPooka() {
-    final net.suberic.pooka.gui.PookaStartup startup = new net.suberic.pooka.gui.PookaStartup();
+    net.suberic.pooka.gui.PookaStartup startup = new net.suberic.pooka.gui.PookaStartup();
     startup.show();
 
     updateTime("startup invoked.");
 
     loadManagers(startup);
 
+    startupMainPookaWindow(startup);
+  }
+
+  /**
+   * Starts up the main Pooka window.
+   */
+  public void startupMainPookaWindow(net.suberic.pooka.gui.PookaStartup pStartup) {
+
+    final net.suberic.pooka.gui.PookaStartup startup = pStartup;
     final JFrame finalFrame = mFrame;
 
-    startup.setStatus("Pooka.startup.configuringWindow");
+    if (Pooka.getUIFactory() == null || Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
+      if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+      else
+	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+    }
+
+    if (startup != null)
+      startup.setStatus("Pooka.startup.configuringWindow");
+
     // do all of this on the awt event thread.
     Runnable createPookaUI = new Runnable() {
 	public void run() {
@@ -90,7 +111,8 @@ public class StartupManager {
 	  finalFrame.getContentPane().add("Center", panel);
 
 	  updateTime("created main panel");
-	  startup.setStatus("Pooka.startup.starting");
+	  if (startup != null)
+	    startup.setStatus("Pooka.startup.starting");
 
 	  panel.configureMainPanel();
 
@@ -107,7 +129,8 @@ public class StartupManager {
 
 	  finalFrame.setLocation(x, y);
 	  updateTime("configured frame");
-	  startup.hide();
+	  if (startup != null)
+	    startup.hide();
 	  finalFrame.show();
 	  updateTime("showed frame");
 	  
@@ -141,33 +164,51 @@ public class StartupManager {
    * Does a minimal startup of Pooka.
    */
   public void startupMinimal() {
-    // first see if we can communicate with another instance of Pooka.
-    if (sendMessageTo(mToAddress, mFromProfile)) {
-      // send succeeded.  exit.
-      System.exit(0);
-    }
-
-    final net.suberic.pooka.gui.PookaStartup startup = new net.suberic.pooka.gui.PookaStartup();
-    startup.show();
-
     updateTime("startup invoked.");
 
-    loadManagers(startup);
+    loadManagers(null);
 
     mPookaManager.setUIFactory(new PookaMinimalUIFactory());
     
-    if (sendMessageTo(mToAddress, mFromProfile)) {
-      System.err.println("send done.");
-    } else {
+    if (!sendMessageTo(mToAddress, mFromProfile))
       System.err.println("send failed.");
-    }
   }
 
+  /**
+   * Checks to see if there's already a running instance of Pooka that
+   * we can use.
+   */
+  boolean checkRunningInstance() {
+    // first see if there's already a pooka instance running.
+    net.suberic.pooka.messaging.PookaMessageSender sender = new net.suberic.pooka.messaging.PookaMessageSender();
+    try {
+      sender.openConnection();
+      // check to make sure that we're connected to a correct version of Pooka.
+      if (sender.checkVersion()) {
+	// ok, there is one.  try either sending a message or starting
+	// up Pooka, whichever we're trying to do.
+	if (mFullStartup) {
+	  sender.sendStartPookaMessage();
+	  sender.closeConnection();
+	  System.out.println("contacted already running instance of Pooka.");
+	  return true;
+	} else {
+	  return sendMessageTo(mToAddress, mFromProfile);
+	}
+      }
+    } catch (Exception e) {
+
+    }
+
+    return false;
+  }
+  
   /**
    * This loads all of the background managers that Pooka uses.
    */
   public void loadManagers(net.suberic.pooka.gui.PookaStartup startup) {
-    startup.setStatus("Pooka.startup.ssl");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.ssl");
     updateTime("loading ssl");
     StoreManager.setupSSL();
     updateTime("ssl loaded.");
@@ -178,7 +219,8 @@ public class StartupManager {
     }
     updateTime("set looknfeel");
 
-    startup.setStatus("Pooka.startup.addressBook");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.addressBook");
     mPookaManager.setAddressBookManager(new AddressBookManager());
     updateTime("loaded address book");
     
@@ -190,7 +232,8 @@ public class StartupManager {
 
     mPookaManager.setDateFormatter(new DateFormatter());
 
-    startup.setStatus("Pooka.startup.profiles");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.profiles");
     UserProfile.createProfiles(mPookaManager.getResources());
     updateTime("created profiles");
     
@@ -221,7 +264,8 @@ public class StartupManager {
     javax.activation.FileTypeMap.setDefaultFileTypeMap(mPookaManager.getMimeTypesMap());
     updateTime("set command/file maps");
 
-    startup.setStatus("Pooka.startup.crypto");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.crypto");
     mPookaManager.setCryptoManager(new PookaEncryptionManager(mPookaManager.getResources(), "EncryptionManager"));
     updateTime("loaded encryption manager");
 
@@ -265,7 +309,8 @@ public class StartupManager {
     
     updateTime("created resource listeners");
     // set up help
-    startup.setStatus("Pooka.startup.help");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.help");
     try {
       ClassLoader cl = new Pooka().getClass().getClassLoader();
       java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
@@ -291,7 +336,8 @@ public class StartupManager {
       mPookaManager.getDefaultSession().setDebug(true);
     
     updateTime("created session.");    
-    startup.setStatus("Pooka.startup.mailboxInfo");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.mailboxInfo");
     mPookaManager.setStoreManager(new StoreManager());
     updateTime("created store manager.");
     
@@ -345,6 +391,10 @@ public class StartupManager {
 	  }
 	  mFullStartup = false;
 	} else if (argv[i].equals("--help")) {
+	  printUsage();
+	  System.exit(0);
+	} else {
+	  // if invalid arguments are specified
 	  printUsage();
 	  System.exit(0);
 	}
@@ -402,9 +452,9 @@ public class StartupManager {
     try {
       sender.openConnection();
       // check to make sure that we're connected to a correct version of Pooka.
-      if (sender.checkVersion())
+      if (sender.checkVersion()) {
 	sender.openNewEmail(pAddress, pProfile);
-      else
+      } else
 	return false;
     } catch (Exception e) {
       return false;

@@ -108,9 +108,7 @@
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true">
-      <compilerarg value="-deprecation"/>
-    </javac>
+    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true" deprecation="true"/>
     <copy todir="${builddir}/net/suberic/pooka">
       <fileset dir="${sourcedir}/net/suberic/pooka">
         <include name="Pookarc"/>

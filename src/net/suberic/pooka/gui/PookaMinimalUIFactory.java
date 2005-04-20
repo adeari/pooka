@@ -3,11 +3,7 @@ import net.suberic.util.gui.propedit.PropertyEditorFactory;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowAdapter;
@@ -30,7 +26,9 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
   java.util.List mNewMessages = new LinkedList();
 
-  InfoPanel mInfoPanel = null;
+  StatusDisplay mStatusPanel = null;
+
+  WindowAdapter mWindowAdapter = null;
 
   /**
    * Constructor.
@@ -38,6 +36,21 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public PookaMinimalUIFactory() {
     mEditorFactory = new PropertyEditorFactory(Pooka.getResources());
     mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+
+    mWindowAdapter = new WindowAdapter() {
+	public void windowClosed(WindowEvent we) {
+	  System.err.println("window closed.");
+	  Window window = we.getWindow();
+	  if (window instanceof NewMessageFrame) {
+	    System.err.println("window is a NMF.  removing.");
+	    mNewMessages.remove(window);
+	    if (mNewMessages.isEmpty()) {
+	      System.err.println("exiting.");
+	      System.exit(0);
+	    }
+	  }
+	}
+      };
   }
   
   /**
@@ -69,30 +82,34 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     if (mp instanceof NewMessageProxy) {
       NewMessageFrame nmf = new NewMessageFrame((NewMessageProxy) mp);
       mNewMessages.add(nmf);
-      nmf.addWindowListener(new WindowAdapter() {
-	public void windowClosed(WindowEvent we) {
-	  System.err.println("window closed.");
-	  Window window = we.getWindow();
-	  if (window instanceof NewMessageFrame) {
-	    System.err.println("window is a NMF.  removing.");
-	    mNewMessages.remove(window);
-	    if (mNewMessages.isEmpty()) {
-	      System.err.println("exiting.");
-	      System.exit(0);
-	    }
-	  }
-	}
-      });
+      nmf.addWindowListener(mWindowAdapter);
       mui = nmf;
     } else
       mui = new ReadMessageFrame(mp);
     
     mp.setMessageUI(mui);
 
-    applyNewWindowLocation((JFrame)mui);
+    //applyNewWindowLocation((JFrame)mui);
+    if (templateMui != null && templateMui instanceof JComponent) 
+      applyNewWindowLocation((JFrame)mui, (JComponent)templateMui);
+    else
+      applyNewWindowLocation((JFrame)mui, null);
+
     return mui;
   }
   
+  /**
+   * Unregisters listeners for this Factory.  Should be called if this
+   * ceases to be the active UIFactory.
+   */
+  public void unregisterListeners() {
+    Iterator iter =  mNewMessages.iterator();
+    while (iter.hasNext()) {
+      java.awt.Window current = (java.awt.Window) iter.next();
+      current.removeWindowListener(mWindowAdapter);
+    }
+  }
+
   /**
    * Opens the given MessageProxy in the default manner for this UI.
    * Usually this will just be callen createMessageUI() and openMessageUI()
@@ -132,7 +149,12 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
     JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
     jf.pack();
-    applyNewWindowLocation(jf);
+    Component currentFocusedComponent = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    if (currentFocusedComponent != null && currentFocusedComponent instanceof JComponent) {
+      applyNewWindowLocation(jf, ((JComponent) currentFocusedComponent));
+    } else {
+      applyNewWindowLocation(jf, null);
+    }
     jf.show();
   }
   
@@ -362,20 +384,13 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final String fTitle = title;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  //JLabel displayPanel = new JLabel(displayMessage);
 	  JTextArea displayPanel = new JTextArea(displayMessage);
 	  displayPanel.setEditable(false);
 	  java.awt.Dimension dpSize = displayPanel.getPreferredSize();
 	  JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 	  scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
-	  //System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
-	  //System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
-	  //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	  //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
-	  //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
 	  
 	  JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
-	  //JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
 	}
       };
 
@@ -395,17 +410,26 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public void showStatusMessage(String newMessage) {
     final String msg = newMessage;
+    System.err.println("sleeping for 5 seconds...  message=" + msg);
+    try {
+      Thread.sleep(5000);
+    } catch (Exception e) {
+    }
+
     Runnable runMe = new Runnable() {
 	public void run() {
 	  synchronized(this) {
-	    if (mInfoPanel == null) {
-	      mInfoPanel = new InfoPanel();
-	      JFrame panelFrame = new JFrame();
-	      panelFrame.getContentPane().add(mInfoPanel);
-	      panelFrame.pack();
-	      panelFrame.setVisible(true);
+	    if (mStatusPanel == null) {
+	      JFrame currentFrame = findJFrame();
+	      mStatusPanel = new StatusDisplay(currentFrame);
+	      mStatusPanel.pack();
+	      mStatusPanel.setLocationRelativeTo(currentFrame);
+	      mStatusPanel.setTitle("Message Status");
+	      mStatusPanel.setStatusMessage(msg);
+	      mStatusPanel.setVisible(true);
+	    } else {
+	      mStatusPanel.setStatusMessage(msg);
 	    }
-	    mInfoPanel.setMessage(msg);
 	  }
 	}
       };
@@ -424,31 +448,25 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     return new ProgressDialogImpl(min, max, initialValue, title, content);
   }
 
-    /**
-     * Clears the main status message panel.
-     */
-    public void clearStatus() {
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    synchronized(this) {
-	      if (mInfoPanel != null) {
-		System.err.println("clearing infoPanel.");
-		Window infoWindow = SwingUtilities.getWindowAncestor(mInfoPanel);
-		if (infoWindow != null) {
-		  System.err.println("removing infoPanel window.");
-		  infoWindow.dispose();
-		}
-		mInfoPanel = null;
-	      }
+  /**
+   * Clears the main status message panel.
+   */
+  public void clearStatus() {
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  synchronized(this) {
+	    if (mStatusPanel != null) {
+	      System.err.println("clearing infoPanel.");
+	      mStatusPanel.clear();
 	    }
 	  }
-	};
-      if (SwingUtilities.isEventDispatchThread())
-	runMe.run();
-      else
-	SwingUtilities.invokeLater(runMe);
-      
-    }
+	}
+      };
+    if (SwingUtilities.isEventDispatchThread())
+      runMe.run();
+    else
+      SwingUtilities.invokeLater(runMe);
+  }
 
   /**
    * Shows a SearchForm with the given FolderInfos selected from the list
@@ -476,7 +494,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     JFrame jf = new JFrame("Choose Address");
     jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
     jf.pack();
-    applyNewWindowLocation(jf);
+    applyNewWindowLocation(jf, aeta);
     jf.show();
   }
 
@@ -491,54 +509,8 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   /**
    * Determines the location for new windows.
    */
-  public void applyNewWindowLocation(JFrame f) {
-    String javaVersion = System.getProperty("java.version");
-    
-    if (javaVersion.compareTo("1.3") >= 0) {
-      try {
-	Point newLocation = getNewWindowLocation(f);
-	f.setLocation(newLocation);
-      } catch (Exception e) {
-      }
-    }
-  }
-
-  int lastX = 20;
-  int lastY = 20;
-  boolean firstPlacement = true;
-
-  /**
-   * Determines the location for new windows.
-   */
-  public Point getNewWindowLocation(JFrame f) throws Exception {
-    if (firstPlacement) {
-      Point location = Pooka.getMainPanel().getParentFrame().getLocation();
-      lastX = location.x;
-      lastY = location.y;
-      firstPlacement = false;
-    }
-    GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    
-    Rectangle bounds = conf.getBounds();
-    
-    int baseDelta = 20;
-    
-    Dimension componentSize = f.getSize();
-    
-    int currentX = lastX + baseDelta;
-    int currentY = lastY + baseDelta;
-    if (currentX + componentSize.width > bounds.x + bounds.width) {
-      currentX = bounds.x;
-    }
-
-    if (currentY + componentSize.height > bounds.y + bounds.height) {
-      currentY = bounds.y;
-    }
-
-    lastX = currentX;
-    lastY = currentY;
-    
-    return new Point(currentX, currentY);
+  public void applyNewWindowLocation(JFrame f, JComponent pParentComponent) {
+    f.setLocationRelativeTo(pParentComponent);
   }
 
   /**
@@ -551,4 +523,84 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
     return returnValue;
   }
+
+  /**
+   * Finds the selected JFrame, if there is one.
+   */
+  JFrame findJFrame() {
+    Window current = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusedWindow();
+    if (current != null && current instanceof JFrame) {
+      return (JFrame) current;
+    } 
+    
+    // if we haven't gotten one yet...
+    if (mNewMessages.size() > 0) {
+      Object first = mNewMessages.get(0);
+      if (first instanceof JFrame)
+	return (JFrame) first;
+    }
+    
+    return null;
+  }
+  
+  /**
+   * A window which shows status messages.
+   */
+  class StatusDisplay extends JDialog {
+    
+    // the display area.
+    JLabel mDisplayLabel = null;
+
+    /**
+     * Creates a new StatusDisplay object.
+     */
+    public StatusDisplay(JFrame pParentFrame) {
+      super(pParentFrame);
+      mDisplayLabel = new JLabel();
+      mDisplayLabel.setLayout(new FlowLayout(FlowLayout.CENTER));
+      mDisplayLabel.setPreferredSize(new Dimension(300,60));
+      mDisplayLabel.setIcon(UIManager.getIcon("Message"));
+      JPanel displayPanel = new JPanel();
+      displayPanel.setBorder(BorderFactory.createEtchedBorder());
+      displayPanel.add(mDisplayLabel);
+      this.getContentPane().add(displayPanel);
+    }
+    
+  /**
+   * Shows a status message.
+   */
+    public void setStatusMessage(String pMessage) {
+      final String msg = pMessage;
+
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    mDisplayLabel.setText(msg);
+	    mDisplayLabel.repaint();
+	  }
+	};
+  
+      if (SwingUtilities.isEventDispatchThread()) {
+	runMe.run();
+      } else {
+	SwingUtilities.invokeLater(runMe);
+      }
+    }
+    
+  /**
+   * Clears the status panel.
+   */
+    public void clear() {
+      Runnable runMe = new Runnable() {
+	  public void run() {
+	    StatusDisplay.this.dispose();
+	  }
+	};
+      if (SwingUtilities.isEventDispatchThread()) {
+	runMe.run();
+      } else {
+	SwingUtilities.invokeLater(runMe);
+      }
+    }
+  }
+  
 }

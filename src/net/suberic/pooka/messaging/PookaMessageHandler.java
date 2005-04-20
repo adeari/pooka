@@ -144,14 +144,21 @@ public class PookaMessageHandler extends Thread {
    * Handles a start Pooka message.
    */
   protected void handleStartPookaMessage() {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  net.suberic.pooka.gui.MainPanel mainPanel = Pooka.getMainPanel();
-	  if (mainPanel != null) {
-	    
+    System.err.println("handing start pooka message.");
+    if (Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
+      ((net.suberic.pooka.gui.PookaMinimalUIFactory) Pooka.getUIFactory()).unregisterListeners();
+      Pooka.sStartupManager.startupMainPookaWindow(null);
+    } else {
+      javax.swing.SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    net.suberic.pooka.gui.MainPanel mainPanel = Pooka.getMainPanel();
+	    if (mainPanel != null) {
+	      System.err.println("calling toFront() on " + javax.swing.SwingUtilities.getWindowAncestor(mainPanel));
+	      javax.swing.SwingUtilities.getWindowAncestor(mainPanel).toFront();
+	    }
 	  }
-	}
-      });    
+	});    
+    }
   }
 
   /**

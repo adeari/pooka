@@ -28,9 +28,10 @@ public class Pooka {
    */
   static public void main(String argv[]) {
     sManager = new PookaManager();
-    StartupManager startup = new StartupManager(sManager);
-    startup.runPooka(argv);
+    sStartupManager = new StartupManager(sManager);
+    sStartupManager.runPooka(argv);
   }
+  public static StartupManager sStartupManager = null;
 
   /**
    * Loads the initial resources for Pooka.  These are used during startup.
