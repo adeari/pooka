@@ -216,9 +216,13 @@ public class NewMessageInfo extends MessageInfo {
 
   /**
    * Saves the NewMessageInfo to the sentFolder associated with the 
-   * given Profile, if any.
+   * given Profile, if any.  Note that if there is a sent folder to
+   * save to, this method will likely just place an action in the
+   * queue.
+   *
+   * @return if there is a sent folder to save to.
    */
-  public void saveToSentFolder(UserProfile profile) {
+  public boolean saveToSentFolder(UserProfile profile) {
     final FolderInfo sentFolder = profile.getSentFolder();
     if (sentFolder != null) {
       try {
@@ -226,8 +230,11 @@ public class NewMessageInfo extends MessageInfo {
 	
 	sentFolder.getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	      net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
+
 	      try {
 		if (sentFolder.getFolder() == null) {
+		  factory.showStatusMessage(Pooka.getProperty("info.sendMessage.openingSentFolder", "Opening sent folder..."));
 		  sentFolder.openFolder(Folder.READ_WRITE);
 		}
 
@@ -236,10 +243,14 @@ public class NewMessageInfo extends MessageInfo {
 		}
 		
 		newMessage.setSentDate(java.util.Calendar.getInstance().getTime());
+		factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingToSentFolder", "Saving message to sent folder..."));
+
 		sentFolder.getFolder().appendMessages(new Message[] {newMessage});
 	      } catch (MessagingException me) {
-		  me.printStackTrace();
-		  Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+		me.printStackTrace();
+		Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+	      } finally {
+		((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendSucceeded(false);
 	      }
 	    }
 	  }, sentFolder.getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-send"));
@@ -248,7 +259,10 @@ public class NewMessageInfo extends MessageInfo {
 	Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 
       }
+      return true;
     }
+
+    return false;
   }
 
   /**

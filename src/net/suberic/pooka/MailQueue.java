@@ -74,7 +74,7 @@ public class MailQueue {
 	      Message m = nmi.getMessage();
 	      sendTransport.sendMessage(m, m.getAllRecipients());
 	      
-	      ((NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
+	      ((NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
 	    } catch (MessagingException me) {
 	      ((NewMessageProxy)nmi.getMessageProxy()).sendFailed(null,me);
 	    }

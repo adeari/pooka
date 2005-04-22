@@ -1,17 +1,15 @@
 *) add support for composing new email messages from an external source,
 say, like reacting to a mailto: link.
    started.  todo:
-	*) add some way to show status -- started; fix it.
-		-- make it appear above or near the message being sent.
-		-- make it the right size.
 	*) add way to work with webstart.
-	*) test with errors
-	*) test with sent folder -- esp with sent folder combined with
-		exit (i.e. make sure it doesn't send, begin save to sent,
-		then exit out before save completes)
-		-- fails.
 
 *) update bouncycastle version to latest.  and cryptix, and javamail-crypto.
+
+*) bug:  configure encryption.  run w/out strong encryption support in jdk.
+	open message.  get:
+java.lang.NullPointerException
+        at net.suberic.crypto.EncryptionManager.checkEncryptionType(EncryptionManager.java:143)
+        at net.suberic.pooka.MailUtilities.handlePart(MailUtilities.java:93)
 
 *) bug:  profile for new message created from selected item on main panel,
 	even if request for new message came from, say, a MessageFrame.

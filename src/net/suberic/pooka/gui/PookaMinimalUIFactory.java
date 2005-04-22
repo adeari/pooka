@@ -410,22 +410,17 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public void showStatusMessage(String newMessage) {
     final String msg = newMessage;
-    System.err.println("sleeping for 5 seconds...  message=" + msg);
-    try {
-      Thread.sleep(5000);
-    } catch (Exception e) {
-    }
 
     Runnable runMe = new Runnable() {
 	public void run() {
 	  synchronized(this) {
 	    if (mStatusPanel == null) {
 	      JFrame currentFrame = findJFrame();
-	      mStatusPanel = new StatusDisplay(currentFrame);
+	      mStatusPanel = new StatusDisplay(currentFrame, msg);
 	      mStatusPanel.pack();
 	      mStatusPanel.setLocationRelativeTo(currentFrame);
 	      mStatusPanel.setTitle("Message Status");
-	      mStatusPanel.setStatusMessage(msg);
+	      //mStatusPanel.setStatusMessage(msg);
 	      mStatusPanel.setVisible(true);
 	    } else {
 	      mStatusPanel.setStatusMessage(msg);
@@ -554,12 +549,12 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     /**
      * Creates a new StatusDisplay object.
      */
-    public StatusDisplay(JFrame pParentFrame) {
+    public StatusDisplay(JFrame pParentFrame, String pMessage) {
       super(pParentFrame);
       mDisplayLabel = new JLabel();
       mDisplayLabel.setLayout(new FlowLayout(FlowLayout.CENTER));
       mDisplayLabel.setPreferredSize(new Dimension(300,60));
-      mDisplayLabel.setIcon(UIManager.getIcon("Message"));
+      mDisplayLabel.setText(pMessage);
       JPanel displayPanel = new JPanel();
       displayPanel.setBorder(BorderFactory.createEtchedBorder());
       displayPanel.add(mDisplayLabel);

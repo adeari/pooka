@@ -190,6 +190,10 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   public boolean updateRecipientInfos(UserProfile profile, InternetHeaders headers) throws javax.mail.internet.AddressException, javax.mail.MessagingException {
     // just use the defaults for now.
 
+    String toHeader = headers.getHeader("To", ",");
+    if (toHeader == null) {
+      throw new MessagingException(Pooka.getProperty("error.NewMessage.noTo", "No To: recipient"));
+    }    
     InternetAddress[] toAddresses = InternetAddress.parse(headers.getHeader("To", ","), false);
     if (toAddresses == null || toAddresses.length == 0) {
       throw new MessagingException(Pooka.getProperty("error.NewMessage.noTo", "No To: recipient"));

@@ -97,26 +97,36 @@ public class NewMessageProxy extends MessageProxy {
     } catch (MessagingException me) {
       sendLock=false;
       getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+      getNewMessageUI().setBusy(false);
     } 
   }
 
   /**
    * Called when the send succeeds.
    */
-  public void sendSucceeded() {
+  public void sendSucceeded(boolean pSaveToSentFolder) {
     final NewMessageUI nmui = getNewMessageUI();
-    Pooka.getUIFactory().clearStatus();
     if (nmui != null) {
-      getNewMessageInfo().saveToSentFolder(getNewMessageUI().getSelectedProfile());
-      
-      Runnable runMe = new Runnable() {
-	  public void run() {
-	    nmui.setBusy(false);
-	    nmui.setModified(false);
-	    nmui.closeMessageUI();
-	  }
-	};
-      SwingUtilities.invokeLater(runMe);
+      boolean closeDialog = true;
+
+      if (pSaveToSentFolder) {
+	// only close the dialog now if we don't have a sent folder to
+	// save to.
+	closeDialog = ! getNewMessageInfo().saveToSentFolder(getNewMessageUI().getSelectedProfile());
+      }
+
+      // if not saving to a sent folder, close the dialog.
+      if ((! pSaveToSentFolder) ||  closeDialog) {
+	Runnable runMe = new Runnable() {
+	    public void run() {
+	      Pooka.getUIFactory().clearStatus();
+	      nmui.setBusy(false);
+	      nmui.setModified(false);
+	      nmui.closeMessageUI();
+	    }
+	  };
+	SwingUtilities.invokeLater(runMe);
+      }
     }
 
   }

@@ -272,7 +272,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	      sendTransport.sendMessage(nmi.getMessage(), nmi.getMessage().getAllRecipients());
 	    }
 	    
-	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
+	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
 	  } catch (MessagingException me) {
 	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);	  
 	  }
@@ -392,7 +392,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	      });
 	  }
 
-	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded();
+	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
 	} catch(MessagingException nme) {
 	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
 	}
