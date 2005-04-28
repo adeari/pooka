@@ -365,35 +365,69 @@ public class FolderDisplayPanel extends JPanel {
     // add sorting by header.
     
     messageTable.getTableHeader().addMouseListener(new MouseAdapter() {
+	public void mousePressed(MouseEvent e) {
+	  // show a wait cursor if we're not done loading the messages yet.
+	  boolean allLoaded = true;
+	  java.util.List data = ((FolderTableModel)messageTable.getModel()).getAllProxies();
+	  java.util.Iterator it = data.iterator();
+	  while (allLoaded && it.hasNext()) {
+	    MessageProxy current = (MessageProxy) it.next();
+	    if (! current.isLoaded())
+	      allLoaded = false;
+	  }
+	  
+	  if (! allLoaded) {
+	    messageTable.getTableHeader().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+	  }
+	  
+	}
+	
+	public void mouseReleased(MouseEvent e) {
+	  // clear the wait cursor, if any.
+	  messageTable.getTableHeader().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+	}
+	
 	public void mouseClicked(MouseEvent e) {
 	  TableColumnModel columnModel = messageTable.getColumnModel();
 	  int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
-	  int column = messageTable.convertColumnIndexToModel(viewColumn); 
+	  int column = messageTable.convertColumnIndexToModel(viewColumn);
 	  if (e.getClickCount() == 1 && column != -1) {
-	    java.util.logging.Logger.getLogger("Pooka.debug").fine("Sorting ..."); 
+	    // check to make sure that all messages are loaded.
+	    boolean allLoaded = true;
+	    java.util.List data = ((FolderTableModel)messageTable.getModel()).getAllProxies();
+	    java.util.Iterator it = data.iterator();
+	    while (allLoaded && it.hasNext()) {
+	      MessageProxy current = (MessageProxy) it.next();
+	      if (! current.isLoaded())
+		allLoaded = false;
+	    }
 	    
-	    int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
-	    boolean ascending = (shiftPressed == 0); 
-	    
-	    MessageProxy selectedMessage = null;
-	    
-	    int rowsSelected = messageTable.getSelectedRowCount();
-	    
-	    if (rowsSelected == 1) 
-	      selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
-	    else if (rowsSelected > 1)
-	      selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
-	    
-	    if (! ascending) {
-	      ((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
+	    if (allLoaded) {
+	      java.util.logging.Logger.getLogger("Pooka.debug").fine("Sorting ..."); 
+	      
+	      int shiftPressed = e.getModifiers()&InputEvent.SHIFT_MASK; 
+	      boolean ascending = (shiftPressed == 0); 
+	      
+	      MessageProxy selectedMessage = null;
+	      
+	      int rowsSelected = messageTable.getSelectedRowCount();
+	      
+	      if (rowsSelected == 1) 
+		selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRow());
+	      else if (rowsSelected > 1)
+		selectedMessage = getFolderInfo().getMessageProxy(messageTable.getSelectedRows()[0]);
+	      
+	      if (! ascending) {
+		((FolderTableModel)messageTable.getModel()).sortByColumn(column, ascending); 
 	    } else {
 	      ((FolderTableModel)messageTable.getModel()).sortByColumn(column ); 
 	    }
 	    
-	    if (selectedMessage != null) {
-	      int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
-	      messageTable.setRowSelectionInterval(selectedIndex, selectedIndex);
-	      makeSelectionVisible(selectedIndex);
+	      if (selectedMessage != null) {
+		int selectedIndex = ((FolderTableModel)messageTable.getModel()).getRowForMessage(selectedMessage);
+		messageTable.setRowSelectionInterval(selectedIndex, selectedIndex);
+		makeSelectionVisible(selectedIndex);
+	      }
 	    }
 	  }
 	}

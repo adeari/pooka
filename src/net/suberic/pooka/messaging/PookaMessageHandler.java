@@ -4,6 +4,7 @@ import java.net.*;
 import java.nio.channels.*;
 
 import java.io.*;
+import java.util.logging.*;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
@@ -32,7 +33,7 @@ public class PookaMessageHandler extends Thread {
    */
   public PookaMessageHandler(PookaMessageListener pParent, Socket pSocket) {
     super("PookaMessageHandler-" + sCounter++);
-    System.err.println("creating new PookaMessageHandler");
+    getLogger().log(Level.FINE, "creating new PookaMessageHandler");
     mSocket = pSocket;
     mParent = pParent;
   }
@@ -43,7 +44,7 @@ public class PookaMessageHandler extends Thread {
   public void run() {
     try {
       while (! mStopped && ! mSocket.isClosed()) {
-	System.err.println("handling messages.");
+	getLogger().log(Level.FINE, "handling messages.");
 	mReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
 	handleMessage(mReader.readLine());
       }
@@ -59,7 +60,7 @@ public class PookaMessageHandler extends Thread {
    * Handles the received message.
    */
   public void handleMessage(String pMessage) throws java.io.IOException {
-    System.err.println("handling message:  '" + pMessage + "'.");
+    getLogger().log(Level.FINE, "handling message:  '" + pMessage + "'.");
 
     if (pMessage != null) {
       if (pMessage.startsWith(PookaMessagingConstants.S_NEW_MESSAGE)) {
@@ -81,7 +82,7 @@ public class PookaMessageHandler extends Thread {
    * Handles a newEmail message.
    */
   protected void handleNewEmailMessage(String pMessage) {
-    System.err.println("it's a new message command.");
+    getLogger().log(Level.FINE, "it's a new message command.");
     // see if there's an address to send to.
     String address = null;
     UserProfile profile = null;
@@ -110,7 +111,7 @@ public class PookaMessageHandler extends Thread {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	public void run() {
 	  try {
-	    System.err.println("creating new message.");
+	    getLogger().log(Level.FINE, "creating new message.");
 	    // create the template first.  this is done so the new message
 	    // opens as a top-level window.
 	    NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
@@ -144,7 +145,7 @@ public class PookaMessageHandler extends Thread {
    * Handles a start Pooka message.
    */
   protected void handleStartPookaMessage() {
-    System.err.println("handing start pooka message.");
+    getLogger().log(Level.FINE, "handing start pooka message.");
     if (Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
       ((net.suberic.pooka.gui.PookaMinimalUIFactory) Pooka.getUIFactory()).unregisterListeners();
       Pooka.sStartupManager.startupMainPookaWindow(null);
@@ -153,7 +154,7 @@ public class PookaMessageHandler extends Thread {
 	  public void run() {
 	    net.suberic.pooka.gui.MainPanel mainPanel = Pooka.getMainPanel();
 	    if (mainPanel != null) {
-	      System.err.println("calling toFront() on " + javax.swing.SwingUtilities.getWindowAncestor(mainPanel));
+	      getLogger().log(Level.FINE, "calling toFront() on " + javax.swing.SwingUtilities.getWindowAncestor(mainPanel));
 	      javax.swing.SwingUtilities.getWindowAncestor(mainPanel).toFront();
 	    }
 	  }
@@ -173,7 +174,7 @@ public class PookaMessageHandler extends Thread {
    */
   public void sendResponse(String pMessage) throws java.io.IOException {
     BufferedWriter writer = getWriter();
-    System.err.println("sending response '" + pMessage);
+    getLogger().log(Level.FINE, "sending response '" + pMessage);
     writer.write(pMessage);
     writer.newLine();
     writer.flush();
@@ -219,5 +220,12 @@ public class PookaMessageHandler extends Thread {
    */
   void cleanup() {
     mParent.removeHandler(this);
+  }
+
+  /**
+   * Gets the logger for this class.
+   */
+  public Logger getLogger() {
+    return Logger.getLogger("Pooka.debug.messaging");
   }
 }

@@ -743,6 +743,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       Message newMessage = new MimeMessage((MimeMessage)getMessageInfo().getMessage());
       NewMessageInfo nmi = new NewMessageInfo(newMessage);
       NewMessageProxy nmp = new NewMessageProxy(nmi);
+      nmi.setDefaultProfile(getDefaultProfile());
       
       final MessageUI nmu = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
 
@@ -806,8 +807,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     FolderDisplayUI fw = getFolderDisplayUI();
     if (fw != null)
       fw.setBusy(true);;
+
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateReply(replyAll, withAttachments));
+      nmp.getNewMessageInfo().setDefaultProfile(getDefaultProfile());
       final MessageUI nmui = Pooka.getUIFactory().createMessageUI(nmp, this.getMessageUI());
 
       // if this has a messageui up, then make the reply 
@@ -820,10 +823,11 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
     }
+
     if (fw != null)
       fw.setBusy(false);
     if (getMessageUI() != null)
-      getMessageUI().setBusy(true);;
+      getMessageUI().setBusy(false);;
     
   }
   
@@ -844,6 +848,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       fw.setBusy(true);;
     try {
       NewMessageProxy nmp = new NewMessageProxy(getMessageInfo().populateForward(withAttachments, method));
+      nmp.getNewMessageInfo().setDefaultProfile(getDefaultProfile());
       final MessageUI nmui = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
       SwingUtilities.invokeLater(new Runnable() {
 	public void run() {
@@ -863,7 +868,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     if (fw != null)
       fw.setBusy(false);
     if (getMessageUI() != null)
-      getMessageUI().setBusy(true);;
+      getMessageUI().setBusy(false);;
     
   }
 
@@ -1672,7 +1677,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       if (fw != null)
 	fw.setBusy(false);
       if (getMessageUI() != null)
-	getMessageUI().setBusy(true);;
+	getMessageUI().setBusy(false);;
     }
     
   }
@@ -1692,7 +1697,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       if (fw != null)
 	fw.setBusy(false);
       if (getMessageUI() != null)
-	getMessageUI().setBusy(true);;
+	getMessageUI().setBusy(false);;
     }
     
   }

@@ -5,6 +5,7 @@ import java.nio.channels.*;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.*;
 
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
@@ -28,7 +29,7 @@ public class PookaMessageListener extends Thread {
    */
   public PookaMessageListener() {
     super("PookaMessageListener Thread");
-    System.err.println("creating new PookaMessageListener.");
+    getLogger().log(Level.FINE, "creating new PookaMessageListener.");
     start();
   }
 
@@ -37,14 +38,14 @@ public class PookaMessageListener extends Thread {
    */
   public void run() {
     try {
-      System.err.println("creating socket.");
+      getLogger().log(Level.FINE, "creating socket.");
       createSocket();
-      System.err.println("socket created.");
+      getLogger().log(Level.FINE, "socket created.");
       while (! mStopped) {
-	System.err.println("accepting connection.");
+	getLogger().log(Level.FINE, "accepting connection.");
 	Socket currentSocket = mSocket.accept();
 	if (! mStopped) {
-	  System.err.println("got connection.");
+	  getLogger().log(Level.FINE, "got connection.");
 	  PookaMessageHandler handler = new PookaMessageHandler(this, currentSocket);
 	  mActiveHandlers.add(handler);
 	  handler.start();
@@ -61,7 +62,7 @@ public class PookaMessageListener extends Thread {
    * Creats the socket to listen to.
    */
   public void createSocket() throws Exception {
-    System.err.println("creating new PookaMessageListener socket.");
+    getLogger().log(Level.FINE, "creating new PookaMessageListener socket.");
     Exception throwMe = null;
     boolean success = false;
     for (int port = PookaMessagingConstants.S_PORT; (! success) && port <  PookaMessagingConstants.S_PORT + 25; port++) {
@@ -110,5 +111,12 @@ public class PookaMessageListener extends Thread {
    */
   public void removeHandler(PookaMessageHandler pHandler) {
     mActiveHandlers.remove(pHandler);
+  }
+
+  /**
+   * Gets the logger for this class.
+   */
+  public Logger getLogger() {
+    return Logger.getLogger("Pooka.debug.messaging");
   }
 }

@@ -382,19 +382,18 @@ public class FolderTableModel extends AbstractTableModel {
   /**
    * This sorts the data List by the value of the given column.
    */
-    public void sortByColumn(int column, boolean ascending) {
-      if (ascending)
-	java.util.Collections.sort(data, new RowComparator(column));
-      else
-	java.util.Collections.sort(data, new ReverseRowComparator(column));
-      
-      this.fireTableChanged(new javax.swing.event.TableModelEvent(this)); 
-      
-      currentSortColumn = column;
-      currentAscending = ascending;
-    }
+  public void sortByColumn(int column, boolean ascending) {
+    if (ascending)
+      java.util.Collections.sort(data, new RowComparator(column));
+    else
+      java.util.Collections.sort(data, new ReverseRowComparator(column));
+    
+    this.fireTableChanged(new javax.swing.event.TableModelEvent(this)); 
+    
+    currentSortColumn = column;
+    currentAscending = ascending;
+  }
   
-
   /**
    * Sorts by the given column.  If the column is already the one that 
    * is sorted by, then reverses the sort.

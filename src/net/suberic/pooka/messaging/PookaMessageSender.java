@@ -3,6 +3,7 @@ package net.suberic.pooka.messaging;
 import java.net.*;
 import java.nio.channels.*;
 import java.io.*;
+import java.util.logging.*;
 
 import net.suberic.pooka.Pooka;
 
@@ -61,7 +62,7 @@ public class PookaMessageSender {
     sendMessage(PookaMessagingConstants.S_CHECK_VERSION);
 
     String response = retrieveResponse();
-    System.err.println("got response " + response);
+    getLogger().log(Level.FINE, "got response " + response);
     
     return (response != null && response.equals(Pooka.getPookaManager().getLocalrc()));
   }
@@ -94,7 +95,7 @@ public class PookaMessageSender {
    */
   public void sendMessage(String pMessage) throws java.io.IOException {
     BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream()));
-    System.err.println("sending message '" + pMessage);
+    getLogger().log(Level.FINE, "sending message '" + pMessage);
     writer.write(pMessage);
     writer.newLine();
     writer.flush();
@@ -114,4 +115,12 @@ public class PookaMessageSender {
   public boolean isConnected() {
     return mConnected;
   }
+
+  /**
+   * Gets the logger for this class.
+   */
+  public Logger getLogger() {
+    return Logger.getLogger("Pooka.debug.messaging");
+  }
+
 }

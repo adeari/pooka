@@ -374,7 +374,7 @@ public class StartupManager {
 	} else if (argv[i].equals("--http")) {
 	  mUseHttp = true;
 	  mUseLocalFiles = false;
-	} else if (argv[i].equals("--newmessage")) {
+	} else if (argv[i].equals("-open")) {
 	  if (argv.length < i + 2) {
 	    System.err.println("error:  no address specified.");
 	    printUsage();
@@ -406,7 +406,7 @@ public class StartupManager {
    * Prints the usage information.
    */
   public void printUsage() {
-    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  --newmessage ADDRESS         sends a new message to ADDRESS.\n    [--from USER]           [from user USER].\n  --help                       shows these options.\n"));
+    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  -open ADDRESS         sends a new message to ADDRESS.\n    [--from USER]           [from user USER].\n  --help                       shows these options.\n"));
   }
 
   /**
