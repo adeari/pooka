@@ -190,8 +190,8 @@
 
     <copy todir="${distdir}/cryptodist/pooka/lib">
       <fileset dir="${importdir}">
-        <include name="bcmail-jdk14-121.jar"/>
-        <include name="bcprov-jdk14-121.jar"/>
+        <include name="bcmail-jdk14-128.jar"/>
+        <include name="bcprov-jdk14-128.jar"/>
         <include name="cryptix-jce-provider.jar"/>
         <include name="cryptix-openpgp-provider.jar"/>
         <include name="cryptix-message-api.jar"/>

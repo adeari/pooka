@@ -1,9 +1,21 @@
-added --newmessage and --from options to startup.  this allows you to 
-invoke Pooka only to send a new message.
+050430 release
+--------------
+
+added -open and --from options to startup.  this allows you to invoke Pooka 
+to only send a new message, rather than starting up the entire client.
 
 added a network listener so that, by default, if you try to start up two
 Pooka clients from the same Pookarc you instead will just bring the first
-one to the foreground.
+one to the foreground.  this also allows an external invocation to contact
+a running client to have it open a new message.
+
+trying to sort a MessageTable before all the messages are loaded no longer
+results in a gui hang.
+
+we now show a status while closing stores on exit.
+
+fixed a bug where replying to a message in a detached window could result
+in the wrong profile being selected by default.
 
 changed the order of saves so that if the save to sent folder fails for
 a new message, the message window doesn't disappear until after the
