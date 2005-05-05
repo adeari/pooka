@@ -212,8 +212,7 @@
   </target>
 
   <target name="dist-jnlp" depends="compile-jnlp">
-
-    <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
+    <jar jarfile="${distdir}/pooka11.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
     </jar>
   </target>
 
@@ -266,6 +265,10 @@
     <copy todir="${helpdir}/net/suberic/pooka/doc">
       <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
     </copy>
+    <tstamp>
+      <format property="today" pattern="yyMMdd" locale="en"/>
+    </tstamp>
+    <replace file="${helpdir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
     <jar jarfile="${distdir}/pooka_help.jar" basedir="${helpdir}"/> 
   </target>
 

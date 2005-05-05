@@ -1,4 +1,4 @@
-050430 release
+050505 release
 --------------
 
 added -open and --from options to startup.  this allows you to invoke Pooka 

@@ -5,6 +5,9 @@
 *) "please reopen" message shouldn't come up when you've requested a
 	store/folder close. (caching, maybe normal uid?)
 
+*) folder-check reopen attempts should only happen if the store is open
+	or should be open.  they should not reopen the store.
+
 *) make sure non-ascii characters work in email text. -- and especially
 	non-iso8859.
 
