@@ -39,13 +39,10 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
     mWindowAdapter = new WindowAdapter() {
 	public void windowClosed(WindowEvent we) {
-	  System.err.println("window closed.");
 	  Window window = we.getWindow();
 	  if (window instanceof NewMessageFrame) {
-	    System.err.println("window is a NMF.  removing.");
 	    mNewMessages.remove(window);
 	    if (mNewMessages.isEmpty()) {
-	      System.err.println("exiting.");
 	      System.exit(0);
 	    }
 	  }
@@ -451,7 +448,6 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 	public void run() {
 	  synchronized(this) {
 	    if (mStatusPanel != null) {
-	      System.err.println("clearing infoPanel.");
 	      mStatusPanel.clear();
 	    }
 	  }

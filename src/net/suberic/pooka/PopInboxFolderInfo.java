@@ -109,14 +109,14 @@ public class PopInboxFolderInfo extends FolderInfo {
    * This method can also be used to reset the mode of an already 
    * opened folder.
    */
-  public void openFolder(int mode) throws MessagingException {
+  public void openFolder(int mode, boolean pConnectStore) throws MessagingException {
     // identical to FolderInfo.openFolder() except that we don't check
     // to make sure that the mode matches.
 
     if (Pooka.isDebug())
       System.out.println(this + ":  checking parent store.");
     
-    if (!getParentStore().isConnected()) {
+    if (!getParentStore().isConnected() && pConnectStore) {
       if (Pooka.isDebug())
 	System.out.println(this + ":  parent store isn't connected.  trying connection.");
       getParentStore().connectStore();

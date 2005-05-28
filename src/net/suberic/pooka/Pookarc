@@ -526,6 +526,21 @@ ConnectionMonitor.popupMenu.Connect.Action=connection-connect
 ConnectionMonitor.popupMenu.Disconnect.Action=connection-disconnect
 ConnectionMonitor.popupMenu.Unavailable.Action=connection-unavailable
 
+FolderSelectorPane.popupMenu=Select
+FolderSelectorPane.popupMenu.Select.Action=select-folder
+FolderSelectorPane.popupMenu.Select.class=net.suberic.pooka.gui.FolderMenu
+
+MessageNotificationManager.popupMenu=NewMessage:OpenMessage:ClearStatus:Preferences:Exit
+MessageNotificationManager.popupMenu.NewMessage.Action=message-new
+MessageNotificationManager.popupMenu.OpenMessage.Action=message-open
+MessageNotificationManager.popupMenu.OpenMessage.class=net.suberic.pooka.gui.RecentMessageMenu
+MessageNotificationManager.popupMenu.ClearStatus.Action=status-clear
+MessageNotificationManager.popupMenu.Preferencese.Action=notification-prefs
+MessageNotificationManager.popupMenu.Exit.Action=message-file-exit
+
+
+# -- end popup menus.
+
 ConnectionMonitor.connectedIcon=/org/javalobby/icons/20x20png/TrafficGreen.png
 ConnectionMonitor.disconnectedIcon=/org/javalobby/icons/20x20png/TrafficRed.png
 ConnectionMonitor.unavailableIcon=/org/javalobby/icons/20x20png/TrafficOff.png
@@ -554,11 +569,6 @@ CryptoPanel.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/Caut
 
 CryptoPanel.hasAttachedkKey.Image=/org/javalobby/icons/20x20png/Key.png
 
-FolderSelectorPane.popupMenu=Select
-FolderSelectorPane.popupMenu.Select.Action=select-folder
-FolderSelectorPane.popupMenu.Select.class=net.suberic.pooka.gui.FolderMenu
-
-# -- end popup menus.
 
 CachedMessages.notCached.foregroundColor=-65536
 
@@ -1138,7 +1148,7 @@ NewAccountPooka.optionPanel.mbox.scopeRoot=NewAccountPooka
 
 FolderSelectorPane.inputButton.image=/net/suberic/util/gui/images/More.gif
 
-Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent:Header:Cached:Available
+Search.searchTerms=Subject:Body:Flagged:From:To:CC:ToOrCC:Received:Sent:Seen:Answered:Deleted:Draft:Recent:Header:Cached:Available:Spam
 Search.searchTerms.Answered.class=javax.mail.search.FlagTerm
 Search.searchTerms.Answered.flag=answered
 Search.searchTerms.Answered.type=Boolean
@@ -1176,6 +1186,8 @@ Search.searchTerms.Sent.class=javax.mail.search.SentDateTerm
 Search.searchTerms.Sent.type=Date
 Search.searchTerms.Cached.class=net.suberic.pooka.filter.CachedSearchTerm
 Search.searchTerms.Cached.type=Boolean
+Search.searchTerms.Spam.class=net.suberic.pooka.filter.SpamSearchTerm
+Search.searchTerms.Spam.type=Boolean
 Search.searchTerms.Available.class=net.suberic.pooka.filter.AvailableSearchTerm
 Search.searchTerms.Available.type=Boolean
 Search.searchTerms.DeleteInProgress.class=net.suberic.pooka.filter.DeleteInProgressSearchTerm

@@ -1,12 +1,41 @@
+*) add taskbar support on gnome, windows, and mac?
+  started.  add in open message support?
+  add support for showing disconnection messages?
+  add preferences dialog
+  add start / bring up pooka
+  add exit pooka
+  add starting pooka as just a service.
+  add disconnect/offline mode to right-click menu
+  bug:  first call of right-click menu vanishes immediately.
+  trayicon support:
+	*) add message display timeout support
+	*) fix resizing code -- should keep ratio
+	*) fix tooltip display code so it doesn't show off screen
+  	*) ?? gnome focus stealing? -- see if you can make it so the update
+		doesn't move focus from other random window.
+
+*) see if we can make pooka start up on correct virtual desktop
+
 *) add a spell checker -- jazzy????
 
-*) virtual folder support <sigh>
+*) bug:  right-clicking on 3rd field in sent folder results in an 
+	empty menu.
 
 *) "please reopen" message shouldn't come up when you've requested a
 	store/folder close. (caching, maybe normal uid?)
 
 *) folder-check reopen attempts should only happen if the store is open
 	or should be open.  they should not reopen the store.
+
+*) status messages should disappear after a while.
+*) status messages:  make them appear and disappear at appropriate times.
+	-- Comparing new messages to current list... never goes away.
+
+-----------
+
+*) virtual folder support <sigh>
+
+*) add plugin for spam checker?
 
 *) make sure non-ascii characters work in email text. -- and especially
 	non-iso8859.
@@ -64,6 +93,9 @@
 	the closing, the previously-loaded messages all go to 'loading'.
 
 -----
+
+*) consider:  move stuff from the bottom status area to the toolbar area.  or
+   at least figure out something to use all that space for.
 
 *) test w/gnu javamail -- ???
 *) test w/javamail 1.3.2.
@@ -195,8 +227,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 ------
 
-*) add plugin for spam checker?
-
 *) add mrpostman support(?)
 
 *) printing
@@ -229,8 +259,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) add help for config stuff.
 
-*) status messages:  make them appear and disappear at appropriate times.
-	-- Comparing new messages to current list... never goes away.
 
 -------
 

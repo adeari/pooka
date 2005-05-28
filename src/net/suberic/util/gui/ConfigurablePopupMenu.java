@@ -129,6 +129,8 @@ public class ConfigurablePopupMenu extends JPopupMenu implements ConfigurableUI 
 	} catch (Exception e) {
 	  // if we get any errors, just create a plain 
 	  // ConfigurableMenu.
+	  System.err.println("Unable to create menu with class " + vars.getProperty(menuID + "." + menuItemID + ".class", "net.suberic.util.gui.ConfigurableMenu") + ":  " + e.getMessage());
+	  e.printStackTrace();
 	  m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
 	}
       }

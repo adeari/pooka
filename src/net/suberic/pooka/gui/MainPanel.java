@@ -11,10 +11,16 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import javax.mail.Session;
 import javax.mail.MessagingException;
+import javax.mail.event.MessageCountEvent;
 import javax.help.*;
+import java.util.logging.Logger;
+
 import net.suberic.pooka.MailQueue;
 import net.suberic.pooka.UserProfile;
 import net.suberic.util.gui.*;
+
+import org.jdesktop.jdic.tray.TrayIcon;
+import org.jdesktop.jdic.tray.SystemTray;
 
 /**
  * The main panel for PookaMail
@@ -33,20 +39,14 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   private MailQueue mailQueue;
   private UserProfile currentUser = null;
   private ConfigurableKeyBinding keyBindings;
+  private MessageNotificationManager mMessageNotificationManager;
 
   protected PookaFocusManager focusManager;
 
-  private boolean newMessageFlag = false;
-  private String standardTitle = Pooka.getProperty("Title", "Pooka");
-  private String newMessageTitle = Pooka.getProperty("Title.withNewMessages", "* Pooka *");
-  
   // status
   private static int CONTENT_LAST = 0;
   private static int FOLDER_LAST = 5;
   
-  private ImageIcon standardIcon = null;
-  private ImageIcon newMessageIcon = null;
-
   public MainPanel(JFrame frame) {
     super(JSplitPane.HORIZONTAL_SPLIT);
     
@@ -88,28 +88,15 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
     
     Pooka.getHelpBroker().enableHelpKey(this, "pooka.intro", Pooka.getHelpBroker().getHelpSet());
-    
-    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
-    if (standardUrl != null) {
-      standardIcon = new ImageIcon(standardUrl);
-      setCurrentIcon(standardIcon.getImage());
-    }
-    
-    java.net.URL newMessageUrl = this.getClass().getResource(Pooka.getProperty("Pooka.newMessageIcon", "images/PookaNewMessageIcon.gif")); 
-    if (newMessageUrl != null) {
-      newMessageIcon = new ImageIcon(newMessageUrl);
-    }
-    
+
     getParentFrame().addWindowListener(new WindowAdapter() {
-	public void windowActivated(WindowEvent e) {
-	  setNewMessageFlag(false);
-	}
-	
 	public void windowClosing(WindowEvent e) {
 	  exitPooka(1);
 	}
       });
-    
+
+    mMessageNotificationManager = new MessageNotificationManager(this);
+
     focusManager = new PookaFocusManager();
 
     this.addFocusListener(new FocusAdapter() {
@@ -195,7 +182,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     mainToolbar.setActive(currentActions);
     contentPanel.refreshActiveMenus();
     keyBindings.setActive(currentActions);
-    setNewMessageFlag(false);
+    getMessageNotificationManager().clearNewMessageFlag();
   }
   
   /**
@@ -212,31 +199,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       currentUser = selectedProfile;
     } else {
       currentUser = UserProfile.getDefaultProfile();
-    }
-  }
-  
-  /**
-   * This resets the title of the main Frame to have the newMessageFlag
-   * or not, depending on if there are any new messages or not.
-   */
-  protected void resetFrameTitle() {
-    String currentTitle = getParentFrame().getTitle();
-    Image currentIcon = getCurrentIcon();
-    
-    if (getNewMessageFlag()) {
-      if (!currentTitle.equals(newMessageTitle))
-	getParentFrame().setTitle(newMessageTitle);
-      
-      if (currentIcon != getNewMessageIcon()) {
-	setCurrentIcon(getNewMessageIcon());
-      }
-    } else {
-      if (!currentTitle.equals(standardTitle))
-	getParentFrame().setTitle(standardTitle);
-      
-      if (currentIcon != getStandardIcon()) {
-	setCurrentIcon(getStandardIcon());
-      }
     }
   }
   
@@ -334,6 +296,13 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     return ! cancel;
   }
 
+  /**
+   * Called when a FolderNode receives a new message.
+   */
+  public void notifyNewMessagesReceived(MessageCountEvent e, String pFolderId) {
+    getMessageNotificationManager().notifyNewMessagesReceived(e, pFolderId);
+  }
+
     // Accessor methods.
     // These shouldn't all be public.
 
@@ -387,53 +356,22 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	return mailQueue;
     }
 
-    public boolean getNewMessageFlag() {
-	return newMessageFlag;
-    }
-
-    public void setNewMessageFlag(boolean newValue) {
-	newMessageFlag = newValue;
-	resetFrameTitle();
-    }
-
     public Action[] getDefaultActions() {
 	return defaultActions;
     }
 
+  /**
+   * Returns the MessageNotificationManager for this panel.
+   */
+  public MessageNotificationManager getMessageNotificationManager() {
+    return mMessageNotificationManager;
+  }
     /**
      * Find the hosting frame, for the file-chooser dialog.
      */
     public JFrame getParentFrame() {
 	return (JFrame) getTopLevelAncestor();
     }
-
-  /**
-   * Get the standard icon for Pooka.
-   */
-  public Image getStandardIcon() {
-    return standardIcon.getImage();
-  }
-
-  /**
-   * Get the new message icon for Pooka.
-   */
-  public Image getNewMessageIcon() {
-    return newMessageIcon.getImage();
-  }
-
-  /**
-   * Gets the current icon for the frame.
-   */
-  public Image getCurrentIcon() {
-    return getParentFrame().getIconImage();
-  }
-
-  /**
-   * Sets the current icon for the frame.
-   */
-  public void setCurrentIcon(Image newIcon) {
-    getParentFrame().setIconImage(newIcon);
-  }
 
     //-----------actions----------------
     // Actions supported by the main Panel itself.  These should always
@@ -759,8 +697,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       if ((newValue == null && oldValue == null) || newValue instanceof JFrame) {
 	passFocus();
       } else {
-	refreshActiveMenus();
-	refreshCurrentUser();
+	// see if the new value is actually part of this frame.
+	if (newValue != null && newValue instanceof Component) {
+	  Window parentWindow = SwingUtilities.getWindowAncestor(MainPanel.this);
+	  Window componentParentWindow = SwingUtilities.getWindowAncestor((Component) newValue);
+	  if (parentWindow == componentParentWindow) {
+	    refreshActiveMenus();
+	    refreshCurrentUser();
+	  } else {
+	    java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("component " + newValue + " got focus, but it's not part of the main window.  Ignoring.");
+	  }
+	}
       }
     }
     

@@ -196,13 +196,13 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * This method can also be used to reset the mode of an already 
    * opened folder.
    */
-  public void openFolder(int mode) throws MessagingException {
+  public void openFolder(int mode, boolean pConnectStore) throws MessagingException {
     try {
       if (Pooka.isDebug())
 	System.out.println(this + ":  checking parent store.");
       
       
-      if (!getParentStore().isConnected()) {
+      if (!getParentStore().isConnected() && pConnectStore) {
 	if (Pooka.isDebug())
 	  System.out.println(this + ":  parent store isn't connected.  trying connection.");
 	getParentStore().connectStore();

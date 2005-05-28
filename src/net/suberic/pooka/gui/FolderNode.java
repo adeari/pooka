@@ -53,12 +53,13 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     folderInfo.addMessageCountListener(new MessageCountAdapter() {
 	public void messagesAdded(MessageCountEvent e) {
+	  if ( folderInfo.notifyNewMessagesMain()) {
+	    Pooka.getMainPanel().notifyNewMessagesReceived(e, getFolderInfo().getFolderID());
+	  }
+	  final MessageCountEvent event = e;
 	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
 	      public void run() {
 		updateNode();
-		if ( folderInfo.notifyNewMessagesMain()) {
-		  Pooka.getMainPanel().setNewMessageFlag(true);
-		}
 	      }
 	    });
 	}
@@ -444,7 +445,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       getFolderInfo().loadAllMessages();
       
       if (! getFolderInfo().isSortaOpen() || (pReconnect && ! getFolderInfo().isConnected())) {
-	getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE);
+	getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE, pReconnect);
       }
       
       int firstUnread = -1;

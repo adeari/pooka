@@ -457,12 +457,26 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * opened folder.
    */
   public void openFolder(int mode) throws MessagingException {
+    openFolder(mode, true);
+  }
+
+  /**
+   * This method opens the Folder, and sets the FolderInfo to know that
+   * the Folder should be open.  You should use this method instead of
+   * calling getFolder().open(), because if you use this method, then
+   * the FolderInfo will try to keep the Folder open, and will try to
+   * reopen the Folder if it gets closed before closeFolder is called.
+   *
+   * This method can also be used to reset the mode of an already 
+   * opened folder.
+   */
+  public void openFolder(int mode, boolean pConnectStore) throws MessagingException {
     //System.err.println("timing:  opening folder " + getFolderID());
     //long currentTime = System.currentTimeMillis();
-    
+
     getLogger().log(Level.FINE, this + ":  checking parent store.");
     
-    if (!getParentStore().isConnected()) {
+    if (!getParentStore().isConnected() && pConnectStore) {
       getLogger().log(Level.FINE, this + ":  parent store isn't connected.  trying connection.");
       getParentStore().connectStore();
     }
@@ -524,7 +538,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     public void openAllFolders(int mode) {
       try {
-	openFolder(mode);
+	openFolder(mode, false);
       } catch (MessagingException me) {
       }
       
@@ -1994,11 +2008,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	      matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
 	    }
 	    
-	    final VirtualFolderInfo vfi = new VirtualFolderInfo(matchingMessages, parentFolders);
+	    final SearchFolderInfo sfi = new SearchFolderInfo(matchingMessages, parentFolders);
 	    
 	    Runnable runMe = new Runnable() {
 		public void run() {
-		  FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(vfi);
+		  FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(sfi);
 		  fdui.openFolderDisplay();
 		}
 	      };

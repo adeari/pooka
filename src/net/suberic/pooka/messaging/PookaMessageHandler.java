@@ -117,7 +117,8 @@ public class PookaMessageHandler extends Thread {
 	    NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
 	    
 	    MimeMessage mm = new MimeMessage(Pooka.getDefaultSession());
-	    mm.setRecipients(Message.RecipientType.TO, fAddress);
+	    if (fAddress != null)
+	      mm.setRecipients(Message.RecipientType.TO, fAddress);
 	    
 	    NewMessageInfo info = new NewMessageInfo(mm);
 	    if (fProfile != null)

@@ -15,8 +15,10 @@
   <property name="javahelp_cp" value="${importdir}/jh.jar"/>
   <property name="crypto_cp" value="${importdir}/javamail-crypto.jar"/>
   <property name="icejni_cp" value="${importdir}/icejni.jar"/>
+  <property name="jasen_cp" value="${importdir}/jasen.jar"/>
+  <property name="jdic_cp" value="${importdir}/jdic.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}:${crypto_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}:${crypto_cp}:${jasen_cp}:${jdic_cp}"/> 
 
 <!-- libaries that will get included in the distribution -->
   <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
