@@ -1315,6 +1315,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This copies the given messages to the given FolderInfo.
    */
   public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+    if (targetFolder == null) {
+      throw new MessagingException(Pooka.getProperty("error.null", "Error: null folder")); 
+    } else if (targetFolder.getStatus() == INVALID) {
+      throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + targetFolder.getFolderID());
+    }
+    
     if (! targetFolder.isAvailable()) 
       targetFolder.loadFolder();
 
