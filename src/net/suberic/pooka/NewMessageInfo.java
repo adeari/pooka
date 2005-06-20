@@ -122,7 +122,21 @@ public class NewMessageInfo extends MessageInfo {
 	  int attachmentCount = attachments.getAttachments().size();
 	  for (int i = 0; i < attachmentCount; i++) {
 	    factory.showStatusMessage(attachmentMessage + i + ofMessage + attachmentCount);
-	    multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
+	    Attachment currentAttachment = (Attachment) attachments.getAttachments().get(i);
+	    if (currentAttachment instanceof MBPAttachment)
+	      multipart.addBodyPart(((MBPAttachment) currentAttachment).getMimeBodyPart());
+	    else {
+	      MimeBodyPart attachmentMbp = new MimeBodyPart();
+	      //attachmentMbp.setContent(currentAttachment.getContent(), currentAttachment.getMimeType().toString());
+    
+	      DataHandler dh = currentAttachment.getDataHandler();
+	      attachmentMbp.setFileName(currentAttachment.getName());
+	      attachmentMbp.setDescription(currentAttachment.getName());
+	      attachmentMbp.setDataHandler( dh );
+	      attachmentMbp.setHeader("Content-Type", currentAttachment.getMimeType().toString());
+    
+	      multipart.addBodyPart(attachmentMbp);
+	    }
 	  }
 	}
 	
@@ -338,7 +352,14 @@ public class NewMessageInfo extends MessageInfo {
    */
   public String getTextPart(boolean showFullHeaders) {
     try {
-      return (String) message.getContent();
+      Object content = message.getContent();
+      if (content instanceof String)
+	return (String) content;
+      else if (content instanceof Multipart) {
+	AttachmentBundle bundle = MailUtilities.parseAttachments((Multipart) content);
+	return bundle.getTextPart(false, false, 10000, getTruncationMessage());
+      } else
+	return null;
     } catch (java.io.IOException ioe) {
       // since this is a NewMessageInfo, there really shouldn't be an
       // IOException
@@ -347,19 +368,60 @@ public class NewMessageInfo extends MessageInfo {
 	    // since this is a NewMessageInfo, there really shouldn't be a
       // MessagingException
       return null;
-    }
+    } 
   }
   
   /**
    * Marks the message as a draft message and then saves it to the outbox
    * folder given.
    */
-  public void saveDraft(FolderInfo outboxFolder) throws MessagingException {
+  public void saveDraft(FolderInfo outboxFolder, UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException {
+    net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
+    
+    MimeMessage mMsg = (MimeMessage) message;
+    
+    factory.showStatusMessage(Pooka.getProperty("info.sendMessage.settingHeaders", "Setting headers..."));
+    
+    Enumeration individualHeaders = headers.getAllHeaders();
+    while(individualHeaders.hasMoreElements()) {
+      Header currentHeader = (Header) individualHeaders.nextElement();
+      mMsg.setHeader(currentHeader.getName(), currentHeader.getValue());
+    }
+    
+    if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
+      messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
+    
+    factory.showStatusMessage(Pooka.getProperty("info.sendMessage.addingMessageText", "Parsing message text..."));
+    if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
+      MimeBodyPart mbp = new MimeBodyPart();
+      mbp.setContent(messageText, messageContentType);
+      MimeMultipart multipart = new MimeMultipart();
+      multipart.addBodyPart(mbp);
+      
+      // i should really use the text parsing code for this, but...
+      String attachmentMessage=Pooka.getProperty("info.sendMessage.addingAttachment.1", "Adding attachment ");
+      String ofMessage = Pooka.getProperty("info.sendMessage.addingAttachment.2", " of ");
+      int attachmentCount = attachments.getAttachments().size();
+      for (int i = 0; i < attachmentCount; i++) {
+	factory.showStatusMessage(attachmentMessage + i + ofMessage + attachmentCount);
+	multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
+      }
+      
+      factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
+      multipart.setSubType("mixed");
+      getMessage().setContent(multipart);
+      getMessage().saveChanges();
+    } else {
+      factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
+      getMessage().setContent(messageText, messageContentType);
+    }
+    
+    getMessage().setSentDate(new java.util.Date(System.currentTimeMillis()));
+    
     getMessage().setFlag(Flags.Flag.DRAFT, true);
-
     outboxFolder.appendMessages(new MessageInfo[] { this });
   }
-
+  
   /**
    * The full map of Messages to be sent, which in turn map to the
    * recipients they will go to.  If there is no Address array as the

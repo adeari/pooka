@@ -6,7 +6,7 @@ public class MultiValueIcon extends BooleanIcon {
     String recentAndUnseenFile, justUnseenFile;
 
     public MultiValueIcon(boolean isSeen, boolean isRecent, String recentAndUnseen, String justUnseen ) {
-	super (isSeen, recentAndUnseen);
+	super (isSeen, recentAndUnseen, "MultiValue");
 	seen = isSeen;
 	recent = isRecent;
 	recentAndUnseenFile = recentAndUnseen;

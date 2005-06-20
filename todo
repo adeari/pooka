@@ -1,5 +1,14 @@
+*)  fix save as draft.
+	basically works.  needs:  better display of draft messages
+	option not to delete draft messsage 
+3)  do jdic stuff.
+
+*) undelete?
+
 *) add taskbar support on gnome, windows, and mac?
-  started.  add in open message support?
+  add in open message support?
+	make the display nice?
+	make it clear automatically?
   add support for showing disconnection messages?
   add preferences dialog
   add start / bring up pooka
@@ -16,11 +25,6 @@
 
 *) see if we can make pooka start up on correct virtual desktop
 
-*) add a spell checker -- jazzy????
-
-*) bug:  right-clicking on 3rd field in sent folder results in an 
-	empty menu.
-
 *) "please reopen" message shouldn't come up when you've requested a
 	store/folder close. (caching, maybe normal uid?)
 
@@ -32,6 +36,8 @@
 	-- Comparing new messages to current list... never goes away.
 
 -----------
+
+*) add a spell checker -- jazzy????
 
 *) virtual folder support <sigh>
 

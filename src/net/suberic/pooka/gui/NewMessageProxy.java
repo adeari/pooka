@@ -215,6 +215,8 @@ public class NewMessageProxy extends MessageProxy {
   public void attach() {
     File[] f = getFileToAttach();
     if (f != null) {
+      NewMessageUI nmui = getNewMessageUI();
+      nmui.setModified(true);
       for (int i = 0; i < f.length; i++)
 	attachFile(f[i]);
     }
@@ -264,29 +266,56 @@ public class NewMessageProxy extends MessageProxy {
    * configured.
    */
   public void saveDraft() {
-    UserProfile profile = getNewMessageUI().getSelectedProfile();
-    
-    OutgoingMailServer mailServer = profile.getMailServer();
+    // thread:  AwtEvent
 
-    final FolderInfo fi = mailServer.getOutbox();
-    
-    
-    if (fi != null) {
-      net.suberic.util.thread.ActionThread folderThread = fi.getFolderThread();
-      Action runMe = new AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent e) {
-	    try {
-	      getNewMessageInfo().saveDraft(fi);
-	      saveDraftSucceeded(fi);
-	    } catch (MessagingException me) {
-	      saveDraftFailed(me);
-	    }
-	  }
-	};
-      folderThread.addToQueue(runMe, new java.awt.event.ActionEvent(this, 0, "saveDraft"));
-    } else {
-      saveDraftFailed(new MessagingException ("No outbox specified for default mailserver " + mailServer.getItemID()));
+    synchronized(this) {
+      if (sendLock) {
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.sendMessage.alreadySendingMessage", "Already sending message."));
+	return;
+      } else
+	sendLock = true;
     }
+    
+    try {
+      if (getNewMessageUI() != null) { 
+	getNewMessageUI().setBusy(true);
+
+	final UserProfile profile = getNewMessageUI().getSelectedProfile();
+	final InternetHeaders headers = getNewMessageUI().getMessageHeaders();
+	
+	final String messageText = getNewMessageUI().getMessageText();
+	
+	final String messageContentType = getNewMessageUI().getMessageContentType();
+	
+	OutgoingMailServer mailServer = profile.getMailServer();
+
+	final FolderInfo fi = mailServer.getOutbox();
+    
+	if (fi != null) {
+	  net.suberic.util.thread.ActionThread folderThread = fi.getFolderThread();
+	  Action runMe = new AbstractAction() {
+	      public void actionPerformed(java.awt.event.ActionEvent e) {
+		try {
+		  getNewMessageInfo().saveDraft(fi, profile, headers, messageText, messageContentType);
+		  saveDraftSucceeded(fi);
+		} catch (MessagingException me) {
+		  saveDraftFailed(me);
+		}
+	      }
+	    };
+	  folderThread.addToQueue(runMe, new java.awt.event.ActionEvent(this, 0, "saveDraft"));
+	} else {
+	  saveDraftFailed(new MessagingException ("No outbox specified for default mailserver " + mailServer.getItemID()));
+	}
+      } else {
+	sendLock = false;
+      }
+    } catch (MessagingException me) {
+      sendLock=false;
+      getMessageUI().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+      getNewMessageUI().setBusy(false);
+    } 
+    
   }
 
   /**
@@ -306,6 +335,7 @@ public class NewMessageProxy extends MessageProxy {
 	};
       SwingUtilities.invokeLater(runMe);
     }
+    sendLock=false;
 
   }
 
@@ -318,12 +348,13 @@ public class NewMessageProxy extends MessageProxy {
     if (nmui != null) {
       Runnable runMe = new Runnable() {
 	  public void run() {
-	    getMessageUI().showError(Pooka.getProperty("error.MessageUI.saveDraftFailed", "Failed to save message.") + "\n" + me.getMessage());
+	    getMessageUI().showError(Pooka.getProperty("error.MessageUI.saveDraftFailed", "Failed to save message."), me);
 	    nmui.setBusy(false);
 	  }
 	};
       SwingUtilities.invokeLater(runMe);
     }
+    sendLock=false;
   }
   
 

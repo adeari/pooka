@@ -192,7 +192,7 @@ public class MessageInfo {
    * about any Email Header) from the Message.
    */
   public Object getMessageProperty(String prop) throws MessagingException {
-    if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
+    if (getFolderInfo() != null && Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
       Logger folderLogger = getFolderInfo().getLogger();
       if (folderLogger.isLoggable(Level.WARNING)) {
 	folderLogger.log(Level.WARNING, "Getting Message Property not on Folder Thread.");

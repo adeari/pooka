@@ -5,16 +5,18 @@ import java.util.MissingResourceException;
 import java.awt.Component;
 
 public class BooleanIcon implements TableCellIcon {
-    public boolean bool;
-    public String iconFile;
-    public static HashMap labelTable = new HashMap();
-    protected static Component blankImage = new JLabel();
+  public boolean bool;
+  public String iconFile;
+  public static HashMap labelTable = new HashMap();
+  protected static Component blankImage = new JLabel();
+  String mIconId = "";
 
-    public BooleanIcon(boolean boolValue, String newIconFile) {
-	bool=boolValue;
-	iconFile = newIconFile;
-	((JLabel)blankImage).setOpaque(true);
-    }
+  public BooleanIcon(boolean boolValue, String newIconFile, String pId) {
+    bool=boolValue;
+    iconFile = newIconFile;
+    ((JLabel)blankImage).setOpaque(true);
+    mIconId = pId;
+  }
 
     /**
      * This returns a JLabel.  If the value of this BooleanIcon is true,
@@ -68,8 +70,22 @@ public class BooleanIcon implements TableCellIcon {
 	throw new ClassCastException("object is not a BooleanIcon.");
     }
 
-    public String toString() {
-	return "";
-    }
+  public String toString() {
+    return "";
+  }
+  
+  /**
+   * Returns the icon id.
+   */
+  public String getIconId() {
+    return mIconId;
+  }
+
+  /**
+   * Returns the icon value.
+   */
+  public boolean iconValue() {
+    return bool;
+  }
 
 }

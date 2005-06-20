@@ -2014,7 +2014,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	      matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
 	    }
 	    
-	    final SearchFolderInfo sfi = new SearchFolderInfo(matchingMessages, parentFolders);
+	    final VirtualFolderInfo sfi = new VirtualFolderInfo(matchingMessages, parentFolders);
 	    
 	    Runnable runMe = new Runnable() {
 		public void run() {

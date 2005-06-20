@@ -56,11 +56,11 @@ public class MessageNotificationManager {
       setCurrentIcon(mStandardIcon);
     }
 
-    java.net.URL standardTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardTrayIcon", "images/PookaIcon_20x20.png")); 
+    java.net.URL standardTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardTrayIcon", "images/PookaIcon.gif")); 
     if (standardTrayUrl != null) {
       mStandardTrayIcon = new ImageIcon(standardTrayUrl);
       mTrayIcon = new TrayIcon(mStandardTrayIcon);
-      //mTrayIcon.setIconAutoSize(true);
+      mTrayIcon.setIconAutoSize(true);
       mTrayIcon.setPopupMenu(createPopupMenu());
       mTrayIcon.addActionListener(new AbstractAction() {
 	  public void actionPerformed(ActionEvent e) {
@@ -290,7 +290,7 @@ public class MessageNotificationManager {
 	  sender.openNewEmail(null, null);
 	}
       } catch (Exception exc) {
-	mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.ERROE_MESSAGE_TYPE);
+	mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.ERROR_MESSAGE_TYPE);
       } finally {
 	if (sender != null && sender.isConnected())
 	  sender.closeConnection();

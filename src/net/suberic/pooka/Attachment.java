@@ -219,7 +219,7 @@ public class Attachment {
    * bytes.
    */
   String getText(int maxLength, String truncationMessage) throws IOException {
-    if (maxLength >= size) {
+    if (maxLength > 0 && maxLength >= size) {
       try {
 	Object o = getDataHandler().getContent();
 	if (o instanceof String)
@@ -360,6 +360,11 @@ public class Attachment {
     }
   }
   
-  
+  /**
+   * Returns the Headers for this Attachment.
+   */
+  public InternetHeaders getHeaders() {
+    return headers;
+  }
 }
 

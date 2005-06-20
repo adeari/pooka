@@ -402,9 +402,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	  if (propertyName.startsWith("FLAG")) 
 	    returnValue.put(newProperty, getMessageFlag(propertyName));
 	  else if (propertyName.equals("attachments"))
-	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "")));
+	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", ""), propertyName));
 	  else if (propertyName.equals("crypto"))
-	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "")));
+	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", ""), propertyName));
 	  else if (propertyName.equalsIgnoreCase("subject")) 
 	    returnValue.put(newProperty, new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
 	  else if (propertyName.equalsIgnoreCase("from")) 
@@ -673,27 +673,26 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * This gets a Flag property from the Message.
    */
-  
   public BooleanIcon getMessageFlag(String flagName) {
     try {
       if (flagName.equals("FLAG.ANSWERED") )
-	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Answered.icon", ""));
+	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Answered.icon", ""), flagName);
       else if (flagName.equals("FLAG.DELETED"))
-	return new BooleanIcon(getMessageInfo().flagIsSet(flagName),Pooka.getProperty("FolderTable.Deleted.icon", ""));
+	return new BooleanIcon(getMessageInfo().flagIsSet(flagName),Pooka.getProperty("FolderTable.Deleted.icon", ""), flagName);
       else if (flagName.equals("FLAG.DRAFT"))
-	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Draft.icon", ""));
+	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Draft.icon", ""), flagName);
       else if (flagName.equals("FLAG.FLAGGED"))
-	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Flagged.icon", ""));
+	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Flagged.icon", ""), flagName);
       else if (flagName.equals("FLAG.RECENT"))
-	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Recent.icon", ""));
+	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Recent.icon", ""), flagName);
       else if (flagName.equals("FLAG.NEW")) 
 	return new MultiValueIcon(getMessageInfo().flagIsSet("FLAG.SEEN"), getMessageInfo().flagIsSet("FLAG.RECENT"), Pooka.getProperty("FolderTable.New.recentAndUnseenIcon", ""), Pooka.getProperty("FolderTable.New.justUnseenIcon", ""));
       else if (flagName.equals("FLAG.SEEN"))
-	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Seen.icon", ""));
+	return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Seen.icon", ""), flagName);
       else
-	return new BooleanIcon(false, "");
+	return new BooleanIcon(false, "", flagName);
     } catch (MessagingException me) {
-      return new BooleanIcon(false, "");
+      return new BooleanIcon(false, "", flagName);
     }
   }
   

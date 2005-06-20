@@ -333,10 +333,18 @@ public class FolderDisplayPanel extends JPanel {
 	    
 	    MessageProxy selectedMessage = getSelectedMessage();
 	    if (selectedMessage != null && isEnabled()) {
-	      if (columnIndex == 2) 
-		selectedMessage.showAttachmentPopupMenu(getMessageTable(), e);
-	      else
+	      Object o = getMessageTable().getValueAt(rowIndex, columnIndex);
+	      if (o != null && o instanceof BooleanIcon) {
+		BooleanIcon bi = (BooleanIcon) o;
+		if (bi.getIconId().equalsIgnoreCase("attachments") && bi.iconValue()) {
+		  selectedMessage.showAttachmentPopupMenu(getMessageTable(), e);
+		} else {
+		  selectedMessage.showPopupMenu(getMessageTable(), e);
+		  
+		}
+	      } else {
 		selectedMessage.showPopupMenu(getMessageTable(), e);
+	      }
 	    }
 	  }
 	}

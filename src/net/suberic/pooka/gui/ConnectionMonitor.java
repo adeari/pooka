@@ -15,7 +15,7 @@ import net.suberic.util.gui.ConfigurablePopupMenu;
  * @author Allen Petersen
  * @version $Revision$
  */
-public class ConnectionMonitor extends JPanel implements NetworkConnectionListener, net.suberic.util.ItemListChangeListener {
+public class ConnectionMonitor extends Box implements NetworkConnectionListener, net.suberic.util.ItemListChangeListener {
 
   /** the Image for CONNECTED connections. */
   public ImageIcon connectedImage = null;
@@ -45,6 +45,7 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
    * Creates a new, empty ConnectionMonitor.
    */
   public ConnectionMonitor() {
+    super(BoxLayout.X_AXIS);
     loadImages();
     setupComponents();
   }
@@ -81,6 +82,9 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
       });
 
     statusPanel.setIcon(connectedImage);
+    statusPanel.getInsets().set(0,0,0,0);
+    comboBox.getInsets().set(0,0,0,0);
+    this.getInsets().set(0,0,0,0);
     this.add(comboBox);
     this.add(statusPanel);
   }
@@ -264,4 +268,6 @@ public class ConnectionMonitor extends JPanel implements NetworkConnectionListen
       }
     }
   }
+
+
 }
