@@ -95,7 +95,11 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
       });
 
-    mMessageNotificationManager = new MessageNotificationManager(this);
+    try {
+      mMessageNotificationManager = new MessageNotificationManager(this);
+    } catch (Error e) {
+      // ignore.
+    }
 
     focusManager = new PookaFocusManager();
 
@@ -182,7 +186,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     mainToolbar.setActive(currentActions);
     contentPanel.refreshActiveMenus();
     keyBindings.setActive(currentActions);
-    getMessageNotificationManager().clearNewMessageFlag();
+    if (getMessageNotificationManager() != null)
+      getMessageNotificationManager().clearNewMessageFlag();
   }
   
   /**
@@ -300,7 +305,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
    * Called when a FolderNode receives a new message.
    */
   public void notifyNewMessagesReceived(MessageCountEvent e, String pFolderId) {
-    getMessageNotificationManager().notifyNewMessagesReceived(e, pFolderId);
+    if (getMessageNotificationManager() != null)
+      getMessageNotificationManager().notifyNewMessagesReceived(e, pFolderId);
   }
 
     // Accessor methods.
