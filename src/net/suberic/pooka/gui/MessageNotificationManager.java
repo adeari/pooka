@@ -290,7 +290,7 @@ public class MessageNotificationManager {
 	  sender.openNewEmail(null, null);
 	}
       } catch (Exception exc) {
-	mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.ERROR_MESSAGE_TYPE);
+	mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.WARNING_MESSAGE_TYPE);
       } finally {
 	if (sender != null && sender.isConnected())
 	  sender.closeConnection();
