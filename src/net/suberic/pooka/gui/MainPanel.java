@@ -95,11 +95,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	}
       });
 
-    try {
-      mMessageNotificationManager = new MessageNotificationManager(this);
-    } catch (Error e) {
-      // ignore.
-    }
+    configureNotificationManager();
 
     focusManager = new PookaFocusManager();
 
@@ -115,6 +111,27 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     
     // select the content panel.
     contentPanel.getUIComponent().requestFocus();
+  }
+
+  /**
+   * Sets the Notification manager as enabled or disabled.
+   */
+  void configureNotificationManager() {
+    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+      if (mMessageNotificationManager == null) {
+	try {
+	  mMessageNotificationManager = new MessageNotificationManager();
+	  mMessageNotificationManager.setMainPanel(this);
+	} catch (Error e) {
+	  System.err.println("Error starting up tray icon:  " + e.getMessage());
+	}
+      }
+    } else if (mMessageNotificationManager != null) {
+      // unset it.
+      mMessageNotificationManager.setMainPanel(null);
+      mMessageNotificationManager.dispose();
+    }
+    
   }
 
   /**

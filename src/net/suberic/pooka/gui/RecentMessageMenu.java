@@ -27,9 +27,9 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
     }
     
     this.setActionCommand(vars.getProperty(key + ".Action", "message-open"));
-    
+
     /*
-    MessageNotificationManager mnm = Pooka.getMainPanel().getMessageNotificationManager();
+    MessageNotificationManager mnm = Pooka.getMainPanel().getMessageNotificationManager(); 
     Map newMessageMap = mnm.getNewMessageMap();
     Iterator folders = newMessageMap.keySet().iterator();
     while (folders.hasNext()) {
@@ -37,6 +37,7 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
       buildFolderMenu(current, (List)newMessageMap.get(current));
     }
     */
+
   }
   
   /**
@@ -66,19 +67,23 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
     System.err.println("resetting...");
     removeAll();
     MessageNotificationManager mnm = Pooka.getMainPanel().getMessageNotificationManager();
-    Map newMessageMap = mnm.getNewMessageMap();
-    Iterator folders = newMessageMap.keySet().iterator();
-    while (folders.hasNext()) {
-      String current = (String) folders.next();
-      buildFolderMenu(current, (List)newMessageMap.get(current));
+    if (mnm != null) {
+      Map newMessageMap = mnm.getNewMessageMap();
+      Iterator folders = newMessageMap.keySet().iterator();
+      while (folders.hasNext()) {
+	String current = (String) folders.next();
+	buildFolderMenu(current, (List)newMessageMap.get(current));
+      }
     }
 
   }
   
+  /*
   public void addNotify() {
     reset();
 
     super.addNotify();
   }
+  */
   
 }

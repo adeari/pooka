@@ -42,10 +42,9 @@ public class MessageNotificationManager {
   private ImageIcon mNewMessageTrayIcon = null;
 
   /**
-   * Creates a new MessageNotificationManager for the given MainPanel.
+   * Creates a new MessageNotificationManager.
    */
-  public MessageNotificationManager(MainPanel pPanel) {
-    mPanel = pPanel;
+  public MessageNotificationManager() {
     mNewMessageMap = new HashMap();
 
     mDefaultActions = new Action[] { new NewMessageAction(), new ClearStatusAction() };
@@ -66,8 +65,9 @@ public class MessageNotificationManager {
 	  public void actionPerformed(ActionEvent e) {
 	    System.err.println("action:  " + e);
 	    mTrayIcon.displayMessage("Pooka", createStatusMessage(), TrayIcon.INFO_MESSAGE_TYPE);
-	    System.err.println("trying to bring frame to front.");
-	    Pooka.getMainPanel().getParentFrame().toFront();
+	    System.err.println("should be trying to bring frame to front, but not implemented yet.");
+	    //Pooka.getMainPanel().getParentFrame().toFront();
+	    //Pooka.getUIFactory().bringToFront();
 	  }
 	});
       
@@ -86,11 +86,6 @@ public class MessageNotificationManager {
 	mNewMessageTrayIcon = new ImageIcon(newMessageTrayUrl);
     }
     
-    getMainPanel().getParentFrame().addWindowListener(new WindowAdapter() {
-	public void windowActivated(WindowEvent e) {
-	  clearNewMessageFlag();
-	}
-      });
   }
 
   /**
@@ -100,13 +95,16 @@ public class MessageNotificationManager {
   protected void updateStatus() {
     synchronized(this) {
       if (getNewMessageFlag()) {
-	getMainPanel().getParentFrame().setTitle(mNewMessageTitle);
-	
+	if (getMainPanel() != null) {
+	  getMainPanel().getParentFrame().setTitle(mNewMessageTitle);
+	}
 	setCurrentIcon(getNewMessageIcon());
 	if (getTrayIcon() != null)
 	  getTrayIcon().setIcon(mNewMessageTrayIcon);
       } else {
-	getMainPanel().getParentFrame().setTitle(mStandardTitle);
+	if (getMainPanel() != null) {
+	  getMainPanel().getParentFrame().setTitle(mStandardTitle);
+	}
 	
 	setCurrentIcon(getStandardIcon());
 	if (getTrayIcon() != null)
@@ -218,6 +216,13 @@ public class MessageNotificationManager {
   }
   
   /**
+   * Disposes of this MessageNotificationManager.
+   */
+  public void dispose() {
+    /FIXME
+  }
+
+  /**
    * Returns the actions for this component.
    */
   public Action[] getActions() {
@@ -242,7 +247,8 @@ public class MessageNotificationManager {
    * Sets the current icon for the frame.
    */
   public void setCurrentIcon(ImageIcon newIcon) {
-    getMainPanel().getParentFrame().setIconImage(newIcon.getImage());
+    if (getMainPanel() != null) 
+      getMainPanel().getParentFrame().setIconImage(newIcon.getImage());
   }
 
   /**
@@ -257,6 +263,28 @@ public class MessageNotificationManager {
    */
   public MainPanel getMainPanel() {
     return mPanel;
+  }
+
+  WindowAdapter mAdapter = null;
+  /**
+   * Sets the MainPanel for this MNM.
+   */
+  public void setMainPanel(MainPanel pPanel) {
+    if (mPanel != pPanel) {
+      if (pPanel != null) {
+	pPanel.getParentFrame().removeWindowListener(mAdapter);
+	mAdapter = null;
+      }
+      mPanel = pPanel;
+
+      if (mPanel != null) {
+	mAdapter = new WindowAdapter() {
+	    public void windowActivated(WindowEvent e) {
+	      mMessageNotificationManager.clearNewMessageFlag();
+	    }
+	  };
+	mPanel.getParentFrame().addWindowListener(mAdapter);
+      }
   }
 
   /**
