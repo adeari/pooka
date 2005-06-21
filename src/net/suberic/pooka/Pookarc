@@ -12,7 +12,7 @@ Pooka.autoSelectFirstUnread=true
 Pooka.autoSelectFirstUnread.propertyType=Boolean
 
 Pooka.trayIcon.enabled=true
-Pooka.trayIcon.propertyType=Boolean
+Pooka.trayIcon.enabled.propertyType=Boolean
 
 Message.sendImmediately=true
 
@@ -538,8 +538,8 @@ MessageNotificationManager.popupMenu.NewMessage.Action=message-new
 MessageNotificationManager.popupMenu.OpenMessage.Action=message-open
 MessageNotificationManager.popupMenu.OpenMessage.class=net.suberic.pooka.gui.RecentMessageMenu
 MessageNotificationManager.popupMenu.ClearStatus.Action=status-clear
-MessageNotificationManager.popupMenu.Preferencese.Action=notification-prefs
-MessageNotificationManager.popupMenu.Exit.Action=message-file-exit
+MessageNotificationManager.popupMenu.Preferencese.Action=file-preferences
+MessageNotificationManager.popupMenu.Exit.Action=file-exit
 
 
 # -- end popup menus.

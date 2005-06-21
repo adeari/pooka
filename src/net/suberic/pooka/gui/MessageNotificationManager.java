@@ -47,7 +47,11 @@ public class MessageNotificationManager {
   public MessageNotificationManager() {
     mNewMessageMap = new HashMap();
 
-    mDefaultActions = new Action[] { new NewMessageAction(), new ClearStatusAction() };
+    mDefaultActions = new Action[] { 
+      new NewMessageAction(), 
+      new PreferencesAction(), 
+      new ExitPookaAction(), 
+      new ClearStatusAction() };
 
     java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
     if (standardUrl != null) {
@@ -219,7 +223,7 @@ public class MessageNotificationManager {
    * Disposes of this MessageNotificationManager.
    */
   public void dispose() {
-    /FIXME
+    //FIXME
   }
 
   /**
@@ -276,15 +280,16 @@ public class MessageNotificationManager {
 	mAdapter = null;
       }
       mPanel = pPanel;
-
+      
       if (mPanel != null) {
 	mAdapter = new WindowAdapter() {
 	    public void windowActivated(WindowEvent e) {
-	      mMessageNotificationManager.clearNewMessageFlag();
+	      clearNewMessageFlag();
 	    }
 	  };
 	mPanel.getParentFrame().addWindowListener(mAdapter);
       }
+    }
   }
 
   /**
@@ -372,6 +377,31 @@ public class MessageNotificationManager {
     
     public void actionPerformed(ActionEvent e) {
       clearNewMessageFlag();
+    }
+  }
+
+  class PreferencesAction extends AbstractAction {
+    
+    PreferencesAction() {
+      super("file-preferences");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      System.err.println("show preferences here.  :)");
+    }
+  }
+
+  class ExitPookaAction extends AbstractAction {
+    
+    ExitPookaAction() {
+      super("file-exit");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMainPanel() != null)
+	getMainPanel().exitPooka(0);
+      else
+	Pooka.exitPooka(0);
     }
   }
 

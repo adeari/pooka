@@ -30,6 +30,8 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
   WindowAdapter mWindowAdapter = null;
 
+  MessageNotificationManager mMessageNotificationManager;
+
   /**
    * Constructor.
    */
@@ -48,6 +50,14 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 	  }
 	}
       };
+
+    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+      try {
+	mMessageNotificationManager = new MessageNotificationManager();
+      } catch (Error e) {
+	System.err.println("Error starting up tray icon:  " + e.getMessage());
+      }
+    }
   }
   
   /**
