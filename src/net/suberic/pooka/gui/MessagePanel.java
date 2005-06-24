@@ -64,7 +64,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   
   // end internal class ExtendedDesktopManager
   
-  MainPanel mainPanel;
   JComponent UIComponent;
   ConfigurableKeyBinding keyBindings;
   boolean savingWindowLocations = false;
@@ -72,10 +71,9 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   MetalTheme currentTheme = null;
 
   /**
-   * Creates a new MessagePanel to go in the given MainPanel.
+   * Creates a new MessagePanel.
    */
-  public MessagePanel(MainPanel newMainPanel) {
-    mainPanel=newMainPanel;
+  public MessagePanel() {
     //this.setAutoscrolls(true);
     this.setSize(1000, 1000);
     
@@ -109,8 +107,8 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * Creates a new MessagePanel from an already created 
    * PreviewContentPanel.
    */
-  public MessagePanel(MainPanel newMainPanel, PreviewContentPanel pcp) {
-    this (newMainPanel);
+  public MessagePanel(PreviewContentPanel pcp) {
+    this ();
     
     // go through each folder on the PreviewContentPanel.
     
@@ -706,13 +704,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
 
   }  
 
-  /**
-   * Returns the MainPanel for this component.
-   */
-  public MainPanel getMainPanel() {
-    return Pooka.getMainPanel();
-  }
-  
   /**
    * Returns the UIComponent for this ContentPanel.
    */

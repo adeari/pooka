@@ -99,6 +99,7 @@ public class MessageNotificationManager {
   protected void updateStatus() {
     synchronized(this) {
       if (getNewMessageFlag()) {
+	System.err.println("updating status.");
 	if (getMainPanel() != null) {
 	  getMainPanel().getParentFrame().setTitle(mNewMessageTitle);
 	}
@@ -251,6 +252,9 @@ public class MessageNotificationManager {
    * Sets the current icon for the frame.
    */
   public void setCurrentIcon(ImageIcon newIcon) {
+    System.err.println("setting icon to " + newIcon.getImage() + " on " + getMainPanel());
+    if (getMainPanel() != null)
+      System.err.println("setting icon to " + newIcon.getImage() + " on " + getMainPanel().getParentFrame());
     if (getMainPanel() != null) 
       getMainPanel().getParentFrame().setIconImage(newIcon.getImage());
   }
@@ -288,8 +292,15 @@ public class MessageNotificationManager {
 	    }
 	  };
 	mPanel.getParentFrame().addWindowListener(mAdapter);
+	SwingUtilities.invokeLater(new Runnable() {
+	    public void run() {
+		updateStatus();
+	    }
+	  });
       }
     }
+
+    System.err.println("mainPanel now = " + mPanel);
   }
 
   /**
@@ -401,7 +412,7 @@ public class MessageNotificationManager {
       if (getMainPanel() != null)
 	getMainPanel().exitPooka(0);
       else
-	Pooka.exitPooka(0);
+	Pooka.exitPooka(0, this);
     }
   }
 

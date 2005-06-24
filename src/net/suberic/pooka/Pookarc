@@ -13,6 +13,7 @@ Pooka.autoSelectFirstUnread.propertyType=Boolean
 
 Pooka.trayIcon.enabled=true
 Pooka.trayIcon.enabled.propertyType=Boolean
+Pooka.exitToIcon=false
 
 Message.sendImmediately=true
 

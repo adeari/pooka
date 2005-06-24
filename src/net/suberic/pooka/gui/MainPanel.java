@@ -39,7 +39,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   private MailQueue mailQueue;
   private UserProfile currentUser = null;
   private ConfigurableKeyBinding keyBindings;
-  private MessageNotificationManager mMessageNotificationManager;
 
   protected PookaFocusManager focusManager;
 
@@ -50,18 +49,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   public MainPanel(JFrame frame) {
     super(JSplitPane.HORIZONTAL_SPLIT);
     
-    /*
-    SimpleAuthenticator auth = new SimpleAuthenticator(frame);
-    
-    session = Session.getDefaultInstance(System.getProperties(), auth);
-    
-    if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
-      session.setDebug(true);
-    */
     session = Pooka.getDefaultSession();
 
     mailQueue = new MailQueue(Pooka.getDefaultSession());
-    
+
   }
   
   /**
@@ -91,11 +82,9 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     getParentFrame().addWindowListener(new WindowAdapter() {
 	public void windowClosing(WindowEvent e) {
-	  exitPooka(1);
+	  exitPooka(0);
 	}
       });
-
-    configureNotificationManager();
 
     focusManager = new PookaFocusManager();
 
@@ -109,29 +98,13 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     // set the initial currentUser
     refreshCurrentUser();
     
+    // set up the MessageNotificationManager.
+    if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
+      Pooka.getUIFactory().getMessageNotificationManager().setMainPanel(this);
+    }
     // select the content panel.
     contentPanel.getUIComponent().requestFocus();
-  }
 
-  /**
-   * Sets the Notification manager as enabled or disabled.
-   */
-  void configureNotificationManager() {
-    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
-      if (mMessageNotificationManager == null) {
-	try {
-	  mMessageNotificationManager = new MessageNotificationManager();
-	  mMessageNotificationManager.setMainPanel(this);
-	} catch (Error e) {
-	  System.err.println("Error starting up tray icon:  " + e.getMessage());
-	}
-      }
-    } else if (mMessageNotificationManager != null) {
-      // unset it.
-      mMessageNotificationManager.setMainPanel(null);
-      mMessageNotificationManager.dispose();
-    }
-    
   }
 
   /**
@@ -203,8 +176,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     mainToolbar.setActive(currentActions);
     contentPanel.refreshActiveMenus();
     keyBindings.setActive(currentActions);
-    if (getMessageNotificationManager() != null)
-      getMessageNotificationManager().clearNewMessageFlag();
+    if (Pooka.getUIFactory().getMessageNotificationManager() != null)
+      Pooka.getUIFactory().getMessageNotificationManager().clearNewMessageFlag();
   }
   
   /**
@@ -277,7 +250,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       contentPanel.saveOpenFolders();
     }
     
-    Pooka.exitPooka(exitValue);
+    if (Pooka.getProperty("Pooka.exitToIcon", "false").equalsIgnoreCase("true")) {
+      net.suberic.pooka.StartupManager sm = new net.suberic.pooka.StartupManager(Pooka.getPookaManager());
+      sm.stopPookaToTray(this);
+    } else {
+      Pooka.exitPooka(exitValue, this);
+    }
   }
   
   /**
@@ -316,14 +294,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     return ! cancel;
-  }
-
-  /**
-   * Called when a FolderNode receives a new message.
-   */
-  public void notifyNewMessagesReceived(MessageCountEvent e, String pFolderId) {
-    if (getMessageNotificationManager() != null)
-      getMessageNotificationManager().notifyNewMessagesReceived(e, pFolderId);
   }
 
     // Accessor methods.
@@ -383,12 +353,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	return defaultActions;
     }
 
-  /**
-   * Returns the MessageNotificationManager for this panel.
-   */
-  public MessageNotificationManager getMessageNotificationManager() {
-    return mMessageNotificationManager;
-  }
     /**
      * Find the hosting frame, for the file-chooser dialog.
      */

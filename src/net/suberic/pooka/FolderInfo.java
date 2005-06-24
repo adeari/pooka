@@ -125,7 +125,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   protected boolean mNamespace = false;
 
   // the thread for connections to this folder.
-  protected ActionThread mFolderThread;
+  //protected ActionThread mFolderThread;
 
   /**
    * For subclasses.
@@ -315,10 +315,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       }
 
 
+      /*
       if (mFolderThread == null) {
 	mFolderThread = new ActionThread(getParentStore().getStoreID() + "." + getFolderID() + " - ActionThread");
 	mFolderThread.start();
       }
+      */
       
 
     } finally {

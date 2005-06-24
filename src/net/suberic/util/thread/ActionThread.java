@@ -140,6 +140,7 @@ public class ActionThread extends Thread {
   
   public void setStop(boolean newValue) {
     stopMe = newValue;
+    this.interrupt();
   }
 
   /**

@@ -44,7 +44,7 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
    * This builds the menu for each folder/message group.
    */
   protected void buildFolderMenu(String pFolderName, List pMessageList) {
-    MessageNotificationManager mnm = Pooka.getMainPanel().getMessageNotificationManager();
+    MessageNotificationManager mnm = Pooka.getUIFactory().getMessageNotificationManager();
     JMenu newMenu = new JMenu(pFolderName);
     for(int i = 0 ; i < pMessageList.size(); i++) {
       JMenuItem mi = new JMenuItem();
@@ -66,7 +66,7 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
   void reset() {
     System.err.println("resetting...");
     removeAll();
-    MessageNotificationManager mnm = Pooka.getMainPanel().getMessageNotificationManager();
+    MessageNotificationManager mnm = Pooka.getUIFactory().getMessageNotificationManager();
     if (mnm != null) {
       Map newMessageMap = mnm.getNewMessageMap();
       Iterator folders = newMessageMap.keySet().iterator();

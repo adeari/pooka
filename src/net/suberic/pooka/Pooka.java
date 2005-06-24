@@ -103,96 +103,22 @@ public class Pooka {
   /**
    * Exits Pooka.  Attempts to close all stores first.
    */
-  public static void exitPooka(int exitValue) {
+  public static void exitPooka(int exitValue, Object pSource) {
     final int fExitValue = exitValue;
+    final Object fSource = pSource;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  java.util.Vector v = getStoreManager().getStoreList();
-	  final java.util.HashMap doneMap = new java.util.HashMap();
-	  for (int i = 0; i < v.size(); i++) {
-	    // FIXME:  we should check to see if there are any messages
-	    // to be deleted, and ask the user if they want to expunge the
-	    // deleted messages.
-	    final StoreInfo currentStore = (StoreInfo)v.elementAt(i);
-	    net.suberic.util.thread.ActionThread storeThread = currentStore.getStoreThread();
-	    if (storeThread != null) {
-	      doneMap.put(currentStore, new Boolean(false));
-	      storeThread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-		  
-		  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-		    try {
-		      if (currentStore.isConnected()) {
-			currentStore.closeAllFolders(false, true);
-			currentStore.disconnectStore();
-			doneMap.put(currentStore, new Boolean(true));
-		      } else {
-			doneMap.put(currentStore, new Boolean(true));
-		      }
-		    } catch (Exception e) {
-		      doneMap.put(currentStore, new Boolean(true));
-		    }
-		  }
-		}, storeThread), new java.awt.event.ActionEvent(getMainPanel(), 1, "store-close"), net.suberic.util.thread.ActionThread.PRIORITY_HIGH);
-	    }
-	  }
-	  long sleepTime = 30000;
-	  try {
-	    sleepTime = Long.parseLong(getProperty("Pooka.exitTimeout", "30000"));
-	  } catch (Exception e) {
-	  }
-	  long currentTime = System.currentTimeMillis();
-	  boolean done = false;
-
-	  String closingMessage = Pooka.getProperty("info.exit.closing", "Closing Store {0}");
-	  String waitingMessage = Pooka.getProperty("info.exit.waiting", "Closing Store {0}... Waiting {1,number} seconds.");
-	  String waitingMultipleMessage = Pooka.getProperty("info.exit.waiting.multiple", "Waiting {0,number} seconds for {1,number} Stores to close.");
-	  
-	  while (! done && System.currentTimeMillis() - currentTime < sleepTime) {
-	    String waitingStoreName = null;
-	    int waitingStoreCount = 0;
-	    try {
-	      Thread.currentThread().sleep(1000);
-	    } catch (InterruptedException ie) {
-	    }
-	    done = true;
-	    for (int i = 0; i < v.size(); i++) {
-	      Object key = v.get(i);
-	      Boolean value = (Boolean) doneMap.get(key);
-	      if (value != null && ! value.booleanValue()) {
-		done = false;
-		waitingStoreCount++;
-		if (waitingStoreName == null)
-		  waitingStoreName = ((StoreInfo) key).getStoreID();
-	      }
-	    }
-
-	    if (! done) {
-	      int secondsWaiting = (int) (sleepTime - (System.currentTimeMillis() - currentTime)) / 1000;
-	      String message = closingMessage;
-	      Object[] args;
-	      if (secondsWaiting > 20) {
-		args = new Object[] { waitingStoreName };
-		message = closingMessage;
-	      } else if (waitingStoreCount == 1) {
-		args = new Object[] { waitingStoreName, new Integer(secondsWaiting) };
-		message = waitingMessage;
-	      } else {
-		args = new Object[] { new Integer(secondsWaiting), new Integer(waitingStoreCount) };
-		message = waitingMultipleMessage;
-	      }
-	      sManager.getUIFactory().showStatusMessage(java.text.MessageFormat.format(message, args));
-	    } 
-	  }
-
-	  getResources().saveProperties();
+	  StartupManager sm = new StartupManager(sManager);
+	  sm.stopMainPookaWindow(fSource);
 	  System.exit(fExitValue);
 	}
       };
 
-    getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-    Thread shutDownThread = new Thread(runMe);
-    shutDownThread.start();
+    if (Pooka.getMainPanel() != null)
+      Pooka.getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    
+    Thread shutdownThread = new Thread(runMe);
+    shutdownThread.start();    
   }
   
   /**

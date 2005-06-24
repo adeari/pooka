@@ -21,8 +21,8 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
    
   PreviewContentPanel contentPanel = null;
   PropertyEditorFactory editorFactory = null;
-
   ThemeManager pookaThemeManager = null;
+  MessageNotificationManager mMessageNotificationManager;
 
   public boolean showing = false;
 
@@ -31,9 +31,36 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
   /**
    * Constructor.
    */
-  public PookaPreviewPaneUIFactory() {
+  public PookaPreviewPaneUIFactory(PookaUIFactory pSource) {
     editorFactory = new PropertyEditorFactory(Pooka.getResources());
+
+    if (pSource != null) {
+
+      pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+	try {
+	  mMessageNotificationManager = pSource.getMessageNotificationManager();
+	} catch (Error e) {
+	  System.err.println("Error starting up tray icon:  " + e.getMessage());
+	}
+      }
+    }
+  }
+  
+  /**
+   * Constructor.
+   */
+  public PookaPreviewPaneUIFactory() {
+    this(null);
     pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+
+    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+      try {
+	mMessageNotificationManager = new MessageNotificationManager();
+      } catch (Error e) {
+	System.err.println("Error starting up tray icon:  " + e.getMessage());
+      }
+    }
   }
   
   /**
@@ -571,4 +598,12 @@ public class PookaPreviewPaneUIFactory implements PookaUIFactory {
 
     return returnValue;
   }
+
+  /**
+   * Gets the current MessageNotificationManager.
+   */
+  public MessageNotificationManager getMessageNotificationManager() {
+    return mMessageNotificationManager;
+  }
+
 }

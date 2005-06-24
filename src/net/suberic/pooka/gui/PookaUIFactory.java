@@ -128,4 +128,10 @@ public interface PookaUIFactory extends ErrorHandler {
    * yet or not.
    */
   public void setShowing(boolean newValue);
+
+  /**
+   * Gets the current MessageNotificationManager.
+   */
+  public MessageNotificationManager getMessageNotificationManager();
+
 }

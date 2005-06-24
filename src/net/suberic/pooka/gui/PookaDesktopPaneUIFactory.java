@@ -21,19 +21,44 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   MessagePanel messagePanel = null;
   PropertyEditorFactory editorFactory = null;
   ThemeManager pookaThemeManager = null;
+  MessageNotificationManager mMessageNotificationManager;
 
   public boolean showing = false;
 
   int maxErrorLine = 50;
 
-    /**
-     * Constructor.
-     */
-    public PookaDesktopPaneUIFactory() {
-      pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
- 
-      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources());
+  /**
+   * Constructor.
+   */
+  public PookaDesktopPaneUIFactory(PookaUIFactory pSource) {
+    editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources());
+    if (pSource != null) {
+      pookaThemeManager = pSource.getPookaThemeManager();
+      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+	try {
+	  mMessageNotificationManager = pSource.getMessageNotificationManager();
+	} catch (Error e) {
+	  System.err.println("Error starting up tray icon:  " + e.getMessage());
+	}
+      }
     }
+  }
+  
+  /**
+   * Constructor.
+   */
+  public PookaDesktopPaneUIFactory() {
+    this(null);
+    pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+      try {
+	mMessageNotificationManager = new MessageNotificationManager();
+      } catch (Error e) {
+	System.err.println("Error starting up tray icon:  " + e.getMessage());
+      }
+    }
+
+  }
 
   /**
    * Returns the ThemeManager for fonts and colors.
@@ -164,7 +189,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This implementation creates an instance of MessagePanel.
    */
   public ContentPanel createContentPanel() {
-    messagePanel = new MessagePanel(Pooka.getMainPanel());
+    messagePanel = new MessagePanel();
     messagePanel.setSize(1000,1000);
     JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
@@ -180,7 +205,7 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    * This implementation creates an instance of MessagePanel.
    */
   public ContentPanel createContentPanel(PreviewContentPanel pcp) {
-    messagePanel = new MessagePanel(Pooka.getMainPanel(), pcp);
+    messagePanel = new MessagePanel(pcp);
     messagePanel.setSize(1000,1000);
     JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
@@ -519,4 +544,12 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
 
     return returnValue;
   }
+
+  /**
+   * Gets the current MessageNotificationManager.
+   */
+  public MessageNotificationManager getMessageNotificationManager() {
+    return mMessageNotificationManager;
+  }
+
 }

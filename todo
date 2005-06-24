@@ -6,12 +6,14 @@
 *) undelete?
 
 *) add taskbar support on gnome, windows, and mac?
+  add start / bring up pooka
+	-- need to add exit pooka as 'go to minimal'
+	-- remove messagenotificationmanager from main panel?
   add in open message support?
 	make the display nice?
 	make it clear automatically?
   add support for showing disconnection messages?
   add preferences dialog
-  add start / bring up pooka
   add exit pooka
   add starting pooka as just a service.
   add disconnect/offline mode to right-click menu

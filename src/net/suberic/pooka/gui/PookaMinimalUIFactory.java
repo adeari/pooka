@@ -17,8 +17,8 @@ import java.util.*;
 public class PookaMinimalUIFactory implements PookaUIFactory {
    
   PropertyEditorFactory mEditorFactory = null;
-
   ThemeManager mThemeManager = null;
+  MessageNotificationManager mMessageNotificationManager;
 
   public boolean mShowing = false;
 
@@ -30,15 +30,11 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
   WindowAdapter mWindowAdapter = null;
 
-  MessageNotificationManager mMessageNotificationManager;
 
   /**
    * Constructor.
    */
-  public PookaMinimalUIFactory() {
-    mEditorFactory = new PropertyEditorFactory(Pooka.getResources());
-    mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
-
+  public PookaMinimalUIFactory(PookaUIFactory pSource) {
     mWindowAdapter = new WindowAdapter() {
 	public void windowClosed(WindowEvent we) {
 	  Window window = we.getWindow();
@@ -51,6 +47,29 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 	}
       };
 
+    mEditorFactory = new PropertyEditorFactory(Pooka.getResources());
+
+    if (pSource != null) {
+      mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+	try {
+	  mMessageNotificationManager = pSource.getMessageNotificationManager();
+	  if (mMessageNotificationManager != null)
+	    mMessageNotificationManager.setMainPanel(null);
+	} catch (Error e) {
+	  System.err.println("Error starting up tray icon:  " + e.getMessage());
+	}
+      }
+    }
+  }
+  
+  /**
+   * Constructor.
+   */
+  public PookaMinimalUIFactory() {
+    this(null);
+    mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+    
     if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
       try {
 	mMessageNotificationManager = new MessageNotificationManager();
@@ -603,5 +622,12 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       }
     }
   }
-  
+
+  /**
+   * Gets the current MessageNotificationManager.
+   */
+  public MessageNotificationManager getMessageNotificationManager() {
+    return mMessageNotificationManager;
+  }
+
 }

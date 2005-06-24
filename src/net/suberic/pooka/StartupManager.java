@@ -91,11 +91,24 @@ public class StartupManager {
     final net.suberic.pooka.gui.PookaStartup startup = pStartup;
     final JFrame finalFrame = mFrame;
 
-    if (Pooka.getUIFactory() == null || Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
+    mPookaManager.setFolderTracker(new net.suberic.pooka.thread.FolderTracker());
+    mPookaManager.getFolderTracker().start();
+    updateTime("started folderTracker");
+    
+    mPookaManager.setSearchThread(new net.suberic.util.thread.ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread ")));
+    mPookaManager.getSearchThread().start();
+    updateTime("started search thread");
+
+    if (Pooka.getUIFactory() == null) {
       if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
 	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
       else
 	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+    } else if (Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
+      if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
+      else
+	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
     }
 
     if (startup != null)
@@ -160,6 +173,138 @@ public class StartupManager {
     }
   }
  
+  /**
+   * Stops the main Pooka window.
+   */
+  public void stopMainPookaWindow(Object pSource) {
+
+    net.suberic.pooka.thread.FolderTracker ft = mPookaManager.getFolderTracker();
+    if (ft != null)
+      ft.setStopped(true);
+    
+    net.suberic.util.thread.ActionThread searchThread = mPookaManager.getSearchThread();
+    if (searchThread != null)
+      mPookaManager.getSearchThread().setStop(true);
+
+    java.util.Vector v = mPookaManager.getStoreManager().getStoreList();
+    final java.util.HashMap doneMap = new java.util.HashMap();
+    for (int i = 0; i < v.size(); i++) {
+      // FIXME:  we should check to see if there are any messages
+      // to be deleted, and ask the user if they want to expunge the
+      // deleted messages.
+      final StoreInfo currentStore = (StoreInfo)v.elementAt(i);
+      net.suberic.util.thread.ActionThread storeThread = currentStore.getStoreThread();
+      if (storeThread != null) {
+	doneMap.put(currentStore, new Boolean(false));
+	storeThread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+	    
+	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+	      try {
+		if (currentStore.isConnected()) {
+		  currentStore.closeAllFolders(false, true);
+		  currentStore.disconnectStore();
+		} else {
+		  doneMap.put(currentStore, new Boolean(true));
+		}
+	      } catch (Exception e) {
+		// ignore.  just say done and exit.
+	      } finally {
+		currentStore.stopStoreThread();
+		doneMap.put(currentStore, new Boolean(true));
+	      }
+	    }
+	  }, storeThread), new java.awt.event.ActionEvent(pSource, 1, "store-close"), net.suberic.util.thread.ActionThread.PRIORITY_HIGH);
+      }
+    }
+    long sleepTime = 30000;
+    try {
+      sleepTime = Long.parseLong(Pooka.getProperty("Pooka.exitTimeout", "30000"));
+    } catch (Exception e) {
+    }
+    long currentTime = System.currentTimeMillis();
+    boolean done = false;
+    
+    String closingMessage = Pooka.getProperty("info.exit.closing", "Closing Store {0}");
+    String waitingMessage = Pooka.getProperty("info.exit.waiting", "Closing Store {0}... Waiting {1,number} seconds.");
+    String waitingMultipleMessage = Pooka.getProperty("info.exit.waiting.multiple", "Waiting {0,number} seconds for {1,number} Stores to close.");
+    
+    while (! done && System.currentTimeMillis() - currentTime < sleepTime) {
+      String waitingStoreName = null;
+      int waitingStoreCount = 0;
+      try {
+	Thread.currentThread().sleep(1000);
+      } catch (InterruptedException ie) {
+      }
+      done = true;
+      for (int i = 0; i < v.size(); i++) {
+	Object key = v.get(i);
+	Boolean value = (Boolean) doneMap.get(key);
+	if (value != null && ! value.booleanValue()) {
+	  done = false;
+	  waitingStoreCount++;
+	  if (waitingStoreName == null)
+	    waitingStoreName = ((StoreInfo) key).getStoreID();
+	}
+      }
+      
+      if (! done) {
+	int secondsWaiting = (int) (sleepTime - (System.currentTimeMillis() - currentTime)) / 1000;
+	String message = closingMessage;
+	Object[] args;
+	if (secondsWaiting > 20) {
+	  args = new Object[] { waitingStoreName };
+	  message = closingMessage;
+	} else if (waitingStoreCount == 1) {
+	  args = new Object[] { waitingStoreName, new Integer(secondsWaiting) };
+	  message = waitingMessage;
+	} else {
+	  args = new Object[] { new Integer(secondsWaiting), new Integer(waitingStoreCount) };
+	  message = waitingMultipleMessage;
+	}
+	Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(message, args));
+      }
+    }
+
+    Pooka.getResources().saveProperties();
+
+    try {
+      SwingUtilities.invokeAndWait(new Runnable() {
+	  public void run() {
+	    Pooka.getMainPanel().getParentFrame().setVisible(false);
+	    Pooka.getMainPanel().getParentFrame().dispose();
+	  }
+	});
+    } catch (Exception e) {
+    }
+
+  }
+
+  /**
+   * Moves Pooka over to a Minimal startup.
+   */
+  public void stopPookaToTray(Object pSource) {
+    final Object fSource = pSource;
+    Runnable runMe = new Runnable() {
+	public void run() {
+	  stopMainPookaWindow(fSource);
+	  mPookaManager.setMainPanel(null);
+	  mPookaManager.getUIFactory().setShowing(false);
+	  mPookaManager.setStoreManager(new StoreManager());
+	  updateTime("created store manager.");
+	  
+	  mPookaManager.getStoreManager().loadAllSentFolders();
+	  mPookaManager.getOutgoingMailManager().loadOutboxFolders();
+	  updateTime("loaded sent/outbox");
+	  mPookaManager.setUIFactory(new PookaMinimalUIFactory(Pooka.getUIFactory()));
+	}
+      };
+    if (Pooka.getMainPanel() != null)
+      Pooka.getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+    
+    Thread stopWindowThread = new Thread(runMe);
+    stopWindowThread.start();
+  }
+
   /**
    * Does a minimal startup of Pooka.
    */
@@ -252,13 +397,6 @@ public class StartupManager {
     }
 
     updateTime("created mailcaps");
-    mPookaManager.setFolderTracker(new net.suberic.pooka.thread.FolderTracker());
-    mPookaManager.getFolderTracker().start();
-    updateTime("started folderTracker");
-    
-    mPookaManager.setSearchThread(new net.suberic.util.thread.ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread ")));
-    mPookaManager.getSearchThread().start();
-    updateTime("started search thread");
     
     javax.activation.CommandMap.setDefaultCommandMap(mPookaManager.getMailcap());
     javax.activation.FileTypeMap.setDefaultFileTypeMap(mPookaManager.getMimeTypesMap());
@@ -285,12 +423,12 @@ public class StartupManager {
 	public void valueChanged(String changedValue) {
 	  if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
 	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
-	    mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+	    mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
 	    ContentPanel cp = ((PookaPreviewPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(mp);
 	    Pooka.getMainPanel().setContentPanel(cp);
 	  } else {
 	    PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
-	    mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+	    mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
 	    ContentPanel mp = ((PookaDesktopPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(pcp);
 	    Pooka.getMainPanel().setContentPanel(mp);
 	  }
