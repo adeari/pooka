@@ -80,7 +80,7 @@ public class ActionThread extends Thread {
 	    }
 	    pair.action.actionPerformed(pair.event);
 	  }
-	} catch (Exception e) {
+	} catch (Throwable e) {
 	  e.printStackTrace();
 	} finally {
 	  mCurrentActionName = "";

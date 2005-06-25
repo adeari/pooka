@@ -110,7 +110,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
       server = Pooka.getProperty("Store." + storeID + ".server", "");
       
-      if (protocol.equals("imap") && Pooka.getProperty(getStoreProperty() + ".SSL").equalsIgnoreCase("true")) {
+      if (protocol.equals("imap") && Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
 	protocol = "imaps";
       }
     }
