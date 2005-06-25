@@ -21,12 +21,10 @@ import javax.swing.*;
 
 public class SimpleAuthenticator extends Authenticator {
 
-    Frame frame;
     String username;
     String password;
 
-    public SimpleAuthenticator(Frame f) {
-	this.frame = f;
+    public SimpleAuthenticator() {
     }
 
     protected PasswordAuthentication getPasswordAuthentication() {
@@ -108,7 +106,7 @@ public class SimpleAuthenticator extends Authenticator {
 	else
 	    username.requestFocus();
 	
-	int result = JOptionPane.showConfirmDialog(frame, d, "Login",
+	int result = JOptionPane.showConfirmDialog(getFrame(), d, "Login",
 	    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 	
 	if (result == JOptionPane.OK_OPTION)
@@ -125,6 +123,10 @@ public class SimpleAuthenticator extends Authenticator {
     }
 
   public Frame getFrame() {
-    return frame;
+    MainPanel mp= net.suberic.pooka.Pooka.getMainPanel();
+    if (mp != null)
+      return mp.getParentFrame();
+    else
+      return null;
   }
 }

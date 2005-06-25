@@ -251,8 +251,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
     
     if (Pooka.getProperty("Pooka.exitToIcon", "false").equalsIgnoreCase("true")) {
-      net.suberic.pooka.StartupManager sm = new net.suberic.pooka.StartupManager(Pooka.getPookaManager());
-      sm.stopPookaToTray(this);
+      Pooka.sStartupManager.stopPookaToTray(this);
     } else {
       Pooka.exitPooka(exitValue, this);
     }
@@ -352,6 +351,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     public Action[] getDefaultActions() {
 	return defaultActions;
     }
+
+  public PookaFocusManager getFocusManager() {
+    return focusManager;
+  }
 
     /**
      * Find the hosting frame, for the file-chooser dialog.

@@ -108,8 +108,7 @@ public class Pooka {
     final Object fSource = pSource;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  StartupManager sm = new StartupManager(sManager);
-	  sm.stopMainPookaWindow(fSource);
+	  sStartupManager.stopMainPookaWindow(fSource);
 	  System.exit(fExitValue);
 	}
       };

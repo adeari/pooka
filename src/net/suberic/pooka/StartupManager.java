@@ -186,8 +186,29 @@ public class StartupManager {
     if (searchThread != null)
       mPookaManager.getSearchThread().setStop(true);
 
+    closeAllStores(pSource);
+
+    Pooka.getResources().saveProperties();
+
+    try {
+      SwingUtilities.invokeAndWait(new Runnable() {
+	  public void run() {
+	    Pooka.getMainPanel().getParentFrame().setVisible(false);
+	    Pooka.getMainPanel().getParentFrame().dispose();
+	  }
+	});
+    } catch (Exception e) {
+    }
+
+  }
+
+  /**
+   * Closes all stores.
+   */
+  void closeAllStores(Object pSource) {
     java.util.Vector v = mPookaManager.getStoreManager().getStoreList();
     final java.util.HashMap doneMap = new java.util.HashMap();
+
     for (int i = 0; i < v.size(); i++) {
       // FIXME:  we should check to see if there are any messages
       // to be deleted, and ask the user if they want to expunge the
@@ -264,19 +285,6 @@ public class StartupManager {
 	Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(message, args));
       }
     }
-
-    Pooka.getResources().saveProperties();
-
-    try {
-      SwingUtilities.invokeAndWait(new Runnable() {
-	  public void run() {
-	    Pooka.getMainPanel().getParentFrame().setVisible(false);
-	    Pooka.getMainPanel().getParentFrame().dispose();
-	  }
-	});
-    } catch (Exception e) {
-    }
-
   }
 
   /**
@@ -287,6 +295,8 @@ public class StartupManager {
     Runnable runMe = new Runnable() {
 	public void run() {
 	  stopMainPookaWindow(fSource);
+	  mFrame = null;
+	  KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
 	  mPookaManager.setMainPanel(null);
 	  mPookaManager.getUIFactory().setShowing(false);
 	  mPookaManager.setStoreManager(new StoreManager());
@@ -295,6 +305,7 @@ public class StartupManager {
 	  mPookaManager.getStoreManager().loadAllSentFolders();
 	  mPookaManager.getOutgoingMailManager().loadOutboxFolders();
 	  updateTime("loaded sent/outbox");
+	  
 	  mPookaManager.setUIFactory(new PookaMinimalUIFactory(Pooka.getUIFactory()));
 	}
       };
@@ -466,7 +477,7 @@ public class StartupManager {
     mFrame = new JFrame("Pooka");
     updateTime("created frame");
     
-    mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator(mFrame));
+    mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator());
     java.util.Properties sysProps = System.getProperties();
     sysProps.setProperty("mail.mbox.mailspool", mPookaManager.getResources().getProperty("Pooka.spoolDir", "/var/spool/mail"));
     mPookaManager.setDefaultSession (javax.mail.Session.getDefaultInstance(sysProps, mPookaManager.getDefaultAuthenticator()));

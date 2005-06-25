@@ -8,8 +8,8 @@
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka
 	-- need to add exit pooka as 'go to minimal'
-	-- remove messagenotificationmanager from main panel?
   add in open message support?
+  !! fix open message  
 	make the display nice?
 	make it clear automatically?
   add support for showing disconnection messages?
