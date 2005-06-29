@@ -51,6 +51,7 @@ public class MessageNotificationManager {
       new NewMessageAction(), 
       new PreferencesAction(), 
       new ExitPookaAction(), 
+      new StartPookaAction(), 
       new ClearStatusAction() };
 
     java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
@@ -67,11 +68,9 @@ public class MessageNotificationManager {
       mTrayIcon.setPopupMenu(createPopupMenu());
       mTrayIcon.addActionListener(new AbstractAction() {
 	  public void actionPerformed(ActionEvent e) {
-	    System.err.println("action:  " + e);
+	    //System.err.println("action:  " + e);
 	    mTrayIcon.displayMessage("Pooka", createStatusMessage(), TrayIcon.INFO_MESSAGE_TYPE);
-	    System.err.println("should be trying to bring frame to front, but not implemented yet.");
-	    //Pooka.getMainPanel().getParentFrame().toFront();
-	    //Pooka.getUIFactory().bringToFront();
+	    // bringToFront();
 	  }
 	});
       
@@ -99,7 +98,7 @@ public class MessageNotificationManager {
   protected void updateStatus() {
     synchronized(this) {
       if (getNewMessageFlag()) {
-	System.err.println("updating status.");
+	//System.err.println("updating status.");
 	if (getMainPanel() != null) {
 	  getMainPanel().getParentFrame().setTitle(mNewMessageTitle);
 	}
@@ -116,6 +115,16 @@ public class MessageNotificationManager {
 	  getTrayIcon().setIcon(mStandardTrayIcon);
       }
     } //synchronized
+  }
+
+  /**
+   * Brings the main window to the front.
+   *
+   */
+  void bringToFront() {
+    //System.err.println("should be trying to bring frame to front, but not implemented yet.");
+    Pooka.getMainPanel().getParentFrame().toFront();
+    //Pooka.getUIFactory().bringToFront();
   }
 
   /**
@@ -252,9 +261,9 @@ public class MessageNotificationManager {
    * Sets the current icon for the frame.
    */
   public void setCurrentIcon(ImageIcon newIcon) {
-    System.err.println("setting icon to " + newIcon.getImage() + " on " + getMainPanel());
-    if (getMainPanel() != null)
-      System.err.println("setting icon to " + newIcon.getImage() + " on " + getMainPanel().getParentFrame());
+    //System.err.println("setting icon to " + newIcon.getImage() + " on " + getMainPanel());
+    //if (getMainPanel() != null)
+      //System.err.println("setting icon to " + newIcon.getImage() + " on " + getMainPanel().getParentFrame());
     if (getMainPanel() != null) 
       getMainPanel().getParentFrame().setIconImage(newIcon.getImage());
   }
@@ -300,7 +309,7 @@ public class MessageNotificationManager {
       }
     }
 
-    System.err.println("mainPanel now = " + mPanel);
+    //System.err.println("mainPanel now = " + mPanel);
   }
 
   /**
@@ -326,7 +335,7 @@ public class MessageNotificationManager {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("sending new message.");
+      //System.err.println("sending new message.");
       net.suberic.pooka.messaging.PookaMessageSender sender =  new net.suberic.pooka.messaging.PookaMessageSender();
       try {
 	sender.openConnection();
@@ -353,7 +362,7 @@ public class MessageNotificationManager {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("opening message.");
+      //System.err.println("opening message.");
 
       try {
 	MessageProxy proxy = mMessageInfo.getMessageProxy();
@@ -398,7 +407,33 @@ public class MessageNotificationManager {
     }
     
     public void actionPerformed(ActionEvent e) {
-      System.err.println("show preferences here.  :)");
+      //System.err.println("show preferences here.  :)");
+    }
+  }
+
+  class StartPookaAction extends AbstractAction {
+    
+    StartPookaAction() {
+      super("file-start");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMainPanel() != null)
+	bringToFront();
+      else {
+	net.suberic.pooka.messaging.PookaMessageSender sender =  new net.suberic.pooka.messaging.PookaMessageSender();
+	try {
+	  sender.openConnection();
+	  if (sender.checkVersion()) {
+	    sender.sendStartPookaMessage();
+	  }
+	} catch (Exception exc) {
+	  mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.WARNING_MESSAGE_TYPE);
+	} finally {
+	  if (sender != null && sender.isConnected())
+	    sender.closeConnection();
+	}
+      }
     }
   }
 

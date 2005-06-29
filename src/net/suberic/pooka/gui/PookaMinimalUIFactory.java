@@ -60,6 +60,17 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 	  System.err.println("Error starting up tray icon:  " + e.getMessage());
 	}
       }
+    } else {
+      mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+      
+      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+	try {
+	  mMessageNotificationManager = new MessageNotificationManager();
+	} catch (Error e) {
+	  System.err.println("Error starting up tray icon:  " + e.getMessage());
+	}
+      }
+
     }
   }
   
@@ -68,15 +79,6 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public PookaMinimalUIFactory() {
     this(null);
-    mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
-    
-    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
-      try {
-	mMessageNotificationManager = new MessageNotificationManager();
-      } catch (Error e) {
-	System.err.println("Error starting up tray icon:  " + e.getMessage());
-      }
-    }
   }
   
   /**

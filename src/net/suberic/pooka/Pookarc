@@ -14,6 +14,7 @@ Pooka.autoSelectFirstUnread.propertyType=Boolean
 Pooka.trayIcon.enabled=true
 Pooka.trayIcon.enabled.propertyType=Boolean
 Pooka.exitToIcon=false
+Pooka.exitToIcon.propertyType=Boolean
 
 Message.sendImmediately=true
 
@@ -534,12 +535,13 @@ FolderSelectorPane.popupMenu=Select
 FolderSelectorPane.popupMenu.Select.Action=select-folder
 FolderSelectorPane.popupMenu.Select.class=net.suberic.pooka.gui.FolderMenu
 
-MessageNotificationManager.popupMenu=NewMessage:OpenMessage:ClearStatus:Preferences:Exit
+MessageNotificationManager.popupMenu=NewMessage:OpenMessage:ClearStatus:Preferences:Start:Exit
 MessageNotificationManager.popupMenu.NewMessage.Action=message-new
 MessageNotificationManager.popupMenu.OpenMessage.Action=message-open
 MessageNotificationManager.popupMenu.OpenMessage.class=net.suberic.pooka.gui.RecentMessageMenu
 MessageNotificationManager.popupMenu.ClearStatus.Action=status-clear
 MessageNotificationManager.popupMenu.Preferencese.Action=file-preferences
+MessageNotificationManager.popupMenu.Start.Action=file-start
 MessageNotificationManager.popupMenu.Exit.Action=file-exit
 
 
@@ -951,7 +953,7 @@ Preferences.propertyScoped=false
 Preferences.templateScoped=true
 Preferences.propertyType=Tabbed
 
-Preferences.UI=Pooka.guiType:Pooka.trayIcon.enabled:Pooka.autoPreview:Pooka.autoSelectFirstUnread:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.fastDelete:Pooka.checkUnsentMessages:Pooka.folderPanel.theme:Pooka.messagePanel.theme
+Preferences.UI=Pooka.guiType:Pooka.trayIcon.enabled:Pooka.exitToIcon:Pooka.autoPreview:Pooka.autoSelectFirstUnread:Pooka.lineWrap:Pooka.lineLength:Pooka.displayTextAttachments:Pooka.attachmentDisplayMaxLength:Pooka.autoExpunge:Pooka.fastDelete:Pooka.checkUnsentMessages:Pooka.folderPanel.theme:Pooka.messagePanel.theme
 Preferences.Reply=Pooka.replyPrefix:Pooka.forwardPrefix:Pooka.forwardStyle
 Preferences.Startup=Pooka.openFoldersOnConnect:Pooka.openSavedFoldersOnStartup:Pooka.saveOpenFoldersOnExit:Pooka.saveFolderWindowLocationsOnExit
 Preferences.Signature=Pooka.newMessage.autoAddSignature:Pooka.newMessage.signatureBeforeCopiedMessage

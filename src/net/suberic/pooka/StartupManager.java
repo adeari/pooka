@@ -89,6 +89,7 @@ public class StartupManager {
   public void startupMainPookaWindow(net.suberic.pooka.gui.PookaStartup pStartup) {
 
     final net.suberic.pooka.gui.PookaStartup startup = pStartup;
+    mFrame = new JFrame("Pooka");
     final JFrame finalFrame = mFrame;
 
     mPookaManager.setFolderTracker(new net.suberic.pooka.thread.FolderTracker());
@@ -181,6 +182,8 @@ public class StartupManager {
     net.suberic.pooka.thread.FolderTracker ft = mPookaManager.getFolderTracker();
     if (ft != null)
       ft.setStopped(true);
+
+    mPookaManager.setFolderTracker(null);
     
     net.suberic.util.thread.ActionThread searchThread = mPookaManager.getSearchThread();
     if (searchThread != null)
@@ -305,8 +308,12 @@ public class StartupManager {
 	  mPookaManager.getStoreManager().loadAllSentFolders();
 	  mPookaManager.getOutgoingMailManager().loadOutboxFolders();
 	  updateTime("loaded sent/outbox");
+	  PookaUIFactory newFactory = new PookaMinimalUIFactory(Pooka.getUIFactory());
 	  
-	  mPookaManager.setUIFactory(new PookaMinimalUIFactory(Pooka.getUIFactory()));
+	  mFullStartup=false;
+
+	  loadManagers(null);
+	  mPookaManager.setUIFactory(newFactory);
 	}
       };
     if (Pooka.getMainPanel() != null)
@@ -326,8 +333,10 @@ public class StartupManager {
 
     mPookaManager.setUIFactory(new PookaMinimalUIFactory());
     
-    if (!sendMessageTo(mToAddress, mFromProfile))
-      System.err.println("send failed.");
+    if (mToAddress != null) {
+      if (!sendMessageTo(mToAddress, mFromProfile))
+	System.err.println("send failed.");
+    }
   }
 
   /**
@@ -474,8 +483,10 @@ public class StartupManager {
     // create the MessageListener.
     PookaMessageListener pmlistener= new PookaMessageListener();
     
+    /*
     mFrame = new JFrame("Pooka");
     updateTime("created frame");
+    */
     
     mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator());
     java.util.Properties sysProps = System.getProperties();
@@ -530,6 +541,7 @@ public class StartupManager {
 	    System.exit(-1);
 	  }
 	  mToAddress = argv[++i];
+	} else if (argv[i].equals("--minimal")) {
 	  mFullStartup = false;
 	} else if (argv[i].equals("--from")) {
 	  mFromProfile = argv[++i];
@@ -555,7 +567,7 @@ public class StartupManager {
    * Prints the usage information.
    */
   public void printUsage() {
-    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  -open ADDRESS         sends a new message to ADDRESS.\n    [--from USER]           [from user USER].\n  --help                       shows these options.\n"));
+    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  -open ADDRESS                sends a new message to ADDRESS.\n       [--from USER]           [from user USER].\n  --minimal                    startup to system tray only.\n  --help                       shows these options.\n"));
   }
 
   /**
@@ -611,6 +623,9 @@ public class StartupManager {
       if (sender.isConnected())
 	sender.closeConnection();
     }
+
+    mToAddress = null;
+    mFromProfile = null;
 
     return true;
   }

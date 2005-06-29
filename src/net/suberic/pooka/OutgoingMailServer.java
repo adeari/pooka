@@ -351,7 +351,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
       sysProps.setProperty("mail.smtp.starttls.enable", "true");
 
-      session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password, (net.suberic.pooka.gui.SimpleAuthenticator) Pooka.getDefaultAuthenticator()));
+      session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password));
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
 	session.setDebug(true);
     }
@@ -471,8 +471,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
      * Creates an Authenticator that will try using the given username and
      * password, and if that fails, then will try a ui dialog.
      */
-    public FailoverAuthenticator(String pUser, String pPassword, net.suberic.pooka.gui.SimpleAuthenticator pAuth) {
-      super(pAuth.getFrame());
+    public FailoverAuthenticator(String pUser, String pPassword) {
+      super();
       mUser = pUser;
       mPassword = pPassword;
     }
