@@ -56,15 +56,12 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
 	mi.setLabel("new message");
       }
       newMenu.add(mi);
-      System.err.println("adding menuitem for message.");
 
     }
-    System.err.println("adding menu for " + pFolderName);
     this.add(newMenu);
   }
 
   void reset() {
-    System.err.println("resetting...");
     removeAll();
     MessageNotificationManager mnm = Pooka.getUIFactory().getMessageNotificationManager();
     if (mnm != null) {
@@ -77,13 +74,11 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableMenu {
     }
 
   }
-  
-  /*
+
   public void addNotify() {
     reset();
 
     super.addNotify();
   }
-  */
   
 }

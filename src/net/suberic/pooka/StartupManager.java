@@ -299,7 +299,8 @@ public class StartupManager {
 	public void run() {
 	  stopMainPookaWindow(fSource);
 	  mFrame = null;
-	  KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
+	  if (mPookaManager.getMainPanel() != null)
+	    KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
 	  mPookaManager.setMainPanel(null);
 	  mPookaManager.getUIFactory().setShowing(false);
 	  mPookaManager.setStoreManager(new StoreManager());

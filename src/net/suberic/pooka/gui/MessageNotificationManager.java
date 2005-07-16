@@ -3,6 +3,7 @@ import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.MessageInfo;
 import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.*;
 
 import java.util.*;
 
@@ -15,6 +16,9 @@ import javax.swing.Action;
 import javax.swing.SwingUtilities;
 import javax.mail.event.MessageCountEvent;
 import java.awt.event.ActionEvent;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsConfiguration;
 
 import org.jdesktop.jdic.tray.TrayIcon;
 import org.jdesktop.jdic.tray.SystemTray;
@@ -22,7 +26,7 @@ import org.jdesktop.jdic.tray.SystemTray;
 /**
  * This manages the display of new message notifications.
  */
-public class MessageNotificationManager {
+public class MessageNotificationManager implements ValueChangeListener {
 
   private MainPanel mPanel;
   private boolean mNewMessageFlag = false;
@@ -30,7 +34,8 @@ public class MessageNotificationManager {
   private Map mNewMessageMap;
   private int mNewMessageCount = 0;
 
-  private Action[] mDefaultActions;
+  private Action[] mOfflineActions;
+  private Action[] mOnlineActions;
 
   // icons and displays
   private String mStandardTitle = Pooka.getProperty("Title", "Pooka");
@@ -47,13 +52,67 @@ public class MessageNotificationManager {
   public MessageNotificationManager() {
     mNewMessageMap = new HashMap();
 
-    mDefaultActions = new Action[] { 
+    mOfflineActions = new Action[] { 
       new NewMessageAction(), 
       new PreferencesAction(), 
       new ExitPookaAction(), 
-      new StartPookaAction(), 
-      new ClearStatusAction() };
+      new StartPookaAction()
+    };
 
+    mOnlineActions = new Action[] { 
+      new NewMessageAction(), 
+      new PreferencesAction(), 
+      new ExitPookaAction(), 
+      new ClearStatusAction()
+    };
+
+    // set up the images to use.
+    setupImages();
+
+    // create the tray icon.
+    configureTrayIcon();
+
+    // add a listener so we can add/remove the tray icon if the setting
+    // changes.
+    Pooka.getResources().addValueChangeListener(this, "Pooka.trayIcon.enabled");
+  }
+
+  /**
+   * Creates the SystemTrayIcon, if configured to do so.
+   */
+  void configureTrayIcon() {
+    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
+      try {
+	mTrayIcon = new TrayIcon(mStandardTrayIcon);
+	mTrayIcon.setIconAutoSize(true);
+	mTrayIcon.setPopupMenu(createPopupMenu());
+	mTrayIcon.addActionListener(new AbstractAction() {
+	    public void actionPerformed(ActionEvent e) {
+	      System.err.println("action:  " + e);
+	      if (getMainPanel() != null) {
+		mTrayIcon.displayMessage("Pooka", createStatusMessage(), TrayIcon.INFO_MESSAGE_TYPE);
+		bringToFront();
+	      } else {
+		startMainWindow();
+	      }
+	    }
+	  });
+	
+	SystemTray.getDefaultSystemTray().addTrayIcon(mTrayIcon);
+      } catch (Error e) {
+	System.err.println("Error starting up tray icon:  " + e.getMessage());
+      }
+    } else if (mTrayIcon != null) {
+      // remove the tray icon.
+      SystemTray.getDefaultSystemTray().removeTrayIcon(mTrayIcon);
+      mTrayIcon = null;
+    }
+  }
+
+  /**
+   * Sets up the images to use for the tray icon and for the main window.
+   */
+  void setupImages() {
     java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
     if (standardUrl != null) {
       mStandardIcon = new ImageIcon(standardUrl);
@@ -63,19 +122,6 @@ public class MessageNotificationManager {
     java.net.URL standardTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardTrayIcon", "images/PookaIcon.gif")); 
     if (standardTrayUrl != null) {
       mStandardTrayIcon = new ImageIcon(standardTrayUrl);
-      mTrayIcon = new TrayIcon(mStandardTrayIcon);
-      mTrayIcon.setIconAutoSize(true);
-      mTrayIcon.setPopupMenu(createPopupMenu());
-      mTrayIcon.addActionListener(new AbstractAction() {
-	  public void actionPerformed(ActionEvent e) {
-	    //System.err.println("action:  " + e);
-	    mTrayIcon.displayMessage("Pooka", createStatusMessage(), TrayIcon.INFO_MESSAGE_TYPE);
-	    // bringToFront();
-	  }
-	});
-      
-      SystemTray.getDefaultSystemTray().addTrayIcon(mTrayIcon);
-
     }
 
     
@@ -88,7 +134,19 @@ public class MessageNotificationManager {
     if (newMessageTrayUrl != null) {
 	mNewMessageTrayIcon = new ImageIcon(newMessageTrayUrl);
     }
-    
+
+  }
+
+  /**
+   * This handles the changes if the source property is modified.
+   *
+   * As defined in net.suberic.util.ValueChangeListener.
+   */
+  
+  public void valueChanged(String pChangedValue) {
+    if (pChangedValue.equals("Pooka.trayIcon.enabled")) {
+      configureTrayIcon();
+    }
   }
 
   /**
@@ -123,6 +181,8 @@ public class MessageNotificationManager {
    */
   void bringToFront() {
     //System.err.println("should be trying to bring frame to front, but not implemented yet.");
+    //Pooka.getMainPanel().getParentFrame().setExtendedState(java.awt.Frame.ICONIFIED);
+    //Pooka.getMainPanel().getParentFrame().setExtendedState(java.awt.Frame.NORMAL);
     Pooka.getMainPanel().getParentFrame().toFront();
     //Pooka.getUIFactory().bringToFront();
   }
@@ -135,8 +195,10 @@ public class MessageNotificationManager {
     mNewMessageFlag = false;
     mNewMessageCount = 0;
     mNewMessageMap = new HashMap();
-    mTrayIcon.setToolTip("Pooka: No new messages.");
-    mTrayIcon.setCaption("Pooka: caption.");
+    if (mTrayIcon != null) {
+      mTrayIcon.setToolTip("Pooka: No new messages.");
+      mTrayIcon.setCaption("Pooka: No new messages.");
+    }
     if (doUpdate) {
       //Thread.currentThread().dumpStack();
       updateStatus();
@@ -193,11 +255,29 @@ public class MessageNotificationManager {
 	  if (fUpdateStatus)
 	    updateStatus();
 
-	  mTrayIcon.setToolTip(fToolTip);
-	  mTrayIcon.displayMessage("New Messages", fDisplayMessage, TrayIcon.INFO_MESSAGE_TYPE);
+	  if (mTrayIcon != null) {
+	    mTrayIcon.setToolTip(fToolTip);
+	    mTrayIcon.setCaption(fToolTip);
+	    mTrayIcon.displayMessage("New Messages", fDisplayMessage, TrayIcon.INFO_MESSAGE_TYPE);
+	  }
 	}
       });
     
+  }
+
+  /**
+   * Removes a message from the new messages list.
+   */
+  public synchronized void removeFromNewMessages(MessageInfo pMessageInfo) {
+    String folderId = pMessageInfo.getFolderInfo().getFolderID();
+    Object newMessageList = mNewMessageMap.get(folderId);
+    if (newMessageList != null && newMessageList instanceof List) {
+      ((List) newMessageList).remove(pMessageInfo);
+      mNewMessageCount --;
+      if (mNewMessageCount == 0) 
+	clearNewMessageFlag();
+    }
+
   }
 
   /**
@@ -228,19 +308,34 @@ public class MessageNotificationManager {
 
     return buffer.toString();
   }
-  
-  /**
-   * Disposes of this MessageNotificationManager.
-   */
-  public void dispose() {
-    //FIXME
-  }
 
+  /**
+   * Starts up the pooka main window.
+   */
+  void startMainWindow() {
+    net.suberic.pooka.messaging.PookaMessageSender sender =  new net.suberic.pooka.messaging.PookaMessageSender();
+    try {
+      sender.openConnection();
+      if (sender.checkVersion()) {
+	sender.sendStartPookaMessage();
+      }
+    } catch (Exception exc) {
+      if (mTrayIcon != null)
+	mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.WARNING_MESSAGE_TYPE);
+    } finally {
+      if (sender != null && sender.isConnected())
+	sender.closeConnection();
+    }
+  }
+  
   /**
    * Returns the actions for this component.
    */
   public Action[] getActions() {
-    return mDefaultActions;
+    if (getMainPanel() == null)
+      return mOfflineActions;
+    else
+      return mOnlineActions;
   }
 
   /**
@@ -308,6 +403,9 @@ public class MessageNotificationManager {
 	  });
       }
     }
+    
+    if (mTrayIcon != null)
+      mTrayIcon.setPopupMenu(createPopupMenu());
 
     //System.err.println("mainPanel now = " + mPanel);
   }
@@ -343,7 +441,8 @@ public class MessageNotificationManager {
 	  sender.openNewEmail(null, null);
 	}
       } catch (Exception exc) {
-	mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.WARNING_MESSAGE_TYPE);
+	if (mTrayIcon != null) 
+	  mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.WARNING_MESSAGE_TYPE);
       } finally {
 	if (sender != null && sender.isConnected())
 	  sender.closeConnection();
@@ -368,24 +467,11 @@ public class MessageNotificationManager {
 	MessageProxy proxy = mMessageInfo.getMessageProxy();
 	MessageUI mui = Pooka.getUIFactory().createMessageUI(proxy, new NewMessageFrame(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(Pooka.getDefaultSession())))));
 	mui.openMessageUI();
+	// and if that works, remove it from the new message map.
+	removeFromNewMessages(mMessageInfo);
       } catch (Exception ex) {
 	ex.printStackTrace();
       }
-      /*
-      net.suberic.pooka.messaging.PookaMessageSender sender =  new net.suberic.pooka.messaging.PookaMessageSender();
-      try {
-	sender.openConnection();
-	if (sender.checkVersion()) {
-	  //sender.openExistingEmail(null, null);
-	}
-      } catch (Exception exc) {
-	mTrayIcon.displayMessage("Error", "Error opening message:  " + exc, TrayIcon.ERROE_MESSAGE_TYPE);
-      } finally {
-	if (sender != null && sender.isConnected())
-	  sender.closeConnection();
-      }
-      */
-
     }
   }
   
@@ -421,18 +507,7 @@ public class MessageNotificationManager {
       if (getMainPanel() != null)
 	bringToFront();
       else {
-	net.suberic.pooka.messaging.PookaMessageSender sender =  new net.suberic.pooka.messaging.PookaMessageSender();
-	try {
-	  sender.openConnection();
-	  if (sender.checkVersion()) {
-	    sender.sendStartPookaMessage();
-	  }
-	} catch (Exception exc) {
-	  mTrayIcon.displayMessage("Error", "Error sending new message:  " + exc, TrayIcon.WARNING_MESSAGE_TYPE);
-	} finally {
-	  if (sender != null && sender.isConnected())
-	    sender.closeConnection();
-	}
+	startMainWindow();
       }
     }
   }

@@ -165,10 +165,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	  
 	  public void disconnected(ConnectionEvent e) {
 	    getLogger().log(Level.FINE, "Store " + getStoreID() + " disconnected.");
-	    try {
-	      disconnectStore();
-	    } catch (MessagingException me) {
-	      getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
+	    // if we think we're connected, then call disconnectStore.
+	    if (isConnected()) {
+	      try {
+		disconnectStore();
+	      } catch (MessagingException me) {
+		getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
+	      }
 	    }
 	    
 	  }
@@ -176,14 +179,17 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	  public void closed(ConnectionEvent e) {
 	    getLogger().log(Level.FINE, "Store " + getStoreID() + " closed.");
 
-	    try {
-	      disconnectStore();
-	    } catch (MessagingException me) {
-	      getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
+	    // if we think we're connected, then call disconnectStore.
+	    if (isConnected()) {
+	      try {
+		disconnectStore();
+	      } catch (MessagingException me) {
+		getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
+	      }
 	    }
 	    
 	  }
-
+	  
 	  public void opened(ConnectionEvent e) {
 	    getLogger().log(Level.FINE, "Store " + getStoreID() + " opened.");
 	  }	  

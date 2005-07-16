@@ -1,30 +1,30 @@
-*)  fix save as draft.
-	basically works.  needs:  better display of draft messages
-	option not to delete draft messsage 
-3)  do jdic stuff.
-
-*) undelete?
-
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka
-	-- need to add exit pooka as 'go to minimal'
-	
-  add in open message support?
-  !! fix open message  
-	make the display nice?
-	make it clear automatically?
-  add support for showing disconnection messages?
+	-- change 2xclick action (?)
   add preferences dialog
-  add exit pooka
-  add starting pooka as just a service.
-  add disconnect/offline mode to right-click menu
   bug:  first call of right-click menu vanishes immediately.
+  add in open message support?
+	make the display nice?
+  add support for showing disconnection messages?
+  add disconnect/offline mode to right-click menu
+	-- sort of done.
+  figure out virtual desktop support???
   trayicon support:
-	*) add message display timeout support
+	*) add changing message display timeout support
 	*) fix resizing code -- should keep ratio
 	*) fix tooltip display code so it doesn't show off screen
   	*) ?? gnome focus stealing? -- see if you can make it so the update
 		doesn't move focus from other random window.
+	   -- look into focus stealing in general.
+	*) should be able to tell if balloon is showing or not.
+	*) should have a full MouseListener, not just an actionlistener.
+	*) remove button border.
+
+*)  fix save as draft.
+	basically works.  needs:  better display of draft messages
+	option not to delete draft messsage 
+
+*) undelete?
 
 *) see if we can make pooka start up on correct virtual desktop
 

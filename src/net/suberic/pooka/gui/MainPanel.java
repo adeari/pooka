@@ -250,7 +250,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       contentPanel.saveOpenFolders();
     }
     
-    if (Pooka.getProperty("Pooka.exitToIcon", "false").equalsIgnoreCase("true")) {
+    if (Pooka.getProperty("Pooka.exitToIcon", "false").equalsIgnoreCase("true") && Pooka.getUIFactory().getMessageNotificationManager().getTrayIcon() != null) {
       Pooka.sStartupManager.stopPookaToTray(this);
     } else {
       Pooka.exitPooka(exitValue, this);

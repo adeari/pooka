@@ -34,13 +34,10 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources());
     if (pSource != null) {
       pookaThemeManager = pSource.getPookaThemeManager();
-      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
-	try {
-	  mMessageNotificationManager = pSource.getMessageNotificationManager();
-	} catch (Error e) {
-	  System.err.println("Error starting up tray icon:  " + e.getMessage());
-	}
-      }
+      mMessageNotificationManager = pSource.getMessageNotificationManager();
+    } else {
+      pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+      mMessageNotificationManager = new MessageNotificationManager();
     }
   }
   
@@ -49,15 +46,6 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    */
   public PookaDesktopPaneUIFactory() {
     this(null);
-    pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
-    if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
-      try {
-	mMessageNotificationManager = new MessageNotificationManager();
-      } catch (Error e) {
-	System.err.println("Error starting up tray icon:  " + e.getMessage());
-      }
-    }
-
   }
 
   /**

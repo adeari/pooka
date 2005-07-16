@@ -158,13 +158,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 	setFolder(new FolderProxy(getFolderName()));
       }
 
-
-      if (mFolderThread == null) {
-	mFolderThread = new ActionThread(getParentStore().getStoreID() + "." + getFolderID() + " - ActionThread");
-	mFolderThread.start();
-      }
-      
-
     } catch (MessagingException me) {
       if (Pooka.isDebug()) {
 	System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception; setting loaded to false:  " + me.getMessage() );

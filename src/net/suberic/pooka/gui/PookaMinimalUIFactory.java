@@ -51,26 +51,11 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
     if (pSource != null) {
       mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
-      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
-	try {
-	  mMessageNotificationManager = pSource.getMessageNotificationManager();
-	  if (mMessageNotificationManager != null)
-	    mMessageNotificationManager.setMainPanel(null);
-	} catch (Error e) {
-	  System.err.println("Error starting up tray icon:  " + e.getMessage());
-	}
-      }
+      mMessageNotificationManager = pSource.getMessageNotificationManager();
+      mMessageNotificationManager.setMainPanel(null);
     } else {
       mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
-      
-      if (Pooka.getProperty("Pooka.trayIcon.enabled", "true").equalsIgnoreCase("true")) {
-	try {
-	  mMessageNotificationManager = new MessageNotificationManager();
-	} catch (Error e) {
-	  System.err.println("Error starting up tray icon:  " + e.getMessage());
-	}
-      }
-
+      mMessageNotificationManager = new MessageNotificationManager();
     }
   }
   
