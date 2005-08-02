@@ -50,10 +50,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	public void focusGained(FocusEvent e) {
 	  if (editorStatus == WITHOUT_ATTACHMENTS) {
 	    if (editorPane != null)
-	      editorPane.requestFocus();
+	      editorPane.requestFocusInWindow();
 	  } else if (editorStatus == WITH_ATTACHMENTS) {
 	    if (otherEditorPane != null)
-	      otherEditorPane.requestFocus();
+	      otherEditorPane.requestFocusInWindow();
 	  }
 	}
       });
@@ -71,10 +71,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	public void focusGained(FocusEvent e) {
 	  if (editorStatus == WITHOUT_ATTACHMENTS) {
 	    if (editorPane != null)
-	      editorPane.requestFocus();
+	      editorPane.requestFocusInWindow();
 	  } else if (editorStatus == WITH_ATTACHMENTS) {
 	    if (otherEditorPane != null)
-	      otherEditorPane.requestFocus();
+	      otherEditorPane.requestFocusInWindow();
 	  }
 	}
       });
@@ -702,7 +702,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     public void actionPerformed(ActionEvent e) {
       if (attachmentPanel != null) {
-	attachmentPanel.requestFocus();
+	attachmentPanel.requestFocusInWindow();
       }
     }
   }
@@ -744,10 +744,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     public void actionPerformed(ActionEvent e) {
       if (editorStatus == WITHOUT_ATTACHMENTS) {
 	if (editorPane != null)
-	  editorPane.requestFocus();
+	  editorPane.requestFocusInWindow();
       } else if (editorStatus == WITH_ATTACHMENTS) {
 	if (otherEditorPane != null)
-	  otherEditorPane.requestFocus();
+	  otherEditorPane.requestFocusInWindow();
       }
     }
   }

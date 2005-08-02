@@ -140,7 +140,7 @@ public class FolderStatusBar extends JPanel implements MessageCountListener, Mes
    */
   public void activateGotoDialog() {
     gotoInputField.selectAll();
-    gotoInputField.requestFocus();
+    gotoInputField.requestFocusInWindow();
   }
   
   public FolderInfo getFolderInfo() {

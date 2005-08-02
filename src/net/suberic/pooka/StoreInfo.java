@@ -168,6 +168,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	    // if we think we're connected, then call disconnectStore.
 	    if (isConnected()) {
 	      try {
+		if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
+		  Pooka.getUIFactory().getMessageNotificationManager().displayMessage("Disconnected", "Disconnected from store " + getStoreID(), net.suberic.pooka.gui.MessageNotificationManager.WARNING_MESSAGE_TYPE);
+		}
 		disconnectStore();
 	      } catch (MessagingException me) {
 		getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
@@ -181,6 +184,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
 	    // if we think we're connected, then call disconnectStore.
 	    if (isConnected()) {
+	      if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
+		Pooka.getUIFactory().getMessageNotificationManager().displayMessage("Disconnected", "Disconnected from store " + getStoreID(), net.suberic.pooka.gui.MessageNotificationManager.WARNING_MESSAGE_TYPE);
+	      }
 	      try {
 		disconnectStore();
 	      } catch (MessagingException me) {

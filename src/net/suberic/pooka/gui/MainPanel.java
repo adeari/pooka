@@ -103,7 +103,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       Pooka.getUIFactory().getMessageNotificationManager().setMainPanel(this);
     }
     // select the content panel.
-    contentPanel.getUIComponent().requestFocus();
+    contentPanel.getUIComponent().requestFocusInWindow();
 
   }
 
@@ -592,7 +592,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
     
     public void actionPerformed(ActionEvent e) {
-	contentPanel.getUIComponent().requestFocus();
+	contentPanel.getUIComponent().requestFocusInWindow();
     }
   }
   
@@ -603,7 +603,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
     
     public void actionPerformed(ActionEvent e) {
-      folderPanel.requestFocus();
+      folderPanel.requestFocusInWindow();
     }
   }
   
@@ -707,11 +707,11 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     public void passFocus() {
       if (lastStatus == CONTENT_LAST && contentPanel != null) {
 	if (contentPanel instanceof JComponent)
-	  ((JComponent)contentPanel).requestFocus();
+	  ((JComponent)contentPanel).requestFocusInWindow();
 	else
-	  contentPanel.getUIComponent().requestFocus();
+	  contentPanel.getUIComponent().requestFocusInWindow();
       } else if (lastStatus == FOLDER_LAST && folderPanel != null) {
-	folderPanel.requestFocus();
+	folderPanel.requestFocusInWindow();
       }
     }
 

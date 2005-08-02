@@ -31,6 +31,7 @@ public class ActionThread extends Thread {
    */
   public ActionThread(String threadName) {
     super(threadName);
+    setPriority(Thread.NORM_PRIORITY);
   }
   
   /**

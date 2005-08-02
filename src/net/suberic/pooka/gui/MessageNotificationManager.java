@@ -28,6 +28,8 @@ import org.jdesktop.jdic.tray.SystemTray;
  */
 public class MessageNotificationManager implements ValueChangeListener {
 
+  public static int WARNING_MESSAGE_TYPE = TrayIcon.WARNING_MESSAGE_TYPE;
+
   private MainPanel mPanel;
   private boolean mNewMessageFlag = false;
   private TrayIcon mTrayIcon = null;
@@ -45,6 +47,9 @@ public class MessageNotificationManager implements ValueChangeListener {
   private ImageIcon mNewMessageIcon = null;
   private ImageIcon mStandardTrayIcon = null;
   private ImageIcon mNewMessageTrayIcon = null;
+
+  private boolean mShowNewMailMessage = true;
+  private boolean mBlinkNewMail = true;
 
   /**
    * Creates a new MessageNotificationManager.
@@ -85,6 +90,8 @@ public class MessageNotificationManager implements ValueChangeListener {
       try {
 	mTrayIcon = new TrayIcon(mStandardTrayIcon);
 	mTrayIcon.setIconAutoSize(true);
+	mTrayIcon.setTimeout(5000);
+	
 	mTrayIcon.setPopupMenu(createPopupMenu());
 	mTrayIcon.addActionListener(new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
@@ -113,13 +120,13 @@ public class MessageNotificationManager implements ValueChangeListener {
    * Sets up the images to use for the tray icon and for the main window.
    */
   void setupImages() {
-    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardIcon", "images/PookaIcon.gif")); 
+    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("PookastandardIcon", "images/PookaIcon.gif")); 
     if (standardUrl != null) {
       mStandardIcon = new ImageIcon(standardUrl);
       setCurrentIcon(mStandardIcon);
     }
 
-    java.net.URL standardTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardTrayIcon", "images/PookaIcon.gif")); 
+    java.net.URL standardTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardTrayIcon", "images/PookaIcon_20x20.png")); 
     if (standardTrayUrl != null) {
       mStandardTrayIcon = new ImageIcon(standardTrayUrl);
     }
@@ -247,24 +254,66 @@ public class MessageNotificationManager implements ValueChangeListener {
       mNewMessageFlag = true;
       doUpdateStatus = true;
     }
-
+    
     final boolean fUpdateStatus = doUpdateStatus;
-
+    
     SwingUtilities.invokeLater(new Runnable() {
 	public void run() {
 	  if (fUpdateStatus)
 	    updateStatus();
-
+	  
 	  if (mTrayIcon != null) {
 	    mTrayIcon.setToolTip(fToolTip);
 	    mTrayIcon.setCaption(fToolTip);
-	    mTrayIcon.displayMessage("New Messages", fDisplayMessage, TrayIcon.INFO_MESSAGE_TYPE);
+	    if (mShowNewMailMessage) {
+	      mTrayIcon.displayMessage("New Messages", fDisplayMessage, TrayIcon.INFO_MESSAGE_TYPE);
+	    } 
+	    if (mBlinkNewMail) {
+	      Runnable runMe = new Runnable() {
+		  public void run() {
+		    Runnable removeMe = new Runnable() {
+			public void run() {
+			  synchronized(MessageNotificationManager.this) {
+			    if (mNewMessageFlag) {
+			      if (getTrayIcon() != null)
+				getTrayIcon().setIcon(null);
+			    }
+			  }
+			}
+		      };
+
+		    Runnable showMe = new Runnable() {
+			public void run() {
+			  synchronized(MessageNotificationManager.this) {
+			    if (getTrayIcon() != null)
+			      getTrayIcon().setIcon(getNewMessageIcon());
+			  }
+			}
+		      };
+		    
+		    try {
+		      for (int i = 0; i < 3; i++) {
+			SwingUtilities.invokeLater(removeMe);
+			Thread.currentThread().sleep(1000);
+			SwingUtilities.invokeLater(showMe);
+			Thread.currentThread().sleep(1000);
+		      }
+		    } catch (Exception e) {
+		      
+		    }
+		  }
+		};
+
+	      Thread blinkThread = new Thread(runMe);
+	      blinkThread.setPriority(Thread.NORM_PRIORITY);
+	      blinkThread.start();
+	    }
 	  }
 	}
       });
     
   }
-
+  
   /**
    * Removes a message from the new messages list.
    */
@@ -408,6 +457,23 @@ public class MessageNotificationManager implements ValueChangeListener {
       mTrayIcon.setPopupMenu(createPopupMenu());
 
     //System.err.println("mainPanel now = " + mPanel);
+  }
+
+  /**
+   * Displays a message.  
+   *
+   * @param pMessage the message to display
+   * @param pTitle the title of the display window
+   * @param pType the type of message to display
+   * @return true if the message is displayed, false otherwise.
+   */
+  public boolean displayMessage(String pTitle, String pMessage, int pType) {
+    if (mTrayIcon != null) {
+      mTrayIcon.displayMessage(pTitle, pMessage, pType);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**

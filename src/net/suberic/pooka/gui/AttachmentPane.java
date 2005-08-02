@@ -189,7 +189,7 @@ public class AttachmentPane extends JPanel {
 	    if (getSelectedAttachment() == null) {
 	      getTable().setRowSelectionInterval(0,0);
 	    }
-	    getTable().requestFocus();
+	    getTable().requestFocusInWindow();
 	  }
 	}
       });

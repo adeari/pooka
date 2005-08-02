@@ -1,8 +1,13 @@
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka
 	-- change 2xclick action (?)
+	should go:
+	  connected:  1xclick=show status?  2xclick = bring to front?
+	  	      rightclick=show menu
+	  disconnected:  1xclick=show status?  2xclick=start up?
+		      rightclick=show menu?
   add preferences dialog
-  bug:  first call of right-click menu vanishes immediately.
+  bug:  first call of right-click menu vanishes immediately. -- jdic bug?
   add in open message support?
 	make the display nice?
   add support for showing disconnection messages?
@@ -11,14 +16,24 @@
   figure out virtual desktop support???
   trayicon support:
 	*) add changing message display timeout support
+		easy in linux.  look up Shell_NotifyIcon for windows.
 	*) fix resizing code -- should keep ratio
+		...the reshape() method seems to be the problem.  call
+		for legal values?
+		...behaviour:  Icon should have a preferred size, past which
+		it will try not to grow.  Icon should also have a setting
+		for keeping the image ratio.  if the display is larger than
+		the preferred ratio (1:1, but size wants to be 3:1) then
+		icon should center.
 	*) fix tooltip display code so it doesn't show off screen
+		easy?  check.
   	*) ?? gnome focus stealing? -- see if you can make it so the update
 		doesn't move focus from other random window.
 	   -- look into focus stealing in general.
 	*) should be able to tell if balloon is showing or not.
 	*) should have a full MouseListener, not just an actionlistener.
 	*) remove button border.
+	*) check it out on windows?
 
 *)  fix save as draft.
 	basically works.  needs:  better display of draft messages
@@ -27,9 +42,6 @@
 *) undelete?
 
 *) see if we can make pooka start up on correct virtual desktop
-
-*) "please reopen" message shouldn't come up when you've requested a
-	store/folder close. (caching, maybe normal uid?)
 
 *) folder-check reopen attempts should only happen if the store is open
 	or should be open.  they should not reopen the store.

@@ -229,6 +229,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * then we can either return to NOT_LOADED, or INVALID.
    */
   public void loadFolder() throws MessagingException {
+    loadFolder(true);
+  }
+
+  /**
+   * This actually loads up the Folder object itself.  This is used so 
+   * that we can have a FolderInfo even if we're not connected to the
+   * parent Store.
+   *
+   * Before we load the folder, the FolderInfo has the state of NOT_LOADED.
+   * Once the parent store is connected, we can try to load the folder.  
+   * If the load is successful, we go to a CLOSED state.  If it isn't,
+   * then we can either return to NOT_LOADED, or INVALID.
+   */
+  public void loadFolder(boolean pConnectStore) throws MessagingException {
     boolean parentIsConnected = false;
 
     if (isLoaded() || (loading && children == null)) 
@@ -246,8 +260,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	if (! parentStore.isAvailable())
 	  throw new MessagingException();
 	
-	if (!parentStore.isConnected())
-	  parentStore.connectStore();
+	if (!parentStore.isConnected()) {
+	  if (pConnectStore) {
+	    parentStore.connectStore();
+	  } else {
+	    return;
+	  }
+	}
+	
+
 	Store store = parentStore.getStore();
 
 	// first see if we're a namespace
@@ -376,7 +397,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       
       getLogger().log(Level.FINE, "Folder " + getFolderID() + " closed:  " + e);
       // if this happened accidentally, check it.
-      if (getStatus() != CLOSED) {
+      if (getStatus() != CLOSED && getStatus() != DISCONNECTED) {
 	
 	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -486,7 +507,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     getLogger().log(Level.FINE, this + ":  loading folder.");
     
     if (! isLoaded() && status != CACHE_ONLY)
-      loadFolder();
+      loadFolder(pConnectStore);
     
     getLogger().log(Level.FINE, this + ":  folder loaded.  status is " + status);
     

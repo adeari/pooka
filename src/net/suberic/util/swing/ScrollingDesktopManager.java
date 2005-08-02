@@ -84,7 +84,7 @@ public class ScrollingDesktopManager extends DefaultDesktopManager
 	public void run() {
 	  
 	  java.awt.KeyboardFocusManager mgr = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager();
-	  pane.requestFocus();
+	  pane.requestFocusInWindow();
 	}
       });
   }

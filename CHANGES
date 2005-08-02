@@ -1,3 +1,6 @@
+closing a disconnected imap store no longer results it 'please reopen' 
+messages.
+
 made status area at bottom smaller.
 
 fixed a bug where the 3rd field was always opening an attachment menu even

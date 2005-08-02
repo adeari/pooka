@@ -150,9 +150,9 @@ public class LoadHttpConfigPooka {
       d.add(constrain(password, gb, c));
       // XXX - following doesn't work
       if (user != null && user.length() > 0)
-	password.requestFocus();
+	password.requestFocusInWindow();
       else
-	username.requestFocus();
+	username.requestFocusInWindow();
       
       int result = JOptionPane.showConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
       

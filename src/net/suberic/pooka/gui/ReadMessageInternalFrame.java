@@ -60,7 +60,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
 	  if (getMessageDisplay() != null)
-	    getMessageDisplay().requestFocus();
+	    getMessageDisplay().requestFocusInWindow();
 	}
       });
     

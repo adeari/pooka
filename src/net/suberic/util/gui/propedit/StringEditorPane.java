@@ -47,7 +47,7 @@ public class StringEditorPane extends SwingPropertyEditor {
 	    } catch (PropertyValueVetoException pvve) {
 	      inputField.setText(currentValue);
 	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
-	      inputField.requestFocus();
+	      inputField.requestFocusInWindow();
 	    }
 	  }
 	}

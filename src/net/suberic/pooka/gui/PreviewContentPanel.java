@@ -74,7 +74,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     this.addFocusListener(new java.awt.event.FocusAdapter() {
 	public void focusGained(java.awt.event.FocusEvent e) {
 	  if (current != null) {
-	    current.requestFocus();
+	    current.requestFocusInWindow();
 	  }
 	}
       });
@@ -404,14 +404,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    */
   public void selectFolderDisplay() {
     if (current != null)
-      current.requestFocus();
+      current.requestFocusInWindow();
   }
 
   /**
    * Selects the preview message panel.
    */
   public void selectMessageDisplay() {
-    messageDisplay.requestFocus();
+    messageDisplay.requestFocusInWindow();
   }
 
   /**
@@ -493,7 +493,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     java.awt.Component fOwner = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     if (fOwner != null && messageDisplay != null && SwingUtilities.isDescendingFrom(fOwner, messageDisplay) && messageDisplay.getMessageUI() == null) {
       if (current != null) {
-	current.requestFocus();
+	current.requestFocusInWindow();
       }
     }
   }

@@ -102,9 +102,9 @@ public class SimpleAuthenticator extends Authenticator {
 	d.add(constrain(password, gb, c));
 	// XXX - following doesn't work
 	if (user != null && user.length() > 0)
-	    password.requestFocus();
+	    password.requestFocusInWindow();
 	else
-	    username.requestFocus();
+	    username.requestFocusInWindow();
 	
 	int result = JOptionPane.showConfirmDialog(getFrame(), d, "Login",
 	    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);

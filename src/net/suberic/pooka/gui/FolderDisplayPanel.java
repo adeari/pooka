@@ -70,7 +70,7 @@ public class FolderDisplayPanel extends JPanel {
 	  java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("folder display panel:  gained focus.");
 
 	  if (messageTable != null) {
-	    messageTable.requestFocus();
+	    messageTable.requestFocusInWindow();
 	  }
 	  Pooka.getMainPanel().refreshActiveMenus();
 	  if (getFolderInfo() != null && getFolderInfo().hasNewMessages()) {

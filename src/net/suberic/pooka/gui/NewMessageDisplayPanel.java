@@ -140,7 +140,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	      String toValue = ((JTextComponent) toComponent).getText();
 	      if (toValue == null || toValue.length() == 0) {
 		done = true;
-		toComponent.requestFocus();
+		toComponent.requestFocusInWindow();
 	      }
 	    }
 
@@ -148,14 +148,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	      String subjectValue = ((JTextComponent) subjectComponent).getText();
 	      if (subjectValue == null || subjectValue.length() == 0) {
 		done = true;
-		subjectComponent.requestFocus();
+		subjectComponent.requestFocusInWindow();
 	      }
 	    }
 	  }
 
 	  if (! done) {
 	    if (editorPane != null)
-	      editorPane.requestFocus();
+	      editorPane.requestFocusInWindow();
 	  }
 	}
       });
@@ -1085,7 +1085,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     public void actionPerformed(ActionEvent e) {
       if (attachmentPanel != null) {
 	tabbedPane.setSelectedComponent(attachmentDisplayPanel);
-	attachmentPanel.requestFocus();
+	attachmentPanel.requestFocusInWindow();
       }
     }
   }

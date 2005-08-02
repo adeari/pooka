@@ -124,7 +124,7 @@ public class FolderPanel extends JScrollPane implements ItemListChangeListener, 
     
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
-	  folderTree.requestFocus();
+	  folderTree.requestFocusInWindow();
 	}
       });
     

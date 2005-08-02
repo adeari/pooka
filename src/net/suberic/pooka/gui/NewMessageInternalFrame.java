@@ -35,7 +35,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
       this.addFocusListener(new FocusAdapter() {
       public void focusGained(FocusEvent e) {
       if (getMessageDisplay() != null)
-      getMessageDisplay().requestFocus();
+      getMessageDisplay().requestFocusInWindow();
       }
       });
     */

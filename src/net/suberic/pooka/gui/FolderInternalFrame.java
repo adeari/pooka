@@ -90,7 +90,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
-	  folderDisplay.requestFocus();
+	  folderDisplay.requestFocusInWindow();
 	}
       });
     
@@ -168,7 +168,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
-	  folderDisplay.requestFocus();
+	  folderDisplay.requestFocusInWindow();
 	}
       });
     

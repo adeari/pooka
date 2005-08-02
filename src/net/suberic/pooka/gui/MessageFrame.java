@@ -49,7 +49,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
 	  if (getMessageDisplay() != null)
-	    getMessageDisplay().requestFocus();
+	    getMessageDisplay().requestFocusInWindow();
 	}
       });
     
@@ -68,7 +68,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     this.addFocusListener(new FocusAdapter() {
 	public void focusGained(FocusEvent e) {
 	  if (getMessageDisplay() != null)
-	    getMessageDisplay().requestFocus();
+	    getMessageDisplay().requestFocusInWindow();
 	}
       });
       
