@@ -277,8 +277,10 @@ public class MailFileSystemView
 		getLogger().info("setting folder f to store.getDefaultFolder().");
 	    roots = new FolderFileWrapper[storeList.length];
 	    for (int i = 0; i < storeList.length; i++) {
+	      synchronized(storeList[i].getStoreThread().getRunLock()) {
 		Folder f = storeList[i].getStore().getDefaultFolder();
-		roots[i] = new FolderFileWrapper(f, null, storeList[i].getStoreID());
+		roots[i] = new FolderFileWrapper(f, storeList[i].getStoreID(), storeList[i].getStoreThread().getRunLock());
+	      }
 	    }
 	    return roots;
 	} catch (MessagingException me) {

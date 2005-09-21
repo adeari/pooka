@@ -107,8 +107,9 @@ public class ExternalLauncher implements CommandObject, Runnable {
       }
       
       if (! cancelled) {
-	mDialog.dispose();
-
+	if (mDialog != null)
+	  mDialog.dispose();
+	
 	String fileHandler = Pooka.getProperty("ExternalLauncher.fileHandler." + java.io.File.separator, null);
 	String wrapper = Pooka.getProperty("ExternalLauncher.cmdWrapper." + java.io.File.separator, null);
 	String fileName = mTmpFile.getAbsolutePath();
@@ -260,7 +261,8 @@ public class ExternalLauncher implements CommandObject, Runnable {
     try {
       mTmpFile.delete();
     } catch (Exception e) {}
-    mDialog.dispose();
+    if (mDialog != null)
+      mDialog.dispose();
   }
 
 }

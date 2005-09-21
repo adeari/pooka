@@ -49,7 +49,7 @@ public class MessageNotificationManager implements ValueChangeListener {
   private ImageIcon mNewMessageTrayIcon = null;
 
   private boolean mShowNewMailMessage = true;
-  private boolean mBlinkNewMail = true;
+  private boolean mBlinkNewMail = false;
 
   /**
    * Creates a new MessageNotificationManager.

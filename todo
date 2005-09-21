@@ -1,3 +1,37 @@
+*) test and fix what happens when we delete an smtp server that's set
+	as a default for a user account.
+
+*) test and fix subscribing to folders w/disconnected operation (?).
+	check loading messages for offline-enabled folder; see if we
+	get enough messages.
+
+*)  fix save as draft.
+	basically works.  needs:  better display of draft messages
+	option not to delete draft messsage 
+
+*) status messages should disappear after a while.
+*) status messages:  make them appear and disappear at appropriate times.
+	-- Comparing new messages to current list... never goes away.
+
+*) redo webstart site; change target to latest version, with old verison
+	around for compatibility.
+
+*) fix address books so that the display uses the real address, not the
+	alias.
+
+*) work out webstart code for tray icon.
+
+------
+*) fix mbox to make it useful (now you can't create new folders).  make it
+	so you can make maildir-based folder.
+
+*) undelete?
+
+*) see if we can make pooka start up on correct virtual desktop
+
+*) folder-check reopen attempts should only happen if the store is open
+	or should be open.  they should not reopen the store.
+
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka
 	-- change 2xclick action (?)
@@ -34,21 +68,6 @@
 	*) should have a full MouseListener, not just an actionlistener.
 	*) remove button border.
 	*) check it out on windows?
-
-*)  fix save as draft.
-	basically works.  needs:  better display of draft messages
-	option not to delete draft messsage 
-
-*) undelete?
-
-*) see if we can make pooka start up on correct virtual desktop
-
-*) folder-check reopen attempts should only happen if the store is open
-	or should be open.  they should not reopen the store.
-
-*) status messages should disappear after a while.
-*) status messages:  make them appear and disappear at appropriate times.
-	-- Comparing new messages to current list... never goes away.
 
 -----------
 

@@ -200,7 +200,7 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
       //underlyingServer = getOutgoingMailServer(defaultServerId);
 
       underlyingServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(defaultServerId);
-      outboxID = Pooka.getProperty("OutgoingServer." + defaultServerId + ".outbox");
+      outboxID = Pooka.getProperty("OutgoingServer." + defaultServerId + ".outbox", "");
 
       mailServerThread = new net.suberic.util.thread.ActionThread("default - smtp thread");
       mailServerThread.start();
@@ -230,23 +230,27 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
 	
 	FolderInfo outbox = getOutbox();
 	
-	Message[] msgs = outbox.getFolder().getMessages();    
-	
-	try {
-	  for (int i = 0; i < msgs.length; i++) {
-	    Message m = msgs[i];
-	    if (! m.isSet(Flags.Flag.DRAFT)) {
-	      sendTransport.sendMessage(m, m.getAllRecipients());
-	      m.setFlag(Flags.Flag.DELETED, true);
+	Message[] msgs; 
+
+	if (outbox != null) {
+	  msgs = outbox.getFolder().getMessages();    
+	  
+	  try {
+	    for (int i = 0; i < msgs.length; i++) {
+	      Message m = msgs[i];
+	      if (! m.isSet(Flags.Flag.DRAFT)) {
+		sendTransport.sendMessage(m, m.getAllRecipients());
+		m.setFlag(Flags.Flag.DELETED, true);
+	      }
 	    }
+	  } finally {
+	    outbox.getFolder().expunge();
 	  }
-	} finally {
-	  outbox.getFolder().expunge();
 	}
 
 	FolderInfo underlyingOutbox = underlyingServer.getOutbox();
 	
-	if (underlyingOutbox != outbox) {
+	if (underlyingOutbox != null && underlyingOutbox != outbox) {
 	  msgs = underlyingOutbox.getFolder().getMessages();    
 	  
 	  try {
@@ -278,7 +282,11 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
      * stored until they're ready to be sent.
      */
     public FolderInfo getOutbox() {
-      return Pooka.getStoreManager().getFolder(outboxID);
+      if (outboxID != null && outboxID != "") {
+	return Pooka.getStoreManager().getFolder(outboxID);
+      } else {
+	return null;
+      }
     }
     
     /**

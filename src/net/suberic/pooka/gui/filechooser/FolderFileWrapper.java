@@ -16,6 +16,7 @@ public class FolderFileWrapper extends File {
   private FolderFileWrapper parent;
   private FolderFileWrapper[] children = null;
   private String path;
+  private Object mRunLock = null;
   
   /**
    * Creates a new FolderFileWrapper from a Folder.  This should only
@@ -26,6 +27,7 @@ public class FolderFileWrapper extends File {
     folder = f;
     parent = p;
     path = f.getName();
+    mRunLock = p.getRunLock();
     if (Pooka.isDebug())
       if (p != null)
 	System.out.println("creating FolderFileWrapper from parent '" + p.getAbsolutePath() + "' from folder '" + f.getName() + "'");
@@ -42,11 +44,27 @@ public class FolderFileWrapper extends File {
     super(f.getName());
     folder = f;
     parent = p;
+    mRunLock = p.getRunLock();
     path = filePath;
     if (Pooka.isDebug())
       if (p != null)
 	System.out.println("creating FolderFileWrapper from parent '" + p.getAbsolutePath() + "' called '" + filePath + "'");
       else
+	System.out.println("creating FolderFileWrapper from parent 'null' called '" + filePath + "'");
+  }
+
+  /**
+   * Creates a new FolderFileWrapper from a Folder with the given path
+   * and parent.  This is used for making relative paths to files, i.e.
+   * a child of '/foo' called 'bar/baz'.
+   */
+  public FolderFileWrapper(Folder f, String filePath, Object pRunLock) {
+    super(f.getName());
+    folder = f;
+    parent = null;
+    mRunLock = pRunLock;
+    path = filePath;
+    if (Pooka.isDebug())
 	System.out.println("creating FolderFileWrapper from parent 'null' called '" + filePath + "'");
   }
   
@@ -451,6 +469,7 @@ public class FolderFileWrapper extends File {
    * This loads the children of the Folder.
    */
   private synchronized void loadChildren() {
+    synchronized(getRunLock()) {
     if (Pooka.isDebug()) {
       System.out.println(Thread.currentThread().getName() + ":  calling loadChildren() on " + getAbsolutePath());
       //Thread.dumpStack();
@@ -513,72 +532,74 @@ public class FolderFileWrapper extends File {
 	}
       }
     }
-    
+    }    
   }
 
   /**
    * This refreshes the children of the Folder.
    */
   public synchronized void refreshChildren() {
-    if (Pooka.isDebug()) {
-      System.out.println(Thread.currentThread().getName() + ":  calling refreshChildren() on " + getAbsolutePath());
-      //Thread.dumpStack();
-    }
-    
-    if (children == null) {
+    synchronized(getRunLock()) {
       if (Pooka.isDebug()) {
-	System.out.println(Thread.currentThread().getName() + ":  children is null on " + getAbsolutePath() + ".  calling loadChildren().");
+	System.out.println(Thread.currentThread().getName() + ":  calling refreshChildren() on " + getAbsolutePath());
+	//Thread.dumpStack();
       }
-      loadChildren();
-    } else {
-      if (isDirectory() ||  ! exists()) {
-	try {
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  checking for connection.");
-	  
-	  if (!folder.getStore().isConnected()) {
-	    if (Pooka.isDebug()) {
-	      System.out.println(Thread.currentThread().getName() + ":  parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
-	    }
-	    folder.getStore().connect();
-	  } else {
+      
+      if (children == null) {
+	if (Pooka.isDebug()) {
+	  System.out.println(Thread.currentThread().getName() + ":  children is null on " + getAbsolutePath() + ".  calling loadChildren().");
+	}
+	loadChildren();
+      } else {
+	if (isDirectory() ||  ! exists()) {
+	  try {
 	    if (Pooka.isDebug())
-	      System.out.println(Thread.currentThread().getName() + ":  connection is ok.");
-	  }
-	  
-	  
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
-	  Folder[] childList = folder.list();
-	  if (Pooka.isDebug())
-	    System.out.println(Thread.currentThread().getName() + ":  folder.list() returned " + childList + "; creating new folderFileWrapper.");
-	  
-	  FolderFileWrapper[] tmpChildren = new FolderFileWrapper[childList.length];
-	  for (int i = 0; i < childList.length; i++) {
-	    if (Pooka.isDebug())
-	      System.out.println(Thread.currentThread().getName() + ":  calling new FolderFileWrapper for " + childList[i].getName() + " (entry # " + i);
+	      System.out.println(Thread.currentThread().getName() + ":  checking for connection.");
 	    
-	    // yeah, this is n! or something like that. shouldn't matter--
-	    // if we have somebody running with that many folders, or with
-	    // that slow of a machine, we're in trouble anyway.
-
-	    //try to get a match.
-	    boolean found = false;
-	    for (int j = 0; ! found && j < children.length; j++) {
-	      if (children[j].getName().equals(childList[i].getName())) {
-		tmpChildren[i] = children[j];
-		found = true;
+	    if (!folder.getStore().isConnected()) {
+	      if (Pooka.isDebug()) {
+		System.out.println(Thread.currentThread().getName() + ":  parent store of " + getAbsolutePath() + " is not connected.  reconnecting.");
+	      }
+	      folder.getStore().connect();
+	    } else {
+	      if (Pooka.isDebug())
+		System.out.println(Thread.currentThread().getName() + ":  connection is ok.");
+	    }
+	    
+	    
+	    if (Pooka.isDebug())
+	      System.out.println(Thread.currentThread().getName() + ":  calling folder.list()");
+	    Folder[] childList = folder.list();
+	    if (Pooka.isDebug())
+	      System.out.println(Thread.currentThread().getName() + ":  folder.list() returned " + childList + "; creating new folderFileWrapper.");
+	    
+	    FolderFileWrapper[] tmpChildren = new FolderFileWrapper[childList.length];
+	    for (int i = 0; i < childList.length; i++) {
+	      if (Pooka.isDebug())
+		System.out.println(Thread.currentThread().getName() + ":  calling new FolderFileWrapper for " + childList[i].getName() + " (entry # " + i);
+	      
+	      // yeah, this is n! or something like that. shouldn't matter--
+	      // if we have somebody running with that many folders, or with
+	      // that slow of a machine, we're in trouble anyway.
+	      
+	      //try to get a match.
+	      boolean found = false;
+	      for (int j = 0; ! found && j < children.length; j++) {
+		if (children[j].getName().equals(childList[i].getName())) {
+		  tmpChildren[i] = children[j];
+		  found = true;
+		}
+	      }
+	      
+	      if (! found) {
+		tmpChildren[i] = new FolderFileWrapper(childList[i], this);
 	      }
 	    }
-
-	    if (! found) {
-	      tmpChildren[i] = new FolderFileWrapper(childList[i], this);
-	    }
+	    
+	    children = tmpChildren;
+	  } catch (MessagingException me) {
+	    Pooka.getUIFactory().showError(Pooka.getProperty("error.refreshingFolder", "error refreshing folder's children: "), me);
 	  }
-	  
-	  children = tmpChildren;
-	} catch (MessagingException me) {
-	  Pooka.getUIFactory().showError(Pooka.getProperty("error.refreshingFolder", "error refreshing folder's children: "), me);
 	}
       }
     }
@@ -679,5 +700,11 @@ public class FolderFileWrapper extends File {
     return relative;
   }
 
+  /**
+   * Returns the object that we use for a run lock.
+   */
+  public Object getRunLock() {
+    return mRunLock;
+  }
   
 }

@@ -1,4 +1,9 @@
-closing a disconnected imap store no longer results it 'please reopen' 
+synchronized the MailFileSystemView access so its access shouldn't conflict
+with any normal Pooka operations.
+
+default server not having an outbox should no longer throw a NPE.
+
+closing a disconnected imap store no longer results in 'please reopen' 
 messages.
 
 made status area at bottom smaller.
@@ -8,7 +13,8 @@ if there were no attachments.
 
 fixed save as draft so it actually works now.
 
-added a system tray icon for Pooka.
+added a system tray icon for Pooka (currenly disabled by default; still
+experimental).
 
 050505 release
 --------------
