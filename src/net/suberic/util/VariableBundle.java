@@ -275,84 +275,85 @@ public class VariableBundle extends Object {
     if (pSaveFile == null)
       return;
 
-    if (writableProperties.size() > 0) { 
-      File outputFile;
-      String currentLine, key;
-      int equalsLoc;
-      
-      try {
-	if (! pSaveFile.exists())
-	  pSaveFile.createNewFile();
-       
-	outputFile  = pSaveFile.createTempFile(pSaveFile.getName(), ".tmp", pSaveFile.getParentFile());
+    synchronized(this) {
+      if (writableProperties.size() > 0) { 
+	File outputFile;
+	String currentLine, key;
+	int equalsLoc;
 	
-	BufferedReader readSaveFile = new BufferedReader(new FileReader(pSaveFile));
-	BufferedWriter writeSaveFile = new BufferedWriter(new FileWriter(outputFile));
-	currentLine = readSaveFile.readLine();
-	while (currentLine != null) {
-	  equalsLoc = currentLine.indexOf('=');
-	  if (equalsLoc != -1) {
-	    String rawKey = currentLine.substring(0, equalsLoc);
-	    key = unEscapeString(rawKey);
-	    
-	    if (!propertyIsRemoved(key)) {
-	      if (writableProperties.getProperty(key, "").equals("")) {
-		
-		writeSaveFile.write(currentLine);
-		writeSaveFile.newLine();
-		
-	      } else {
-		writeSaveFile.write(rawKey + "=" + escapeWhiteSpace(writableProperties.getProperty(key, "")));
-		writeSaveFile.newLine();
-		properties.setProperty(key, writableProperties.getProperty(key, ""));
-		writableProperties.remove(key);
-	      }
-	      removeProperty(key);
-	    }
-	    
-	  } else {
-	    writeSaveFile.write(currentLine);
-	    writeSaveFile.newLine();
-	  }
-	  currentLine = readSaveFile.readLine();
-	}
-	
-	// write out the rest of the writableProperties
-	
-	Enumeration propsLeft = writableProperties.keys();
-	while (propsLeft.hasMoreElements()) {
-	  String nextKey = (String)propsLeft.nextElement();
-	  String nextKeyEscaped = escapeWhiteSpace(nextKey);
-	  String nextValueEscaped = escapeWhiteSpace(writableProperties.getProperty(nextKey, ""));
-	  writeSaveFile.write(nextKeyEscaped + "=" + nextValueEscaped);
-	  writeSaveFile.newLine();
+	try {
+	  if (! pSaveFile.exists())
+	    pSaveFile.createNewFile();
 	  
-	  properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
-	  writableProperties.remove(nextKey);
+	  outputFile  = pSaveFile.createTempFile(pSaveFile.getName(), ".tmp", pSaveFile.getParentFile());
+	  
+	  BufferedReader readSaveFile = new BufferedReader(new FileReader(pSaveFile));
+	  BufferedWriter writeSaveFile = new BufferedWriter(new FileWriter(outputFile));
+	  currentLine = readSaveFile.readLine();
+	  while (currentLine != null) {
+	    equalsLoc = currentLine.indexOf('=');
+	    if (equalsLoc != -1) {
+	      String rawKey = currentLine.substring(0, equalsLoc);
+	      key = unEscapeString(rawKey);
+	      
+	      if (!propertyIsRemoved(key)) {
+		if (writableProperties.getProperty(key, "").equals("")) {
+		  
+		  writeSaveFile.write(currentLine);
+		  writeSaveFile.newLine();
+		  
+		} else {
+		  writeSaveFile.write(rawKey + "=" + escapeWhiteSpace(writableProperties.getProperty(key, "")));
+		  writeSaveFile.newLine();
+		  properties.setProperty(key, writableProperties.getProperty(key, ""));
+		  writableProperties.remove(key);
+		}
+		removeProperty(key);
+	      }
+	      
+	    } else {
+	      writeSaveFile.write(currentLine);
+	      writeSaveFile.newLine();
+	    }
+	    currentLine = readSaveFile.readLine();
+	  }
+	  
+	  // write out the rest of the writableProperties
+	  
+	  Enumeration propsLeft = writableProperties.keys();
+	  while (propsLeft.hasMoreElements()) {
+	    String nextKey = (String)propsLeft.nextElement();
+	    String nextKeyEscaped = escapeWhiteSpace(nextKey);
+	    String nextValueEscaped = escapeWhiteSpace(writableProperties.getProperty(nextKey, ""));
+	    writeSaveFile.write(nextKeyEscaped + "=" + nextValueEscaped);
+	    writeSaveFile.newLine();
+	    
+	    properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
+	    writableProperties.remove(nextKey);
+	  }
+	  
+	  clearRemoveList();
+	  
+	  readSaveFile.close();
+	  writeSaveFile.flush();
+	  writeSaveFile.close();
+	  
+	  // if you don't delete the .old file first, then the
+	  // rename fails under Windows.
+	  String oldSaveName = pSaveFile.getAbsolutePath() + ".old";
+	  File oldSave = new File (oldSaveName);
+	  if (oldSave.exists())
+	    oldSave.delete();
+	  
+	  String fileName = new String(pSaveFile.getAbsolutePath());
+	  pSaveFile.renameTo(oldSave);
+	  outputFile.renameTo(new File(fileName));
+	  
+	} catch (Exception e) {
+	  System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + pSaveFile.getName() + ": " + e.getMessage()));
+	  e.printStackTrace(System.err);
 	}
-	
-	clearRemoveList();
-	
-	readSaveFile.close();
-	writeSaveFile.flush();
-	writeSaveFile.close();
-	
-	// if you don't delete the .old file first, then the
-	// rename fails under Windows.
-	String oldSaveName = pSaveFile.getAbsolutePath() + ".old";
-	File oldSave = new File (oldSaveName);
-	if (oldSave.exists())
-	  oldSave.delete();
-	
-	String fileName = new String(pSaveFile.getAbsolutePath());
-	pSaveFile.renameTo(oldSave);
-	outputFile.renameTo(new File(fileName));
-	
-      } catch (Exception e) {
-	System.out.println(getProperty("VariableBundle.saveError", "Error saving properties file: " + pSaveFile.getName() + ": " + e.getMessage()));
-	e.printStackTrace(System.err);
       }
-      
     }
   }
   
