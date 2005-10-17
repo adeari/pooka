@@ -27,6 +27,8 @@ public class StartupManager {
   String mToAddress = null;
   String mFromProfile = null;
 
+  
+
   /**
    * Creates a new StartupManager.
    */
@@ -484,8 +486,11 @@ public class StartupManager {
     updateTime("loaded help");
     
     // create the MessageListener.
-    PookaMessageListener pmlistener= new PookaMessageListener();
-    
+    if (mPookaManager.getMessageListener() == null) {
+      PookaMessageListener pmlistener= new PookaMessageListener();
+      mPookaManager.setMessageListener(pmlistener);
+    }
+
     /*
     mFrame = new JFrame("Pooka");
     updateTime("created frame");
@@ -544,6 +549,7 @@ public class StartupManager {
 	    System.exit(-1);
 	  }
 	  mToAddress = argv[++i];
+	  mFullStartup = false;
 	} else if (argv[i].equals("--minimal")) {
 	  mFullStartup = false;
 	} else if (argv[i].equals("--from")) {

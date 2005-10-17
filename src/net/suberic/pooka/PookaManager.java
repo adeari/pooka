@@ -2,6 +2,7 @@ package net.suberic.pooka;
 import net.suberic.pooka.gui.*;
 import net.suberic.util.VariableBundle;
 import net.suberic.pooka.resource.*;
+import net.suberic.pooka.messaging.PookaMessageListener;
 
 import java.awt.*;
 import javax.swing.*;
@@ -249,6 +250,13 @@ public class PookaManager {
   public HelpBroker getHelpBroker() { return mHelpBroker; }
   /** The HelpBroker is used to bring up the Pooka help system. */
   public void setHelpBroker(HelpBroker pHelpBroker) { mHelpBroker = pHelpBroker; }
+
+  /** The MessageListener for this server. */
+  PookaMessageListener mMessageListener = null;
+  /** The MessageListener for this server. */
+  public PookaMessageListener getMessageListener() { return mMessageListener; }
+  /** The MessageListener for this server. */
+  public void setMessageListener(PookaMessageListener pMessageListener) { mMessageListener = pMessageListener; }
 
 }
 

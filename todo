@@ -1,3 +1,9 @@
+*) fix focus on login authenticator--should be in username or password.
+
+*) fix -open argument (??)
+	*) make sure we handle what happens if we can't bind to a port.
+		i.e. don't hang.
+
 *) test and fix subscribing to folders w/disconnected operation (?).
 	check loading messages for offline-enabled folder; see if we
 	get enough messages.
@@ -9,10 +15,10 @@
 *) redo webstart site; change target to latest version, with old verison
 	around for compatibility.
 
-*) fix address books so that the display uses the real address, not the
-	alias.
-
 ----
+*) webmail?????
+	*) check out gmail and yahoo mail
+	*) quick sample implementation?
 
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
@@ -510,6 +516,9 @@ doesn't change, you still resize the window.
 	2)  make it test for valid email addresses
 	3)  make it add an extension to incomplete and unmatched addresses
 	    (i.e. change 'allen' to 'allen@somehostname.org')
+	4)  change the UI so that matched address aliases display differently
+		(bold, in a different color, or some such).  that way a
+		user can tell if the entered address is a proper alias or not.
 
 
 *) fix the launcher (specifically the html launcher, but maybe all of them)

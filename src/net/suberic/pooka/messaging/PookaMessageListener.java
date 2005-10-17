@@ -69,7 +69,12 @@ public class PookaMessageListener extends Thread {
       try {
 	mSocket = new ServerSocket(port);
 	success = true;
+	String propertiesPort = Pooka.getProperty("Pooka.messaging.port", Integer.toString(port));
 	Pooka.setProperty("Pooka.messaging.port", Integer.toString(port));
+	if (! Integer.toString(port).equals(propertiesPort)) {
+	  System.err.println("writing properties.");
+	  Pooka.getResources().saveProperties();
+	}
       } catch (Exception e) {
 	throwMe = e;
       }

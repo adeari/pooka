@@ -488,7 +488,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
       newValue.append(", ");
 
     for (int i = 0; i < newEntries.length; i++) {
-      newValue.append(newEntries[i].getID());
+      newValue.append(newEntries[i].getAddressString());
       if (i < newEntries.length -1)
 	newValue.append(", ");
     }
