@@ -4,6 +4,7 @@ import java.net.*;
 import java.nio.channels.*;
 import java.io.*;
 import java.util.logging.*;
+import java.nio.channels.SocketChannel;
 
 import net.suberic.pooka.Pooka;
 
@@ -31,9 +32,25 @@ public class PookaMessageSender {
     } catch (Exception e) {
       port = PookaMessagingConstants.S_PORT;
     }
-    mSocket = new Socket("localhost",port);
+    SocketAddress address = new InetSocketAddress("localhost",port);
+    SocketChannel channel = SocketChannel.open();
+    channel.configureBlocking(false);
+    if (! channel.connect(address)) {
+      // we're willing to wait for about a second.
+      for (int i = 0; (! channel.isConnected()) && i < 4; i++) {
+	try {
+	  Thread.currentThread().sleep(250);
+	} catch (Exception e) {
+	}
+      }
+    }
+    if (channel.isConnected()) {
+      mSocket = channel.socket();
 
-    mConnected = true;
+      mConnected = true;
+    } else {
+      throw new SocketTimeoutException("Unable to connect to server localhost at port " + port);
+    }
   }
 
   /**

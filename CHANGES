@@ -1,3 +1,9 @@
+fixed a bug where pooka would take a long time to startup when the loopback
+address wasn't available.
+
+addresses added from the address book are now added as email addresses 
+rather than aliases.
+
 status messages now disappear after 30 seconds.
 
 synchronized the MailFileSystemView access so its access shouldn't conflict

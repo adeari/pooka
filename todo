@@ -1,9 +1,5 @@
 *) fix focus on login authenticator--should be in username or password.
 
-*) fix -open argument (??)
-	*) make sure we handle what happens if we can't bind to a port.
-		i.e. don't hang.
-
 *) test and fix subscribing to folders w/disconnected operation (?).
 	check loading messages for offline-enabled folder; see if we
 	get enough messages.
