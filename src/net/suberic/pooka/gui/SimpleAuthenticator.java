@@ -84,8 +84,8 @@ public class SimpleAuthenticator extends Authenticator {
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	c.weightx = 1.0;
-	String user = getDefaultUserName();
-	JTextField username = new JTextField(user, 20);
+	final String user = getDefaultUserName();
+	final JTextField username = new JTextField(user, 20);
 	d.add(constrain(username, gb, c));
 
 	c.gridwidth = 1;
@@ -98,22 +98,32 @@ public class SimpleAuthenticator extends Authenticator {
 	c.fill = GridBagConstraints.HORIZONTAL;
 	c.gridwidth = GridBagConstraints.REMAINDER;
 	c.weightx = 1.0;
-	JPasswordField password = new JPasswordField("", 20);
+	final JPasswordField password = new JPasswordField("", 20);
 	d.add(constrain(password, gb, c));
-	// XXX - following doesn't work
-	if (user != null && user.length() > 0)
-	    password.requestFocusInWindow();
-	else
-	    username.requestFocusInWindow();
+
+	final JOptionPane authPane = new JOptionPane(d, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
+	    public void selectInitialValue() {
+	      if (user != null && user.length() > 0)
+		password.requestFocusInWindow();
+	      else
+		username.requestFocusInWindow();
+	      
+	    }
+	  };
 	
-	int result = JOptionPane.showConfirmDialog(getFrame(), d, "Login",
-	    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+	final JDialog dialog = authPane.createDialog(getFrame(), "Login");
+
+	dialog.show();
+
+	Object result = authPane.getValue();
 	
-	if (result == JOptionPane.OK_OPTION)
+	if (result instanceof Integer) {
+	  int resultInt = ((Integer) result).intValue();
+	  if (resultInt == JOptionPane.OK_OPTION)
 	    return new PasswordAuthentication(username.getText(),
-						new String(password.getPassword()));
-	else
-	    return null;
+					      new String(password.getPassword()));
+	}
+	return null;
     }
 
     private Component constrain(Component cmp,

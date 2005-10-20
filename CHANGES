@@ -1,3 +1,5 @@
+login authenticator now has password field selected by default.
+
 fixed a bug where pooka would take a long time to startup when the loopback
 address wasn't available.
 
