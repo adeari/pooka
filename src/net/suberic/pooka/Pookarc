@@ -254,7 +254,7 @@ MainToolbar.Paste.Image=/org/javalobby/icons/20x20png/Paste.png
 MainToolbar.Print.Action=file-print
 MainToolbar.Print.Image=/org/javalobby/icons/20x20png/Print.png
 
-FolderWindowToolbar=Down:Up:Cut:Copy:Paste:Open:Reply:ReplyAll:Delete:Print:Spam:Update:Search
+FolderWindowToolbar=Down:Up:Cut:Copy:Paste:Open:Reply:ReplyAll:Forward:Delete:Print:Spam:Update:Search
 FolderWindowToolbar.Down.Action=message-next
 FolderWindowToolbar.Down.Image=/org/javalobby/icons/20x20png/Down.png
 FolderWindowToolbar.Up.Action=message-previous
@@ -271,6 +271,8 @@ FolderWindowToolbar.Reply.Action=message-reply
 FolderWindowToolbar.Reply.Image=/org/javalobby/icons/20x20png/Reply.png
 FolderWindowToolbar.ReplyAll.Action=message-reply-all
 FolderWindowToolbar.ReplyAll.Image=/org/javalobby/icons/20x20png/ReplyAll.png
+FolderWindowToolbar.ReplyAll.Action=message-forward
+FolderWindowToolbar.ReplyAll.Image=/org/javalobby/icons/20x20png/Forward.png
 FolderWindowToolbar.Delete.Action=message-delete
 FolderWindowToolbar.Delete.Image=/org/javalobby/icons/20x20png/DeleteEnvelope.png
 FolderWindowToolbar.Spam.Action=message-spam

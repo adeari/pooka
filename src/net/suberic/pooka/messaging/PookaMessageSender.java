@@ -2,6 +2,7 @@ package net.suberic.pooka.messaging;
 
 import java.net.*;
 import java.nio.channels.*;
+import java.nio.charset.Charset;
 import java.io.*;
 import java.util.logging.*;
 import java.nio.channels.SocketChannel;
@@ -13,8 +14,8 @@ import net.suberic.pooka.Pooka;
  */
 public class PookaMessageSender {
   
-  /** the socket that's connected to a PookaMessageListener. */
-  Socket mSocket = null;
+  /** the channel that's connected to a PookaMessageListener. */
+  SocketChannel mChannel = null;
 
   /** whether or not we have a connection open. */
   boolean mConnected = false;
@@ -32,23 +33,28 @@ public class PookaMessageSender {
     } catch (Exception e) {
       port = PookaMessagingConstants.S_PORT;
     }
+    getLogger().log(Level.FINE, "opening port " + port);
     SocketAddress address = new InetSocketAddress("localhost",port);
     SocketChannel channel = SocketChannel.open();
     channel.configureBlocking(false);
     if (! channel.connect(address)) {
       // we're willing to wait for about a second.
-      for (int i = 0; (! channel.isConnected()) && i < 4; i++) {
+      for (int i = 0; (! channel.finishConnect()) && i < 4; i++) {
 	try {
+	  getLogger().log(Level.FINE, "not connected; sleeping (" + i + ").");
 	  Thread.currentThread().sleep(250);
 	} catch (Exception e) {
 	}
       }
     }
     if (channel.isConnected()) {
-      mSocket = channel.socket();
+      getLogger().log(Level.FINE, "got connection.");
+      mChannel = channel;
+      mChannel.configureBlocking(true);
 
       mConnected = true;
     } else {
+      getLogger().log(Level.FINE, "failed to get connection.");
       throw new SocketTimeoutException("Unable to connect to server localhost at port " + port);
     }
   }
@@ -67,7 +73,8 @@ public class PookaMessageSender {
 	sendBuffer.append(pUserProfile);
       }
     }
-
+    
+    getLogger().log(Level.FINE, "sending message " + sendBuffer.toString());
     sendMessage(sendBuffer.toString());
   }
 
@@ -88,6 +95,7 @@ public class PookaMessageSender {
    * Starts an instance of Pooka.
    */
   public void sendStartPookaMessage() throws java.io.IOException {
+    getLogger().log(Level.FINE, "sending message " + PookaMessagingConstants.S_START_POOKA);
     sendMessage(PookaMessagingConstants.S_START_POOKA);
   }
 
@@ -95,13 +103,15 @@ public class PookaMessageSender {
    * Closes the connection.
    */
   public void closeConnection() {
-    if (mConnected || mSocket != null) {
+    if (mConnected || mChannel != null) {
       try {
+	getLogger().log(Level.FINE, "sending message " + PookaMessagingConstants.S_BYE);
 	sendMessage(PookaMessagingConstants.S_BYE);
+	mChannel.close();
       } catch (java.io.IOException ioe) {
 	// ignore -- we're closing anyway.
       } finally {
-	mSocket = null;
+	mChannel = null;
 	mConnected = false;
       }
     }
@@ -111,7 +121,7 @@ public class PookaMessageSender {
    * Sends a message.
    */
   public void sendMessage(String pMessage) throws java.io.IOException {
-    BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream()));
+    BufferedWriter writer = new BufferedWriter(Channels.newWriter(mChannel, "UTF-8"));
     getLogger().log(Level.FINE, "sending message '" + pMessage);
     writer.write(pMessage);
     writer.newLine();
@@ -122,8 +132,10 @@ public class PookaMessageSender {
    * Gets a response from the (already open) connection.
    */
   public String retrieveResponse() throws java.io.IOException {
-    BufferedReader reader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-    return reader.readLine();
+    BufferedReader reader = new BufferedReader(Channels.newReader(mChannel,"UTF-8"));
+    String returnValue = reader.readLine();
+    getLogger().log(Level.FINE, "got response '" + returnValue + "'");
+    return returnValue;
   }
 
   /**

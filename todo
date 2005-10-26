@@ -1,7 +1,5 @@
-*) reply-all for certian messages... would sit for a few minutes then
+*) reply-all for certain messages... would sit for a few minutes then
 go back to pointer.
-
-*) add forward button to folder toolbar
 
 *) test and fix subscribing to folders w/disconnected operation (?).
 	check loading messages for offline-enabled folder; see if we

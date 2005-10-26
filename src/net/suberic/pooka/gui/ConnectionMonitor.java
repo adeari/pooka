@@ -3,6 +3,7 @@ package net.suberic.pooka.gui;
 import java.util.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.awt.Insets;
 
 import net.suberic.pooka.*;
 import net.suberic.util.*;
@@ -82,9 +83,13 @@ public class ConnectionMonitor extends Box implements NetworkConnectionListener,
       });
 
     statusPanel.setIcon(connectedImage);
-    statusPanel.getInsets().set(0,0,0,0);
-    comboBox.getInsets().set(0,0,0,0);
-    this.getInsets().set(0,0,0,0);
+    statusPanel.setBorder(BorderFactory.createEmptyBorder());
+    comboBox.setBorder(BorderFactory.createEmptyBorder());
+    this.setBorder(BorderFactory.createEmptyBorder());
+
+    //statusPanel.getInsets().set(0,0,0,0);
+    //comboBox.getInsets().set(0,0,0,0);
+    //this.getInsets().set(0,0,0,0);
     this.add(comboBox);
     this.add(statusPanel);
   }

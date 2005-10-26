@@ -9,6 +9,7 @@ package net.suberic.pooka.gui;
 import javax.mail.*;
 import java.net.InetAddress;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 
 /**
@@ -103,15 +104,31 @@ public class SimpleAuthenticator extends Authenticator {
 
 	final JOptionPane authPane = new JOptionPane(d, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
 	    public void selectInitialValue() {
-	      if (user != null && user.length() > 0)
+	      if (user != null && user.length() > 0) {
 		password.requestFocusInWindow();
-	      else
+	      }
+	      else {
 		username.requestFocusInWindow();
-	      
+	      }
 	    }
 	  };
 	
 	final JDialog dialog = authPane.createDialog(getFrame(), "Login");
+
+	// work around a bug in jdk 1.4
+	String javaVersion = System.getProperty("java.version");
+	if (javaVersion.compareTo("1.5") < 0) {
+	  dialog.addWindowFocusListener(new WindowAdapter() {
+	      private boolean gotFocus = false;
+	      public void windowGainedFocus(WindowEvent we) {
+                // Once window gets focus, set initial focus
+                if (!gotFocus) {
+		  authPane.selectInitialValue();
+		  gotFocus = true;
+                }
+	      }
+	    });
+	}
 
 	dialog.show();
 
