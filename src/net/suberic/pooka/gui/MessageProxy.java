@@ -1534,6 +1534,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	new ActionWrapper(new CacheMessageAction(), folderThread),
 	new ActionWrapper(new SaveAddressAction(), folderThread),
 	new ActionWrapper(new OpenAsNewAction(), folderThread),
+	new ActionWrapper(new OpenCopyAction(), folderThread),
 	new ActionWrapper(new MessageFilterAction(), folderThread),
 	new ActionWrapper(new SpamAction(), folderThread),
 	new ActionWrapper(new DecryptAction(), folderThread),
@@ -1988,6 +1989,27 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	fw.setBusy(true);;
 	
       openWindowAsNew(true);
+      
+      if (fw != null)
+	fw.setBusy(false);
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(false);
+    }
+  }
+
+  public class OpenCopyAction extends AbstractAction {
+    OpenCopyAction() {
+      super("message-open-copy");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      if (getMessageUI() != null)
+	getMessageUI().setBusy(true);
+      FolderDisplayUI fw = getFolderDisplayUI();
+      if (fw != null)
+	fw.setBusy(true);;
+	
+      openWindowAsNew(false);
       
       if (fw != null)
 	fw.setBusy(false);

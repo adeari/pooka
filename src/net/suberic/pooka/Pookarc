@@ -467,8 +467,9 @@ MessageProxy.popupMenu.Forward.Action=message-forward
 MessageProxy.popupMenu.Delete.Action=message-delete
 MessageProxy.popupMenu.Filter.Action=message-filter
 
-NewMessageProxy.popupMenu=OpenAsNew:Delete
+NewMessageProxy.popupMenu=OpenAsNew:OpenCopy:Delete
 NewMessageProxy.popupMenu.OpenAsNew.Action=message-open-as-new
+NewMessageProxy.popupMenu.OpenCopy.Action=message-open-copy
 NewMessageProxy.popupMenu.Delete.Action=message-delete
 
 MessageProxy.cachingPopupMenu=Open:OpenMulti:Move:Copy:Reply:ReplyAll:Forward:Delete:Filter:Cache

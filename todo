@@ -5,10 +5,6 @@ go back to pointer.
 	check loading messages for offline-enabled folder; see if we
 	get enough messages.
 
-*)  fix save as draft.
-	basically works.  needs:  better display of draft messages
-	option not to delete draft messsage 
-
 *) redo webstart site; change target to latest version, with old verison
 	around for compatibility.
 

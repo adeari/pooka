@@ -176,30 +176,34 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 	  outbox.openFolder(Folder.READ_WRITE);
 	}
 
-	Message[] msgs = outbox.getFolder().getMessages();    
+	Folder outboxFolder = outbox.getFolder();
 	
-	try {
-	  for (int i = 0; i < msgs.length; i++) {
-	    Message m = msgs[i];
-	    if (! m.isSet(Flags.Flag.DRAFT)) {
-	      try {
-		sendTransport.sendMessage(m, m.getAllRecipients());
-		m.setFlag(Flags.Flag.DELETED, true);
-	      } catch (MessagingException me) {
-		exceptionList.add(me);
+	if (outboxFolder != null) {
+	  Message[] msgs = outboxFolder.getMessages();    
+	  
+	  try {
+	    for (int i = 0; i < msgs.length; i++) {
+	      Message m = msgs[i];
+	      if (! m.isSet(Flags.Flag.DRAFT)) {
+		try {
+		  sendTransport.sendMessage(m, m.getAllRecipients());
+		  m.setFlag(Flags.Flag.DELETED, true);
+		} catch (MessagingException me) {
+		  exceptionList.add(me);
+		}
 	      }
 	    }
-	  }
-	} finally {
-	  if (exceptionList.size() > 0) {
-	    final int exceptionCount = exceptionList.size();
-	    javax.swing.SwingUtilities.invokeLater( new Runnable() {
-		public void run() {
-		  Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.queuedSendFailed", "Failed to send message(s) in the Outbox.  Number of errors:  ") +  exceptionCount );
+	  } finally {
+	    if (exceptionList.size() > 0) {
+	      final int exceptionCount = exceptionList.size();
+	      javax.swing.SwingUtilities.invokeLater( new Runnable() {
+		  public void run() {
+		    Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.queuedSendFailed", "Failed to send message(s) in the Outbox.  Number of errors:  ") +  exceptionCount );
 		}
-	      } );
+		} );
+	    }
+	    outboxFolder.expunge();
 	  }
-	  outbox.getFolder().expunge();
 	}
       }
     }
