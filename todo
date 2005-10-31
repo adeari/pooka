@@ -1,25 +1,7 @@
-*) reply-all for certain messages... would sit for a few minutes then
-go back to pointer.
-
-*) test and fix subscribing to folders w/disconnected operation (?).
-	check loading messages for offline-enabled folder; see if we
-	get enough messages.
-
-*) redo webstart site; change target to latest version, with old verison
-	around for compatibility.
-
-----
-*) webmail?????
-	*) check out gmail and yahoo mail
-	*) quick sample implementation?
+*) new icons?
 
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
-
-*) undelete?
-
-*) folder-check reopen attempts should only happen if the store is open
-	or should be open.  they should not reopen the store.
 
 *) fix fonts so they're no longer butt-ugly on windows
 
@@ -27,6 +9,14 @@ go back to pointer.
 
 *) fix preview pane mode; make it look nice
 
+*) undelete?
+
+*) folder-check reopen attempts should only happen if the store is open
+	or should be open.  they should not reopen the store.
+
+*) webmail?????
+	*) check out gmail and yahoo mail
+	*) quick sample implementation?
 
 2.0 version
 ------
@@ -69,7 +59,7 @@ go back to pointer.
 	*) remove button border.
 	*) check it out on windows?
 
-*) 
+*) update locking code with new mechanism.
 -----------
 
 *) see if we can make pooka start up on correct virtual desktop

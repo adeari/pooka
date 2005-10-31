@@ -1,3 +1,11 @@
+051031 release
+--------------
+
+fixed a bug where the 3rd field was always opening an attachment menu even
+if there were no attachments.
+
+fixed save as draft so it actually works now.
+
 cleaned up the save as draft/resume draft ui a bit.
 
 login authenticator now has password field selected by default.
@@ -19,11 +27,6 @@ closing a disconnected imap store no longer results in 'please reopen'
 messages.
 
 made status area at bottom smaller.
-
-fixed a bug where the 3rd field was always opening an attachment menu even
-if there were no attachments.
-
-fixed save as draft so it actually works now.
 
 added a system tray icon for Pooka (currenly disabled by default; still
 experimental).

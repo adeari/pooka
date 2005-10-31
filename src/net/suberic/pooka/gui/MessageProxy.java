@@ -819,7 +819,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	  }
 	});
       
-    } catch (MessagingException me) {
+    } catch (Exception me) {
       showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
     }
 

@@ -90,7 +90,7 @@ public class MessageNotificationManager implements ValueChangeListener {
       try {
 	mTrayIcon = new TrayIcon(mStandardTrayIcon);
 	mTrayIcon.setIconAutoSize(true);
-	mTrayIcon.setTimeout(5000);
+	//mTrayIcon.setTimeout(5000);
 	
 	mTrayIcon.setPopupMenu(createPopupMenu());
 	mTrayIcon.addActionListener(new AbstractAction() {
@@ -108,6 +108,7 @@ public class MessageNotificationManager implements ValueChangeListener {
 	SystemTray.getDefaultSystemTray().addTrayIcon(mTrayIcon);
       } catch (Error e) {
 	System.err.println("Error starting up tray icon:  " + e.getMessage());
+	e.printStackTrace();
       }
     } else if (mTrayIcon != null) {
       // remove the tray icon.

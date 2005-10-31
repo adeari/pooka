@@ -214,7 +214,7 @@
   </target>
 
   <target name="dist-jnlp" depends="compile-jnlp">
-    <jar jarfile="${distdir}/pooka11.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
+    <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"> 
     </jar>
   </target>
 
