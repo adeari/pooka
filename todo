@@ -1,4 +1,13 @@
+*) look at online bugs, etc.
+
+*) change download link on site
+*) make sure mailing list info is correct
+*) update website in general
+
 *) new icons?
+	*) new splashscreen
+	*) IconManager class
+	*) ClearLooks icons
 
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.

@@ -300,10 +300,10 @@ public class MessageLoader extends Thread {
    */
   public synchronized void enqueue() {
     //FIXME
-    if (! getFolderInfo().getFolderThread().getQueue().contains(mAction))
+    if (getFolderInfo() != null && getFolderInfo().getFolderThread() != null && ! getFolderInfo().getFolderThread().getQueue().contains(mAction)) {
       getFolderInfo().getFolderThread().addToQueue(mAction, null, net.suberic.util.thread.ActionThread.PRIORITY_LOW);
+    }
   }
-
   public int getUpdateMessagesCount() {
     return updateMessagesCount;
   }

@@ -60,7 +60,7 @@
   </target>
 
   <target name="docs" depends="init">
-    <javadoc sourcepath="." 
+    <javadoc sourcepath="src" 
              destdir="${docdir}" 
              windowtitle="Pooka Documentation"
              classpath="${full_cp}"
@@ -75,6 +75,11 @@
     <copy todir="${builddir}/net/suberic/pooka">
       <fileset dir="${sourcedir}/net/suberic/pooka">
         <include name="Pookarc"/>
+        <include name="*.properties"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/net/suberic/pooka/conf">
+      <fileset dir="${sourcedir}/net/suberic/pooka/conf">
         <include name="*.properties"/>
       </fileset>
     </copy>
@@ -95,6 +100,11 @@
     </copy>
     <copy todir="${builddir}/org/javalobby/icons/20x20png">
       <fileset dir="${iconsdir}/javalobby/icons/20x20png">
+        <include name="**/*"/>
+      </fileset>
+    </copy>
+    <copy todir="${builddir}/org/javalobby/icons/20x20new">
+      <fileset dir="${iconsdir}/javalobby/icons/20x20new">
         <include name="**/*"/>
       </fileset>
     </copy>

@@ -85,7 +85,26 @@ public class VariableBundle extends Object {
       } catch (java.io.IOException ioe) {
 	System.err.println(ioe.getMessage() + ":  " + propertiesFile);
       }
-    
+
+    List includeStreams = getPropertyAsList("VariableBundle.include", "");
+    if (includeStreams != null && includeStreams.size() > 0) {
+      for (int i = 0; i < includeStreams.size(); i++) {
+	String current = (String) includeStreams.get(i);
+	try {
+	  if (current != null && ! current.equals("")) {
+	    java.net.URL url = this.getClass().getResource(current);
+	    
+	    java.io.InputStream is = url.openStream();
+	    
+	    properties.load(is);
+	  }
+	} catch (java.io.IOException ioe) {
+	  System.err.println("error including file " + current + ":  " + ioe.getMessage());
+	  ioe.printStackTrace();
+	}
+      }
+    }
+
     parentProperties = newParentProperties;
     
 

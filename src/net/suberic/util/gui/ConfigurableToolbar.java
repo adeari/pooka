@@ -74,12 +74,13 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
   protected JButton createToolButton(String key, VariableBundle vars) {
     JButton bi;
     
+    IconManager iconManager = new IconManager(vars, "IconManager._default");
+
     try {
-      java.net.URL url =this.getClass().getResource(vars.getProperty(key + ".Image"));
-      if (url == null)
-	return null;
+
+      ImageIcon icon = iconManager.getIcon(vars.getProperty(key + ".Image"));
       
-      bi = new JButton(new ImageIcon(url));
+      bi = new JButton(icon);
 
       // workaround for bug in jdk 1.4.2 -- remove for 1.5
       bi.setMargin(new java.awt.Insets(2, 2, 2, 2));

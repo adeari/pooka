@@ -107,37 +107,24 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
    */
   protected Object createComboBoxItem(String buttonID, VariableBundle vars) {
 
-    /*
-    JLabel returnValue = new JLabel();
-    try {
-      returnValue.setText(vars.getProperty(buttonID + ".Label"));
-    } catch (MissingResourceException mre) {
-    }
-    */
-
     ImageIcon returnValue = null;
 
-    java.net.URL url = null;
-    
-    try {
-      url = this.getClass().getResource(vars.getProperty(buttonID + ".Image"));
-    } catch (MissingResourceException mre) {
-    }
-    
-    if (url != null) {
-      ImageIcon icon = new ImageIcon(url);
+    IconManager iconManager = new IconManager(vars, "IconManager._default");
+    ImageIcon icon = iconManager.getIcon(vars.getProperty(buttonID + ".Image"));
+    if (icon != null) {
+
       if (minWidth < 0) {
 	minWidth = icon.getIconWidth();
       } else {
 	minWidth = java.lang.Math.min(minWidth, icon.getIconWidth());
       }
-
+      
       if (minHeight < 0) {
 	minHeight = icon.getIconHeight();
       } else {
 	minHeight = java.lang.Math.min(minHeight, icon.getIconHeight());
       }
-
+      
       
       //returnValue.setIcon(icon);
       returnValue = icon;
