@@ -73,7 +73,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     this.setDividerLocation(folderPanel.getPreferredSize().width + 1);
     
     mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
-    mainToolbar = new ConfigurableIconToolbar("MainToolbar", Pooka.getResources());
+    mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
 
     keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
     keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
