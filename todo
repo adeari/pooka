@@ -9,6 +9,8 @@
 	*) IconManager class
 	*) ClearLooks icons
 
+*) middle-click on toolbar to back?
+
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
 

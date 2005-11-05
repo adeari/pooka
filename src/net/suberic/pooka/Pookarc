@@ -223,17 +223,17 @@ Pooka.urlHandler=netscape %s
 
 FolderTree.readStyle=PLAIN
 FolderTree.unreadStyle=BOLD
-FolderTree.rootIcon=images/PookaFolderIcon.gif
-FolderTree.connectedIcon=/org/javalobby/icons/20x20png/Plus.png
-FolderTree.connectedWithNewIcon=/net/suberic/pooka/gui/images/PlusNew.gif
-FolderTree.disconnectedIcon=/org/javalobby/icons/20x20png/PlusMinus.png
-FolderTree.disconnectedWithNewIcon=/net/suberic/pooka/gui/images/PlusMinusNew.gif
-FolderTree.closedFolderIcon=/org/javalobby/icons/20x20png/Minus.png
-FolderTree.unavailableIcon=/org/javalobby/icons/20x20png/Delete.png
-FolderTree.connectedStoreIcon=/net/suberic/pooka/gui/images/OpenMailbox.png
-FolderTree.disconnectedStoreIcon=/net/suberic/pooka/gui/images/mailbox.gif
-FolderTree.subfolderIcon=/org/javalobby/icons/20x20png/Folder.png
-FolderTree.subfolderWithNewIcon=/net/suberic/pooka/gui/images/FolderNew.png
+FolderTree.rootIcon=FolderTree.Root
+FolderTree.connectedIcon=FolderTree.Connected
+FolderTree.connectedWithNewIcon=FolderTree.ConnectedNew
+FolderTree.disconnectedIcon=FolderTree.Disconnected
+FolderTree.disconnectedWithNewIcon=FolderTree.DisconnectedNew
+FolderTree.closedFolderIcon=FolderTree.Closed
+FolderTree.unavailableIcon=FolderTree.Unavailable
+FolderTree.connectedStoreIcon=FolderTree.StoreConnected
+FolderTree.disconnectedStoreIcon=FolderTree.StoreDisconnected
+FolderTree.subfolderIcon=FolderTree.SubFolder
+FolderTree.subfolderWithNewIcon=FolderTree.SubFolderNew
 
 AddressBook.button.image=/org/javalobby/icons/20x20png/Book.png
 AddressBook.selectionPanel.addImage=/org/javalobby/icons/20x20png/Right.png
@@ -274,6 +274,7 @@ PropertyEditor.filter.portFilter.class=net.suberic.util.gui.propedit.NumberFilte
 PropertyEditor.filter.portFilter.min=0
 PropertyEditor.filter.portFilter.max=32000
 
-IconManager._default=IconSet.javalobby
+#IconManager._default=IconSet.javalobby
+IconManager._default=IconSet.crystalclear
 
 

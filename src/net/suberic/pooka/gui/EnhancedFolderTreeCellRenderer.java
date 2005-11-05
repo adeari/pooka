@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.pooka.*;
+import net.suberic.util.gui.IconManager;
 import javax.swing.tree.*;
 import java.awt.*;
 import javax.swing.Icon;
@@ -13,6 +14,8 @@ import javax.swing.JTree;
 public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRenderer {
 
   protected boolean hasFocus;
+
+  IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
 
   Icon rootIcon;
   Icon connectedIcon;
@@ -144,9 +147,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getUnavailableIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.unavailableIcon", "images/Delete.gif"));
-      if (url != null) {
-	setUnavailableIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.Unavailable");
+
+      if (icon != null) {
+	setUnavailableIcon(icon);
 	setIcon(getUnavailableIcon());
       }
     }
@@ -160,9 +164,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.connectedIcon", "images/Plus.gif"));
-      if (url != null) {
-	setConnectedIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.Connected");
+
+      if (icon != null) {
+	setConnectedIcon(icon);
 	setIcon(getConnectedIcon());
       }
     }
@@ -176,9 +181,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedWithNewIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.connectedWithNewIcon", "images/PlusNew.gif"));
-      if (url != null) {
-	setConnectedWithNewIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.ConnectedNew");
+
+      if (icon != null) {
+	setConnectedWithNewIcon(icon);
 	setIcon(getConnectedWithNewIcon());
       }
     }
@@ -192,9 +198,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.disconnectedIcon", "images/PlusMinus.gif"));
-      if (url != null) {
-	setDisconnectedIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.Disconnected");
+
+      if (icon != null) {
+	setDisconnectedIcon(icon);
 	setIcon(getDisconnectedIcon());
       }
     }
@@ -208,9 +215,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedWithNewIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.disconnectedWithNewIcon", "images/PlusNew.gif"));
-      if (url != null) {
-	setDisconnectedWithNewIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.DisconnectedNew");
+
+      if (icon != null) {
+	setDisconnectedWithNewIcon(icon);
 	setIcon(getDisconnectedWithNewIcon());
       }
     }
@@ -221,9 +229,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getClosedFolderIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.closedFolderIcon", "images/Minus.gif"));
-      if (url != null) {
-	setClosedFolderIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.Closed");
+
+      if (icon != null) {
+	setClosedFolderIcon(icon);
 	setIcon(getClosedFolderIcon());
       }
     }
@@ -234,9 +243,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedStoreIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.disconnectedStoreIcon", "images/mailbox.gif"));
-      if (url != null) {
-	setDisconnectedStoreIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.StoreDisconnected");
+
+      if (icon != null) {
+	setDisconnectedStoreIcon(icon);
 	setIcon(getDisconnectedStoreIcon());
       }
     }
@@ -247,9 +257,11 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedStoreIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.connectedStoreIcon", "images/OpenMailbox.png"));
-      if (url != null) {
-	setConnectedStoreIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.StoreConnected");
+
+      if (icon != null) {
+	// create the new Icon.
+	setConnectedStoreIcon(icon);
 	setIcon(getConnectedStoreIcon());
       }
     }
@@ -260,9 +272,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderIcon", "/org/javalobby/icons/20x20png/Folder.png"));
-      if (url != null) {
-	setSubfolderIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.SubFolder");
+
+      if (icon != null) {
+	setSubfolderIcon(icon);
 	setIcon(getSubfolderIcon());
       }
     }
@@ -273,9 +286,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderWithNewIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.subfolderWithNewIcon", "images/FolderNew.png"));
-      if (url != null) {
-	setSubfolderWithNewIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.SubFolderNew");
+
+      if (icon != null) {
+	setSubfolderWithNewIcon(icon);
 	setIcon(getSubfolderWithNewIcon());
       }
     }
@@ -286,9 +300,10 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getRootIcon());
     else {
       // create the new Icon.
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("FolderTree.rootIcon", "images/PookaFolderIcon.gif"));
-      if (url != null) {
-	setRootIcon(new ImageIcon(url));
+      ImageIcon icon = iconManager.getIcon("FolderTree.Root");
+
+      if (icon != null) {
+	setRootIcon(icon);
 	setIcon(getRootIcon());
       }
     }
