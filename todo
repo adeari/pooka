@@ -8,6 +8,16 @@
 	*) new splashscreen
 	*) IconManager class
 	*) ClearLooks icons
+		*) fix:  code for closed subfolder
+		*) new message icon
+		*) disconnected folder/subfolder (green)
+		*) spam
+		*) delete/reply/forward
+		*) refresh
+		*) attach/detach window
+		*) headrs
+
+*) redo attachment display
 
 *) middle-click on toolbar to back?
 
