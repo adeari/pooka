@@ -1,4 +1,7 @@
 package net.suberic.pooka.gui;
+import net.suberic.util.gui.IconManager;
+import net.suberic.pooka.*;
+
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.Component;
@@ -6,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.net.URL;
 
 import java.util.*;
-
-import net.suberic.pooka.*;
 
 /**
  * This shows a dialog which allows you to select addresses from an
@@ -132,8 +133,11 @@ public class AddressBookSelectionPanel extends JPanel {
 
     returnValue.add(Box.createVerticalGlue());
 
-    java.net.URL url = this.getClass().getResource(Pooka.getProperty("AddressBook.selectionPanel.addImage", "/org/javalobby/icons/20x20png/Right.png"));
-    JButton addButton = new JButton(new ImageIcon(url));
+    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    
+    ImageIcon addButtonIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.selectionPanel.button.add", "Right"));
+
+    JButton addButton = new JButton(addButtonIcon);
     addButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  confirmSelectedAddresses();
@@ -143,8 +147,9 @@ public class AddressBookSelectionPanel extends JPanel {
 
     returnValue.add(Box.createVerticalGlue());
 
-    url = this.getClass().getResource(Pooka.getProperty("AddressBook.selectionPanel.removeImage", "/org/javalobby/icons/20x20png/Left.png"));
-    JButton removeButton = new JButton(new ImageIcon(url));
+    ImageIcon removeButtonIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.selectionPanel.button.remove", "Left"));
+
+    JButton removeButton = new JButton(removeButtonIcon);
     removeButton.addActionListener(new AbstractAction() {
 	public void actionPerformed(ActionEvent e) {
 	  removeSelectedAddresses();

@@ -2,6 +2,7 @@ package net.suberic.pooka.gui;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.AddressBookEntry;
 import net.suberic.pooka.AddressMatcher;
+import net.suberic.util.gui.IconManager;
 import java.awt.event.KeyEvent;
 import java.awt.Color;
 import java.awt.Font;
@@ -67,6 +68,9 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   Color matchedColor = Color.green;
   Color validColor = Color.blue;
   
+  // the IconManager.
+  IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+
   /**
    * Creates a new AddressEntryTextArea using the given NewMessageUI.
    */
@@ -505,16 +509,23 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     java.awt.Dimension key = new java.awt.Dimension(width, height);
     java.awt.Image defaultImage = (java.awt.Image) buttonImageMap.get(key);
     if (defaultImage == null) {
-      java.net.URL url = this.getClass().getResource(Pooka.getProperty("AddressBook.button.image", "images/User.gif"));
-      ImageIcon addressIcon = new ImageIcon(url);
-      java.awt.Image addressImage = addressIcon.getImage();
-      defaultImage = addressImage.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
-      addressIcon.setImage(defaultImage);
-      buttonImageMap.put(key, defaultImage);
+      ImageIcon addressIcon = iconManager.getIcon(Pooka.getProperty("AddressBook.button", "Book"));
+      
+      if (addressIcon != null) {
+	java.awt.Image addressImage = addressIcon.getImage();
+	defaultImage = addressImage.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+	addressIcon.setImage(defaultImage);
+	buttonImageMap.put(key, defaultImage);
+      }
     }
 
-    ImageIcon addressIcon = new ImageIcon(defaultImage);
-    JButton returnValue = new JButton(addressIcon);
+    JButton returnValue = null;
+    if (defaultImage != null) {
+      ImageIcon addressIcon = new ImageIcon(defaultImage);
+      returnValue = new JButton(addressIcon);
+    } else {
+      returnValue=new JButton();
+    }
     returnValue.setFocusable(false);
     returnValue.addActionListener(new AbstractAction() {
 	public void actionPerformed(java.awt.event.ActionEvent e) {

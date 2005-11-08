@@ -237,11 +237,11 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
     JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
 
-    java.net.URL customButtonURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.button", "/org/javalobby/icons/20x20png/Hammer.png"));
 
-    if (customButtonURL != null) {
-
-      ImageIcon headerIcon = new ImageIcon(customButtonURL);
+    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    
+    ImageIcon headerIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.customHeader.button", "Hammer"));
+    if (headerIcon != null) {
       java.awt.Image headerImage = headerIcon.getImage();
       headerImage = headerImage.getScaledInstance(15, 15, java.awt.Image.SCALE_SMOOTH);
       headerIcon.setImage(headerImage);
@@ -251,7 +251,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     } else {
       customHeaderButton = new JToggleButton();
     }
-
+    
     customHeaderButton.addChangeListener(new ChangeListener() {
 
         public void stateChanged(ChangeEvent e) {
@@ -677,12 +677,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-    java.net.URL headerURL = this.getClass().getResource(Pooka.getProperty("NewMessage.customHeader.add.button", "/org/javalobby/icons/20x20png/Plus.png"));
+    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    
+    ImageIcon headerIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.customHeader.add.button", "Plus"));
 
     JButton headerButton = null;
 
-    if (headerURL != null) {
-      headerButton = new JButton(new ImageIcon(headerURL));
+    if (headerIcon != null) {
+      headerButton = new JButton(headerIcon);
       headerButton.setMargin(new java.awt.Insets(0, 0, 0, 0));
       headerButton.setSize(new java.awt.Dimension(10,10));
     } else {

@@ -97,8 +97,10 @@ Pooka.fetchBatchSize=50
 Pooka.xmailer=Pooka
 Pooka.userProfileProperty=X-Pooka-UserProfile
 
-Pooka.standardIcon=/net/suberic/pooka/gui/images/PookaIcon.gif
-Pooka.newMessageIcon=/org/javalobby/icons/20x20png/EnvelopeOpen.png
+Pooka.standardIcon=PookaIcon
+Pooka.standardTrayIcon=PookaTrayIcon
+Pooka.newMessageIcon=EnvelopeOpen
+Pooka.newMessageTrayIcon=NewMessageTray
 
 FolderPanel.2xClickAction=file-open
 
@@ -235,12 +237,12 @@ FolderTree.disconnectedStoreIcon=FolderTree.StoreDisconnected
 FolderTree.subfolderIcon=FolderTree.SubFolder
 FolderTree.subfolderWithNewIcon=FolderTree.SubFolderNew
 
-AddressBook.button.image=/org/javalobby/icons/20x20png/Book.png
-AddressBook.selectionPanel.addImage=/org/javalobby/icons/20x20png/Right.png
-AddressBook.selectionPanel.removeImage=/org/javalobby/icons/20x20png/Left.png
+AddressBook.button=Book
+AddressBook.selectionPanel.button.add=Right
+AddressBook.selectionPanel.button.remove=Left
 
-NewMessage.customHeader.button=/org/javalobby/icons/20x20png/Hammer.png
-NewMessage.customHeader.add.button=/org/javalobby/icons/20x20png/Plus.png
+NewMessage.customHeader.button=Hammer
+NewMessage.customHeader.add.button=Plus
 
 FolderSelectorPane.inputButton.image=/net/suberic/util/gui/images/More.gif
 

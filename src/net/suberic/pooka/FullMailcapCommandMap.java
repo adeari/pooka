@@ -201,7 +201,7 @@ public class FullMailcapCommandMap extends MailcapCommandMap {
    * This writes the entry to the mailcap file.  Note that it actually
    * ends up overwriting _all_ entries for that particular mime type.
    */
-  private void writeEntryToSourceFile(String mail_cap) {
+  private synchronized void writeEntryToSourceFile(String mail_cap) {
     if (sourceFile != null) {
       int semicolonIndex = mail_cap.indexOf(';');
       if (semicolonIndex > -1) {

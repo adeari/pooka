@@ -3,6 +3,7 @@ import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.MessageInfo;
 import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.gui.IconManager;
 import net.suberic.util.*;
 
 import java.util.*;
@@ -121,28 +122,17 @@ public class MessageNotificationManager implements ValueChangeListener {
    * Sets up the images to use for the tray icon and for the main window.
    */
   void setupImages() {
-    java.net.URL standardUrl = this.getClass().getResource(Pooka.getProperty("PookastandardIcon", "images/PookaIcon.gif")); 
-    if (standardUrl != null) {
-      mStandardIcon = new ImageIcon(standardUrl);
-      setCurrentIcon(mStandardIcon);
-    }
-
-    java.net.URL standardTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.standardTrayIcon", "images/PookaIcon_20x20.png")); 
-    if (standardTrayUrl != null) {
-      mStandardTrayIcon = new ImageIcon(standardTrayUrl);
-    }
-
+    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
     
-    java.net.URL newMessageUrl = this.getClass().getResource(Pooka.getProperty("Pooka.newMessageIcon", "images/PookaNewMessageIcon.gif")); 
-    if (newMessageUrl != null) {
-      mNewMessageIcon = new ImageIcon(newMessageUrl);
-    }
-    
-    java.net.URL newMessageTrayUrl = this.getClass().getResource(Pooka.getProperty("Pooka.newMessageTrayIcon", "images/PookaNewMessageIcon_20x20.png")); 
-    if (newMessageTrayUrl != null) {
-	mNewMessageTrayIcon = new ImageIcon(newMessageTrayUrl);
-    }
+    mStandardIcon = iconManager.getIcon(Pooka.getProperty("Pooka.standardIcon", "PookaIcon"));
+    setCurrentIcon(mStandardIcon);
 
+    mStandardTrayIcon = iconManager.getIcon(Pooka.getProperty("Pooka.standardTrayIcon", "PookaTrayIcon"));
+    
+      mNewMessageIcon = iconManager.getIcon(Pooka.getProperty("Pooka.newMessageIcon", "EnvelopeOpen"));
+
+      mNewMessageTrayIcon = iconManager.getIcon(Pooka.getProperty("Pooka.newMessageIcon", "NewMessageTray"));
+    
   }
 
   /**

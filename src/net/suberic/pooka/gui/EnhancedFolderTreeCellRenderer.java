@@ -27,6 +27,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
   Icon closedStoreIcon;
   Icon subfolderIcon;
   Icon subfolderWithNewIcon;
+  Icon subfolderClosedIcon;
   Icon connectedWithNewIcon;
   Icon disconnectedWithNewIcon;
   
@@ -104,8 +105,11 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    //System.out.println("folderInfo is " + folderInfo.getFolderID() + "; hasNewMessages is " + folderInfo.hasNewMessages());
 	    if (folderInfo.hasNewMessages() && folderInfo.notifyNewMessagesNode())
 	      setIconToSubfolderWithNew();
-	    else 
+	    else if (folderInfo.isConnected()) {
 	      setIconToSubfolder();
+	    } else {
+	      setIconToSubfolderClosed();
+	    }
 	  } else if (folderInfo.isConnected()) {
 	    if (folderInfo.notifyNewMessagesNode() && folderInfo.hasNewMessages()) {
 	      setIconToOpenWithNew();
@@ -267,6 +271,20 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     }
   }
   
+  public void setIconToSubfolderClosed() {
+    if (getSubfolderClosedIcon() != null)
+      setIcon(getSubfolderClosedIcon());
+    else {
+      // create the new Icon.
+      ImageIcon icon = iconManager.getIcon("FolderTree.SubFolderClosed");
+
+      if (icon != null) {
+	setSubfolderClosedIcon(icon);
+	setIcon(getSubfolderClosedIcon());
+      }
+    }
+  }
+  
   public void setIconToSubfolder() {
     if (getSubfolderIcon() != null)
       setIcon(getSubfolderIcon());
@@ -386,6 +404,14 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
   
   public void setSubfolderIcon(Icon newIcon) {
     subfolderIcon = newIcon;
+  }
+
+  public Icon getSubfolderClosedIcon() {
+    return subfolderClosedIcon;
+  }
+  
+  public void setSubfolderClosedIcon(Icon newIcon) {
+    subfolderClosedIcon = newIcon;
   }
 
   public Icon getRootIcon() {
