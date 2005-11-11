@@ -20,7 +20,6 @@ import javax.mail.MessagingException;
 public class PookaDesktopPaneUIFactory extends SwingUIFactory {
   
   MessagePanel messagePanel = null;
-  PropertyEditorFactory editorFactory = null;
 
   public boolean showing = false;
 
