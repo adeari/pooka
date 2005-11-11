@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.swing.ProgressDialog;
+import net.suberic.util.gui.IconManager;
 
 public interface PookaUIFactory extends ErrorHandler {
 
@@ -133,5 +134,11 @@ public interface PookaUIFactory extends ErrorHandler {
    * Gets the current MessageNotificationManager.
    */
   public MessageNotificationManager getMessageNotificationManager();
+
+  /**
+   * Gets the IconManager for this UI.
+   */
+  public net.suberic.util.gui.IconManager getIconManager();
+
 
 }

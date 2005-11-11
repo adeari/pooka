@@ -33,50 +33,50 @@ public class SearchTermIconManager {
         ((JLabel)blankImage).setOpaque(true);
     }
 
-    /**
-     * Populates the terms and icons arrays.
-     */
-    private void createTermsAndIcons(String property, SearchTermManager manager) {
-	// i'm lazy.
-	Vector iconVector = new Vector();
-	Vector termVector = new Vector(); 
-
-	Vector items = Pooka.getResources().getPropertyAsVector(property + ".value", "");
-	for (int i = 0; i < items.size(); i++) {
-	    String subProperty = property + "." + (String) items.elementAt(i);
-	    Component currentIcon = loadImage(Pooka.getProperty(subProperty + ".icon", ""));
-	    if (currentIcon != null) {
-		SearchTerm currentTerm = null;
-		try {
-		    currentTerm = createSearchTerm(subProperty , manager); 
-		} catch (java.text.ParseException pe) {
-
-		}
-		if (currentTerm != null) {
-		    iconVector.add(currentIcon);
-		    termVector.add(currentTerm);
-		}
-	    }
+  /**
+   * Populates the terms and icons arrays.
+   */
+  private void createTermsAndIcons(String property, SearchTermManager manager) {
+    // i'm lazy.
+    Vector iconVector = new Vector();
+    Vector termVector = new Vector(); 
+    
+    Vector items = Pooka.getResources().getPropertyAsVector(property + ".value", "");
+    for (int i = 0; i < items.size(); i++) {
+      String subProperty = property + "." + (String) items.elementAt(i);
+      Component currentIcon = loadImage(Pooka.getProperty(subProperty + ".icon", ""));
+      if (currentIcon != null) {
+	SearchTerm currentTerm = null;
+	try {
+	  currentTerm = createSearchTerm(subProperty , manager); 
+	} catch (java.text.ParseException pe) {
+	  
 	}
-
-	terms = new SearchTerm[termVector.size()];
-	icons = new Component[iconVector.size()];
-	for (int i = 0; i < termVector.size() ; i++) {
-	    terms[i] = (SearchTerm)termVector.elementAt(i);
-	    icons[i] = (Component)iconVector.elementAt(i);
+	if (currentTerm != null) {
+	  iconVector.add(currentIcon);
+	  termVector.add(currentTerm);
 	}
+      }
     }
-
-    /**
-     * This returns the icon for the given value.
-     */
-    public Component getIcon(int value) {
-	if (value < 0 || value >= icons.length || icons[value] == null) {
-	    return blankImage;
-	} else 
-	    return icons[value];
+    
+    terms = new SearchTerm[termVector.size()];
+    icons = new Component[iconVector.size()];
+    for (int i = 0; i < termVector.size() ; i++) {
+      terms[i] = (SearchTerm)termVector.elementAt(i);
+      icons[i] = (Component)iconVector.elementAt(i);
     }
-
+  }
+  
+  /**
+   * This returns the icon for the given value.
+   */
+  public Component getIcon(int value) {
+    if (value < 0 || value >= icons.length || icons[value] == null) {
+      return blankImage;
+    } else 
+      return icons[value];
+  }
+  
     /**
      * This calculates the int value for the given Message.  It does this
      * by running the SearchTerm on each message.  The value of the first
@@ -104,22 +104,18 @@ public class SearchTermIconManager {
     /**
      * This attempts to load an image from the given ImageFile.
      */
-    public Component loadImage(String imageFile) {
-	Component returnValue = null;
+    public Component loadImage(String imageKey) {
+      Component returnValue = null;
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon(imageKey);
+      if (icon != null) {
+	returnValue = new JLabel(icon);
+	((JLabel)returnValue).setOpaque(true);
 	
-	try {
-	    java.net.URL url = this.getClass().getResource(imageFile);
-	    if (url != null) {
-		returnValue = new JLabel(new ImageIcon(url));
-		((JLabel)returnValue).setOpaque(true);
-		
-	    } else
-		returnValue = null;
-	} catch (MissingResourceException mre) {
-	    returnValue = blankImage;
-	}
-	
-	return returnValue;
+      } else {
+	returnValue = null;
+      }
+      
+      return returnValue;
     }
     
 }

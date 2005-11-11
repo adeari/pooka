@@ -133,7 +133,7 @@ public class AddressBookSelectionPanel extends JPanel {
 
     returnValue.add(Box.createVerticalGlue());
 
-    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
     
     ImageIcon addButtonIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.selectionPanel.button.add", "Right"));
 

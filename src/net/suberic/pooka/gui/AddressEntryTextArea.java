@@ -68,9 +68,6 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
   Color matchedColor = Color.green;
   Color validColor = Color.blue;
   
-  // the IconManager.
-  IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
-
   /**
    * Creates a new AddressEntryTextArea using the given NewMessageUI.
    */
@@ -509,7 +506,7 @@ public class AddressEntryTextArea extends net.suberic.util.swing.EntryTextArea i
     java.awt.Dimension key = new java.awt.Dimension(width, height);
     java.awt.Image defaultImage = (java.awt.Image) buttonImageMap.get(key);
     if (defaultImage == null) {
-      ImageIcon addressIcon = iconManager.getIcon(Pooka.getProperty("AddressBook.button", "Book"));
+      ImageIcon addressIcon = Pooka.getUIFactory().getIconManager().getIcon(Pooka.getProperty("AddressBook.button", "Book"));
       
       if (addressIcon != null) {
 	java.awt.Image addressImage = addressIcon.getImage();

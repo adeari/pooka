@@ -402,9 +402,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 	  if (propertyName.startsWith("FLAG")) 
 	    returnValue.put(newProperty, getMessageFlag(propertyName));
 	  else if (propertyName.equals("attachments"))
-	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", ""), propertyName));
+	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "Attachment.small"), propertyName));
 	  else if (propertyName.equals("crypto"))
-	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", ""), propertyName));
+	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "Encrypted.small"), propertyName));
 	  else if (propertyName.equalsIgnoreCase("subject")) 
 	    returnValue.put(newProperty, new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
 	  else if (propertyName.equalsIgnoreCase("from")) 

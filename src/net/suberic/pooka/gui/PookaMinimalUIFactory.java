@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
+import net.suberic.util.gui.IconManager;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
@@ -19,6 +20,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   PropertyEditorFactory mEditorFactory = null;
   ThemeManager mThemeManager = null;
   MessageNotificationManager mMessageNotificationManager;
+  IconManager mIconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
 
   public boolean mShowing = false;
 
@@ -615,6 +617,13 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public MessageNotificationManager getMessageNotificationManager() {
     return mMessageNotificationManager;
+  }
+
+  /**
+   * Gets the IconManager for this UI.
+   */
+  public net.suberic.util.gui.IconManager getIconManager() {
+    return mIconManager;
   }
 
 }

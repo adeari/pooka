@@ -109,7 +109,7 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
 
     ImageIcon returnValue = null;
 
-    IconManager iconManager = new IconManager(vars, "IconManager._default");
+    IconManager iconManager = IconManager.getIconManager(vars, "IconManager._default");
     ImageIcon icon = iconManager.getIcon(vars.getProperty(buttonID + ".Image"));
     if (icon != null) {
 

@@ -103,11 +103,6 @@
         <include name="**/*"/>
       </fileset>
     </copy>
-    <copy todir="${builddir}/org/javalobby/icons/20x20new">
-      <fileset dir="${iconsdir}/javalobby/icons/20x20new">
-        <include name="**/*"/>
-      </fileset>
-    </copy>
     <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
     <copy file="${importdir}/ICE_JNIDDE.dll" todir="${builddir}"/>
     <copy todir="${builddir}/net/suberic/pooka/doc">

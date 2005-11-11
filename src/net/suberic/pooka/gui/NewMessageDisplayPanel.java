@@ -238,7 +238,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
 
 
-    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
     
     ImageIcon headerIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.customHeader.button", "Hammer"));
     if (headerIcon != null) {
@@ -677,7 +677,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     JPanel buttonPanel = new JPanel();
     buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
-    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
     
     ImageIcon headerIcon = iconManager.getIcon(Pooka.getProperty("NewMessage.customHeader.add.button", "Plus"));
 

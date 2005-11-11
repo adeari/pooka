@@ -74,7 +74,7 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
   protected JButton createToolButton(String key, VariableBundle vars) {
     JButton bi;
     
-    IconManager iconManager = new IconManager(vars, "IconManager._default");
+    IconManager iconManager = IconManager.getIconManager(vars, "IconManager._default");
 
     try {
 

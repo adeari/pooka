@@ -15,8 +15,6 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 
   protected boolean hasFocus;
 
-  IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
-
   Icon rootIcon;
   Icon connectedIcon;
   Icon disconnectedIcon;
@@ -151,7 +149,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getUnavailableIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.Unavailable");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.Unavailable");
 
       if (icon != null) {
 	setUnavailableIcon(icon);
@@ -168,7 +166,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.Connected");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.Connected");
 
       if (icon != null) {
 	setConnectedIcon(icon);
@@ -185,7 +183,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedWithNewIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.ConnectedNew");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.ConnectedNew");
 
       if (icon != null) {
 	setConnectedWithNewIcon(icon);
@@ -202,7 +200,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.Disconnected");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.Disconnected");
 
       if (icon != null) {
 	setDisconnectedIcon(icon);
@@ -219,7 +217,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedWithNewIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.DisconnectedNew");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.DisconnectedNew");
 
       if (icon != null) {
 	setDisconnectedWithNewIcon(icon);
@@ -233,7 +231,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getClosedFolderIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.Closed");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.Closed");
 
       if (icon != null) {
 	setClosedFolderIcon(icon);
@@ -247,7 +245,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getDisconnectedStoreIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.StoreDisconnected");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.StoreDisconnected");
 
       if (icon != null) {
 	setDisconnectedStoreIcon(icon);
@@ -261,7 +259,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getConnectedStoreIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.StoreConnected");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.StoreConnected");
 
       if (icon != null) {
 	// create the new Icon.
@@ -276,7 +274,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderClosedIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.SubFolderClosed");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.SubFolderClosed");
 
       if (icon != null) {
 	setSubfolderClosedIcon(icon);
@@ -290,7 +288,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.SubFolder");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.SubFolder");
 
       if (icon != null) {
 	setSubfolderIcon(icon);
@@ -304,7 +302,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getSubfolderWithNewIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.SubFolderNew");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.SubFolderNew");
 
       if (icon != null) {
 	setSubfolderWithNewIcon(icon);
@@ -318,7 +316,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
       setIcon(getRootIcon());
     else {
       // create the new Icon.
-      ImageIcon icon = iconManager.getIcon("FolderTree.Root");
+      ImageIcon icon = Pooka.getUIFactory().getIconManager().getIcon("FolderTree.Root");
 
       if (icon != null) {
 	setRootIcon(icon);

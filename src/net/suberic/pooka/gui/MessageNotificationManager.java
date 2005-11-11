@@ -122,7 +122,13 @@ public class MessageNotificationManager implements ValueChangeListener {
    * Sets up the images to use for the tray icon and for the main window.
    */
   void setupImages() {
-    IconManager iconManager = new IconManager(Pooka.getResources(), "IconManager._default");
+    IconManager iconManager;
+    if (Pooka.getUIFactory() != null) {
+      iconManager = Pooka.getUIFactory().getIconManager();
+    } else {
+      iconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
+    }
+    
     
     mStandardIcon = iconManager.getIcon(Pooka.getProperty("Pooka.standardIcon", "PookaIcon"));
     setCurrentIcon(mStandardIcon);

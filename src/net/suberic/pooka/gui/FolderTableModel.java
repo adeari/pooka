@@ -72,41 +72,6 @@ public class FolderTableModel extends AbstractTableModel {
 
 	  if (returnValue == null) {
 	    return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
-	    /*
-	    // FIXME this is making us load stuff on the display thread.
-	    try {
-	      MessageProxy proxy = (MessageProxy)data.get(row);
-	      HashMap tableInfo = proxy.getTableInfo();
-	      Set keySet = tableInfo.keySet();
-	      if (! keySet.contains(key)) {
-		if (key instanceof String) {
-		  String propertyName = (String)key;
-		  
-		  if (propertyName.startsWith("FLAG")) 
-		    tableInfo.put(propertyName, proxy.getMessageFlag(propertyName));
-		  else if (propertyName.equals("attachments"))
-		    tableInfo.put(propertyName, new BooleanIcon(proxy.getMessageInfo().hasAttachments(), net.suberic.pooka.Pooka.getProperty("FolderTable.Attachments.icon", "")));
-		  else if (propertyName.equals("crypto"))
-		    tableInfo.put(propertyName, new BooleanIcon(proxy.getMessageInfo().hasEncryption(), net.suberic.pooka.Pooka.getProperty("FolderTable.Crypto.icon", "")));
-		  else if (propertyName.equalsIgnoreCase("subject"))
-		    tableInfo.put(propertyName, proxy.new SubjectLine((String) proxy.getMessageInfo().getMessageProperty(propertyName)));
-		  else if (propertyName.equalsIgnoreCase("from")) 
-		    tableInfo.put(key, proxy.new AddressLine((String) proxy.getMessageInfo().getMessageProperty(propertyName)));
-		  else
-		    tableInfo.put(key, proxy.getMessageInfo().getMessageProperty(propertyName));
-		} else if (key instanceof SearchTermIconManager) {
-		  SearchTermIconManager stm = (SearchTermIconManager) key;
-		  tableInfo.put(key, new net.suberic.pooka.gui.SearchTermIcon(stm, proxy));
-		} else if (key instanceof net.suberic.pooka.RowCounter) {
-		  tableInfo.put(key, key);
-		}
-		
-		returnValue = ((MessageProxy)data.get(row)).getTableInfo().get(key);
-	      }
-	    } catch (Exception e) {
-	      // ignore.
-	    }
-	    */
 	  }
 	  return returnValue;
 	}

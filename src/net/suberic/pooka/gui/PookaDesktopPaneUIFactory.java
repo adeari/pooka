@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
 import net.suberic.util.gui.propedit.DesktopPropertyEditorFactory;
+import net.suberic.util.gui.IconManager;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
@@ -16,16 +17,12 @@ import javax.mail.MessagingException;
  * This is an implementation of PookaUIFactory which creates InternalFrame
  * objects on a JDesktopPane.
  */
-public class PookaDesktopPaneUIFactory implements PookaUIFactory {
+public class PookaDesktopPaneUIFactory extends SwingUIFactory {
   
   MessagePanel messagePanel = null;
   PropertyEditorFactory editorFactory = null;
-  ThemeManager pookaThemeManager = null;
-  MessageNotificationManager mMessageNotificationManager;
 
   public boolean showing = false;
-
-  int maxErrorLine = 50;
 
   /**
    * Constructor.
@@ -34,9 +31,11 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources());
     if (pSource != null) {
       pookaThemeManager = pSource.getPookaThemeManager();
+      mIconManager = pSource.getIconManager();
       mMessageNotificationManager = pSource.getMessageNotificationManager();
     } else {
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
+      mIconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
       mMessageNotificationManager = new MessageNotificationManager();
     }
   }
@@ -46,20 +45,6 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    */
   public PookaDesktopPaneUIFactory() {
     this(null);
-  }
-
-  /**
-   * Returns the ThemeManager for fonts and colors.
-   */
-  public ThemeManager getPookaThemeManager() {
-    return pookaThemeManager;
-  }
-  
-  /**
-   * Creates an appropriate MessageUI object for the given MessageProxy.
-   */
-  public MessageUI createMessageUI(MessageProxy mp) throws MessagingException {
-    return createMessageUI(mp, null);
   }
 
   /**
@@ -140,38 +125,6 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   }
   
   /**
-   * Shows an Editor Window with the given title, which allows the user
-   * to edit the values in the properties Vector.
-   */
-  public void showEditorWindow(String title, java.util.Vector properties) {
-    showEditorWindow(title, properties, properties);
-  }
-  
-  /**
-   * Shows an Editor Window with the given title, which allows the user
-   * to edit the given property.
-   */
-  public void showEditorWindow(String title, String property) {
-    java.util.Vector v = new java.util.Vector();
-    v.add(property);
-    showEditorWindow(title, v, v);
-  }
-  
-  /**
-   * Shows an Editor Window with the given title, which allows the user
-   * to edit the given property, which is in turn defined by the 
-   * given template.
-   */
-  public void showEditorWindow(String title, String property, String template) {
-    java.util.Vector prop = new java.util.Vector();
-    prop.add(property);
-    java.util.Vector templ = new java.util.Vector();
-    templ.add(template);
-    showEditorWindow(title, prop, templ);
-  }
-  
-  
-  /**
    * Creates a JPanel which will be used to show messages and folders.
    *
    * This implementation creates an instance of MessagePanel.
@@ -208,13 +161,6 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
    */
   public MessagePanel getMessagePanel() {
     return messagePanel;
-  }
-  
-  /**
-   * Returns the PropertyEditorFactory used by this component.
-   */
-  public PropertyEditorFactory getEditorFactory() {
-    return editorFactory;
   }
   
   /**
@@ -420,97 +366,10 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
   }
   
   /**
-   * Shows a status message.
-   */
-  public void showStatusMessage(String newMessage) {
-
-    final String msg = newMessage;
-    Runnable runMe = new Runnable() {
-	public void run() {
-	  if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
-	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
-	}
-      };
-    if (SwingUtilities.isEventDispatchThread()) {
-      runMe.run();
-    } else
-      SwingUtilities.invokeLater(runMe);
-  }
-  
-  /**
-   * Clears the main status message panel.
-   */
-  public void clearStatus() {
-    Runnable runMe = new Runnable() {
-	public void run() {
-	  if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
-	    Pooka.getMainPanel().getInfoPanel().clear();
-	}
-      };
-    if (SwingUtilities.isEventDispatchThread())
-      runMe.run();
-    else
-      SwingUtilities.invokeLater(runMe);
-  }   
-  
-  /**
    * Creates a ProgressDialog using the given values.
    */
   public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
     return new ProgressInternalDialog(min, max, initialValue, title, content, getMessagePanel());
-  }
-
-  /**
-   * Shows a SearchForm with the given FolderInfos selected from the list
-   * of the given allowedValues.
-   */
-  public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
-    SearchForm sf = null;
-    if (allowedValues != null)
-      sf = new SearchForm(selectedFolders, allowedValues);
-    else
-      sf = new SearchForm(selectedFolders);
-    
-    boolean ok = false;
-    int returnValue = -1;
-    java.util.Vector tmpSelectedFolders = null;
-    javax.mail.search.SearchTerm tmpSearchTerm = null;
-    
-    while (! ok ) {
-      returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
-      if (returnValue == JOptionPane.OK_OPTION) {
-	tmpSelectedFolders = sf.getSelectedFolders();
-	try {
-	  tmpSearchTerm = sf.getSearchTerm();
-	  ok = true;
-	} catch (java.text.ParseException pe) {
-	  showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
-	  ok = false;
-	}
-      } else {
-	ok = true;
-      }
-    }
-    
-    if (returnValue == JOptionPane.OK_OPTION) {
-      FolderInfo.searchFolders(tmpSelectedFolders, tmpSearchTerm);
-    }
-  }
-
-    /**
-     * Shows a SearchForm with the given FolderInfos selected.  The allowed
-     * values will be the list of all available Folders.
-     */
-    public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
-	showSearchForm(selectedFolders, null);
-    } 
-
-  /**
-   * This tells the factory whether or not its ui components are showing
-   * yet or not.
-   */
-  public void setShowing(boolean newValue) {
-    showing=newValue;
   }
 
   /**
@@ -533,11 +392,5 @@ public class PookaDesktopPaneUIFactory implements PookaUIFactory {
     return returnValue;
   }
 
-  /**
-   * Gets the current MessageNotificationManager.
-   */
-  public MessageNotificationManager getMessageNotificationManager() {
-    return mMessageNotificationManager;
-  }
 
 }
