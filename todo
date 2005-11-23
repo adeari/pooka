@@ -1,4 +1,6 @@
-fix subjects with carriage returns
+*) encryption panel icons
+
+*) fix subjects with carriage returns
 
 *) look at online bugs, etc.
 
@@ -10,21 +12,18 @@ fix subjects with carriage returns
 	*) new splashscreen
 	*) IconManager class
 	*) ClearLooks icons
-		*) fix:  code for closed subfolder
 		*) new message icon
 		*) disconnected folder/subfolder (green)
 		*) spam
-		*) delete/reply/forward
-		*) refresh
-		*) attach/detach window
-		*) headrs
+		*) headers
+		*) encryption panel.
 
 *) redo attachment display
 
-*) middle-click on toolbar to back?
-
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
+
+*) make wheel scroll customizable
 
 *) fix fonts so they're no longer butt-ugly on windows
 

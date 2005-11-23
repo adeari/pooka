@@ -103,10 +103,20 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
 	    //System.out.println("folderInfo is " + folderInfo.getFolderID() + "; hasNewMessages is " + folderInfo.hasNewMessages());
 	    if (folderInfo.hasNewMessages() && folderInfo.notifyNewMessagesNode())
 	      setIconToSubfolderWithNew();
-	    else if (folderInfo.isConnected()) {
-	      setIconToSubfolder();
+	    else if ((folderInfo.getType() & javax.mail.Folder.HOLDS_MESSAGES) != 0) {
+	      // folder that don't hold messages are always disconnected,
+	      // so show their status by their store.
+	      if ( folderInfo.isConnected()) {
+		setIconToSubfolder();
+	      } else {
+		setIconToSubfolderClosed();
+	      }
 	    } else {
-	      setIconToSubfolderClosed();
+	      if ( folderInfo.getParentStore().isConnected()) {
+		setIconToSubfolder();
+	      } else {
+		setIconToSubfolderClosed();
+	      }
 	    }
 	  } else if (folderInfo.isConnected()) {
 	    if (folderInfo.notifyNewMessagesNode() && folderInfo.hasNewMessages()) {

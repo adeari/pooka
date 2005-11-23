@@ -437,36 +437,6 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   }
   
   /**
-   * This saves the location of this FolderWindow, so that the next
-   * time we start up, we can put it in the same place.
-   */
-
-  /*
-  public void saveWindowLocation(FolderDisplayUI currentUI) {
-    String folderProperty = currentUI.getFolderInfo().getFolderProperty();
-    
-    JInternalFrame current = (JInternalFrame) currentUI;
-    
-    // we have to do these as absolute values.
-    int x = current.getX() + ((JScrollPane)getUIComponent()).getHorizontalScrollBar().getValue();
-    int y = current.getY() + ((JScrollPane)getUIComponent()).getVerticalScrollBar().getValue();
-    int layer = getLayer(current);
-    int position = getPosition(current);
-    boolean selected = current.isSelected();
-    
-    Pooka.setProperty(folderProperty + ".windowLocation.x", Integer.toString(x));
-    Pooka.setProperty(folderProperty + ".windowLocation.y", Integer.toString(y));
-    Pooka.setProperty(folderProperty + ".windowLocation.layer", Integer.toString(layer));
-    Pooka.setProperty(folderProperty + ".windowLocation.position", Integer.toString(position));
-    
-    if (selected)
-      Pooka.setProperty(folderProperty + ".windowLocation.selected", "true");
-    else
-      Pooka.setProperty(folderProperty + ".windowLocation.selected", "false");
-  }
-  */
-  
-  /**
    * This saves a list of open folders, so that on future startup we
    * can automatically reopen them.
    */
@@ -599,6 +569,34 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       current.setLocation(x, y);
     }
   }
+
+  /**
+   * Unselects the given JInternalFrame and selects the frame now on
+   * top.
+   */
+  public void unselectAndMoveToBack(JInternalFrame pFrame) {
+    pFrame.moveToBack();
+    if (pFrame.isSelected()) {
+      try {
+	pFrame.setSelected(false);
+      } catch (Exception e) {
+	java.util.logging.Logger.getLogger("Pooka.debug.gui").fine("error unselecting frame.");
+      }
+      int topLayer = highestLayer();
+      JInternalFrame[] onTop = getAllFramesInLayer(topLayer);
+      for (int i = 0; onTop != null && i < onTop.length; i++) {
+	if (onTop[i] != null && onTop[i] != pFrame) {
+	  try {
+	    onTop[i].setSelected(true);
+	  } catch (Exception e) {
+	    java.util.logging.Logger.getLogger("Pooka.debug.gui").fine("selecting frame.");
+	  }
+	  break;
+	}
+      }
+    }
+  }
+
   
   /**
    * This method shows a help screen.  At the moment, it just takes the

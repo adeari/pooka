@@ -1,3 +1,12 @@
+middle clicking folder and message internalframes now deselects them
+and moves them to the back.
+
+added a new icon set, and added in an IconManager to allow for changeable
+icon sets.
+
+fixed a bug with subscribing to subfolders of stores where the subfolder 
+would get the subscription, but the sub-subfolder wouldn't.
+
 051031 release
 --------------
 

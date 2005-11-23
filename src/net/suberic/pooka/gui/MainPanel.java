@@ -294,7 +294,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     return ! cancel;
   }
-
+  
     // Accessor methods.
     // These shouldn't all be public.
 

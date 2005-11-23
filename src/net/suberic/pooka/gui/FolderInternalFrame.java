@@ -8,6 +8,7 @@ import javax.mail.search.SearchTerm;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.plaf.basic.*;
 import javax.swing.table.*;
 import javax.swing.text.TextAction;
 import java.util.*;
@@ -116,6 +117,25 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
       });
     
+    if (getUI() instanceof BasicInternalFrameUI) {
+      ((BasicInternalFrameUI) getUI()).getNorthPane().addMouseListener(new MouseAdapter() { 
+
+	  public void mousePressed(MouseEvent evt) { 
+	    if (evt.getButton() == MouseEvent.BUTTON2) {
+	      try {
+		Object messagePanel = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.MessagePanel"), FolderInternalFrame.this);
+		if (messagePanel != null) {
+		  ((MessagePanel) messagePanel).unselectAndMoveToBack(FolderInternalFrame.this);
+		  evt.consume();
+		}
+	      } catch (Exception e) {
+		getLogger().log(java.util.logging.Level.FINE, "exception lowering FolderInternalFrame", e);
+	      }
+	    }
+	  } 
+	  
+	});
+    }
   }
   
   
@@ -183,6 +203,25 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 	}
       });
     
+    if (getUI() instanceof BasicInternalFrameUI) {
+      ((BasicInternalFrameUI) getUI()).getNorthPane().addMouseListener(new MouseAdapter() { 
+
+	  public void mousePressed(MouseEvent evt) { 
+	    if (evt.getButton() == MouseEvent.BUTTON2) {
+	      try {
+		Object messagePanel = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.MessagePanel"), FolderInternalFrame.this);
+		if (messagePanel != null) {
+		  ((MessagePanel) messagePanel).unselectAndMoveToBack(FolderInternalFrame.this);
+		  evt.consume();
+		}
+	      } catch (Exception e) {
+		getLogger().log(java.util.logging.Level.FINE, "exception lowering FolderInternalFrame", e);
+	      }
+	    }
+	  } 
+	  
+	});
+    }
   }
 
   /**
@@ -443,7 +482,7 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
    * Displays a status message for the folder.
    */
   public void updateStatus(String message) {
-    
+    Pooka.getUIFactory().showStatusMessage(message);
   }
   
   /**
@@ -487,6 +526,10 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
   
   public void setFolderStatusBar(FolderStatusBar newValue) {
     folderStatusBar = newValue;
+  }
+
+  public java.util.logging.Logger getLogger() {
+    return java.util.logging.Logger.getLogger("Pooka.debug.gui");
   }
   
   /**

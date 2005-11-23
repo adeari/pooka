@@ -511,7 +511,14 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	}
       };
 
-    getStoreThread().addToQueue(valueChangedAction, new java.awt.event.ActionEvent(this, 0, "value-changed"));
+    // if we don't do the update synchronously on the store thread,
+    // then subscribing to subfolders breaks.
+    java.awt.event.ActionEvent actionEvent =  new java.awt.event.ActionEvent(this, 0, "value-changed");
+    if (Thread.currentThread() == getStoreThread()) {
+      valueChangedAction.actionPerformed(actionEvent);
+    } else {
+      getStoreThread().addToQueue(valueChangedAction, actionEvent);
+    }
     
   }
   
@@ -661,8 +668,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     
     FolderInfo childFolder = getChild(childFolderName);
     
-    if (childFolder != null && subFolderName != null)
+    getLogger().log(Level.FINE, "got child folder '" + childFolder + "' for " + childFolderName);
+
+    if (childFolder != null && subFolderName != null) {
       childFolder.subscribeFolder(subFolderName);
+    }
   }
     
   /**

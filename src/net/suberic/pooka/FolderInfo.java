@@ -470,6 +470,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   /**
+   * Invoked when a Store/Folder/Transport is opened.
+   * 
+   * As specified in javax.mail.event.ConnectionListener.
+   */
+  public void connected (ConnectionEvent e) {
+    fireConnectionEvent(e);
+  }
+  
+  /**
    * This method opens the Folder, and sets the FolderInfo to know that
    * the Folder should be open.  You should use this method instead of
    * calling getFolder().open(), because if you use this method, then
@@ -538,7 +547,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   /**
-   * Actually records that the folde has been opened or closed.  
+   * Actually records that the folder has been opened or closed.  
    * This is separated out so that subclasses can override it more
    * easily.
    */
@@ -676,16 +685,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
      * the current FolderInfo, if it is Open and can contain Messages.
      */
     public Vector getAllFolders() {
-	Vector returnValue = new Vector();
-	if (children != null) {
-	    for (int i = 0 ; i < children.size(); i++) 
-		returnValue.addAll(((FolderInfo) children.elementAt(i)).getAllFolders());
-	}
-	
-	if (isSortaOpen() && (getType() & Folder.HOLDS_MESSAGES) != 0)
-	    returnValue.add(this);
-
-	return returnValue;
+      Vector returnValue = new Vector();
+      if (children != null) {
+	for (int i = 0 ; i < children.size(); i++) 
+	  returnValue.addAll(((FolderInfo) children.elementAt(i)).getAllFolders());
+      }
+      
+      if (isSortaOpen() && (getType() & Folder.HOLDS_MESSAGES) != 0)
+	returnValue.add(this);
+      
+      return returnValue;
     }
 
   /**

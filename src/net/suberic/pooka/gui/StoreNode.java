@@ -12,6 +12,7 @@ import net.suberic.pooka.gui.filechooser.*;
 import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.logging.Logger;
 import javax.swing.*;
 import java.awt.Cursor;
 import javax.mail.event.*; 
@@ -77,21 +78,19 @@ public class StoreNode extends MailTreeNode {
    * gui thread.
    */
   private void doLoadChildren() {
-    if (Pooka.isDebug())
-      System.out.println("calling loadChildren() for " + getStoreInfo().getStoreID());
+    Logger logger = Logger.getLogger("Store." + getStoreInfo().getStoreID());
+    logger.fine("calling loadChildren() for " + getStoreInfo().getStoreID());
     
     Enumeration origChildren = super.children();
       Vector origChildrenVector = new Vector();
       while (origChildren.hasMoreElements())
 	origChildrenVector.add(origChildren.nextElement());
       
-      if (Pooka.isDebug())
-	System.out.println(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
+      logger.fine(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
       
       Vector storeChildren = getStoreInfo().getChildren();
       
-      if (Pooka.isDebug())
-	System.out.println(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
+      logger.fine(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
       
       if (storeChildren != null) {
 	for (int i = 0; i < storeChildren.size(); i++) {
@@ -333,7 +332,9 @@ public class StoreNode extends MailTreeNode {
       
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
-	    
+	    final Logger storeLogger = Logger.getLogger("Store." + getStoreInfo().getStoreID());
+	    final Logger guiLogger = Logger.getLogger("Pooka.debug.gui.filechooser");
+
 	    JFileChooser jfc =
 	      new JFileChooser(getStoreInfo().getStoreID(), mfsv);
 	    jfc.setMultiSelectionEnabled(true);
@@ -343,6 +344,7 @@ public class StoreNode extends MailTreeNode {
 			     Pooka.getProperty("FolderEditorPane.Select",
 					       "Select"));
 	    if (returnValue == JFileChooser.APPROVE_OPTION) {
+	      guiLogger.fine("got " + jfc.getSelectedFile() + " as a return value.");
 	      final net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
 	      
 	      getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
@@ -358,8 +360,8 @@ public class StoreNode extends MailTreeNode {
 		      if (firstSlash >= 0)
 			normalizedFileName = absFileName.substring(firstSlash);
 		      
-		      if (Pooka.isDebug()) 
-			System.out.println("adding folder " + normalizedFileName);
+		      guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
+		      storeLogger.fine("adding folder " + normalizedFileName);
 		      
 		      getStoreInfo().subscribeFolder(normalizedFileName);
 		    } catch (MessagingException me) {

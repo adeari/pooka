@@ -21,8 +21,6 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
   
   MessagePanel messagePanel = null;
 
-  public boolean showing = false;
-
   /**
    * Constructor.
    */

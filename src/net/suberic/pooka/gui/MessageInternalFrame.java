@@ -7,6 +7,7 @@ import javax.mail.internet.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import javax.swing.plaf.basic.*;
 import javax.swing.text.TextAction;
 import java.util.*;
 import javax.swing.text.JTextComponent;
@@ -63,6 +64,24 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
       };
     this.setFocusTraversalPolicy(ftp);
 
+    if (getUI() instanceof BasicInternalFrameUI) {
+      ((BasicInternalFrameUI) getUI()).getNorthPane().addMouseListener(new MouseAdapter() { 
+
+	  public void mousePressed(MouseEvent evt) { 
+	    if (evt.getButton() == MouseEvent.BUTTON2) {
+	      try {
+		Object messagePanel = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.MessagePanel"), MessageInternalFrame.this);
+		if (messagePanel != null) {
+		  ((MessagePanel) messagePanel).unselectAndMoveToBack(MessageInternalFrame.this);
+		  evt.consume();
+		}
+	      } catch (Exception e) {
+		getLogger().log(java.util.logging.Level.FINE, "exception lowering MessageInternalFrame", e);
+	      }
+	    }
+	  } 
+	});
+    }
   }
   
   /**
@@ -73,6 +92,25 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
     super(Pooka.getProperty("Pooka.messageInternalFrame.messageTitle.newMessage", "New Message"), true, true, true, true);
     this.getContentPane().setLayout(new BorderLayout());
     
+    if (getUI() instanceof BasicInternalFrameUI) {
+      ((BasicInternalFrameUI) getUI()).getNorthPane().addMouseListener(new MouseAdapter() { 
+
+	  public void mouseClicked(MouseEvent evt) { 
+	    if (evt.getButton() == MouseEvent.BUTTON2) {
+	      try {
+		Object messagePanel = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.MessagePanel"), MessageInternalFrame.this);
+		if (messagePanel != null) {
+		  ((MessagePanel) messagePanel).unselectAndMoveToBack(MessageInternalFrame.this);
+		  evt.consume();
+		}
+	      } catch (Exception e) {
+		getLogger().log(java.util.logging.Level.FINE, "exception lowering MessageInternalFrame", e);
+	      }
+	    }
+	  } 
+	  
+	});
+    }
   }
   
   /**
@@ -449,6 +487,10 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   
   public ConfigurableKeyBinding getKeyBindings() {
     return keyBindings;
+  }
+
+  public java.util.logging.Logger getLogger() {
+    return java.util.logging.Logger.getLogger("Pooka.debug.gui");
   }
 
   //------- Actions ----------//
