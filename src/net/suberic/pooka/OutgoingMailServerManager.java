@@ -171,6 +171,17 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
     }
   }
 
+  /**
+   * Stops all mail server threads.
+   */
+  public void stopServers() {
+    Vector v = getOutgoingMailServerList();
+
+    for (int i = 0; i < v.size(); i++) {
+      OutgoingMailServer oms = (OutgoingMailServer) v.get(i);
+      oms.stopThread();
+    }
+  }
 
   /**
    * A special OutgoingMailServer that represents the 'default' value.

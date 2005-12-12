@@ -138,6 +138,15 @@ public class PookaManager {
   /** Sets the Store Manager. */
   public void setStoreManager(StoreManager pStoreManager) { mStoreManager = pStoreManager; }
 
+  /** The UserProfile Manager tracks all of the User Profiles that Pooka knows about.*/
+  UserProfileManager mUserProfileManager;
+  /** Returns the UserProfile Manager. */
+  public UserProfileManager getUserProfileManager() {
+    return mUserProfileManager;
+  }
+  /** Sets the UserProfile Manager. */
+  public void setUserProfileManager(UserProfileManager pUserProfileManager) { mUserProfileManager = pUserProfileManager; }
+
   /**
    * The UIFactory for Pooka.  This is used to create just about all of the
    * graphical UI components for Pooka.  Usually this is either an instance

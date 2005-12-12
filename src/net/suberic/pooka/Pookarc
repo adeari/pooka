@@ -163,18 +163,21 @@ ConnectionMonitor.unavailableIcon=/org/javalobby/icons/20x20png/TrafficOff.png
 
 AttachmentPane.2xClickAction=file-open
 
-CryptoPanel.notEncrypted.Image=/org/javalobby/icons/20x20png/UnLock.png
-CryptoPanel.uncheckedEncrypted.Image=/org/javalobby/icons/20x20png/Lock.png
-CryptoPanel.decryptedSuccessfully.Image=/org/javalobby/icons/20x20png/OpenLock.png
-CryptoPanel.decryptedUnsuccessfully.Image=/org/javalobby/icons/20x20png/Bomb.png
+CryptoPanel.notEncryptedIcon=Decrypted
+CryptoPanel.uncheckedEncryptedIcon=Lock
+CryptoPanel.decryptedSuccessfullyIcon=UnLock
+CryptoPanel.decryptedUnsuccessfullyIcon=Bomb
 
-CryptoPanel.notSigned.Image=/org/javalobby/icons/20x20png/EnvelopeOpen.png
-CryptoPanel.uncheckedSigned.Image=/org/javalobby/icons/20x20png/Draw.png
-CryptoPanel.signatureVerified.Image=/org/javalobby/icons/20x20png/Check.png
-CryptoPanel.signatureBad.Image=/org/javalobby/icons/20x20png/Caution.png
-CryptoPanel.signatureFailedVerification.Image=/org/javalobby/icons/20x20png/Caution.png
+CryptoPanel.notSignedIcon=EnvelopeOpen
+CryptoPanel.uncheckedSignedIcon=Sign
+CryptoPanel.signatureVerifiedIcon=Check
+CryptoPanel.signatureBadIcon=Caution
+CryptoPanel.signatureFailedVerificationIcon=Caution
 
-CryptoPanel.hasAttachedkKey.Image=/org/javalobby/icons/20x20png/Key.png
+CryptoPanel.hasAttachedKeyIcon=Key
+
+NewMessageCryptoDisplay.keyIcon=Key
+NewMessageCryptoDisplay.noKeyIcon=NoKey
 
 CachedMessages.notCached.foregroundColor=-65536
 

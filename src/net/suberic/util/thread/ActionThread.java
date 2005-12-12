@@ -124,24 +124,36 @@ public class ActionThread extends Thread {
    * not already running.
    */
   public synchronized void addToQueue(Action action, ActionEvent event, int priority) {
-    // see where this should go.
-    int index = 0;
-    boolean found = false;
-    while (! found && index < actionQueue.size()) {
-      ActionEventPair current = (ActionEventPair) actionQueue.elementAt(index);
-      if (current.priority < priority)
-	found = true;
-      else
-	index++;
+    if (! stopMe) {
+      // see where this should go.
+      int index = 0;
+      boolean found = false;
+      while (! found && index < actionQueue.size()) {
+	ActionEventPair current = (ActionEventPair) actionQueue.elementAt(index);
+	if (current.priority < priority)
+	  found = true;
+	else
+	  index++;
+      }
+      actionQueue.add(index, new ActionEventPair(action, event, priority));
+      if (sleeping)
+	this.interrupt();
     }
-    actionQueue.add(index, new ActionEventPair(action, event, priority));
-    if (sleeping)
-      this.interrupt();
   } 	
-  
+
+  /**
+   * Stops the ActionThread.
+   */
   public void setStop(boolean newValue) {
     stopMe = newValue;
     this.interrupt();
+  }
+
+  /**
+   * Returns whether or not this thread has been stopped.
+   */
+  public boolean getStopped() {
+    return stopMe;
   }
 
   /**

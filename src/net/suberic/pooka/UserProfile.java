@@ -6,16 +6,16 @@ import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.InternetHeaders;
 
-public class UserProfile extends Object implements ValueChangeListener {
+public class UserProfile extends Object implements ValueChangeListener, Item {
   Properties mailProperties;
   String name;
-  URLName sendMailURL;
+  //URLName sendMailURL;
   String mailServerName;
   String defaultDomain;
   String defaultDefaultDomain;
   OutgoingMailServer mailServer;
   OutgoingMailServer mTempMailServer = null;
-  String sendPrecommand;
+  //String sendPrecommand;
   String sentFolderName;
   FolderInfo sentFolder;
   public boolean autoAddSignature = true;
@@ -30,25 +30,8 @@ public class UserProfile extends Object implements ValueChangeListener {
   
   private Vector excludeAddresses;
   
-  static Vector profileList = new Vector();
-  static Vector mailPropertiesMap = null;
-  
-  public static ValueChangeListener vcl = new ValueChangeAdapter() {
-      public void valueChanged(String changedValue) {
-	if (changedValue.equals("UserProfile") )
-	  UserProfile.updateProfilesFromProperty();
-      }
-    };
-  
   public UserProfile(String newName, VariableBundle mainProperties) {
-    if (mailPropertiesMap == null)
-      createMailPropertiesMap(mainProperties);
-    
     name = newName;
-    
-    initializeFromProperties(mainProperties);
-    
-    profileList.addElement(this);
     
     registerChangeListeners();
   }
@@ -57,57 +40,54 @@ public class UserProfile extends Object implements ValueChangeListener {
    * This populates the UserProfile from the Pooka properties list.
    * Useful on creation as well as when any of the properties change.
    */
-  public void initializeFromProperties(VariableBundle mainProperties) {
-    if (mailPropertiesMap != null) {
-      
-      mailProperties = new Properties();
-      String profileKey;
-      
-      for (int i = 0; i < mailPropertiesMap.size(); i++) {
-	profileKey = (String)mailPropertiesMap.elementAt(i);
-	mailProperties.put(profileKey, mainProperties.getProperty("UserProfile." + name + ".mailHeaders." + profileKey, ""));
-      }
-      
-      setSentFolderName(mainProperties.getProperty("UserProfile." + name + ".sentFolder", ""));
-       
-      mailServerName = mainProperties.getProperty("UserProfile." + name + ".mailServer", "_default");
-      mailServer = null; // reload it next time it's requested.
-      
-      sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
-      sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
-      sigGenerator=createSignatureGenerator();
-      
-      setDefaultDomain(mainProperties.getProperty("UserProfile." + name + ".defaultDomain", ""));
-
-      String fromAddr = (String)mailProperties.get("From");
-      excludeAddresses = new Vector();
-      excludeAddresses.add(fromAddr);
-      if (fromAddr.lastIndexOf('@') >0) {
-	defaultDefaultDomain = fromAddr.substring(fromAddr.lastIndexOf('@') + 1);
-      }
-      Vector excludeProp = mainProperties.getPropertyAsVector("UserProfile." + name + ".excludeAddresses", "");
-      excludeAddresses.addAll(excludeProp);
+  public void initializeFromProperties(VariableBundle mainProperties, List mailPropertiesList) {
+    mailProperties = new Properties();
+    String profileKey;
+    
+    for (int i = 0; i < mailPropertiesList.size(); i++) {
+      profileKey = (String)mailPropertiesList.get(i);
+      mailProperties.put(profileKey, mainProperties.getProperty("UserProfile." + name + ".mailHeaders." + profileKey, ""));
     }
-
+    
+    setSentFolderName(mainProperties.getProperty("UserProfile." + name + ".sentFolder", ""));
+    
+    mailServerName = mainProperties.getProperty("UserProfile." + name + ".mailServer", "_default");
+    mailServer = null; // reload it next time it's requested.
+    
+    //sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
+    //sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
+    sigGenerator=createSignatureGenerator();
+    
+    setDefaultDomain(mainProperties.getProperty("UserProfile." + name + ".defaultDomain", ""));
+    
+    String fromAddr = (String)mailProperties.get("From");
+    excludeAddresses = new Vector();
+    excludeAddresses.add(fromAddr);
+    if (fromAddr.lastIndexOf('@') >0) {
+      defaultDefaultDomain = fromAddr.substring(fromAddr.lastIndexOf('@') + 1);
+    }
+    Vector excludeProp = mainProperties.getPropertyAsVector("UserProfile." + name + ".excludeAddresses", "");
+    excludeAddresses.addAll(excludeProp);
+    
     pgpEncryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".pgpKey", "");
-
+    
     smimeEncryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".smimeKey", "");
-
+    
     signAsDefault = (! mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("manual"));
-
+    
     if (! signAsDefault) {
       if ( mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("smime")) {
 	cryptoDefaultType="SMIME";
       }
     }
-
+    
     String addressBookId = mainProperties.getProperty("UserProfile." + name + ".addressBook", "");
     if (!addressBookId.equals("")) {
       addressBook = Pooka.getAddressBookManager().getAddressBook(addressBookId);
     } else
       addressBook = null;
   }
-  
+
   /**
    * Registers this UserProfile as a ValueChangeListener for all of its
    * source properties.
@@ -123,11 +103,9 @@ public class UserProfile extends Object implements ValueChangeListener {
    * As specified in net.suberic.util.ValueChangeListener.
    */
   public void valueChanged(String changedValue) {
-    initializeFromProperties(Pooka.getResources());
-  }
-  
-  public void finalize() {
-    profileList.removeElement(this);
+    VariableBundle bundle = Pooka.getResources();
+    UserProfileManager manager = Pooka.getPookaManager().getUserProfileManager();
+    initializeFromProperties(bundle, manager.getMailPropertiesList());
   }
   
   /**
@@ -267,147 +245,20 @@ public class UserProfile extends Object implements ValueChangeListener {
       return addresses;
   }
   
-  /**
-   * This method updates the ProfileList from the UserProfile property.
-   */
-  static public void updateProfilesFromProperty() {
-    Vector currentValues = Pooka.getResources().getPropertyAsVector("UserProfile", "");
-    Vector oldValues = new Vector(profileList);
-    Vector newValues = new Vector();
-    Vector removeValues = new Vector();
-    
-    for (int i = 0; i < currentValues.size(); i++) {
-      UserProfile up = getProfile((String)currentValues.elementAt(i));
-      if (up == null)
-	newValues.add(currentValues.elementAt(i));
-      else
-	oldValues.removeElement(up);
-    }
-    
-    for (int i = 0; i < oldValues.size(); i++)
-      removeValues.add(((UserProfile)oldValues.elementAt(i)).getName());
-    
-    createProfilesFromList(Pooka.getResources(), newValues);
-    removeProfilesFromList(Pooka.getResources(), removeValues);
-  }
-  
-  /**
-   * Creates the profile list from the given VariableBundle.
-   */
-  static public void createProfiles(VariableBundle mainProperties) {
-    StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile", ""), ":");
-    Vector newProfiles = new Vector();
-    while (tokens.hasMoreTokens())
-      newProfiles.add(tokens.nextToken());
-    createProfilesFromList(mainProperties, newProfiles);
-  }
-  
-  /**
-   * This creates a new Profile for each Profile specified in the 
-   * newProfileKeys Vector.
-   */ 
-  static public void createProfilesFromList(VariableBundle mainProperties, Vector newProfileKeys) {
-    
-    if (mailPropertiesMap == null)
-      createMailPropertiesMap(mainProperties);
-    
-    // Create each Profile
-    
-    String currentProfileName, profileKey;
-    Properties userProperties;;
-    UserProfile tmpProfile;
-    
-    for (int j = 0; j < newProfileKeys.size(); j++) {
-      currentProfileName = (String)(newProfileKeys.elementAt(j));
-      
-      // don't add it if it's empty.
-      if (currentProfileName.length() > 0) {
-	tmpProfile = new UserProfile(currentProfileName, mainProperties);
-      }
-    }
-  }
-  
-  /**
-   * This creates the profile map that we'll use to create new 
-   * Profile objects.
-   */
-  static public void createMailPropertiesMap(VariableBundle mainProperties) {
-    mailPropertiesMap = new Vector();
-    
-    // Initialize Profile Map
-    
-    StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.mailHeaders.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization"), ":");
-    while (tokens.hasMoreTokens()) {
-      mailPropertiesMap.addElement(tokens.nextToken());
-    }
-    
-  }
-  
-  /**
-   * This removes each profile specified in the Vector removeKeys.
-   * Each entry in the removeKeys Vector should be the String which 
-   * returns the corresponding Profile to be removed.
-   */
-  static public void removeProfilesFromList(VariableBundle mainProperties, Vector removeProfileKeys) {
-    if (removeProfileKeys == null)
-      return;
-    
-    for (int i = 0; i < removeProfileKeys.size(); i++) {
-      UserProfile tmpProfile = getProfile((String)removeProfileKeys.elementAt(i));
-      if (tmpProfile != null) { 
-	profileList.removeElement(tmpProfile);
-	Pooka.getResources().removeValueChangeListener(tmpProfile);
-	tmpProfile = null;
-      }
-    }
-  }
-  
-  static public Vector getProfileList() {
-    return profileList;
-  }
-  
-  static public UserProfile getProfile(String profileName) {
-    for (int i = 0; i < profileList.size(); i++) {
-      UserProfile tmpProfile = (UserProfile)(profileList.elementAt(i));
-      if (tmpProfile.getName().equals(profileName)) 
-	return tmpProfile;
-	}
-    
-    return null;
-  }
-  
-  /**
-   * for compatibility.
-   */
-  static public UserProfile getDefaultProfile(UserProfileContainer upc) {
-    return upc.getDefaultProfile();
-  }
-  
-  /**
-   * returns the default Profile object as defined by the 
-   * "UserProfile.default" property, or null if there are no Profiles
-   * defined.
-   */
-  static public UserProfile getDefaultProfile() {
-    UserProfile defaultProfile;
-    
-    try {
-      defaultProfile = UserProfile.getProfile(Pooka.getProperty("UserProfile.default"));
-      return defaultProfile;
-    } catch (Exception e) {
-      if (profileList.isEmpty())
-	return null;
-      else
-	return (UserProfile)(profileList.firstElement());
-    }
-  }
-  
   public String getName() {
     return name;
   }
 
   public String getUserProperty() {
     return "UserProfile." + getName();
+  }
+  
+  public String getItemID() {
+    return getName();
+  }
+
+  public String getItemProperty() {
+    return getUserProperty();
   }
   
   public Properties getMailProperties() {
@@ -417,14 +268,16 @@ public class UserProfile extends Object implements ValueChangeListener {
   public String toString() {
     return name;
   }
-  
+
+  /*
   public URLName getSendMailURL() {
     return sendMailURL;
   }
-  
+
   public String getSendPrecommand() {
     return sendPrecommand;
   }
+  */
   
   public FolderInfo getSentFolder() {
     if (sentFolder == null)

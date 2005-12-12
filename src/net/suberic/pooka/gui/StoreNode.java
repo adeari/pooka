@@ -345,35 +345,39 @@ public class StoreNode extends MailTreeNode {
 					       "Select"));
 	    if (returnValue == JFileChooser.APPROVE_OPTION) {
 	      guiLogger.fine("got " + jfc.getSelectedFile() + " as a return value.");
-	      final net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = ((net.suberic.pooka.gui.filechooser.FolderFileWrapper)jfc.getSelectedFile());
+
+	      final java.io.File[] selectedFiles = jfc.getSelectedFiles();
 	      
 	      getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
 		  public void actionPerformed(java.awt.event.ActionEvent ae) {
-		    try {
-		      // if it doesn't exist, try to create it.
-		      if (! wrapper.exists()) {
-			wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+		    for (int i = 0 ; selectedFiles != null && i < selectedFiles.length; i++) {
+		      net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = (net.suberic.pooka.gui.filechooser.FolderFileWrapper) selectedFiles[i];
+		      try {
+			// if it doesn't exist, try to create it.
+			if (! wrapper.exists()) {
+			  wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+			}
+			String absFileName = wrapper.getAbsolutePath();
+			int firstSlash = absFileName.indexOf('/');
+			String normalizedFileName = absFileName;
+			if (firstSlash >= 0)
+			  normalizedFileName = absFileName.substring(firstSlash);
+			
+			guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
+			storeLogger.fine("adding folder " + normalizedFileName);
+			
+			getStoreInfo().subscribeFolder(normalizedFileName);
+		      } catch (MessagingException me) {
+			final String folderName = wrapper.getName();
+			SwingUtilities.invokeLater(new Runnable() {
+			    public void run() {
+			      Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
+			    }
+			  });
 		      }
-		      String absFileName = wrapper.getAbsolutePath();
-		      int firstSlash = absFileName.indexOf('/');
-		      String normalizedFileName = absFileName;
-		      if (firstSlash >= 0)
-			normalizedFileName = absFileName.substring(firstSlash);
-		      
-		      guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
-		      storeLogger.fine("adding folder " + normalizedFileName);
-		      
-		      getStoreInfo().subscribeFolder(normalizedFileName);
-		    } catch (MessagingException me) {
-		      final String folderName = wrapper.getName();
-		      SwingUtilities.invokeLater(new Runnable() {
-			  public void run() {
-			    Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
-			  }
-			});
 		    }
 		  }
-		},  new java.awt.event.ActionEvent(this, 0, "message-refresh"));
+		},  new java.awt.event.ActionEvent(this, 0, "folder-subscribe"));
 	    }
 
 	    Pooka.getUIFactory().clearStatus();

@@ -353,7 +353,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   /**
-   * This adds a listener to the Folder.
+   * This adds this a listener to the Folder.
    */
   protected void addFolderListeners() {
     if (folder != null) {
@@ -364,9 +364,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
   
   /**
+   * This removes this as a listener to the Folder.
+   */
+  protected void removeFolderListeners() {
+    if (folder != null) {
+      folder.removeMessageChangedListener(this);
+      folder.removeMessageCountListener(this);
+      folder.removeConnectionListener(this);
+    }
+  }
+  
+  /**
    * this is called by loadFolders if a proper Folder object 
    * is returned.
-     */
+   */
   protected void initializeFolderInfo() {
     addFolderListeners();
     
@@ -380,7 +391,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
     if (!defProfile.equals(""))
-      defaultProfile = UserProfile.getProfile(defProfile);
+      defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(defProfile);
     
     // if we got to this point, we should assume that the open worked.
     
@@ -398,7 +409,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       getLogger().log(Level.FINE, "Folder " + getFolderID() + " closed:  " + e);
       // if this happened accidentally, check it.
       if (getStatus() != CLOSED && getStatus() != DISCONNECTED) {
-	
+
 	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
 	    public void actionPerformed(java.awt.event.ActionEvent e) {
 	      // check to see if the parent store is still open.
@@ -1485,7 +1496,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       if (Pooka.getProperty(changedValue, "").equals(""))
 	defaultProfile = null;
       else 
-	defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
+	defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
     } else if (changedValue.equals(getFolderProperty() + ".backendFilters")) { 
       createFilters();
       
@@ -1638,19 +1649,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * the Pooka resources.
    */
   public void unsubscribe() {
-    
-    if (children != null && children.size() > 0) {
-      for (int i = 0; i < children.size(); i++) 
-	((FolderInfo)children.elementAt(i)).unsubscribe();
-    }
-    
-    Pooka.getResources().removeValueChangeListener(this);
-    Pooka.getLogManager().removeLogger(getFolderProperty());
 
-    if (getFolderDisplayUI() != null)
-      getFolderDisplayUI().closeFolderDisplay();
-    
-    Pooka.getResources().removeProperty(getFolderProperty() + ".folderList");
+    cleanup();
     
     if (parentFolder != null)
       parentFolder.removeFromFolderList(getFolderName());
@@ -1683,6 +1683,29 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     f.delete(true);
   }
   
+  /**
+   * Cleans up all references to this folder.
+   */
+  protected void cleanup() {
+    
+    Pooka.getResources().removeValueChangeListener(this);
+    Folder f = getFolder();
+    if (f != null) {
+      removeFolderListeners();
+    }
+    
+    if (children != null && children.size() > 0) {
+      for (int i = 0; i < children.size(); i++) 
+	((FolderInfo)children.elementAt(i)).cleanup();
+    }
+    
+    Pooka.getLogManager().removeLogger(getFolderProperty());
+
+    if (getFolderDisplayUI() != null)
+      getFolderDisplayUI().closeFolderDisplay();
+    
+  }
+
   /**
    * This returns whether or not this Folder is set up to use the 
    * TrashFolder for the Store.  If this is a Trash Folder itself, 
@@ -2598,7 +2621,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       return parentStore.getDefaultProfile();
     }
     else {
-      return UserProfile.getDefaultProfile();
+      return Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
     }
   }
   

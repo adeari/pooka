@@ -95,7 +95,7 @@ public class PookaMessageHandler extends Thread {
       address = pMessage.substring(PookaMessagingConstants.S_NEW_MESSAGE.length() + 1, toAddressEnd);
       if (toAddressEnd != pMessage.length() && toAddressEnd != pMessage.length() + 1) {
 	String profileString = pMessage.substring(toAddressEnd + 1);
-	profile = UserProfile.getProfile(profileString);
+	profile = Pooka.getPookaManager().getUserProfileManager().getProfile(profileString);
       }
     }
     sendNewEmail(address, profile);

@@ -193,7 +193,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     if (selectedProfile != null) {
       currentUser = selectedProfile;
     } else {
-      currentUser = UserProfile.getDefaultProfile();
+      currentUser = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
     }
   }
   

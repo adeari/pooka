@@ -236,6 +236,7 @@ public class StartupManager {
 		// ignore.  just say done and exit.
 	      } finally {
 		currentStore.stopStoreThread();
+		currentStore.cleanup();
 		doneMap.put(currentStore, new Boolean(true));
 	      }
 	    }
@@ -307,12 +308,18 @@ public class StartupManager {
 	  }
 	  mPookaManager.setMainPanel(null);
 	  mPookaManager.getUIFactory().setShowing(false);
+	  /*
 	  mPookaManager.setStoreManager(new StoreManager());
 	  updateTime("created store manager.");
 	  
 	  mPookaManager.getStoreManager().loadAllSentFolders();
 	  mPookaManager.getOutgoingMailManager().loadOutboxFolders();
 	  updateTime("loaded sent/outbox");
+	  */
+	  mPookaManager.setStoreManager(null);
+	  mPookaManager.setUserProfileManager(null);
+	  mPookaManager.getOutgoingMailManager().stopServers();
+
 	  PookaUIFactory newFactory = new PookaMinimalUIFactory(Pooka.getUIFactory());
 	  
 	  mFullStartup=false;
@@ -404,10 +411,9 @@ public class StartupManager {
 
     if (startup != null)
       startup.setStatus("Pooka.startup.profiles");
-    UserProfile.createProfiles(mPookaManager.getResources());
+    UserProfileManager profileManager = new UserProfileManager(mPookaManager.getResources());
+    mPookaManager.setUserProfileManager(profileManager);
     updateTime("created profiles");
-    
-    Pooka.getResources().addValueChangeListener(UserProfile.vcl, "UserProfile");
     
     String mailcapSource = null;
     if (System.getProperty("file.separator").equals("\\")) {

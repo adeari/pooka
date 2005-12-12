@@ -168,10 +168,10 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
    * and StoreInfos have references to UserProfiles.
    */
   public void loadAllSentFolders() {
-    Vector profileList = UserProfile.profileList;
+    List profileList = Pooka.getPookaManager().getUserProfileManager().getUserProfileList();
     
     for (int i = 0; i < profileList.size(); i++) {
-      ((UserProfile)profileList.elementAt(i)).loadSentFolder();
+      ((UserProfile)profileList.get(i)).loadSentFolder();
     }
   }
   

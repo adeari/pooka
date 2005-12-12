@@ -120,6 +120,16 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   }
 
   /**
+   * Stops the thread.
+   */
+  public void stopThread() {
+    if (mailServerThread != null) {
+      mailServerThread.setStop(true);
+      mailServerThread = null;
+    }
+  }
+
+  /**
    * Sends all available messages in the outbox.
    */
   public void sendAll() {

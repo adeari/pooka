@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 
 import net.suberic.util.VariableBundle;
+import net.suberic.util.gui.IconManager;
 import net.suberic.pooka.Pooka;
 
 /**
@@ -286,78 +287,17 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
      * ...and maybe more.
      */
 
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".notEncrypted.Image"));
-      if (url != null)
-	notEncryptedIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".uncheckedEncrypted.Image"));
-      if (url != null)
-	uncheckedEncryptedIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
     
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".decryptedSuccessfully.Image"));
-      if (url != null)
-	decryptedSuccessfullyIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".decryptedUnsuccessfully.Image"));
-      if (url != null)
-	decryptedUnsuccessfullyIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".uncheckedSigned.Image"));
-      if (url != null)
-	uncheckedSignedIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".notSigned.Image"));
-      if (url != null)
-	notSignedIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".signatureVerified.Image"));
-      if (url != null)
-	signatureVerifiedIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".signatureBad.Image"));
-      if (url != null)
-	signatureBadIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
-    try {
-      java.net.URL url =thisClass.getResource(vars.getProperty(key + ".signatureFailedVerification.Image"));
-      if (url != null)
-	signatureFailedVerificationIcon = new ImageIcon(url);
-    } catch (java.util.MissingResourceException mre) {
-      return;
-    }
-    
+    notEncryptedIcon = iconManager.getIcon(Pooka.getProperty(key + ".notEncryptedIcon", "UnLock"));
+    uncheckedEncryptedIcon = iconManager.getIcon(Pooka.getProperty(key + ".uncheckedEncryptedIcon", "Lock"));
+    decryptedSuccessfullyIcon = iconManager.getIcon(Pooka.getProperty(key + ".decryptedSuccessfullyIcon", "OpenLock"));
+    decryptedUnsuccessfullyIcon = iconManager.getIcon(Pooka.getProperty(key + ".decryptedUnsuccessfullyIcon", "Bomb"));
+    uncheckedSignedIcon = iconManager.getIcon(Pooka.getProperty(key + ".uncheckedSignedIcon", "Draw"));
+    notSignedIcon = iconManager.getIcon(Pooka.getProperty(key + ".notSignedIcon", "EnvelopeOpen"));
+    signatureVerifiedIcon = iconManager.getIcon(Pooka.getProperty(key + ".signatureVerifiedIcon", "Check"));
+    signatureBadIcon = iconManager.getIcon(Pooka.getProperty(key + ".signatureBadIcon", "Caution"));
+    signatureFailedVerificationIcon = iconManager.getIcon(Pooka.getProperty(key + ".signatureFailedVerificationIcon", "Caution"));
   }
 
   /**

@@ -65,6 +65,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   // automatically
   private boolean useSubscribed = false;
 
+  // the connection listener for this store.
+  private ConnectionListener connectionListener;
+
   /**
    * Creates a new StoreInfo from a Store ID.
    */
@@ -161,7 +164,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Pooka.getLogManager().addLogger(getStoreProperty() + ".sessionDebug");
     
     if (available) {
-      store.addConnectionListener(new ConnectionListener() { 
+      connectionListener = new ConnectionListener() { 
 	  
 	  public void disconnected(ConnectionEvent e) {
 	    getLogger().log(Level.FINE, "Store " + getStoreID() + " disconnected.");
@@ -199,8 +202,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	  public void opened(ConnectionEvent e) {
 	    getLogger().log(Level.FINE, "Store " + getStoreID() + " opened.");
 	  }	  
-	});
+	};
 
+      store.addConnectionListener(connectionListener);
       
     }
     
@@ -209,7 +213,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       storeThread.start();
     }
     
-    defaultProfile = UserProfile.getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
+    defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
     
     connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
     if (connection == null) {
@@ -459,6 +463,23 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   }
 
   /**
+   * Cleans up all references to this StoreInfo.
+   */
+  public void cleanup() {
+    Pooka.getResources().removeValueChangeListener(this);
+    Pooka.getLogManager().removeLogger(getStoreProperty());
+
+    if (children != null && children.size() > 0) {
+      for (int i = 0; i < children.size(); i++) 
+	((FolderInfo)children.elementAt(i)).cleanup();
+    }
+
+    if (store != null) {
+      store.removeConnectionListener(connectionListener);
+    }
+  }
+
+  /**
    * This handles the changes if the source property is modified.
    *
    * As defined in net.suberic.util.ValueChangeListener.
@@ -471,7 +492,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 	  if (changedValue.equals(getStoreProperty() + ".folderList")) {
 	    updateChildren();
 	  } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
-	    defaultProfile = UserProfile.getProfile(Pooka.getProperty(changedValue, ""));
+	    defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
 	  } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
 	    
 	    if (storeNode != null) {
@@ -816,7 +837,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Closes all of the Store's children.
    */
   public void closeAllFolders(boolean expunge, boolean shuttingDown) throws MessagingException {
-    if (getStoreThread() != null) {
+    if (getStoreThread() != null && ! getStoreThread().getStopped()) {
       // if the store thread has exited, assume we're exiting, too.
       synchronized(getStoreThread().getRunLock()) {
 	getLogger().log(Level.FINE, "closing all folders of store " + getStoreID());

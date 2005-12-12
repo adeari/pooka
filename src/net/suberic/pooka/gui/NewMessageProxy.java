@@ -198,7 +198,7 @@ public class NewMessageProxy extends MessageProxy {
       try {
 	String profileId = (String) getMessageInfo().getMessageProperty(Pooka.getProperty("Pooka.userProfileProperty", "X-Pooka-UserProfile"));
 	if (profileId != null && ! profileId.equals("")) {
-	  UserProfile profile = UserProfile.getProfile(profileId);
+	  UserProfile profile = Pooka.getPookaManager().getUserProfileManager().getProfile(profileId);
 	  if (profile != null)
 	    nmui.setSelectedProfile(profile);
 	}

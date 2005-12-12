@@ -235,7 +235,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     // Create UserProfile DropDown
     JLabel userProfileLabel = new JLabel(Pooka.getProperty("UserProfile.label","User:"), SwingConstants.RIGHT);
     userProfileLabel.setPreferredSize(new Dimension(75,userProfileLabel.getPreferredSize().height));
-    JComboBox profileCombo = new JComboBox(UserProfile.getProfileList());
+    JComboBox profileCombo = new JComboBox(new Vector(Pooka.getPookaManager().getUserProfileManager().getUserProfileList()));
 
 
     IconManager iconManager = Pooka.getUIFactory().getIconManager();
@@ -277,7 +277,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	selectedProfile = Pooka.getMainPanel().getCurrentUser();
 
     if (selectedProfile == null)
-      selectedProfile = UserProfile.getDefaultProfile();
+      selectedProfile = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
     
     if (selectedProfile != null)
       profileCombo.setSelectedItem(selectedProfile);

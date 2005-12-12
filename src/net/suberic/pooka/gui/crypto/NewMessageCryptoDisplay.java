@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import net.suberic.util.VariableBundle;
+import net.suberic.util.gui.IconManager;
 import net.suberic.pooka.Pooka;
 import net.suberic.crypto.EncryptionKey;
 import net.suberic.pooka.gui.NewMessageProxy;
@@ -152,22 +153,19 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
    * Creates a ToggleButton for enabling/disabling encryption.
    */
   public JToggleButton createEncryptionEnabledButton() {
-    java.net.URL keyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/Key.png"));
-
-    java.net.URL noKeyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/NoKey.png"));
-
-    if (keyUrl != null) {
-      ImageIcon keyIcon = new ImageIcon(keyUrl);
-      ImageIcon noKeyIcon = new ImageIcon(noKeyUrl);
-      
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
+    
+    ImageIcon keyIcon = iconManager.getIcon(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "Key"));
+    ImageIcon noKeyIcon = iconManager.getIcon(Pooka.getProperty("NewMessageCryptoDisplay.noKeyIcon", "NoKey"));
+    if (keyIcon != null && noKeyIcon != null) {
       JToggleButton returnValue = new JToggleButton(noKeyIcon, proxy.getCryptoInfo().getEncryptMessage() != NewMessageCryptoInfo.CRYPTO_NO);
-
+      
       returnValue.setSelectedIcon(keyIcon);
       
       returnValue.addActionListener(new ActionListener() {
 	  public void actionPerformed(ActionEvent e) {
 	    boolean nowSelected = mEncryptionEnabledButton.isSelected();
-
+	    
 	    mEncryptionKeyButton.setEnabled(nowSelected);
 	    if (nowSelected)
 	      proxy.getCryptoInfo().setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
@@ -175,15 +173,15 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
 	      proxy.getCryptoInfo().setEncryptMessage(NewMessageCryptoInfo.CRYPTO_NO);
 	  }
 	});
-
+      
       returnValue.setSize(keyIcon.getIconHeight(), keyIcon.getIconWidth());
       returnValue.setPreferredSize(new java.awt.Dimension(keyIcon.getIconHeight(), keyIcon.getIconWidth()));
       return returnValue;
     }
-
+    
     return null;
   }
-
+  
   /**
    * Creates a button which clears the encryption key.
    */
@@ -221,14 +219,11 @@ public class NewMessageCryptoDisplay extends JPanel implements CryptoStatusDispl
    * Creates a ToggleButton for enabling/disabling the signature.
    */
   public JToggleButton createSignatureEnabledButton() {
-    java.net.URL keyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/Key.png"));
-
-    java.net.URL noKeyUrl = this.getClass().getResource(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "/org/javalobby/icons/20x20png/NoKey.png"));
-
-    if (keyUrl != null) {
-      ImageIcon keyIcon = new ImageIcon(keyUrl);
-      ImageIcon noKeyIcon = new ImageIcon(noKeyUrl);
-
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
+    
+    ImageIcon keyIcon = iconManager.getIcon(Pooka.getProperty("NewMessageCryptoDisplay.keyIcon", "Key"));
+    ImageIcon noKeyIcon = iconManager.getIcon(Pooka.getProperty("NewMessageCryptoDisplay.noKeyIcon", "NoKey"));
+    if (keyIcon != null && noKeyIcon != null) {
       JToggleButton returnValue = new JToggleButton(noKeyIcon, proxy.getCryptoInfo().getSignMessage() != NewMessageCryptoInfo.CRYPTO_NO);
       
       returnValue.setSelectedIcon(keyIcon);

@@ -1,6 +1,44 @@
+*) make it so, on startup, new folder windows don't grab away focus.
+
+*) fix move-to-back on message windows.
+
+*) listeners:
+	*) make sure that on disconnection that we remove all listeners.
+	*) -- smtp threads, especially.
+  *) (!!) make sure that smtp threads don't exit while there is still mail to
+	be sent (!!)
+  *) test UserProfile stuff to see if we're getting rid of all of them
+	correctly.
+
+*) on initial startup/config:  make sure it's clear that you can
+	start up without a working smtp server.
+
 *) encryption panel icons
+*) new icons?
+	*) new splashscreen
+	*) ClearLooks icons
+	  must be fixed:
+		*) disconnected folder/subfolder (green)
+		*) spam
+		*) headers
+		*) encryption panel.
+		*) connection panel (traffic green etc.)
+	  think about changing
+		*) new message icon
+		*) some others on the encryption panel
+		*) refresh
+		*) store connected/disconnected
+		*) new locks
+
+*) new attachment display w/icons?
+
+*) fix fonts so they're no longer butt-ugly on windows
+
+*) fix default font selector so it works on kunstoff and ocean
 
 *) fix subjects with carriage returns
+
+---
 
 *) look at online bugs, etc.
 
@@ -8,26 +46,15 @@
 *) make sure mailing list info is correct
 *) update website in general
 
-*) new icons?
-	*) new splashscreen
-	*) IconManager class
-	*) ClearLooks icons
-		*) new message icon
-		*) disconnected folder/subfolder (green)
-		*) spam
-		*) headers
-		*) encryption panel.
-
 *) redo attachment display
+
+*) exit:  closing window should pop up a notice saying pooka is still
+	running; file->exit should exit.
 
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
 
 *) make wheel scroll customizable
-
-*) fix fonts so they're no longer butt-ugly on windows
-
-*) fix default font selector so it works on kunstoff and ocean
 
 *) fix preview pane mode; make it look nice
 
@@ -40,9 +67,15 @@
 	*) check out gmail and yahoo mail
 	*) quick sample implementation?
 
+*) check what happens if you hit enter on a subfolder while subscribing.
+	-- see if we can make it so hitting enter opens the subfolder
+	   rather than subscribing to it.
+
 2.0 version
 ------
 *) work out webstart code for tray icon.
+
+*) change Item and ItemManager to using generics.
 
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka

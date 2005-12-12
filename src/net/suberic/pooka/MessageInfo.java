@@ -66,7 +66,7 @@ public class MessageInfo {
       if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && cryptoInfo.isEncrypted()) {
 	UserProfile p = getDefaultProfile();
 	if (p == null)
-	  p = UserProfile.getDefaultProfile();
+	  p = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
 	
 	if (cryptoInfo.autoDecrypt(p)) {
 	  //attachments = MailUtilities.parseAttachments(getMessage());
@@ -473,7 +473,7 @@ public class MessageInfo {
 
     UserProfile p = getDefaultProfile();
     if (p == null)
-      p = UserProfile.getDefaultProfile();
+      p = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
 
     if (p != null && p.getMailServer() != null) {
       final OutgoingMailServer mailServer = p.getMailServer();
@@ -633,7 +633,7 @@ public class MessageInfo {
     
     UserProfile up = getDefaultProfile();
     if (up == null)
-      up = UserProfile.getDefaultProfile();
+      up = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
 
     String parsedText;
     String replyPrefix;
@@ -689,7 +689,7 @@ public class MessageInfo {
       
       UserProfile up = getDefaultProfile();
       if (up == null) {
-	up = UserProfile.getDefaultProfile();
+	up = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
       }
       
       String forwardPrefix;

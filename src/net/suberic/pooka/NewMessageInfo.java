@@ -178,6 +178,7 @@ public class NewMessageInfo extends MessageInfo {
 	sent = true;
       }
       
+      /*
       if (! sent) {
 	if (profile != null) {
 	  URLName urlName = profile.getSendMailURL();
@@ -187,7 +188,8 @@ public class NewMessageInfo extends MessageInfo {
 	  sent = true;
 	}
       }
-      
+      */
+
       if (! sent) {
 	throw new MessagingException(Pooka.getProperty("error.noSMTPServer", "Error sending Message:  No mail server configured."));
       }
