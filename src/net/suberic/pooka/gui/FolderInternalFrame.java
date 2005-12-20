@@ -235,19 +235,9 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 
     int x = getX() + ((JScrollPane)mp.getUIComponent()).getHorizontalScrollBar().getValue();
     int y = getY() + ((JScrollPane)mp.getUIComponent()).getVerticalScrollBar().getValue();
-    int layer = mp.getLayer(this);
-    int position = mp.getPosition(this);
-    boolean selected = this.isSelected();
     
     Pooka.setProperty(folderProperty + ".windowLocation.x", Integer.toString(x));
     Pooka.setProperty(folderProperty + ".windowLocation.y", Integer.toString(y));
-    Pooka.setProperty(folderProperty + ".windowLocation.layer", Integer.toString(layer));
-    Pooka.setProperty(folderProperty + ".windowLocation.position", Integer.toString(position));
-    
-    if (selected)
-      Pooka.setProperty(folderProperty + ".windowLocation.selected", "true");
-    else
-      Pooka.setProperty(folderProperty + ".windowLocation.selected", "false");
     
     Pooka.setProperty(folderProperty + ".windowLocation.height", Integer.toString(getHeight()));
     Pooka.setProperty(folderProperty + ".windowLocation.width", Integer.toString(getWidth()));
@@ -282,9 +272,17 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
    * This opens the FolderInternalFrame.
    */
   public void openFolderDisplay() {
+    openFolderDisplay(true);
+  }
+
+  /**
+   * This opens the FolderInternalFrame.
+   */
+  public void openFolderDisplay(boolean selected) {
+    final boolean fSelected = selected;
     Runnable runMe = new Runnable() {
 	public void run() {
-	  getMessagePanel().openFolderWindow(FolderInternalFrame.this);
+	  getMessagePanel().openFolderWindow(FolderInternalFrame.this, fSelected);
 	} 
       };
     if (SwingUtilities.isEventDispatchThread())

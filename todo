@@ -1,4 +1,10 @@
-*) make it so, on startup, new folder windows don't grab away focus.
+*) change exit so that closing window exits to icon, and file->exit
+	actually exits.
+
+*) new usermanager:  sent folders not loading properly???
+
+*) subscribe folder.  2x click on holds-messages folder (file) and it
+opens it up.
 
 *) fix move-to-back on message windows.
 

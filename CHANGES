@@ -1,3 +1,9 @@
+C+W now closes internal frame windows.
+
+if you have multiple folder windows opeening on startup, only the first
+one is selected by default now, so that you don't have your keyboard focus
+changing on you.
+
 you can now subscribe to multiple folders at once.
 
 middle clicking folder and message internalframes now deselects them

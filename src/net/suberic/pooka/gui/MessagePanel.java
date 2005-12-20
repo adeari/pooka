@@ -154,36 +154,42 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   public void openFolderWindow(FolderInternalFrame newFolderWindow, boolean selectWindow) {
 
     if (newFolderWindow.getDesktopPane() != this) {
-      this.add(newFolderWindow);
+      setLayer(newFolderWindow, JLayeredPane.DEFAULT_LAYER);
       String folderProperty = newFolderWindow.getFolderInfo().getFolderProperty();
       try {
 	int x = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.x"));
 	int y = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.y"));
-	int layer = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.layer"));
-	int position = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.position"));
 	
 	newFolderWindow.setLocation(x, y);
-	setLayer(newFolderWindow, layer, position);
       } catch (Exception e) {
 	newFolderWindow.setLocation(getNewWindowLocation(newFolderWindow, false));
       }
-      if (Pooka.getProperty(folderProperty + ".windowLocation.selected", "false").equalsIgnoreCase("true"))
+      
+      if (!newFolderWindow.isVisible())
+	newFolderWindow.setVisible(true);
+      
+      if (getComponentCount() == 0)
 	selectWindow = true;
-    } else if (newFolderWindow.isIcon()) {
+      
+      this.add(newFolderWindow);
+    } else {
+      if (!newFolderWindow.isVisible())
+	newFolderWindow.setVisible(true);
+    }
+    
+    if (newFolderWindow.isIcon()) {
       try {
 	newFolderWindow.setIcon(false);
       } catch (java.beans.PropertyVetoException e) {
       } 
     }
     
-    if (!newFolderWindow.isVisible())
-      newFolderWindow.setVisible(true);
-    
-    if (selectWindow) 
+    if (selectWindow) {
       try {
 	newFolderWindow.setSelected(true);
       } catch (java.beans.PropertyVetoException e) {
       } 
+    }
   }
   
   
@@ -335,10 +341,16 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
       for (int i = 0; i < folderList.size(); i++) {
 	FolderInfo fInfo = Pooka.getStoreManager().getFolderById((String)folderList.elementAt(i));
 	if (fInfo != null && fInfo.getFolderNode() != null) {
-	  FolderNode fNode = fInfo.getFolderNode();
+	  
+	  final FolderNode fNode = fInfo.getFolderNode();
 	  fNode.makeVisible();
-	  Action a = fNode.getAction("file-open");
-	  a.actionPerformed(new ActionEvent(this, 0, "file-open"));
+	  //Action a = fNode.getAction("file-open");
+	  //a.actionPerformed(new ActionEvent(this, 0, "file-open"));
+	  fInfo.getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+	      public void actionPerformed(java.awt.event.ActionEvent ae) {
+		fNode.openFolder(false, false);
+	      }
+	    }, new java.awt.event.ActionEvent(this, 0, "message-send"));
 	}
       }
   }

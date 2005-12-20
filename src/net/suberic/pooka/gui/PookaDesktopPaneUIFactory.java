@@ -114,11 +114,11 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
     
     jif.setVisible(true);
+
     try {
       jif.setSelected(true);
     } catch (java.beans.PropertyVetoException pve) {
     }
-    
   }
   
   /**

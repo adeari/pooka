@@ -107,6 +107,7 @@ public class PookaLogManager implements ValueChangeListener {
 	    newValue = evt.getNewValue().getClass().getName();
 	  }
 	  logger.log(logLevel, evt.getPropertyName() + ":  oldValue=" + oldValue + "; newValue=" + newValue);
+
 	}
       });
     
