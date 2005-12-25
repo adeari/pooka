@@ -326,6 +326,13 @@ public class StartupManager {
 
 	  loadManagers(null);
 	  mPookaManager.setUIFactory(newFactory);
+	  if (mPookaManager.getResources().getProperty("Pooka.exitToIcon.notify", "true").equalsIgnoreCase("true")) {
+	    MessageNotificationManager mnm = newFactory.getMessageNotificationManager();
+	    if (mnm != null)
+	      mnm.displayMessage(mPookaManager.getResources().getProperty("info.exitToIcon.title", "System Tray Notification"), mPookaManager.getResources().getProperty("info.exitToIcon", "Pooka has disconnected from you mail servers, but is still running in the System Tray.  To exit Pooka completely, use File->Exit from the toolbar or right-click on the Tray Icon and choose Exit."), MessageNotificationManager.INFO_MESSAGE_TYPE);
+	    
+	  }    
+	  
 	}
       };
     if (Pooka.getMainPanel() != null)

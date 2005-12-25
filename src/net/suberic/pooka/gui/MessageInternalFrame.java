@@ -131,12 +131,30 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
 	    getMessageDisplay().setDefaultFont();
 	    getMessageDisplay().sizeToDefault();
 	    MessageInternalFrame.this.setSize(MessageInternalFrame.this.getPreferredSize());
-	    
+	    if (getUI() instanceof BasicInternalFrameUI) {
+	      ((BasicInternalFrameUI) getUI()).getNorthPane().addMouseListener(new MouseAdapter() { 
+		  
+		  public void mouseClicked(MouseEvent evt) { 
+		    if (evt.getButton() == MouseEvent.BUTTON2) {
+		      try {
+			Object messagePanel = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.MessagePanel"), MessageInternalFrame.this);
+			if (messagePanel != null) {
+			  ((MessagePanel) messagePanel).unselectAndMoveToBack(MessageInternalFrame.this);
+			  evt.consume();
+			}
+		      } catch (Exception e) {
+			getLogger().log(java.util.logging.Level.FINE, "exception lowering MessageInternalFrame", e);
+		      }
+		    }
+		  } 
+		  
+		});
+	    }  
 	  } catch (Exception e) {
 	  }
 	}
       };
-
+    
     if (! SwingUtilities.isEventDispatchThread()) {
       SwingUtilities.invokeLater(runMe);
     } else {

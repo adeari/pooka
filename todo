@@ -1,12 +1,32 @@
+*) check release versions of libaries; make sure we have the most
+recent one of each in all areas (dist, webstart, Imported.)
+
 *) change exit so that closing window exits to icon, and file->exit
 	actually exits.
+	*) started.  need to make it reasonably nice.
+
+*) encryption panel icons
+*) new icons?
+	*) new splashscreen
+	*) ClearLooks icons
+	  must be fixed:
+		*) disconnected folder/subfolder (green)
+		*) spam
+		*) encryption panel.
+		*) connection panel (traffic green etc.)
+	  think about changing
+		*) new message icon
+		*) some others on the encryption panel
+		*) refresh
+		*) store connected/disconnected
+		*) new locks
+
+*) new attachment display w/icons?
 
 *) new usermanager:  sent folders not loading properly???
 
 *) subscribe folder.  2x click on holds-messages folder (file) and it
 opens it up.
-
-*) fix move-to-back on message windows.
 
 *) listeners:
 	*) make sure that on disconnection that we remove all listeners.
@@ -18,25 +38,6 @@ opens it up.
 
 *) on initial startup/config:  make sure it's clear that you can
 	start up without a working smtp server.
-
-*) encryption panel icons
-*) new icons?
-	*) new splashscreen
-	*) ClearLooks icons
-	  must be fixed:
-		*) disconnected folder/subfolder (green)
-		*) spam
-		*) headers
-		*) encryption panel.
-		*) connection panel (traffic green etc.)
-	  think about changing
-		*) new message icon
-		*) some others on the encryption panel
-		*) refresh
-		*) store connected/disconnected
-		*) new locks
-
-*) new attachment display w/icons?
 
 *) fix fonts so they're no longer butt-ugly on windows
 

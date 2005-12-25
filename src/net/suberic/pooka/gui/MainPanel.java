@@ -82,7 +82,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     getParentFrame().addWindowListener(new WindowAdapter() {
 	public void windowClosing(WindowEvent e) {
-	  exitPooka(0);
+	  exitPooka(true);
 	}
       });
 
@@ -229,7 +229,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
    * This exits Pooka.
    */
   
-  public void exitPooka(int exitValue) {
+  public void exitPooka(boolean exitToIcon) {
     if (! processUnsentMessages())
       return;
     
@@ -250,10 +250,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       contentPanel.saveOpenFolders();
     }
     
-    if (Pooka.getProperty("Pooka.exitToIcon", "false").equalsIgnoreCase("true") && Pooka.getUIFactory().getMessageNotificationManager().getTrayIcon() != null) {
+    if (exitToIcon && Pooka.getProperty("Pooka.exitToIcon", "false").equalsIgnoreCase("true") && Pooka.getUIFactory().getMessageNotificationManager().getTrayIcon() != null) {
       Pooka.sStartupManager.stopPookaToTray(this);
     } else {
-      Pooka.exitPooka(exitValue, this);
+      Pooka.exitPooka(0, this);
     }
   }
   
@@ -400,7 +400,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
     
     public void actionPerformed(ActionEvent e) {
-      exitPooka(0);
+      exitPooka(false);
     }
   }
   

@@ -30,6 +30,7 @@ import org.jdesktop.jdic.tray.SystemTray;
 public class MessageNotificationManager implements ValueChangeListener {
 
   public static int WARNING_MESSAGE_TYPE = TrayIcon.WARNING_MESSAGE_TYPE;
+  public static int INFO_MESSAGE_TYPE = TrayIcon.INFO_MESSAGE_TYPE;
 
   private MainPanel mPanel;
   private boolean mNewMessageFlag = false;
@@ -96,7 +97,6 @@ public class MessageNotificationManager implements ValueChangeListener {
 	mTrayIcon.setPopupMenu(createPopupMenu());
 	mTrayIcon.addActionListener(new AbstractAction() {
 	    public void actionPerformed(ActionEvent e) {
-	      System.err.println("action:  " + e);
 	      if (getMainPanel() != null) {
 		mTrayIcon.displayMessage("Pooka", createStatusMessage(), TrayIcon.INFO_MESSAGE_TYPE);
 		bringToFront();
@@ -583,7 +583,7 @@ public class MessageNotificationManager implements ValueChangeListener {
     
     public void actionPerformed(ActionEvent e) {
       if (getMainPanel() != null)
-	getMainPanel().exitPooka(0);
+	getMainPanel().exitPooka(false);
       else
 	Pooka.exitPooka(0, this);
     }
