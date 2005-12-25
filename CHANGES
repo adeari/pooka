@@ -15,6 +15,8 @@ icon sets.
 fixed a bug with subscribing to subfolders of stores where the subfolder 
 would get the subscription, but the sub-subfolder wouldn't.
 
+carriage returns in subjects are now replaced with spaces.
+
 051031 release
 --------------
 

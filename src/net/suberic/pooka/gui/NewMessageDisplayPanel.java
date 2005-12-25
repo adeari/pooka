@@ -468,6 +468,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
 	  value = ((NewMessageInfo)getMessageProxy().getMessageInfo()).convertAddressLine(value, getSelectedProfile());
 	} else {
 	  value = ((EntryTextArea)(inputTable.get(key))).getText();
+	  value = value.replaceAll("\n", " ");
 	}
 	
 	// don't set it if it's blank.

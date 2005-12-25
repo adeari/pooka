@@ -1,3 +1,5 @@
+*) new attachment display w/icons?
+
 *) check release versions of libaries; make sure we have the most
 recent one of each in all areas (dist, webstart, Imported.)
 
@@ -21,8 +23,6 @@ recent one of each in all areas (dist, webstart, Imported.)
 		*) store connected/disconnected
 		*) new locks
 
-*) new attachment display w/icons?
-
 *) new usermanager:  sent folders not loading properly???
 
 *) subscribe folder.  2x click on holds-messages folder (file) and it
@@ -39,11 +39,11 @@ opens it up.
 *) on initial startup/config:  make sure it's clear that you can
 	start up without a working smtp server.
 
-*) fix fonts so they're no longer butt-ugly on windows
-
 *) fix default font selector so it works on kunstoff and ocean
 
-*) fix subjects with carriage returns
+*) fix fonts so they're no longer butt-ugly on windows
+
+*) test login selection on windows; make sure password field is selected.
 
 ---
 
