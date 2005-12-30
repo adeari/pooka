@@ -691,11 +691,15 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 	if (newValue != null && newValue instanceof Component) {
 	  Window parentWindow = SwingUtilities.getWindowAncestor(MainPanel.this);
 	  Window componentParentWindow = SwingUtilities.getWindowAncestor((Component) newValue);
-	  if (parentWindow == componentParentWindow) {
+	  if (parentWindow == componentParentWindow || componentParentWindow == null) {
 	    refreshActiveMenus();
 	    refreshCurrentUser();
 	  } else {
+	    
 	    java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("component " + newValue + " got focus, but it's not part of the main window.  Ignoring.");
+
+	    
+	    java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("main window = " + parentWindow  + "; component's parent = " + componentParentWindow);
 	  }
 	}
       }
@@ -705,6 +709,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
      * Passes the focus to the correct subcomponent.
      */
     public void passFocus() {
+      java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("passing focus to subcomponent.");
       if (lastStatus == CONTENT_LAST && contentPanel != null) {
 	if (contentPanel instanceof JComponent)
 	  ((JComponent)contentPanel).requestFocusInWindow();

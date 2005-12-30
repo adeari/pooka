@@ -118,7 +118,18 @@ public class FolderDisplayPanel extends JPanel {
      * This creates the messageTable.
      */
     public void createMessageTable() {
-      messageTable=new JTable(getFolderInfo().getFolderTableModel());
+      messageTable=new JTable(getFolderInfo().getFolderTableModel()) {
+	  public String getToolTipText(MouseEvent event) {
+	    int rowIndex = rowAtPoint(event.getPoint());
+	    int columnIndex = columnAtPoint(event.getPoint());
+	    Object value = getValueAt(rowIndex, columnIndex);
+	    if (value != null) {
+	      return value.toString();
+	    } else {
+	      return null;
+	    }
+	  }
+	};
       
       if (!Pooka.getProperty("FolderTable.showLines", "true").equals("true")) {
 	messageTable.setShowVerticalLines(false);

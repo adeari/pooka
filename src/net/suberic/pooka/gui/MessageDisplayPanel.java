@@ -201,7 +201,7 @@ public abstract class MessageDisplayPanel extends JPanel {
 
   /**
    * This sets the default font for the editorPane to a font determined
-   * by the MessageWindow.editorPane.font (.name and .size) properties.
+   * by the MessageWindow.editorPane.font property.
    * 
    * I believe that if the font cannot be found or instantiated, 
    * nothing should happen, but i'm not sure.  :)
@@ -212,7 +212,7 @@ public abstract class MessageDisplayPanel extends JPanel {
 
   /**
    * This sets the default font for the editorPane to a font determined
-   * by the MessageWindow.editorPane.font (.name and .size) properties.
+   * by the MessageWindow.editorPane.font property.
    * 
    * I believe that if the font cannot be found or instantiated, 
    * nothing should happen, but i'm not sure.  :)
@@ -230,10 +230,9 @@ public abstract class MessageDisplayPanel extends JPanel {
     }
     
     if (f == null && mFontSetMap.get(jep) == null) {
-      String fontName = Pooka.getProperty("MessageWindow.editorPane.font.name", "monospaced");
-      int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.font.size", "10"));
+      String fontString = Pooka.getProperty("MessageWindow.editorPane.font", "Monospaced-Plain-11");
       
-      f = new Font(fontName, Font.PLAIN, fontSize);
+      f = Font.decode(fontString);
     }
     
     if (f != null) {

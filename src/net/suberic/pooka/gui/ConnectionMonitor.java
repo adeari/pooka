@@ -8,6 +8,7 @@ import java.awt.Insets;
 import net.suberic.pooka.*;
 import net.suberic.util.*;
 import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.gui.IconManager;
 
 /**
  * This class monitors the status of the network connection(s) that
@@ -113,19 +114,12 @@ public class ConnectionMonitor extends Box implements NetworkConnectionListener,
    * Loads the images for the ConnectionMonitor.
    */
   private void loadImages() {
-    java.net.URL url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.connectedIcon", "images/TrafficGreen.gif")); 
-    if (url != null) {
-      connectedImage = new ImageIcon(url);
-    }
-    url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.disconnectedIcon", "images/TrafficRed.gif")); 
-    if (url != null) {
-      disconnectedImage = new ImageIcon(url);
-    }
-    url = this.getClass().getResource(Pooka.getProperty("ConnectionMonitor.unavailableIcon", "images/TrafficOff.gif")); 
-    if (url != null) {
-      unavailableImage = new ImageIcon(url);
-    }
+    IconManager iconManager = Pooka.getUIFactory().getIconManager();
+    connectedImage = iconManager.getIcon(Pooka.getProperty("ConnectionMonitor.connectedIcon", "ConnectionMonitor.ConnectedIcon"));
+    disconnectedImage = iconManager.getIcon(Pooka.getProperty("ConnectionMonitor.disconnectedIcon", "ConnectionMonitor.DisconnectedIcon"));
+    unavailableImage = iconManager.getIcon(Pooka.getProperty("ConnectionMonitor.unavailableIcon", "ConnectionMonitor.UnavailableIcon"));
   }
+
   /**
    * This creates and shows a PopupMenu for this component.  
    */
@@ -149,10 +143,13 @@ public class ConnectionMonitor extends Box implements NetworkConnectionListener,
       int status = selectedConnection.getStatus();
       if (status == NetworkConnection.CONNECTED) {
 	statusPanel.setIcon(connectedImage);
+	statusPanel.setToolTipText("Connected");
       } else if (status == NetworkConnection.DISCONNECTED) {
 	statusPanel.setIcon(disconnectedImage);
+	statusPanel.setToolTipText("Disonnected");
       } else if (status == NetworkConnection.UNAVAILABLE) {
 	statusPanel.setIcon(unavailableImage);
+	statusPanel.setToolTipText("Unavailable");
       }
     } else {
       statusPanel.setIcon(connectedImage);

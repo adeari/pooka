@@ -26,6 +26,7 @@
   <property name="mail_dist_lib" value="${importdir}/mail.jar"/>
   <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
   <property name="activation_dist_lib" value="${importdir}/activation_dist.jar"/>
+  <property name="icons_dist_lib" value="${importdir}/linspire_clear.jar"/>
   <property name="crypto_lib" value="${importdir}/javamail-crypto.jar"/>
   <property name="cryptix_message_api_lib" value="${importdir}/cryptix-message-api.jar"/>
   <property name="cryptix_pki_api_lib" value="${importdir}/cryptix-pki-api.jar"/>
@@ -171,6 +172,7 @@
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${icejni_cp}"/>
       <zipfileset src="${crypto_lib}"/>
+      <zipfileset src="${icons_dist_lib}"/>
     </jar>
     <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
   </target>

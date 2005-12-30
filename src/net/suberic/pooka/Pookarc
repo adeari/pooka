@@ -158,9 +158,9 @@ SentFolderTable.To.size=210
 SentFolderTable.Subject.value=Subject
 SentFolderTable.Subject.size=260
 
-ConnectionMonitor.connectedIcon=/org/javalobby/icons/20x20png/TrafficGreen.png
-ConnectionMonitor.disconnectedIcon=/org/javalobby/icons/20x20png/TrafficRed.png
-ConnectionMonitor.unavailableIcon=/org/javalobby/icons/20x20png/TrafficOff.png
+ConnectionMonitor.connectedIcon=ConnectionMonitor.Connected
+ConnectionMonitor.disconnectedIcon=ConnectionMonitor.Disconnected
+ConnectionMonitor.unavailableIcon=ConnectionMonitor.Unavailable
 
 AttachmentPane.2xClickAction=file-open
 
@@ -185,6 +185,7 @@ CachedMessages.notCached.foregroundColor=-65536
 MessageWindow.backgroundColor=white
 MessageWindow.vsize=500
 MessageWindow.headerPanel.vsize=200
+MessageWindow.editorPane.font=Monospaced-Plain-12
 
 MessageWindow.editorPane.hsizeByCharLength=true
 # if hsizeByFont=true
@@ -192,9 +193,6 @@ MessageWindow.editorPane.charLength=80
 # if hsizeByFont=false
 MessageWindow.editorPane.hsize=500
 MessageWindow.editorPane.vsize=500
-
-MessageWindow.editorPane.font.name=monospaced
-MessageWindow.editorPane.font.size=10
 
 MessageWindow.Header.DefaultHeaders=From:To:CC:Date:Subject
 MessageWindow.Header.ShowFullHeaders=false

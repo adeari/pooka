@@ -82,8 +82,7 @@ public class ConfigurableToolbar extends JToolBar implements ConfigurableUI {
       
       bi = new JButton(icon);
 
-      // workaround for bug in jdk 1.4.2 -- remove for 1.5
-      bi.setMargin(new java.awt.Insets(2, 2, 2, 2));
+      bi.setMargin(new java.awt.Insets(1, 1, 1, 1));
 
     } catch (MissingResourceException mre) {
       return null;

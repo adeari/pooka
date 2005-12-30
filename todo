@@ -1,11 +1,9 @@
-*) new attachment display w/icons?
-
 *) check release versions of libaries; make sure we have the most
 recent one of each in all areas (dist, webstart, Imported.)
 
-*) change exit so that closing window exits to icon, and file->exit
-	actually exits.
-	*) started.  need to make it reasonably nice.
+*) bug with focus -- in GTK+ l&f, if you open a message window and then
+close/delete it, then the focus disappears.  focus is regained if you exit
+and reselect the main window.
 
 *) encryption panel icons
 *) new icons?
@@ -15,11 +13,8 @@ recent one of each in all areas (dist, webstart, Imported.)
 		*) disconnected folder/subfolder (green)
 		*) spam
 		*) encryption panel.
-		*) connection panel (traffic green etc.)
 	  think about changing
-		*) new message icon
 		*) some others on the encryption panel
-		*) refresh
 		*) store connected/disconnected
 		*) new locks
 
@@ -36,16 +31,13 @@ opens it up.
   *) test UserProfile stuff to see if we're getting rid of all of them
 	correctly.
 
-*) on initial startup/config:  make sure it's clear that you can
-	start up without a working smtp server.
-
-*) fix default font selector so it works on kunstoff and ocean
-
 *) fix fonts so they're no longer butt-ugly on windows
+	-- started.  check for v2.0
 
 *) test login selection on windows; make sure password field is selected.
 
 ---
+*) new attachment display w/icons?
 
 *) look at online bugs, etc.
 
@@ -80,9 +72,21 @@ opens it up.
 
 2.0 version
 ------
+*) add in notification for exiting to icon.
+	actually exits.
+	*) started.  need to make it reasonably nice.
+		-- only do this in 2.0?
+
 *) work out webstart code for tray icon.
 
 *) change Item and ItemManager to using generics.
+
+*) NewAccountPooka should aggregate errors, so if you have no username and
+	no mail server, you should get a single error screen saying both
+	'no username' and 'no mail server'.
+
+*) NewAccountPooka should be callable anytime, so you can use it to create
+	any new account, not just your first account.
 
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka

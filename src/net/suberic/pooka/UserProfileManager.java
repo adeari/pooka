@@ -111,7 +111,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
    * exists; otherwise, returns null.
    */
   public UserProfile getDefaultProfile() {
-    UserProfile defaultUser = getUserProfile(Pooka.getProperty("UserProfile.default"));
+    UserProfile defaultUser = getUserProfile(Pooka.getProperty("UserProfile.default", ""));
     if (defaultUser == null) {
       List profileList = manager.getItems();
       if (profileList != null && profileList.size() > 0) {

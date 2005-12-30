@@ -344,7 +344,7 @@ public class NewAccountPooka {
       try {
 	testConnection(mailServerName, port);
       } catch (Exception mailServerException) {
-	throw new Exception("Error connection to mail server:\n" + mailServerException.getMessage(), mailServerException);
+	throw new Exception("Error connecting to mail server:\n" + mailServerException.getMessage(), mailServerException);
       }
     } else {
       // setup maildir connection
@@ -537,17 +537,13 @@ public class NewAccountPooka {
 		    StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.connectingToStore", "Failed to connect to store.  \nReceived the following error:\n"));
 		    errorMessage.append(error.getMessage());
 		    errorMessage.append("\n\n");
-		    errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
+		    errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage.noCancel", "Would you like to re-enter your information?"));
 		    
-		    JTextArea jta = new JTextArea(errorMessage.toString());
-		    JLabel jl = new JLabel("test");
-		    jta.setBackground(jl.getBackground());
-		    jta.setFont(jl.getFont());
-		    jta.setEditable(false);
-
-		    int continueResponse = Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION);
-		    if (continueResponse == javax.swing.JOptionPane.YES_OPTION)
+		    JLabel jta = new JLabel(errorMessage.toString());
+		    int continueResponse = JOptionPane.showOptionDialog(Pooka.getMainPanel().getContentPanel().getUIComponent(), errorMessage.toString(), "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE,  null, new Object[] { "Re-enter", "Continue" }, "Re-enter");
+		    if (continueResponse == 0) {
 		      showFirstEntryWindow();
+		    } 
 		  }
 		});
 	    }
@@ -572,13 +568,23 @@ public class NewAccountPooka {
     }
     errorMessage.append("\n\n");
     errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
-    
-    JTextArea jta = new JTextArea(errorMessage.toString());
-    JLabel jl = new JLabel("test");
-    jta.setBackground(jl.getBackground());
-    jta.setFont(jl.getFont());
-    
-    return Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_CANCEL_OPTION);
+    /*
+      JTextArea jta = new JTextArea(errorMessage.toString());
+      JLabel jl = new JLabel("test");
+      jta.setBackground(jl.getBackground());
+      jta.setFont(jl.getFont());
+      
+      return Pooka.getUIFactory().showConfirmDialog(new Object[] { jta }, "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_CANCEL_OPTION);
+    */
+    JLabel jta = new JLabel(errorMessage.toString());
+    int continueResponse = JOptionPane.showOptionDialog(Pooka.getMainPanel().getContentPanel().getUIComponent(), errorMessage.toString(), "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE,  null, new Object[] { "Re-enter", "Continue", "Cancel" }, "Re-enter");
+    if (continueResponse == 0) {
+      return JOptionPane.YES_OPTION;
+    } else if (continueResponse == 1) {
+      return JOptionPane.NO_OPTION;
+    } else {
+      return JOptionPane.CANCEL_OPTION;
+    }
     
   }
 
