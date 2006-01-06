@@ -188,4 +188,17 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
     return mailPropertiesList;
   }
 
+  /**
+   * Removes all UserProfiles from this Manager.
+   */
+  public void shutdownManager() {
+    VariableBundle resources = Pooka.getResources();
+    List profiles = getUserProfileList();
+    for (int i = 0; i < profiles.size(); i++) {
+      UserProfile up = (UserProfile) profiles.get(i);
+      resources.removeValueChangeListener(up);
+    }
+    resources.removeValueChangeListener(manager);
+  }
+
 }

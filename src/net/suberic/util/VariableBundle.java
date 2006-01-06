@@ -655,6 +655,15 @@ public class VariableBundle extends Object {
   }
 
   /**
+   * Returns all of the ValueChangeListeners registered.
+   */
+  public Map getAllListeners() {
+    HashMap returnValue =  new HashMap(VCListeners);
+    returnValue.putAll(VCGlobListeners);
+    return returnValue;
+  }
+
+  /**
    * Convert a nibble to a hex character
    * @param	nibble	the nibble to convert.
    */

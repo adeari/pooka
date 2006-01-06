@@ -176,11 +176,13 @@ public class OutgoingMailServerManager implements ItemCreator, ItemListChangeLis
    */
   public void stopServers() {
     Vector v = getOutgoingMailServerList();
-
+    VariableBundle resources = Pooka.getResources();
     for (int i = 0; i < v.size(); i++) {
       OutgoingMailServer oms = (OutgoingMailServer) v.get(i);
       oms.stopThread();
+      resources.removeValueChangeListener(oms);
     }
+    resources.removeValueChangeListener(manager);
   }
 
   /**

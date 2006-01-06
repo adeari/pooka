@@ -20,7 +20,7 @@ Pooka.autoSelectFirstUnread=true
 
 Pooka.trayIcon.enabled=true
 Pooka.exitToIcon=false
-Pooka.exitToIcon.notify=true
+Pooka.exitToIcon.notify=false
 
 Message.sendImmediately=true
 

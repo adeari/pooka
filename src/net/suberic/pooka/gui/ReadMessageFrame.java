@@ -100,7 +100,9 @@ public class ReadMessageFrame extends MessageFrame {
       
       keyBindings = new ConfigurableKeyBinding(getMessageDisplay(), "ReadMessageWindow.keyBindings", Pooka.getResources());
 
-      keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
+      //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);    
+      keyBindings.setCondition(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
       keyBindings.setActive(getActions());
       
     } catch (MessagingException me) {

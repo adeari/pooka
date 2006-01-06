@@ -244,5 +244,12 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
     
   }
+
+  /**
+   * Cleans up the StoreManager.
+   */
+  public void cleanup() {
+    Pooka.getResources().removeValueChangeListener(manager);
+  }
 }
 

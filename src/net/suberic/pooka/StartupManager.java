@@ -211,6 +211,7 @@ public class StartupManager {
    * Closes all stores.
    */
   void closeAllStores(Object pSource) {
+    mPookaManager.getStoreManager().cleanup();
     java.util.Vector v = mPookaManager.getStoreManager().getStoreList();
     final java.util.HashMap doneMap = new java.util.HashMap();
 
@@ -291,6 +292,7 @@ public class StartupManager {
 	Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(message, args));
       }
     }
+    
   }
 
   /**
@@ -317,9 +319,27 @@ public class StartupManager {
 	  updateTime("loaded sent/outbox");
 	  */
 	  mPookaManager.setStoreManager(null);
+	  mPookaManager.getUserProfileManager().shutdownManager();
 	  mPookaManager.setUserProfileManager(null);
 	  mPookaManager.getOutgoingMailManager().stopServers();
 
+	  /*
+	  java.util.Map allListeners = mPookaManager.getResources().getAllListeners();
+	  java.util.Iterator keys = allListeners.keySet().iterator();
+	  while (keys.hasNext()) {
+	    Object o = keys.next();
+	    Object value = allListeners.get(o);
+	    if (value instanceof java.util.List) {
+	      java.util.Iterator values = ((java.util.List) value).iterator();
+	      while (values.hasNext()) {
+		System.err.println("key " + o + ", value " + values.next());
+	      }
+	    } else {
+	      System.err.println("key " + o + ", value " + allListeners.get(o));
+	    }
+	  }
+	  */
+	  
 	  PookaUIFactory newFactory = new PookaMinimalUIFactory(Pooka.getUIFactory());
 	  
 	  mFullStartup=false;

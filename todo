@@ -1,3 +1,23 @@
+*) deb:  if caching set to autocache, and access folder with 9000 new messages,
+should give you a chance to work with the folder instead of making you wait
+as you download everything.
+
+*) search sent folder results in 'loading' entries where the non-matching
+	to/from entries are.
+
+*) new usermanager:  sent folders not loading properly???
+	-- seems to be working ok?
+
+*) listeners:
+	*) make sure that on disconnection that we remove all listeners.
+		*) check:  listeners on VariableBundle.
+		*) check:  listeners on KeyboardManager (IN_FOCUSED_WINDOW).
+	*) -- smtp threads, especially.
+  *) (!!) make sure that smtp threads don't exit while there is still mail to
+	be sent (!!)
+  *) test UserProfile stuff to see if we're getting rid of all of them
+	correctly.
+
 *) check release versions of libaries; make sure we have the most
 recent one of each in all areas (dist, webstart, Imported.)
 
@@ -18,18 +38,8 @@ and reselect the main window.
 		*) store connected/disconnected
 		*) new locks
 
-*) new usermanager:  sent folders not loading properly???
-
 *) subscribe folder.  2x click on holds-messages folder (file) and it
 opens it up.
-
-*) listeners:
-	*) make sure that on disconnection that we remove all listeners.
-	*) -- smtp threads, especially.
-  *) (!!) make sure that smtp threads don't exit while there is still mail to
-	be sent (!!)
-  *) test UserProfile stuff to see if we're getting rid of all of them
-	correctly.
 
 *) fix fonts so they're no longer butt-ugly on windows
 	-- started.  check for v2.0
