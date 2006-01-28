@@ -1,3 +1,9 @@
+messages from sent folders should show up properly in search folders now.
+also, empty values should now show up as blank rather than as 'loading...'.
+
+if autoCache is set, you now connect to the folder and show the messages
+before you start to download the messages to cache them.
+
 C+W now closes internal frame windows.
 
 if you have multiple folder windows opeening on startup, only the first

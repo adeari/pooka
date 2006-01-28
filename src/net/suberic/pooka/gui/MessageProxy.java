@@ -394,37 +394,60 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     HashMap returnValue = new HashMap();
     
     for(int j=0; j < columnCount; j++) {
-      try {
-	Object newProperty = columnHeaders.elementAt(j);
-	if (newProperty instanceof String) {
-	  String propertyName = (String)newProperty;
-	  
-	  if (propertyName.startsWith("FLAG")) 
-	    returnValue.put(newProperty, getMessageFlag(propertyName));
-	  else if (propertyName.equals("attachments"))
-	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "Attachment.small"), propertyName));
-	  else if (propertyName.equals("crypto"))
-	    returnValue.put(newProperty, new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "Encrypted.small"), propertyName));
-	  else if (propertyName.equalsIgnoreCase("subject")) 
-	    returnValue.put(newProperty, new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName)));
-	  else if (propertyName.equalsIgnoreCase("from")) 
-	    returnValue.put(newProperty, new AddressLine((String) getMessageInfo().getMessageProperty(propertyName)));
-	  else
-	    returnValue.put(newProperty, getMessageInfo().getMessageProperty(propertyName));
-	} else if (newProperty instanceof SearchTermIconManager) {
-	  SearchTermIconManager stm = (SearchTermIconManager) newProperty;
-	  returnValue.put(newProperty, new SearchTermIcon(stm, this));
-	} else if (newProperty instanceof RowCounter) {
-	  returnValue.put(newProperty, newProperty);
-	}
-      } catch (Exception e) {
-	// if we catch an exception, keep going for the rest.
-	if (getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
-	  e.printStackTrace();
-      }
+      loadTableProperty(columnHeaders.elementAt(j), returnValue);
     }
 
     return returnValue;
+  }
+
+  /**
+   * gets the column headers.
+   */
+  java.util.List getColumnHeaders() {
+    return columnHeaders;
+  }
+
+  /**
+   * Loads a value into the TableInfo.
+   */
+  private void loadTableProperty(Object newProperty, HashMap returnValue) {
+    try {
+      Object newValue = null;
+      if (newProperty instanceof String) {
+	String propertyName = (String)newProperty;
+	if (propertyName.startsWith("FLAG")) 
+	  newValue=getMessageFlag(propertyName);
+	else if (propertyName.equals("attachments"))
+	  newValue=new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "Attachment.small"), propertyName);
+	else if (propertyName.equals("crypto"))
+	  newValue=new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "Encrypted.small"), propertyName);
+	else if (propertyName.equalsIgnoreCase("subject")) 
+	  newValue=new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName));
+	else if (propertyName.equalsIgnoreCase("from")) 
+	  newValue=new AddressLine((String) getMessageInfo().getMessageProperty(propertyName));
+	else if (propertyName.equalsIgnoreCase("Date")) {
+	  newValue = getMessageInfo().getMessageProperty("Date");
+	  if (newValue == null) {
+	    newValue = getMessageInfo().getMessageProperty("ReceivedDate");
+	  }
+	} else {
+	  newValue=getMessageInfo().getMessageProperty(propertyName);
+	}
+      } else if (newProperty instanceof SearchTermIconManager) {
+	SearchTermIconManager stm = (SearchTermIconManager) newProperty;
+	newValue=new SearchTermIcon(stm, this);
+      } else if (newProperty instanceof RowCounter) {
+	newValue=newProperty;
+      }
+      
+      returnValue.put(newProperty, newValue);
+	
+    } catch (Exception e) {
+      // if we catch an exception, keep going for the rest.
+      if (getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
+	e.printStackTrace();
+    }
+
   }
 
   /**

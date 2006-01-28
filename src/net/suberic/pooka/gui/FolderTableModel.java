@@ -1,4 +1,6 @@
 package net.suberic.pooka.gui;
+import net.suberic.pooka.FolderInfo;
+import net.suberic.pooka.thread.MessageLoader;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.SwingUtilities;
 import net.suberic.util.swing.RunnableAdapter;
@@ -59,20 +61,45 @@ public class FolderTableModel extends AbstractTableModel {
 	return "null";
       else {
 	if (! mp.isLoaded()) {
+	  FolderInfo fi = mp.getFolderInfo();
+	  if (fi != null) {
+	    MessageLoader ml = fi.getMessageLoader();
+	    if (ml != null) {
+	      ml.loadMessages(mp, net.suberic.pooka.thread.MessageLoader.HIGH);
+	    }
+	  }
 	  return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
 	} else {
 	  Object key = columnKeys.get(col);
 	  Object returnValue = null;
 	  try {
-	    returnValue = ((MessageProxy)data.get(row)).getTableInfo().get(key);
+	    returnValue = mp.getTableInfo().get(key);
+	    if (returnValue == null) {
+	      if (! mp.getTableInfo().containsKey(key)) {
+		// means that we need to load this again.
+		java.util.List columnHeaders = mp.getColumnHeaders();
+		columnHeaders.add(key);
+		mp.setRefresh(true);
+		
+		FolderInfo fi = mp.getFolderInfo();
+		if (fi != null) {
+		  MessageLoader ml = fi.getMessageLoader();
+		  if (ml != null) {
+		    ml.loadMessages(mp, net.suberic.pooka.thread.MessageLoader.HIGH);
+		  }
+		}
+	      } else {
+		return "";
+	      }
+	    }
 	  } catch (javax.mail.MessagingException me) {
 	    if (((MessageProxy)data).getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
 	      me.printStackTrace();
 	  }
-
+	  
 	  if (returnValue == null) {
 	    return (net.suberic.pooka.Pooka.getProperty("FolderTableModel.unloadedCell", "loading..."));
-	  }
+	  } 
 	  return returnValue;
 	}
       }

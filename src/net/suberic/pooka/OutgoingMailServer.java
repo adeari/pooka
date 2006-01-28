@@ -32,6 +32,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
   boolean sending = false;
 
+  boolean mStopped = false;
+
   ActionThread mailServerThread = null;
 
   /**
@@ -118,6 +120,15 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       outbox.setOutboxFolder(this);
     }
   }
+
+  /**
+   * Stops the server so that it will continue to send its current 
+   * message(s), but will not accept any new ones.
+   */
+  public void stopServer() {
+    mStopped = true;
+  }
+
 
   /**
    * Stops the thread.
@@ -226,6 +237,10 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * the message anyway.  
    */
   public synchronized void sendMessage(NewMessageInfo nmi, boolean connect) {
+    if (mStopped) {
+      throw new IllegalStateException("MailServer " + getItemID() + " has been stopped and is not accepting new messages.");
+    }
+
     final NewMessageInfo nmi_final = nmi;
     final boolean connect_final = connect;
     
@@ -468,7 +483,23 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   public URLName getSendMailURL() {
     return sendMailURL;
   }
-  
+
+  /**
+   * Returns true if this MailServer is currently in the process of sending
+   * a message.
+   */
+  public boolean isSending() {
+    return sending;
+  }
+
+  /**
+   * Returns true if this MailServer has been set not to send any more messages
+   * this session.
+   */
+  public boolean isStopped() {
+    return mStopped;
+  }
+
   /**
    * An Authenticator that first tries the configured User and Password,
    * then uses the underlying Authenticator.

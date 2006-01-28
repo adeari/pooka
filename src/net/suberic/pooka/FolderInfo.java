@@ -1334,6 +1334,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     MessageLoader ml = new MessageLoader(this);
     return ml;
   }
+
+  /**
+   * Returns the MessageLoader for this FolderInfo.
+   */
+  public MessageLoader getMessageLoader() {
+    return mMessageLoader;
+  }
+   
   
   /**
    * gets the 'real' message for the given MessageInfo.
@@ -1872,7 +1880,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	
 	// notify the message loaded thread.
 	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	//loaderThread.loadMessages(addedArray, LoadMessageThread.HIGH);
 	mMessageLoader.loadMessages(addedArray, MessageLoader.HIGH);
 	
 	fireMessageCountEvent(mce);

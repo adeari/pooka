@@ -5,6 +5,7 @@ import net.suberic.pooka.event.*;
 import net.suberic.pooka.gui.LoadMessageTracker;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.pooka.gui.FolderInternalFrame;
+import net.suberic.pooka.cache.*;
 import javax.mail.*;
 import javax.mail.internet.*;
 import java.util.*;
@@ -31,6 +32,7 @@ public class MessageLoader extends Thread {
   private List columnValues;
   private List loadQueue = new LinkedList();
   private List priorityLoadQueue = new LinkedList();
+  private List cacheQueue = new LinkedList();
   private List messageLoadedListeners = new LinkedList();
   private int updateMessagesCount = 10;
   private boolean mEnqueued = false;
@@ -66,66 +68,89 @@ public class MessageLoader extends Thread {
     
     // start this load section.
     int queueSize = getQueueSize();    
-    if (! stopped && queueSize > 0) {
-      folderInfo.getLogger().log(java.util.logging.Level.FINE, folderInfo.getFolderID() + " loading " + queueSize + " messages.");
-
-      // get the batch sizes.
-      int fetchBatchSize = 50;
-      try {
-	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
-      } catch (NumberFormatException nfe) {
-      }
-      
-      FetchProfile fetchProfile = getFolderInfo().getFetchProfile();
-      
-      // get the next batch.
-      List messageProxies = retrieveNextBatch(fetchBatchSize);
-      List toFetchInfos = new LinkedList();
-      
-      // go through and find all of the messages that need to be fetched
-      // or refetched, and add them to the toFetchInfos list.
-      for (int i = 0 ; i < messageProxies.size(); i++) {
-	MessageInfo fetchCheckInfo = ((MessageProxy) messageProxies.get(i)).getMessageInfo();
-	if (! fetchCheckInfo.hasBeenFetched()) {
-	  toFetchInfos.add(fetchCheckInfo);
-	}
-      }
-
-      if (toFetchInfos.size() > 0) {
+    if (! stopped) {
+      if (queueSize > 0) {
+	folderInfo.getLogger().log(java.util.logging.Level.FINE, folderInfo.getFolderID() + " loading " + queueSize + " messages.");
+	
+	// get the batch sizes.
+	int fetchBatchSize = 50;
 	try {
-	  MessageInfo[] toFetch = new MessageInfo[toFetchInfos.size()];
-	  toFetch = (MessageInfo[]) toFetchInfos.toArray(toFetch);
-	  getFolderInfo().fetch(toFetch, fetchProfile);
-	} catch(MessagingException me) {
-	  if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
-	    System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
-	    me.printStackTrace();
+	  fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+	} catch (NumberFormatException nfe) {
+	}
+	
+	FetchProfile fetchProfile = getFolderInfo().getFetchProfile();
+	
+	// get the next batch.
+	List messageProxies = retrieveNextBatch(fetchBatchSize);
+	List toFetchInfos = new LinkedList();
+	
+	// go through and find all of the messages that need to be fetched
+	// or refetched, and add them to the toFetchInfos list.
+	for (int i = 0 ; i < messageProxies.size(); i++) {
+	  MessageInfo fetchCheckInfo = ((MessageProxy) messageProxies.get(i)).getMessageInfo();
+	  if (! fetchCheckInfo.hasBeenFetched()) {
+	    toFetchInfos.add(fetchCheckInfo);
 	  }
 	}
-      }
+	
+	if (toFetchInfos.size() > 0) {
+	  try {
+	    MessageInfo[] toFetch = new MessageInfo[toFetchInfos.size()];
+	    toFetch = (MessageInfo[]) toFetchInfos.toArray(toFetch);
+	    getFolderInfo().fetch(toFetch, fetchProfile);
+	  } catch(MessagingException me) {
+	    if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
+	      System.out.println("caught error while fetching for folder " + getFolderInfo().getFolderID() + ":  " + me);
+	      me.printStackTrace();
+	    }
+	  }
+	}
+	
+	// now load each individual messageproxy.
+	// and refresh each message.
+	for (int i = 0 ; i < messageProxies.size(); i++) {
+	  mp = (MessageProxy) messageProxies.get(i);
+	  try {
+	    if (! mp.isLoaded())
+	      mp.loadTableInfo();
+	    if (mp.needsRefresh()) {
+	      mp.refreshMessage();
+	    }
+	    else if (! mp.matchedFilters()) {
+	      mp.matchFilters();
+	    }
+	  } catch (Exception e) {
+	    if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
+	      e.printStackTrace();
+	    }
+	  }
+	}
 
-      // now load each individual messageproxy.
-      // and refresh each message.
-      for (int i = 0 ; i < messageProxies.size(); i++) {
-	mp = (MessageProxy) messageProxies.get(i);
+      } else if (getCacheQueueSize() > 0) {
 	try {
-	  if (! mp.isLoaded())
-	    mp.loadTableInfo();
-	  if (mp.needsRefresh())
-	    mp.refreshMessage();
-	  else if (! mp.matchedFilters()) {
-	    mp.matchFilters();
+	  MessageProxy nextCache = (MessageProxy) cacheQueue.remove(0);
+	  if (folderInfo instanceof CachingFolderInfo) {
+	    MessageInfo mi = nextCache.getMessageInfo();
+	    MimeMessage mimeMessage = (MimeMessage) mi.getMessage();
+	    CachingFolderInfo cfi = (CachingFolderInfo) folderInfo;
+	    if (cfi.getFolderDisplayUI() != null) {
+	      cfi.showStatusMessage(cfi.getFolderDisplayUI(), "caching messages, " + getCacheQueueSize() + " remaining...");
+	    }
+	    cfi.getCache().cacheMessage(mimeMessage, cfi.getUID(mimeMessage), cfi.getUIDValidity(), SimpleFileCache.MESSAGE, false);
+	    if (cfi.getFolderDisplayUI() != null && getCacheQueueSize() == 0) {
+	      cfi.clearStatusMessage(cfi.getFolderDisplayUI());
+	    }
 	  }
 	} catch (Exception e) {
 	  if (folderInfo.getLogger().isLoggable(java.util.logging.Level.WARNING)) {
 	    e.printStackTrace();
 	  }
+	
 	}
       }
-
     }
-
-    if (getQueueSize() > 0) {
+    if (! stopped && (getQueueSize() > 0 || getCacheQueueSize() > 0)) {
       enqueue();
     }
   }
@@ -216,6 +241,28 @@ public class MessageLoader extends Thread {
 	copy.removeAll(priorityLoadQueue);
 	addUniqueReversed(loadQueue, copy);
       }
+    }
+    
+    enqueue();
+  }
+  
+  /**
+   * Adds the MessageProxy(s) to the cacheQueue.
+   */
+  public synchronized void cacheMessages(List mp) {
+    if (mp != null && mp.size() > 0) {
+	addUniqueReversed(cacheQueue, mp);
+    }
+    
+    enqueue();
+  }
+  
+  /**
+   * Adds the MessageProxy(s) to the cacheQueue.
+   */
+  public synchronized void cacheMessages(MessageProxy[] mp) {
+    if (mp != null && mp.length > 0) {
+	addUniqueReversed(cacheQueue, Arrays.asList(mp));
     }
     
     enqueue();
@@ -317,6 +364,13 @@ public class MessageLoader extends Thread {
    */
   public synchronized int getQueueSize() {
     return loadQueue.size() + priorityLoadQueue.size();
+  }
+
+  /**
+   * Returns the total amount left in the cache queue.
+   */
+  public synchronized int getCacheQueueSize() {
+    return cacheQueue.size();
   }
 
   public List getColumnValues() {

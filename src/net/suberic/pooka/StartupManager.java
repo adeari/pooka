@@ -181,6 +181,10 @@ public class StartupManager {
    */
   public void stopMainPookaWindow(Object pSource) {
 
+    checkUnsentMessages();
+
+    //checkUncachedMessages();
+
     net.suberic.pooka.thread.FolderTracker ft = mPookaManager.getFolderTracker();
     if (ft != null)
       ft.setStopped(true);
@@ -204,6 +208,46 @@ public class StartupManager {
 	});
     } catch (Exception e) {
     }
+
+  }
+
+  /**
+   * Checks for any unsent messages.
+   */
+  void checkUnsentMessages() {
+    java.util.List allServers = mPookaManager.getOutgoingMailManager().getOutgoingMailServerList();
+    // first stop all the servers.
+    java.util.Iterator iter = allServers.iterator();
+    while (iter.hasNext()) {
+      OutgoingMailServer oms = (OutgoingMailServer) iter.next();
+      oms.stopServer();
+    }
+
+    int counter = 0;
+    iter = allServers.iterator();
+    String waitingMessage = Pooka.getProperty("info.exit.waiting.send", "Waiting {0,number} seconds to send unsent messages...");
+
+    while (iter.hasNext()) {
+      OutgoingMailServer oms = (OutgoingMailServer) iter.next();
+      /*
+	while (oms.isSending() && counter < 5) {
+	Object[] args = new Object[] { new Integer(5 - counter) };
+	Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(waitingMessage, args));
+	// wait for 5 seconds for all threads to exit.
+	try {
+	Thread.currentThread().sleep(1000);
+	} catch (Exception e) { }
+	counter++;
+      }
+      */
+      while (oms.isSending()) {
+	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.exit.waiting.send.noCounter", "Waiting to finish sending unsent messages..."));
+	try {
+	  Thread.currentThread().sleep(1000);
+	} catch (Exception e) { }
+      }
+    }
+
 
   }
 
