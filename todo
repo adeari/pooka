@@ -1,14 +1,7 @@
-*) search sent folder results in 'loading' entries where the non-matching
-	to/from entries are.
-	-- test with spam.
-
 *) bug with focus -- in GTK+ l&f, if you open a message window and then
 close/delete it, then the focus disappears.  focus is regained if you exit
 and reselect the main window.
 	-- test in 1.6; if still there, try to fix.
-
-*) subscribe folder.  2x click on holds-messages folder (file) and it
-opens it up.
 
 *) listeners:
 	*) make sure that on disconnection that we remove all listeners.
@@ -25,11 +18,9 @@ recent one of each in all areas (dist, webstart, Imported.)
 	  must be fixed:
 		*) disconnected folder/subfolder (green)
 		*) spam
-		*) encryption panel.
 	  think about changing
 		*) some others on the encryption panel
 		*) store connected/disconnected
-		*) new locks
 
 *) fix fonts so they're no longer butt-ugly on windows
 	-- started.  check for v2.0

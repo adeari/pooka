@@ -310,7 +310,10 @@ public class MailFileSystemView
    */
   public Boolean isTraversable(File f) {
     if (f != null && f instanceof FolderFileWrapper) {
-      return new Boolean(true);
+      if (((FolderFileWrapper) f).isDirectory())
+	return new Boolean(true);
+      else
+	return new Boolean(false);
     } else
       return new Boolean(false);
   }

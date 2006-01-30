@@ -1,3 +1,6 @@
+in the folder file chooser, double-clicking on a folder that holds only
+messages (no other folders) now selects the folder, rather than opening it.
+
 messages from sent folders should show up properly in search folders now.
 also, empty values should now show up as blank rather than as 'loading...'.
 

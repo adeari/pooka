@@ -264,7 +264,10 @@ public class PookaFileSystemView
     getLogger().info("pfsv:  checking isTraversable on file " + f);
     
     if (f != null && f instanceof FolderInfoFileWrapper) {
-      return new Boolean(true);
+      if (((FolderInfoFileWrapper) f).isDirectory())
+	return new Boolean(true);
+      else
+	return new Boolean(false);
     } else {
       return new Boolean(false);
     }
