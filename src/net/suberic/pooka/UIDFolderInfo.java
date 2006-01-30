@@ -398,10 +398,10 @@ public class UIDFolderInfo extends FolderInfo {
 	    uidRemovedMessages[i] = removedMessages[i];
 	  
 	  mi = getMessageInfo(removedMsg);
-	  if (mi.getMessageProxy() != null)
-	    mi.getMessageProxy().close();
-	  
 	  if (mi != null) {
+	    if (mi.getMessageProxy() != null)
+	      mi.getMessageProxy().close();
+	    
 	    getLogger().log(Level.FINE, "message exists--removing");
 	    removedProxies.add(mi.getMessageProxy());
 	    messageToInfoTable.remove(mi);

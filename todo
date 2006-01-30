@@ -1,3 +1,6 @@
+*) fix uncaught error if the crypto provider is not available.
+  -- should be fixed in javamail-crypto.
+
 *) bug with focus -- in GTK+ l&f, if you open a message window and then
 close/delete it, then the focus disappears.  focus is regained if you exit
 and reselect the main window.
@@ -28,6 +31,8 @@ recent one of each in all areas (dist, webstart, Imported.)
 *) test login selection on windows; make sure password field is selected.
 
 ---
+*) after next release, branch 2.0 release.  
+
 *) fix manager exit cleanup of listeners; make it a consistent API.
 
 *) new attachment display w/icons?
@@ -65,6 +70,12 @@ recent one of each in all areas (dist, webstart, Imported.)
 
 2.0 version
 ------
+*) jdk 1.6 only
+*) javamail 1.4 
+   and jaf whatever
+*) javahelp 2.0
+*) linspire default icons
+
 *) add in notification for exiting to icon.
 	actually exits.
 	*) started.  need to make it reasonably nice.
