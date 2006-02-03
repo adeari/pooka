@@ -6,32 +6,24 @@ close/delete it, then the focus disappears.  focus is regained if you exit
 and reselect the main window.
 	-- test in 1.6; if still there, try to fix.
 
-*) listeners:
-	*) make sure that on disconnection that we remove all listeners.
-		*) check:  listeners on VariableBundle.
-		*) check:  listeners on KeyboardManager (IN_FOCUSED_WINDOW).
-
 *) check release versions of libaries; make sure we have the most
 recent one of each in all areas (dist, webstart, Imported.)
 
-*) encryption panel icons
-*) new icons?
-	*) new splashscreen
-	*) ClearLooks icons
-	  must be fixed:
-		*) disconnected folder/subfolder (green)
-		*) spam
-	  think about changing
-		*) some others on the encryption panel
-		*) store connected/disconnected
+*) test icons w/javalobby configured; make sure they all work.
+*) new splashscreen
+*) new TrayIcon, too?
+
 
 *) fix fonts so they're no longer butt-ugly on windows
 	-- started.  check for v2.0
-
 *) test login selection on windows; make sure password field is selected.
 
----
+
+-----------
+
 *) after next release, branch 2.0 release.  
+
+*) make wheel scroll customizable
 
 *) fix manager exit cleanup of listeners; make it a consistent API.
 
@@ -45,13 +37,14 @@ recent one of each in all areas (dist, webstart, Imported.)
 
 *) redo attachment display
 
+*) add ability to save all attachments.
+
 *) exit:  closing window should pop up a notice saying pooka is still
 	running; file->exit should exit.
 
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
 
-*) make wheel scroll customizable
 
 *) fix preview pane mode; make it look nice
 
@@ -67,6 +60,11 @@ recent one of each in all areas (dist, webstart, Imported.)
 *) check what happens if you hit enter on a subfolder while subscribing.
 	-- see if we can make it so hitting enter opens the subfolder
 	   rather than subscribing to it.
+
+*) listeners:
+	*) make sure that on disconnection that we remove all listeners.
+		*) check:  listeners on VariableBundle.
+		*) check:  listeners on KeyboardManager (IN_FOCUSED_WINDOW).
 
 2.0 version
 ------
@@ -114,24 +112,13 @@ recent one of each in all areas (dist, webstart, Imported.)
   figure out virtual desktop support???
   trayicon support:
 	*) add changing message display timeout support
-		easy in linux.  look up Shell_NotifyIcon for windows.
-	*) fix resizing code -- should keep ratio
-		...the reshape() method seems to be the problem.  call
-		for legal values?
-		...behaviour:  Icon should have a preferred size, past which
-		it will try not to grow.  Icon should also have a setting
-		for keeping the image ratio.  if the display is larger than
-		the preferred ratio (1:1, but size wants to be 3:1) then
-		icon should center.
+		should be codeable with custom action????
 	*) fix tooltip display code so it doesn't show off screen
-		easy?  check.
-  	*) ?? gnome focus stealing? -- see if you can make it so the update
-		doesn't move focus from other random window.
-	   -- look into focus stealing in general.
+		check in new API
 	*) should be able to tell if balloon is showing or not.
-	*) should have a full MouseListener, not just an actionlistener.
-	*) remove button border.
-	*) check it out on windows?
+	*) new new-message-list support
+	*) fix new message notification on folders if you read a message
+		from the Open Message menu from the TrayIcon.
 
 *) update locking code with new mechanism.
 -----------

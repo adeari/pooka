@@ -1173,7 +1173,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * at every check.  It's nasty, but it _should_ keep the Folder open..
    */
   public void checkFolder() throws javax.mail.MessagingException {
-    getLogger().log(Level.FINE, "checking folder " + getFolderName());
+    getLogger().log(Level.FINE, "checking folder " + getFolderID());
     
     // i'm taking this almost directly from ICEMail; i don't know how
     // to keep the stores/folders open, either.  :)
@@ -1210,12 +1210,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 	// one part brute, one part force, one part ignorance.
 	
 	Message[] messages = getFolder().getMessages();
+	int lastUnreadFound = -1;
 	for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
-	  if (!(messages[i].isSet(Flags.Flag.SEEN))) 
+	  if (!(messages[i].isSet(Flags.Flag.SEEN))) {
+	    lastUnreadFound = i;
 	    countUnread++;
+	  }
 	}
-	getLogger().log(Level.FINE, "Returning " + (i + 1));
-	return i + 1;
+	if (lastUnreadFound != -1) {
+	  getLogger().log(Level.FINE, "Returning " + (lastUnreadFound + 1));
+	  return lastUnreadFound;
+	} else {
+	  getLogger().log(Level.FINE, "unreads detected, but none found.");
+	  return -1;
+	}
+
       } else { 
 	getLogger().log(Level.FINE, "Returning -1");
 	return -1;
@@ -2583,8 +2592,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       else
 	getLogger().log(Level.FINE, "running resetMessageCounts.  getFolder() is null.");
       
-      if (tracksUnreadMessages())
+      if (tracksUnreadMessages()) {
 	unreadCount = getFolder().getUnreadMessageCount();
+      }
 
       messageCount = getFolder().getMessageCount();
     } catch (MessagingException me) {

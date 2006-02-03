@@ -1,3 +1,6 @@
+changed the select-first-unread code so that it handles cases where the
+server returns a bogus unread count.
+
 in the folder file chooser, double-clicking on a folder that holds only
 messages (no other folders) now selects the folder, rather than opening it.
 
