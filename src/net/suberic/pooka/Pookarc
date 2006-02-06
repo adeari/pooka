@@ -278,7 +278,7 @@ PropertyEditor.filter.portFilter.class=net.suberic.util.gui.propedit.NumberFilte
 PropertyEditor.filter.portFilter.min=0
 PropertyEditor.filter.portFilter.max=32000
 
-#IconManager._default=IconSet.javalobby
-IconManager._default=IconSet.crystalclear
+IconManager._default=IconSet.javalobby
+#IconManager._default=IconSet.crystalclear
 
 
