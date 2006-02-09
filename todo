@@ -37,8 +37,6 @@
 
 *) redo attachment display
 
-*) add ability to save all attachments.
-
 *) exit:  closing window should pop up a notice saying pooka is still
 	running; file->exit should exit.
 

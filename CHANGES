@@ -18,6 +18,8 @@ server returns a bogus unread count.
 if autoCache is set, you now connect to the folder and show the messages
 before you start to download the messages to cache them.
 
+added a way to save all the attachments on a message at once.
+
 C+W now closes internal frame windows.
 
 if you have multiple folder windows opeening on startup, only the first

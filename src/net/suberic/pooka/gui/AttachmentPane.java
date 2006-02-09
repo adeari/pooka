@@ -246,6 +246,16 @@ public class AttachmentPane extends JPanel {
   }    
   
   /**
+   * This opens up a JFileChooser to let the user choose under what
+   * name and where the selected Attachment should be saved.  It then
+   * calls saveFileAs() to save the file.
+   */
+  public void saveAllAttachments() {
+    AttachmentHandler ah = new AttachmentHandler(message);
+    ah.saveAllAttachments(this);
+  }    
+  
+  /**
    * This removes the Attachment from the message.
    */
   public void removeAttachment() {
@@ -332,7 +342,8 @@ public class AttachmentPane extends JPanel {
 	  return new Action[] {
 	    new ActionWrapper(new OpenAction(), storeThread),
 	    new ActionWrapper(new OpenWithAction(), storeThread),
-	    new ActionWrapper(new SaveAsAction(), storeThread)
+	    new ActionWrapper(new SaveAsAction(), storeThread),
+	    new ActionWrapper(new SaveAllAction(), storeThread)
 	  };
 	}
   }
@@ -408,6 +419,16 @@ public class AttachmentPane extends JPanel {
     
     public void actionPerformed(ActionEvent e) {
       saveAttachment();
+    }
+  }
+  
+  class SaveAllAction extends AbstractAction {
+    SaveAllAction() {
+      super("file-save-all");
+    }
+    
+    public void actionPerformed(ActionEvent e) {
+      saveAllAttachments();
     }
   }
   

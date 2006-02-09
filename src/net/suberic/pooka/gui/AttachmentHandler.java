@@ -454,6 +454,58 @@ public class AttachmentHandler {
   }
   
   /**
+   * This opens up a JFileChooser to let the user choose the location
+   * to which to save the attachments.  Then it calls saveFileAs() to save
+   * the attachments with their default filenames.
+   */
+  public void saveAllAttachments(Component pComponent) {
+    // usually called on the folder thread.  so we need to throw the
+    // filechooser over to the AWTEvent thread.
+    try {
+      final Component fComponent = pComponent;
+      final java.util.List fAttachmentList = mProxy.getAttachments();
+      
+      SwingUtilities.invokeLater(new Runnable() {
+	  public void run() {
+	    JFileChooser saveChooser;
+	    String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
+	    if (currentDirectoryPath == "")
+	      saveChooser = new JFileChooser();
+	    else
+	      saveChooser = new JFileChooser(currentDirectoryPath);
+	    
+	    saveChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	    
+	    int saveConfirm = saveChooser.showSaveDialog(fComponent);
+	    File selectedDir = saveChooser.getSelectedFile();
+	    Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", saveChooser.getCurrentDirectory().getPath(), true);
+	    if (saveConfirm == JFileChooser.APPROVE_OPTION) {
+	      for (int i = 0; i < fAttachmentList.size(); i++) {
+		Attachment currentAttachment = (Attachment) fAttachmentList.get(i);
+		String filename = currentAttachment.getName();
+		if (filename == null || filename.equals("")) {
+		  filename = "savedFile_" + i;
+		}
+		File currentFile = new File(selectedDir, filename);
+		try {
+		  // saveFileAs creates a new thread, so don't bother
+		  // dispatching this somewhere else.
+		  saveFileAs(currentAttachment, currentFile);
+		} catch (IOException exc) {
+		  showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+		}
+	      }
+	    }
+	  }
+	});
+    } catch (javax.mail.MessagingException me) {
+	showError("Error getting attachment list", me);
+    }
+
+
+  }
+  
+  /**
    * This actually saves the Attachment as the File saveFile.
    */
   public void saveFileAs(Attachment mbp, File saveFile) throws IOException {

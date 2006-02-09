@@ -93,6 +93,11 @@ public class AttachmentPopupMenu extends JPopupMenu {
       this.add(item);
     }
 
+    JMenuItem saveAllItem = new JMenuItem();
+    saveAllItem.setAction(new SaveAllAction());
+    saveAllItem.setText(Pooka.getProperty("AttachmentPane.Actions.SaveAll.Label", "Save All"));
+    this.add(saveAllItem);
+
     if (mActionType == SAVE) {
       this.setLabel(Pooka.getProperty("AttachmentPopupMenu.save.title", "Save Attachment"));
     } else if (mActionType == OPEN_WITH) {
@@ -148,6 +153,22 @@ public class AttachmentPopupMenu extends JPopupMenu {
       } else {
 	ah.openAttachment(mAttachment);
       }
+    }
+  }
+
+  /**
+   * An Action that will save all the attachments on a message.
+   */
+  class SaveAllAction extends AbstractAction {
+    /**
+     * Creates a new SaveAllAction for this Attachment.
+     */
+    public SaveAllAction() {
+    }
+
+    public void actionPerformed(java.awt.event.ActionEvent e) {
+      AttachmentHandler ah = new AttachmentHandler(mProxy);
+      ah.saveAllAttachments(AttachmentPopupMenu.this);
     }
   }
 }
