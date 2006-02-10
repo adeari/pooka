@@ -105,15 +105,17 @@ public class SimpleAuthenticator extends Authenticator {
 	final JOptionPane authPane = new JOptionPane(d, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
 	    public void selectInitialValue() {
 	      if (user != null && user.length() > 0) {
-		password.requestFocusInWindow();
+		password.requestFocus();
 	      }
 	      else {
-		username.requestFocusInWindow();
+		username.requestFocus();
 	      }
 	    }
 	  };
 	
 	final JDialog dialog = authPane.createDialog(getFrame(), "Login");
+
+	authPane.selectInitialValue();
 
 	// work around a bug in jdk 1.4
 	String javaVersion = System.getProperty("java.version");
