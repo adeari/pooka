@@ -154,7 +154,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
   public void openFolderWindow(FolderInternalFrame newFolderWindow, boolean selectWindow) {
 
     if (newFolderWindow.getDesktopPane() != this) {
-      setLayer(newFolderWindow, JLayeredPane.DEFAULT_LAYER);
+      setLayer(newFolderWindow, JLayeredPane.DEFAULT_LAYER.intValue());
       String folderProperty = newFolderWindow.getFolderInfo().getFolderProperty();
       try {
 	int x = Integer.parseInt(Pooka.getProperty(folderProperty + ".windowLocation.x"));
