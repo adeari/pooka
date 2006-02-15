@@ -11,9 +11,6 @@ import net.suberic.pooka.*;
 import net.suberic.util.swing.*;
 import net.suberic.util.thread.*;
 
-import com.ice.jni.dde.JNIDDE;
-import com.ice.jni.registry.*;
-
 /**
  * Handles opening, saving, etc. attachments.
  */

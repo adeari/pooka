@@ -14,18 +14,16 @@
   <property name="mail_cp" value="${importdir}/mail.jar"/>
   <property name="javahelp_cp" value="${importdir}/jh.jar"/>
   <property name="crypto_cp" value="${importdir}/javamail-crypto.jar"/>
-  <property name="icejni_cp" value="${importdir}/icejni.jar"/>
-  <property name="jasen_cp" value="${importdir}/jasen.jar"/>
   <property name="jdic_cp" value="${importdir}/jdic.jar"/>
 
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${icejni_cp}:${crypto_cp}:${jasen_cp}:${jdic_cp}"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${crypto_cp}:${jdic_cp}"/> 
 
 <!-- libaries that will get included in the distribution -->
   <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
   <property name="localproviders_lib" value="${importdir}/localproviders.jar"/>
   <property name="mail_dist_lib" value="${importdir}/mail.jar"/>
-  <property name="javahelp_dist_lib" value="${importdir}/jh_dist.jar"/>
-  <property name="activation_dist_lib" value="${importdir}/activation_dist.jar"/>
+  <property name="javahelp_dist_lib" value="${importdir}/jh.jar"/>
+  <property name="activation_dist_lib" value="${importdir}/activation.jar"/>
   <property name="icons_dist_lib" value="${importdir}/linspire_clear.jar"/>
   <property name="crypto_lib" value="${importdir}/javamail-crypto.jar"/>
   <property name="cryptix_message_api_lib" value="${importdir}/cryptix-message-api.jar"/>
@@ -105,53 +103,21 @@
       </fileset>
     </copy>
     <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
-    <copy file="${importdir}/ICE_JNIDDE.dll" todir="${builddir}"/>
     <copy todir="${builddir}/net/suberic/pooka/doc">
       <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
     </copy>
     <replace file="${builddir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
   </target>
 
-  <target name="compile-dep" depends="init">
+  <target name="version-tag" depends="compile">
+    <copy file="${sourcedir}/net/suberic/pooka/doc/About.html" todir="${builddir}/net/suberic/pooka/doc/"/>
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <javac srcdir="${sourcedir}" destdir="${builddir}" classpath="${full_cp}" debug="true" deprecation="true"/>
-    <copy todir="${builddir}/net/suberic/pooka">
-      <fileset dir="${sourcedir}/net/suberic/pooka">
-        <include name="Pookarc"/>
-        <include name="*.properties"/>
-      </fileset>
-    </copy>
-    <copy todir="${builddir}/net/suberic/pooka/gui/images">
-      <fileset dir="${sourcedir}/net/suberic/pooka/gui/images">
-        <include name="**/*"/>
-      </fileset>
-    </copy>
-    <copy todir="${builddir}/net/suberic/util/gui/propedit/images">
-      <fileset dir="${sourcedir}/net/suberic/util/gui/propedit/images">
-        <include name="**/*"/>
-      </fileset>
-    </copy>
-    <copy todir="${builddir}/net/suberic/util/gui/images">
-      <fileset dir="${sourcedir}/net/suberic/util/gui/images">
-        <include name="**/*"/>
-      </fileset>
-    </copy>
-    <copy todir="${builddir}/org/javalobby/icons/20x20png">
-      <fileset dir="${iconsdir}/javalobby/icons/20x20png">
-        <include name="**/*"/>
-      </fileset>
-    </copy>
-    <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
-    <copy file="${importdir}/ICE_JNIDDE.dll" todir="${builddir}"/>
-    <copy todir="${builddir}/net/suberic/pooka/doc">
-      <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
-    </copy>
     <replace file="${builddir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
   </target>
 
-  <target name="dist" depends="compile">
+  <target name="dist" depends="version-tag">
     <jar jarfile="${distdir}/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka.manifest"/> 
     <copy todir="${distdir}">
       <fileset dir="${importdir}">
@@ -160,17 +126,16 @@
     </copy>
   </target>
 
-  <target name="dist-full" depends="compile">
+  <target name="dist-full" depends="version-tag">
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
     <jar jarfile="${distdir}/pooka_11_${today}.jar" basedir="${builddir}" manifest="${importdir}/pooka_full.manifest"> 
-      <zipfileset src="${activation_dist_lib}"/>
-      <zipfileset src="${javahelp_dist_lib}"/>
-      <zipfileset src="${mail_dist_lib}"/>
+      <zipfileset src="${activation_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
+      <zipfileset src="${javahelp_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
+      <zipfileset src="${mail_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${localproviders_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
-      <zipfileset src="${icejni_cp}"/>
       <zipfileset src="${crypto_lib}"/>
       <zipfileset src="${icons_dist_lib}"/>
     </jar>
@@ -178,7 +143,7 @@
   </target>
 
 
-  <target name="dist-crypto" depends="compile">
+  <target name="dist-crypto" depends="version-tag">
     <mkdir dir="${distdir}/cryptodist"/>
     <mkdir dir="${distdir}/cryptodist/pooka"/>
     <mkdir dir="${distdir}/cryptodist/pooka/lib"/>
@@ -187,20 +152,19 @@
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
     <jar jarfile="${distdir}/cryptodist/pooka/pooka.jar" basedir="${builddir}" manifest="${importdir}/pooka_crypto.manifest"> 
-      <zipfileset src="${activation_dist_lib}"/>
-      <zipfileset src="${javahelp_dist_lib}"/>
+      <zipfileset src="${activation_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
+      <zipfileset src="${javahelp_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${mail_dist_lib}"/>
       <zipfileset src="${localproviders_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
-      <zipfileset src="${icejni_cp}"/>
       <zipfileset src="${crypto_lib}"/>
     </jar>
     <signjar jar="${distdir}/cryptodist/pooka/pooka.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
 
     <copy todir="${distdir}/cryptodist/pooka/lib">
       <fileset dir="${importdir}">
-        <include name="bcmail-jdk14-128.jar"/>
-        <include name="bcprov-jdk14-128.jar"/>
+        <include name="bcmail-jdk14-131.jar"/>
+        <include name="bcprov-jdk14-131.jar"/>
         <include name="cryptix-jce-provider.jar"/>
         <include name="cryptix-openpgp-provider.jar"/>
         <include name="cryptix-message-api.jar"/>
@@ -266,29 +230,23 @@
 
   </target>
 
-  <target name="icejni-jnlp">
-    <jar jarfile="${distdir}/icejnidde.jar" basedir="${importdir}" includes="ICE_JNIDDE.dll"/>
-  </target>
-
   <target name="help-jnlp" depends="clean-help,init-help">
     <copy todir="${helpdir}/net/suberic/pooka/doc">
-      <fileset dir="${sourcedir}/net/suberic/pooka/doc"/>
+      <fileset dir="${sourcedir}/net/suberic/pooka/doc" excludes="${sourcedir}/net/suberic/pooka/doc/About.html"/>
     </copy>
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <replace file="${helpdir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
     <jar jarfile="${distdir}/pooka_help.jar" basedir="${helpdir}"/> 
   </target>
 
-  <target name="jnlp" depends="dist-jnlp,images-jnlp,help-jnlp,icejni-jnlp"/>
+  <target name="jnlp" depends="dist-jnlp,images-jnlp,help-jnlp"/>
 
   <!--
   <target name="sign" depends="jnlp">
     <signjar jar="${distdir}/pooka.jar" alias="pooka" storepass=""/>
     <signjar jar="${distdir}/pooka_help.jar" alias="pooka" storepass=""/>
     <signjar jar="${distdir}/pooka_images.jar" alias="pooka" storepass=""/>
-    <signjar jar="${distdir}/icejnidde.jar" alias="pooka" storepass=""/>
   </target>
   -->
 </project>
