@@ -110,7 +110,7 @@
   </target>
 
   <target name="version-tag" depends="compile">
-    <copy file="${sourcedir}/net/suberic/pooka/doc/About.html" todir="${builddir}/net/suberic/pooka/doc/"/>
+    <copy file="${sourcedir}/net/suberic/pooka/doc/en/About.html" todir="${builddir}/net/suberic/pooka/doc/"/>
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
