@@ -317,7 +317,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
    * Shows an Address Selection form for the given AddressEntryTextArea.
    */
   public void showAddressWindow(AddressEntryTextArea aeta) {
-    JInternalFrame jif = new JInternalFrame("Choose Address", true, true, true, true);
+    JInternalFrame jif = new JInternalFrame(Pooka.getProperty("AddressBookTable.title", "Choose Address"), true, true, true, true);
     jif.getContentPane().add(new AddressBookSelectionPanel(aeta, jif));
     jif.pack();
 

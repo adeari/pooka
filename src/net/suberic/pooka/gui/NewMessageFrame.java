@@ -274,7 +274,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
    * Shows an Address Selection form for the given AddressEntryTextArea.
    */
   public void showAddressWindow(AddressEntryTextArea aeta) {
-    JFrame jf = new JFrame("Choose Address");
+    JFrame jf = new JFrame(Pooka.getProperty("AddressBookTable.title", "Choose Address"));
     jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
     jf.pack();
     jf.show();

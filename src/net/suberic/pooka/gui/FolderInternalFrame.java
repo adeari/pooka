@@ -295,11 +295,23 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
    * This closes the FolderInternalFrame.
    */
   public void closeFolderDisplay(){
-    try {
-      saveWindowSettings();
-      this.setClosed(true);
-    } catch (java.beans.PropertyVetoException e) {
+    Runnable runMe = new Runnable() {
+        public void run() {
+          
+          try {
+            saveWindowSettings();
+            setClosed(true);
+          } catch (java.beans.PropertyVetoException e) {
+          }
+        }
+      };
+    if (SwingUtilities.isEventDispatchThread()) {
+      runMe.run();
+    } else {
+      SwingUtilities.invokeLater(runMe);
     }
+    
+    
   }
   
   /**
