@@ -1,18 +1,14 @@
-*) release
-
------------
-
-*) after next release, branch 2.0 release.  
+*) branch 2.0 release.  
 
 *) make wheel scroll customizable
 
-*) new attachment display w/icons?
-
-p*) make reply-to html work in a resonable way.
+*) make reply-to html work in a resonable way.
 
 *) configure trash folder as default.
 
 *) look at online bugs, etc.
+
+*) new attachment display w/icons?
 
 *) change download link on site
 *) make sure mailing list info is correct
@@ -30,6 +26,8 @@ p*) make reply-to html work in a resonable way.
 *) fix preview pane mode; make it look nice
 
 *) undelete?
+
+*) make icons update dynamically.
 
 *) bug?  change password of store with sent folder.  does sent folder
 	get re-tagged as a sent folder?

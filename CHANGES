@@ -1,3 +1,6 @@
+060227 release
+--------------
+
 in the folder file chooser, double-clicking on a folder that holds only
 messages (no other folders) now selects the folder, rather than opening it.
 
@@ -5,6 +8,10 @@ fixed a bug with subscribing to subfolders of stores where the subfolder
 would get the subscription, but the sub-subfolder wouldn't.
 
 you can now subscribe to multiple folders at once.
+
+added a new icon set, and added in an IconManager to allow for changeable
+icon sets.  set IconManager._default=IconSet.crystalclear to see the new
+icon set.  this will most likely be the default iconset for release 2.0
 
 fixed a javamail-crypto bug in which missing classes can cause 
 getEncryptionUtils() to throw an uncaught error.
@@ -14,6 +21,8 @@ also, empty values should now show up as blank rather than as 'loading...'.
 
 changed the select-first-unread code so that it handles cases where the
 server returns a bogus unread count.
+
+changed the default font under windows to something a bit more readable.
 
 if autoCache is set, you now connect to the folder and show the messages
 before you start to download the messages to cache them.
@@ -28,10 +37,6 @@ changing on you.
 
 middle clicking folder and message internalframes now deselects them
 and moves them to the back.
-
-added a new icon set, and added in an IconManager to allow for changeable
-icon sets.  set IconManager._default=IconSet.crystalclear to see the new
-icon set.  this will most likely be the default iconset for release 2.0
 
 carriage returns in subjects are now replaced with spaces.
 
