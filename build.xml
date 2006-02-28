@@ -26,6 +26,7 @@
   <property name="activation_dist_lib" value="${importdir}/activation.jar"/>
   <property name="icons_dist_lib" value="${importdir}/linspire_clear.jar"/>
   <property name="crypto_lib" value="${importdir}/javamail-crypto.jar"/>
+  <property name="crypto_combined_lib" value="${importdir}/cryptoproviders.jar"/>
   <property name="cryptix_message_api_lib" value="${importdir}/cryptix-message-api.jar"/>
   <property name="cryptix_pki_api_lib" value="${importdir}/cryptix-pki-api.jar"/>
 
@@ -59,7 +60,7 @@
   </target>
 
   <target name="docs" depends="init">
-    <javadoc sourcepath="src" 
+    <javadoc sourcepath="${sourcedir}" 
              destdir="${docdir}" 
              windowtitle="Pooka Documentation"
              classpath="${full_cp}"
@@ -110,7 +111,7 @@
   </target>
 
   <target name="version-tag" depends="compile">
-    <copy file="${sourcedir}/net/suberic/pooka/doc/en/About.html" todir="${builddir}/net/suberic/pooka/doc/"/>
+    <copy file="${sourcedir}/net/suberic/pooka/doc/en/About.html" todir="${builddir}/net/suberic/pooka/doc/en/"/>
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
@@ -139,7 +140,7 @@
       <zipfileset src="${crypto_lib}"/>
       <zipfileset src="${icons_dist_lib}"/>
     </jar>
-    <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
+    <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
   </target>
 
 
@@ -158,8 +159,9 @@
       <zipfileset src="${localproviders_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${crypto_lib}"/>
+      <zipfileset src="${icons_dist_lib}"/>
     </jar>
-    <signjar jar="${distdir}/cryptodist/pooka/pooka.jar" alias="pooka" storepass="pooka_fake" keystore="Imported/test_keystore"/>
+    <signjar jar="${distdir}/cryptodist/pooka/pooka.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
 
     <copy todir="${distdir}/cryptodist/pooka/lib">
       <fileset dir="${importdir}">
@@ -191,7 +193,7 @@
 
   <target name="all" depends="compile,dist-full,docs">
     <jar jarfile="${distdir}/pooka_javadoc_${today}.jar" basedir="${docdir}"/>
-    <jar jarfile="${distdir}/pooka_src_${today}.jar" basedir="." includes="net/**"/>
+    <jar jarfile="${distdir}/pooka_src_${today}.jar" basedir="${sourcedir}" includes="net/**"/>
   </target>
 
   <target name="compile-jnlp" depends="clean,init">
@@ -202,7 +204,17 @@
         <include name="*.properties"/>
       </fileset>
     </copy>
+    <copy todir="${builddir}/net/suberic/pooka/conf">
+      <fileset dir="${sourcedir}/net/suberic/pooka/conf">
+        <include name="*.properties"/>
+      </fileset>
+    </copy>
     <copy file="${sourcedir}/net/suberic/pooka/COPYING" todir="${builddir}/net/suberic/pooka/"/>
+    <copy file="${sourcedir}/net/suberic/pooka/doc/en/About.html" todir="${builddir}/net/suberic/pooka/doc/en/"/>
+    <tstamp>
+      <format property="today" pattern="yyMMdd" locale="en"/>
+    </tstamp>
+    <replace file="${builddir}/net/suberic/pooka/doc/en/About.html" token="VERSION_ID" value="version 1.1 snapshot build ${today}"/>
   </target>
 
   <target name="images-jnlp" depends="clean-images,init-images">
@@ -232,7 +244,7 @@
 
   <target name="help-jnlp" depends="clean-help,init-help">
     <copy todir="${helpdir}/net/suberic/pooka/doc">
-      <fileset dir="${sourcedir}/net/suberic/pooka/doc" excludes="${sourcedir}/net/suberic/pooka/doc/About.html"/>
+      <fileset dir="${sourcedir}/net/suberic/pooka/doc" excludes="${sourcedir}/net/suberic/pooka/doc/en/About.html"/>
     </copy>
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
@@ -242,11 +254,9 @@
 
   <target name="jnlp" depends="dist-jnlp,images-jnlp,help-jnlp"/>
 
-  <!--
   <target name="sign" depends="jnlp">
-    <signjar jar="${distdir}/pooka.jar" alias="pooka" storepass=""/>
-    <signjar jar="${distdir}/pooka_help.jar" alias="pooka" storepass=""/>
-    <signjar jar="${distdir}/pooka_images.jar" alias="pooka" storepass=""/>
+    <signjar jar="${distdir}/pooka.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${distdir}/pooka_help.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${distdir}/pooka_images.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
   </target>
-  -->
 </project>
