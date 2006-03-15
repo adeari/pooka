@@ -16,9 +16,9 @@ public class Pooka {
   /**
    * Runs Pooka.  Takes the following arguments:
    *
-   * -nf 
+   * -nf
    * --noOpenSavedFolders    don't open saved folders on startup.
-   * 
+   *
    * -rc [FILE]
    * --rcfile [FILE]    use the given file as the pooka startup file.
    *
@@ -41,16 +41,16 @@ public class Pooka {
       ClassLoader cl = new Pooka().getClass().getClassLoader();
       java.net.URL url;
       if (cl == null) {
-	url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
+  url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
       } else {
-	url = cl.getResource("net/suberic/pooka/Pookarc");
+  url = cl.getResource("net/suberic/pooka/Pookarc");
       }
 
       if (url == null) {
-	//sigh
-	url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
+  //sigh
+  url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
       }
-      
+
       java.io.InputStream is = url.openStream();
       VariableBundle resources = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
       sManager.setResources(resources);
@@ -60,7 +60,7 @@ public class Pooka {
       System.exit(-1);
     }
   }
-  
+
 
   /**
    * Loads all the resources for Pooka.
@@ -76,17 +76,17 @@ public class Pooka {
       ResourceManager resourceManager = null;
 
       if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
-	resourceManager = new DisklessResourceManager();
+  resourceManager = new DisklessResourceManager();
       } else {
-	resourceManager = new FileResourceManager();
+  resourceManager = new FileResourceManager();
       }
 
       sManager.setResourceManager(resourceManager);
 
       // if localrc hasn't been set, use the user's home directory.
       if (sManager.getLocalrc() == null) {
-	String localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc");
-	sManager.setLocalrc(localrc);
+  String localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc");
+  sManager.setLocalrc(localrc);
       }
       sManager.setResources(sManager.getResourceManager().createVariableBundle(sManager.getLocalrc(), pookaDefaultBundle));
     } catch (Exception e) {
@@ -107,19 +107,19 @@ public class Pooka {
     final int fExitValue = exitValue;
     final Object fSource = pSource;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  sStartupManager.stopMainPookaWindow(fSource);
-	  System.exit(fExitValue);
-	}
+  public void run() {
+    sStartupManager.stopMainPookaWindow(fSource);
+    System.exit(fExitValue);
+  }
       };
 
     if (Pooka.getMainPanel() != null)
       Pooka.getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    
+
     Thread shutdownThread = new Thread(runMe);
-    shutdownThread.start();    
+    shutdownThread.start();
   }
-  
+
   /**
    * Convenience method for getting Pooka configuration properties.  Calls
    * getResources().getProperty(propName, defVal).
@@ -127,7 +127,7 @@ public class Pooka {
   static public String getProperty(String propName, String defVal) {
     return (getResources().getProperty(propName, defVal));
   }
-  
+
   /**
    * Convenience method for getting Pooka configuration properties.  Calls
    * getResources().getProperty(propName).
@@ -135,7 +135,7 @@ public class Pooka {
   static public String getProperty(String propName) {
     return (getResources().getProperty(propName));
   }
-  
+
   /**
    * Convenience method for setting Pooka configuration properties.  Calls
    * getResources().setProperty(propName, propValue).
@@ -143,7 +143,7 @@ public class Pooka {
   static public void setProperty(String propName, String propValue) {
     getResources().setProperty(propName, propValue);
   }
-  
+
   /**
    * Returns the VariableBundle which provides all of the Pooka resources.
    */
@@ -157,12 +157,10 @@ public class Pooka {
     sManager.setResources(pResources);
   }
 
-  
+
   /**
    * Returns whether or not debug is enabled for this Pooka instance.
-   * 
-   * @deprecated Use Logger.getLogger("Pooka.debug") instead.
-   * 
+   *
    */
   static public boolean isDebug() {
     if (getResources().getProperty("Pooka.debug", "true").equals("true"))
@@ -172,14 +170,14 @@ public class Pooka {
     else
       return false;
   }
-  
+
   /**
    * Returns the DateFormatter used by Pooka.
    */
   static public DateFormatter getDateFormatter() {
     return sManager.getDateFormatter();
   }
-  
+
   /**
    * Returns the mailcap command map.  This is what is used to determine
    * which external programs are used to handle files of various MIME
@@ -188,7 +186,7 @@ public class Pooka {
   static public javax.activation.CommandMap getMailcap() {
     return sManager.getMailcap();
   }
-  
+
   /**
    * Returns the Mime Types map.  This is used to map file extensions to
    * MIME types.
@@ -196,7 +194,7 @@ public class Pooka {
   static public javax.activation.MimetypesFileTypeMap getMimeTypesMap() {
     return sManager.getMimeTypesMap();
   }
-  
+
   /**
    * Gets the default mail Session for Pooka.
    */
@@ -209,7 +207,7 @@ public class Pooka {
    */
   static public javax.mail.Authenticator getDefaultAuthenticator() { return sManager.getDefaultAuthenticator(); }
 
-  
+
   /**
    * Gets the Folder Tracker thread.  This is the thread that monitors the
    * individual folders and checks to make sure that they stay connected,
@@ -218,14 +216,14 @@ public class Pooka {
   static public net.suberic.pooka.thread.FolderTracker getFolderTracker() {
     return sManager.getFolderTracker();
   }
-  
+
   /**
    * Gets the Pooka Main Panel.  This is the root of the entire Pooka UI.
    */
   static public MainPanel getMainPanel() {
     return sManager.getMainPanel();
   }
-  
+
   /**
    * The Store Manager.  This tracks all of the Mail Stores that Pooka knows
    * about.
@@ -233,16 +231,16 @@ public class Pooka {
   static public StoreManager getStoreManager() {
     return sManager.getStoreManager();
   }
-  
+
   /**
-   * The Search Manager.  This manages the Search Terms that Pooka knows 
+   * The Search Manager.  This manages the Search Terms that Pooka knows
    * about, and also can be used to construct Search queries from sets
    * of properties.
    */
   static public SearchTermManager getSearchManager() {
     return sManager.getSearchManager();
   }
-  
+
   /**
    * The UIFactory for Pooka.  This is used to create just about all of the
    * graphical UI components for Pooka.  Usually this is either an instance
@@ -252,7 +250,7 @@ public class Pooka {
   static public PookaUIFactory getUIFactory() {
     return sManager.getUIFactory();
   }
-  
+
   /**
    * The Search Thread.  This is the thread that folder searches are done
    * on.
@@ -262,7 +260,7 @@ public class Pooka {
   }
 
   /**
-   * The Address Book Manager keeps track of all of the configured Address 
+   * The Address Book Manager keeps track of all of the configured Address
    * Books.
    */
   static public AddressBookManager getAddressBookManager() {
@@ -333,7 +331,7 @@ public class Pooka {
   static public PookaManager getPookaManager() {
     return sManager;
   }
-  
+
 }
 
 

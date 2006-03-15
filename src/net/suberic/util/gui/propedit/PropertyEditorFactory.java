@@ -37,19 +37,19 @@ public class PropertyEditorFactory {
 
     try {
       Class parentClass = Class.forName("net.suberic.util.gui.propedit.SwingPropertyEditor");
-    
+
       Vector propertyTypes = sourceBundle.getPropertyAsVector(SOURCE_PROPERTY, "");
       for (int i = 0; i < propertyTypes.size(); i++) {
-	String currentType = (String) propertyTypes.get(i);
-	String className = sourceBundle.getProperty(SOURCE_PROPERTY + "." + currentType + ".class", "");
-	try {
-	  Class currentClass = Class.forName(className);
-	  if (parentClass.isAssignableFrom(currentClass)) {
-	    typeToClassMap.put(currentType, currentClass);
-	  }
-	} catch (Exception e) {
-	  System.out.println("error registering class for property type " + currentType + ":  " + e);
-	}
+  String currentType = (String) propertyTypes.get(i);
+  String className = sourceBundle.getProperty(SOURCE_PROPERTY + "." + currentType + ".class", "");
+  try {
+    Class currentClass = Class.forName(className);
+    if (parentClass.isAssignableFrom(currentClass)) {
+      typeToClassMap.put(currentType, currentClass);
+    }
+  } catch (Exception e) {
+    System.out.println("error registering class for property type " + currentType + ":  " + e);
+  }
       }
     } catch (Exception e) {
       System.out.println("caught exception initializing PropertyEditorFactory:  " + e);
@@ -72,43 +72,43 @@ public class PropertyEditorFactory {
   }
 
   /**
-   * Creates and displays an editor window.  
+   * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, List properties) {
     showNewEditorWindow(title, properties, properties);
   }
-  
+
   /**
-   * Creates and displays an editor window.  
+   * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, List properties, List templates) {
     showNewEditorWindow(title, properties, templates, null);
   }
-  
+
   /**
-   * Creates and displays an editor window.  
+   * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
     JFrame jf = (JFrame) createEditorWindow(title, properties, templates, mgr);
-    jf.show();
+    jf.setVisible(true);
   }
-  
+
 
   /**
-   * Creates and displays an editor window.  
+   * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, PropertyEditorUI editor) {
     JFrame jf = new JFrame(title);
     jf.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jf));
     jf.setSize(200,200);
     jf.pack();
-    jf.show();
+    jf.setVisible(true);
   }
-  
+
   /**
    * This method returns an EditorWindow (a JFrame in this
    * implementation) which has an editor for each property in the
-   * properties List.  The title string is the title of the 
+   * properties List.  The title string is the title of the
    * JInternalFrame.
    */
   public Container createEditorWindow(String title, List properties) {
@@ -118,7 +118,7 @@ public class PropertyEditorFactory {
   /**
    * This method returns an EditorWindow (a JFrame in this
    * implementation) which has an editor for each property in the
-   * properties List.  The title string is the title of the 
+   * properties List.  The title string is the title of the
    * JFrame.
    */
   public Container createEditorWindow(String title, List properties, List templates ) {
@@ -128,7 +128,7 @@ public class PropertyEditorFactory {
   /**
    * This method returns an EditorWindow (a JFrame in this
    * implementation) which has an editor for each property in the
-   * properties Vector.  The title string is the title of the 
+   * properties Vector.  The title string is the title of the
    * JInternalFrame.
    */
   public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
@@ -138,7 +138,7 @@ public class PropertyEditorFactory {
     jf.pack();
     return jf;
   }
-  
+
 
   /**
    * Creates an appropriate PropertyEditorUI for the given property and
@@ -178,7 +178,7 @@ public class PropertyEditorFactory {
       returnValue = new StringEditorPane();
     }
     returnValue.configureEditor(property, editorTemplate, mgr, enabled);
-    return returnValue; 
+    return returnValue;
   }
 
   /**
@@ -195,12 +195,12 @@ public class PropertyEditorFactory {
   public VariableBundle getSourceBundle() {
     return sourceBundle;
   }
-  
+
 }
 
 
 
-    
+
 
 
 

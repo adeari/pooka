@@ -160,7 +160,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
     ReadMessageFrame rmf = new ReadMessageFrame(this);
     getMessageProxy().setMessageUI(rmf);
   
-    rmf.show();
+    rmf.setVisible(true);
     try {
       this.setClosed(true);
     } catch (java.beans.PropertyVetoException pve) {

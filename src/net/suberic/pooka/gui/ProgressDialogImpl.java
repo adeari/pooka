@@ -177,11 +177,11 @@ public class ProgressDialogImpl implements ProgressDialog {
    */
   public void show() {
     if (SwingUtilities.isEventDispatchThread())
-      dialog.show();
+      dialog.setVisible(true);
     else
       SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
-	    dialog.show();
+	    dialog.setVisible(true);
 	  }
 	});
   }

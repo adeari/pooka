@@ -13,7 +13,7 @@ import java.util.logging.*;
  * This manages all startup options for Pooka.
  */
 public class StartupManager {
-  
+
   // the PookaManager that we're using to startup.  for convenience.
   PookaManager mPookaManager = null;
 
@@ -27,7 +27,7 @@ public class StartupManager {
   String mToAddress = null;
   String mFromProfile = null;
 
-  
+
 
   /**
    * Creates a new StartupManager.
@@ -64,9 +64,9 @@ public class StartupManager {
     // check to see if there's already a Pooka instance running.
     if (!checkRunningInstance()) {
       if (mFullStartup) {
-	startupPooka();
+  startupPooka();
       } else {
-	startupMinimal();
+  startupMinimal();
       }
     }
   }
@@ -97,21 +97,21 @@ public class StartupManager {
     mPookaManager.setFolderTracker(new net.suberic.pooka.thread.FolderTracker());
     mPookaManager.getFolderTracker().start();
     updateTime("started folderTracker");
-    
+
     mPookaManager.setSearchThread(new net.suberic.util.thread.ActionThread(Pooka.getProperty("thread.searchThread", "Search Thread ")));
     mPookaManager.getSearchThread().start();
     updateTime("started search thread");
 
     if (Pooka.getUIFactory() == null) {
       if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+  mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
       else
-	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+  mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
     } else if (Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
       if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
+  mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
       else
-	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
+  mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
     }
 
     if (startup != null)
@@ -119,55 +119,55 @@ public class StartupManager {
 
     // do all of this on the awt event thread.
     Runnable createPookaUI = new Runnable() {
-	public void run() {
-	  finalFrame.setBackground(Color.lightGray);
-	  finalFrame.getContentPane().setLayout(new BorderLayout());
-	  MainPanel panel = new MainPanel(finalFrame);
-	  mPookaManager.setMainPanel(panel);
-	  finalFrame.getContentPane().add("Center", panel);
+  public void run() {
+    finalFrame.setBackground(Color.lightGray);
+    finalFrame.getContentPane().setLayout(new BorderLayout());
+    MainPanel panel = new MainPanel(finalFrame);
+    mPookaManager.setMainPanel(panel);
+    finalFrame.getContentPane().add("Center", panel);
 
-	  updateTime("created main panel");
-	  if (startup != null)
-	    startup.setStatus("Pooka.startup.starting");
+    updateTime("created main panel");
+    if (startup != null)
+      startup.setStatus("Pooka.startup.starting");
 
-	  panel.configureMainPanel();
+    panel.configureMainPanel();
 
-	  updateTime("configured main panel");
+    updateTime("configured main panel");
 
-	  finalFrame.getContentPane().add("North", panel.getMainToolbar());
-	  finalFrame.setJMenuBar(panel.getMainMenu());
-	  finalFrame.getContentPane().add("South", panel.getInfoPanel());
-	  finalFrame.pack();
-	  finalFrame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
-	  
-	  int x = Integer.parseInt(Pooka.getProperty("Pooka.lastX", "10"));
-	  int y = Integer.parseInt(Pooka.getProperty("Pooka.lastY", "10"));
+    finalFrame.getContentPane().add("North", panel.getMainToolbar());
+    finalFrame.setJMenuBar(panel.getMainMenu());
+    finalFrame.getContentPane().add("South", panel.getInfoPanel());
+    finalFrame.pack();
+    finalFrame.setSize(Integer.parseInt(Pooka.getProperty("Pooka.hsize", "800")), Integer.parseInt(Pooka.getProperty("Pooka.vsize", "600")));
 
-	  finalFrame.setLocation(x, y);
-	  updateTime("configured frame");
-	  if (startup != null)
-	    startup.hide();
-	  finalFrame.show();
-	  updateTime("showed frame");
-	  
-	  mPookaManager.getUIFactory().setShowing(true);
-	  
-	  if (Pooka.getProperty("Store", "").equals("")) {
-	    if (panel.getContentPanel() instanceof MessagePanel) {
-	      SwingUtilities.invokeLater(new Runnable() {
-		  public void run() {
-		    NewAccountPooka nap = new NewAccountPooka((MessagePanel) Pooka.getMainPanel().getContentPanel());
-		    nap.start();
-		  }
-		});
-	    }
-	  } else if (mOpenFolders && Pooka.getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true")) {
-	    panel.getContentPanel().openSavedFolders(mPookaManager.getResources().getPropertyAsVector("Pooka.openFolderList", ""));
-	  }
-	  panel.refreshActiveMenus();
-	}
+    int x = Integer.parseInt(Pooka.getProperty("Pooka.lastX", "10"));
+    int y = Integer.parseInt(Pooka.getProperty("Pooka.lastY", "10"));
+
+    finalFrame.setLocation(x, y);
+    updateTime("configured frame");
+    if (startup != null)
+      startup.hide();
+    finalFrame.setVisible(true);
+    updateTime("showed frame");
+
+    mPookaManager.getUIFactory().setShowing(true);
+
+    if (Pooka.getProperty("Store", "").equals("")) {
+      if (panel.getContentPanel() instanceof MessagePanel) {
+        SwingUtilities.invokeLater(new Runnable() {
+      public void run() {
+        NewAccountPooka nap = new NewAccountPooka((MessagePanel) Pooka.getMainPanel().getContentPanel());
+        nap.start();
+      }
+    });
+      }
+    } else if (mOpenFolders && Pooka.getProperty("Pooka.openSavedFoldersOnStartup", "false").equalsIgnoreCase("true")) {
+      panel.getContentPanel().openSavedFolders(mPookaManager.getResources().getPropertyAsVector("Pooka.openFolderList", ""));
+    }
+    panel.refreshActiveMenus();
+  }
       };
-    
+
     try {
       javax.swing.SwingUtilities.invokeAndWait(createPookaUI);
     } catch (Exception e) {
@@ -175,7 +175,7 @@ public class StartupManager {
       e.printStackTrace();
     }
   }
- 
+
   /**
    * Stops the main Pooka window.
    */
@@ -190,7 +190,7 @@ public class StartupManager {
       ft.setStopped(true);
 
     mPookaManager.setFolderTracker(null);
-    
+
     net.suberic.util.thread.ActionThread searchThread = mPookaManager.getSearchThread();
     if (searchThread != null)
       mPookaManager.getSearchThread().setStop(true);
@@ -201,11 +201,11 @@ public class StartupManager {
 
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
-	  public void run() {
-	    Pooka.getMainPanel().getParentFrame().setVisible(false);
-	    Pooka.getMainPanel().getParentFrame().dispose();
-	  }
-	});
+    public void run() {
+      Pooka.getMainPanel().getParentFrame().setVisible(false);
+      Pooka.getMainPanel().getParentFrame().dispose();
+    }
+  });
     } catch (Exception e) {
     }
 
@@ -230,21 +230,21 @@ public class StartupManager {
     while (iter.hasNext()) {
       OutgoingMailServer oms = (OutgoingMailServer) iter.next();
       /*
-	while (oms.isSending() && counter < 5) {
-	Object[] args = new Object[] { new Integer(5 - counter) };
-	Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(waitingMessage, args));
-	// wait for 5 seconds for all threads to exit.
-	try {
-	Thread.currentThread().sleep(1000);
-	} catch (Exception e) { }
-	counter++;
+  while (oms.isSending() && counter < 5) {
+  Object[] args = new Object[] { new Integer(5 - counter) };
+  Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(waitingMessage, args));
+  // wait for 5 seconds for all threads to exit.
+  try {
+  Thread.currentThread().sleep(1000);
+  } catch (Exception e) { }
+  counter++;
       }
       */
       while (oms.isSending()) {
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.exit.waiting.send.noCounter", "Waiting to finish sending unsent messages..."));
-	try {
-	  Thread.currentThread().sleep(1000);
-	} catch (Exception e) { }
+  Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.exit.waiting.send.noCounter", "Waiting to finish sending unsent messages..."));
+  try {
+    Thread.currentThread().sleep(1000);
+  } catch (Exception e) { }
       }
     }
 
@@ -266,26 +266,26 @@ public class StartupManager {
       final StoreInfo currentStore = (StoreInfo)v.elementAt(i);
       net.suberic.util.thread.ActionThread storeThread = currentStore.getStoreThread();
       if (storeThread != null) {
-	doneMap.put(currentStore, new Boolean(false));
-	storeThread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-	    
-	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-	      try {
-		if (currentStore.isConnected()) {
-		  currentStore.closeAllFolders(false, true);
-		  currentStore.disconnectStore();
-		} else {
-		  doneMap.put(currentStore, new Boolean(true));
-		}
-	      } catch (Exception e) {
-		// ignore.  just say done and exit.
-	      } finally {
-		currentStore.stopStoreThread();
-		currentStore.cleanup();
-		doneMap.put(currentStore, new Boolean(true));
-	      }
-	    }
-	  }, storeThread), new java.awt.event.ActionEvent(pSource, 1, "store-close"), net.suberic.util.thread.ActionThread.PRIORITY_HIGH);
+  doneMap.put(currentStore, new Boolean(false));
+  storeThread.addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+
+      public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+        try {
+    if (currentStore.isConnected()) {
+      currentStore.closeAllFolders(false, true);
+      currentStore.disconnectStore();
+    } else {
+      doneMap.put(currentStore, new Boolean(true));
+    }
+        } catch (Exception e) {
+    // ignore.  just say done and exit.
+        } finally {
+    currentStore.stopStoreThread();
+    currentStore.cleanup();
+    doneMap.put(currentStore, new Boolean(true));
+        }
+      }
+    }, storeThread), new java.awt.event.ActionEvent(pSource, 1, "store-close"), net.suberic.util.thread.ActionThread.PRIORITY_HIGH);
       }
     }
     long sleepTime = 30000;
@@ -295,48 +295,48 @@ public class StartupManager {
     }
     long currentTime = System.currentTimeMillis();
     boolean done = false;
-    
+
     String closingMessage = Pooka.getProperty("info.exit.closing", "Closing Store {0}");
     String waitingMessage = Pooka.getProperty("info.exit.waiting", "Closing Store {0}... Waiting {1,number} seconds.");
     String waitingMultipleMessage = Pooka.getProperty("info.exit.waiting.multiple", "Waiting {0,number} seconds for {1,number} Stores to close.");
-    
+
     while (! done && System.currentTimeMillis() - currentTime < sleepTime) {
       String waitingStoreName = null;
       int waitingStoreCount = 0;
       try {
-	Thread.currentThread().sleep(1000);
+  Thread.currentThread().sleep(1000);
       } catch (InterruptedException ie) {
       }
       done = true;
       for (int i = 0; i < v.size(); i++) {
-	Object key = v.get(i);
-	Boolean value = (Boolean) doneMap.get(key);
-	if (value != null && ! value.booleanValue()) {
-	  done = false;
-	  waitingStoreCount++;
-	  if (waitingStoreName == null)
-	    waitingStoreName = ((StoreInfo) key).getStoreID();
-	}
+  Object key = v.get(i);
+  Boolean value = (Boolean) doneMap.get(key);
+  if (value != null && ! value.booleanValue()) {
+    done = false;
+    waitingStoreCount++;
+    if (waitingStoreName == null)
+      waitingStoreName = ((StoreInfo) key).getStoreID();
+  }
       }
-      
+
       if (! done) {
-	int secondsWaiting = (int) (sleepTime - (System.currentTimeMillis() - currentTime)) / 1000;
-	String message = closingMessage;
-	Object[] args;
-	if (secondsWaiting > 20) {
-	  args = new Object[] { waitingStoreName };
-	  message = closingMessage;
-	} else if (waitingStoreCount == 1) {
-	  args = new Object[] { waitingStoreName, new Integer(secondsWaiting) };
-	  message = waitingMessage;
-	} else {
-	  args = new Object[] { new Integer(secondsWaiting), new Integer(waitingStoreCount) };
-	  message = waitingMultipleMessage;
-	}
-	Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(message, args));
+  int secondsWaiting = (int) (sleepTime - (System.currentTimeMillis() - currentTime)) / 1000;
+  String message = closingMessage;
+  Object[] args;
+  if (secondsWaiting > 20) {
+    args = new Object[] { waitingStoreName };
+    message = closingMessage;
+  } else if (waitingStoreCount == 1) {
+    args = new Object[] { waitingStoreName, new Integer(secondsWaiting) };
+    message = waitingMessage;
+  } else {
+    args = new Object[] { new Integer(secondsWaiting), new Integer(waitingStoreCount) };
+    message = waitingMultipleMessage;
+  }
+  Pooka.getUIFactory().showStatusMessage(java.text.MessageFormat.format(message, args));
       }
     }
-    
+
   }
 
   /**
@@ -345,63 +345,63 @@ public class StartupManager {
   public void stopPookaToTray(Object pSource) {
     final Object fSource = pSource;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  stopMainPookaWindow(fSource);
-	  mFrame = null;
-	  if (mPookaManager.getMainPanel() != null) {
-	    KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
-	    mPookaManager.getMainPanel().getInfoPanel().stopThread();
-	  }
-	  mPookaManager.setMainPanel(null);
-	  mPookaManager.getUIFactory().setShowing(false);
-	  /*
-	  mPookaManager.setStoreManager(new StoreManager());
-	  updateTime("created store manager.");
-	  
-	  mPookaManager.getStoreManager().loadAllSentFolders();
-	  mPookaManager.getOutgoingMailManager().loadOutboxFolders();
-	  updateTime("loaded sent/outbox");
-	  */
-	  mPookaManager.setStoreManager(null);
-	  mPookaManager.getUserProfileManager().shutdownManager();
-	  mPookaManager.setUserProfileManager(null);
-	  mPookaManager.getOutgoingMailManager().stopServers();
+  public void run() {
+    stopMainPookaWindow(fSource);
+    mFrame = null;
+    if (mPookaManager.getMainPanel() != null) {
+      KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
+      mPookaManager.getMainPanel().getInfoPanel().stopThread();
+    }
+    mPookaManager.setMainPanel(null);
+    mPookaManager.getUIFactory().setShowing(false);
+    /*
+    mPookaManager.setStoreManager(new StoreManager());
+    updateTime("created store manager.");
 
-	  /*
-	  java.util.Map allListeners = mPookaManager.getResources().getAllListeners();
-	  java.util.Iterator keys = allListeners.keySet().iterator();
-	  while (keys.hasNext()) {
-	    Object o = keys.next();
-	    Object value = allListeners.get(o);
-	    if (value instanceof java.util.List) {
-	      java.util.Iterator values = ((java.util.List) value).iterator();
-	      while (values.hasNext()) {
-		System.err.println("key " + o + ", value " + values.next());
-	      }
-	    } else {
-	      System.err.println("key " + o + ", value " + allListeners.get(o));
-	    }
-	  }
-	  */
-	  
-	  PookaUIFactory newFactory = new PookaMinimalUIFactory(Pooka.getUIFactory());
-	  
-	  mFullStartup=false;
+    mPookaManager.getStoreManager().loadAllSentFolders();
+    mPookaManager.getOutgoingMailManager().loadOutboxFolders();
+    updateTime("loaded sent/outbox");
+    */
+    mPookaManager.setStoreManager(null);
+    mPookaManager.getUserProfileManager().shutdownManager();
+    mPookaManager.setUserProfileManager(null);
+    mPookaManager.getOutgoingMailManager().stopServers();
 
-	  loadManagers(null);
-	  mPookaManager.setUIFactory(newFactory);
-	  if (mPookaManager.getResources().getProperty("Pooka.exitToIcon.notify", "true").equalsIgnoreCase("true")) {
-	    MessageNotificationManager mnm = newFactory.getMessageNotificationManager();
-	    if (mnm != null)
-	      mnm.displayMessage(mPookaManager.getResources().getProperty("info.exitToIcon.title", "System Tray Notification"), mPookaManager.getResources().getProperty("info.exitToIcon", "Pooka has disconnected from you mail servers, but is still running in the System Tray.  To exit Pooka completely, use File->Exit from the toolbar or right-click on the Tray Icon and choose Exit."), MessageNotificationManager.INFO_MESSAGE_TYPE);
-	    
-	  }    
-	  
-	}
+    /*
+    java.util.Map allListeners = mPookaManager.getResources().getAllListeners();
+    java.util.Iterator keys = allListeners.keySet().iterator();
+    while (keys.hasNext()) {
+      Object o = keys.next();
+      Object value = allListeners.get(o);
+      if (value instanceof java.util.List) {
+        java.util.Iterator values = ((java.util.List) value).iterator();
+        while (values.hasNext()) {
+    System.err.println("key " + o + ", value " + values.next());
+        }
+      } else {
+        System.err.println("key " + o + ", value " + allListeners.get(o));
+      }
+    }
+    */
+
+    PookaUIFactory newFactory = new PookaMinimalUIFactory(Pooka.getUIFactory());
+
+    mFullStartup=false;
+
+    loadManagers(null);
+    mPookaManager.setUIFactory(newFactory);
+    if (mPookaManager.getResources().getProperty("Pooka.exitToIcon.notify", "true").equalsIgnoreCase("true")) {
+      MessageNotificationManager mnm = newFactory.getMessageNotificationManager();
+      if (mnm != null)
+        mnm.displayMessage(mPookaManager.getResources().getProperty("info.exitToIcon.title", "System Tray Notification"), mPookaManager.getResources().getProperty("info.exitToIcon", "Pooka has disconnected from you mail servers, but is still running in the System Tray.  To exit Pooka completely, use File->Exit from the toolbar or right-click on the Tray Icon and choose Exit."), MessageNotificationManager.INFO_MESSAGE_TYPE);
+
+    }
+
+  }
       };
     if (Pooka.getMainPanel() != null)
       Pooka.getMainPanel().setCursor(java.awt.Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    
+
     Thread stopWindowThread = new Thread(runMe);
     stopWindowThread.start();
   }
@@ -415,10 +415,10 @@ public class StartupManager {
     loadManagers(null);
 
     mPookaManager.setUIFactory(new PookaMinimalUIFactory());
-    
+
     if (mToAddress != null) {
       if (!sendMessageTo(mToAddress, mFromProfile))
-	System.err.println("send failed.");
+  System.err.println("send failed.");
     }
   }
 
@@ -433,16 +433,16 @@ public class StartupManager {
       sender.openConnection();
       // check to make sure that we're connected to a correct version of Pooka.
       if (sender.checkVersion()) {
-	// ok, there is one.  try either sending a message or starting
-	// up Pooka, whichever we're trying to do.
-	if (mFullStartup) {
-	  sender.sendStartPookaMessage();
-	  sender.closeConnection();
-	  System.out.println("contacted already running instance of Pooka.");
-	  return true;
-	} else {
-	  return sendMessageTo(mToAddress, mFromProfile);
-	}
+  // ok, there is one.  try either sending a message or starting
+  // up Pooka, whichever we're trying to do.
+  if (mFullStartup) {
+    sender.sendStartPookaMessage();
+    sender.closeConnection();
+    System.out.println("contacted already running instance of Pooka.");
+    return true;
+  } else {
+    return sendMessageTo(mToAddress, mFromProfile);
+  }
       }
     } catch (Exception e) {
 
@@ -450,7 +450,7 @@ public class StartupManager {
 
     return false;
   }
-  
+
   /**
    * This loads all of the background managers that Pooka uses.
    */
@@ -471,10 +471,10 @@ public class StartupManager {
       startup.setStatus("Pooka.startup.addressBook");
     mPookaManager.setAddressBookManager(new AddressBookManager());
     updateTime("loaded address book");
-    
+
     mPookaManager.setConnectionManager(new NetworkConnectionManager());
     updateTime("loaded connections");
-    
+
     mPookaManager.setOutgoingMailManager(new OutgoingMailServerManager());
     updateTime("loaded mailservers");
 
@@ -485,7 +485,7 @@ public class StartupManager {
     UserProfileManager profileManager = new UserProfileManager(mPookaManager.getResources());
     mPookaManager.setUserProfileManager(profileManager);
     updateTime("created profiles");
-    
+
     String mailcapSource = null;
     if (System.getProperty("file.separator").equals("\\")) {
       mailcapSource = System.getProperty("user.home") + "\\pooka_mailcap.txt";
@@ -499,7 +499,7 @@ public class StartupManager {
     }
 
     updateTime("created mailcaps");
-    
+
     javax.activation.CommandMap.setDefaultCommandMap(mPookaManager.getMailcap());
     javax.activation.FileTypeMap.setDefaultFileTypeMap(mPookaManager.getMimeTypesMap());
     updateTime("set command/file maps");
@@ -514,39 +514,39 @@ public class StartupManager {
 
     if (mFullStartup) {
       if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-	mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+  mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
       else
-	mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
-    
+  mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+
       updateTime("created ui factory");
     }
 
     mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
-	public void valueChanged(String changedValue) {
-	  if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
-	    MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
-	    mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
-	    ContentPanel cp = ((PookaPreviewPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(mp);
-	    Pooka.getMainPanel().setContentPanel(cp);
-	  } else {
-	    PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
-	    mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
-	    ContentPanel mp = ((PookaDesktopPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(pcp);
-	    Pooka.getMainPanel().setContentPanel(mp);
-	  }
-	}
+  public void valueChanged(String changedValue) {
+    if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
+      MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
+      mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
+      ContentPanel cp = ((PookaPreviewPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(mp);
+      Pooka.getMainPanel().setContentPanel(cp);
+    } else {
+      PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
+      mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
+      ContentPanel mp = ((PookaDesktopPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(pcp);
+      Pooka.getMainPanel().setContentPanel(mp);
+    }
+  }
       }, "Pooka.guiType");
 
     mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
-	public void valueChanged(String changedValue) {
-	  try {
-	    UIManager.setLookAndFeel(Pooka.getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
-	    javax.swing.SwingUtilities.updateComponentTreeUI(javax.swing.SwingUtilities.windowForComponent(Pooka.getMainPanel()));
-	  } catch (Exception e) { 
-	    System.out.println("Cannot set look and feel..."); }
-	}
+  public void valueChanged(String changedValue) {
+    try {
+      UIManager.setLookAndFeel(Pooka.getProperty("Pooka.looknfeel", UIManager.getCrossPlatformLookAndFeelClassName()));
+      javax.swing.SwingUtilities.updateComponentTreeUI(javax.swing.SwingUtilities.windowForComponent(Pooka.getMainPanel()));
+    } catch (Exception e) {
+      System.out.println("Cannot set look and feel..."); }
+  }
       }, "Pooka.looknfeel");
-    
+
     updateTime("created resource listeners");
     // set up help
     if (startup != null)
@@ -561,7 +561,7 @@ public class StartupManager {
       ee.printStackTrace();
     }
     updateTime("loaded help");
-    
+
     // create the MessageListener.
     if (mPookaManager.getMessageListener() == null) {
       PookaMessageListener pmlistener= new PookaMessageListener();
@@ -572,26 +572,26 @@ public class StartupManager {
     mFrame = new JFrame("Pooka");
     updateTime("created frame");
     */
-    
+
     mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator());
     java.util.Properties sysProps = System.getProperties();
     sysProps.setProperty("mail.mbox.mailspool", mPookaManager.getResources().getProperty("Pooka.spoolDir", "/var/spool/mail"));
     mPookaManager.setDefaultSession (javax.mail.Session.getDefaultInstance(sysProps, mPookaManager.getDefaultAuthenticator()));
     if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
       mPookaManager.getDefaultSession().setDebug(true);
-    
-    updateTime("created session.");    
+
+    updateTime("created session.");
     if (startup != null)
       startup.setStatus("Pooka.startup.mailboxInfo");
     mPookaManager.setStoreManager(new StoreManager());
     updateTime("created store manager.");
-    
+
     mPookaManager.getStoreManager().loadAllSentFolders();
     mPookaManager.getOutgoingMailManager().loadOutboxFolders();
     updateTime("loaded sent/outbox");
 
   }
-    
+
   /**
    * This parses any command line arguments, and makes the appropriate
    * changes.
@@ -602,53 +602,53 @@ public class StartupManager {
 
     String mailAddress = null;
     String selectedProfile = null;
-    
+
     for (int i = 0; i < argv.length; i++) {
       if (argv[i] != null) {
-	if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders")) {
-	  mOpenFolders = false;
-	} else if (argv[i].equals("-rc") || argv[i].equals("--rcfile")) {
-	  String filename = argv[++i];
-	  if (filename == null) {
-	    System.err.println("error:  no startup file specified.");
-	    printUsage();
-	    System.exit(-1);
-	  }
-	  
-	  mPookaManager.setLocalrc(filename);
-	} else if (argv[i].equals("--http")) {
-	  mUseHttp = true;
-	  mUseLocalFiles = false;
-	} else if (argv[i].equals("-open")) {
-	  if (argv.length < i + 2) {
-	    System.err.println("error:  no address specified.");
-	    printUsage();
-	    System.exit(-1);
-	  }
-	  mToAddress = argv[++i];
-	  mFullStartup = false;
-	} else if (argv[i].equals("--minimal")) {
-	  mFullStartup = false;
-	} else if (argv[i].equals("--from")) {
-	  mFromProfile = argv[++i];
-	  if (mFromProfile == null) {
-	    System.err.println("error:  no from profile specified.");
-	    printUsage();
-	    System.exit(-1);
-	  }
-	  mFullStartup = false;
-	} else if (argv[i].equals("--help")) {
-	  printUsage();
-	  System.exit(0);
-	} else {
-	  // if invalid arguments are specified
-	  printUsage();
-	  System.exit(0);
-	}
+  if (argv[i].equals("-nf") || argv[i].equals("--noOpenSavedFolders")) {
+    mOpenFolders = false;
+  } else if (argv[i].equals("-rc") || argv[i].equals("--rcfile")) {
+    String filename = argv[++i];
+    if (filename == null) {
+      System.err.println("error:  no startup file specified.");
+      printUsage();
+      System.exit(-1);
+    }
+
+    mPookaManager.setLocalrc(filename);
+  } else if (argv[i].equals("--http")) {
+    mUseHttp = true;
+    mUseLocalFiles = false;
+  } else if (argv[i].equals("-open")) {
+    if (argv.length < i + 2) {
+      System.err.println("error:  no address specified.");
+      printUsage();
+      System.exit(-1);
+    }
+    mToAddress = argv[++i];
+    mFullStartup = false;
+  } else if (argv[i].equals("--minimal")) {
+    mFullStartup = false;
+  } else if (argv[i].equals("--from")) {
+    mFromProfile = argv[++i];
+    if (mFromProfile == null) {
+      System.err.println("error:  no from profile specified.");
+      printUsage();
+      System.exit(-1);
+    }
+    mFullStartup = false;
+  } else if (argv[i].equals("--help")) {
+    printUsage();
+    System.exit(0);
+  } else {
+    // if invalid arguments are specified
+    printUsage();
+    System.exit(0);
+  }
       }
     }
   }
-  
+
   /**
    * Prints the usage information.
    */
@@ -674,17 +674,17 @@ public class StartupManager {
    */
   private void versionError() {
     Runnable runMe = new Runnable() {
-	public void run() {
-	  String errorString = Pooka.getProperty("error.incorrectJavaVersion", "Error running Pooka.  This version (1.0 beta) \nof Pooka requires a 1.2 or 1.3 JDK.  \n\nFor JDK 1.4, please use a release of Pooka 1.1.\n\nPooka can be downloaded from\nhttp://pooka.sourceforge.net/\n\nYour JDK version:  ");
-	  javax.swing.JOptionPane.showMessageDialog(null, errorString + System.getProperty("java.version"));
-	}
+  public void run() {
+    String errorString = Pooka.getProperty("error.incorrectJavaVersion", "Error running Pooka.  This version (1.0 beta) \nof Pooka requires a 1.2 or 1.3 JDK.  \n\nFor JDK 1.4, please use a release of Pooka 1.1.\n\nPooka can be downloaded from\nhttp://pooka.sourceforge.net/\n\nYour JDK version:  ");
+    javax.swing.JOptionPane.showMessageDialog(null, errorString + System.getProperty("java.version"));
+  }
       };
 
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
     else {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+  SwingUtilities.invokeAndWait(runMe);
       } catch (Exception ie) {
       }
     }
@@ -700,14 +700,14 @@ public class StartupManager {
       sender.openConnection();
       // check to make sure that we're connected to a correct version of Pooka.
       if (sender.checkVersion()) {
-	sender.openNewEmail(pAddress, pProfile);
+  sender.openNewEmail(pAddress, pProfile);
       } else
-	return false;
+  return false;
     } catch (Exception e) {
       return false;
     } finally {
       if (sender.isConnected())
-	sender.closeConnection();
+  sender.closeConnection();
     }
 
     mToAddress = null;

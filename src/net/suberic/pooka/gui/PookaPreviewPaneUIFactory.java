@@ -143,7 +143,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
     jf.pack();
     applyNewWindowLocation(jf);
-    jf.show();
+    jf.setVisible(true);
   }
   
   /**
@@ -377,7 +377,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
     jf.pack();
     applyNewWindowLocation(jf);
-    jf.show();
+    jf.setVisible(true);
   }
 
   /**

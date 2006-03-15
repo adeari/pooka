@@ -170,7 +170,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     } else {
       applyNewWindowLocation(jf, null);
     }
-    jf.show();
+    jf.setVisible(true);
   }
   
   /**
@@ -504,7 +504,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
     jf.pack();
     applyNewWindowLocation(jf, aeta);
-    jf.show();
+    jf.setVisible(true);
   }
 
   /**

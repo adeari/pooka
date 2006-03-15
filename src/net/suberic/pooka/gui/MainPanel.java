@@ -19,9 +19,6 @@ import net.suberic.pooka.MailQueue;
 import net.suberic.pooka.UserProfile;
 import net.suberic.util.gui.*;
 
-import org.jdesktop.jdic.tray.TrayIcon;
-import org.jdesktop.jdic.tray.SystemTray;
-
 /**
  * The main panel for PookaMail
  *

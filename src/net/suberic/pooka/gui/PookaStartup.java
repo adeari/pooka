@@ -22,7 +22,7 @@ public class PookaStartup {
     mFrame = new JFrame();
     JPanel fullPanel = new JPanel();
     fullPanel.setLayout(new BorderLayout());
-    
+
     ImagePanel imagePanel = null;
     try {
       java.net.URL sourceUrl = this.getClass().getResource(Pooka.getProperty("Pooka.startupImage", "images/PookaSplashscreen.jpg"));
@@ -52,47 +52,47 @@ public class PookaStartup {
     mFrame.getContentPane().add(fullPanel);
 
     SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  mFrame.setUndecorated(true);
-	  mFrame.pack();
+  public void run() {
+    mFrame.setUndecorated(true);
+    mFrame.pack();
 
-	  Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-	  Dimension frameSize = mFrame.getSize();
-	  int x = Math.max(0, (screenSize.width - frameSize.width) / 2);
-	  int y = Math.max(0, (screenSize.height - frameSize.height) / 2);
+    Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+    Dimension frameSize = mFrame.getSize();
+    int x = Math.max(0, (screenSize.width - frameSize.width) / 2);
+    int y = Math.max(0, (screenSize.height - frameSize.height) / 2);
 
-	  mFrame.setLocation(x, y);
-	  mFrame.show();
-	  mFrame.setLocation(x, y);
-	}
+    mFrame.setLocation(x, y);
+    mFrame.setVisible(true);
+    mFrame.setLocation(x, y);
+  }
       });
   }
 
   /**
    * Sets the current status.  Note that this actually takes a resource string
-   * from 
+   * from
    */
   public void setStatus(String pStatus) {
     final String fStatus = pStatus;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  String text = Pooka.getProperty(fStatus + ".label", fStatus);
-	  int weight = 10;
-	  try {
-	    weight = Integer.parseInt(Pooka.getProperty(fStatus + ".weight", "10"));
-	  } catch (NumberFormatException nfe) {
-	  }
-	  mStatusField.setText(text);
-	  mStatusField.repaint();
-	  
-	  try {
-	    mProgressBar.setValue(mProgressBar.getValue() + weight);
-	  } catch (Exception e) {
-	    // if we get an error setting the value, just set to 
-	    // indeterminate.
-	    mProgressBar.setIndeterminate(true);
-	  }
-	}
+  public void run() {
+    String text = Pooka.getProperty(fStatus + ".label", fStatus);
+    int weight = 10;
+    try {
+      weight = Integer.parseInt(Pooka.getProperty(fStatus + ".weight", "10"));
+    } catch (NumberFormatException nfe) {
+    }
+    mStatusField.setText(text);
+    mStatusField.repaint();
+
+    try {
+      mProgressBar.setValue(mProgressBar.getValue() + weight);
+    } catch (Exception e) {
+      // if we get an error setting the value, just set to
+      // indeterminate.
+      mProgressBar.setIndeterminate(true);
+    }
+  }
       };
 
     if (SwingUtilities.isEventDispatchThread()) {
@@ -107,10 +107,10 @@ public class PookaStartup {
    */
   public void hide() {
     Runnable runMe = new Runnable() {
-	public void run() {
-	  mFrame.hide();
-	  mFrame.dispose();
-	}
+  public void run() {
+    mFrame.setVisible(false);
+    mFrame.dispose();
+  }
       };
 
     if (SwingUtilities.isEventDispatchThread()) {
@@ -127,15 +127,15 @@ class ImagePanel extends JPanel {
     mImage = pImage;
   }
 
-  public void paintComponent(Graphics g) { 
-    super.paintComponent(g); 
-    
-    int x = (getSize().width - mImage.getWidth(this)) / 2; 
+  public void paintComponent(Graphics g) {
+    super.paintComponent(g);
+
+    int x = (getSize().width - mImage.getWidth(this)) / 2;
     int y = (getSize().height - mImage.getHeight(this)) / 2;
 
-    g.drawImage(mImage, x, y, this); 
+    g.drawImage(mImage, x, y, this);
 
-  } 
+  }
 }
-  
+
 }

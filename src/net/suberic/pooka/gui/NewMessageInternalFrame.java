@@ -200,7 +200,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
     
     getMessageProxy().setMessageUI(nmf);
 
-    nmf.show();
+    nmf.setVisible(true);
     try {
       this.setClosed(true);
     } catch (java.beans.PropertyVetoException pve) {

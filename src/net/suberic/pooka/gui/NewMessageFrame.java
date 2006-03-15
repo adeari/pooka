@@ -277,7 +277,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
     JFrame jf = new JFrame(Pooka.getProperty("AddressBookTable.title", "Choose Address"));
     jf.getContentPane().add(new AddressBookSelectionPanel(aeta, jf));
     jf.pack();
-    jf.show();
+    jf.setVisible(true);
   }
 
   /**

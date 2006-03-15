@@ -187,7 +187,7 @@ public class MessagePrinterDisplay implements PrintJobListener {
       updateDisplayPane();
       mDialog.pack();
       mDialog.setSize(Math.max(mDialog.getPreferredSize().width, 300), Math.max(mDialog.getPreferredSize().height, 200));
-      mDialog.show();
+      mDialog.setVisible(true);
     }
 
   }
