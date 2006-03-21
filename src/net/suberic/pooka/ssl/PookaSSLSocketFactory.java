@@ -26,9 +26,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    * Creates a PookaSSLSocketFactory.
    */
   public PookaSSLSocketFactory() {
-    if (Pooka.isDebug()) {
-      System.out.println("PookaSSLSocketFactory created.");
-    }
+    getLogger().fine("PookaSSLSocketFactory created.");
 
     try {
 
@@ -52,33 +50,33 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
       
       PookaTrustManager ptm = Pooka.getTrustManager();
       if (ptm == null) {
-	synchronized (sLock) {
-	  ptm = Pooka.getTrustManager();
-	  if (ptm == null) {
-	    TrustManager[] trustManagers = tmFactory.getTrustManagers();
-	    
-	    String fileName = Pooka.getProperty("Pooka.sslCertFile", "");
-	    ptm = Pooka.getResourceManager().createPookaTrustManager(trustManagers, fileName);
-	    Pooka.setTrustManager(ptm);
-	  }
-	}
+        synchronized (sLock) {
+          ptm = Pooka.getTrustManager();
+          if (ptm == null) {
+            TrustManager[] trustManagers = tmFactory.getTrustManagers();
+            
+            String fileName = Pooka.getProperty("Pooka.sslCertFile", "");
+            ptm = Pooka.getResourceManager().createPookaTrustManager(trustManagers, fileName);
+            Pooka.setTrustManager(ptm);
+          }
+        }
       }
-	
+      
       TrustManager[] pookaTrustManagers = new TrustManager[1];
       pookaTrustManagers[0] = ptm;
-
+      
       java.security.SecureRandom secureRandomGenerator = new java.security.SecureRandom();
       if (Pooka.getProperty("Pooka.SSL.useSecureRandom", "true").equalsIgnoreCase("false")) {
 	seed(secureRandomGenerator);
       }
       sslc.init(keyManagers, pookaTrustManagers, secureRandomGenerator);
       wrappedFactory = (SSLSocketFactory) sslc.getSocketFactory();
-
+      
     } catch(Exception e) {
       e.printStackTrace();
     }
   }
-
+  
   /**
    * Gets a default PookaSSLSocketFactory.
    */
@@ -90,8 +88,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    * Creates an SSL Socket.
    */
   public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-    if (Pooka.isDebug())
-      System.out.println("PookaSSLSocketFactory:  create socket.");
+    getLogger().fine("PookaSSLSocketFactory:  create socket.");
     return wrappedFactory.createSocket(s, host, port, autoClose);
   }
   
@@ -99,8 +96,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    * Creates an SSL Socket.
    */
   public Socket createSocket(InetAddress host, int port) throws IOException {
-    if (Pooka.isDebug())
-      System.out.println("PookaSSLSocketFactory:  create socket.");
+    getLogger().fine("PookaSSLSocketFactory:  create socket.");
     return wrappedFactory.createSocket(host, port);
   }
   
@@ -108,8 +104,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    * Creates an SSL Socket.
    */
   public Socket createSocket(InetAddress address, int port, InetAddress clientAddress, int clientPort) throws IOException {
-    if (Pooka.isDebug())
-      System.out.println("PookaSSLSocketFactory:  create socket.");
+    getLogger().fine("PookaSSLSocketFactory:  create socket.");
     return wrappedFactory.createSocket(address, port, clientAddress, clientPort);
   }
   
@@ -117,8 +112,7 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    * Creates an SSL Socket.
    */
   public Socket createSocket(String host, int port) throws IOException {
-    if (Pooka.isDebug())
-      System.out.println("PookaSSLSocketFactory:  create socket.");
+    getLogger().fine("PookaSSLSocketFactory:  create socket.");
     return wrappedFactory.createSocket(host, port);
   }
   
@@ -126,9 +120,16 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
    * Creates an SSL Socket.
    */
   public Socket createSocket(String host, int port, InetAddress clientHost, int clientPort) throws IOException {
-    if (Pooka.isDebug())
-      System.out.println("PookaSSLSocketFactory:  create socket.");
+    getLogger().fine("PookaSSLSocketFactory:  create socket.");
     return wrappedFactory.createSocket(host, port, clientHost, clientPort);
+  }
+  
+  /**
+   * Creates an SSL Socket.
+   */
+  public Socket createSocket() throws IOException {
+    getLogger().fine("PookaSSLSocketFactory:  create socket.");
+    return wrappedFactory.createSocket();
   }
   
   /**
@@ -154,17 +155,17 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
     if (File.separatorChar == '/') {
       File f = new File("/dev/urandom");
       if (f.exists()) {
-	try {
-	  FileInputStream fis = new FileInputStream(f);
-	  byte[] seed = new byte[8];
-	  fis.read(seed);
-	  random.setSeed(seed);
-	  return;
-	} catch (java.io.IOException ioe) {
-	  long newSeed = new java.util.Random(System.currentTimeMillis()).nextLong();
-	  random.setSeed(newSeed);
-
-	}
+        try {
+          FileInputStream fis = new FileInputStream(f);
+          byte[] seed = new byte[8];
+          fis.read(seed);
+          random.setSeed(seed);
+          return;
+        } catch (java.io.IOException ioe) {
+          long newSeed = new java.util.Random(System.currentTimeMillis()).nextLong();
+          random.setSeed(newSeed);
+          
+        }
       }
       
     } 
@@ -172,6 +173,13 @@ public class PookaSSLSocketFactory extends SSLSocketFactory {
     // if not...
     long newSeed = new java.util.Random(System.currentTimeMillis()).nextLong();
     random.setSeed(newSeed);
+  }
+
+  /**
+   * Returns the logger for this class.
+   */
+  java.util.logging.Logger getLogger() {
+    return java.util.logging.Logger.getLogger("Pooka.debug.sslFactory");
   }
 }
 

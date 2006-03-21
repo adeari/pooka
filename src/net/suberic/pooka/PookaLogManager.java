@@ -26,7 +26,8 @@ public class PookaLogManager implements ValueChangeListener {
     "Pooka.debug.folderTracker",
     "Pooka.debug.logManager",
     "Pooka.debug.startupManager",
-    "Pooka.debug.messaging"
+    "Pooka.debug.messaging",
+    "Pooka.debug.sslFactory"
   };
   
   
