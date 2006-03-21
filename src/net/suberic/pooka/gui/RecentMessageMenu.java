@@ -15,9 +15,11 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableAwtMenu 
    * This creates a new RecentMessageMenu.
    */
   public RecentMessageMenu() {
-    MessageNotificationManager mnm = Pooka.getUIFactory().getMessageNotificationManager();
-    if (mnm != null)
-      mnm.setRecentMessageMenu(this);
+    if (Pooka.getUIFactory() != null) {
+      MessageNotificationManager mnm = Pooka.getUIFactory().getMessageNotificationManager();
+      if (mnm != null)
+        mnm.setRecentMessageMenu(this);
+    }
   }
 
   /**
@@ -47,7 +49,6 @@ public class RecentMessageMenu extends net.suberic.util.gui.ConfigurableAwtMenu 
    * This builds the menu for each folder/message group.
    */
   protected void buildFolderMenu(String pFolderName, java.util.List pMessageList) {
-    System.err.println("building folder menu.");
     MessageNotificationManager mnm = Pooka.getUIFactory().getMessageNotificationManager();
     Menu newMenu = new Menu(pFolderName);
     for(int i = 0 ; i < pMessageList.size(); i++) {
