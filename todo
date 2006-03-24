@@ -1,74 +1,19 @@
-"AWT-EventQueue-0" prio=1 tid=0x08464c30 nid=0x168e runnable [0xb16b0000..0xb16b10b0]
-        at java.net.SocketInputStream.socketRead0(Native Method)
-        at java.net.SocketInputStream.read(SocketInputStream.java:129)
-        at com.sun.net.ssl.internal.ssl.InputRecord.readFully(InputRecord.java:284)
-        at com.sun.net.ssl.internal.ssl.InputRecord.read(InputRecord.java:319)
-        at com.sun.net.ssl.internal.ssl.SSLSocketImpl.readRecord(SSLSocketImpl.java:720)
-        - locked <0x8651a0b0> (a java.lang.Object)
-        at com.sun.net.ssl.internal.ssl.SSLSocketImpl.readDataRecord(SSLSocketImpl.java:677)
-        at com.sun.net.ssl.internal.ssl.AppInputStream.read(AppInputStream.java:75)
-        - locked <0x8651a1c0> (a com.sun.net.ssl.internal.ssl.AppInputStream)
-        at com.sun.mail.util.TraceInputStream.read(TraceInputStream.java:79)
-        at java.io.BufferedInputStream.fill(BufferedInputStream.java:218)
-        at java.io.BufferedInputStream.read1(BufferedInputStream.java:256)
-        at java.io.BufferedInputStream.read(BufferedInputStream.java:313)
-        - locked <0x8650dd70> (a com.sun.mail.iap.ResponseInputStream)
-        at com.sun.mail.iap.ResponseInputStream.read0(ResponseInputStream.java:112)
-        at com.sun.mail.iap.ResponseInputStream.readResponse(ResponseInputStream.java:47)
-        at com.sun.mail.iap.Response.<init>(Response.java:65)
-        at com.sun.mail.imap.protocol.IMAPResponse.<init>(IMAPResponse.java:30)
-        at com.sun.mail.imap.protocol.IMAPResponse.readResponse(IMAPResponse.java:104)
-        at com.sun.mail.imap.protocol.IMAPProtocol.readResponse(IMAPProtocol.java:212)
-        at com.sun.mail.iap.Protocol.command(Protocol.java:245)
-        - locked <0x8650a998> (a com.sun.mail.imap.protocol.IMAPProtocol)
-        at com.sun.mail.imap.protocol.IMAPProtocol.fetch(IMAPProtocol.java:1155)        at com.sun.mail.imap.protocol.IMAPProtocol.fetch(IMAPProtocol.java:1147)        at com.sun.mail.imap.protocol.IMAPProtocol.fetchBody(IMAPProtocol.java:912)
-        at com.sun.mail.imap.protocol.IMAPProtocol.peekBody(IMAPProtocol.java:896)
-        at com.sun.mail.imap.IMAPMessage.loadHeaders(IMAPMessage.java:1239)
-        - locked <0x852fb9a0> (a java.lang.Object)
-        - locked <0x848e2cb8> (a com.sun.mail.imap.IMAPMessage)
-        at com.sun.mail.imap.IMAPMessage.getAllHeaders(IMAPMessage.java:729)
-        at net.suberic.pooka.UIDMimeMessage.getAllHeaders(UIDMimeMessage.java:210)
-        at net.suberic.pooka.AttachmentBundle.setHeaderSource(AttachmentBundle.java:267)
-        at net.suberic.pooka.AttachmentBundle.<init>(AttachmentBundle.java:30)
-        at net.suberic.pooka.MailUtilities.parseAttachments(MailUtilities.java:68)
-        at net.suberic.pooka.MessageInfo.loadAttachmentInfo(MessageInfo.java:64)        at net.suberic.pooka.MessageInfo.isHtml(MessageInfo.java:1109)
-        at net.suberic.pooka.gui.ReadMessageDisplayPanel.resetEditorText(ReadMessageDisplayPanel.java:279)
-        at net.suberic.pooka.gui.ReadMessageDisplayPanel.configureMessageDisplay(ReadMessageDisplayPanel.java:242)
-        at net.suberic.pooka.gui.ReadMessageInternalFrame.configureMessageInternalFrame(ReadMessageInternalFrame.java:99)
-        at net.suberic.pooka.gui.PookaDesktopPaneUIFactory.createMessageUI(PookaDesktopPaneUIFactory.java:69)
-        at net.suberic.pooka.gui.SwingUIFactory.createMessageUI(SwingUIFactory.java:35)
-        at net.suberic.pooka.gui.MessageProxy.openWindow(MessageProxy.java:738)
-        at net.suberic.pooka.gui.MessageProxy.openWindow(MessageProxy.java:726)
-        at net.suberic.pooka.gui.PookaDesktopPaneUIFactory.doDefaultOpen(PookaDesktopPaneUIFactory.java:87)
-        at net.suberic.pooka.gui.FolderDisplayPanel$11.actionPerformed(FolderDisplayPanel.java:477)
-        at javax.swing.JComponent$ActionStandin.actionPerformed(JComponent.java:3227)
-        at javax.swing.SwingUtilities.notifyAction(SwingUtilities.java:1571)
-        at javax.swing.JComponent.processKeyBinding(JComponent.java:2763)
-        at javax.swing.JTable.processKeyBinding(JTable.java:3463)
-        at javax.swing.JComponent.processKeyBindings(JComponent.java:2798)
-        at javax.swing.JComponent.processKeyEvent(JComponent.java:2726)
-        at java.awt.Component.processEvent(Component.java:5265)
-        at java.awt.Container.processEvent(Container.java:1966)
-        at java.awt.Component.dispatchEventImpl(Component.java:3955)
-        at java.awt.Container.dispatchEventImpl(Container.java:2024)
-        at java.awt.Component.dispatchEvent(Component.java:3803)
-        at java.awt.KeyboardFocusManager.redispatchEvent(KeyboardFocusManager.java:1810)
-        at java.awt.DefaultKeyboardFocusManager.dispatchKeyEvent(DefaultKeyboardFocusManager.java:672)
-        at java.awt.DefaultKeyboardFocusManager.preDispatchKeyEvent(DefaultKeyboardFocusManager.java:920)
-        at java.awt.DefaultKeyboardFocusManager.typeAheadAssertions(DefaultKeyboardFocusManager.java:798)
-        at java.awt.DefaultKeyboardFocusManager.dispatchEvent(DefaultKeyboardFocusManager.java:636)
-        at java.awt.Component.dispatchEventImpl(Component.java:3841)
-        at java.awt.Container.dispatchEventImpl(Container.java:2024)
-        at java.awt.Window.dispatchEventImpl(Window.java:1774)
-        at java.awt.Component.dispatchEvent(Component.java:3803)
-        at java.awt.EventQueue.dispatchEvent(EventQueue.java:463)
-        at java.awt.EventDispatchThread.pumpOneEventForHierarchy(EventDispatchThread.java:242)
-        at java.awt.EventDispatchThread.pumpEventsForHierarchy(EventDispatchThread.java:163)
-        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:157)        at java.awt.EventDispatchThread.pumpEvents(EventDispatchThread.java:149)        at java.awt.EventDispatchThread.run(EventDispatchThread.java:110)
-
+*) create a way to cache local headers so we don't have to download
+   those all the time.  sort of like running offline, but not really.
 
 *) fix behavior when other mail client is connected; make sure we handle
 deleted messages, etc. gracefully.
+
+*) make reply-to html work in a resonable way.
+	- research.
+
+*) make wheel scroll customizable
+
+*) new attachment display w/icons?
+
+*) redo attachment display
+
+*) configure trash folder as default.
 
 online:
   *) look at online bugs, etc.
@@ -79,18 +24,7 @@ online:
     *) add blog/rss feed
 
 
-*) make reply-to html work in a resonable way.
-	- research.
-
-*) make wheel scroll customizable
-
 *) add unread message count to folder display.
-
-*) configure trash folder as default.
-
-*) new attachment display w/icons?
-
-*) redo attachment display
 
 *) look at thunderbird.
 *) look at balsa?

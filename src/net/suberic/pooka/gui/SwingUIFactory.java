@@ -134,10 +134,10 @@ public abstract class SwingUIFactory implements PookaUIFactory {
   public void showStatusMessage(String newMessage) {
     final String msg = newMessage;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
-	    Pooka.getMainPanel().getInfoPanel().setMessage(msg);
-	}
+        public void run() {
+          if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
+            Pooka.getMainPanel().getInfoPanel().setMessage(msg);
+        }
       };
     if (SwingUtilities.isEventDispatchThread()) {
       runMe.run();
@@ -150,10 +150,10 @@ public abstract class SwingUIFactory implements PookaUIFactory {
    */
   public void clearStatus() {
     Runnable runMe = new Runnable() {
-	public void run() {
-	  if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
-	    Pooka.getMainPanel().getInfoPanel().clear();
-	}
+        public void run() {
+          if (Pooka.getMainPanel() != null && Pooka.getMainPanel().getInfoPanel() != null)
+            Pooka.getMainPanel().getInfoPanel().clear();
+        }
       };
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
@@ -194,16 +194,16 @@ public abstract class SwingUIFactory implements PookaUIFactory {
     while (! ok ) {
       returnValue = showConfirmDialog(new Object[] { sf }, Pooka.getProperty("title.search", "Search Folders"), JOptionPane.OK_CANCEL_OPTION);
       if (returnValue == JOptionPane.OK_OPTION) {
-	tmpSelectedFolders = sf.getSelectedFolders();
-	try {
-	  tmpSearchTerm = sf.getSearchTerm();
-	  ok = true;
-	} catch (java.text.ParseException pe) {
-	  showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
-	  ok = false;
-	}
+        tmpSelectedFolders = sf.getSelectedFolders();
+        try {
+          tmpSearchTerm = sf.getSearchTerm();
+          ok = true;
+        } catch (java.text.ParseException pe) {
+          showError(Pooka.getProperty("error.search.invalidDateFormat", "Invalid date format:  "), pe);
+          ok = false;
+        }
       } else {
-	ok = true;
+        ok = true;
       }
     }
     
@@ -225,7 +225,7 @@ public abstract class SwingUIFactory implements PookaUIFactory {
    * This tells the factory whether or not its ui components are showing
    * yet or not.
    */
-    public void setShowing(boolean newValue) {
+  public void setShowing(boolean newValue) {
     showing=newValue;
   }
 

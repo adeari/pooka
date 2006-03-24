@@ -1,3 +1,5 @@
+opening a message by keypress was incorrectly happening on the AwtEventThread.
+
 060227 release
 --------------
 

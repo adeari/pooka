@@ -33,81 +33,81 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       msg = newMsg;
       saveFile = newSaveFile;
     }
-
+    
     public void run() {
       InputStream decodedIS = null;
       BufferedOutputStream outStream = null;
-
+      
       int msgSize = 0;
-
+      
       try {
-  msgSize = msg.getSize();
-
-  createDialog(msgSize);
-  jd.setVisible(true);
-
-  outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
-  int b=0;
-  byte[] buf = new byte[32768];
-
-  b = decodedIS.read(buf);
-  while (b != -1 && running) {
-    outStream.write(buf, 0, b);
-    progressBar.setValue(progressBar.getValue() + b);
-    b = decodedIS.read(buf);
-  }
-
-  jd.dispose();
-
+        msgSize = msg.getSize();
+        
+        createDialog(msgSize);
+        jd.setVisible(true);
+        
+        outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
+        int b=0;
+        byte[] buf = new byte[32768];
+        
+        b = decodedIS.read(buf);
+        while (b != -1 && running) {
+          outStream.write(buf, 0, b);
+          progressBar.setValue(progressBar.getValue() + b);
+          b = decodedIS.read(buf);
+        }
+        
+        jd.dispose();
+        
       } catch (IOException ioe) {
-  if (getMessageUI() != null)
-    getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
-  else
-    Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
-  cancelSave();
+        if (getMessageUI() != null)
+          getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
+        else
+          Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
+        cancelSave();
       } catch (MessagingException me) {
-  if (getMessageUI() != null)
-    getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + me.getMessage());
-  else
-    Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + me.getMessage());
-  cancelSave();
+        if (getMessageUI() != null)
+          getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + me.getMessage());
+        else
+          Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + me.getMessage());
+        cancelSave();
       } finally {
-  if (outStream != null) {
-    try {
-      outStream.flush();
-      outStream.close();
-    } catch (IOException ioe) {}
-  }
+        if (outStream != null) {
+          try {
+            outStream.flush();
+            outStream.close();
+          } catch (IOException ioe) {}
+        }
       }
     }
-
+    
     public void createDialog(int msgSize) {
       progressBar = new JProgressBar(0, msgSize);
       progressBar.setBorderPainted(true);
       progressBar.setStringPainted(true);
-
+      
       jd = new JDialog();
       jd.getContentPane().setLayout(new BoxLayout(jd.getContentPane(), BoxLayout.Y_AXIS));
       JLabel nameLabel = new JLabel(saveFile.getName());
       JPanel buttonPanel = new JPanel();
       JButton cancelButton = new JButton(Pooka.getProperty("button.cancel", "Cancel"));
       cancelButton.addActionListener(new ActionListener() {
-    public void actionPerformed(ActionEvent e) {
-      cancelSave();
-    }
-  });
+          public void actionPerformed(ActionEvent e) {
+            cancelSave();
+          }
+        });
       buttonPanel.add(cancelButton);
-
+      
       jd.getContentPane().add(nameLabel);
       jd.getContentPane().add(progressBar);
       jd.getContentPane().add(buttonPanel);
-
+      
       jd.pack();
     }
-
+    
     public void cancelSave() {
       try {
-  saveFile.delete();
+        saveFile.delete();
       } catch (Exception e) {}
       jd.dispose();
     }
@@ -178,15 +178,15 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     public SubjectLine(String newSubject) {
       subject = newSubject;
       if (subject != null)
-  sortingSubject = subject.toLowerCase();
+        sortingSubject = subject.toLowerCase();
       else
-  sortingSubject = new String("");
+        sortingSubject = new String("");
 
       int cutoffPoint = 0;
       while(sortingSubject.startsWith("re:", cutoffPoint))
-  for(cutoffPoint = cutoffPoint + 3; cutoffPoint < sortingSubject.length() && Character.isWhitespace(sortingSubject.charAt(cutoffPoint)); cutoffPoint++) { }
+        for(cutoffPoint = cutoffPoint + 3; cutoffPoint < sortingSubject.length() && Character.isWhitespace(sortingSubject.charAt(cutoffPoint)); cutoffPoint++) { }
       if (cutoffPoint != 0)
-  sortingSubject = sortingSubject.substring(cutoffPoint);
+        sortingSubject = sortingSubject.substring(cutoffPoint);
     }
 
     /**
@@ -195,12 +195,12 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     public int compareTo(Object o) {
       // proper SubjectLines are always greater than null.
       if (o == null)
-  return 1;
+        return 1;
 
       if (o instanceof SubjectLine) {
-  return sortingSubject.compareTo(((SubjectLine)o).sortingSubject);
+        return sortingSubject.compareTo(((SubjectLine)o).sortingSubject);
       } else
-  return sortingSubject.compareToIgnoreCase(o.toString());
+        return sortingSubject.compareToIgnoreCase(o.toString());
     }
 
     /**
@@ -234,12 +234,12 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     public AddressLine(String newAddress) {
       address = newAddress;
       if (address != null)
-  sortingAddress = address.toLowerCase();
+        sortingAddress = address.toLowerCase();
       else
-  sortingAddress = new String("");
+        sortingAddress = new String("");
 
       while(sortingAddress.length() > 0 && ! Character.isLetterOrDigit(sortingAddress.charAt(0)))
-  sortingAddress = sortingAddress.substring(1);
+        sortingAddress = sortingAddress.substring(1);
     }
 
     /**
@@ -248,12 +248,12 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     public int compareTo(Object o) {
       // proper AddressLines are always greater than null.
       if (o == null)
-  return 1;
+        return 1;
 
       if (o instanceof AddressLine) {
-  return sortingAddress.compareTo(((AddressLine)o).sortingAddress);
+        return sortingAddress.compareTo(((AddressLine)o).sortingAddress);
       } else
-  return sortingAddress.compareToIgnoreCase(o.toString());
+        return sortingAddress.compareToIgnoreCase(o.toString());
     }
 
     /**
@@ -308,7 +308,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
       FolderInfo fi = getFolderInfo();
       if (fi != null) {
-  fi.fireMessageChangedEvent(mce);
+        fi.fireMessageChangedEvent(mce);
       }
 
     }
@@ -337,48 +337,48 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       // assume that we're not actually changing the values...
       java.util.Iterator it = newTableInfo.keySet().iterator();
       while ((! hasChanged) && it.hasNext()) {
-  Object key = it.next();
-  Object newValue = newTableInfo.get(key);
-  Object oldValue = tableInfo.get(key);
-  if (newValue == null) {
-    if (oldValue != null) {
-      hasChanged = true;
-    }
-  } else if (oldValue == null || ! newValue.equals(oldValue)) {
-    hasChanged = true;
-  }
+        Object key = it.next();
+        Object newValue = newTableInfo.get(key);
+        Object oldValue = tableInfo.get(key);
+        if (newValue == null) {
+          if (oldValue != null) {
+            hasChanged = true;
+          }
+        } else if (oldValue == null || ! newValue.equals(oldValue)) {
+          hasChanged = true;
+        }
       }
 
       // check for the matching filters, also.
       MessageFilter[] newMatchingFilters = doFilterMatch();
       if (newMatchingFilters == null) {
-  if (matchingFilters != null)
-    hasChanged = true;
+        if (matchingFilters != null)
+          hasChanged = true;
       } else if (matchingFilters == null) {
-  hasChanged = true;
+        hasChanged = true;
       } else if (matchingFilters.length != newMatchingFilters.length) {
-  hasChanged = true;
+        hasChanged = true;
       } else {
-  for (int i = 0; hasChanged != true && i < newMatchingFilters.length; i++) {
-    MessageFilter newValue = newMatchingFilters[i];
-    MessageFilter oldValue = matchingFilters[i];
-    if (newValue != oldValue) {
-      hasChanged = true;
-    }
-  }
+        for (int i = 0; hasChanged != true && i < newMatchingFilters.length; i++) {
+          MessageFilter newValue = newMatchingFilters[i];
+          MessageFilter oldValue = matchingFilters[i];
+          if (newValue != oldValue) {
+            hasChanged = true;
+          }
+        }
       }
 
       if (hasChanged) {
-  tableInfo = newTableInfo;
-  matchingFilters = newMatchingFilters;
+        tableInfo = newTableInfo;
+        matchingFilters = newMatchingFilters;
 
-  // notify the JTable that this proxy has loaded.
-  MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
+        // notify the JTable that this proxy has loaded.
+        MessageChangedEvent mce = new net.suberic.pooka.event.MessageTableInfoChangedEvent(this, MessageChangedEvent.ENVELOPE_CHANGED, getMessageInfo().getMessage());
 
-  FolderInfo fi = getFolderInfo();
-  if (fi != null) {
-    fi.fireMessageChangedEvent(mce);
-  }
+        FolderInfo fi = getFolderInfo();
+        if (fi != null) {
+          fi.fireMessageChangedEvent(mce);
+        }
       }
 
     }
@@ -414,30 +414,30 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     try {
       Object newValue = null;
       if (newProperty instanceof String) {
-  String propertyName = (String)newProperty;
-  if (propertyName.startsWith("FLAG"))
-    newValue=getMessageFlag(propertyName);
-  else if (propertyName.equals("attachments"))
-    newValue=new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "Attachment.small"), propertyName);
-  else if (propertyName.equals("crypto"))
-    newValue=new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "Encrypted.small"), propertyName);
-  else if (propertyName.equalsIgnoreCase("subject"))
-    newValue=new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName));
-  else if (propertyName.equalsIgnoreCase("from"))
-    newValue=new AddressLine((String) getMessageInfo().getMessageProperty(propertyName));
-  else if (propertyName.equalsIgnoreCase("Date")) {
-    newValue = getMessageInfo().getMessageProperty("Date");
-    if (newValue == null) {
-      newValue = getMessageInfo().getMessageProperty("ReceivedDate");
-    }
-  } else {
-    newValue=getMessageInfo().getMessageProperty(propertyName);
-  }
+        String propertyName = (String)newProperty;
+        if (propertyName.startsWith("FLAG"))
+          newValue=getMessageFlag(propertyName);
+        else if (propertyName.equals("attachments"))
+          newValue=new BooleanIcon(getMessageInfo().hasAttachments(), Pooka.getProperty("FolderTable.Attachments.icon", "Attachment.small"), propertyName);
+        else if (propertyName.equals("crypto"))
+          newValue=new BooleanIcon(getMessageInfo().hasEncryption(), Pooka.getProperty("FolderTable.Crypto.icon", "Encrypted.small"), propertyName);
+        else if (propertyName.equalsIgnoreCase("subject"))
+          newValue=new SubjectLine((String) getMessageInfo().getMessageProperty(propertyName));
+        else if (propertyName.equalsIgnoreCase("from"))
+          newValue=new AddressLine((String) getMessageInfo().getMessageProperty(propertyName));
+        else if (propertyName.equalsIgnoreCase("Date")) {
+          newValue = getMessageInfo().getMessageProperty("Date");
+          if (newValue == null) {
+            newValue = getMessageInfo().getMessageProperty("ReceivedDate");
+          }
+        } else {
+          newValue=getMessageInfo().getMessageProperty(propertyName);
+        }
       } else if (newProperty instanceof SearchTermIconManager) {
-  SearchTermIconManager stm = (SearchTermIconManager) newProperty;
-  newValue=new SearchTermIcon(stm, this);
+        SearchTermIconManager stm = (SearchTermIconManager) newProperty;
+        newValue=new SearchTermIcon(stm, this);
       } else if (newProperty instanceof RowCounter) {
-  newValue=newProperty;
+        newValue=newProperty;
       }
 
       returnValue.put(newProperty, newValue);
@@ -445,7 +445,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     } catch (Exception e) {
       // if we catch an exception, keep going for the rest.
       if (getFolderInfo().getLogger().isLoggable(java.util.logging.Level.WARNING))
-  e.printStackTrace();
+        e.printStackTrace();
     }
 
   }
@@ -472,18 +472,18 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     if (folderFilters != null) {
       Vector tmpMatches = new Vector();
       for (int i = 0; i < folderFilters.length; i++) {
-  if (folderFilters[i].getSearchTerm() instanceof net.suberic.pooka.filter.DeleteInProgressSearchTerm) {
-    // big hack.
-    if (isDeleteInProgress()) {
-      tmpMatches.add(folderFilters[i]);
-    }
-  } else if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
-    tmpMatches.add(folderFilters[i]);
+        if (folderFilters[i].getSearchTerm() instanceof net.suberic.pooka.filter.DeleteInProgressSearchTerm) {
+          // big hack.
+          if (isDeleteInProgress()) {
+            tmpMatches.add(folderFilters[i]);
+          }
+        } else if (folderFilters[i].getSearchTerm().match(getMessageInfo().getMessage()))
+          tmpMatches.add(folderFilters[i]);
       }
 
       MessageFilter[] newMatchingFilters = new MessageFilter[tmpMatches.size()];
       for (int i = 0; i < tmpMatches.size(); i++) {
-  newMatchingFilters[i] = (MessageFilter) tmpMatches.elementAt(i);
+        newMatchingFilters[i] = (MessageFilter) tmpMatches.elementAt(i);
       }
 
       return newMatchingFilters;
@@ -508,56 +508,56 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     MessageInfo info = getMessageInfo();
     if (info != null) {
       try {
-  if (info.hasEncryption()) {
+        if (info.hasEncryption()) {
 
-    MessageCryptoInfo cInfo = info.getCryptoInfo();
+          MessageCryptoInfo cInfo = info.getCryptoInfo();
 
-    if (cInfo != null && cInfo.isEncrypted()) {
+          if (cInfo != null && cInfo.isEncrypted()) {
 
-      java.security.Key key = getDefaultProfile().getEncryptionKey(cInfo.getEncryptionType());
+            java.security.Key key = getDefaultProfile().getEncryptionKey(cInfo.getEncryptionType());
 
-      if (key != null) {
-        try {
-    cInfo.decryptMessage(key, true);
-        } catch (Exception e) {
-    // ignore here.
+            if (key != null) {
+              try {
+                cInfo.decryptMessage(key, true);
+              } catch (Exception e) {
+                // ignore here.
+              }
+            }
+
+            if (key == null) {
+              try {
+                key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());
+              } catch (Exception e) {
+                showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
+              }
+            }
+            // check the encryption
+
+            if (key != null) {
+              try {
+                cInfo.decryptMessage(key, true);
+              } catch (Exception e) {
+                showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
+              }
+
+              MessageUI ui = getMessageUI();
+              if (ui != null) {
+
+                CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
+
+                if (csd != null)
+                  csd.cryptoUpdated(cInfo);
+                try {
+                  ui.refreshDisplay();
+                } catch (MessagingException me) {
+                  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
+                }
+              }
+            }
+          }
         }
-      }
-
-      if (key == null) {
-        try {
-    key = selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."), cInfo.getEncryptionType());
-        } catch (Exception e) {
-    showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
-        }
-      }
-      // check the encryption
-
-      if (key != null) {
-        try {
-    cInfo.decryptMessage(key, true);
-        } catch (Exception e) {
-    showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), e);
-        }
-
-        MessageUI ui = getMessageUI();
-        if (ui != null) {
-
-    CryptoStatusDisplay csd = ui.getCryptoStatusDisplay();
-
-    if (csd != null)
-      csd.cryptoUpdated(cInfo);
-    try {
-      ui.refreshDisplay();
-    } catch (MessagingException me) {
-      showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
-    }
-        }
-      }
-    }
-  }
       } catch (MessagingException me) {
-  showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
+        showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
       }
     }
   }
@@ -570,38 +570,38 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     if (info != null) {
       MessageCryptoInfo cInfo = info.getCryptoInfo();
       try {
-  if (cInfo != null && cInfo.isSigned()) {
-    CryptoStatusDisplay csd = null;
+        if (cInfo != null && cInfo.isSigned()) {
+          CryptoStatusDisplay csd = null;
 
-    String fromString = "";
-    Address[] fromAddr = getMessageInfo().getMessage().getFrom();
-    if (fromAddr != null && fromAddr.length > 0) {
-      fromString = ((javax.mail.internet.InternetAddress)fromAddr[0]).getAddress();
-    }
-    java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(fromString, cInfo.getEncryptionType());
+          String fromString = "";
+          Address[] fromAddr = getMessageInfo().getMessage().getFrom();
+          if (fromAddr != null && fromAddr.length > 0) {
+            fromString = ((javax.mail.internet.InternetAddress)fromAddr[0]).getAddress();
+          }
+          java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(fromString, cInfo.getEncryptionType());
 
-    if (keys == null || keys.length < 1) {
-      java.security.Key newKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forSig", "Select key for verifying the signature on this message."), cInfo.getEncryptionType());
-      keys = new java.security.Key[] { newKey };
-    }
+          if (keys == null || keys.length < 1) {
+            java.security.Key newKey = selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forSig", "Select key for verifying the signature on this message."), cInfo.getEncryptionType());
+            keys = new java.security.Key[] { newKey };
+          }
 
-    if (keys != null) {
-      boolean checked = false;
-      for (int i = 0; (! checked) && i < keys.length; i++) {
-        checked = cInfo.checkSignature(keys[i], true);
-      }
-    }
-    MessageUI ui = getMessageUI();
-    if (ui != null) {
-      csd = ui.getCryptoStatusDisplay();
-    }
+          if (keys != null) {
+            boolean checked = false;
+            for (int i = 0; (! checked) && i < keys.length; i++) {
+              checked = cInfo.checkSignature(keys[i], true);
+            }
+          }
+          MessageUI ui = getMessageUI();
+          if (ui != null) {
+            csd = ui.getCryptoStatusDisplay();
+          }
 
-    if (csd != null)
-      csd.cryptoUpdated(cInfo);
+          if (csd != null)
+            csd.cryptoUpdated(cInfo);
 
-  }
+        }
       } catch (Exception e) {
-  showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
+        showError(Pooka.getProperty("Error.encryption.signatureValidationFailed", "Signature Validation Failed"), e);
       }
     }
   }
@@ -614,45 +614,45 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     if (info != null) {
       MessageCryptoInfo cInfo = info.getCryptoInfo();
       if (cInfo != null) {
-  try {
-    java.security.Key[] newKeys = cInfo.extractKeys();
-    if (newKeys != null && newKeys.length > 0) {
-      // check to see if these match our current keys.
-      String changedMessage = Pooka.getProperty("Pooka.crypto.importKeysMessage", "Import the following keys:") + "\n";
+        try {
+          java.security.Key[] newKeys = cInfo.extractKeys();
+          if (newKeys != null && newKeys.length > 0) {
+            // check to see if these match our current keys.
+            String changedMessage = Pooka.getProperty("Pooka.crypto.importKeysMessage", "Import the following keys:") + "\n";
 
-      for (int i = 0; i < newKeys.length; i++) {
-        // FIXME check to see if changed.
-        if (newKeys[i] instanceof net.suberic.crypto.EncryptionKey)
-    changedMessage = changedMessage + ((net.suberic.crypto.EncryptionKey)newKeys[i]).getDisplayAlias() + "\n";
-        else
-    changedMessage = changedMessage + newKeys[i].toString() + "\n";
-      }
+            for (int i = 0; i < newKeys.length; i++) {
+              // FIXME check to see if changed.
+              if (newKeys[i] instanceof net.suberic.crypto.EncryptionKey)
+                changedMessage = changedMessage + ((net.suberic.crypto.EncryptionKey)newKeys[i]).getDisplayAlias() + "\n";
+              else
+                changedMessage = changedMessage + newKeys[i].toString() + "\n";
+            }
 
-      int doImport = JOptionPane.NO_OPTION;
+            int doImport = JOptionPane.NO_OPTION;
 
-      if (getMessageUI() != null)
-        doImport = getMessageUI().showConfirmDialog(changedMessage, Pooka.getProperty("Pooka.crypto.importKeysTitle", "Import keys"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-      else
-        doImport = Pooka.getUIFactory().showConfirmDialog(changedMessage, Pooka.getProperty("Pooka.crypto.importKeysTitle", "Import keys"), JOptionPane.YES_NO_OPTION);
+            if (getMessageUI() != null)
+              doImport = getMessageUI().showConfirmDialog(changedMessage, Pooka.getProperty("Pooka.crypto.importKeysTitle", "Import keys"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            else
+              doImport = Pooka.getUIFactory().showConfirmDialog(changedMessage, Pooka.getProperty("Pooka.crypto.importKeysTitle", "Import keys"), JOptionPane.YES_NO_OPTION);
 
-      if (doImport == JOptionPane.YES_OPTION) {
-        for (int i = 0; i < newKeys.length; i++) {
-    if (newKeys[i] instanceof net.suberic.crypto.EncryptionKey) {
-      net.suberic.crypto.EncryptionKey eKey = (net.suberic.crypto.EncryptionKey) newKeys[i];
-      Pooka.getCryptoManager().addPublicKey(eKey.getDisplayAlias(), eKey, eKey.getEncryptionUtils().getType());
-    }
+            if (doImport == JOptionPane.YES_OPTION) {
+              for (int i = 0; i < newKeys.length; i++) {
+                if (newKeys[i] instanceof net.suberic.crypto.EncryptionKey) {
+                  net.suberic.crypto.EncryptionKey eKey = (net.suberic.crypto.EncryptionKey) newKeys[i];
+                  Pooka.getCryptoManager().addPublicKey(eKey.getDisplayAlias(), eKey, eKey.getEncryptionUtils().getType());
+                }
+              }
+            }
+
+          } else {
+            if (getMessageUI() != null)
+              getMessageUI().showMessageDialog("No keys found.", "No keys found");
+            else
+              Pooka.getUIFactory().showMessage("No keys found.", "No keys found");
+          }
+        } catch (Exception e) {
+          showError(Pooka.getProperty("Error.encryption.keyExtractionFailed", "Failed to extract keys."), e);
         }
-      }
-
-    } else {
-      if (getMessageUI() != null)
-        getMessageUI().showMessageDialog("No keys found.", "No keys found");
-      else
-        Pooka.getUIFactory().showMessage("No keys found.", "No keys found");
-    }
-  } catch (Exception e) {
-    showError(Pooka.getProperty("Error.encryption.keyExtractionFailed", "Failed to extract keys."), e);
-  }
       }
     }
   }
@@ -699,21 +699,21 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public BooleanIcon getMessageFlag(String flagName) {
     try {
       if (flagName.equals("FLAG.ANSWERED") )
-  return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Answered.icon", ""), flagName);
+        return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Answered.icon", ""), flagName);
       else if (flagName.equals("FLAG.DELETED"))
-  return new BooleanIcon(getMessageInfo().flagIsSet(flagName),Pooka.getProperty("FolderTable.Deleted.icon", ""), flagName);
+        return new BooleanIcon(getMessageInfo().flagIsSet(flagName),Pooka.getProperty("FolderTable.Deleted.icon", ""), flagName);
       else if (flagName.equals("FLAG.DRAFT"))
-  return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Draft.icon", ""), flagName);
+        return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Draft.icon", ""), flagName);
       else if (flagName.equals("FLAG.FLAGGED"))
-  return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Flagged.icon", ""), flagName);
+        return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Flagged.icon", ""), flagName);
       else if (flagName.equals("FLAG.RECENT"))
-  return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Recent.icon", ""), flagName);
+        return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Recent.icon", ""), flagName);
       else if (flagName.equals("FLAG.NEW"))
-  return new MultiValueIcon(getMessageInfo().flagIsSet("FLAG.SEEN"), getMessageInfo().flagIsSet("FLAG.RECENT"), Pooka.getProperty("FolderTable.New.recentAndUnseenIcon", ""), Pooka.getProperty("FolderTable.New.justUnseenIcon", ""));
+        return new MultiValueIcon(getMessageInfo().flagIsSet("FLAG.SEEN"), getMessageInfo().flagIsSet("FLAG.RECENT"), Pooka.getProperty("FolderTable.New.recentAndUnseenIcon", ""), Pooka.getProperty("FolderTable.New.justUnseenIcon", ""));
       else if (flagName.equals("FLAG.SEEN"))
-  return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Seen.icon", ""), flagName);
+        return new BooleanIcon(getMessageInfo().flagIsSet(flagName), Pooka.getProperty("FolderTable.Seen.icon", ""), flagName);
       else
-  return new BooleanIcon(false, "", flagName);
+        return new BooleanIcon(false, "", flagName);
     } catch (MessagingException me) {
       return new BooleanIcon(false, "", flagName);
     }
@@ -732,22 +732,22 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public void openWindow(int newDisplayMode, int newHeaderMode) {
     try {
       if (getMessageUI() == null) {
-  setDisplayMode(newDisplayMode);
-  setHeaderMode(newHeaderMode);
+        setDisplayMode(newDisplayMode);
+        setHeaderMode(newHeaderMode);
 
-  MessageUI newUI = Pooka.getUIFactory().createMessageUI(this);
-  setMessageUI(newUI);
+        MessageUI newUI = Pooka.getUIFactory().createMessageUI(this);
+        setMessageUI(newUI);
       } else if (newDisplayMode != getDisplayMode() || newHeaderMode != getHeaderMode()) {
-  setDisplayMode(newDisplayMode);
-  setHeaderMode(newHeaderMode);
-  getMessageUI().refreshDisplay();
+        setDisplayMode(newDisplayMode);
+        setHeaderMode(newHeaderMode);
+        getMessageUI().refreshDisplay();
       }
 
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      getMessageUI().openMessageUI();
-    }
-  });
+          public void run() {
+            getMessageUI().openMessageUI();
+          }
+        });
 
       getMessageInfo().setSeen(true);
     } catch (MessagingException me) {
@@ -772,14 +772,14 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       nmp.matchUserProfile();
 
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      nmu.openMessageUI();
-    }
-  });
+          public void run() {
+            nmu.openMessageUI();
+          }
+        });
 
 
       if (removeProxy)
-  deleteMessage();
+        deleteMessage();
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
     }
@@ -801,7 +801,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     } catch (MessagingException me) {
       showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
       if (Pooka.isDebug())
-  me.printStackTrace();
+        me.printStackTrace();
     }
   }
 
@@ -814,7 +814,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     } catch (MessagingException me) {
       showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
       if (Pooka.isDebug())
-  me.printStackTrace();
+        me.printStackTrace();
     }
   }
 
@@ -837,10 +837,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
       // if this has a messageui up, then make the reply
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      nmui.openMessageUI();
-    }
-  });
+          public void run() {
+            nmui.openMessageUI();
+          }
+        });
 
     } catch (Exception me) {
       showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n", me);
@@ -873,16 +873,16 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       nmp.getNewMessageInfo().setDefaultProfile(getDefaultProfile());
       final MessageUI nmui = Pooka.getUIFactory().createMessageUI(nmp, getMessageUI());
       SwingUtilities.invokeLater(new Runnable() {
-  public void run() {
-    nmui.openMessageUI();
-  }
-  });
+          public void run() {
+            nmui.openMessageUI();
+          }
+        });
 
     } catch (MessagingException me) {
       if (getMessageUI() != null)
-  getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+        getMessageUI().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
       else
-  Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
+        Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageUI.replyFailed", "Failed to create new Message.") + "\n" + me.getMessage());
 
       me.printStackTrace();
     }
@@ -906,21 +906,21 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     boolean resolved = false;
     while (! resolved) {
       if (getMessageUI() != null)
-  addressString = getMessageUI().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
+        addressString = getMessageUI().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
       else if (getMessageInfo().getFolderInfo().getFolderDisplayUI() != null) {
-  addressString = getMessageInfo().getFolderInfo().getFolderDisplayUI().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
+        addressString = getMessageInfo().getFolderInfo().getFolderDisplayUI().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
       } else {
-  addressString = Pooka.getUIFactory().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
+        addressString = Pooka.getUIFactory().showInputDialog(Pooka.getProperty("message.bounceMessage.addresses", "Bounce to address(es):"), Pooka.getProperty("message.bounceMessage.title", "Bounce to addresses"));
       }
       if (addressString == null) {
-  resolved = true;
+        resolved = true;
       } else {
-  try {
-    addresses = javax.mail.internet.InternetAddress.parse(addressString, false);
-    resolved = true;
-  } catch (MessagingException me) {
-    showError(Pooka.getProperty("error.bounceMessage.addresses", "Error parsing address entry."), me);
-  }
+        try {
+          addresses = javax.mail.internet.InternetAddress.parse(addressString, false);
+          resolved = true;
+        } catch (MessagingException me) {
+          showError(Pooka.getProperty("error.bounceMessage.addresses", "Error parsing address entry."), me);
+        }
       }
     }
 
@@ -950,21 +950,21 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     ActionThread folderThread = getMessageInfo().getFolderInfo().getFolderThread();
     folderThread.addToQueue(new javax.swing.AbstractAction() {
-  public void actionPerformed(java.awt.event.ActionEvent ae) {
-    try {
-      getMessageInfo().bounceMessage(final_addresses);
-      if (final_delete)
-        deleteMessage(final_expunge);
+        public void actionPerformed(java.awt.event.ActionEvent ae) {
+          try {
+            getMessageInfo().bounceMessage(final_addresses);
+            if (final_delete)
+              deleteMessage(final_expunge);
 
-    } catch (javax.mail.MessagingException me) {
-      final MessagingException final_me = me;
-      SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      showError(Pooka.getProperty("error.bounceMessage.error", "Error bouncing Message"), final_me);
-    }
-        });
-    }
-  }
+          } catch (javax.mail.MessagingException me) {
+            final MessagingException final_me = me;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                  showError(Pooka.getProperty("error.bounceMessage.error", "Error bouncing Message"), final_me);
+                }
+              });
+          }
+        }
       }, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
   }
 
@@ -983,29 +983,29 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       this.close();
     } catch (MessagingException me) {
       if (me instanceof NoTrashFolderException) {
-  final boolean finalAutoExpunge = autoExpunge;
-  try {
-    SwingUtilities.invokeAndWait(new Runnable() {
-        public void run() {
-    try {
-      if (getMessageUI().showConfirmDialog(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
-        getMessageInfo().remove(finalAutoExpunge);
-        close();
-      }
-    } catch (MessagingException mex) {
-      showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mex);
-    }
+        final boolean finalAutoExpunge = autoExpunge;
+        try {
+          SwingUtilities.invokeAndWait(new Runnable() {
+              public void run() {
+                try {
+                  if (getMessageUI().showConfirmDialog(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "The Trash Folder configured is not available.\nDelete messages anyway?"), Pooka.getProperty("error.Messsage.DeleteNoTrashFolder.title", "Trash Folder Unavailable"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE) == JOptionPane.YES_OPTION) {
+                    getMessageInfo().remove(finalAutoExpunge);
+                    close();
+                  }
+                } catch (MessagingException mex) {
+                  showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mex);
+                }
+              }
+            });
+        } catch (Exception e) {
         }
-      });
-  } catch (Exception e) {
-  }
       } else {
-  final Exception mEx = me;
-  SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mEx);
-      }
-    });
+        final Exception mEx = me;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mEx);
+            }
+          });
       }
     }
   }
@@ -1026,12 +1026,12 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     if (saveConfirm == JFileChooser.APPROVE_OPTION)
       try {
-  getMessageInfo().saveMessageAs(saveChooser.getSelectedFile());
+        getMessageInfo().saveMessageAs(saveChooser.getSelectedFile());
       } catch (MessagingException exc) {
-  if (getMessageUI() != null)
-    getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
-  else
-    Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+        if (getMessageUI() != null)
+          getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
+        else
+          Pooka.getUIFactory().showError(Pooka.getProperty("error.SaveFile", "Error saving file") + ":\n", Pooka.getProperty("error.SaveFile", "Error saving file"), exc);
       }
   }
 
@@ -1050,10 +1050,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    */
   public void close() {
     Runnable runMe = new Runnable() {
-  public void run() {
-    if (getMessageUI() != null)
-      getMessageUI().closeMessageUI();
-  }
+        public void run() {
+          if (getMessageUI() != null)
+            getMessageUI().closeMessageUI();
+        }
       };
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
@@ -1108,50 +1108,50 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       final Object final_source = source;
 
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
+          public void run() {
 
-      // Set the document type
-      final DocFlavor messageFormat = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
+            // Set the document type
+            final DocFlavor messageFormat = DocFlavor.SERVICE_FORMATTED.PRINTABLE;
 
-      // bring up a dialog.
-      PrintService[] services = PrintServiceLookup.lookupPrintServices(messageFormat, null);
+            // bring up a dialog.
+            PrintService[] services = PrintServiceLookup.lookupPrintServices(messageFormat, null);
 
-      PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
-      PrintService service =  ServiceUI.printDialog(null, 50, 50,
-                services,
-                PrintServiceLookup.lookupDefaultPrintService(),
-                messageFormat,
-                attributes);
+            PrintRequestAttributeSet attributes = new HashPrintRequestAttributeSet();
+            PrintService service =  ServiceUI.printDialog(null, 50, 50,
+                                                          services,
+                                                          PrintServiceLookup.lookupDefaultPrintService(),
+                                                          messageFormat,
+                                                          attributes);
 
-      if (service != null) {
-        final PrintRequestAttributeSet final_attributes = attributes;
+            if (service != null) {
+              final PrintRequestAttributeSet final_attributes = attributes;
 
-        final Doc myDoc = new SimpleDoc(messagePrinter, messageFormat, null);
+              final Doc myDoc = new SimpleDoc(messagePrinter, messageFormat, null);
 
-        final DocPrintJob final_job = service.createPrintJob();
+              final DocPrintJob final_job = service.createPrintJob();
 
-        final MessagePrinterDisplay mpd = new MessagePrinterDisplay(messagePrinter, final_job, final_source);
+              final MessagePrinterDisplay mpd = new MessagePrinterDisplay(messagePrinter, final_job, final_source);
 
-        final_job.addPrintJobListener(mpd);
+              final_job.addPrintJobListener(mpd);
 
-        mpd.show();
+              mpd.show();
 
-        Runnable runMe = new Runnable() {
-      public void run() {
-        try {
-          final_job.print(myDoc, final_attributes);
-        } catch (PrintException pe) {
-          if (mpd.getStatus() != MessagePrinterDisplay.CANCELED)
-      mpd.showError("Failed to print", pe);
-        }
-      }
-    };
+              Runnable runMe = new Runnable() {
+                  public void run() {
+                    try {
+                      final_job.print(myDoc, final_attributes);
+                    } catch (PrintException pe) {
+                      if (mpd.getStatus() != MessagePrinterDisplay.CANCELED)
+                        mpd.showError("Failed to print", pe);
+                    }
+                  }
+                };
 
-        Thread messagePrintThread = new Thread(runMe);
-        messagePrintThread.start();
-      }
-    }
-  });
+              Thread messagePrintThread = new Thread(runMe);
+              messagePrintThread.start();
+            }
+          }
+        });
     } catch (MessagingException e) {
       showError("error printing", e);
     }
@@ -1165,11 +1165,11 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     FolderInfo fi = getMessageInfo().getFolderInfo();
     if ( fi != null ) {
       if (fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
-      popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());
+        popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());
       } else if (fi.isOutboxFolder()) {
-  popupMenu.configureComponent("NewMessageProxy.popupMenu", Pooka.getResources());
+        popupMenu.configureComponent("NewMessageProxy.popupMenu", Pooka.getResources());
       } else {
-  popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());
+        popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());
       }
     } else {
       popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());
@@ -1271,9 +1271,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public void setSeen(boolean newValue) {
     if (newValue != getMessageInfo().isSeen()) {
       try {
-  getMessageInfo().setSeen(newValue);
+        getMessageInfo().setSeen(newValue);
       } catch (MessagingException me) {
-  showError( Pooka.getProperty("error.MessageUI.setSeenFailed", "Failed to set Seen flag to ") + newValue + "\n", me);
+        showError( Pooka.getProperty("error.MessageUI.setSeenFailed", "Failed to set Seen flag to ") + newValue + "\n", me);
       }
     }
   }
@@ -1404,10 +1404,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     }
     else {
       if (isLoaded()) {
-  matchFilters();
-  return matchingFilters;
+        matchFilters();
+        return matchingFilters;
       } else {
-  return new MessageFilter[0];
+        return new MessageFilter[0];
       }
     }
   }
@@ -1428,9 +1428,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     if (orig != mDeleteInProgress) {
       setRefresh(true);
       try {
-  refreshMessage();
+        refreshMessage();
       } catch ( MessagingException me ) {
-  me.printStackTrace();
+        me.printStackTrace();
       }
     }
   }
@@ -1493,14 +1493,14 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public boolean removeMessageOnCompletion() {
     if (mImportDone && mActionType == javax.swing.TransferHandler.MOVE) {
       if ( !mCutDisallowed) {
-  deleteMessage();
-  return true;
+        deleteMessage();
+        return true;
       } else {
-  // if cut has been disallowed and the import has completed, then
-  // reset things.
-  setActionType(TransferHandler.COPY);
-  setCutDisallowed(false);
-  setDeleteInProgress(false);
+        // if cut has been disallowed and the import has completed, then
+        // reset things.
+        setActionType(TransferHandler.COPY);
+        setCutDisallowed(false);
+        setDeleteInProgress(false);
       }
     }
 
@@ -1511,7 +1511,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * indicates that this has been removed from the clipboard.
    */
   public void lostOwnership(java.awt.datatransfer.Clipboard clipboard,
-          java.awt.datatransfer.Transferable contents) {
+                            java.awt.datatransfer.Transferable contents) {
     // reset everything
     setActionType(TransferHandler.COPY);
     setCutDisallowed(false);
@@ -1532,46 +1532,46 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       ActionThread folderThread = messageInfo.getFolderInfo().getFolderThread();
 
       defaultActions = new Action[] {
-  new ActionWrapper(new OpenAction(), folderThread),
-  new ActionWrapper(new OpenDefaultDisplayAction(), folderThread),
-  new ActionWrapper(new OpenFullDisplayAction(), folderThread),
-  new ActionWrapper(new OpenRawDisplayAction(), folderThread),
-  new ActionWrapper(new OpenTextDisplayAction(), folderThread),
-  new ActionWrapper(new OpenHtmlDisplayAction(), folderThread),
-  new ActionWrapper(new DefaultOpenAction(), folderThread),
-  new ActionWrapper(new MoveAction(), folderThread),
-  new ActionWrapper(new CopyAction(), folderThread),
-  new ActionWrapper(new ReplyAction(), folderThread),
-  new ActionWrapper(new ReplyAllAction(), folderThread),
-  new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
-  new ActionWrapper(new ReplyAllWithAttachmentsAction(), folderThread),
-  new ActionWrapper(new ForwardAction(), folderThread),
-  new ActionWrapper(new ForwardWithAttachmentsAction(), folderThread),
-  new ActionWrapper(new ForwardAsInlineAction(), folderThread),
-  new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
-  new ActionWrapper(new ForwardQuotedAction(), folderThread),
-  new BounceAction(),
-  new DeleteAction(),
-  new ActionWrapper(new PrintAction(), folderThread),
-  new ActionWrapper(new SaveMessageAction(), folderThread),
-  new ActionWrapper(new CacheMessageAction(), folderThread),
-  new ActionWrapper(new SaveAddressAction(), folderThread),
-  new ActionWrapper(new OpenAsNewAction(), folderThread),
-  new ActionWrapper(new OpenCopyAction(), folderThread),
-  new ActionWrapper(new MessageFilterAction(), folderThread),
-  new ActionWrapper(new SpamAction(), folderThread),
-  new ActionWrapper(new DecryptAction(), folderThread),
-  new ActionWrapper(new CheckSignatureAction(), folderThread),
-  new ActionWrapper(new ImportKeysAction(), folderThread),
-  new ActionWrapper(new SignatureStatusAction(), folderThread),
-  new ActionWrapper(new EncryptionStatusAction(), folderThread)
+        new ActionWrapper(new OpenAction(), folderThread),
+        new ActionWrapper(new OpenDefaultDisplayAction(), folderThread),
+        new ActionWrapper(new OpenFullDisplayAction(), folderThread),
+        new ActionWrapper(new OpenRawDisplayAction(), folderThread),
+        new ActionWrapper(new OpenTextDisplayAction(), folderThread),
+        new ActionWrapper(new OpenHtmlDisplayAction(), folderThread),
+        new ActionWrapper(new DefaultOpenAction(), folderThread),
+        new ActionWrapper(new MoveAction(), folderThread),
+        new ActionWrapper(new CopyAction(), folderThread),
+        new ActionWrapper(new ReplyAction(), folderThread),
+        new ActionWrapper(new ReplyAllAction(), folderThread),
+        new ActionWrapper(new ReplyWithAttachmentsAction(), folderThread),
+        new ActionWrapper(new ReplyAllWithAttachmentsAction(), folderThread),
+        new ActionWrapper(new ForwardAction(), folderThread),
+        new ActionWrapper(new ForwardWithAttachmentsAction(), folderThread),
+        new ActionWrapper(new ForwardAsInlineAction(), folderThread),
+        new ActionWrapper(new ForwardAsAttachmentAction(), folderThread),
+        new ActionWrapper(new ForwardQuotedAction(), folderThread),
+        new BounceAction(),
+        new DeleteAction(),
+        new ActionWrapper(new PrintAction(), folderThread),
+        new ActionWrapper(new SaveMessageAction(), folderThread),
+        new ActionWrapper(new CacheMessageAction(), folderThread),
+        new ActionWrapper(new SaveAddressAction(), folderThread),
+        new ActionWrapper(new OpenAsNewAction(), folderThread),
+        new ActionWrapper(new OpenCopyAction(), folderThread),
+        new ActionWrapper(new MessageFilterAction(), folderThread),
+        new ActionWrapper(new SpamAction(), folderThread),
+        new ActionWrapper(new DecryptAction(), folderThread),
+        new ActionWrapper(new CheckSignatureAction(), folderThread),
+        new ActionWrapper(new ImportKeysAction(), folderThread),
+        new ActionWrapper(new SignatureStatusAction(), folderThread),
+        new ActionWrapper(new EncryptionStatusAction(), folderThread)
       };
 
       commands = new Hashtable();
 
       for (int i = 0; i < defaultActions.length; i++) {
-  Action a = defaultActions[i];
-  commands.put(a.getValue(Action.NAME), a);
+        Action a = defaultActions[i];
+        commands.put(a.getValue(Action.NAME), a);
       }
 
     }
@@ -1610,24 +1610,24 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);
+        fw.setBusy(true);
 
       int newDisplayMode;
       if (displayModeValue != 999)
-  newDisplayMode = displayModeValue;
+        newDisplayMode = displayModeValue;
       else
-  newDisplayMode = getDisplayMode();
+        newDisplayMode = getDisplayMode();
 
       int newHeaderMode;
       if (headerModeValue != 999)
-  newHeaderMode = headerModeValue;
+        newHeaderMode = headerModeValue;
       else
-  newHeaderMode = getHeaderMode();
+        newHeaderMode = getHeaderMode();
 
       openWindow(newDisplayMode, newHeaderMode);
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
     }
   }
 
@@ -1677,11 +1677,11 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       Pooka.getUIFactory().doDefaultOpen(MessageProxy.this);
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
     }
   }
 
@@ -1692,15 +1692,15 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
       moveMessage((FolderInfo)getValue("target"));
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);;
+        getMessageUI().setBusy(false);;
     }
 
   }
@@ -1712,15 +1712,15 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
       copyMessage((FolderInfo)getValue("target"));
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);;
+        getMessageUI().setBusy(false);;
     }
 
   }
@@ -1834,12 +1834,12 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
 
       bounceMessage();
 
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -1853,37 +1853,37 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       ActionThread folderThread = messageInfo.getFolderInfo().getFolderThread();
 
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);
+        fw.setBusy(true);
 
       if (fw != null && Pooka.getProperty("Pooka.fastDelete", "false").equalsIgnoreCase("true")) {
-  Vector v = new Vector();
-  v.add(MessageProxy.this);
-  FolderDisplayPanel fdp = null;
-  if (fw instanceof FolderInternalFrame) {
-    fdp = ((FolderInternalFrame) fw).getFolderDisplay();
-  } else if (fw instanceof PreviewFolderPanel) {
-    fdp = ((PreviewFolderPanel) fw).getFolderDisplay();
-  }
-  if (fdp != null)
-    fdp.moveSelectionOnRemoval(v);
+        Vector v = new Vector();
+        v.add(MessageProxy.this);
+        FolderDisplayPanel fdp = null;
+        if (fw instanceof FolderInternalFrame) {
+          fdp = ((FolderInternalFrame) fw).getFolderDisplay();
+        } else if (fw instanceof PreviewFolderPanel) {
+          fdp = ((PreviewFolderPanel) fw).getFolderDisplay();
+        }
+        if (fdp != null)
+          fdp.moveSelectionOnRemoval(v);
       }
 
 
       folderThread.addToQueue(new javax.swing.AbstractAction() {
-    public void actionPerformed(java.awt.event.ActionEvent ae) {
-      try {
-        deleteMessage();
-      } finally {
+          public void actionPerformed(java.awt.event.ActionEvent ae) {
+            try {
+              deleteMessage();
+            } finally {
 
-        FolderDisplayUI fw = getFolderDisplayUI();
-        if (fw != null)
-    fw.setBusy(false);
-      }
-    }
-  }, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
+              FolderDisplayUI fw = getFolderDisplayUI();
+              if (fw != null)
+                fw.setBusy(false);
+            }
+          }
+        }, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
     }
   }
 
@@ -1895,17 +1895,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       printMessage(e.getSource());
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -1916,16 +1916,16 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
       saveMessageToFile();
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -1936,21 +1936,21 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       try {
-  getMessageInfo().cacheMessage();
+        getMessageInfo().cacheMessage();
       } catch (MessagingException me) {
-  showError(Pooka.getProperty("Pooka.cache.errorCachingMessage", "Error caching message"), me);
+        showError(Pooka.getProperty("Pooka.cache.errorCachingMessage", "Error caching message"), me);
       }
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -1961,40 +1961,40 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       try {
-  UserProfile defaultProfile = getDefaultProfile();
-  AddressBook book = null;
+        UserProfile defaultProfile = getDefaultProfile();
+        AddressBook book = null;
 
-  if (defaultProfile != null) {
-    book = defaultProfile.getAddressBook();
-  }
-
-  if (book == null) {
-    // get the default Address Book.
-    book = Pooka.getAddressBookManager().getDefault();
-  }
-  if (book != null)
-    getMessageInfo().addAddress(book, true);
-  else {
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-    getMessageUI().showError(Pooka.getProperty("error.noAddressBook", "No Address Book set as default."));
+        if (defaultProfile != null) {
+          book = defaultProfile.getAddressBook();
         }
-      });
-  }
+
+        if (book == null) {
+          // get the default Address Book.
+          book = Pooka.getAddressBookManager().getDefault();
+        }
+        if (book != null)
+          getMessageInfo().addAddress(book, true);
+        else {
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                getMessageUI().showError(Pooka.getProperty("error.noAddressBook", "No Address Book set as default."));
+              }
+            });
+        }
       } catch (MessagingException me) {
-  showError(Pooka.getProperty("error.savingAddress", "Error saving Address"), me);
+        showError(Pooka.getProperty("error.savingAddress", "Error saving Address"), me);
       }
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2006,17 +2006,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       openWindowAsNew(true);
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2027,17 +2027,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       openWindowAsNew(false);
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2048,17 +2048,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       runBackendFilters();
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2069,20 +2069,20 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       MessageInfo info = getMessageInfo();
       if (info != null) {
-  info.runSpamAction();
+        info.runSpamAction();
       }
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2093,17 +2093,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       decryptMessage();
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2114,17 +2114,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       checkSignature();
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2135,17 +2135,17 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       importKeys();
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2156,20 +2156,20 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       if (getMessageUI() != null)
-  getMessageUI().showMessageDialog("(Encryption Status)", "Encryption Status");
+        getMessageUI().showMessageDialog("(Encryption Status)", "Encryption Status");
       else
-  Pooka.getUIFactory().showMessage("(Encryption Status)", "Encryption Status");
+        Pooka.getUIFactory().showMessage("(Encryption Status)", "Encryption Status");
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 
@@ -2180,20 +2180,20 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
     public void actionPerformed(ActionEvent e) {
       if (getMessageUI() != null)
-  getMessageUI().setBusy(true);
+        getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-  fw.setBusy(true);;
+        fw.setBusy(true);;
 
       if (getMessageUI() != null)
-  getMessageUI().showMessageDialog("(Signature Status)", "Signature Status");
+        getMessageUI().showMessageDialog("(Signature Status)", "Signature Status");
       else
-  Pooka.getUIFactory().showMessage("(Signature Status)", "Signature Status");
+        Pooka.getUIFactory().showMessage("(Signature Status)", "Signature Status");
 
       if (fw != null)
-  fw.setBusy(false);
+        fw.setBusy(false);
       if (getMessageUI() != null)
-  getMessageUI().setBusy(false);
+        getMessageUI().setBusy(false);
     }
   }
 }
