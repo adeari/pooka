@@ -1,13 +1,18 @@
 *) create a way to cache local headers so we don't have to download
    those all the time.  sort of like running offline, but not really.
 
-*) fix behavior when other mail client is connected; make sure we handle
-deleted messages, etc. gracefully.
+*) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
+	-- antialiasing yes.  opengl probably not unless as a special option.
 
 *) make reply-to html work in a resonable way.
-	- research.
+	- research.  should be doable, maybe with a custom library
 
 *) make wheel scroll customizable
+
+-----
+
+*) fix behavior when other mail client is connected; make sure we handle
+deleted messages, etc. gracefully.
 
 *) new attachment display w/icons?
 
@@ -25,6 +30,13 @@ online:
 
 
 *) add unread message count to folder display.
+
+*) NewAccountPooka should be callable anytime, so you can use it to create
+	any new account, not just your first account.
+*) NewAccountPooka should allow user to enter smtp authentication info.
+*) NewAccountPooka should aggregate errors, so if you have no username and
+	no mail server, you should get a single error screen saying both
+	'no username' and 'no mail server'.
 
 *) look at thunderbird.
 *) look at balsa?
@@ -87,15 +99,6 @@ online:
 *) new splash screen.
 
 *) change Item and ItemManager to using generics.
-
-*) NewAccountPooka should aggregate errors, so if you have no username and
-	no mail server, you should get a single error screen saying both
-	'no username' and 'no mail server'.
-
-*) NewAccountPooka should be callable anytime, so you can use it to create
-	any new account, not just your first account.
-
-*) NewAccountPooka should allow user to enter smtp authentication info.
 
 *) add taskbar support on gnome, windows, and mac?
   add start / bring up pooka

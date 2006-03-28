@@ -31,12 +31,12 @@ public class MailUtilities {
     StringBuffer returnValue = new StringBuffer();
     for (int i = 0; i < addresses.length; i++) {
       if (addresses[i] != null) {
-	if (i > 0)
-	  returnValue.append(", ");
-	if (addresses[i] instanceof javax.mail.internet.InternetAddress)
-	  returnValue.append(((javax.mail.internet.InternetAddress)addresses[i]).toUnicodeString());
-	else
-	  returnValue.append(addresses[i].toString());
+        if (i > 0)
+          returnValue.append(", ");
+        if (addresses[i] instanceof javax.mail.internet.InternetAddress)
+          returnValue.append(((javax.mail.internet.InternetAddress)addresses[i]).toUnicodeString());
+        else
+          returnValue.append(addresses[i].toString());
       }
     }
 
@@ -95,7 +95,7 @@ public class MailUtilities {
     EncryptionUtils utils = null;
     if (encryptionType != null) {
       try {
-	utils = EncryptionManager.getEncryptionUtils(encryptionType);
+        utils = EncryptionManager.getEncryptionUtils(encryptionType);
       } catch (java.security.NoSuchProviderException nspe) {
       }
     }
@@ -105,54 +105,54 @@ public class MailUtilities {
       int encryptionStatus = utils.getEncryptionStatus(mp);
 
       if (encryptionStatus == EncryptionUtils.ENCRYPTED) {
-	Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mp);
-	bundle.addAttachment(newAttach);
+        Attachment newAttach = new net.suberic.pooka.crypto.CryptoAttachment(mp);
+        bundle.addAttachment(newAttach);
       } else if (encryptionStatus == EncryptionUtils.SIGNED) {
-	// in the case of signed attachments, we should get the wrapped body.
+        // in the case of signed attachments, we should get the wrapped body.
 	
-	Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mp);
+        Attachment newAttach = new net.suberic.pooka.crypto.SignedAttachment(mp);
 
-	MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
+        MimeBodyPart signedMbp = ((net.suberic.pooka.crypto.SignedAttachment) newAttach).getSignedPart();
 	
-	if (signedMbp != null) {
-	  handlePart(signedMbp, bundle);
-	}
+        if (signedMbp != null) {
+          handlePart(signedMbp, bundle);
+        }
 	
-	bundle.addAttachment(newAttach);
+        bundle.addAttachment(newAttach);
 	
       } else if (encryptionStatus == EncryptionUtils.ATTACHED_KEYS) {
-	  bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mp));
+        bundle.addAttachment(new net.suberic.pooka.crypto.KeyAttachment(mp));
       } else {
-	// FIXME
-	  bundle.addAttachment(new Attachment(mp));
+        // FIXME
+        bundle.addAttachment(new Attachment(mp));
       }
       
     } else {
       ContentType ct = new ContentType(mp.getContentType());
       if (ct.getPrimaryType().equalsIgnoreCase("multipart")) {
-	if (mp.getContent() instanceof Multipart) {
-	  if (ct.getSubType().equalsIgnoreCase("alternative"))
-	    parseAlternativeAttachment(bundle, mp);
-	  else 
-	    bundle.addAll(parseAttachments((Multipart)mp.getContent()));
-	} else {
-	  Attachment attachment = new Attachment(mp);
-	  bundle.addAttachment(attachment);
-	}
+        if (mp.getContent() instanceof Multipart) {
+          if (ct.getSubType().equalsIgnoreCase("alternative"))
+            parseAlternativeAttachment(bundle, mp);
+          else 
+            bundle.addAll(parseAttachments((Multipart)mp.getContent()));
+        } else {
+          Attachment attachment = new Attachment(mp);
+          bundle.addAttachment(attachment);
+        }
       } else if (ct.getPrimaryType().equalsIgnoreCase("Message")) {
-	bundle.addAttachment(new Attachment(mp));
-	Object msgContent;
-	msgContent = mp.getContent();
+        bundle.addAttachment(new Attachment(mp));
+        Object msgContent;
+        msgContent = mp.getContent();
 	
-	if (msgContent instanceof Message)
-	  bundle.addAll(parseAttachments((Message)msgContent));
-	else if (msgContent instanceof java.io.InputStream)
-	  bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
-	else
-	  System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
+        if (msgContent instanceof Message)
+          bundle.addAll(parseAttachments((Message)msgContent));
+        else if (msgContent instanceof java.io.InputStream)
+          bundle.addAll(parseAttachments(new MimeMessage(Pooka.getDefaultSession(), (java.io.InputStream)msgContent)));
+        else
+          System.out.println("Error:  unsupported Message Type:  " + msgContent.getClass().getName());
 	
       } else {
-	bundle.addAttachment(new Attachment(mp), ct);
+        bundle.addAttachment(new Attachment(mp), ct);
       }
     }
   }
@@ -172,11 +172,11 @@ public class MailUtilities {
       MimeBodyPart current = (MimeBodyPart)amp.getBodyPart(j);
       ContentType ct2 = new ContentType(current.getContentType());
       if (ct2.match("text/plain") && altTextPart == null)
-	altTextPart = current;
+        altTextPart = current;
       else if (ct2.match("text/html") && altHtmlPart == null)
-	altHtmlPart = current;
+        altHtmlPart = current;
       else
-	extraList.add(new Attachment(current));
+        extraList.add(new Attachment(current));
     }
     
     if (altHtmlPart != null && altTextPart != null) {
@@ -184,7 +184,7 @@ public class MailUtilities {
       bundle.addAttachment(attachment);
       Iterator it = extraList.iterator();
       while (it.hasNext()) {
-	bundle.addAttachment((Attachment) it.next());
+        bundle.addAttachment((Attachment) it.next());
       }
     } else {
       // hurm
@@ -210,9 +210,9 @@ public class MailUtilities {
       breakLength=breakLength - tabAddition;
       tabAccumulator = tabAccumulator + tabAddition;
       if (nextTab + 1 < buffer.length())
-	nextTab = buffer.indexOf('\t', nextTab + 1);
+        nextTab = buffer.indexOf('\t', nextTab + 1);
       else
-	nextTab = -1;
+        nextTab = -1;
     }
     
     
@@ -223,20 +223,20 @@ public class MailUtilities {
     int breakLocation = -1;
     for (int caret = breakLength; breakLocation == -1 && caret >= 0; caret--) {
       if (Character.isWhitespace(buffer.charAt(caret))) {
-	breakLocation=caret + 1;
-	if (breakLocation < buffer.length()) {
-	  // check to see if the next character is a line feed of some sort.
-	  char nextChar = buffer.charAt(breakLocation);
-	  if (nextChar == '\n')
-	    breakLocation ++;
-	  else if (nextChar == '\r') {
-	    if (breakLocation + 1<  buffer.length() && buffer.charAt(breakLocation + 1) == '\n') {
-	      breakLocation +=2;
-	    } else {
-	      breakLocation ++;
-	    }
-	  }
-	}
+        breakLocation=caret + 1;
+        if (breakLocation < buffer.length()) {
+          // check to see if the next character is a line feed of some sort.
+          char nextChar = buffer.charAt(breakLocation);
+          if (nextChar == '\n')
+            breakLocation ++;
+          else if (nextChar == '\r') {
+            if (breakLocation + 1<  buffer.length() && buffer.charAt(breakLocation + 1) == '\n') {
+              breakLocation +=2;
+            } else {
+              breakLocation ++;
+            }
+          }
+        }
       } 
     }
     
@@ -279,20 +279,20 @@ public class MailUtilities {
       
       int nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
       while (nextSoftBreak < currentString.length()) {
-	wrappedText.append(currentString.substring(0, nextSoftBreak));
-	wrappedText.append(newLine);
+        wrappedText.append(currentString.substring(0, nextSoftBreak));
+        wrappedText.append(newLine);
 
-	Logger.getLogger("Pooka.debug").finest("appending '" + currentString.substring(0, nextSoftBreak) + "', plus newline.");
+        Logger.getLogger("Pooka.debug").finest("appending '" + currentString.substring(0, nextSoftBreak) + "', plus newline.");
 
-	currentString = currentString.substring(nextSoftBreak);
-	Logger.getLogger("Pooka.debug").finest("in loop:  new current string:");
-	Logger.getLogger("Pooka.debug").finest("--- begin current string ---");
-	Logger.getLogger("Pooka.debug").finest(currentString);
-	Logger.getLogger("Pooka.debug").finest("--- end current string ---");
-	Logger.getLogger("Pooka.debug").finest("");
+        currentString = currentString.substring(nextSoftBreak);
+        Logger.getLogger("Pooka.debug").finest("in loop:  new current string:");
+        Logger.getLogger("Pooka.debug").finest("--- begin current string ---");
+        Logger.getLogger("Pooka.debug").finest(currentString);
+        Logger.getLogger("Pooka.debug").finest("--- end current string ---");
+        Logger.getLogger("Pooka.debug").finest("");
       
-	nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
-	Logger.getLogger("Pooka.debug").finest("nextSoftBreak=" + nextSoftBreak);
+        nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
+        Logger.getLogger("Pooka.debug").finest("nextSoftBreak=" + nextSoftBreak);
       }
       Logger.getLogger("Pooka.debug").finest("appending '" + currentString + "', which should include newline.");
       wrappedText.append(currentString);
@@ -318,12 +318,12 @@ public class MailUtilities {
     for (int i = start; foundIndex == -1 && i < text.length(); i++) {
       char current = text.charAt(i);
       if (current == '\r') {
-	if (i + 1 < text.length() && text.charAt(i+1) == '\n')
-	  foundIndex = i+1;
-	else
-	  foundIndex = i;
+        if (i + 1 < text.length() && text.charAt(i+1) == '\n')
+          foundIndex = i+1;
+        else
+          foundIndex = i;
       } else if (current == '\n') {
-	foundIndex = i;
+        foundIndex = i;
       }
     }
 
@@ -362,20 +362,20 @@ public class MailUtilities {
 
     if (origSubString.endsWith("\r\n")) {
       if (newLine.equals("\r\n"))
-	return origSubString;
+        return origSubString;
       else {
-	return origSubString.substring(0, origSubString.length() - 2) + newLine;
+        return origSubString.substring(0, origSubString.length() - 2) + newLine;
       }
     } else if (origSubString.endsWith("\n")) {
       if (newLine.equals("\n"))
-	return origSubString;
+        return origSubString;
       else 
-	return origSubString.substring(0, origSubString.length() - 1) + newLine;
+        return origSubString.substring(0, origSubString.length() - 1) + newLine;
     } else if (origSubString.endsWith("\r")) {
       if (newLine.equals("\r"))
-	return origSubString;
+        return origSubString;
       else 
-	return origSubString.substring(0, origSubString.length() - 1) + newLine;
+        return origSubString.substring(0, origSubString.length() - 1) + newLine;
     } else {
       return origSubString + newLine;
     }
@@ -412,13 +412,13 @@ public class MailUtilities {
     StringBuffer retVal = new StringBuffer();
     for (int i = 0; i < characters.length; i++) {
       if (characters[i] == '&')
-	retVal.append("&amp;");
+        retVal.append("&amp;");
       else if (characters[i] == '<')
-	retVal.append("&lt;");
+        retVal.append("&lt;");
       else if (characters[i] == '>')
-	retVal.append("&gt;");
+        retVal.append("&gt;");
       else
-	retVal.append(characters[i]);
+        retVal.append(characters[i]);
     }
     return retVal.toString();
   }

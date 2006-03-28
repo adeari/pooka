@@ -61,6 +61,8 @@ public class StartupManager {
       System.exit(-1);
     }
 
+    System.setProperty("swing.aatext", "true");
+
     // check to see if there's already a Pooka instance running.
     if (!checkRunningInstance()) {
       if (mFullStartup) {
