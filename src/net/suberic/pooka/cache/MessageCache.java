@@ -19,9 +19,19 @@ public interface MessageCache {
   public DataHandler getDataHandler(long uid, long uidValidity) throws MessagingException;
   
   /**
+   * Returns the datahandler for the given message uid.
+   */
+  public DataHandler getDataHandler(long uid, long uidValidity, boolean saveToCache) throws MessagingException;
+  
+  /**
    * Returns a non-mutable Message representation of the given Message.
    */
   public MimeMessage getMessageRepresentation(long uid, long uidValidity) throws MessagingException;
+
+  /**
+   * Returns a non-mutable Message representation of the given Message.
+   */
+  public MimeMessage getMessageRepresentation(long uid, long uidValidity, boolean saveToCache) throws MessagingException;
 
   /**
    * Adds the given Flags to the message with the given uid.
@@ -39,77 +49,77 @@ public interface MessageCache {
    */
   public void removeFlag(long uid, long uidValidity, Flags flag) throws MessagingException;
   
-    /**
-     * Returns the InternetHeaders object for the given uid.
-     */
-    public InternetHeaders getHeaders(long uid, long uidValidity) throws MessagingException;
+  /**
+   * Returns the InternetHeaders object for the given uid.
+   */
+  public InternetHeaders getHeaders(long uid, long uidValidity) throws MessagingException;
 
-    /**
-     * Returns the Flags object for the given uid.
-     */
-    public Flags getFlags(long uid, long uidValidity) throws MessagingException;
+  /**
+   * Returns the Flags object for the given uid.
+   */
+  public Flags getFlags(long uid, long uidValidity) throws MessagingException;
 
-    /**
-     * Adds a message to the cache.  Note that status is only used to
-     * determine whether or not the entire message is cached, or just
-     * the headers and flags.
-     *
-     * This does not affect the server, nor does it affect message
-     * count on the client.
-     */
-    public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status) throws MessagingException;
+  /**
+   * Adds a message to the cache.  Note that status is only used to
+   * determine whether or not the entire message is cached, or just
+   * the headers and flags.
+   *
+   * This does not affect the server, nor does it affect message
+   * count on the client.
+   */
+  public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status) throws MessagingException;
 
-    /**
-     * Adds a message to the cache.  Note that status is only used to
-     * determine whether or not the entire message is cached, or just
-     * the headers and flags.
-     *
-     * This does not affect the server, nor does it affect message
-     * count on the client.
-     */
-    public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status, boolean writeMsgFile) throws MessagingException;
+  /**
+   * Adds a message to the cache.  Note that status is only used to
+   * determine whether or not the entire message is cached, or just
+   * the headers and flags.
+   *
+   * This does not affect the server, nor does it affect message
+   * count on the client.
+   */
+  public boolean cacheMessage(MimeMessage m, long uid, long uidValidity, int status, boolean writeMsgFile) throws MessagingException;
 
-    /**
-     * Removes a message from the cache only.  This has no effect on the
-     * server.
-     */
-    public boolean invalidateCache(long uid, int status);
+  /**
+   * Removes a message from the cache only.  This has no effect on the
+   * server.
+   */
+  public boolean invalidateCache(long uid, int status);
 
-    /**
-     *  Invalidates all of the messages in the uids array in the cache.
-     */
-    public boolean invalidateCache(long[] uids, int status);
+  /**
+   *  Invalidates all of the messages in the uids array in the cache.
+   */
+  public boolean invalidateCache(long[] uids, int status);
 
-    /**
-     * Invalidates the entire cache.
-     */
-    public void invalidateCache();
+  /**
+   * Invalidates the entire cache.
+   */
+  public void invalidateCache();
 
-    /**
-     * Adds the messages to the given folder.  Returns the uids for the 
-     * message.
-     *
-     * This method changes both the client cache as well as the server, if
-     * the server is available.
-     */
+  /**
+   * Adds the messages to the given folder.  Returns the uids for the 
+   * message.
+   *
+   * This method changes both the client cache as well as the server, if
+   * the server is available.
+   */
   public long[] appendMessages(MessageInfo[] msgs) throws MessagingException;
 
-    /**
-     * Removes all messages marked as 'DELETED'  from the given folder.  
-     *
-     * Note that if any message fails to be removed, then the ones
-     * that have succeeded should be returned in the long[].
-     *
-     * This method changes both the client cache as well as the server, if
-     * the server is available.
-     */
-    public void expungeMessages() throws MessagingException;
+  /**
+   * Removes all messages marked as 'DELETED'  from the given folder.  
+   *
+   * Note that if any message fails to be removed, then the ones
+   * that have succeeded should be returned in the long[].
+   *
+   * This method changes both the client cache as well as the server, if
+   * the server is available.
+   */
+  public void expungeMessages() throws MessagingException;
 
-    /**
-     * This returns the uid's of the message which exist in updatedUids, but
-     * not in the current list of messsages.
-     */ 
-    public long[] getAddedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
+  /**
+   * This returns the uid's of the message which exist in updatedUids, but
+   * not in the current list of messsages.
+   */ 
+  public long[] getAddedMessages(long[] updatedUids, long uidValidity) throws StaleCacheException;
 
   /**
    * This returns the uid's of the message which exist in the current

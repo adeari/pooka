@@ -1,13 +1,20 @@
 *) create a way to cache local headers so we don't have to download
    those all the time.  sort of like running offline, but not really.
+	*) make this the default IMAP setting, barring running diskless
+	*) change UI -- make sure cache option, etc. doesn't show up.
+	*) fix loading headers for new messages -- looks like we do an
+		individual fetch for each.
+	   *) also add in some status messages during this; right now
+	      opening a new large folder will take a while even if we're
+	      just getting the headers and flags.
 
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
 	-- antialiasing yes.  opengl probably not unless as a special option.
 
-*) make reply-to html work in a resonable way.
+**) make reply-to html work in a resonable way.
 	- research.  should be doable, maybe with a custom library
 
-*) make wheel scroll customizable
+**) make wheel scroll customizable
 
 -----
 
@@ -27,7 +34,6 @@ online:
     *) make sure mailing list info is correct
     *) update website in general
     *) add blog/rss feed
-
 
 *) add unread message count to folder display.
 

@@ -39,7 +39,7 @@ public class CachingMimeMessage extends UIDMimeMessage {
   
   public synchronized DataHandler getDataHandler() 
     throws MessagingException {
-    return getCache().getDataHandler(getUID(), getUIDValidity());
+    return getCache().getDataHandler(getUID(), getUIDValidity(), ! getCacheHeadersOnly());
   }
   
   public String[] getHeader(String name)
@@ -108,7 +108,7 @@ public class CachingMimeMessage extends UIDMimeMessage {
    * and "value" field. 
    *
    * @exception  	MessagingException
-     */
+   */
   public Enumeration getAllHeaderLines() throws MessagingException {
     return getHeaders().getAllHeaderLines();
   }
@@ -154,9 +154,9 @@ public class CachingMimeMessage extends UIDMimeMessage {
       return (Flags) getCache().getFlags(getUID(), getUIDValidity()).clone();
     } catch (MessagingException me) {
       if (me instanceof MessageRemovedException) {
-	return new Flags();
+        return new Flags();
       } else {
-	throw me;
+        throw me;
       }
     }
 
@@ -210,36 +210,43 @@ public class CachingMimeMessage extends UIDMimeMessage {
       getCache().removeFlag(getUID(), getUIDValidity(), flag);
   }
 
-    public MessageCache getCache() {
-	return ((CachingFolderInfo)getParent()).getCache();
-    }
+  public MessageCache getCache() {
+    return ((CachingFolderInfo)getParent()).getCache();
+  }
 
-    public void setExpungedValue(boolean newValue) {
-	expunged=newValue;
-    }
+  public void setExpungedValue(boolean newValue) {
+    expunged=newValue;
+  }
 
-    /**
-     * Returns whether this message is expunged or not.
-     */
-    public boolean isExpunged() {
-	return expunged;
-    }
+  /**
+   * Returns whether this message is expunged or not.
+   */
+  public boolean isExpunged() {
+    return expunged;
+  }
 
-    public InternetHeaders getHeaders() throws MessagingException {
-      try {
-	return getCache().getHeaders(getUID(), getUIDValidity());
-      } catch (MessagingException me) {
-	if (me instanceof MessageRemovedException) {
-	  return new InternetHeaders();
-	} else {
-	  throw me;
-	}
+  public InternetHeaders getHeaders() throws MessagingException {
+    try {
+      return getCache().getHeaders(getUID(), getUIDValidity());
+    } catch (MessagingException me) {
+      if (me instanceof MessageRemovedException) {
+        return new InternetHeaders();
+      } else {
+        throw me;
       }
     }
+  }
 
   public void writeTo(java.io.OutputStream os, String[] ignoreList)
     throws java.io.IOException, MessagingException {
-    getCache().getMessageRepresentation(getUID(), getUIDValidity()).writeTo(os, ignoreList);
+    getCache().getMessageRepresentation(getUID(), getUIDValidity(), ! getCacheHeadersOnly()).writeTo(os, ignoreList);
+  }
+ 
+  /**
+   * Returns if we're caching only headers.
+   */
+  public boolean getCacheHeadersOnly() {
+    return ((CachingFolderInfo)getParent()).getCacheHeadersOnly();
   }
   
 }
