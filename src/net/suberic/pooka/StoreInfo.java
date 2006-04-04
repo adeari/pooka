@@ -92,9 +92,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       password = "";
       server = "localhost";
       if (Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset").equalsIgnoreCase("true"))
-	protocol = "maildir";
+        protocol = "maildir";
       else
-	protocol = "mbox";
+        protocol = "mbox";
       port = -1;
       popStore = true;
     } else {
@@ -104,17 +104,17 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       String portValue = Pooka.getProperty("Store." + storeID + ".port", "");
       port = -1;
       if (!portValue.equals("")) {
-	try {
-	  port = Integer.parseInt(portValue);
-	} catch (Exception e) {
-	}
+        try {
+          port = Integer.parseInt(portValue);
+        } catch (Exception e) {
+        }
       }
       if (!password.equals(""))
-	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
+        password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
       server = Pooka.getProperty("Store." + storeID + ".server", "");
       
       if (protocol.equals("imap") && Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-	protocol = "imaps";
+        protocol = "imaps";
       }
     }
     
@@ -166,43 +166,43 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (available) {
       connectionListener = new ConnectionListener() { 
 	  
-	  public void disconnected(ConnectionEvent e) {
-	    getLogger().log(Level.FINE, "Store " + getStoreID() + " disconnected.");
-	    // if we think we're connected, then call disconnectStore.
-	    if (isConnected()) {
-	      try {
-		if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
-		  Pooka.getUIFactory().getMessageNotificationManager().displayMessage("Disconnected", "Disconnected from store " + getStoreID(), net.suberic.pooka.gui.MessageNotificationManager.WARNING_MESSAGE_TYPE);
-		}
-		disconnectStore();
-	      } catch (MessagingException me) {
-		getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
-	      }
-	    }
+          public void disconnected(ConnectionEvent e) {
+            getLogger().log(Level.FINE, "Store " + getStoreID() + " disconnected.");
+            // if we think we're connected, then call disconnectStore.
+            if (isConnected()) {
+              try {
+                if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
+                  Pooka.getUIFactory().getMessageNotificationManager().displayMessage("Disconnected", "Disconnected from store " + getStoreID(), net.suberic.pooka.gui.MessageNotificationManager.WARNING_MESSAGE_TYPE);
+                }
+                disconnectStore();
+              } catch (MessagingException me) {
+                getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
+              }
+            }
 	    
-	  }
+          }
 
-	  public void closed(ConnectionEvent e) {
-	    getLogger().log(Level.FINE, "Store " + getStoreID() + " closed.");
+          public void closed(ConnectionEvent e) {
+            getLogger().log(Level.FINE, "Store " + getStoreID() + " closed.");
 
-	    // if we think we're connected, then call disconnectStore.
-	    if (isConnected()) {
-	      if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
-		Pooka.getUIFactory().getMessageNotificationManager().displayMessage("Disconnected", "Disconnected from store " + getStoreID(), net.suberic.pooka.gui.MessageNotificationManager.WARNING_MESSAGE_TYPE);
-	      }
-	      try {
-		disconnectStore();
-	      } catch (MessagingException me) {
-		getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
-	      }
-	    }
+            // if we think we're connected, then call disconnectStore.
+            if (isConnected()) {
+              if (Pooka.getUIFactory().getMessageNotificationManager() != null) {
+                Pooka.getUIFactory().getMessageNotificationManager().displayMessage("Disconnected", "Disconnected from store " + getStoreID(), net.suberic.pooka.gui.MessageNotificationManager.WARNING_MESSAGE_TYPE);
+              }
+              try {
+                disconnectStore();
+              } catch (MessagingException me) {
+                getLogger().log(Level.FINE, "error disconnecting Store:  " + me.getMessage());
+              }
+            }
 	    
-	  }
+          }
 	  
-	  public void opened(ConnectionEvent e) {
-	    getLogger().log(Level.FINE, "Store " + getStoreID() + " opened.");
-	  }	  
-	};
+          public void opened(ConnectionEvent e) {
+            getLogger().log(Level.FINE, "Store " + getStoreID() + " opened.");
+          }	  
+        };
 
       store.addConnectionListener(connectionListener);
       
@@ -230,7 +230,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (trashFolderName.length() > 0) {
       trashFolder = getChild(trashFolderName);
       if (trashFolder != null)
-	trashFolder.setTrashFolder(true);
+        trashFolder.setTrashFolder(true);
     }
   }	
   
@@ -251,15 +251,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       String useMaildir = Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset");
 
       if (useMaildir.equals("unset")) {
-	//File f = new File(Pooka.getProperty() + ".
-	Pooka.setProperty(getStoreProperty() + ".useMaildir", "false");
-	useMaildir="false";
+        //File f = new File(Pooka.getProperty() + ".
+        Pooka.setProperty(getStoreProperty() + ".useMaildir", "false");
+        useMaildir="false";
       }
 	  
       if ( useMaildir.equalsIgnoreCase("false")) {
-	loadMboxProperties(p);
+        loadMboxProperties(p);
       } else {
-	loadMaildirProperties(p);
+        loadMaildirProperties(p);
       }
     } else if (realProtocol.equalsIgnoreCase("maildir")) {
       loadMaildirProperties(p);
@@ -311,7 +311,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (mailHome.equals("")) {
       mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
       if (mailHome.equals(""))
-	mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+        mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
       
       mailHome = mailHome + java.io.File.separator + storeID;
     }
@@ -340,7 +340,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (mailHome.equals("")) {
       mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
       if (mailHome.equals(""))
-	mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+        mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
 	
       mailHome = mailHome + java.io.File.separator + storeID;
     }
@@ -379,14 +379,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       newFolderName = (String)tokens.nextToken();
       FolderInfo childFolder = getChild(newFolderName);
       if (childFolder == null) {
-	if (popStore && newFolderName.equalsIgnoreCase("INBOX")) 
-	  childFolder = new PopInboxFolderInfo(this, newFolderName);
-	else if (Pooka.getProperty(getStoreProperty() + ".cachingEnabled", "false").equalsIgnoreCase("true") || Pooka.getProperty(getStoreProperty() + "." + newFolderName + ".cachingEnabled", "false").equalsIgnoreCase("true"))
-	  childFolder = new net.suberic.pooka.cache.CachingFolderInfo(this, newFolderName);
-	else if (Pooka.getProperty(getStoreProperty() + ".protocol", "mbox").equalsIgnoreCase("imap")) {
-	  childFolder = new UIDFolderInfo(this, newFolderName);
-	} else
-	  childFolder = new FolderInfo(this, newFolderName);
+        childFolder = Pooka.getResourceManager().createFolderInfo(this, newFolderName);
       }
       
       newChildren.add(childFolder);
@@ -411,15 +404,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (children != null) {
       int divider = childName.indexOf('/');
       if (divider > 0) {
-	folderName = childName.substring(0, divider);
-	if (divider < childName.length() - 1)
-	  subFolderName = childName.substring(divider + 1);
+        folderName = childName.substring(0, divider);
+        if (divider < childName.length() - 1)
+          subFolderName = childName.substring(divider + 1);
       } else 
-	folderName = childName;
+        folderName = childName;
       
       for (int i = 0; i < children.size(); i++)
-	if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
-	  childFolder = (FolderInfo)children.elementAt(i);
+        if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
+          childFolder = (FolderInfo)children.elementAt(i);
     }
     
     if (childFolder != null && subFolderName != null)
@@ -440,10 +433,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     
     if (children != null) {
       for (int i = 0; i < children.size(); i++) {
-	FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
-	if (possibleMatch != null) {
-	  return possibleMatch;
-	}
+        FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
+        if (possibleMatch != null) {
+          return possibleMatch;
+        }
       }
     }
     
@@ -471,7 +464,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
     if (children != null && children.size() > 0) {
       for (int i = 0; i < children.size(); i++) 
-	((FolderInfo)children.elementAt(i)).cleanup();
+        ((FolderInfo)children.elementAt(i)).cleanup();
     }
 
     if (store != null) {
@@ -488,48 +481,48 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   public void valueChanged(String pChangedValue) {
     final String changedValue = pChangedValue;
     javax.swing.AbstractAction valueChangedAction = new javax.swing.AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent ae) {
-	  if (changedValue.equals(getStoreProperty() + ".folderList")) {
-	    updateChildren();
-	  } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
-	    defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
-	  } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
+        public void actionPerformed(java.awt.event.ActionEvent ae) {
+          if (changedValue.equals(getStoreProperty() + ".folderList")) {
+            updateChildren();
+          } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
+            defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
+          } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
 	    
-	    if (storeNode != null) {
-	      Enumeration childEnum = storeNode.children();
-	      Vector v = new Vector();
-	      while (childEnum.hasMoreElements())
-		v.add(childEnum.nextElement());
+            if (storeNode != null) {
+              Enumeration childEnum = storeNode.children();
+              Vector v = new Vector();
+              while (childEnum.hasMoreElements())
+                v.add(childEnum.nextElement());
 	      
-	      storeNode.removeChildren(v);
-	    }
+              storeNode.removeChildren(v);
+            }
 	    
-	    children = null;
+            children = null;
 	    
-	    try {
-	      disconnectStore();
-	    } catch (Exception e) { }
+            try {
+              disconnectStore();
+            } catch (Exception e) { }
 	    
-	    getLogger().log(Level.FINE, "calling configureStore()");
+            getLogger().log(Level.FINE, "calling configureStore()");
 	    
-	    configureStore();
-	  } else if (changedValue.equals(getStoreProperty() + ".connection")) {
-	    connection.removeConnectionListener(StoreInfo.this);
+            configureStore();
+          } else if (changedValue.equals(getStoreProperty() + ".connection")) {
+            connection.removeConnectionListener(StoreInfo.this);
 	    
-	    connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
-	    if (connection == null) {
-	      connection = Pooka.getConnectionManager().getDefaultConnection();
-	    }
+            connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
+            if (connection == null) {
+              connection = Pooka.getConnectionManager().getDefaultConnection();
+            }
 	    
-	    if (connection != null) {
-	      connection.addConnectionListener(StoreInfo.this);
-	    }
-	  } else if (changedValue.equals(getStoreProperty() + ".useSubscribed")) {
-	    useSubscribed = Pooka.getProperty(getStoreProperty() + ".useSubscribed", "false").equalsIgnoreCase("true");
-	  } else if (changedValue.equals(getStoreProperty() + ".sessionDebug.level")) {
-	    updateSessionDebug();
-	  }
-	}
+            if (connection != null) {
+              connection.addConnectionListener(StoreInfo.this);
+            }
+          } else if (changedValue.equals(getStoreProperty() + ".useSubscribed")) {
+            useSubscribed = Pooka.getProperty(getStoreProperty() + ".useSubscribed", "false").equalsIgnoreCase("true");
+          } else if (changedValue.equals(getStoreProperty() + ".sessionDebug.level")) {
+            updateSessionDebug();
+          }
+        }
       };
 
     // if we don't do the update synchronously on the store thread,
@@ -551,62 +544,62 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     // mbox folders still don't care.
     if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
       if (newStatus == NetworkConnection.CONNECTED) {
-	// we've connected.
-	// we probably don't care.
+        // we've connected.
+        // we probably don't care.
 	
       } else if (newStatus == NetworkConnection.DISCONNECTED) {
-	// we're being disconnected.  close all the connections.
-	try {
-	  disconnectStore();
-	} catch (MessagingException me) {
-	  getLogger().log(Level.FINE, "Caught exception disconnecting Store " + getStoreID() + ":  " + me);
-	  if (getLogger().isLoggable(Level.FINE))
-	    me.printStackTrace();
-	  // else ignore
-	}
+        // we're being disconnected.  close all the connections.
+        try {
+          disconnectStore();
+        } catch (MessagingException me) {
+          getLogger().log(Level.FINE, "Caught exception disconnecting Store " + getStoreID() + ":  " + me);
+          if (getLogger().isLoggable(Level.FINE))
+            me.printStackTrace();
+          // else ignore
+        }
 	
       } else {
-	// we've been cut off.  note it.
-	try {
-	  disconnectStore();
-	} catch (MessagingException me) {
-	  getLogger().log(Level.FINE, "Caught exception disconnecting Store " + getStoreID() + ":  " + me);
-	  if (getLogger().isLoggable(Level.FINE))
-	    me.printStackTrace();
-	  // else ignore
-	}
+        // we've been cut off.  note it.
+        try {
+          disconnectStore();
+        } catch (MessagingException me) {
+          getLogger().log(Level.FINE, "Caught exception disconnecting Store " + getStoreID() + ":  " + me);
+          if (getLogger().isLoggable(Level.FINE))
+            me.printStackTrace();
+          // else ignore
+        }
       }
     }
   }
-    /**
-     * Remove the given String from the folderList property.  
-     *
-     * Note that because this is also a ValueChangeListener to the
-     * folderList property, this will also result in the FolderInfo being
-     * removed from the children Vector.
-     */
-    void removeFromFolderList(String removeFolderName) {
-	Vector folderNames = Pooka.getResources().getPropertyAsVector(getStoreProperty() + ".folderList", "");
+  /**
+   * Remove the given String from the folderList property.  
+   *
+   * Note that because this is also a ValueChangeListener to the
+   * folderList property, this will also result in the FolderInfo being
+   * removed from the children Vector.
+   */
+  void removeFromFolderList(String removeFolderName) {
+    Vector folderNames = Pooka.getResources().getPropertyAsVector(getStoreProperty() + ".folderList", "");
 	
-	boolean first = true;
-	StringBuffer newValue = new StringBuffer();
-	String folderName;
+    boolean first = true;
+    StringBuffer newValue = new StringBuffer();
+    String folderName;
 
-	for (int i = 0; i < folderNames.size(); i++) {
+    for (int i = 0; i < folderNames.size(); i++) {
 	    folderName = (String) folderNames.elementAt(i);
 
 	    if (! folderName.equals(removeFolderName)) {
-		if (!first)
-		    newValue.append(":");
+        if (!first)
+          newValue.append(":");
 		
-		newValue.append(folderName);
-		first = false;
+        newValue.append(folderName);
+        first = false;
 	    }
 	    
-	}
-	
-	Pooka.setProperty(getStoreProperty() + ".folderList", newValue.toString());
     }
+	
+    Pooka.setProperty(getStoreProperty() + ".folderList", newValue.toString());
+  }
     
   /**
    * This adds the given folderString to the folderList property.
@@ -621,7 +614,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       folderName = (String) folderNames.elementAt(i);
       
       if (folderName.equals(addFolderName)) {
-	found=true;
+        found=true;
       }
       
     }
@@ -629,9 +622,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (!found) {
       String currentValue = Pooka.getProperty(getStoreProperty() + ".folderList");
       if (currentValue.equals(""))
-	Pooka.setProperty(getStoreProperty() + ".folderList", addFolderName);
+        Pooka.setProperty(getStoreProperty() + ".folderList", addFolderName);
       else
-	Pooka.setProperty(getStoreProperty() + ".folderList", currentValue + ":" + addFolderName);
+        Pooka.setProperty(getStoreProperty() + ".folderList", currentValue + ":" + addFolderName);
     }
     
   }
@@ -648,11 +641,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       Folder subFolder = folder.getFolder(subFolderName);
       
       if (subFolder == null) {
-	throw new MessagingException("Store returned null for subfolder " + subFolderName);
+        throw new MessagingException("Store returned null for subfolder " + subFolderName);
       }
       
       if (! subFolder.exists())
-	subFolder.create(type);
+        subFolder.create(type);
       
       subscribeFolder(subFolderName);
     } else {
@@ -679,7 +672,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (firstSlash > 0) {
       childFolderName = folderName.substring(0, firstSlash);
       if (firstSlash < folderName.length() -1)
-	subFolderName = folderName.substring(firstSlash +1);      
+        subFolderName = folderName.substring(firstSlash +1);      
     } else
       childFolderName = folderName;
     
@@ -717,62 +710,62 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       return;
     } else { 
       try {
-	// don't test for connections for mbox providers.
-	if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
-	  NetworkConnection currentConnection = getConnection();
-	  getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  checking connection.");
+        // don't test for connections for mbox providers.
+        if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
+          NetworkConnection currentConnection = getConnection();
+          getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  checking connection.");
 
-	  if (currentConnection != null) {
-	    if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
-	      getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
+          if (currentConnection != null) {
+            if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
+              getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
 
-	      currentConnection.connect(true, true);
-	    }
+              currentConnection.connect(true, true);
+            }
 	    
-	    if (connection.getStatus() != NetworkConnection.CONNECTED) {
-	      throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
-	    } else {
-	      getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  successfully opened connection.");
+            if (connection.getStatus() != NetworkConnection.CONNECTED) {
+              throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
+            } else {
+              getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  successfully opened connection.");
 	      
-	    }
-	  }
-	}
+            }
+          }
+        }
 
-	// Execute the precommand if there is one
-	String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
-	if (preCommand.length() > 0) {
-	  getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
+        // Execute the precommand if there is one
+        String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
+        if (preCommand.length() > 0) {
+          getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
 
-	  try {
-	    Process p = Runtime.getRuntime().exec(preCommand);
-	    p.waitFor();
-	  } catch (Exception ex) {
-	    getLogger().log(Level.FINE, "Could not run precommand:");
-	    ex.printStackTrace();
-	  }
-	}
+          try {
+            Process p = Runtime.getRuntime().exec(preCommand);
+            p.waitFor();
+          } catch (Exception ex) {
+            getLogger().log(Level.FINE, "Could not run precommand:");
+            ex.printStackTrace();
+          }
+        }
 
-	getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  doing store.connect()");
-	store.connect();
+        getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  doing store.connect()");
+        store.connect();
       } catch (MessagingException me) {
-	Exception e = me.getNextException();
-	if (e != null && e instanceof java.io.InterruptedIOException) 
-	  store.connect();
-	else
-	  throw me;
+        Exception e = me.getNextException();
+        if (e != null && e instanceof java.io.InterruptedIOException) 
+          store.connect();
+        else
+          throw me;
       }
 
       getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection succeeded; connected = true.");
       connected=true;
       
       if (useSubscribed && protocol.equalsIgnoreCase("imap")) {
-	synchSubscribed();
+        synchSubscribed();
       }
       
       if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true")) {
-	for (int i = 0; i < children.size(); i++) {
-	  doOpenFolders((FolderInfo) children.elementAt(i));
-	}
+        for (int i = 0; i < children.size(); i++) {
+          doOpenFolders((FolderInfo) children.elementAt(i));
+        }
       }
     }
   }
@@ -782,10 +775,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
       final FolderInfo current = fi;
       javax.swing.AbstractAction openFoldersAction = new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent e) {
-	    current.openAllFolders(Folder.READ_WRITE);
-	  }
-	};
+          public void actionPerformed(java.awt.event.ActionEvent e) {
+            current.openAllFolders(Folder.READ_WRITE);
+          }
+        };
       
       openFoldersAction.putValue(javax.swing.Action.NAME, "file-open");
       openFoldersAction.putValue(javax.swing.Action.SHORT_DESCRIPTION, "file-open on folder " + fi.getFolderID());
@@ -812,24 +805,24 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       return;
     } else {
       try {
-	try {
-	  closeAllFolders(false, false);
-	} catch (MessagingException folderMe) {
-	  storeException = folderMe;
-	}
-	store.close();
+        try {
+          closeAllFolders(false, false);
+        } catch (MessagingException folderMe) {
+          storeException = folderMe;
+        }
+        store.close();
       } catch (MessagingException me) {
-	if (storeException != null) {
-	  me.setNextException(storeException);
-	}
-	storeException = me;
-	throw storeException;
+        if (storeException != null) {
+          me.setNextException(storeException);
+        }
+        storeException = me;
+        throw storeException;
       } finally {
-	connected=false;
+        connected=false;
       }
 
       if (storeException != null)
-	throw storeException;
+        throw storeException;
     }
   }
 
@@ -840,13 +833,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (getStoreThread() != null && ! getStoreThread().getStopped()) {
       // if the store thread has exited, assume we're exiting, too.
       synchronized(getStoreThread().getRunLock()) {
-	getLogger().log(Level.FINE, "closing all folders of store " + getStoreID());
-	Vector folders = getChildren();
-	if (folders != null) {
-	  for (int i = 0; i < folders.size(); i++) {
-	    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge, shuttingDown);
-	  }
-	}
+        getLogger().log(Level.FINE, "closing all folders of store " + getStoreID());
+        Vector folders = getChildren();
+        if (folders != null) {
+          for (int i = 0; i < folders.size(); i++) {
+            ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge, shuttingDown);
+          }
+        }
       }
     }
   }
@@ -861,18 +854,18 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
   }
 
-    /**
-     * Gets all of the children folders of this StoreInfo which are both
-     * Open and can contain Messages.
-     */
-    public Vector getAllFolders() {
-	Vector returnValue = new Vector();
-	Vector subFolders = getChildren();
-	for (int i = 0; i < subFolders.size(); i++) {
+  /**
+   * Gets all of the children folders of this StoreInfo which are both
+   * Open and can contain Messages.
+   */
+  public Vector getAllFolders() {
+    Vector returnValue = new Vector();
+    Vector subFolders = getChildren();
+    for (int i = 0; i < subFolders.size(); i++) {
 	    returnValue.addAll(((FolderInfo) subFolders.elementAt(i)).getAllFolders());
-	}
-	return returnValue;
     }
+    return returnValue;
+  }
 
   /**
    * Synchronizes the locally stored subscribed folders list to the subscribed
@@ -895,13 +888,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       // and sometimes list() returns duplicate entries for some reason.
       String folderName = subscribedFolders[i].getName();
       if (folderName.equalsIgnoreCase("inbox")) {
-	if (!foundInbox) {
-	  foundInbox=true;
-	  subscribedNames.add(folderName);
-	}
+        if (!foundInbox) {
+          foundInbox=true;
+          subscribedNames.add(folderName);
+        }
       } else if (subscribedFolders[i].isSubscribed()) {
-	if (! subscribedNames.contains(folderName))
-	  subscribedNames.add(folderName);
+        if (! subscribedNames.contains(folderName))
+          subscribedNames.add(folderName);
       }
     }
 
@@ -913,10 +906,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       
       Iterator it = tmpChildren.iterator();
       while (it.hasNext()) {
-	FolderInfo fi = (FolderInfo) it.next();
-	String folderName = fi.getFolderName();
-	if (fi.isNamespace() && ! subscribedNames.contains(folderName))
-	  subscribedNames.add(folderName);
+        FolderInfo fi = (FolderInfo) it.next();
+        String folderName = fi.getFolderName();
+        if (fi.isNamespace() && ! subscribedNames.contains(folderName))
+          subscribedNames.add(folderName);
       }
     }
 
@@ -953,15 +946,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       Store realStore = getStore();
       
       if (realStore != null) {
-	if (! realStore.isConnected()) {
-	  getLogger().log(Level.FINER, getStoreID() + ":  isConnected() returns false.  returning false.");
+        if (! realStore.isConnected()) {
+          getLogger().log(Level.FINER, getStoreID() + ":  isConnected() returns false.  returning false.");
 	  
-	  return false;
-	} else {
-	  return true;
-	}
+          return false;
+        } else {
+          return true;
+        }
       } else {
-	return false;
+        return false;
       }
     } else {
       return isConnected();
@@ -979,13 +972,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     getLogger().log(Level.INFO, "Connected:  " + infoIsConnected);
     statusBuffer.append("Connected:  " + infoIsConnected + "\r\n");
     /*
-    if (store != null) {
+      if (store != null) {
       boolean storeIsConnected = store.isConnected();
       getLogger().log(Level.INFO, "store.isConnected():  " + storeIsConnected);
       statusBuffer.append("store.isConnected():  " + storeIsConnected + "\r\n");
-    } else {
+      } else {
       getLogger().log(Level.INFO, "No store object.");
-    }
+      }
     */
 
     if (storeThread != null) {
@@ -996,21 +989,21 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       getLogger().log(Level.INFO, "Action Queue Size:  " + queueSize);
       statusBuffer.append("Action Queue Size:  " + queueSize +"\r\n");
       if (storeThread.getQueueSize() > 0) {
-	System.out.println("Queue:");
-	java.util.List queue = storeThread.getQueue();
-	for (int i = 0; i < queue.size(); i++) {
-	  net.suberic.util.thread.ActionThread.ActionEventPair current = (net.suberic.util.thread.ActionThread.ActionEventPair) queue.get(i);
-	  String queueString = "  queue[" + i + "]:  ";
-	  String entryDescription = (String) current.action.getValue(javax.swing.Action.SHORT_DESCRIPTION);
-	  if (entryDescription == null)
-	    entryDescription = (String) current.action.getValue(javax.swing.Action.NAME);
-	  if (entryDescription == null)
-	    entryDescription = "Unknown action";
+        System.out.println("Queue:");
+        java.util.List queue = storeThread.getQueue();
+        for (int i = 0; i < queue.size(); i++) {
+          net.suberic.util.thread.ActionThread.ActionEventPair current = (net.suberic.util.thread.ActionThread.ActionEventPair) queue.get(i);
+          String queueString = "  queue[" + i + "]:  ";
+          String entryDescription = (String) current.action.getValue(javax.swing.Action.SHORT_DESCRIPTION);
+          if (entryDescription == null)
+            entryDescription = (String) current.action.getValue(javax.swing.Action.NAME);
+          if (entryDescription == null)
+            entryDescription = "Unknown action";
 
-	  queueString = queueString + entryDescription;
-	  System.out.println(queueString);
-	  statusBuffer.append(queueString + "\r\n");
-	}
+          queueString = queueString + entryDescription;
+          System.out.println(queueString);
+          statusBuffer.append(queueString + "\r\n");
+        }
       }
     } else {
       getLogger().log(Level.INFO, "No Action Thread.");
@@ -1022,15 +1015,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       
       java.lang.reflect.Method stackTraceMethod = threadClass.getMethod("getStackTrace", new Class[0]);
       if (stackTraceMethod != null) {
-	System.out.println("Stack Trace:");
-	statusBuffer.append("Stack Trace:\r\n");
-	Object returnValue = stackTraceMethod.invoke(storeThread, (Object[]) null);
-	Object[] objectArray = (Object[]) returnValue;
-	for (int i = 0; i < objectArray.length; i++) {
-	  String stackLine = "  " + objectArray[i];
-	  System.out.println(stackLine);
-	  statusBuffer.append(stackLine + "\r\n");
-	}
+        System.out.println("Stack Trace:");
+        statusBuffer.append("Stack Trace:\r\n");
+        Object returnValue = stackTraceMethod.invoke(storeThread, (Object[]) null);
+        Object[] objectArray = (Object[]) returnValue;
+        for (int i = 0; i < objectArray.length; i++) {
+          String stackLine = "  " + objectArray[i];
+          System.out.println(stackLine);
+          statusBuffer.append(stackLine + "\r\n");
+        }
       }
 
     } catch (Exception e) {
@@ -1092,6 +1085,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   public String getProtocol() {
     return protocol;
+  }
+
+  /**
+   * Returns true if this is a pop3 store.
+   */
+  public boolean isPopStore() {
+    return popStore;
   }
 
   public Vector getChildren() {
