@@ -39,4 +39,10 @@ public abstract class ResourceManager {
   public abstract java.io.OutputStream getOutputStream(String pFileName) 
     throws java.io.IOException;
 
+  /**
+   * Creates an appropriate FolderInfo for the given StoreInfo.  
+   */
+  public abstract FolderInfo createFolderInfo(StoreInfo pStore, String pName);
+
+
 }

@@ -58,10 +58,10 @@ public class DisklessResourceManager extends ResourceManager {
       StoreInfo current = (StoreInfo) iter.next();
 
       if (current.getProtocol() != null && current.getProtocol().toLowerCase().startsWith("imap")) {
-	newWritableProperties.setProperty(current.getStoreProperty() + ".cachingEnabled", "false");
-	keepList.add(current.getStoreID());
+        newWritableProperties.setProperty(current.getStoreProperty() + ".cachingEnabled", "false");
+        keepList.add(current.getStoreID());
       } else {
-	toRemoveList.add(current.getStoreID());
+        toRemoveList.add(current.getStoreID());
       }
     }
     
@@ -74,21 +74,21 @@ public class DisklessResourceManager extends ResourceManager {
       
       boolean keep = true;
       if (current.startsWith("Store")) {
-	if ((! pIncludePasswords) && current.endsWith("password")) {
-	  keep = false;
-	} else if (current.endsWith("cachingEnabled")) {
-	  keep = false;
-	}
+        if ((! pIncludePasswords) && current.endsWith("password")) {
+          keep = false;
+        } else if (current.endsWith("cachingEnabled")) {
+          keep = false;
+        }
 
-	for (int i = 0; keep && i < toRemoveList.size(); i++) {
-	  if (current.startsWith("Store." + (String) toRemoveList.get(i))) {
-	    keep = false;
-	  }
-	}
+        for (int i = 0; keep && i < toRemoveList.size(); i++) {
+          if (current.startsWith("Store." + (String) toRemoveList.get(i))) {
+            keep = false;
+          }
+        }
       }
 
       if (keep) {
-	newWritableProperties.setProperty(current, sourceBundle.getProperty(current));
+        newWritableProperties.setProperty(current, sourceBundle.getProperty(current));
       }
 
     }
@@ -124,10 +124,27 @@ public class DisklessResourceManager extends ResourceManager {
   }
 
   public java.io.OutputStream getOutputStream(String pFileName) 
-  throws java.io.IOException {
+    throws java.io.IOException {
     // no writing to streams in this one.
     throw new IOException("Diskless mode:  no file modification available.");
   }
   
+  /**
+   * Creates an appropriate FolderInfo for the given StoreInfo.  
+   */
+  public FolderInfo createFolderInfo(StoreInfo pStore, String pName) {
+    String storeProperty = pStore.getStoreProperty();
+    if (pStore.isPopStore() && pName.equalsIgnoreCase("INBOX")) {
+      return new PopInboxFolderInfo(pStore, pName);
+    } else if (Pooka.getProperty(storeProperty + ".protocol", "mbox").equalsIgnoreCase("imap")) {
+      if (Pooka.getProperty(storeProperty + ".cachingEnabled", Pooka.getProperty(storeProperty + "." + pName + ".cachingEnabled", "false")).equalsIgnoreCase("true") || Pooka.getProperty(storeProperty + ".cacheHeadersOnly", Pooka.getProperty(storeProperty + "." + pName + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true")) {
+        return new net.suberic.pooka.cache.CachingFolderInfo(pStore, pName);
+      } else {
+        return  new UIDFolderInfo(pStore, pName);
+      }
+    } else {
+      return new FolderInfo(pStore, pName);
+    }
+  }
   
 }

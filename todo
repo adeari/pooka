@@ -27,6 +27,9 @@ deleted messages, etc. gracefully.
 
 *) configure trash folder as default.
 
+*) add a way to show update information when the webstart version is
+	upgraded.
+
 online:
   *) look at online bugs, etc.
 
