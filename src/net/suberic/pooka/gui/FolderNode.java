@@ -46,32 +46,32 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     if (actions != null) {
       for (int i = 0; i < actions.length; i++) {
-	Action a = actions[i];
-	commands.put(a.getValue(Action.NAME), a);
+        Action a = actions[i];
+        commands.put(a.getValue(Action.NAME), a);
       }
     }
     
     folderInfo.addMessageCountListener(new MessageCountAdapter() {
-	public void messagesAdded(MessageCountEvent e) {
-	  if ( folderInfo.notifyNewMessagesMain()) {
-	    Pooka.getUIFactory().getMessageNotificationManager().notifyNewMessagesReceived(e, getFolderInfo().getFolderID());
-	  }
-	  final MessageCountEvent event = e;
-	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		updateNode();
-	      }
-	    });
-	}
+        public void messagesAdded(MessageCountEvent e) {
+          if ( folderInfo.notifyNewMessagesMain()) {
+            Pooka.getUIFactory().getMessageNotificationManager().notifyNewMessagesReceived(e, getFolderInfo().getFolderID());
+          }
+          final MessageCountEvent event = e;
+          javax.swing.SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                updateNode();
+              }
+            });
+        }
 	
-	public void messagesRemoved(MessageCountEvent e) {
-	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		updateNode();
-	      }
-	    });
+        public void messagesRemoved(MessageCountEvent e) {
+          javax.swing.SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                updateNode();
+              }
+            });
 	  
-	}
+        }
       });
     
     folderInfo.addMessageChangedListener(this);
@@ -129,7 +129,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     return super.children();
     }
     
-    */
+  */
   
   /**
    * This loads (or reloads) the children of the FolderNode from
@@ -139,16 +139,16 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
    */
   public void loadChildren() {
     Runnable runMe = new Runnable() {
-	public void run() {
-	  doLoadChildren();
-	}
+        public void run() {
+          doLoadChildren();
+        }
       };
     
     if (SwingUtilities.isEventDispatchThread())
       doLoadChildren();
     else {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception ie) {
       }
     }
@@ -168,13 +168,13 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     if (folderChildren != null) {
       for (int i = 0; i < folderChildren.size(); i++) {
-	FolderNode node = popChild(((FolderInfo)folderChildren.elementAt(i)).getFolderName(), origChildrenVector);
-	if (node == null) {
-	  node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer());
-	  // we used insert here, since add() would mak
-	  // another recursive call to getChildCount();
-	  insert(node, 0);
-	}
+        FolderNode node = popChild(((FolderInfo)folderChildren.elementAt(i)).getFolderName(), origChildrenVector);
+        if (node == null) {
+          node = new FolderNode((FolderInfo)folderChildren.elementAt(i), getParentContainer());
+          // we used insert here, since add() would mak
+          // another recursive call to getChildCount();
+          insert(node, 0);
+        }
       }
       
     }
@@ -199,11 +199,11 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   public FolderNode popChild(String childName, Vector childrenList) {
     if (children != null) {
       for (int i = 0; i < childrenList.size(); i++)
-	if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
-	  FolderNode fn = (FolderNode)childrenList.elementAt(i);
-	  childrenList.remove(fn);
-	  return fn;
-	}
+        if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
+          FolderNode fn = (FolderNode)childrenList.elementAt(i);
+          childrenList.remove(fn);
+          return fn;
+        }
     }
     
     // no match.
@@ -221,13 +221,13 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     if (popupMenu == null) {
       popupMenu = new net.suberic.util.gui.ConfigurablePopupMenu();
       if (getFolderInfo().isTrashFolder())
-	popupMenu.configureComponent("TrashFolderNode.popupMenu", Pooka.getResources());
+        popupMenu.configureComponent("TrashFolderNode.popupMenu", Pooka.getResources());
       else if (getFolderInfo().isOutboxFolder())
-	popupMenu.configureComponent("OutboxFolderNode.popupMenu", Pooka.getResources());
-      else if (getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo) 
-	popupMenu.configureComponent("CachingFolderNode.popupMenu", Pooka.getResources());
+        popupMenu.configureComponent("OutboxFolderNode.popupMenu", Pooka.getResources());
+      else if (getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo && ! ((net.suberic.pooka.cache.CachingFolderInfo) getFolderInfo()).getCacheHeadersOnly()) 
+        popupMenu.configureComponent("CachingFolderNode.popupMenu", Pooka.getResources());
       else
-	popupMenu.configureComponent("FolderNode.popupMenu", Pooka.getResources());
+        popupMenu.configureComponent("FolderNode.popupMenu", Pooka.getResources());
       
       updatePopupTheme();
       
@@ -243,7 +243,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   public void removeChildren(Vector removeList) {
     for (int i = 0; i < removeList.size(); i++) {
       if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
-	this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
+        this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
     }
   }
   
@@ -252,44 +252,44 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
    */
   public void makeVisible() {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	  TreeNode[] nodeList = ((DefaultTreeModel)folderTree.getModel()).getPathToRoot(FolderNode.this);
-	  TreePath path = new TreePath(nodeList);
-	  folderTree.makeVisible(path);
-	}
+        public void run() {
+          javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+          TreeNode[] nodeList = ((DefaultTreeModel)folderTree.getModel()).getPathToRoot(FolderNode.this);
+          TreePath path = new TreePath(nodeList);
+          folderTree.makeVisible(path);
+        }
       });
   }
   
   public void messageChanged(MessageChangedEvent mce) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  updateNode();
-	}
+        public void run() {
+          updateNode();
+        }
       });
   }
   
   public void closed(ConnectionEvent e) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  updateNode();
-	}
+        public void run() {
+          updateNode();
+        }
       });
   }
   
   public void opened(ConnectionEvent e) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  updateNode();
-	}
+        public void run() {
+          updateNode();
+        }
       });
   }
   
   public void disconnected(ConnectionEvent e) {
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  updateNode();
-	}
+        public void run() {
+          updateNode();
+        }
       });
   }
   
@@ -310,10 +310,10 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       boolean hasNewMessages = fi.hasNewMessages();
 
       if (currentStatus != lastFolderStatus || hasUnread != lastUnread || hasNewMessages != lastNewMessages) {
-	lastFolderStatus = currentStatus;
-	lastUnread = hasUnread;
-	lastNewMessages = hasNewMessages;
-	getParentContainer().repaint();
+        lastFolderStatus = currentStatus;
+        lastUnread = hasUnread;
+        lastNewMessages = hasNewMessages;
+        getParentContainer().repaint();
       }
     }
   }
@@ -334,10 +334,10 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     if (response == JOptionPane.YES_OPTION) {
       getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent e) {
-	    getFolderInfo().unsubscribe();
-	  }
-	} , new java.awt.event.ActionEvent(this, 0, "folder-unsubscribe"));
+          public void actionPerformed(java.awt.event.ActionEvent e) {
+            getFolderInfo().unsubscribe();
+          }
+        } , new java.awt.event.ActionEvent(this, 0, "folder-unsubscribe"));
     }
   }
   
@@ -360,20 +360,20 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       int responseTwo = Pooka.getUIFactory().showConfirmDialog(message, Pooka.getProperty("Folder.deleteConfirm.secondMessage.title", "Are you sure?"), JOptionPane.YES_NO_OPTION);
       if (responseTwo == JOptionPane.YES_OPTION) {
 	
-	getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	      try {
-		getFolderInfo().delete();
-	      } catch(MessagingException me) {
-		final Exception fme = me;
-		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-		      Pooka.getUIFactory().showError("Error deleting folder:  ", fme);
-		    }
-		  });
-	      }
-	    }
-	  } , new java.awt.event.ActionEvent(this, 0, "folder-delete"));
+        getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+              try {
+                getFolderInfo().delete();
+              } catch(MessagingException me) {
+                final Exception fme = me;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                      Pooka.getUIFactory().showError("Error deleting folder:  ", fme);
+                    }
+                  });
+              }
+            }
+          } , new java.awt.event.ActionEvent(this, 0, "folder-delete"));
       }
     }
   }
@@ -402,36 +402,36 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       typePanel.add(foldersButton);
 
       Object[] inputPanels = new Object[] {
-	messageLabel,
-	typePanel
+        messageLabel,
+        typePanel
       };
 
       final String response = Pooka.getUIFactory().showInputDialog(inputPanels, Pooka.getProperty("Folder.new.title", "Create new Folder"));
 
       int type = javax.mail.Folder.HOLDS_MESSAGES;
       if (foldersButton.isSelected()) {
-	type = javax.mail.Folder.HOLDS_FOLDERS;
+        type = javax.mail.Folder.HOLDS_FOLDERS;
       }
       
       final int finalType = type;
 
       if (response != null && response.length() > 0) {
-	getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	      try {
-		getFolderInfo().createSubFolder(response, finalType);
-	      } catch (MessagingException me) {
-		final Exception fme = me;
-		SwingUtilities.invokeLater(new Runnable() {
-		    public void run() {
-		      Pooka.getUIFactory().showError(fme.getMessage());
-		    }
-		  });
+        getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+              try {
+                getFolderInfo().createSubFolder(response, finalType);
+              } catch (MessagingException me) {
+                final Exception fme = me;
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                      Pooka.getUIFactory().showError(fme.getMessage());
+                    }
+                  });
 
-		me.printStackTrace();
-	      }
-	  }
-	  } , new java.awt.event.ActionEvent(this, 0, "folder-new"));
+                me.printStackTrace();
+              }
+            }
+          } , new java.awt.event.ActionEvent(this, 0, "folder-new"));
       }
     }
   }
@@ -452,7 +452,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       getFolderInfo().loadAllMessages();
       
       if (! getFolderInfo().isSortaOpen() || (pReconnect && ! getFolderInfo().isConnected())) {
-	getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE, pReconnect);
+        getFolderInfo().openFolder(javax.mail.Folder.READ_WRITE, pReconnect);
       }
       
       int firstUnread = -1;
@@ -461,8 +461,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       final int folderType = getFolderInfo().getType();
       
       if (getFolderInfo().isSortaOpen() && (folderType & Folder.HOLDS_MESSAGES) != 0 && getFolderInfo().getFolderDisplayUI() == null) {
-	firstUnread = getFolderInfo().getFirstUnreadMessage();
-	messageCount = getFolderInfo().getMessageCount();
+        firstUnread = getFolderInfo().getFirstUnreadMessage();
+        messageCount = getFolderInfo().getMessageCount();
       }
       
       final int finalFirstUnread = firstUnread;
@@ -470,41 +470,41 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
       final boolean fSelectFolder = pSelectFolder;
 
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
-	      if (getFolderInfo().getFolderDisplayUI() != null) {
-		getFolderInfo().getFolderDisplayUI().openFolderDisplay(fSelectFolder);
-	      } else {
-		getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
-		if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {
-		  if (finalFirstUnread >= 0)
-		    getFolderInfo().getFolderDisplayUI().selectMessage(finalFirstUnread);
-		  else
-		    getFolderInfo().getFolderDisplayUI().selectMessage(finalMessageCount);
-		} else {
-		  if (finalFirstUnread >= 0)
-		    getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalFirstUnread);
-		  else
-		    getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalMessageCount);
+          public void run() {
+            if ((folderType & Folder.HOLDS_MESSAGES) != 0) {
+              if (getFolderInfo().getFolderDisplayUI() != null) {
+                getFolderInfo().getFolderDisplayUI().openFolderDisplay(fSelectFolder);
+              } else {
+                getFolderInfo().setFolderDisplayUI(Pooka.getUIFactory().createFolderDisplayUI(getFolderInfo()));
+                if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {
+                  if (finalFirstUnread >= 0)
+                    getFolderInfo().getFolderDisplayUI().selectMessage(finalFirstUnread);
+                  else
+                    getFolderInfo().getFolderDisplayUI().selectMessage(finalMessageCount);
+                } else {
+                  if (finalFirstUnread >= 0)
+                    getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalFirstUnread);
+                  else
+                    getFolderInfo().getFolderDisplayUI().makeSelectionVisible(finalMessageCount);
 		  
-		}
-		getFolderInfo().getFolderDisplayUI().openFolderDisplay(fSelectFolder);
-	      }
+                }
+                getFolderInfo().getFolderDisplayUI().openFolderDisplay(fSelectFolder);
+              }
 	      
-	    }
-	    if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
-	      javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-	      folderTree.expandPath(folderTree.getSelectionPath());
-	    }
-	  }
-	});
+            }
+            if ((folderType & Folder.HOLDS_FOLDERS) != 0) {
+              javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+              folderTree.expandPath(folderTree.getSelectionPath());
+            }
+          }
+        });
     }  catch (MessagingException me) {
       final MessagingException newMe = me;
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
-	  }
-	});
+          public void run() {
+            Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
+          }
+        });
     }
     
   }
@@ -563,18 +563,18 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     public void actionPerformed(ActionEvent e) {
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	  }
-	});
+          public void run() {
+            ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          }
+        });
       
       openFolder(false);
 
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-	  }
-	});
+          public void run() {
+            ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+          }
+        });
     }
     
   }
@@ -591,18 +591,18 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     public void actionPerformed(ActionEvent e) {
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-	  }
-	});
+          public void run() {
+            ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          }
+        });
       
       openFolder(true);
 
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-	  }
-	});
+          public void run() {
+            ((FolderPanel)getParentContainer()).getMainPanel().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+          }
+        });
     }
     
   }
@@ -651,9 +651,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     
     public void actionPerformed(ActionEvent e) {
       try {
-	getFolderInfo().closeFolder(false);
+        getFolderInfo().closeFolder(false);
       } catch (Exception ex) {
-	System.out.println("caught exception:  " + ex.getMessage());
+        System.out.println("caught exception:  " + ex.getMessage());
       }
     }
     
