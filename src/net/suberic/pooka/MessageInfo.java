@@ -64,45 +64,45 @@ public class MessageInfo {
       attachments = MailUtilities.parseAttachments(getMessage());
       attachmentsLoaded = true;
       if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && cryptoInfo.isEncrypted()) {
-	UserProfile p = getDefaultProfile();
-	if (p == null)
-	  p = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
+        UserProfile p = getDefaultProfile();
+        if (p == null)
+          p = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
 	
-	if (cryptoInfo.autoDecrypt(p)) {
-	  //attachments = MailUtilities.parseAttachments(getMessage());
-	}
+        if (cryptoInfo.autoDecrypt(p)) {
+          //attachments = MailUtilities.parseAttachments(getMessage());
+        }
       }
       
       if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") && cryptoInfo.isSigned()) {
-	if (cryptoInfo.autoCheckSignature((javax.mail.internet.InternetAddress) getMessage().getFrom()[0])) {
-	  //attachments = MailUtilities.parseAttachments(getMessage());
-	}
+        if (cryptoInfo.autoCheckSignature((javax.mail.internet.InternetAddress) getMessage().getFrom()[0])) {
+          //attachments = MailUtilities.parseAttachments(getMessage());
+        }
       }
       
     } catch (MessagingException me) {
       // if we can't parse the message, try loading it as a single text
       // file.
       try {
-	javax.mail.internet.MimeMessage mimeMessage = (javax.mail.internet.MimeMessage)getMessage();
-	AttachmentBundle bundle = new AttachmentBundle(mimeMessage);
-	ByteArrayOutputStream baos = new ByteArrayOutputStream();
-	java.util.List headerList = new java.util.ArrayList();
-	java.util.Enumeration headerEnum = mimeMessage.getAllHeaders();
-	while (headerEnum.hasMoreElements()) {
-	  Header hdr = (Header) headerEnum.nextElement();
-	  headerList.add(hdr.getName());
-	}
-	String[] excludeList = (String[]) headerList.toArray(new String[0]);
-	mimeMessage.writeTo(baos, excludeList);
-	String content = baos.toString("ISO-8859-1");
-	javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-	mbp.setText(content);
-	Attachment textPart = new Attachment(mbp);
-	bundle.addAttachment(textPart);
+        javax.mail.internet.MimeMessage mimeMessage = (javax.mail.internet.MimeMessage)getMessage();
+        AttachmentBundle bundle = new AttachmentBundle(mimeMessage);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        java.util.List headerList = new java.util.ArrayList();
+        java.util.Enumeration headerEnum = mimeMessage.getAllHeaders();
+        while (headerEnum.hasMoreElements()) {
+          Header hdr = (Header) headerEnum.nextElement();
+          headerList.add(hdr.getName());
+        }
+        String[] excludeList = (String[]) headerList.toArray(new String[0]);
+        mimeMessage.writeTo(baos, excludeList);
+        String content = baos.toString("ISO-8859-1");
+        javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+        mbp.setText(content);
+        Attachment textPart = new Attachment(mbp);
+        bundle.addAttachment(textPart);
 	
-	attachments = bundle;
+        attachments = bundle;
       } catch (Exception e) {
-	throw me;
+        throw me;
       }
     } catch (java.io.IOException ioe) {
       throw new MessagingException("Error loading Message:  " + ioe.toString(), ioe);
@@ -117,8 +117,8 @@ public class MessageInfo {
     if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
       Logger folderLogger = getFolderInfo().getLogger();
       if (folderLogger.isLoggable(Level.WARNING)) {
-	folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
-	Thread.currentThread().dumpStack();
+        folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
+        Thread.currentThread().dumpStack();
       }
     }
     
@@ -134,9 +134,9 @@ public class MessageInfo {
       return getMessage().isSet(Flags.Flag.RECENT);
     else if (flagName.equals("FLAG.SEEN")) {
       if (folderInfo != null && ! folderInfo.tracksUnreadMessages())
-	return true;
+        return true;
       else
-	return getMessage().isSet(Flags.Flag.SEEN);
+        return getMessage().isSet(Flags.Flag.SEEN);
     }
     
     return false;
@@ -149,8 +149,8 @@ public class MessageInfo {
     if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
       Logger folderLogger = getFolderInfo().getLogger();
       if (folderLogger.isLoggable(Level.WARNING)) {
-	folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
-	Thread.currentThread().dumpStack();
+        folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
+        Thread.currentThread().dumpStack();
 	
       }
     }
@@ -164,8 +164,8 @@ public class MessageInfo {
     if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
       Logger folderLogger = getFolderInfo().getLogger();
       if (folderLogger.isLoggable(Level.WARNING)) {
-	folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
-	Thread.currentThread().dumpStack();
+        folderLogger.log(Level.WARNING, "Accessing Message Flags not on Folder Thread.");
+        Thread.currentThread().dumpStack();
 	
       }
     }
@@ -179,8 +179,8 @@ public class MessageInfo {
     if (Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
       Logger folderLogger = getFolderInfo().getLogger();
       if (folderLogger.isLoggable(Level.WARNING)) {
-	folderLogger.log(Level.WARNING, "Accessing Message Headers not on Folder Thread.");
-	Thread.currentThread().dumpStack();
+        folderLogger.log(Level.WARNING, "Accessing Message Headers not on Folder Thread.");
+        Thread.currentThread().dumpStack();
 	
       }
     }
@@ -195,18 +195,18 @@ public class MessageInfo {
     if (getFolderInfo() != null && Thread.currentThread() != getFolderInfo().getFolderThread() && ! (Thread.currentThread() instanceof net.suberic.pooka.thread.LoadMessageThread)) {
       Logger folderLogger = getFolderInfo().getLogger();
       if (folderLogger.isLoggable(Level.WARNING)) {
-	folderLogger.log(Level.WARNING, "Getting Message Property not on Folder Thread.");
-	Thread.currentThread().dumpStack();
+        folderLogger.log(Level.WARNING, "Getting Message Property not on Folder Thread.");
+        Thread.currentThread().dumpStack();
 	
       }
     }
     Message msg = getMessage();
     if (prop.equals("From")) {
       try {
-	Address[] fromAddr = msg.getFrom();
-	return MailUtilities.decodeAddressString(fromAddr);
+        Address[] fromAddr = msg.getFrom();
+        return MailUtilities.decodeAddressString(fromAddr);
       } catch (javax.mail.internet.AddressException ae) {
-	return ((MimeMessage) msg).getHeader("From", ",");
+        return ((MimeMessage) msg).getHeader("From", ",");
       }
     } else if (prop.equalsIgnoreCase("receivedDate")) {
       return msg.getReceivedDate();
@@ -227,7 +227,7 @@ public class MessageInfo {
     if (msg instanceof MimeMessage) {
       String hdrVal = ((MimeMessage)msg).getHeader(prop, ",");
       if (hdrVal != null && hdrVal.length() > 0)
-	return MailUtilities.decodeText(hdrVal);
+        return MailUtilities.decodeText(hdrVal);
     }
     return "";
   }
@@ -238,19 +238,19 @@ public class MessageInfo {
   public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
     try {
       if (!hasLoadedAttachments()) 
-	loadAttachmentInfo();
+        loadAttachmentInfo();
       return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
     } catch (FolderClosedException fce) {
       try {
-	if (getFolderInfo().shouldBeConnected()) {
-	  getFolderInfo().openFolder(Folder.READ_WRITE);
-	  loadAttachmentInfo();
-	  return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} else {
-	  throw fce;
-	}
+        if (getFolderInfo().shouldBeConnected()) {
+          getFolderInfo().openFolder(Folder.READ_WRITE);
+          loadAttachmentInfo();
+          return attachments.getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+        } else {
+          throw fce;
+        }
       } catch (java.io.IOException ioe) {
-	throw new MessagingException(ioe.getMessage()); 
+        throw new MessagingException(ioe.getMessage()); 
       }
     } catch (java.io.IOException ioe) {
       ioe.printStackTrace();
@@ -265,12 +265,12 @@ public class MessageInfo {
     return getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
   }
   
-    /**
-     * Gets the Content and inline text content for the Message.
-     */
-    public String getTextAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
-	return getTextAndTextInlines(getAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
-    }
+  /**
+   * Gets the Content and inline text content for the Message.
+   */
+  public String getTextAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+    return getTextAndTextInlines(getAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
+  }
 
   /**
    * Gets the Text part of the Content of this Message.  If no real text
@@ -280,27 +280,27 @@ public class MessageInfo {
   public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
     try {
       if (!hasLoadedAttachments()) 
-	loadAttachmentInfo();
+        loadAttachmentInfo();
       String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
       if (returnValue != null)
-	return returnValue;
+        return returnValue;
       else
-	return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
+        return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
     } catch (FolderClosedException fce) {
       try {
-	if (getFolderInfo().shouldBeConnected()) {
-	  getFolderInfo().openFolder(Folder.READ_WRITE);
-	  loadAttachmentInfo();
-	  String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	  if (returnValue != null)
-	    return returnValue;
-	  else
-	    return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
-	} else {
-	  throw fce;
-	}
+        if (getFolderInfo().shouldBeConnected()) {
+          getFolderInfo().openFolder(Folder.READ_WRITE);
+          loadAttachmentInfo();
+          String returnValue = attachments.getTextPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+          if (returnValue != null)
+            return returnValue;
+          else
+            return getHtmlPart(withHeaders, showFullHeaders, maxLength, getHtmlTruncationMessage());
+        } else {
+          throw fce;
+        }
       } catch (java.io.IOException ioe) {
-	throw new MessagingException(ioe.getMessage()); 
+        throw new MessagingException(ioe.getMessage()); 
       }
     } catch (java.io.IOException ioe) {
       throw new MessagingException(ioe.getMessage()); 
@@ -322,19 +322,19 @@ public class MessageInfo {
   public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
     try {
       if (!hasLoadedAttachments()) 
-	loadAttachmentInfo();
+        loadAttachmentInfo();
       return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
     } catch (FolderClosedException fce) {
       try {
-	if (getFolderInfo().shouldBeConnected()) {
-	  getFolderInfo().openFolder(Folder.READ_WRITE);
-	  loadAttachmentInfo();
-	  return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} else {
-	  throw fce;
-	}
+        if (getFolderInfo().shouldBeConnected()) {
+          getFolderInfo().openFolder(Folder.READ_WRITE);
+          loadAttachmentInfo();
+          return attachments.getHtmlPart(withHeaders, showFullHeaders, maxLength, truncationMessage);
+        } else {
+          throw fce;
+        }
       } catch (java.io.IOException ioe) {
-	throw new MessagingException(ioe.getMessage()); 
+        throw new MessagingException(ioe.getMessage()); 
       }
     } catch (java.io.IOException ioe) {
       throw new MessagingException(ioe.getMessage()); 
@@ -354,19 +354,19 @@ public class MessageInfo {
   public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
     try {
       if (!hasLoadedAttachments()) 
-	loadAttachmentInfo();
+        loadAttachmentInfo();
       return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
     } catch (FolderClosedException fce) {
       try {
-	if (getFolderInfo().shouldBeConnected()) {
-	  getFolderInfo().openFolder(Folder.READ_WRITE);
-	  loadAttachmentInfo();
-	  return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
-	} else {
-	  throw fce;
-	}
+        if (getFolderInfo().shouldBeConnected()) {
+          getFolderInfo().openFolder(Folder.READ_WRITE);
+          loadAttachmentInfo();
+          return attachments.getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, maxLength, truncationMessage);
+        } else {
+          throw fce;
+        }
       } catch (java.io.IOException ioe) {
-	throw new MessagingException(ioe.getMessage()); 
+        throw new MessagingException(ioe.getMessage()); 
       }
     } catch (java.io.IOException ioe) {
       throw new MessagingException(ioe.getMessage()); 
@@ -393,11 +393,11 @@ public class MessageInfo {
   public String getRawText() throws MessagingException {
     try {
       /*
-      StringWriter writer = new StringWriter();
-      for (int i = 0; i > -1; i = is.read()) {
-	writer.write(i);
-      }
-      return writer.toString();
+        StringWriter writer = new StringWriter();
+        for (int i = 0; i > -1; i = is.read()) {
+        writer.write(i);
+        }
+        return writer.toString();
       */
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       MimeMessage mm = (MimeMessage) getMessage();
@@ -478,10 +478,10 @@ public class MessageInfo {
     if (p != null && p.getMailServer() != null) {
       final OutgoingMailServer mailServer = p.getMailServer();
       mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent ae) {
-	    mailServer.sendMessage(final_nmi);
-	  }
-	}, new java.awt.event.ActionEvent(this, 0, "message-send"));
+          public void actionPerformed(java.awt.event.ActionEvent ae) {
+            mailServer.sendMessage(final_nmi);
+          }
+        }, new java.awt.event.ActionEvent(this, 0, "message-send"));
     }
   }
 
@@ -496,19 +496,19 @@ public class MessageInfo {
     FolderInfo trashFolder = getFolderInfo().getTrashFolder();
     if ((getFolderInfo().useTrashFolder()) && (trashFolder != null) && (trashFolder != getFolderInfo())) {
       try {
-	moveMessage(trashFolder, autoExpunge);
+        moveMessage(trashFolder, autoExpunge);
       } catch (MessagingException me) {
-	throw new MessagingException(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "No trash folder available."),  me);
+        throw new MessagingException(Pooka.getProperty("error.Messsage.DeleteNoTrashFolder", "No trash folder available."),  me);
       }
     } else {
       
       // actually remove the message, if we haven't already moved it.
       
       try {
-	remove(autoExpunge);
+        remove(autoExpunge);
       } catch (MessagingException me) {
-	me.printStackTrace();
-	throw new MessagingException(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", me);
+        me.printStackTrace();
+        throw new MessagingException(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", me);
       }   
     }
     
@@ -540,7 +540,7 @@ public class MessageInfo {
     if (m != null) {
       m.setFlag(Flags.Flag.DELETED, true);
       if ( autoExpunge ) {
-	folderInfo.expunge();
+        folderInfo.expunge();
       }
     }
   }
@@ -575,35 +575,35 @@ public class MessageInfo {
     int index = introTemplate.lastIndexOf('%', introTemplate.length());
     try {
       while (index > -1) {
-	try {
-	  char nextChar = introTemplate.charAt(index + 1);
-	  String replaceMe = null;
-	  if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
+        try {
+          char nextChar = introTemplate.charAt(index + 1);
+          String replaceMe = null;
+          if (nextChar == Pooka.getProperty("Pooka.parsedString.nameChar", "n").charAt(0)) {
 	    
-	    Address[] fromAddresses = m.getFrom();
-	    if (fromAddresses.length > 0 && fromAddresses[0] != null) {
-	      replaceMe = MailUtilities.decodeAddressString(fromAddresses);
-	      if (replaceMe == null)
-		replaceMe = "";
-	      intro.replace(index, index +2, replaceMe);
-	    }
-	  } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
-	    replaceMe = Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate());
-	    if (replaceMe == null)
-	      replaceMe = "";
-	    intro.replace(index, index + 2, replaceMe);
-	  } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
-	    replaceMe = m.getSubject();
-	    if (replaceMe == null)
-	      replaceMe = "";
-	    intro.replace(index, index + 2, m.getSubject());
-	  } else if (nextChar == '%') {
-	    intro.replace(index, index+1, "%");
-	  }
-	  index = introTemplate.lastIndexOf('%', index -1);
-	} catch (StringIndexOutOfBoundsException e) {
-	  index = introTemplate.lastIndexOf('%', index -1);
-	}
+            Address[] fromAddresses = m.getFrom();
+            if (fromAddresses.length > 0 && fromAddresses[0] != null) {
+              replaceMe = MailUtilities.decodeAddressString(fromAddresses);
+              if (replaceMe == null)
+                replaceMe = "";
+              intro.replace(index, index +2, replaceMe);
+            }
+          } else if (nextChar == Pooka.getProperty("Pooka.parsedString.dateChar", "d").charAt(0)) {
+            replaceMe = Pooka.getDateFormatter().fullDateFormat.format(m.getSentDate());
+            if (replaceMe == null)
+              replaceMe = "";
+            intro.replace(index, index + 2, replaceMe);
+          } else if (nextChar == Pooka.getProperty("Pooka.parsedString.subjChar", "s").charAt(0)) {
+            replaceMe = m.getSubject();
+            if (replaceMe == null)
+              replaceMe = "";
+            intro.replace(index, index + 2, m.getSubject());
+          } else if (nextChar == '%') {
+            intro.replace(index, index+1, "%");
+          }
+          index = introTemplate.lastIndexOf('%', index -1);
+        } catch (StringIndexOutOfBoundsException e) {
+          index = introTemplate.lastIndexOf('%', index -1);
+        }
       }
     } catch (MessagingException me) {
       return null;
@@ -611,7 +611,7 @@ public class MessageInfo {
     
     if (addLF)
       if (intro.charAt(intro.length()-1) != '\n')
-	intro.append('\n');
+        intro.append('\n');
     
     return intro.toString();
   }
@@ -699,18 +699,18 @@ public class MessageInfo {
       
       UserProfile up = getDefaultProfile();
       if (up == null) {
-	up = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
+        up = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
       }
       
       String forwardPrefix;
       String parsedIntro;
       
       if (up != null && up.getMailProperties() != null) {
-	forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
-	parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")), true);
+        forwardPrefix = up.getMailProperties().getProperty("forwardPrefix", Pooka.getProperty("Pooka.forwardPrefix", "> "));
+        parsedIntro = parseMsgString(mMsg, up.getMailProperties().getProperty("forwardIntro", Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:")), true);
       } else { 
-	forwardPrefix = Pooka.getProperty("Pooka.forwardPrefix", "> ");
-	parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"), true);
+        forwardPrefix = Pooka.getProperty("Pooka.forwardPrefix", "> ");
+        parsedIntro = parseMsgString(mMsg, Pooka.getProperty("Pooka.forwardIntro", "Forwarded message from %n:"), true);
       }
       parsedText = prefixMessage(textPart, forwardPrefix, parsedIntro);
       
@@ -738,17 +738,17 @@ public class MessageInfo {
       returnValue.attachments = new AttachmentBundle();
       Vector fromAttachments = attachments.getAttachments();
       if (fromAttachments != null) {
-	AttachmentBundle returnAttachments = returnValue.getAttachmentBundle();
-	for (int i = 0; i < fromAttachments.size(); i++) {
-	  Attachment current = (Attachment) fromAttachments.elementAt(i);
-	  Attachment newAttachment = null;
+        AttachmentBundle returnAttachments = returnValue.getAttachmentBundle();
+        for (int i = 0; i < fromAttachments.size(); i++) {
+          Attachment current = (Attachment) fromAttachments.elementAt(i);
+          Attachment newAttachment = null;
 	  
-	  javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-	  mbp.setDataHandler(current.getDataHandler());
-	  newAttachment = new MBPAttachment(mbp);
-	  returnAttachments.addAttachment(newAttachment, false);
-	}
-	returnValue.attachmentsLoaded=true;
+          javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+          mbp.setDataHandler(current.getDataHandler());
+          newAttachment = new MBPAttachment(mbp);
+          returnAttachments.addAttachment(newAttachment, false);
+        }
+        returnValue.attachmentsLoaded=true;
       }
     }
     
@@ -784,10 +784,10 @@ public class MessageInfo {
     } catch (Exception e) {
       int configureNow = Pooka.getUIFactory().showConfirmDialog("Spam action currently not configured.  Would you like to configure it now?", "Configure Spam action", javax.swing.JOptionPane.YES_NO_OPTION);
       if (configureNow == javax.swing.JOptionPane.YES_OPTION) {
-	// show configure screen.
-	Vector valuesToEdit = new Vector();
-	valuesToEdit.add("Pooka.spamAction");
-	Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("Preferences.Spam.label", "Spam"), valuesToEdit);
+        // show configure screen.
+        Vector valuesToEdit = new Vector();
+        valuesToEdit.add("Pooka.spamAction");
+        Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("Preferences.Spam.label", "Spam"), valuesToEdit);
       }
       
     }
@@ -796,11 +796,11 @@ public class MessageInfo {
       v.add(this.getMessageProxy());
       java.util.List removed = spamFilter.performFilter(v);
       if (removed != null && removed.size() > 0) {
-	try {
-	  getFolderInfo().expunge();
-	} catch (MessagingException me) {
-	  // throw it away
-	}
+        try {
+          getFolderInfo().expunge();
+        } catch (MessagingException me) {
+          // throw it away
+        }
       }
       return;
     } 
@@ -856,27 +856,27 @@ public class MessageInfo {
       // see if there's a Vcard attachment on here.
       Vector attachList = getAttachments();
       if (attachList != null) {
-	for (int i = 0; i < attachList.size() && vcard==null; i++) {
-	  Attachment current = (Attachment)attachList.get(i);
-	  if (current.getMimeType().match("text/x-vcard")) {
-	    vcard = current;
-	  }
-	}
+        for (int i = 0; i < attachList.size() && vcard==null; i++) {
+          Attachment current = (Attachment)attachList.get(i);
+          if (current.getMimeType().match("text/x-vcard")) {
+            vcard = current;
+          }
+        }
 
-	if (vcard != null) {
-	  try {
-	    String vcardText = (String) vcard.getContent();
-	    BufferedReader reader = new BufferedReader(new StringReader(vcardText));
-	    net.suberic.pooka.vcard.Vcard addressEntry = net.suberic.pooka.vcard.Vcard.parse(reader);
-	    book.addAddress(addressEntry);
-	    found = true;
-	  } catch (Exception e) {
-	    // if we get any exceptions parsing the Vcard, just fall back to
-	    // using the fromAddress.  do print out a debugging message,
-	    // though.
-	    getMessageProxy().showError(Pooka.getProperty("error.parsingVcard", "Error parsing Vcard"), e);
-	  }
-	}
+        if (vcard != null) {
+          try {
+            String vcardText = (String) vcard.getContent();
+            BufferedReader reader = new BufferedReader(new StringReader(vcardText));
+            net.suberic.pooka.vcard.Vcard addressEntry = net.suberic.pooka.vcard.Vcard.parse(reader);
+            book.addAddress(addressEntry);
+            found = true;
+          } catch (Exception e) {
+            // if we get any exceptions parsing the Vcard, just fall back to
+            // using the fromAddress.  do print out a debugging message,
+            // though.
+            getMessageProxy().showError(Pooka.getProperty("error.parsingVcard", "Error parsing Vcard"), e);
+          }
+        }
       }
     }
 
@@ -888,7 +888,7 @@ public class MessageInfo {
       AddressBookEntry entry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
       String personalName = addr.getPersonal();
       if (personalName == null) 
-	personalName = addr.getAddress();
+        personalName = addr.getAddress();
       
       entry.setPersonalName(personalName);
       entry.setAddress(addr);
@@ -931,9 +931,9 @@ public class MessageInfo {
       return true;
     } else
       try {
-	return flagIsSet("FLAG.SEEN");
+        return flagIsSet("FLAG.SEEN");
       } catch (MessagingException me) {
-	return true;
+        return true;
       }
   }
 
@@ -947,10 +947,10 @@ public class MessageInfo {
     else {
       boolean seen = isSeen();
       if (newValue != seen) {
-	//Message m = getRealMessage();
-	Message m = getMessage();
-	m.setFlag(Flags.Flag.SEEN, newValue);
-	getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
+        //Message m = getRealMessage();
+        Message m = getMessage();
+        m.setFlag(Flags.Flag.SEEN, newValue);
+        getFolderInfo().fireMessageChangedEvent(new MessageChangedEvent(this, MessageChangedEvent.FLAGS_CHANGED, getMessage()));
       }
     }
   }
@@ -983,27 +983,27 @@ public class MessageInfo {
       return mHasAttachments;
     } else {
       if (hasLoadedAttachments()) {
-	if (getAttachments() != null && getAttachments().size() > 0)
-	  mHasAttachments = true;
+        if (getAttachments() != null && getAttachments().size() > 0)
+          mHasAttachments = true;
 	
-	mHasCheckedAttachments = true;
+        mHasCheckedAttachments = true;
 	
-	return mHasAttachments;
+        return mHasAttachments;
 	
       } else {
-	try {
-	  javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
-	  if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
-	    return true;
-	  } else {
-	    return false;
-	  }
-	} catch (javax.mail.internet.ParseException pe) {
-	  if (Pooka.isDebug()) {
-	    System.out.println("unable to parse content-type:  " + getMessage().getContentType());
-	  }
-	  mHasAttachments = false;
-	}
+        try {
+          javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
+          if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
+            return true;
+          } else {
+            return false;
+          }
+        } catch (javax.mail.internet.ParseException pe) {
+          if (Pooka.isDebug()) {
+            System.out.println("unable to parse content-type:  " + getMessage().getContentType());
+          }
+          mHasAttachments = false;
+        }
       }
     }
 

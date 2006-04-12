@@ -1,3 +1,5 @@
+made the remove-self-from-reply-all code case-insensitive.
+
 added htmlparser library to handle replies to html-only email.
 
 opening a message by keypress was incorrectly happening on the AwtEventThread.

@@ -77,7 +77,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     
     if (! signAsDefault) {
       if ( mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("smime")) {
-	cryptoDefaultType="SMIME";
+        cryptoDefaultType="SMIME";
       }
     }
     
@@ -122,32 +122,32 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       String key = (String)(keys.nextElement());
       
       if (key.equals("FromPersonal")) {
-	fromPersonal = mailProperties.getProperty(key);
+        fromPersonal = mailProperties.getProperty(key);
       } else if (key.equals("From")) {
-	fromAddr = mailProperties.getProperty(key);
+        fromAddr = mailProperties.getProperty(key);
       } else if (key.equals("ReplyTo")) {
-	replyAddr = mailProperties.getProperty(key);
+        replyAddr = mailProperties.getProperty(key);
       } else if (key.equals("ReplyToPersonal")) {
-	replyPersonal = mailProperties.getProperty(key);
+        replyPersonal = mailProperties.getProperty(key);
       } else {
-	mMsg.setHeader(key, mailProperties.getProperty(key));
+        mMsg.setHeader(key, mailProperties.getProperty(key));
       }
       
       try {
-	if (fromAddr != null) 
-	  if (fromPersonal != null && !(fromPersonal.equals(""))) 
-	    mMsg.setFrom(new InternetAddress(fromAddr, fromPersonal));
-	  else
-	    mMsg.setFrom(new InternetAddress(fromAddr));
+        if (fromAddr != null) 
+          if (fromPersonal != null && !(fromPersonal.equals(""))) 
+            mMsg.setFrom(new InternetAddress(fromAddr, fromPersonal));
+          else
+            mMsg.setFrom(new InternetAddress(fromAddr));
 	
-	if (replyAddr != null && !(replyAddr.equals("")))
-	  if (replyPersonal != null)
-	    mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr, replyPersonal)});
-	  else
-	    mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr)});
+        if (replyAddr != null && !(replyAddr.equals("")))
+          if (replyPersonal != null)
+            mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr, replyPersonal)});
+          else
+            mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr)});
 	
       } catch (java.io.UnsupportedEncodingException uee) {
-	throw new MessagingException("", uee);
+        throw new MessagingException("", uee);
       }
     }
   }
@@ -167,32 +167,32 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       String key = (String)(keys.nextElement());
       
       if (key.equals("FromPersonal")) {
-	fromPersonal = mailProperties.getProperty(key);
+        fromPersonal = mailProperties.getProperty(key);
       } else if (key.equals("From")) {
-	fromAddr = mailProperties.getProperty(key);
+        fromAddr = mailProperties.getProperty(key);
       } else if (key.equals("ReplyTo")) {
-	replyAddr = mailProperties.getProperty(key);
+        replyAddr = mailProperties.getProperty(key);
       } else if (key.equals("ReplyToPersonal")) {
-	replyPersonal = mailProperties.getProperty(key);
+        replyPersonal = mailProperties.getProperty(key);
       } else {
-	pHeaders.setHeader(key, mailProperties.getProperty(key));
+        pHeaders.setHeader(key, mailProperties.getProperty(key));
       }
       
       try {
-	if (fromAddr != null) 
-	  if (fromPersonal != null && !(fromPersonal.equals(""))) 
-	    pHeaders.setHeader("From", new InternetAddress(fromAddr, fromPersonal).toString());
-	  else
-	    pHeaders.setHeader("From", new InternetAddress(fromAddr).toString());
+        if (fromAddr != null) 
+          if (fromPersonal != null && !(fromPersonal.equals(""))) 
+            pHeaders.setHeader("From", new InternetAddress(fromAddr, fromPersonal).toString());
+          else
+            pHeaders.setHeader("From", new InternetAddress(fromAddr).toString());
 	
-	if (replyAddr != null && !(replyAddr.equals("")))
-	  if (replyPersonal != null)
-	    pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
-	  else
-	    pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr).toString());
+        if (replyAddr != null && !(replyAddr.equals("")))
+          if (replyPersonal != null)
+            pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
+          else
+            pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr).toString());
 	
       } catch (java.io.UnsupportedEncodingException uee) {
-	throw new MessagingException("", uee);
+        throw new MessagingException("", uee);
       }
     }
   }
@@ -224,21 +224,21 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     if (addresses != null && addresses.length > 0) {
       Vector returnVector = new Vector();
       for (int i = 0; i < addresses.length; i++) {
-	String currentAddress = ((InternetAddress) addresses[i]).getAddress();
-	boolean found = false;
-	for (int j = 0; j < excludeAddresses.size() && found == false ; j++) {
-	  String excludeAddr = (String)excludeAddresses.elementAt(j);
-	  if (currentAddress.equals(excludeAddr))
-	    found = true;
-	}
-	if (!found)
-	  returnVector.add(addresses[i]);
+        String currentAddress = ((InternetAddress) addresses[i]).getAddress();
+        boolean found = false;
+        for (int j = 0; j < excludeAddresses.size() && found == false ; j++) {
+          String excludeAddr = (String)excludeAddresses.elementAt(j);
+          if (currentAddress.equalsIgnoreCase(excludeAddr))
+            found = true;
+        }
+        if (!found)
+          returnVector.add(addresses[i]);
       }
       
       Object[] retArr = returnVector.toArray();
       Address[] returnValue = new Address[retArr.length];
       for (int i = 0; i < retArr.length; i++)
-	returnValue[i] = (Address) retArr[i];
+        returnValue[i] = (Address) retArr[i];
       
       return returnValue;
     } else
@@ -270,13 +270,13 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   }
 
   /*
-  public URLName getSendMailURL() {
+    public URLName getSendMailURL() {
     return sendMailURL;
-  }
+    }
 
-  public String getSendPrecommand() {
+    public String getSendPrecommand() {
     return sendPrecommand;
-  }
+    }
   */
   
   public FolderInfo getSentFolder() {
@@ -343,7 +343,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
       
       if (sentFolder != null) {
-	sentFolder.setSentFolder(true);
+        sentFolder.setSentFolder(true);
       } 
     }
   }
@@ -427,17 +427,17 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
 
     if (keyAlias != null && keyAlias.length() > 0) {
       try {
-	if (Pooka.getCryptoManager().privateKeyAliases(type).contains(keyAlias)) {
-	  try {
-	    java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
+        if (Pooka.getCryptoManager().privateKeyAliases(type).contains(keyAlias)) {
+          try {
+            java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
 	    
-	    return returnValue;
-	  } catch (java.security.UnrecoverableKeyException uke) {
-	    // we just haven't accessed the key yet.  skip.
-	  }
-	}
+            return returnValue;
+          } catch (java.security.UnrecoverableKeyException uke) {
+            // we just haven't accessed the key yet.  skip.
+          }
+        }
       } catch (Exception ee) {
-	ee.printStackTrace();
+        ee.printStackTrace();
       }
       // FIXME
       return null;
@@ -463,9 +463,9 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     else {
       AddressBook defaultBook = Pooka.getAddressBookManager().getDefault();
       if (defaultBook != null)
-	return defaultBook.getAddressMatcher();
+        return defaultBook.getAddressMatcher();
       else
-	return null;
+        return null;
     }
   }
 
