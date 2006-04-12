@@ -630,7 +630,17 @@ public class MessageInfo {
     if (textPart == null) {
       textPart = "";
     }
-    
+
+    if (isHtml()) {
+      net.suberic.pooka.htmlparser.PookaStringBean psb = new net.suberic.pooka.htmlparser.PookaStringBean();
+      psb.setContent(textPart, null);
+      textPart = psb.getStrings();
+    }
+
+    if (textPart == null) {
+      textPart = "";
+    }
+
     UserProfile up = getDefaultProfile();
     if (up == null)
       up = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();

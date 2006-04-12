@@ -1,4 +1,8 @@
+added htmlparser library to handle replies to html-only email.
+
 opening a message by keypress was incorrectly happening on the AwtEventThread.
+
+2.0 branch:  moved to javamail 1.4, jdk 1.6.
 
 060227 release
 --------------

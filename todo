@@ -13,9 +13,6 @@
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
 	-- antialiasing yes.  opengl probably not unless as a special option.
 
-**) make reply-to html work in a resonable way.
-	- research.  should be doable, maybe with a custom library
-
 **) make wheel scroll customizable
 
 -----
@@ -31,6 +28,9 @@ deleted messages, etc. gracefully.
 
 *) add a way to show update information when the webstart version is
 	upgraded.
+
+*) change build.xml to include everything in Imported, rather than doing
+	each file explicitly.
 
 online:
   *) look at online bugs, etc.

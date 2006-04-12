@@ -14,9 +14,8 @@
   <property name="mail_cp" value="${importdir}/mail.jar"/>
   <property name="javahelp_cp" value="${importdir}/jh.jar"/>
   <property name="crypto_cp" value="${importdir}/javamail-crypto.jar"/>
-  <property name="jdic_cp" value="${importdir}/jdic.jar"/>
-
-  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${crypto_cp}:${jdic_cp}"/> 
+  <property name="htmlparser_cp" value="${importdir}/htmlparser.jar"/> 
+  <property name="full_cp" value="${activation_cp}:${mail_cp}:${javahelp_cp}:${crypto_cp}:${htmlparser_cp}"/> 
 
 <!-- libaries that will get included in the distribution -->
   <property name="kunststoff_lib" value="${importdir}/kunststoff.jar"/>
@@ -29,6 +28,7 @@
   <property name="crypto_combined_lib" value="${importdir}/cryptoproviders.jar"/>
   <property name="cryptix_message_api_lib" value="${importdir}/cryptix-message-api.jar"/>
   <property name="cryptix_pki_api_lib" value="${importdir}/cryptix-pki-api.jar"/>
+  <property name="htmlparser_lib" value="${importdir}/htmlparser.jar"/> 
 
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -139,6 +139,7 @@
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${crypto_lib}"/>
       <zipfileset src="${icons_dist_lib}"/>
+      <zipfileset src="${htmlparser_lib}"/>
     </jar>
     <signjar jar="${distdir}/pooka_11_${today}.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
   </target>
@@ -156,6 +157,7 @@
       <zipfileset src="${activation_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${javahelp_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${mail_dist_lib}"/>
+      <zipfileset src="${htmlparser_lib}"/>
       <zipfileset src="${localproviders_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${crypto_lib}"/>
