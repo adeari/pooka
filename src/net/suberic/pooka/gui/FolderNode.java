@@ -224,7 +224,7 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
         popupMenu.configureComponent("TrashFolderNode.popupMenu", Pooka.getResources());
       else if (getFolderInfo().isOutboxFolder())
         popupMenu.configureComponent("OutboxFolderNode.popupMenu", Pooka.getResources());
-      else if (getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo && ! ((net.suberic.pooka.cache.CachingFolderInfo) getFolderInfo()).getCacheHeadersOnly()) 
+      else if (getFolderInfo() instanceof net.suberic.pooka.cache.CachingFolderInfo && ! ((net.suberic.pooka.cache.CachingFolderInfo) getFolderInfo()).getCacheHeadersOnly())
         popupMenu.configureComponent("CachingFolderNode.popupMenu", Pooka.getResources());
       else
         popupMenu.configureComponent("FolderNode.popupMenu", Pooka.getResources());

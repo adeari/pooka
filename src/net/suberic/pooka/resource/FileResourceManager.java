@@ -67,7 +67,11 @@ public class FileResourceManager extends ResourceManager {
     if (pStore.isPopStore() && pName.equalsIgnoreCase("INBOX")) {
       return new PopInboxFolderInfo(pStore, pName);
     } else if (Pooka.getProperty(storeProperty + ".protocol", "mbox").equalsIgnoreCase("imap")) {
-      return  new UIDFolderInfo(pStore, pName);
+      if (Pooka.getProperty(storeProperty + ".cachingEnabled", Pooka.getProperty(storeProperty + "." + pName + ".cachingEnabled", "false")).equalsIgnoreCase("true") || Pooka.getProperty(storeProperty + ".cacheHeadersOnly", Pooka.getProperty(storeProperty + "." + pName + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true")) {
+        return new net.suberic.pooka.cache.CachingFolderInfo(pStore, pName);
+      } else {
+        return  new UIDFolderInfo(pStore, pName);
+      }
     } else {
       return new FolderInfo(pStore, pName);
     }

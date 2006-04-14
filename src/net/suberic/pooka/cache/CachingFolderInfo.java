@@ -950,19 +950,19 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
         getLogger().warning("error prefetching messages:  " + me.toString());
       }
       /*
-      for (int i = 0; i < preloadMessages.length; i++) {
+        for (int i = 0; i < preloadMessages.length; i++) {
         long uid = -1;
         try {
-          uid = getUID(preloadMessages[i]);
+        uid = getUID(preloadMessages[i]);
         } catch (MessagingException me) {
         }
         try {
-          // FIXME
-          getCache().cacheMessage((MimeMessage)preloadMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
+        // FIXME
+        getCache().cacheMessage((MimeMessage)preloadMessages[i], uid, getUIDValidity(), SimpleFileCache.FLAGS_AND_HEADERS, false);
         } catch (Exception e) {
 
         }
-      }
+        }
       */
 
       getCache().writeMsgFile();

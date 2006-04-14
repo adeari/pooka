@@ -1164,10 +1164,10 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
     FolderInfo fi = getMessageInfo().getFolderInfo();
     if ( fi != null ) {
-      if (fi instanceof net.suberic.pooka.cache.CachingFolderInfo) {
-        popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());
-      } else if (fi.isOutboxFolder()) {
+      if (fi.isOutboxFolder()) {
         popupMenu.configureComponent("NewMessageProxy.popupMenu", Pooka.getResources());
+      } else if (fi instanceof net.suberic.pooka.cache.CachingFolderInfo && ! ((net.suberic.pooka.cache.CachingFolderInfo) fi).getCacheHeadersOnly()) {
+        popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());
       } else {
         popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());
       }

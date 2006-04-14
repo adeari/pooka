@@ -145,13 +145,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     try {
       if (parent.isLoaded())
-	loadFolder();
+        loadFolder();
     } catch (MessagingException me) {
       // if we get an exception loading the folder while creating the folder
       // object, just ignore it.
       if (getLogger().isLoggable(Level.FINE)) {
-	getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
-	me.printStackTrace();
+        getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
+        me.printStackTrace();
 	
       }
     }
@@ -190,13 +190,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     try {
       if (parent.isConnected())
-	loadFolder();
+        loadFolder();
     } catch (MessagingException me) {
       // if we get an exception loading the folder while creating the folder
       // object, just ignore it.
       if (getLogger().isLoggable(Level.FINE)) {
-      getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
-	me.printStackTrace();
+        getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
+        me.printStackTrace();
 	
       }
     }
@@ -255,92 +255,92 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       loading = true;
 
       if (parentStore != null) {
-	getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
+        getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
 	
-	if (! parentStore.isAvailable())
-	  throw new MessagingException();
+        if (! parentStore.isAvailable())
+          throw new MessagingException();
 	
-	if (!parentStore.isConnected()) {
-	  if (pConnectStore) {
-	    parentStore.connectStore();
-	  } else {
-	    return;
-	  }
-	}
+        if (!parentStore.isConnected()) {
+          if (pConnectStore) {
+            parentStore.connectStore();
+          } else {
+            return;
+          }
+        }
 	
 
-	Store store = parentStore.getStore();
+        Store store = parentStore.getStore();
 
-	// first see if we're a namespace
-	try {
-	  getLogger().log(Level.FINE, "checking to see if " + getFolderID() + " is a shared folder.");
+        // first see if we're a namespace
+        try {
+          getLogger().log(Level.FINE, "checking to see if " + getFolderID() + " is a shared folder.");
 	  
-	  Folder[] sharedFolders = store.getSharedNamespaces();
+          Folder[] sharedFolders = store.getSharedNamespaces();
 	  
-	  if (sharedFolders != null && sharedFolders.length > 0) {
-	    for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
-	      if (sharedFolders[i].getName().equalsIgnoreCase(mFolderName)) {
-		if (!mNamespace) {
-		  Pooka.setProperty(getFolderID() + "._namespace", "true");
-		  mNamespace = true;
-		}
-		tmpFolder = new Folder[1];
-		tmpFolder[0] =  sharedFolders[i] ;
-	      }
-	    }
-	  }
-	} catch (Exception e) {
-	  // if we get a not supported exception or some such here,
-	  // just ignore it.
-	}
+          if (sharedFolders != null && sharedFolders.length > 0) {
+            for (int i = 0; ( tmpFolder == null || tmpFolder.length == 0 ) && i < sharedFolders.length; i++) {
+              if (sharedFolders[i].getName().equalsIgnoreCase(mFolderName)) {
+                if (!mNamespace) {
+                  Pooka.setProperty(getFolderID() + "._namespace", "true");
+                  mNamespace = true;
+                }
+                tmpFolder = new Folder[1];
+                tmpFolder[0] =  sharedFolders[i] ;
+              }
+            }
+          }
+        } catch (Exception e) {
+          // if we get a not supported exception or some such here,
+          // just ignore it.
+        }
 
-	if (tmpFolder == null || tmpFolder.length == 0) {
-	  // not a shared namespace
-	  tmpParentFolder = store.getDefaultFolder();
-	  getLogger().log(Level.FINE, "got " + tmpParentFolder + " as Default Folder for store.");
-	  getLogger().log(Level.FINE, "doing a list on default folder " + tmpParentFolder + " for folder " + mFolderName);
-	  tmpFolder = tmpParentFolder.list(mFolderName);
-	}
+        if (tmpFolder == null || tmpFolder.length == 0) {
+          // not a shared namespace
+          tmpParentFolder = store.getDefaultFolder();
+          getLogger().log(Level.FINE, "got " + tmpParentFolder + " as Default Folder for store.");
+          getLogger().log(Level.FINE, "doing a list on default folder " + tmpParentFolder + " for folder " + mFolderName);
+          tmpFolder = tmpParentFolder.list(mFolderName);
+        }
 
-	getLogger().log(Level.FINE, "got " + tmpFolder + " as Folder for folder " + getFolderID() + ".");
+        getLogger().log(Level.FINE, "got " + tmpFolder + " as Folder for folder " + getFolderID() + ".");
 	
       } else {
-	if (!parentFolder.isLoaded())
-	  parentFolder.loadFolder();
-	if (!parentFolder.isLoaded()) {
-	  tmpFolder = null;
-	} else {
-	  tmpParentFolder = parentFolder.getFolder();
-	  if (tmpParentFolder != null) {
-	    parentIsConnected = true;
-	    getLogger().log(Level.FINE, "running list (" + mFolderName + ") on parent folder " + tmpParentFolder);
-	    tmpFolder = tmpParentFolder.list(mFolderName);
-	  } else {
-	    tmpFolder = null;
-	  }
-	}
+        if (!parentFolder.isLoaded())
+          parentFolder.loadFolder();
+        if (!parentFolder.isLoaded()) {
+          tmpFolder = null;
+        } else {
+          tmpParentFolder = parentFolder.getFolder();
+          if (tmpParentFolder != null) {
+            parentIsConnected = true;
+            getLogger().log(Level.FINE, "running list (" + mFolderName + ") on parent folder " + tmpParentFolder);
+            tmpFolder = tmpParentFolder.list(mFolderName);
+          } else {
+            tmpFolder = null;
+          }
+        }
       }
 
       if (tmpFolder != null && tmpFolder.length > 0) {
-	setFolder(tmpFolder[0]);
-	if (! getFolder().isSubscribed())
-	  getFolder().setSubscribed(true);
+        setFolder(tmpFolder[0]);
+        if (! getFolder().isSubscribed())
+          getFolder().setSubscribed(true);
 	
-	type = getFolder().getType();
-	setStatus(CLOSED);
+        type = getFolder().getType();
+        setStatus(CLOSED);
       } else {
-	getLogger().log(Level.FINE, "folder " + mFolderName + " does not exist; setting as INVALID.");
-	if (parentIsConnected)
-	  setStatus(INVALID);
-	setFolder(null);
+        getLogger().log(Level.FINE, "folder " + mFolderName + " does not exist; setting as INVALID.");
+        if (parentIsConnected)
+          setStatus(INVALID);
+        setFolder(null);
       }
 
 
       /*
-      if (mFolderThread == null) {
-	mFolderThread = new ActionThread(getParentStore().getStoreID() + "." + getFolderID() + " - ActionThread");
-	mFolderThread.start();
-      }
+        if (mFolderThread == null) {
+        mFolderThread = new ActionThread(getParentStore().getStoreID() + "." + getFolderID() + " - ActionThread");
+        mFolderThread.start();
+        }
       */
       
 
@@ -410,25 +410,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       // if this happened accidentally, check it.
       if (getStatus() != CLOSED && getStatus() != DISCONNECTED) {
 
-	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	      // check to see if the parent store is still open.
+        getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+              // check to see if the parent store is still open.
 	      
-	      StoreInfo parentStoreInfo = getParentStore();
-	      if (parentStoreInfo != null) {
-		if (parentStoreInfo.isConnected())
-		  parentStoreInfo.checkConnection();
-	      }
-	    }
-	  }, new java.awt.event.ActionEvent(this, 0, "folder-closed"), ActionThread.PRIORITY_HIGH);
+              StoreInfo parentStoreInfo = getParentStore();
+              if (parentStoreInfo != null) {
+                if (parentStoreInfo.isConnected())
+                  parentStoreInfo.checkConnection();
+              }
+            }
+          }, new java.awt.event.ActionEvent(this, 0, "folder-closed"), ActionThread.PRIORITY_HIGH);
 	
-	if (getFolderDisplayUI() != null) {
-	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
-	}
+        if (getFolderDisplayUI() != null) {
+          getFolderDisplayUI().showStatusMessage(Pooka.getProperty(disconnectedMessage, "Lost connection to folder..."));
+        }
 	
-	if (status == CONNECTED) {
-	  setStatus(LOST_CONNECTION);
-	}
+        if (status == CONNECTED) {
+          setStatus(LOST_CONNECTION);
+        }
       }
       
     }
@@ -439,30 +439,30 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public void disconnected(ConnectionEvent e) {
     synchronized(this) {
       if (getLogger().isLoggable(Level.FINE)) {
-	getLogger().log(Level.FINE, "Folder " + getFolderID() + " disconnected.");
-	Thread.dumpStack();
+        getLogger().log(Level.FINE, "Folder " + getFolderID() + " disconnected.");
+        Thread.dumpStack();
       }
 
       // if this happened accidentally, check it.
       if (getStatus() != CLOSED) {
-	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	      // check to see if the parent store is still open.
+        getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+              // check to see if the parent store is still open.
 	      
-	      StoreInfo parentStoreInfo = getParentStore();
-	      if (parentStoreInfo != null && parentStoreInfo.isConnected()) {
-		parentStoreInfo.checkConnection();
-	      }
-	    }
-	  }, new java.awt.event.ActionEvent(this, 0, "folder-closed"), ActionThread.PRIORITY_HIGH);
+              StoreInfo parentStoreInfo = getParentStore();
+              if (parentStoreInfo != null && parentStoreInfo.isConnected()) {
+                parentStoreInfo.checkConnection();
+              }
+            }
+          }, new java.awt.event.ActionEvent(this, 0, "folder-closed"), ActionThread.PRIORITY_HIGH);
 	
-	if (getFolderDisplayUI() != null) {
-	  getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
-	}
+        if (getFolderDisplayUI() != null) {
+          getFolderDisplayUI().showStatusMessage(Pooka.getProperty("error.UIDFolder.disconnected", "Lost connection to folder..."));
+        }
 
-	if (status == CONNECTED) {
-	  setStatus(LOST_CONNECTION);
-	}
+        if (status == CONNECTED) {
+          setStatus(LOST_CONNECTION);
+        }
       } 
 
     }
@@ -536,18 +536,18 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
       getLogger().log(Level.FINE, this + ":  isLoaded() and isAvailable().");
       if (folder.isOpen()) {
-	if (folder.getMode() == mode)
-	  return;
-	else { 
-	  folder.close(false);
-	  openFolder(mode);
-	  updateFolderOpenStatus(true);
-	  resetMessageCounts();
-	}
+        if (folder.getMode() == mode)
+          return;
+        else { 
+          folder.close(false);
+          openFolder(mode);
+          updateFolderOpenStatus(true);
+          resetMessageCounts();
+        }
       } else {
-	folder.open(mode);
-	updateFolderOpenStatus(true);
-	resetMessageCounts();
+        folder.open(mode);
+        updateFolderOpenStatus(true);
+        resetMessageCounts();
       }
     } else if (status == INVALID) {
       throw new MessagingException(Pooka.getProperty("error.folderInvalid", "Error:  folder is invalid.  ") + getFolderID());
@@ -570,27 +570,27 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
 
-    /**
-     * This method calls openFolder() on this FolderInfo, and then, if
-     * this FolderInfo has any children, calls openFolder() on them,
-     * also.  
-     * 
-     * This is usually called by StoreInfo.connectStore() if 
-     * Pooka.openFoldersOnConnect is set to true.
-     */
+  /**
+   * This method calls openFolder() on this FolderInfo, and then, if
+   * this FolderInfo has any children, calls openFolder() on them,
+   * also.  
+   * 
+   * This is usually called by StoreInfo.connectStore() if 
+   * Pooka.openFoldersOnConnect is set to true.
+   */
 
-    public void openAllFolders(int mode) {
-      try {
-	openFolder(mode, false);
-      } catch (MessagingException me) {
-      }
+  public void openAllFolders(int mode) {
+    try {
+      openFolder(mode, false);
+    } catch (MessagingException me) {
+    }
       
-      if (children != null) {
-	for (int i = 0; i < children.size(); i++) {
-	  doOpenFolders((FolderInfo) children.elementAt(i), mode);
-	}
+    if (children != null) {
+      for (int i = 0; i < children.size(); i++) {
+        doOpenFolders((FolderInfo) children.elementAt(i), mode);
       }
     }
+  }
 
   /**
    * Handles the threading of doing an openAllFolders.
@@ -601,10 +601,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       final int finalMode = mode;
 
       javax.swing.AbstractAction openFoldersAction =new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent e) {
-	    current.openAllFolders(finalMode);
-	  }
-	};
+          public void actionPerformed(java.awt.event.ActionEvent e) {
+            current.openAllFolders(finalMode);
+          }
+        };
       
       openFoldersAction.putValue(javax.swing.Action.NAME, "file-open");
       openFoldersAction.putValue(javax.swing.Action.SHORT_DESCRIPTION, "file-open on folder " + fi.getFolderID());
@@ -626,7 +626,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       unloadAllMessages();
       
       if (getFolderDisplayUI() != null)
-	getFolderDisplayUI().closeFolderDisplay();
+        getFolderDisplayUI().closeFolderDisplay();
       
       setFolderDisplayUI(null);
     }
@@ -639,9 +639,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (isLoaded() && isValid()) {
       setStatus(CLOSED);
       try {
-	folder.close(expunge);
+        folder.close(expunge);
       } catch (java.lang.IllegalStateException ise) {
-	throw new MessagingException(ise.getMessage(), ise);
+        throw new MessagingException(ise.getMessage(), ise);
       }
     }
     
@@ -656,9 +656,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    */
   public void closeAllFolders(boolean expunge, boolean shuttingDown) throws MessagingException {
     /*
-    if (shuttingDown && loaderThread != null) {
+      if (shuttingDown && loaderThread != null) {
       loaderThread.stopThread();
-    }
+      }
     */
 
     if (shuttingDown && mMessageLoader != null) {
@@ -669,44 +669,44 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       MessagingException otherException = null;
       Vector folders = getChildren();
       if (folders != null) {
-	for (int i = 0; i < folders.size(); i++) {
-	  try {
-	    ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge, shuttingDown);
-	  } catch (MessagingException me) {
-	    if (otherException == null)
-	      otherException = me;
-	  } catch (Exception e) {
-	    MessagingException newMe = new MessagingException (e.getMessage(), e);
-	    if (otherException == null)
-	      otherException = newMe;
-	  }
-	}
+        for (int i = 0; i < folders.size(); i++) {
+          try {
+            ((FolderInfo) folders.elementAt(i)).closeAllFolders(expunge, shuttingDown);
+          } catch (MessagingException me) {
+            if (otherException == null)
+              otherException = me;
+          } catch (Exception e) {
+            MessagingException newMe = new MessagingException (e.getMessage(), e);
+            if (otherException == null)
+              otherException = newMe;
+          }
+        }
       }  
       
       closeFolder(expunge, false);
       
       if (otherException != null)
-	throw otherException;
+        throw otherException;
     }
   }
 
-    /**
-     * Gets all of the children folders of this FolderInfo which are
-     * both Open and can contain Messages.  The return value should include
-     * the current FolderInfo, if it is Open and can contain Messages.
-     */
-    public Vector getAllFolders() {
-      Vector returnValue = new Vector();
-      if (children != null) {
-	for (int i = 0 ; i < children.size(); i++) 
-	  returnValue.addAll(((FolderInfo) children.elementAt(i)).getAllFolders());
-      }
-      
-      if (isSortaOpen() && (getType() & Folder.HOLDS_MESSAGES) != 0)
-	returnValue.add(this);
-      
-      return returnValue;
+  /**
+   * Gets all of the children folders of this FolderInfo which are
+   * both Open and can contain Messages.  The return value should include
+   * the current FolderInfo, if it is Open and can contain Messages.
+   */
+  public Vector getAllFolders() {
+    Vector returnValue = new Vector();
+    if (children != null) {
+      for (int i = 0 ; i < children.size(); i++) 
+        returnValue.addAll(((FolderInfo) children.elementAt(i)).getAllFolders());
     }
+      
+    if (isSortaOpen() && (getType() & Folder.HOLDS_MESSAGES) != 0)
+      returnValue.add(this);
+      
+    return returnValue;
+  }
 
   /**
    * Synchronizes the locally stored subscribed folders list to the subscribed
@@ -729,22 +729,22 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       StringBuffer newSubscribed = new StringBuffer();
 
       for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
-	// sometimes listSubscribed() doesn't work.
-	if (subscribedFolders[i].isSubscribed() || subscribedFolders[i].getName().equalsIgnoreCase("INBOX")) {
-	  String folderName = subscribedFolders[i].getName();
-	  newSubscribed.append(folderName).append(':');
-	}
+        // sometimes listSubscribed() doesn't work.
+        if (subscribedFolders[i].isSubscribed() || subscribedFolders[i].getName().equalsIgnoreCase("INBOX")) {
+          String folderName = subscribedFolders[i].getName();
+          newSubscribed.append(folderName).append(':');
+        }
       }
 
       if (newSubscribed.length() > 0)
-	newSubscribed.deleteCharAt(newSubscribed.length() -1);
+        newSubscribed.deleteCharAt(newSubscribed.length() -1);
       
       // this will update our children vector.
       Pooka.setProperty(getFolderProperty() + ".folderList", newSubscribed.toString());
       
       for (int i = 0; children != null && i < children.size(); i++) {
-	FolderInfo fi = (FolderInfo) children.elementAt(i);
-	fi.synchSubscribed();
+        FolderInfo fi = (FolderInfo) children.elementAt(i);
+        fi.synchSubscribed();
       }
     }
   }
@@ -775,41 +775,41 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       String tmp;
       
       while (tokens.hasMoreElements()) {
-	tmp = (String)tokens.nextElement();
-	String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
-	if (type.equalsIgnoreCase("Multi")) {
-	  SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
-	  colvals.addElement(stm);
-	  Vector toFetch = Pooka.getResources().getPropertyAsVector(tableType + "." + tmp + ".profileItems", "");
-	  if (toFetch != null) {
-	    for (int z = 0; z < toFetch.size(); z++) {
-	      String profileDef = (String) toFetch.elementAt(z);
-	      if (profileDef.equalsIgnoreCase("Flags")) {
-		getLogger().log(Level.FINE, "adding FLAGS to FetchProfile.");
-		fp.add(FetchProfile.Item.FLAGS);
-	      } else if (profileDef.equalsIgnoreCase("Envelope")) {
-		getLogger().log(Level.FINE, "adding ENVELOPE to FetchProfile.");
-		fp.add(FetchProfile.Item.ENVELOPE);
-	      } else if (profileDef.equalsIgnoreCase("Content_Info")) {
-		getLogger().log(Level.FINE, "adding CONTENT_INFO to FetchProfile.");
-		fp.add(FetchProfile.Item.CONTENT_INFO);
-	      } else {
-		getLogger().log(Level.FINE, "adding " + profileDef + " to FetchProfile.");
-		fp.add(profileDef);
-	      }
-	    }
-	  }
-	} else if (type.equalsIgnoreCase("RowCounter")) {
-	  colvals.addElement(RowCounter.getInstance());
-	} else {
-	  String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
-	  colvals.addElement(value);
-	  String fpValue = Pooka.getProperty(tableType + "." + tmp + ".profileItems", value);
-	  fp.add(fpValue);
- 	}
+        tmp = (String)tokens.nextElement();
+        String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
+        if (type.equalsIgnoreCase("Multi")) {
+          SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
+          colvals.addElement(stm);
+          Vector toFetch = Pooka.getResources().getPropertyAsVector(tableType + "." + tmp + ".profileItems", "");
+          if (toFetch != null) {
+            for (int z = 0; z < toFetch.size(); z++) {
+              String profileDef = (String) toFetch.elementAt(z);
+              if (profileDef.equalsIgnoreCase("Flags")) {
+                getLogger().log(Level.FINE, "adding FLAGS to FetchProfile.");
+                fp.add(FetchProfile.Item.FLAGS);
+              } else if (profileDef.equalsIgnoreCase("Envelope")) {
+                getLogger().log(Level.FINE, "adding ENVELOPE to FetchProfile.");
+                fp.add(FetchProfile.Item.ENVELOPE);
+              } else if (profileDef.equalsIgnoreCase("Content_Info")) {
+                getLogger().log(Level.FINE, "adding CONTENT_INFO to FetchProfile.");
+                fp.add(FetchProfile.Item.CONTENT_INFO);
+              } else {
+                getLogger().log(Level.FINE, "adding " + profileDef + " to FetchProfile.");
+                fp.add(profileDef);
+              }
+            }
+          }
+        } else if (type.equalsIgnoreCase("RowCounter")) {
+          colvals.addElement(RowCounter.getInstance());
+        } else {
+          String value = Pooka.getProperty(tableType + "." + tmp + ".value", tmp);
+          colvals.addElement(value);
+          String fpValue = Pooka.getProperty(tableType + "." + tmp + ".profileItems", value);
+          fp.add(fpValue);
+        }
 	
-	colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
-	colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
+        colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
+        colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
       }	    
       setColumnNames(colnames);
       setColumnValues(colvals);
@@ -819,7 +819,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // if we've already loaded the filters, then add those in, too.
     if (filterHeaders != null) {
       for (int i = 0; i < filterHeaders.size(); i++) {
-	fp.add((String) filterHeaders.get(i));
+        fp.add((String) filterHeaders.get(i));
       }
     }
 
@@ -827,9 +827,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       getLogger().log(Level.FINE, "created fetch profile.");
       String[] headers = fp.getHeaderNames();
       if (headers != null) {
-	for (int i = 0; i < headers.length; i++) {
-	  getLogger().log(Level.FINE, "headers["+i+"]=" + headers[i]);
-	}
+        for (int i = 0; i < headers.length; i++) {
+          getLogger().log(Level.FINE, "headers["+i+"]=" + headers[i]);
+        }
       }
       getLogger().log(Level.FINE, "headers done.");
     }
@@ -844,11 +844,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   protected void updateDisplay(boolean start) {
     if (getFolderDisplayUI() != null) {
       if (start) {
-	getFolderDisplayUI().setBusy(true);
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.Folder.loading.starting", "Loading messages."));
+        getFolderDisplayUI().setBusy(true);
+        getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.Folder.loading.starting", "Loading messages."));
       } else {
-	getFolderDisplayUI().setBusy(false);
-	getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.Folder.loading.finished", "Done loading messages."));
+        getFolderDisplayUI().setBusy(false);
+        getFolderDisplayUI().showStatusMessage(Pooka.getProperty("messages.Folder.loading.finished", "Done loading messages."));
       }
     }
   }
@@ -896,7 +896,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       mi = new MessageInfo(msgs[i], this);
       
       if ( i >= firstFetched)
-	mi.setFetched(true);
+        mi.setFetched(true);
       
       messageProxies.add(new MessageProxy(getColumnValues() , mi));
       messageToInfoTable.put(msgs[i], mi);
@@ -912,16 +912,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (isConnected()) {
       Folder current = getFolder();
       if (current != null && current.isOpen()) {
-	int newCount = current.getNewMessageCount();
+        int newCount = current.getNewMessageCount();
 
-	if (newCount > 0) {
-	  int numProxies = proxies.size();
-	  List newProxies = new ArrayList();
-	  for (int i = 0; i < newCount; i++) {
-	    newProxies.add(proxies.get((numProxies - newCount) + i));
-	  }
-	  proxies.removeAll(applyFilters(newProxies));
-	}
+        if (newCount > 0) {
+          int numProxies = proxies.size();
+          List newProxies = new ArrayList();
+          for (int i = 0; i < newCount; i++) {
+            newProxies.add(proxies.get((numProxies - newCount) + i));
+          }
+          proxies.removeAll(applyFilters(newProxies));
+        }
       }
     }
     
@@ -945,72 +945,72 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       updateDisplay(true);
 
       if (! isLoaded())
-	loadFolder();
+        loadFolder();
       
       fetchProfile = createColumnInformation();
 
       /*
-      if (loaderThread == null) 
-	loaderThread = createLoaderThread();
+        if (loaderThread == null) 
+        loaderThread = createLoaderThread();
       */
       if (mMessageLoader == null) 
-	mMessageLoader = createMessageLoader();
+        mMessageLoader = createMessageLoader();
       
       try {
-	updateFolderStatusForLoading();
+        updateFolderStatusForLoading();
 	
-	List messageProxies = createInfosAndProxies();
+        List messageProxies = createInfosAndProxies();
 	
-	runFilters(messageProxies);
+        runFilters(messageProxies);
 
-	FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
+        FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
 	
-	setFolderTableModel(ftm);
+        setFolderTableModel(ftm);
 	
-	updateCache();
+        updateCache();
 
-	Vector loadImmediately = null;
+        Vector loadImmediately = null;
 
-	int loadBatchSize = 25;
+        int loadBatchSize = 25;
 	
-	if (messageProxies.size() > loadBatchSize) {
-	  // get the first unread.
-	  int firstUnread = messageProxies.size();
-	  if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {	  
-	    firstUnread = getFirstUnreadMessage();
-	  }
+        if (messageProxies.size() > loadBatchSize) {
+          // get the first unread.
+          int firstUnread = messageProxies.size();
+          if (Pooka.getProperty("Pooka.autoSelectFirstUnread", "true").equalsIgnoreCase("true")) {	  
+            firstUnread = getFirstUnreadMessage();
+          }
 
-	  int lastLoaded = messageProxies.size() - 1;
-	  int firstLoaded = messageProxies.size() - loadBatchSize - 1;
+          int lastLoaded = messageProxies.size() - 1;
+          int firstLoaded = messageProxies.size() - loadBatchSize - 1;
 
-	  if (firstUnread > -1) {
-	    if (firstUnread < firstLoaded) {
-	      firstLoaded = Math.max(0, firstUnread - 5);
-	      lastLoaded = firstLoaded + loadBatchSize;
-	    }
-	  }
+          if (firstUnread > -1) {
+            if (firstUnread < firstLoaded) {
+              firstLoaded = Math.max(0, firstUnread - 5);
+              lastLoaded = firstLoaded + loadBatchSize;
+            }
+          }
 
-	  loadImmediately = new Vector();
-	  for (int i = lastLoaded; i >= firstLoaded; i--) {
-	    loadImmediately.add(messageProxies.get(i));
-	  }
-	} else {
-	  loadImmediately = new Vector(messageProxies);
-	}
+          loadImmediately = new Vector();
+          for (int i = lastLoaded; i >= firstLoaded; i--) {
+            loadImmediately.add(messageProxies.get(i));
+          }
+        } else {
+          loadImmediately = new Vector(messageProxies);
+        }
 	
-	loadMessageTableInfos(loadImmediately);
+        loadMessageTableInfos(loadImmediately);
 	
-	/*
-	loaderThread.loadMessages(messageProxies);
+        /*
+          loaderThread.loadMessages(messageProxies);
 	
-	if (!loaderThread.isAlive())
-	  loaderThread.start();
-	*/
-	mMessageLoader.loadMessages(messageProxies);
+          if (!loaderThread.isAlive())
+          loaderThread.start();
+        */
+        mMessageLoader.loadMessages(messageProxies);
 
 	
       } finally {
-	updateDisplay(false);
+        updateDisplay(false);
       }
 
     }
@@ -1030,7 +1030,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       int fetchBatchSize = 25;
       int loadBatchSize = 25;
       try {
-	fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
+        fetchBatchSize = Integer.parseInt(Pooka.getProperty("Pooka.fetchBatchSize", "50"));
       } catch (NumberFormatException nfe) {
       }
       
@@ -1038,43 +1038,43 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
       int i = numMessages - 1;
       while ( i >= 0 ) {
-	for (int batchCount = 0; i >=0 && batchCount < loadBatchSize; batchCount++) {
-	  mp=(MessageProxy)messages.elementAt(i);
+        for (int batchCount = 0; i >=0 && batchCount < loadBatchSize; batchCount++) {
+          mp=(MessageProxy)messages.elementAt(i);
 	  
-	  if (! mp.getMessageInfo().hasBeenFetched()) {
-	    try {
-	      int fetchCount = 0;
-	      Vector fetchVector = new Vector();
-	      for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
-		MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
-		if (! fetchInfo.hasBeenFetched()) {
-		  fetchVector.add(fetchInfo);
-		  fetchInfo.setFetched(true);
-		}
-	      }
+          if (! mp.getMessageInfo().hasBeenFetched()) {
+            try {
+              int fetchCount = 0;
+              Vector fetchVector = new Vector();
+              for (int j = i; fetchCount < fetchBatchSize && j >= 0; j--) {
+                MessageInfo fetchInfo = ((MessageProxy) messages.elementAt(j)).getMessageInfo();
+                if (! fetchInfo.hasBeenFetched()) {
+                  fetchVector.add(fetchInfo);
+                  fetchInfo.setFetched(true);
+                }
+              }
 	      
-	      MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
-	      toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
-	      this.fetch(toFetch, fetchProfile);
-	    } catch(MessagingException me) {
-	      getLogger().log(Level.FINE, "caught error while fetching for folder " + getFolderID() + ":  " + me);
-	      me.printStackTrace();
-	    }
+              MessageInfo[] toFetch = new MessageInfo[fetchVector.size()];
+              toFetch = (MessageInfo[]) fetchVector.toArray(toFetch);
+              this.fetch(toFetch, fetchProfile);
+            } catch(MessagingException me) {
+              getLogger().log(Level.FINE, "caught error while fetching for folder " + getFolderID() + ":  " + me);
+              me.printStackTrace();
+            }
 	      
-	  }
-	  try {
-	    if (! mp.isLoaded())
-	      mp.loadTableInfo();
-	    if (mp.needsRefresh())
-	      mp.refreshMessage();
-	    else if (! mp.matchedFilters()) {
-	      mp.matchFilters();
-	    }
-	  } catch (Exception e) {
-	    e.printStackTrace();
-	  }
-	  i--;
-	}
+          }
+          try {
+            if (! mp.isLoaded())
+              mp.loadTableInfo();
+            if (mp.needsRefresh())
+              mp.refreshMessage();
+            else if (! mp.matchedFilters()) {
+              mp.matchFilters();
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+          i--;
+        }
 	
       }
     }
@@ -1096,14 +1096,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
   }
 
-    /**
-     * Unloads all messages.  This should be run if ever the current message
-     * information becomes out of date, as can happen when the connection
-     * to the folder goes down.
-     */
-    public void unloadAllMessages() {
-	folderTableModel = null;
-    }
+  /**
+   * Unloads all messages.  This should be run if ever the current message
+   * information becomes out of date, as can happen when the connection
+   * to the folder goes down.
+   */
+  public void unloadAllMessages() {
+    folderTableModel = null;
+  }
 
 
   /**
@@ -1115,39 +1115,39 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (folderTableModel != null) {
       List allProxies = folderTableModel.getAllProxies();
       for (int i = 0; i < allProxies.size(); i++) {
-	MessageProxy mp = (MessageProxy) allProxies.get(i);
-	mp.unloadTableInfo();
+        MessageProxy mp = (MessageProxy) allProxies.get(i);
+        mp.unloadTableInfo();
       }
 
       /*
-      if (loaderThread != null)
-	loaderThread.loadMessages(allProxies);
+        if (loaderThread != null)
+        loaderThread.loadMessages(allProxies);
       */
 
       if (mMessageLoader != null)
-	mMessageLoader.loadMessages(allProxies);
+        mMessageLoader.loadMessages(allProxies);
       
     }
   }
   
-    /**
-     * Unloads the matching filters.
-     */
+  /**
+   * Unloads the matching filters.
+   */
   public void unloadMatchingFilters() {
     if (folderTableModel != null) {
       List allProxies = folderTableModel.getAllProxies();
       for (int i = 0; i < allProxies.size(); i++) {
-	MessageProxy mp = (MessageProxy) allProxies.get(i);
-	mp.clearMatchedFilters();
+        MessageProxy mp = (MessageProxy) allProxies.get(i);
+        mp.clearMatchedFilters();
       }
       
       /*
-      if (loaderThread != null)
-	loaderThread.loadMessages(allProxies);
+        if (loaderThread != null)
+        loaderThread.loadMessages(allProxies);
       */
 
       if (mMessageLoader != null)
-	mMessageLoader.loadMessages(allProxies);
+        mMessageLoader.loadMessages(allProxies);
       
     }
   }
@@ -1181,8 +1181,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (isConnected()) {
       Folder current = getFolder();
       if (current != null && current.isOpen()) {
-	current.getNewMessageCount();
-	current.getUnreadMessageCount();
+        current.getNewMessageCount();
+        current.getUnreadMessageCount();
       }
       resetMessageCounts();
     }
@@ -1207,27 +1207,27 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       int i;
       if (unreadCount > 0) {
 	
-	// one part brute, one part force, one part ignorance.
+        // one part brute, one part force, one part ignorance.
 	
-	Message[] messages = getFolder().getMessages();
-	int lastUnreadFound = -1;
-	for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
-	  if (!(messages[i].isSet(Flags.Flag.SEEN))) {
-	    lastUnreadFound = i;
-	    countUnread++;
-	  }
-	}
-	if (lastUnreadFound != -1) {
-	  getLogger().log(Level.FINE, "Returning " + (lastUnreadFound + 1));
-	  return lastUnreadFound;
-	} else {
-	  getLogger().log(Level.FINE, "unreads detected, but none found.");
-	  return -1;
-	}
+        Message[] messages = getFolder().getMessages();
+        int lastUnreadFound = -1;
+        for (i = messages.length - 1; ( i >= 0 && countUnread < unreadCount) ; i--) {
+          if (!(messages[i].isSet(Flags.Flag.SEEN))) {
+            lastUnreadFound = i;
+            countUnread++;
+          }
+        }
+        if (lastUnreadFound != -1) {
+          getLogger().log(Level.FINE, "Returning " + (lastUnreadFound + 1));
+          return lastUnreadFound;
+        } else {
+          getLogger().log(Level.FINE, "unreads detected, but none found.");
+          return -1;
+        }
 
       } else { 
-	getLogger().log(Level.FINE, "Returning -1");
-	return -1;
+        getLogger().log(Level.FINE, "Returning -1");
+        return -1;
       }
     } catch (MessagingException me) {
       getLogger().log(Level.FINE, "Messaging Exception.  Returning -1");
@@ -1251,20 +1251,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       String newFolderName;
       
       for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-	newFolderName = (String)tokens.nextToken();
-	FolderInfo childFolder = getChild(newFolderName);
-	if (childFolder == null) {
-	  childFolder = new FolderInfo(this, newFolderName);
-	  newChildren.add(childFolder);
-	} else {
-	  newChildren.add(childFolder);
-	}
+        newFolderName = (String)tokens.nextToken();
+        FolderInfo childFolder = getChild(newFolderName);
+        if (childFolder == null) {
+          childFolder = new FolderInfo(this, newFolderName);
+          newChildren.add(childFolder);
+        } else {
+          newChildren.add(childFolder);
+        }
       }
       
       children = newChildren;
       
       if (folderNode != null) 
-	folderNode.loadChildren();
+        folderNode.loadChildren();
     }
   }
   
@@ -1283,25 +1283,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (children != null) {
       int divider = childName.indexOf('/');
       if (divider > 0) {
-	folderName = childName.substring(0, divider);
-	if (divider < childName.length() - 1)
-	  subFolderName = childName.substring(divider + 1);
+        folderName = childName.substring(0, divider);
+        if (divider < childName.length() - 1)
+          subFolderName = childName.substring(divider + 1);
       } else 
-	folderName = childName;
+        folderName = childName;
       
       getLogger().log(Level.FINE, "getting direct child " + folderName);
       
-	for (int i = 0; i < children.size(); i++)
-	  if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
-	    childFolder = (FolderInfo)children.elementAt(i);
+      for (int i = 0; i < children.size(); i++)
+        if (((FolderInfo)children.elementAt(i)).getFolderName().equals(folderName))
+          childFolder = (FolderInfo)children.elementAt(i);
     } else {
       getLogger().log(Level.FINE, "children of " + getFolderID() + " is null.");
     }
     
     if (childFolder != null && subFolderName != null)
       return childFolder.getChild(subFolderName);
-      else
-	return childFolder;
+    else
+      return childFolder;
   }
   
   /**
@@ -1318,10 +1318,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (children != null) {
       for (int i = 0; i < children.size(); i++) {
-	FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
-	if (possibleMatch != null) {
-	  return possibleMatch;
-	}
+        FolderInfo possibleMatch = ((FolderInfo)children.elementAt(i)).getFolderById(folderID);
+        if (possibleMatch != null) {
+          return possibleMatch;
+        }
       }
     }
     
@@ -1387,20 +1387,20 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     synchronized(targetFolder.getFolderThread().getRunLock()) {
       Folder target = targetFolder.getFolder();
       if (target != null) {
-	Message[] m = new Message[msgs.length];
-	for (int i = 0; i < msgs.length; i++) {
-	  m[i] = msgs[i].getRealMessage();
-	}
+        Message[] m = new Message[msgs.length];
+        for (int i = 0; i < msgs.length; i++) {
+          m[i] = msgs[i].getRealMessage();
+        }
 	
-	getFolder().copyMessages(m, target);
+        getFolder().copyMessages(m, target);
 
-	// if we do a copy, we'll probably need to do a refresh on the target
-	// folder, also.
+        // if we do a copy, we'll probably need to do a refresh on the target
+        // folder, also.
 	
-	targetFolder.checkFolder();
+        targetFolder.checkFolder();
 
       } else {
-	targetFolder.appendMessages(msgs);
+        targetFolder.appendMessages(msgs);
       }
     }
   }
@@ -1441,7 +1441,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // those that are interested in this event
     for (int i = listeners.length-2; i>=0; i-=2) {
       if (listeners[i]==MessageChangedListener.class) {
-	((MessageChangedListener)listeners[i+1]).messageChanged(mce);
+        ((MessageChangedListener)listeners[i+1]).messageChanged(mce);
       }              
     }
   }  
@@ -1469,13 +1469,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     // those that are interested in this event
     for (int i = listeners.length-2; i>=0; i-=2) {
       if (listeners[i]==ConnectionListener.class) {
-	ConnectionListener listener = (ConnectionListener) listeners[i+1];
-	if (e.getType() == ConnectionEvent.CLOSED)
-	  listener.closed(e);
-	else if (e.getType() == ConnectionEvent.DISCONNECTED)
-	  listener.disconnected(e);
-	else if (e.getType() == ConnectionEvent.OPENED)
-	  listener.opened(e);
+        ConnectionListener listener = (ConnectionListener) listeners[i+1];
+        if (e.getType() == ConnectionEvent.CLOSED)
+          listener.closed(e);
+        else if (e.getType() == ConnectionEvent.DISCONNECTED)
+          listener.disconnected(e);
+        else if (e.getType() == ConnectionEvent.OPENED)
+          listener.opened(e);
       }  
     }
   }  
@@ -1488,32 +1488,32 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public void valueChanged(String changedValue) {
     if (changedValue.equals(getFolderProperty() + ".folderList")) {
       final Runnable runMe = new  Runnable() {
-	  public void run() {
-	    ((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
-	  }
-	};
+          public void run() {
+            ((javax.swing.tree.DefaultTreeModel)(((FolderPanel)folderNode.getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(folderNode);
+          }
+        };
       // if we don't do the update synchronously on the folder thread,
       // then subscribing to subfolders breaks.
       if (Thread.currentThread() != getFolderThread()) {
-	getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent e) {
-	      updateChildren();
-	      if (folderNode != null) {
-		javax.swing.SwingUtilities.invokeLater(runMe);
-	      }
-	    }
-	  } , new java.awt.event.ActionEvent(this, 0, "open-all"));
+        getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+              updateChildren();
+              if (folderNode != null) {
+                javax.swing.SwingUtilities.invokeLater(runMe);
+              }
+            }
+          } , new java.awt.event.ActionEvent(this, 0, "open-all"));
       } else {
-	updateChildren();
-	if (folderNode != null) {
-	  javax.swing.SwingUtilities.invokeLater(runMe);
-	}
+        updateChildren();
+        if (folderNode != null) {
+          javax.swing.SwingUtilities.invokeLater(runMe);
+        }
       }
     } else if (changedValue.equals(getFolderProperty() + ".defaultProfile")) {
       if (Pooka.getProperty(changedValue, "").equals(""))
-	defaultProfile = null;
+        defaultProfile = null;
       else 
-	defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
+        defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
     } else if (changedValue.equals(getFolderProperty() + ".backendFilters")) { 
       createFilters();
       
@@ -1537,11 +1537,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       Folder subFolder = folder.getFolder(subFolderName);
       
       if (subFolder == null) {
-	throw new MessagingException("Store returned null for subfolder " + subFolderName + " of folder " + getFolderName());
+        throw new MessagingException("Store returned null for subfolder " + subFolderName + " of folder " + getFolderName());
       }
 
       if (! subFolder.exists())
-	subFolder.create(type);
+        subFolder.create(type);
 
       subscribeFolder(subFolderName);
     } else {
@@ -1568,7 +1568,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (firstSlash > 0) {
       childFolderName = folderName.substring(0, firstSlash);
       if (firstSlash < folderName.length() -1)
-	subFolderName = folderName.substring(firstSlash +1);
+        subFolderName = folderName.substring(firstSlash +1);
     } else
       childFolderName = folderName;
     
@@ -1587,13 +1587,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     try {
       if (childFolder != null && childFolder.isLoaded() == false)
-	childFolder.loadFolder();
+        childFolder.loadFolder();
     } catch (MessagingException me) {
       // if we get an exception loading a child folder while subscribing a
       // folder object, just ignore it.
       getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
       if (getLogger().isLoggable(Level.FINE))
-	me.printStackTrace();
+        me.printStackTrace();
 	
     }
 
@@ -1613,7 +1613,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       String folderName = (String) folderNames.elementAt(i);
       
       if (folderName.equals(addFolderName)) {
-	found=true;
+        found=true;
       }
       
     }
@@ -1621,42 +1621,42 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (!found) {
       String currentValue = Pooka.getProperty(getFolderProperty() + ".folderList", "");
       if (currentValue.equals(""))
-	Pooka.setProperty(getFolderProperty() + ".folderList", addFolderName);
+        Pooka.setProperty(getFolderProperty() + ".folderList", addFolderName);
       else
-	Pooka.setProperty(getFolderProperty() + ".folderList", currentValue + ":" + addFolderName);
+        Pooka.setProperty(getFolderProperty() + ".folderList", currentValue + ":" + addFolderName);
     }
     
   }
 
-    /**
-     * Remove the given String from the folderList property.  
-     *
-     * Note that because this is also a ValueChangeListener to the
-     * folderList property, this will also result in the FolderInfo being
-     * removed from the children Vector.
-     */
-    void removeFromFolderList(String removeFolderName) {
-	Vector folderNames = Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".folderList", "");
+  /**
+   * Remove the given String from the folderList property.  
+   *
+   * Note that because this is also a ValueChangeListener to the
+   * folderList property, this will also result in the FolderInfo being
+   * removed from the children Vector.
+   */
+  void removeFromFolderList(String removeFolderName) {
+    Vector folderNames = Pooka.getResources().getPropertyAsVector(getFolderProperty() + ".folderList", "");
 	
-	boolean first = true;
-	StringBuffer newValue = new StringBuffer();
-	String folderName;
+    boolean first = true;
+    StringBuffer newValue = new StringBuffer();
+    String folderName;
 
-	for (int i = 0; i < folderNames.size(); i++) {
+    for (int i = 0; i < folderNames.size(); i++) {
 	    folderName = (String) folderNames.elementAt(i);
 
 	    if (! folderName.equals(removeFolderName)) {
-		if (!first)
-		    newValue.append(":");
+        if (!first)
+          newValue.append(":");
 		
-		newValue.append(folderName);
-		first = false;
+        newValue.append(folderName);
+        first = false;
 	    }
 	    
-	}
-	
-	Pooka.setProperty(getFolderProperty() + ".folderList", newValue.toString());
     }
+	
+    Pooka.setProperty(getFolderProperty() + ".folderList", newValue.toString());
+  }
 
   /**
    * This unsubscribes this FolderInfo and all of its children, if 
@@ -1676,7 +1676,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     try {
       if (folder != null)
-	folder.setSubscribed(false);
+        folder.setSubscribed(false);
     } catch (MessagingException me) {
       Pooka.getUIFactory().showError(Pooka.getProperty("error.folder.unsubscribe", "Error unsubscribing on server from folder ") + getFolderID(), me);
     }
@@ -1713,7 +1713,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (children != null && children.size() > 0) {
       for (int i = 0; i < children.size(); i++) 
-	((FolderInfo)children.elementAt(i)).cleanup();
+        ((FolderInfo)children.elementAt(i)).cleanup();
     }
     
     Pooka.getLogManager().removeLogger(getFolderProperty());
@@ -1753,15 +1753,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public void emptyTrash() {
     if (isTrashFolder()) {
       try {
-	Message[] allMessages = getFolder().getMessages();
-	getFolder().setFlags(allMessages, new Flags(Flags.Flag.DELETED), true);
-	getFolder().expunge();
+        Message[] allMessages = getFolder().getMessages();
+        getFolder().setFlags(allMessages, new Flags(Flags.Flag.DELETED), true);
+        getFolder().expunge();
       } catch (MessagingException me) {
-	String m = Pooka.getProperty("error.trashFolder.EmptyTrashError", "Error emptying Trash:") +"\n" + me.getMessage();
-	if (getFolderDisplayUI() != null) 
-	  getFolderDisplayUI().showError(m);
-	else
-	  getLogger().log(Level.FINE, m);
+        String m = Pooka.getProperty("error.trashFolder.EmptyTrashError", "Error emptying Trash:") +"\n" + me.getMessage();
+        if (getFolderDisplayUI() != null) 
+          getFolderDisplayUI().showError(m);
+        else
+          getLogger().log(Level.FINE, m);
       }
     }
   }
@@ -1774,21 +1774,21 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public void resetDefaultActions() {
     if (isTrashFolder()) {
       defaultActions = new Action[] {
-	new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-	new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread()),
-	new EditPropertiesAction()
+        new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+        new net.suberic.util.thread.ActionWrapper(new EmptyTrashAction(), getFolderThread()),
+        new EditPropertiesAction()
       };
     } else if (isOutboxFolder()) {
       defaultActions = new Action[] {
-	new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-	new net.suberic.util.thread.ActionWrapper(new SendAllAction(), getFolderThread()),
-	new EditPropertiesAction()
+        new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+        new net.suberic.util.thread.ActionWrapper(new SendAllAction(), getFolderThread()),
+        new EditPropertiesAction()
       };
       
     } else {
       defaultActions = new Action[] {
-	new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
-	new EditPropertiesAction()
+        new net.suberic.util.thread.ActionWrapper(new UpdateCountAction(), getFolderThread()),
+        new EditPropertiesAction()
       };
     }
   }
@@ -1822,16 +1822,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (mce.getType() == MessageCountEvent.ADDED) {
       for (int i = listeners.length-2; i>=0; i-=2) {
-	if (listeners[i]==MessageCountListener.class) {
-	  ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
-	}              
+        if (listeners[i]==MessageCountListener.class) {
+          ((MessageCountListener)listeners[i+1]).messagesAdded(mce);
+        }              
       }
     } else if (mce.getType() == MessageCountEvent.REMOVED) {
       for (int i = listeners.length-2; i>=0; i-=2) {
-	if (listeners[i]==MessageCountListener.class) {
+        if (listeners[i]==MessageCountListener.class) {
 	  
-	  ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
-	}              
+          ((MessageCountListener)listeners[i+1]).messagesRemoved(mce);
+        }              
       }
       
     }
@@ -1855,9 +1855,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     else 
 	    getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
 		
-		public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-		  runMessagesAdded((MessageCountEvent)actionEvent.getSource());
-		}
+          public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+            runMessagesAdded((MessageCountEvent)actionEvent.getSource());
+          }
 	      }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-count-changed"));
 	
   }
@@ -1873,25 +1873,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       getLogger().log(Level.FINE, "running messagesAdded: creating " + addedMessages.length + " proxies/MessageInfos.");
 
       for (int i = 0; i < addedMessages.length; i++) {
-	mp = new MessageInfo(addedMessages[i], FolderInfo.this);
-	addedProxies.add(new MessageProxy(getColumnValues(), mp));
-	messageToInfoTable.put(addedMessages[i], mp);
+        mp = new MessageInfo(addedMessages[i], FolderInfo.this);
+        addedProxies.add(new MessageProxy(getColumnValues(), mp));
+        messageToInfoTable.put(addedMessages[i], mp);
       }
       getLogger().log(Level.FINE, "filtering proxies.");
 
       addedProxies.removeAll(applyFilters(addedProxies));
       if (addedProxies.size() > 0) {
-	getLogger().log(Level.FINE, "filters run; adding " + addedProxies.size() + " messages.");
+        getLogger().log(Level.FINE, "filters run; adding " + addedProxies.size() + " messages.");
 
-	getFolderTableModel().addRows(addedProxies);
-	setNewMessages(true);
-	resetMessageCounts();
+        getFolderTableModel().addRows(addedProxies);
+        setNewMessages(true);
+        resetMessageCounts();
 	
-	// notify the message loaded thread.
-	MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
-	mMessageLoader.loadMessages(addedArray, MessageLoader.HIGH);
+        // notify the message loaded thread.
+        MessageProxy[] addedArray = (MessageProxy[]) addedProxies.toArray(new MessageProxy[0]);
+        mMessageLoader.loadMessages(addedArray, MessageLoader.HIGH);
 	
-	fireMessageCountEvent(mce);
+        fireMessageCountEvent(mce);
       }
     }
     
@@ -1913,10 +1913,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       runMessagesRemoved(e);
     } else {
       getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-	    runMessagesRemoved((MessageCountEvent)actionEvent.getSource());
-	  }
-	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "messages-removed"));
+          public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+            runMessagesRemoved((MessageCountEvent)actionEvent.getSource());
+          }
+        }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "messages-removed"));
     }
   }
   
@@ -1934,34 +1934,34 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       Vector removedProxies=new Vector();
       
       if (getLogger().isLoggable(Level.FINE)) {
-	getLogger().log(Level.FINE, "message in info table:");
-	Enumeration keys = messageToInfoTable.keys();
-	while (keys.hasMoreElements())
-	  getLogger().log(Level.FINE, (String)keys.nextElement());
+        getLogger().log(Level.FINE, "message in info table:");
+        Enumeration keys = messageToInfoTable.keys();
+        while (keys.hasMoreElements())
+          getLogger().log(Level.FINE, (String)keys.nextElement());
       }
       
       for (int i = 0; i < removedMessages.length; i++) {
-	getLogger().log(Level.FINE, "checking for existence of message " + removedMessages[i]);
-	mi = getMessageInfo(removedMessages[i]);
-	if (mi != null) {
-	  if (mi.getMessageProxy() != null)
-	    mi.getMessageProxy().close();
+        getLogger().log(Level.FINE, "checking for existence of message " + removedMessages[i]);
+        mi = getMessageInfo(removedMessages[i]);
+        if (mi != null) {
+          if (mi.getMessageProxy() != null)
+            mi.getMessageProxy().close();
 	  
-	  getLogger().log(Level.FINE, "message exists--removing");
-	  removedProxies.add(mi.getMessageProxy());
-	  messageToInfoTable.remove(removedMessages[i]);
-	}
+          getLogger().log(Level.FINE, "message exists--removing");
+          removedProxies.add(mi.getMessageProxy());
+          messageToInfoTable.remove(removedMessages[i]);
+        }
       }
       if (getFolderDisplayUI() != null) {
-	if (removedProxies.size() > 0) 
-	  getFolderDisplayUI().removeRows(removedProxies);
-	resetMessageCounts();
-	fireMessageCountEvent(mce);
+        if (removedProxies.size() > 0) 
+          getFolderDisplayUI().removeRows(removedProxies);
+        resetMessageCounts();
+        fireMessageCountEvent(mce);
       } else {
-	resetMessageCounts();
-	fireMessageCountEvent(mce);
-	if (removedProxies.size() > 0)
-	  getFolderTableModel().removeRows(removedProxies);
+        resetMessageCounts();
+        fireMessageCountEvent(mce);
+        if (removedProxies.size() > 0)
+          getFolderTableModel().removeRows(removedProxies);
       }
     } else {
       resetMessageCounts();
@@ -1981,10 +1981,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       runMessageChanged(e);
     else 
       getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-	  public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-	    runMessageChanged((MessageChangedEvent)actionEvent.getSource());
-	  }
-	}, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
+          public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+            runMessageChanged((MessageChangedEvent)actionEvent.getSource());
+          }
+        }, getFolderThread()), new java.awt.event.ActionEvent(e, 1, "message-changed"));
   }
   
   
@@ -2005,25 +2005,25 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     if (updateInfo) {
       try {
-	MessageInfo mi = getMessageInfo(mce.getMessage());
-	MessageProxy mp = mi.getMessageProxy();
-	if (mp != null) {
-	  mp.unloadTableInfo();
-	  mp.loadTableInfo();
-	  if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
-	    mi.refreshFlags();
-	  else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
-	    mi.refreshHeaders();
-	}
+        MessageInfo mi = getMessageInfo(mce.getMessage());
+        MessageProxy mp = mi.getMessageProxy();
+        if (mp != null) {
+          mp.unloadTableInfo();
+          mp.loadTableInfo();
+          if (mce.getMessageChangeType() == MessageChangedEvent.FLAGS_CHANGED)
+            mi.refreshFlags();
+          else if (mce.getMessageChangeType() == MessageChangedEvent.ENVELOPE_CHANGED)
+            mi.refreshHeaders();
+        }
       } catch (MessagingException me) {
-	// if we catch a MessagingException, it just means
-	// that the message has already been expunged.
+        // if we catch a MessagingException, it just means
+        // that the message has already been expunged.
       }
       
       // if we're not just a tableinfochanged event, do a resetmessagecouts.
       // don't do this if we're just a delete.
       if (! (mce instanceof net.suberic.pooka.event.MessageTableInfoChangedEvent)) {
-	resetMessageCounts();
+        resetMessageCounts();
       }
     }
     
@@ -2047,85 +2047,85 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     final Vector selectedFolders = folderList;
 
     Pooka.getSearchThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  Vector matchingValues = new Vector();
-	  Logger.getLogger("Pooka.debug").log(Level.FINE, "init:  matchingValues.size() = " + matchingValues.size());
+        public void actionPerformed(ActionEvent e) {
+          Vector matchingValues = new Vector();
+          Logger.getLogger("Pooka.debug").log(Level.FINE, "init:  matchingValues.size() = " + matchingValues.size());
 
-	  net.suberic.util.swing.ProgressDialog dialog = Pooka.getUIFactory().createProgressDialog(0,100,0,"Search","Searching");
-	  dialog.show();
-	  boolean cancelled = dialog.isCancelled();
+          net.suberic.util.swing.ProgressDialog dialog = Pooka.getUIFactory().createProgressDialog(0,100,0,"Search","Searching");
+          dialog.show();
+          boolean cancelled = dialog.isCancelled();
 
-	  for (int i = 0; ! cancelled && i < selectedFolders.size(); i++) {
-	    Logger.getLogger("Pooka.debug").log(Level.FINE, "trying selected folder number " + i);
-	    try {
-	      net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
-	      Logger.getLogger("Pooka.debug").log(Level.FINE, "matches.length = " + matches.length);
-	      for (int j = 0; j < matches.length; j++) {
-		matchingValues.add(matches[j]);
-		Logger.getLogger("Pooka.debug").log(Level.FINE, "adding " + matches[j] + " to matchingValues.");
-	      }
+          for (int i = 0; ! cancelled && i < selectedFolders.size(); i++) {
+            Logger.getLogger("Pooka.debug").log(Level.FINE, "trying selected folder number " + i);
+            try {
+              net.suberic.pooka.MessageInfo[] matches = ((FolderInfo) selectedFolders.elementAt(i)).search(searchTerm);
+              Logger.getLogger("Pooka.debug").log(Level.FINE, "matches.length = " + matches.length);
+              for (int j = 0; j < matches.length; j++) {
+                matchingValues.add(matches[j]);
+                Logger.getLogger("Pooka.debug").log(Level.FINE, "adding " + matches[j] + " to matchingValues.");
+              }
 	      
-	    } catch (MessagingException me) {
-	      Logger.getLogger("Pooka.debug").log(Level.FINE, "caught exception " + me);
-	    }
-	    cancelled = dialog.isCancelled();
-	  }
+            } catch (MessagingException me) {
+              Logger.getLogger("Pooka.debug").log(Level.FINE, "caught exception " + me);
+            }
+            cancelled = dialog.isCancelled();
+          }
 	  
-	  Logger.getLogger("Pooka.debug").log(Level.FINE, "got " + matchingValues.size() + " matches.");
+          Logger.getLogger("Pooka.debug").log(Level.FINE, "got " + matchingValues.size() + " matches.");
 	  
-	  if (! cancelled) {
-	    FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
-	    for (int i = 0; i < selectedFolders.size(); i++) {
-	      parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
-	    }
+          if (! cancelled) {
+            FolderInfo[] parentFolders = new FolderInfo[selectedFolders.size()];
+            for (int i = 0; i < selectedFolders.size(); i++) {
+              parentFolders[i] = (FolderInfo) selectedFolders.elementAt(i);
+            }
 	    
-	    MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
-	    for (int i = 0; i < matchingValues.size(); i++) {
-	      Logger.getLogger("Pooka.debug").log(Level.FINE, "matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
-	      matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
-	    }
+            MessageInfo[] matchingMessages = new MessageInfo[matchingValues.size()];
+            for (int i = 0; i < matchingValues.size(); i++) {
+              Logger.getLogger("Pooka.debug").log(Level.FINE, "matchingValues.elementAt(" + i + ") = " + matchingValues.elementAt(i));
+              matchingMessages[i] = (MessageInfo) matchingValues.elementAt(i);
+            }
 	    
-	    final VirtualFolderInfo sfi = new VirtualFolderInfo(matchingMessages, parentFolders);
+            final VirtualFolderInfo sfi = new VirtualFolderInfo(matchingMessages, parentFolders);
 	    
-	    Runnable runMe = new Runnable() {
-		public void run() {
-		  FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(sfi);
-		  fdui.openFolderDisplay();
-		}
-	      };
+            Runnable runMe = new Runnable() {
+                public void run() {
+                  FolderDisplayUI fdui = Pooka.getUIFactory().createFolderDisplayUI(sfi);
+                  fdui.openFolderDisplay();
+                }
+              };
 	    
-	    javax.swing.SwingUtilities.invokeLater(runMe);
-	  }
+            javax.swing.SwingUtilities.invokeLater(runMe);
+          }
 
-	  dialog.dispose();
-	}
+          dialog.dispose();
+        }
       }, Pooka.getSearchThread()), new java.awt.event.ActionEvent(FolderInfo.class, 1, "search"));
     
   }
 
-    /**
-     * Searches for messages in this folder which match the given
-     * SearchTerm.
-     *
-     * Basically wraps the call to Folder.search(), and then wraps the
-     * returned Message objects as MessageInfos.
-     */
-    public MessageInfo[] search(javax.mail.search.SearchTerm term) 
+  /**
+   * Searches for messages in this folder which match the given
+   * SearchTerm.
+   *
+   * Basically wraps the call to Folder.search(), and then wraps the
+   * returned Message objects as MessageInfos.
+   */
+  public MessageInfo[] search(javax.mail.search.SearchTerm term) 
     throws MessagingException {
-	if (folderTableModel == null)
+    if (folderTableModel == null)
 	    loadAllMessages();
 
-	Message[] matchingMessages = folder.search(term);
-	MessageInfo returnValue[] = new MessageInfo[matchingMessages.length];
-	for (int i = 0; i < matchingMessages.length; i++) {
-	  getLogger().log(Level.FINE, "match " + i + " = " + matchingMessages[i]);
-	  MessageInfo info = getMessageInfo(matchingMessages[i]);
-	  getLogger().log(Level.FINE, "messageInfo " + i + " = " + info);
-	  returnValue[i] = info;
-	}
-	getLogger().log(Level.FINE, "got " + returnValue.length + " results.");
-	return returnValue;
+    Message[] matchingMessages = folder.search(term);
+    MessageInfo returnValue[] = new MessageInfo[matchingMessages.length];
+    for (int i = 0; i < matchingMessages.length; i++) {
+      getLogger().log(Level.FINE, "match " + i + " = " + matchingMessages[i]);
+      MessageInfo info = getMessageInfo(matchingMessages[i]);
+      getLogger().log(Level.FINE, "messageInfo " + i + " = " + info);
+      returnValue[i] = info;
     }
+    getLogger().log(Level.FINE, "got " + returnValue.length + " results.");
+    return returnValue;
+  }
 
   /**
    * The resource for the default display filters.
@@ -2153,7 +2153,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       
       tmpBackendFilters = new BackendMessageFilter[backendFilterNames.size()];
       for (int i = 0; i < backendFilterNames.size(); i++) {
-	tmpBackendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
+        tmpBackendFilters[i] = new BackendMessageFilter(getFolderProperty() + ".backendFilters." + (String) backendFilterNames.elementAt(i));
       }
       
       backendFilters = tmpBackendFilters;
@@ -2182,14 +2182,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     for (int i = 0; i < tmpDisplayFilters.length; i++) {
       javax.mail.search.SearchTerm filterTerm = tmpDisplayFilters[i].getSearchTerm();
       if (filterTerm != null) {
-	List headers = getHeaders(filterTerm);
-	filterHeaders.addAll(headers);
+        List headers = getHeaders(filterTerm);
+        filterHeaders.addAll(headers);
       }
     }
 
     if (fetchProfile != null) {
       for (int i = 0; i < filterHeaders.size(); i++) {
-	fetchProfile.add((String) filterHeaders.get(i));
+        fetchProfile.add((String) filterHeaders.get(i));
       }
     }
   }
@@ -2205,12 +2205,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     } else if (term instanceof AndTerm) {
       SearchTerm[] terms = ((AndTerm)term).getTerms();
       for (int i = 0; i < terms.length; i++) {
-	returnValue.addAll(getHeaders(terms[i]));
+        returnValue.addAll(getHeaders(terms[i]));
       }
     } else if (term instanceof OrTerm) {
       SearchTerm[] terms = ((OrTerm)term).getTerms();
       for (int i = 0; i < terms.length; i++) {
-	returnValue.addAll(getHeaders(terms[i]));
+        returnValue.addAll(getHeaders(terms[i]));
       }
     } else if (term instanceof NotTerm) {
       SearchTerm otherTerm = ((NotTerm)term).getTerm();
@@ -2220,15 +2220,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     } else if (term instanceof RecipientTerm || term instanceof RecipientStringTerm) {
       Message.RecipientType type;
       if (term instanceof RecipientTerm)
-	type = ((RecipientTerm) term).getRecipientType();
+        type = ((RecipientTerm) term).getRecipientType();
       else
-	type = ((RecipientStringTerm) term).getRecipientType();
+        type = ((RecipientStringTerm) term).getRecipientType();
       if (type == Message.RecipientType.TO)
-	returnValue.add("To");
+        returnValue.add("To");
       else if (type == Message.RecipientType.CC)
-	returnValue.add("Cc");
+        returnValue.add("Cc");
       else if (type == Message.RecipientType.BCC)
-	returnValue.add("Bcc");
+        returnValue.add("Bcc");
     }
 
     return returnValue;
@@ -2255,18 +2255,18 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     Vector removed = new Vector();
     if (backendFilters != null) 
       for (int i = 0; i < backendFilters.length; i++) {
-	if (backendFilters[i] != null) {
-	  List justRemoved = backendFilters[i].filterMessages(notRemovedYet, pd);
-	  removed.addAll(justRemoved);
-	  notRemovedYet.removeAll(justRemoved);
-	}
+        if (backendFilters[i] != null) {
+          List justRemoved = backendFilters[i].filterMessages(notRemovedYet, pd);
+          removed.addAll(justRemoved);
+          notRemovedYet.removeAll(justRemoved);
+        }
       }
     
     if (removed.size() > 0) {
       try {
-	expunge();
+        expunge();
       } catch (MessagingException me) {
-	me.printStackTrace();
+        me.printStackTrace();
       }
     }
 
@@ -2482,14 +2482,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       setNotifyNewMessagesNode(false);
     } else {
       if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
-	setNotifyNewMessagesMain(true);
+        setNotifyNewMessagesMain(true);
       else
-	setNotifyNewMessagesMain(false);
+        setNotifyNewMessagesMain(false);
       
       if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
-	setNotifyNewMessagesNode(true);
+        setNotifyNewMessagesNode(true);
       else
-	setNotifyNewMessagesNode(false);
+        setNotifyNewMessagesNode(false);
     }
 
     resetDefaultActions();
@@ -2510,14 +2510,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       setNotifyNewMessagesNode(false);
     } else {
       if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
-	setNotifyNewMessagesMain(true);
+        setNotifyNewMessagesMain(true);
       else
-	setNotifyNewMessagesMain(false);
+        setNotifyNewMessagesMain(false);
       
       if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
-	setNotifyNewMessagesNode(true);
+        setNotifyNewMessagesNode(true);
       else
-	setNotifyNewMessagesNode(false);
+        setNotifyNewMessagesNode(false);
     }
     setTracksUnreadMessages (! newValue);
     createFilters();
@@ -2541,14 +2541,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       setNotifyNewMessagesNode(false);
     } else {
       if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"))
-	setNotifyNewMessagesMain(true);
+        setNotifyNewMessagesMain(true);
       else
-	setNotifyNewMessagesMain(false);
+        setNotifyNewMessagesMain(false);
       
       if (!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"))
-	setNotifyNewMessagesNode(true);
+        setNotifyNewMessagesNode(true);
       else
-	setNotifyNewMessagesNode(false);
+        setNotifyNewMessagesNode(false);
     }
 
     resetDefaultActions();
@@ -2588,12 +2588,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   public void resetMessageCounts() {
     try {
       if (getFolder() != null)
-	getLogger().log(Level.FINE, "running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
+        getLogger().log(Level.FINE, "running resetMessageCounts.  unread message count is " + getFolder().getUnreadMessageCount());
       else
-	getLogger().log(Level.FINE, "running resetMessageCounts.  getFolder() is null.");
+        getLogger().log(Level.FINE, "running resetMessageCounts.  getFolder() is null.");
       
       if (tracksUnreadMessages()) {
-	unreadCount = getFolder().getUnreadMessageCount();
+        unreadCount = getFolder().getUnreadMessageCount();
       }
 
       messageCount = getFolder().getMessageCount();
@@ -2713,60 +2713,60 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       super("file-edit");
     } 
 
-	public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
 	    Pooka.getUIFactory().showEditorWindow(getFolderProperty(), getFolderProperty(), "Folder.editableFields");
-	}
     }
+  }
 
-    class UpdateCountAction extends AbstractAction {
+  class UpdateCountAction extends AbstractAction {
 	
-	UpdateCountAction() {
+    UpdateCountAction() {
 	    super("folder-update");
-	}
+    }
 	
-      public void actionPerformed(ActionEvent e) {
-	// should always be on the Folder thread.
-	try {
-	  checkFolder();
-	} catch (MessagingException me) {
-	  final MessagingException me2 = me;
+    public void actionPerformed(ActionEvent e) {
+      // should always be on the Folder thread.
+      try {
+        checkFolder();
+      } catch (MessagingException me) {
+        final MessagingException me2 = me;
 
-	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		if (getFolderDisplayUI() != null)
-		  getFolderDisplayUI().showError(Pooka.getProperty("error.updatingFolder", "Error updating Folder ") + getFolderID(), me2);
-		else
-		  Pooka.getUIFactory().showError(Pooka.getProperty("error.updatingFolder", "Error updating Folder ") + getFolderID(), me2);
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              if (getFolderDisplayUI() != null)
+                getFolderDisplayUI().showError(Pooka.getProperty("error.updatingFolder", "Error updating Folder ") + getFolderID(), me2);
+              else
+                Pooka.getUIFactory().showError(Pooka.getProperty("error.updatingFolder", "Error updating Folder ") + getFolderID(), me2);
 		  
-	      }
-	    });
+            }
+          });
 	  
-	}
       }
     }
+  }
 
-    class EmptyTrashAction extends AbstractAction {
+  class EmptyTrashAction extends AbstractAction {
 	
-	EmptyTrashAction() {
+    EmptyTrashAction() {
 	    super("folder-empty");
-	}
+    }
 	
-        public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e) {
 	    emptyTrash();
-	}
     }
+  }
 
 
-    class SendAllAction extends AbstractAction {
+  class SendAllAction extends AbstractAction {
       
-      SendAllAction() {
-	super("folder-send");
-      }
-      
-      public void actionPerformed(ActionEvent e) {
-	if (isOutboxFolder())
-	  mailServer.sendAll();
-      }
+    SendAllAction() {
+      super("folder-send");
     }
+      
+    public void actionPerformed(ActionEvent e) {
+      if (isOutboxFolder())
+        mailServer.sendAll();
+    }
+  }
 
 }

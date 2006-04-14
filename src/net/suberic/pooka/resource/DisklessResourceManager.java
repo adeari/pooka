@@ -137,11 +137,7 @@ public class DisklessResourceManager extends ResourceManager {
     if (pStore.isPopStore() && pName.equalsIgnoreCase("INBOX")) {
       return new PopInboxFolderInfo(pStore, pName);
     } else if (Pooka.getProperty(storeProperty + ".protocol", "mbox").equalsIgnoreCase("imap")) {
-      if (Pooka.getProperty(storeProperty + ".cachingEnabled", Pooka.getProperty(storeProperty + "." + pName + ".cachingEnabled", "false")).equalsIgnoreCase("true") || Pooka.getProperty(storeProperty + ".cacheHeadersOnly", Pooka.getProperty(storeProperty + "." + pName + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true")) {
-        return new net.suberic.pooka.cache.CachingFolderInfo(pStore, pName);
-      } else {
-        return  new UIDFolderInfo(pStore, pName);
-      }
+      return  new UIDFolderInfo(pStore, pName);
     } else {
       return new FolderInfo(pStore, pName);
     }

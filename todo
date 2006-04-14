@@ -13,6 +13,9 @@
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
 	-- antialiasing yes.  opengl probably not unless as a special option.
 
+*) (??) add in option to open html-only messages as parsed html instead
+	of 'real' html (??)
+
 **) make wheel scroll customizable
 
 -----

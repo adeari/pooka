@@ -38,24 +38,24 @@ public class MultiMessageProxy extends MessageProxy {
       ActionThread storeThread = folderInfo.getFolderThread();
       
       defaultActions = new Action[] {
-	new ActionWrapper(new OpenAction(), storeThread),
-	new ActionWrapper(new DeleteAction(), storeThread),
-	new ActionWrapper(new MoveAction(), storeThread),
-	new ActionWrapper(new CopyAction(), storeThread),
-	new ActionWrapper(new PrintAction(), storeThread),
-	new ActionWrapper(new CacheMessageAction(), storeThread),
-	new ActionWrapper(new MessageFilterAction(), storeThread),
-	new ActionWrapper(new SpamAction(), storeThread)
+        new ActionWrapper(new OpenAction(), storeThread),
+        new ActionWrapper(new DeleteAction(), storeThread),
+        new ActionWrapper(new MoveAction(), storeThread),
+        new ActionWrapper(new CopyAction(), storeThread),
+        new ActionWrapper(new PrintAction(), storeThread),
+        new ActionWrapper(new CacheMessageAction(), storeThread),
+        new ActionWrapper(new MessageFilterAction(), storeThread),
+        new ActionWrapper(new SpamAction(), storeThread)
       };
     } else {
       defaultActions = new Action[] {
-	new OpenAction(),
-	new DeleteAction(),
-	new MoveAction(),
-	new CopyAction(),
-	new PrintAction(),
-	new MessageFilterAction(),
-	new SpamAction()
+        new OpenAction(),
+        new DeleteAction(),
+        new MoveAction(),
+        new CopyAction(),
+        new PrintAction(),
+        new MessageFilterAction(),
+        new SpamAction()
       };
     }	    
     
@@ -64,8 +64,8 @@ public class MultiMessageProxy extends MessageProxy {
     Action[] actions = getActions();
     if (actions != null) {
       for (int i = 0; i < actions.length; i++) {
-	Action a = actions[i];
-	commands.put(a.getValue(Action.NAME), a);
+        Action a = actions[i];
+        commands.put(a.getValue(Action.NAME), a);
       }
     }
     
@@ -87,7 +87,7 @@ public class MultiMessageProxy extends MessageProxy {
    */
   public void showPopupMenu(JComponent component, MouseEvent e) {
     ConfigurablePopupMenu popupMenu = new ConfigurablePopupMenu();
-    if (folderInfo instanceof net.suberic.pooka.cache.CachingFolderInfo) {
+    if (folderInfo instanceof net.suberic.pooka.cache.CachingFolderInfo  && ! ((net.suberic.pooka.cache.CachingFolderInfo) folderInfo).getCacheHeadersOnly()) {
       popupMenu.configureComponent("MessageProxy.cachingPopupMenu", Pooka.getResources());
     } else {
       popupMenu.configureComponent("MessageProxy.popupMenu", Pooka.getResources());
@@ -116,15 +116,15 @@ public class MultiMessageProxy extends MessageProxy {
     final PrinterJob externalJob = job;
     if (job.printDialog ()) {
       Thread printThread = new Thread(new Runnable() {
-	  public void run() {
-	    try {
-	      externalJob.print ();
-	    }
-	    catch (PrinterException ex) {
-	      ex.printStackTrace ();
-	    }
-	  }
-	}, "printing thread");
+          public void run() {
+            try {
+              externalJob.print ();
+            }
+            catch (PrinterException ex) {
+              ex.printStackTrace ();
+            }
+          }
+        }, "printing thread");
       printThread.start();
       
     }
@@ -139,8 +139,8 @@ public class MultiMessageProxy extends MessageProxy {
     if (orig != mDeleteInProgress) {
       MultiMessageInfo multi = getMulti();
       for (int i = 0; i < multi.getMessageCount(); i++) {
-	MessageProxy current = multi.getMessageInfo(i).getMessageProxy();
-	current.setDeleteInProgress(newValue);
+        MessageProxy current = multi.getMessageInfo(i).getMessageProxy();
+        current.setDeleteInProgress(newValue);
       }
     }
   }
