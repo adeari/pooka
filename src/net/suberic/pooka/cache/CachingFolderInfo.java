@@ -29,26 +29,27 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   
   boolean autoCache = false;
 
-  boolean cacheHeadersOnly = false;
-
   public CachingFolderInfo(StoreInfo parent, String fname) {
     super(parent, fname);
 
-    autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+    if (! getCacheHeadersOnly()) {
+      autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+    }
 
-    cacheHeadersOnly =  Pooka.getProperty(getFolderProperty() + ".cacheHeadersOnly", Pooka.getProperty(getParentStore().getStoreProperty() + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true");
-    
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".autoCache");
   }
   
   public CachingFolderInfo(FolderInfo parent, String fname) {
     super(parent, fname);
     
-    autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+    if (! getCacheHeadersOnly()) {
+      autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+    }
 
-    cacheHeadersOnly =  Pooka.getProperty(getFolderProperty() + ".cacheHeadersOnly", Pooka.getProperty(getParentStore().getStoreProperty() + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true");
-    
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".autoCache");
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".cacheHeadersOnly");
+    Pooka.getResources().addValueChangeListener(this, getParentStore().getStoreProperty() + ".autoCache");
+    Pooka.getResources().addValueChangeListener(this, getParentStore().getStoreProperty() + ".cacheHeadersOnly");
   }
 
   /**
@@ -1423,8 +1424,17 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    */
   
   public void valueChanged(String changedValue) {
-    if (changedValue.equals(getFolderProperty() + ".autoCache")) {
-      autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false")))).equalsIgnoreCase("true");
+    if (changedValue.equals(getFolderProperty() + ".autoCache") || changedValue.equals(getParentStore().getStoreProperty() + ".autoCache")) {
+      if (! getCacheHeadersOnly()) {
+	autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false")))).equalsIgnoreCase("true");
+      }
+    } else if (changedValue.equals(getFolderProperty() + ".cacheHeadersOnly") || changedValue.equals(getParentStore().getStoreProperty() + ".cacheHeadersOnly")) {
+      if (! getCacheHeadersOnly()) {
+	autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
+      }
+      createFilters();
+      if (getFolderNode() != null)
+	getFolderNode().popupMenu = null;
     } else {
       super.valueChanged(changedValue);
     }
@@ -1434,7 +1444,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * Returns if we're caching only headers.
    */
   public boolean getCacheHeadersOnly() {
-    return cacheHeadersOnly;
+    return Pooka.getProperty(getFolderProperty() + ".cacheHeadersOnly", Pooka.getProperty(getParentStore().getStoreProperty() + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true");
   }
 }
 

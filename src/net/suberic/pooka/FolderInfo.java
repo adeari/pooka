@@ -2161,7 +2161,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     
     Vector foundFilters = new Vector();
     Vector defaultFilterNames = Pooka.getResources().getPropertyAsVector(getDefaultDisplayFiltersResource(), "");
-    
+
     for (int i = 0; i < defaultFilterNames.size(); i++) {
       foundFilters.add(new MessageFilter("FolderInfo.defaultDisplayFilters." + (String) defaultFilterNames.elementAt(i)));
     }
