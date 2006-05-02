@@ -295,4 +295,5 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
       }
     }
   }
+
 }

@@ -375,6 +375,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   new EditConnectionAction(),
   new EditInterfaceAction(),
   new EditCryptoAction(),
+  new EditAllPreferencesAction(),
   new HelpAboutAction(),
   new HelpLicenseAction(),
   new HelpAction(),
@@ -530,6 +531,19 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       valuesToEdit.add("Pooka.looknfeel");
       valuesToEdit.add("IconManager._default");
       Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.interfaceEditor", "User Interface Editor"), valuesToEdit);
+    }
+  }
+
+  class EditAllPreferencesAction extends AbstractAction {
+
+    EditAllPreferencesAction() {
+      super("cfg-all-prefs");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      Vector valuesToEdit = new Vector();
+      valuesToEdit.add("Pooka.allPreferences");
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
     }
   }
 

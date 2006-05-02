@@ -63,6 +63,10 @@ online:
 *) bug?  change password of store with sent folder.  does sent folder
 	get re-tagged as a sent folder?
 
+*) check to make sure that show new message notification messages are
+	updated dynamically, so if you change their values you don't
+	have to restart to get the effect.
+
 *) folder-check reopen attempts should only happen if the store is open
 	or should be open.  they should not reopen the store.
 
@@ -91,7 +95,7 @@ online:
 ----- ui update
 *) make required fields for the gui properties.
 *)  implement a way to make a custom FolderCellRenderer for a property.
-
+*) write help screens along with 
 *)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
 *) NewAccountPooka should be callable anytime, so you can use it to create

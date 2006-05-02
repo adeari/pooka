@@ -2,13 +2,15 @@ package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import java.util.Vector;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * This will make an editor for a list of properties.
  */
 public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   protected List editors;
-  
+  protected Logger mLogger = Logger.getLogger("editors.debug");
+
   /**
    * This writes the currently configured values in the PropertyEditorUI
    * to the source VariableBundle.
@@ -16,7 +18,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   public void setValue() throws PropertyValueVetoException {
     if (isEnabled()) {
       for (int i = 0; i < editors.size() ; i++) {
-	((PropertyEditorUI) editors.get(i)).setValue();
+        ((PropertyEditorUI) editors.get(i)).setValue();
       }
     }
   }
@@ -28,7 +30,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   public void resetDefaultValue() throws PropertyValueVetoException {
     if (isEnabled()) {
       for (int i = 0; i < editors.size() ; i++) {
-	((PropertyEditorUI) editors.get(i)).resetDefaultValue();
+        ((PropertyEditorUI) editors.get(i)).resetDefaultValue();
       }
     }
   }

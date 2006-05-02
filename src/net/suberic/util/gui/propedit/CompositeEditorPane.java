@@ -6,7 +6,7 @@ import net.suberic.util.VariableBundle;
 
 /**
  * This is a Property Editor which displays a group of properties.
- * These properties should all be definte by a single property.
+ * These properties should all be defined by a single property.
  *
  * An example:
  *
@@ -93,35 +93,35 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     
     if (scoped) {
       if (debug) {
-	System.out.println("testing for template " + template);
+        System.out.println("testing for template " + template);
       }
       String scopeRoot = manager.getProperty(template + ".scopeRoot", template);
       if (debug) {
-	System.out.println("scopeRoot is " + scopeRoot);
+        System.out.println("scopeRoot is " + scopeRoot);
       }
       List templateNames = manager.getPropertyAsList(template, "");
       if (debug) {
-	System.out.println("templateNames = getProp(" + template + ") = " + manager.getProperty(template, ""));
+        System.out.println("templateNames = getProp(" + template + ") = " + manager.getProperty(template, ""));
       }
       
       for (int i = 0; i < templateNames.size() ; i++) {
-	String propToEdit = null;
-	String currentSubProperty =  (String) templateNames.get(i);
-	if (manager.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false")) {
-	  propToEdit = property;
-	} else {
-	  propToEdit = property + "." + (String) templateNames.get(i);
-	}
-	String templateToEdit = scopeRoot + "." + (String) templateNames.get(i);
-	properties.add(propToEdit);
-	templates.add(templateToEdit);
-	if (debug) {
-	  System.out.println("adding " + propToEdit + ", template " + templateToEdit);
-	}
+        String propToEdit = null;
+        String currentSubProperty =  (String) templateNames.get(i);
+        if (manager.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false")) {
+          propToEdit = property;
+        } else {
+          propToEdit = property + "." + (String) templateNames.get(i);
+        }
+        String templateToEdit = scopeRoot + "." + (String) templateNames.get(i);
+        properties.add(propToEdit);
+        templates.add(templateToEdit);
+        if (debug) {
+          System.out.println("adding " + propToEdit + ", template " + templateToEdit);
+        }
       }
     } else {
       if (debug) {
-	System.out.println("creating prop list for Composite EP using " + property + ", " + template);
+        System.out.println("creating prop list for Composite EP using " + property + ", " + template);
       }
       properties = manager.getPropertyAsList(property, "");
       templates = manager.getPropertyAsList(template, "");
@@ -152,22 +152,22 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
 
     for (int i = 0; i < properties.size(); i++) {
       currentEditor =
-	(SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i));
+        (SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i));
       currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
       
       if (currentEditor.valueComponent != null) {
-	if (currentEditor.labelComponent != null) {
-	  layout.setConstraints(currentEditor.labelComponent, constraints);
-	  contentPanel.add(currentEditor.labelComponent);
-	}
-	constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
-	layout.setConstraints(currentEditor.valueComponent, constraints);
-	contentPanel.add(currentEditor.valueComponent);
+        if (currentEditor.labelComponent != null) {
+          layout.setConstraints(currentEditor.labelComponent, constraints);
+          contentPanel.add(currentEditor.labelComponent);
+        }
+        constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
+        layout.setConstraints(currentEditor.valueComponent, constraints);
+        contentPanel.add(currentEditor.valueComponent);
       } else {
-	constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
-	layout.setConstraints(currentEditor, constraints);
-	contentPanel.add(currentEditor);
+        constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
+        layout.setConstraints(currentEditor, constraints);
+        contentPanel.add(currentEditor);
       }
 
       constraints.weightx = 0.0;

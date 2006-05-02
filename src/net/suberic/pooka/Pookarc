@@ -252,7 +252,7 @@ FolderSelectorPane.inputButton.image=/net/suberic/util/gui/images/More.gif
 Pooka.background=0
 
 # PropertyEditors
-PropertyEditor=String:Boolean:DefaultBoolean:List:Variable:Composite:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key:LookAndFeel
+PropertyEditor=String:Boolean:DefaultBoolean:List:Variable:Composite:Sectioned:Color:Font:File:Multi:Password:Directory:Tabbed:Folder:Filter:SearchTerm:AddressList:Key:LookAndFeel
 
 PropertyEditor.String.class=net.suberic.util.gui.propedit.StringEditorPane
 PropertyEditor.Boolean.class=net.suberic.util.gui.propedit.BooleanEditorPane
@@ -260,6 +260,7 @@ PropertyEditor.DefaultBoolean.class=net.suberic.util.gui.propedit.DefaultBoolean
 PropertyEditor.List.class=net.suberic.util.gui.propedit.ListEditorPane
 PropertyEditor.Variable.class=net.suberic.util.gui.propedit.VariableEditorPane
 PropertyEditor.Composite.class=net.suberic.util.gui.propedit.CompositeEditorPane
+PropertyEditor.Sectioned.class=net.suberic.util.gui.propedit.SectionedEditorPane
 PropertyEditor.Color.class=net.suberic.util.gui.propedit.ColorSelectorPane
 PropertyEditor.Font.class=net.suberic.util.gui.propedit.FontSelectorPane
 PropertyEditor.File.class=net.suberic.util.gui.propedit.FileSelectorPane
