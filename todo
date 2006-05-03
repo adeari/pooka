@@ -20,6 +20,8 @@
 
 -----
 
+
+
 *) fix behavior when other mail client is connected; make sure we handle
 deleted messages, etc. gracefully.
 
@@ -93,6 +95,35 @@ online:
 *) linspire default icons
 
 ----- ui update
+*) new editor system.
+   *) reorganize properties
+	*) store:
+	   *) type
+	     *) servername
+	     *) username
+	     *) secure connection
+	        *) never / when possible / always
+	     *) auth type???
+	     *) port (??)
+	   *) receiving options
+	     *) check every x minutes
+	     *) new messages in all folders (umm, duh)
+	     *) custom connection (good idea - make it just an option.)
+	     *) only subscribed folders
+	     *) override namespace
+	   *) filters
+	   *) caching
+	   *) expunge on exit
+	   *) use subscribed folders list
+	   *) trash folder
+	     *) empty trash on exit?
+	   *) ? select for offline use by folder?
+	   *) option for not caching messages over x kb.
+   *) fix layout
+   *) add in help.
+
+
+
 *) make required fields for the gui properties.
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with 
@@ -104,7 +135,8 @@ entered through a propertyEditor.
 *) NewAccountPooka should aggregate errors, so if you have no username and
 	no mail server, you should get a single error screen saying both
 	'no username' and 'no mail server'.
------
+----- /ui update
+
 *) fix 'failed to open folder' message in v. 2.0.
 
 

@@ -39,7 +39,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   List templates;
   Box optionBox;
   
-  Hashtable currentPanels = new Hashtable();
+  Hashtable<String, SwingPropertyEditor> currentPanels = new Hashtable<String, SwingPropertyEditor>();
   
   /**
    * This configures this editor with the following values.
@@ -67,7 +67,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
 
     List propertyList = manager.getPropertyAsList(propertyName + ".editableFields", "");
     
-    optionList = createOptionList(propertyList, manager);
+    optionList = createOptionList(propertyList);
     
     optionBox = createOptionBox(label, optionList);
     this.add(optionBox);
@@ -100,14 +100,19 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   /**
    * Creates the list of edited items.
    */
-  private JList createOptionList(List editedProperties, PropertyEditorManager manager) {
+  private JList createOptionList(List editedProperties) {
 
     optionListModel = new DefaultListModel();
   
     Iterator iter = editedProperties.iterator();
     while (iter.hasNext()) {
       String key = (String) iter.next();
-      SEPListEntry listEntry = new SEPListEntry(manager.getProperty(key + ".Label", key), null, key);
+      String iconString = manager.getProperty(key + ".Icon", "");
+      Icon icon = null;
+      if (iconString != "") {
+        icon = manager.getIconManager().getIcon(iconString);
+      }
+      SEPListEntry listEntry = new SEPListEntry(manager.getProperty(key + ".Label", key), icon, key);
       optionListModel.addElement(listEntry);
     }
     
@@ -137,29 +142,26 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
    * subproperties are to be edited.
    */
   private JPanel createEntryPanel (List itemList) {
-    JPanel entryPanel = new JPanel(new CardLayout());
+    CardLayout entryLayout = new CardLayout();
+    JPanel panel = new JPanel(entryLayout);
     
-    String rootProp;
-    List propList;
-    List templateList;
-    
-    // create the default 
-    
-    int i = itemList.size();
-    
-    rootProp = new String(property + "._default");
-    
-    SwingPropertyEditor pep =  createEditorPane(rootProp, editorTemplate + ".editableFields");
-    pep.setEnabled(false);
-    
-    currentPanels.put("___default", pep);
-    editors.add(pep);
+    for (Object o: itemList) {
+      String rootProp = (String) o;
+      SwingPropertyEditor sep = createEditorPane(rootProp, rootProp);
 
-    entryPanel.add("___default", pep);
-    CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
-    entryLayout.show(entryPanel, "___default");
-    
-    return entryPanel;
+      getLogger().fine("creating editor for " + rootProp);
+      // save reference to new pane in hash table
+      currentPanels.put(rootProp, sep);
+      editors.add(sep);
+        
+      panel.add(rootProp, sep);
+    }
+    String defaultProperty = manager.getProperty(property + "._default", "");
+
+    if (defaultProperty != "")
+      entryLayout.show(panel, defaultProperty);
+
+    return panel;
   }
   
   /**
@@ -173,22 +175,12 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     
     String selectedId = ((SEPListEntry)((JList)e.getSource()).getSelectedValue()).getKey();
     
+    getLogger().fine("selectedId = " + selectedId);
     if (selectedId != null) {
-      Object newSelected = currentPanels.get(selectedId);
-      if (newSelected == null) {
-        String rootProp = new String(property + "." + selectedId);
-        SwingPropertyEditor sep = createEditorPane(rootProp, editorTemplate + ".editableFields");
-
-        // save reference to new pane in hash table
-        currentPanels.put(selectedId, sep);
-        editors.add(sep);
-	
-        entryPanel.add(selectedId, sep);
-        resize = true;
-      }
+      SwingPropertyEditor newSelected = currentPanels.get(selectedId);
+      getLogger().fine("newSelected = " + newSelected);
       entryLayout.show(entryPanel, selectedId);
-    } else
-      entryLayout.show(entryPanel, "___default");
+    }
     
     if (resize)
       doResize();
@@ -201,87 +193,11 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   }
   
   /**
-   * Puts up a dialog to get a name for the new value.
-   */
-  public String getNewValueName() {
-    boolean goodValue = false;
-    boolean matchFound = false;
-    
-    String newName = null;
-    newName = manager.getFactory().showInputDialog(this, manager.getProperty("SectionedEditorPane.renameProperty", "Enter new name."));
-    
-    while (goodValue == false) {
-      matchFound = false;
-      if (newName != null) {
-        for (int i = 0; i < optionListModel.getSize() && matchFound == false; i++) {
-          if (((String)optionListModel.getElementAt(i)).equals(newName)) 
-            matchFound = true;
-	  
-        }
-	
-        if (matchFound == false)
-          goodValue = true;
-        else
-          newName = manager.getFactory().showInputDialog(this, manager.getProperty("SectionedEditorPane.error.duplicateName", "Name already exists:") + "  " + newName + "\n" + manager.getProperty("SectionedEditorPane.renameProperty", "Enter new name."));
-      } else {
-        goodValue = true;
-      }
-    }
-    
-    return newName;
-  }
-  
-  /**
-   * This renames the selected property.
-   */
-  public void renameProperty(String oldName, String newName) {
-    /*
-      newName = getNewValueName();
-      if (newName != null) {
-      CompositeEditorPane oldPane = (CompositeEditorPane)currentPanels.get(oldName);
-      if (oldPane != null) {
-      
-      String rootProp =new String(property.concat("." + newName));
-	
-      CompositeEditorPane pep = new CompositeEditorPane(manager, rootProp, editorTemplate);;
-      java.util.Properties oldProps = oldPane.getValue();
-      }
-      }
-    */
-  }
-  
-  /**
-   * This produces a string for the given JList.
-   */
-  public String getStringFromList(DefaultListModel dlm) {
-    
-    String retVal;
-    if (dlm.getSize() < 1)
-      return "";
-    else 
-      retVal = new String((String)dlm.getElementAt(0));
-    
-    for (int i = 1; i < dlm.getSize(); i++) {
-      retVal = retVal.concat(":" + (String)dlm.getElementAt(i));
-    }
-    
-    return retVal;
-  }
-  
-  /**
    * Sets the value for this SectionedEditorPane.
    */
   public void setValue() throws PropertyValueVetoException {
     if (isEnabled()) {
-      
       super.setValue();
-      
-      if (isChanged()) {
-        if (debug) {
-          System.out.println("setting property.  property is " + property + "; getStringFromList is " + getStringFromList(optionListModel));
-        }
-        manager.setProperty(property, getStringFromList(optionListModel));
-      }
     }
   }
   
@@ -309,7 +225,6 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
    */
   public java.util.Properties getValue() {
     java.util.Properties currentRetValue = super.getValue();
-    currentRetValue.setProperty(property, getStringFromList(optionListModel));
     return currentRetValue;
   }
   
@@ -347,7 +262,8 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
    * Creates an editor.
    */
   public SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
+    getLogger().fine("creating editor for " + subProperty + ", template " + subTemplate);
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, manager);
   }
   
   /**
@@ -357,12 +273,9 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
 
     optionList.setEnabled(newValue);
 
-    Object defaultEditor = currentPanels.get("___default");
     for (int i = 0; i < editors.size() ; i++) {
       PropertyEditorUI current = (PropertyEditorUI) editors.get(i);
-      if (current != defaultEditor) {
-        current.setEnabled(newValue);
-      }
+      current.setEnabled(newValue);
     }
 
     enabled = newValue;

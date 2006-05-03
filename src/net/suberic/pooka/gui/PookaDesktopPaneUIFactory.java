@@ -25,14 +25,15 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    * Constructor.
    */
   public PookaDesktopPaneUIFactory(PookaUIFactory pSource) {
-    editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources());
     if (pSource != null) {
+      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), pSource.getIconManager());
       pookaThemeManager = pSource.getPookaThemeManager();
       mIconManager = pSource.getIconManager();
       mMessageNotificationManager = pSource.getMessageNotificationManager();
     } else {
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mIconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
+      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), mIconManager);
       mMessageNotificationManager = new MessageNotificationManager();
     }
   }
@@ -58,15 +59,15 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     MessageUI mui;
     if (mp instanceof NewMessageProxy) {
       if (createExternal)
-	mui = new NewMessageFrame((NewMessageProxy) mp);
+        mui = new NewMessageFrame((NewMessageProxy) mp);
       else
-	mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
+        mui = new NewMessageInternalFrame(getMessagePanel(), (NewMessageProxy) mp);
     } else {
       if (createExternal) {
-	mui = new ReadMessageFrame(mp);
+        mui = new ReadMessageFrame(mp);
       } else {
-	mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
-	((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
+        mui = new ReadMessageInternalFrame(getMessagePanel(), mp);
+        ((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
       }
     }
     
@@ -170,14 +171,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     final String fTitle = title;
     final int fType = type;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fDisplayMessage, fTitle, fType));
-	}
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fDisplayMessage, fTitle, fType));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -196,14 +197,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     final String fTitle = title;
     final int fType = type;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fMessageComponents, fTitle, fType));
-	}
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fMessageComponents, fTitle, fType));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -222,10 +223,10 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
 
     if (showing) {
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    JOptionPane.showInternalMessageDialog(getMessagePanel(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
-	  }
-	});
+          public void run() {
+            JOptionPane.showInternalMessageDialog(getMessagePanel(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
+          }
+        });
     } else
       System.out.println(errorMessage);
     
@@ -254,10 +255,10 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     final String fTitle = title;
     if (showing) {
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    JOptionPane.showInternalMessageDialog(getMessagePanel(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
-	  }
-	});
+          public void run() {
+            JOptionPane.showInternalMessageDialog(getMessagePanel(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
+          }
+        });
     } else
       System.out.println(errorMessage);
 
@@ -280,14 +281,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
 
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
-	}
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -308,14 +309,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
 
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
-	}
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -334,27 +335,27 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     final String fTitle = title;
 
     Runnable runMe = new Runnable() {
-	public void run() {
-	  //JLabel displayPanel = new JLabel(displayMessage);
-	  JTextArea displayPanel = new JTextArea(displayMessage);
-	  displayPanel.setEditable(false);
-	  java.awt.Dimension dpSize = displayPanel.getPreferredSize();
-	  JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	  scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
-	  //System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
-	  //System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
-	  //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-	  //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
-	  //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
+        public void run() {
+          //JLabel displayPanel = new JLabel(displayMessage);
+          JTextArea displayPanel = new JTextArea(displayMessage);
+          displayPanel.setEditable(false);
+          java.awt.Dimension dpSize = displayPanel.getPreferredSize();
+          JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+          scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
+          //System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
+          //System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
+          //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+          //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
+          //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
 
-	  JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
-	  //JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
-	}
+          JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
+          //JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {

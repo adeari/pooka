@@ -31,33 +31,33 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   StatusDisplay mStatusPanel = null;
 
   WindowAdapter mWindowAdapter = null;
-
-
+  
+  
   /**
    * Constructor.
    */
   public PookaMinimalUIFactory(PookaUIFactory pSource) {
     mWindowAdapter = new WindowAdapter() {
-	public void windowClosed(WindowEvent we) {
-	  Window window = we.getWindow();
-	  if (window instanceof NewMessageFrame) {
-	    mNewMessages.remove(window);
-	    if (mNewMessages.isEmpty()) {
-	      System.exit(0);
-	    }
-	  }
-	}
+        public void windowClosed(WindowEvent we) {
+          Window window = we.getWindow();
+          if (window instanceof NewMessageFrame) {
+            mNewMessages.remove(window);
+            if (mNewMessages.isEmpty()) {
+              System.exit(0);
+            }
+          }
+        }
       };
 
-    mEditorFactory = new PropertyEditorFactory(Pooka.getResources());
-
     if (pSource != null) {
+      mEditorFactory = new PropertyEditorFactory(Pooka.getResources(), pSource.getIconManager());
       mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mMessageNotificationManager = pSource.getMessageNotificationManager();
       mMessageNotificationManager.setMainPanel(null);
     } else {
       mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mMessageNotificationManager = new MessageNotificationManager();
+      mEditorFactory = new PropertyEditorFactory(Pooka.getResources(), mIconManager);
     }
   }
   
@@ -216,14 +216,14 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final String fTitle = title;
     final int fType = type;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fDisplayMessage, fTitle, fType));
-	}
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fDisplayMessage, fTitle, fType));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -243,14 +243,14 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final String fTitle = title;
     final int fType = type;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fMessageComponents, fTitle, fType));
-	}
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fMessageComponents, fTitle, fType));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -271,10 +271,10 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
     if (mShowing) {
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
-	  }
-	});
+          public void run() {
+            JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
+          }
+        });
     } else
       System.out.println(errorMessage);
     
@@ -310,10 +310,10 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final String fTitle = title;
     if (mShowing) {
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
-	  }
-	});
+          public void run() {
+            JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
+          }
+        });
     } else
       System.out.println(errorMessage);
     
@@ -338,14 +338,14 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
 
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
-	}
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -366,14 +366,14 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
 
     Runnable runMe = new Runnable() {
-	public void run() {
-	  fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
-	}
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
+        }
       };
     
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -398,20 +398,20 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final String displayMessage = formatMessage(newMessage);
     final String fTitle = title;
     Runnable runMe = new Runnable() {
-	public void run() {
-	  JTextArea displayPanel = new JTextArea(displayMessage);
-	  displayPanel.setEditable(false);
-	  java.awt.Dimension dpSize = displayPanel.getPreferredSize();
-	  JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-	  scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
+        public void run() {
+          JTextArea displayPanel = new JTextArea(displayMessage);
+          displayPanel.setEditable(false);
+          java.awt.Dimension dpSize = displayPanel.getPreferredSize();
+          JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+          scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
 	  
-	  JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
-	}
+          JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-	SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -427,21 +427,21 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     final String msg = newMessage;
 
     Runnable runMe = new Runnable() {
-	public void run() {
-	  synchronized(this) {
-	    if (mStatusPanel == null) {
-	      JFrame currentFrame = findJFrame();
-	      mStatusPanel = new StatusDisplay(currentFrame, msg);
-	      mStatusPanel.pack();
-	      mStatusPanel.setLocationRelativeTo(currentFrame);
-	      mStatusPanel.setTitle("Message Status");
-	      //mStatusPanel.setStatusMessage(msg);
-	      mStatusPanel.setVisible(true);
-	    } else {
-	      mStatusPanel.setStatusMessage(msg);
-	    }
-	  }
-	}
+        public void run() {
+          synchronized(this) {
+            if (mStatusPanel == null) {
+              JFrame currentFrame = findJFrame();
+              mStatusPanel = new StatusDisplay(currentFrame, msg);
+              mStatusPanel.pack();
+              mStatusPanel.setLocationRelativeTo(currentFrame);
+              mStatusPanel.setTitle("Message Status");
+              //mStatusPanel.setStatusMessage(msg);
+              mStatusPanel.setVisible(true);
+            } else {
+              mStatusPanel.setStatusMessage(msg);
+            }
+          }
+        }
       };
 
     if (SwingUtilities.isEventDispatchThread())
@@ -463,13 +463,13 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public void clearStatus() {
     Runnable runMe = new Runnable() {
-	public void run() {
-	  synchronized(this) {
-	    if (mStatusPanel != null) {
-	      mStatusPanel.clear();
-	    }
-	  }
-	}
+        public void run() {
+          synchronized(this) {
+            if (mStatusPanel != null) {
+              mStatusPanel.clear();
+            }
+          }
+        }
       };
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
@@ -546,7 +546,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     if (mNewMessages.size() > 0) {
       Object first = mNewMessages.get(0);
       if (first instanceof JFrame)
-	return (JFrame) first;
+        return (JFrame) first;
     }
     
     return null;
@@ -575,39 +575,39 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       this.getContentPane().add(displayPanel);
     }
     
-  /**
-   * Shows a status message.
-   */
+    /**
+     * Shows a status message.
+     */
     public void setStatusMessage(String pMessage) {
       final String msg = pMessage;
 
       Runnable runMe = new Runnable() {
-	  public void run() {
-	    mDisplayLabel.setText(msg);
-	    mDisplayLabel.repaint();
-	  }
-	};
+          public void run() {
+            mDisplayLabel.setText(msg);
+            mDisplayLabel.repaint();
+          }
+        };
   
       if (SwingUtilities.isEventDispatchThread()) {
-	runMe.run();
+        runMe.run();
       } else {
-	SwingUtilities.invokeLater(runMe);
+        SwingUtilities.invokeLater(runMe);
       }
     }
     
-  /**
-   * Clears the status panel.
-   */
+    /**
+     * Clears the status panel.
+     */
     public void clear() {
       Runnable runMe = new Runnable() {
-	  public void run() {
-	    StatusDisplay.this.dispose();
-	  }
-	};
+          public void run() {
+            StatusDisplay.this.dispose();
+          }
+        };
       if (SwingUtilities.isEventDispatchThread()) {
-	runMe.run();
+        runMe.run();
       } else {
-	SwingUtilities.invokeLater(runMe);
+        SwingUtilities.invokeLater(runMe);
       }
     }
   }

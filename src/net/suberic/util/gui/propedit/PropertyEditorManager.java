@@ -1,5 +1,6 @@
 package net.suberic.util.gui.propedit;
 import net.suberic.util.VariableBundle;
+import net.suberic.util.gui.IconManager;
 import java.util.*;
 
 /**
@@ -20,6 +21,7 @@ public class PropertyEditorManager {
 
   protected Properties localProps = new Properties();
 
+  protected IconManager iconManager;
   /**
    * Creates a new PropertyEditorManager.
    */
@@ -30,9 +32,10 @@ public class PropertyEditorManager {
    * Creates a PropertyEditorManager using the given VariableBundle and
    * PropertyEditorFactory.
    */
-  public PropertyEditorManager(VariableBundle vb, PropertyEditorFactory factory) {
+  public PropertyEditorManager(VariableBundle vb, PropertyEditorFactory factory, IconManager manager) {
     sourceBundle = vb;
     propertyFactory = factory;
+    iconManager = manager;
   }
 
   /**
@@ -51,7 +54,7 @@ public class PropertyEditorManager {
     if (listenerList != null) {
       Iterator it = listenerList.iterator();
       while (it.hasNext()) {
-	editor.addPropertyEditorListener((PropertyEditorListener) it.next());
+        editor.addPropertyEditorListener((PropertyEditorListener) it.next());
       }
     }
 
@@ -66,6 +69,13 @@ public class PropertyEditorManager {
   }
   
   /**
+   * Gets the IconManager for this PropertyEditorManager.
+   */
+  public IconManager getIconManager() {
+    return iconManager;
+  }
+  
+  /**
    * Gets the value of the given property.
    */
   public String getProperty(String property, String defaultValue) {
@@ -73,7 +83,7 @@ public class PropertyEditorManager {
     if (! writeChanges) {
       String tmpValue = (String) localProps.get(property);
       if (tmpValue != null)
-	return tmpValue;
+        return tmpValue;
     }
     return sourceBundle.getProperty(property, defaultValue);
   }
@@ -86,7 +96,7 @@ public class PropertyEditorManager {
     if (! writeChanges) {
       String tmpValue = (String) localProps.get(property);
       if (tmpValue != null) {
-	return VariableBundle.convertToVector(tmpValue);
+        return VariableBundle.convertToVector(tmpValue);
       }
     }
     return sourceBundle.getPropertyAsVector(property, defaultValue);
@@ -147,7 +157,7 @@ public class PropertyEditorManager {
     } else {
       List listenerList = (List) pendingListenerMap.get(property);
       if (listenerList == null) {
-	listenerList = new ArrayList();
+        listenerList = new ArrayList();
       }
       listenerList.add(listener);
       pendingListenerMap.put(property, listenerList);

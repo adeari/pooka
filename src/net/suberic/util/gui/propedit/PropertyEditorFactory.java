@@ -1,6 +1,7 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import net.suberic.util.*;
+import net.suberic.util.gui.IconManager;
 import java.util.*;
 import java.awt.Container;
 import java.awt.Component;
@@ -15,8 +16,10 @@ public class PropertyEditorFactory {
 
   // the VariableBundle that holds both the properties and the editor
   // definitions.
-
   VariableBundle sourceBundle;
+
+  // the IconManager used for PropertyEditors that use icons.
+  IconManager iconManager;
 
   // the propertyType to className mapping
   Map typeToClassMap = new HashMap();
@@ -25,8 +28,9 @@ public class PropertyEditorFactory {
    * Creates a PropertyEditorFactory using the given VariableBundle as
    * a source.
    */
-  public PropertyEditorFactory(VariableBundle bundle) {
+  public PropertyEditorFactory(VariableBundle bundle, IconManager manager) {
     sourceBundle = bundle;
+    iconManager = manager;
     createTypeToClassMap();
   }
 
@@ -40,16 +44,16 @@ public class PropertyEditorFactory {
 
       Vector propertyTypes = sourceBundle.getPropertyAsVector(SOURCE_PROPERTY, "");
       for (int i = 0; i < propertyTypes.size(); i++) {
-  String currentType = (String) propertyTypes.get(i);
-  String className = sourceBundle.getProperty(SOURCE_PROPERTY + "." + currentType + ".class", "");
-  try {
-    Class currentClass = Class.forName(className);
-    if (parentClass.isAssignableFrom(currentClass)) {
-      typeToClassMap.put(currentType, currentClass);
-    }
-  } catch (Exception e) {
-    System.out.println("error registering class for property type " + currentType + ":  " + e);
-  }
+        String currentType = (String) propertyTypes.get(i);
+        String className = sourceBundle.getProperty(SOURCE_PROPERTY + "." + currentType + ".class", "");
+        try {
+          Class currentClass = Class.forName(className);
+          if (parentClass.isAssignableFrom(currentClass)) {
+            typeToClassMap.put(currentType, currentClass);
+          }
+        } catch (Exception e) {
+          System.out.println("error registering class for property type " + currentType + ":  " + e);
+        }
       }
     } catch (Exception e) {
       System.out.println("caught exception initializing PropertyEditorFactory:  " + e);
@@ -112,7 +116,7 @@ public class PropertyEditorFactory {
    * JInternalFrame.
    */
   public Container createEditorWindow(String title, List properties) {
-    return createEditorWindow(title, properties, properties, new PropertyEditorManager(sourceBundle, this));
+    return createEditorWindow(title, properties, properties, new PropertyEditorManager(sourceBundle, this, iconManager));
   }
 
   /**
@@ -122,7 +126,7 @@ public class PropertyEditorFactory {
    * JFrame.
    */
   public Container createEditorWindow(String title, List properties, List templates ) {
-    return createEditorWindow(title, properties, templates, new PropertyEditorManager(sourceBundle, this));
+    return createEditorWindow(title, properties, templates, new PropertyEditorManager(sourceBundle, this, iconManager));
   }
 
   /**
@@ -161,7 +165,7 @@ public class PropertyEditorFactory {
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using the given PropertyEditorManager.
    */
-  public PropertyEditorUI createEditor(String property, String editorTemplate, String type, PropertyEditorManager mgr, boolean enabled) {
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String baseProperty, String type, PropertyEditorManager mgr, boolean enabled) {
 
     //System.err.println("creating editor for property " + property + ", template " + editorTemplate + ", type " + type);
 
@@ -196,6 +200,12 @@ public class PropertyEditorFactory {
     return sourceBundle;
   }
 
+  /** 
+   * Gets the IconManager for this factory.
+   */
+  public IconManager getIconManager() {
+    return iconManager;
+  }
 }
 
 

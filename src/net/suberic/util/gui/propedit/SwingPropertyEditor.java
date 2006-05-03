@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.Dimension;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 /**
  * A Swing implementation of the PropertyEditorUI.
@@ -38,6 +39,9 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   // the listener list.
   protected List listenerList = new LinkedList();
 
+  // the logger
+  protected static Logger sLogger =  Logger.getLogger("editors.debug");
+
   /**
    * Creates a new SwingPropertyEditor, in this case a JPanel with a 
    * GridBagLayout.  Note that configureEditor() will need to get called
@@ -46,6 +50,22 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public SwingPropertyEditor() {
     super();
     this.setLayout(new java.awt.GridBagLayout());
+  }
+  
+  /**
+   * Creates a SwingPropertyEditor using the given property and manager.
+   *
+   * @param propertyName The property to be edited.  This property will
+   *        also be used to define the layout of this Editor.
+   * @param template The template to be used for this property
+   * @param baseProperty The base property to be used for other scoped
+   *                     properties.
+   * @param newManager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default. 
+   */
+  public SwingPropertyEditor(String propertyName, String template, String baseProperty, PropertyEditorManager newManager, boolean isEnabled) {
+    configureEditor(propertyName, template, newManager, isEnabled);
   }
   
   /**
@@ -294,6 +314,14 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
 	addPropertyEditorListener(pel);
       }
     }
+  }
+
+  /**
+   * Gets the Logger for this Editor.
+   *
+   */
+  public Logger getLogger() {
+    return sLogger;
   }
 
 }

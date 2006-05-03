@@ -49,7 +49,7 @@ public class NewAccountPooka {
       PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
       setFactory(factory);
       
-      manager = new PropertyEditorManager(Pooka.getResources(), factory);
+      manager = new PropertyEditorManager(Pooka.getResources(), factory, factory.getIconManager());
       manager.setWriteChanges(false);
 
       showFirstEntryWindow();

@@ -1,6 +1,7 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import net.suberic.util.*;
+import net.suberic.util.gui.IconManager;
 import java.util.*;
 import java.awt.Container;
 import java.awt.Component;
@@ -15,8 +16,8 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    * Creates a PropertyEditorFactory using the given VariableBundle as
    * a source.
    */
-  public DesktopPropertyEditorFactory(VariableBundle bundle, JDesktopPane newDesktop) {
-    super(bundle);
+  public DesktopPropertyEditorFactory(VariableBundle bundle, JDesktopPane newDesktop, IconManager manager) {
+    super(bundle, manager);
     desktop = newDesktop;
   }
 
@@ -24,8 +25,8 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    * Creates a PropertyEditorFactory using the given VariableBundle as
    * a source.
    */
-  public DesktopPropertyEditorFactory(VariableBundle bundle) {
-    super(bundle);
+  public DesktopPropertyEditorFactory(VariableBundle bundle, IconManager manager) {
+    super(bundle, manager);
   }
 
   /**
