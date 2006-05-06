@@ -91,7 +91,7 @@ public class PropertyEditorManager {
   /**
    * Gets the value of the given property.
    */
-  public List getPropertyAsList(String property, String defaultValue) {
+  public List<String> getPropertyAsList(String property, String defaultValue) {
     // check the localProps first
     if (! writeChanges) {
       String tmpValue = (String) localProps.get(property);

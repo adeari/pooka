@@ -218,11 +218,11 @@ public class VariableBundle extends Object {
    * Converts a value which has multiple values separated by a ':' (colon)
    * to a java.util.Vector.
    */
-  public static Vector convertToVector(String value) {
-    Vector returnValue = new Vector();
+  public static Vector<String> convertToVector(String value) {
+    Vector<String> returnValue = new Vector<String>();
     StringTokenizer tokens = new StringTokenizer(value, ":");
     while (tokens.hasMoreElements())
-      returnValue.add(tokens.nextElement());
+      returnValue.add((String)tokens.nextElement());
     return returnValue;
   }
   
@@ -230,7 +230,7 @@ public class VariableBundle extends Object {
    * Converts the given property value to a Vector using the convertToVector
    * call.
    */
-  public Vector getPropertyAsVector(String propertyName, String defaultValue) {
+  public Vector<String> getPropertyAsVector(String propertyName, String defaultValue) {
     return convertToVector(getProperty(propertyName, defaultValue));
   }
   
@@ -238,11 +238,11 @@ public class VariableBundle extends Object {
    * Converts a value which has multiple values separated by a ':' (colon)
    * to a java.util.List.
    */
-  public static List convertToList(String value) {
-    List returnValue = new ArrayList();
+  public static List<String> convertToList(String value) {
+    List<String> returnValue = new ArrayList<String>();
     StringTokenizer tokens = new StringTokenizer(value, ":");
     while (tokens.hasMoreElements())
-      returnValue.add(tokens.nextElement());
+      returnValue.add((String)tokens.nextElement());
     return returnValue;
   }
   
@@ -250,7 +250,7 @@ public class VariableBundle extends Object {
    * Converts the given property value to a List using the convertToList
    * call.
    */
-  public List getPropertyAsList(String propertyName, String defaultValue) {
+  public List<String> getPropertyAsList(String propertyName, String defaultValue) {
     return convertToList(getProperty(propertyName, defaultValue));
   }
   

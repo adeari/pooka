@@ -132,6 +132,10 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    */
   public void setEnabled(boolean newValue) {
     enabled=newValue;
+    if (valueComponent != null)
+      valueComponent.setEnabled(newValue);
+    if (labelComponent != null)
+      labelComponent.setEnabled(newValue);
   }
   
   /**

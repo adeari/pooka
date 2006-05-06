@@ -165,7 +165,7 @@ public class PropertyEditorFactory {
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using the given PropertyEditorManager.
    */
-  public PropertyEditorUI createEditor(String property, String editorTemplate, String baseProperty, String type, PropertyEditorManager mgr, boolean enabled) {
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String type, PropertyEditorManager mgr, boolean enabled) {
 
     //System.err.println("creating editor for property " + property + ", template " + editorTemplate + ", type " + type);
 
