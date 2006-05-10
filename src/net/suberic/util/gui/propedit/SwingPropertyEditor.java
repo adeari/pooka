@@ -286,8 +286,8 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     try {
       Class pepClass = Class.forName("net.suberic.util.gui.propedit.PropertyEditorPane");
       if (pepClass != null) {
-	PropertyEditorPane pep = (PropertyEditorPane) SwingUtilities.getAncestorOfClass(pepClass, valueComponent);
-	return pep;
+        PropertyEditorPane pep = (PropertyEditorPane) SwingUtilities.getAncestorOfClass(pepClass, valueComponent);
+        return pep;
       }
     } catch (Exception e) {
     }
@@ -315,7 +315,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
       String current = (String)it.next();
       PropertyEditorListener pel = manager.createListener(current);
       if (pel != null) {
-	addPropertyEditorListener(pel);
+        addPropertyEditorListener(pel);
       }
     }
   }

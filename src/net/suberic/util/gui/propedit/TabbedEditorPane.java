@@ -51,9 +51,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
     
-    if (debug) {
-      System.out.println("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
-    }
+    getLogger().info("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
     
     enabled=isEnabled;
     
@@ -64,9 +62,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     
     // first, get the strings that we're going to edit.
 
-    if (debug) {
-      System.out.println("creating prop from " + template + "=" + manager.getProperty(template, ""));
-    }
+    getLogger().info("creating prop from " + template + "=" + manager.getProperty(template, ""));
 
     List propsToEdit = manager.getPropertyAsList(template, "");
     
@@ -74,12 +70,10 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     
     labelComponent=tabbedPane;
 
-    if (debug) {
-      System.out.println("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
-      System.out.println("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
-      System.out.println("size for tabbedPane = " + tabbedPane.getSize());
-    }
-
+    getLogger().info("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
+    getLogger().info("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
+    getLogger().info("size for tabbedPane = " + tabbedPane.getSize());
+    
     this.add(tabbedPane);
 
     manager.registerPropertyEditor(property, this);
@@ -96,28 +90,24 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     for (int i = 0; i < propsToEdit.size(); i++) {
       String currentTemplate = (String)propsToEdit.get(i);
       if (templateScoped) 
-	currentTemplate = editorTemplate + "." + currentTemplate;
+        currentTemplate = editorTemplate + "." + currentTemplate;
 
-      if (debug) {
-	System.out.println("getting editor using template " + currentTemplate);
-      }
+      getLogger().info("getting editor using template " + currentTemplate);
       
       if (propertyScoped) {
-	if (debug) {
-	  System.out.println("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
-	}
-	currentEditor = createEditorPane(property, currentTemplate);
+        getLogger().info("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
+
+        currentEditor = createEditorPane(property, currentTemplate);
       } else {
-	if (debug) {
-	  System.out.println("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
-	}
-	currentEditor = createEditorPane(currentTemplate, currentTemplate);
+
+        getLogger().info("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
+        
+        currentEditor = createEditorPane(currentTemplate, currentTemplate);
       }
       
-      if (debug) {
-	System.out.println("adding " + currentEditor);
-	System.out.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
-      }
+      getLogger().info("adding " + currentEditor);
+      getLogger().info("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+
       editorList.add(currentEditor);
       tabbedPane.add(manager.getProperty(currentTemplate + ".label", currentTemplate), currentEditor);
     }

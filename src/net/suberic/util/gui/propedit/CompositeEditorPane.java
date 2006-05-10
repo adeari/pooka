@@ -1,5 +1,7 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
+import java.awt.Container;
+import java.awt.Component;
 import java.util.Vector;
 import java.util.List;
 import net.suberic.util.VariableBundle;
@@ -134,49 +136,36 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     SwingPropertyEditor currentEditor;
     
     editors = new Vector();
-    
-    java.awt.GridBagConstraints constraints = new java.awt.GridBagConstraints();
-    constraints.insets = new java.awt.Insets(1,3,0,3);
-    
-    java.awt.GridBagLayout layout = new java.awt.GridBagLayout();
+
+    SpringLayout layout = new SpringLayout();
     JPanel contentPanel = new JPanel();
-    contentPanel.setLayout(layout);
 
-    constraints.weightx = 1.0;
-    constraints.fill = java.awt.GridBagConstraints.BOTH;
-    
-    
-    if (debug) {
-      System.out.println("creating editors for " + properties.size() + " properties.");
-    }
-
+    contentPanel.setLayout(new SpringLayout());
+    Component[] labelComponents = new Component[properties.size()];
+    Component[] valueComponents = new Component[properties.size()];
     for (int i = 0; i < properties.size(); i++) {
-      currentEditor =
-        (SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i));
+      currentEditor = (SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i));
       currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
       
       if (currentEditor.valueComponent != null) {
         if (currentEditor.labelComponent != null) {
-          layout.setConstraints(currentEditor.labelComponent, constraints);
           contentPanel.add(currentEditor.labelComponent);
+          labelComponents[i] = currentEditor.labelComponent;
+          contentPanel.add(currentEditor.valueComponent);
+          valueComponents[i] = currentEditor.valueComponent;
+        } else {
+          labelComponents[i] = currentEditor.valueComponent;
+          contentPanel.add(currentEditor.valueComponent);
         }
-        constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
-        layout.setConstraints(currentEditor.valueComponent, constraints);
-        contentPanel.add(currentEditor.valueComponent);
       } else {
-        constraints.gridwidth=java.awt.GridBagConstraints.REMAINDER;
-        layout.setConstraints(currentEditor, constraints);
         contentPanel.add(currentEditor);
+        labelComponents[i] = currentEditor;
       }
-
-      constraints.weightx = 0.0;
-      constraints.gridwidth = 1;
-      
     }
     
     this.add(contentPanel);
-    alignEditorSizes();
+    makeCompactGrid(contentPanel, labelComponents, valueComponents, 5, 5, 5, 5);
 
     manager.registerPropertyEditor(property, this);
   }
@@ -203,33 +192,96 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
   }
   
   /**
-   * This should even out the various editors on the panel.
    */
-  public void alignEditorSizes() {
-    int labelWidth = 0;
-    int valueWidth = 0;
-    int totalWidth = 0;
-    for (int i = 0; i <  editors.size(); i++) {
-      labelWidth = Math.max(labelWidth, ((SwingPropertyEditor)editors.get(i)).getMinimumLabelSize().width);
-      valueWidth = Math.max(valueWidth, ((SwingPropertyEditor)editors.get(i)).getMinimumValueSize().width);
-      totalWidth = Math.max(totalWidth, ((SwingPropertyEditor)editors.get(i)).getMinimumTotalSize().width);
+  protected void makeCompactGrid(Container parent,
+                                 Component[] labelComponents,
+                                 Component[] valueComponents,
+                                 int initialX, int initialY,
+                                 int xPad, int yPad) {
+    SpringLayout layout;
+    try {
+      layout = (SpringLayout)parent.getLayout();
+    } catch (ClassCastException exc) {
+      System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+      return;
     }
-    
-    if (totalWidth > labelWidth + valueWidth) {
-      int difference = totalWidth - labelWidth - valueWidth;
-      labelWidth = labelWidth + (difference / 2);
-      valueWidth = totalWidth - labelWidth;
-    }
-    
-    for (int i = 0; i < editors.size(); i++) {
-      ((SwingPropertyEditor) editors.get(i)).setWidths(labelWidth, valueWidth);
-    }
-    
 
+    // go through both columns.
+    Spring labelX = Spring.constant(initialX);
+    Spring valueX = Spring.constant(initialX);
+    Spring labelWidth = Spring.constant(0);
+    Spring valueWidth = Spring.constant(0);
+    Spring fullWidth = Spring.constant(0);
+    for (int i = 0; i < labelComponents.length; i++) {
+      // for components with a label and a value, add to labelWidth and 
+      // valueWidth.
+      if (valueComponents[i] != null) {
+        labelWidth = Spring.max(labelWidth, layout.getConstraints(labelComponents[i]).getWidth());
+        valueWidth = Spring.max(valueWidth, layout.getConstraints(valueComponents[i]).getWidth());
+      } else {
+        // otherwise just add to fullWidth.
+        fullWidth = Spring.max(fullWidth, layout.getConstraints(labelComponents[i]).getWidth());
+      }
+    }
+
+    // make sure fullWidth and labelWidth + valueWidth match.
+    if (fullWidth.getValue() <= labelWidth.getValue() + xPad + valueWidth.getValue()) {
+      fullWidth = Spring.sum(labelWidth, Spring.sum(Spring.constant(xPad), valueWidth));
+    } else {
+      valueWidth = Spring.sum(fullWidth, Spring.minus(Spring.sum(Spring.constant(xPad), labelWidth)));
+    }
+
+    // recalculate valueX.
+    valueX = Spring.sum(labelX, Spring.sum(labelWidth, Spring.constant(xPad)));
     
+    // now set the widths and x values for all of our components.
+    for (int i = 0; i < labelComponents.length; i++) {
+      if (valueComponents[i] != null) {
+        SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
+        constraints.setX(labelX);
+        constraints.setWidth(labelWidth);
+
+        constraints = layout.getConstraints(valueComponents[i]);
+        constraints.setX(valueX);
+        constraints.setWidth(valueWidth);
+      } else {
+        // set for the full width.
+        SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
+        constraints.setX(labelX);
+        constraints.setWidth(fullWidth);
+      }
+    }
+
+    //Align all cells in each row and make them the same height.
+    Spring y = Spring.constant(initialY);
+    for (int i = 0; i < labelComponents.length; i++) {
+      Spring height = Spring.constant(0);
+      if (valueComponents[i] != null) {
+        height = Spring.max(layout.getConstraints(labelComponents[i]).getHeight(), layout.getConstraints(valueComponents[i]).getHeight());
+        layout.getConstraints(labelComponents[i]).setY(y);
+        layout.getConstraints(valueComponents[i]).setY(y);
+
+        layout.getConstraints(labelComponents[i]).setHeight(height);
+        layout.getConstraints(valueComponents[i]).setHeight(height);
+      } else {
+        height = layout.getConstraints(labelComponents[i]).getHeight();
+        layout.getConstraints(labelComponents[i]).setY(y);
+      }
+      y = Spring.sum(y, Spring.sum(height, Spring.constant(yPad)));
+    }
+
+    //Set the parent's size.
+    SpringLayout.Constraints pCons = layout.getConstraints(parent);
+    pCons.setConstraint(SpringLayout.SOUTH, y);
+    pCons.setConstraint(SpringLayout.EAST, Spring.sum(fullWidth, Spring.constant(initialX)));
   }
-  
+
+  private static SpringLayout.Constraints getConstraintsForCell(int row, int col,Container parent, int cols) {
+    SpringLayout layout = (SpringLayout) parent.getLayout();
+    Component c = parent.getComponent(row * cols + col);
+    return layout.getConstraints(c);
+  }
 }
-    
+
 
 
