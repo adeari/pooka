@@ -14,7 +14,7 @@ import java.util.Vector;
  * This displays the currently selected key (if any).
  */
 
-public class KeySelectorPane extends SwingPropertyEditor {
+public class KeySelectorPane extends LabelValuePropertyEditor {
 
   JLabel label;
   JComboBox valueDisplay;

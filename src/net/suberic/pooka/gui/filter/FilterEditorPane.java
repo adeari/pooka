@@ -9,7 +9,7 @@ import java.util.Vector;
 /**
  * This is a class that lets you choose your filter actions.
  */
-public class FilterEditorPane extends SwingPropertyEditor implements java.awt.event.ItemListener {
+public class FilterEditorPane extends LabelValuePropertyEditor implements java.awt.event.ItemListener {
 
   JLabel label;
   JComboBox typeCombo;

@@ -12,7 +12,7 @@ import javax.swing.Action;
 /**
  * A property editor which edits an AddressBook.
  */
-public class AddressBookEditorPane extends SwingPropertyEditor {
+public class AddressBookEditorPane extends LabelValuePropertyEditor {
   
   AddressBook book;
   String bookName;

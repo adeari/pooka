@@ -8,7 +8,7 @@ import java.awt.FlowLayout;
  * The default EditorPane.  Just shows a text field in which a user
  * can enter a String.
  */
-public class StringEditorPane extends SwingPropertyEditor {
+public class StringEditorPane extends LabelValuePropertyEditor {
   
   JLabel label;
   JTextField inputField;

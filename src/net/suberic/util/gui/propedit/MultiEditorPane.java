@@ -52,7 +52,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * @param isEnabled Whether or not this editor is enabled by default. 
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
-    getLogger().info("creating MultiEditorPane for property " + propertyName + ", template " + template);
+    getLogger().fine("creating MultiEditorPane for property " + propertyName + ", template " + template);
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
@@ -60,21 +60,12 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     // set the default label.
     
-    label = createLabel();
-    
     // create the current list of edited items.  so if this is a User list,
     // these values might be 'allen', 'deborah', 'marc', 'jessica', etc.
     
     List<String> optionList = manager.getPropertyAsList(property, "");
 
     List<String> displayProperties = manager.getPropertyAsList(editorTemplate + ".displayProperties", "");
-
-    System.err.println("getting property '" + editorTemplate + ".displayProperties' = " + manager.getProperty(editorTemplate + ".displayProperties", ""));
-
-    for (String dispProp: displayProperties) {
-      System.err.println("display property:  "+ dispProp);
-    }
-    System.err.println("done with display properties.");
 
     optionTable = createOptionTable(optionList, displayProperties);
     
@@ -87,27 +78,26 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     Box mainBox = new Box(BoxLayout.X_AXIS);
     mainBox.add(optionTable);
     mainBox.add(buttonPanel);
-    labelComponent = mainBox;
 
-    this.add(labelComponent);
+    this.add(mainBox);
 
-    getLogger().info("MultiEditorPane for property " + propertyName + ", template " + template + ":  labelComponent = " + labelComponent);
+    getLogger().fine("MultiEditorPane for property " + propertyName + ", template " + template);
     /*
     // create entryPanels (the panels which show the subproperties
     // of each item in the optionList) for each option.
     entryPanel = createEntryPanel(optionVector, true);
     
     if (manager.getProperty(template + "._useScrollPane", "false").equalsIgnoreCase("true")) {
-      JScrollPane jsp = new JScrollPane(entryPanel);
-      java.awt.Dimension size = jsp.getPreferredSize();
-      size.height = Math.min(size.height, 300);
-      size.width = Math.min(size.width, 475);
-      jsp.setPreferredSize(size);
-      this.add(jsp);
-      valueComponent = jsp;
+    JScrollPane jsp = new JScrollPane(entryPanel);
+    java.awt.Dimension size = jsp.getPreferredSize();
+    size.height = Math.min(size.height, 300);
+    size.width = Math.min(size.width, 475);
+    jsp.setPreferredSize(size);
+    this.add(jsp);
+    valueComponent = jsp;
     } else {
-      this.add(entryPanel);
-      valueComponent = entryPanel;
+    this.add(entryPanel);
+    valueComponent = entryPanel;
     }
     
     labelComponent = optionBox;
@@ -128,7 +118,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     // first one is always the id.
     columnLabels.add(manager.getProperty(editorTemplate + ".Label", editorTemplate));
     for (String subProperty: displayProperties) {
-      getLogger().info("adding label for " + subProperty);
+      getLogger().fine("adding label for " + subProperty);
 
       String label = manager.getProperty(editorTemplate + "." + subProperty + ".Label", subProperty);
       columnLabels.add(label);
@@ -143,8 +133,8 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       // first one is always the id, at least for now.
       optionValues.add(option);
       for (String subProperty: displayProperties) {
-	getLogger().info("adding display property for " + option + "." + subProperty);
-	optionValues.add(manager.getProperty(property + "." + option + "." + subProperty, subProperty));
+        getLogger().fine("adding display property for " + option + "." + subProperty);
+        optionValues.add(manager.getProperty(property + "." + option + "." + subProperty, subProperty));
       }
       dtm.addRow(optionValues);
     }
@@ -162,7 +152,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Creates the box which holds the "Add", "Edit", and "Remove" buttons.
    */
   private JPanel createButtonPanel() {
-    getLogger().info("creating buttons.");
+    getLogger().fine("creating buttons.");
     buttonList = new ArrayList();
     JPanel returnValue = new JPanel();
     Box buttonBox = new Box(BoxLayout.Y_AXIS);
@@ -244,9 +234,9 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     try {
       List<String> newValueList = new ArrayList<String>();
       for (int i = 0; i < optionTable.getRowCount(); i++) {
-	if (i != selectedRow) {
-	  newValueList.add((String) optionTable.getValueAt(i, 0));
-	}
+        if (i != selectedRow) {
+          newValueList.add((String) optionTable.getValueAt(i, 0));
+        }
       }
       String newValue = VariableBundle.convertToString(newValueList);
       firePropertyChangingEvent(newValue) ;
@@ -264,23 +254,23 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Edits the currently selected value.
    */
   public void editSelectedValue() {
-    getLogger().info("calling editSelectedValue().");
+    getLogger().fine("calling editSelectedValue().");
     int selectedRow = optionTable.getSelectedRow();
     if (selectedRow != -1) {
       String valueToEdit = (String) optionTable.getValueAt(selectedRow, 0);
       String editProperty = property + "." + valueToEdit;
-      getLogger().info("editing " + editProperty);
+      getLogger().fine("editing " + editProperty);
       ArrayList<String> propList = new ArrayList<String>();
       ArrayList<String> templateList = new ArrayList<String>();
       List<String> subEditors = manager.getPropertyAsList(editorTemplate + ".editableFields", "");
       for(String subEditor: subEditors) {
-	propList.add(editProperty);
-	templateList.add(editorTemplate + ".editableFields." + subEditor);
-	getLogger().info("adding " + editorTemplate + ".editableFields." + subEditor + " to the editor list.");
+        propList.add(editProperty);
+        templateList.add(editorTemplate + ".editableFields." + subEditor);
+        getLogger().fine("adding " + editorTemplate + ".editableFields." + subEditor + " to the editor list.");
       }
       manager.getFactory().showNewEditorWindow("testing", propList, templateList, manager);
     } else {
-      getLogger().info("editSelectedValue():  no selected value.");
+      getLogger().fine("editSelectedValue():  no selected value.");
     }
 
   }
@@ -349,9 +339,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       super.setValue();
       
       if (isChanged()) {
-        if (debug) {
-          System.out.println("setting property.  property is " + property + "; value is " + getCurrentValue());
-        }
+        getLogger().fine("setting property.  property is " + property + "; value is " + getCurrentValue());
         manager.setProperty(property, getCurrentValue());
       }
     }

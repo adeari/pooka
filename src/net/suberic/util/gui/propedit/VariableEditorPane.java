@@ -54,20 +54,19 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     }
 
     manager.addPropertyEditorListener(keyProperty, new PropertyEditorAdapter() {
-	public void propertyChanged(PropertyEditorUI ui, String prop, String newValue) {
-	  showPanel(newValue);
-	}
+        public void propertyChanged(PropertyEditorUI ui, String prop, String newValue) {
+          showPanel(newValue);
+        }
       });
 
-    valueComponent = new JPanel();
-    valueComponent.setLayout(new java.awt.CardLayout());
+    this.setLayout(new java.awt.CardLayout());
 
     String currentValue = manager.getProperty(keyProperty, "");
     if (currentValue == "") {
       // check the editor for this, if any.
       PropertyEditorUI keyEditor = manager.getPropertyEditor(keyProperty);
       if (keyEditor != null) {
-	currentValue = keyEditor.getValue().getProperty(keyProperty, "");
+        currentValue = keyEditor.getValue().getProperty(keyProperty, "");
       }
     }
 
@@ -91,28 +90,28 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
       //}
     }
 
-    CardLayout layout = (CardLayout)valueComponent.getLayout();
+    CardLayout layout = (CardLayout) getLayout();
 
     Object newSelected = idToEditorMap.get(selectedId);
     if (newSelected == null) {
       // we'll have to make a new window.
       if (selectedId == null || selectedId.equals("")) {
-	JPanel jp = new JPanel();
-	valueComponent.add(selectedId, jp);
+        JPanel jp = new JPanel();
+        this.add(selectedId, jp);
       } else {
 
-	SwingPropertyEditor spe = createEditorPane(selectedId);
+        SwingPropertyEditor spe = createEditorPane(selectedId);
 	
-	// save reference to new pane in hash table
-	idToEditorMap.put(selectedId, spe);
-	editors.add(spe);
+        // save reference to new pane in hash table
+        idToEditorMap.put(selectedId, spe);
+        editors.add(spe);
 	
-	spe.setEnabled(enableMe && enabled);
-	valueComponent.add(selectedId, spe);
-	resize = true;
+        spe.setEnabled(enableMe && enabled);
+        this.add(selectedId, spe);
+        resize = true;
       }
     }
-    layout.show(valueComponent, selectedId);
+    layout.show(this, selectedId);
     if (resize) {
       doResize();
     }
@@ -128,11 +127,11 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     if (scoped) {
       editValue = editorTemplate + "." + selectedId;
       if (debug) {
-	System.out.println("scoped; editValue = " + editValue);
+        System.out.println("scoped; editValue = " + editValue);
       }
     } else {
       if (debug) 
-	System.out.println("not scoped; editValue = " + editValue);
+        System.out.println("not scoped; editValue = " + editValue);
     }
     
     SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.createEditor(property, editValue);

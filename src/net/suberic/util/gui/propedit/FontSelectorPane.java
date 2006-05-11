@@ -15,7 +15,7 @@ import java.awt.Font;
  * 
  */
 
-public class FontSelectorPane extends SwingPropertyEditor {
+public class FontSelectorPane extends LabelValuePropertyEditor {
   
   JLabel label;
   JTextField valueDisplay;

@@ -51,7 +51,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
     
-    getLogger().info("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
+    getLogger().fine("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
     
     enabled=isEnabled;
     
@@ -62,19 +62,23 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     
     // first, get the strings that we're going to edit.
 
-    getLogger().info("creating prop from " + template + "=" + manager.getProperty(template, ""));
+    getLogger().fine("creating prop from " + template + "=" + manager.getProperty(template, ""));
 
     List propsToEdit = manager.getPropertyAsList(template, "");
     
     editors = createEditors(property, propsToEdit);
     
-    labelComponent=tabbedPane;
-
-    getLogger().info("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
-    getLogger().info("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
-    getLogger().info("size for tabbedPane = " + tabbedPane.getSize());
+    getLogger().fine("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
+    getLogger().fine("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
+    getLogger().fine("size for tabbedPane = " + tabbedPane.getSize());
     
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
     this.add(tabbedPane);
+    layout.putConstraint(SpringLayout.WEST, tabbedPane, 5 ,SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, tabbedPane, 5 ,SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5 ,SpringLayout.SOUTH, tabbedPane);
+    layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, tabbedPane);
 
     manager.registerPropertyEditor(property, this);
   }
@@ -92,21 +96,21 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
       if (templateScoped) 
         currentTemplate = editorTemplate + "." + currentTemplate;
 
-      getLogger().info("getting editor using template " + currentTemplate);
+      getLogger().fine("getting editor using template " + currentTemplate);
       
       if (propertyScoped) {
-        getLogger().info("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
+        getLogger().fine("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
 
         currentEditor = createEditorPane(property, currentTemplate);
       } else {
 
-        getLogger().info("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
+        getLogger().fine("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
         
         currentEditor = createEditorPane(currentTemplate, currentTemplate);
       }
       
-      getLogger().info("adding " + currentEditor);
-      getLogger().info("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+      getLogger().fine("adding " + currentEditor);
+      getLogger().fine("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
 
       editorList.add(currentEditor);
       tabbedPane.add(manager.getProperty(currentTemplate + ".label", currentTemplate), currentEditor);

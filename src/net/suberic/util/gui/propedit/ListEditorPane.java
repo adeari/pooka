@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * An EditorPane which allows a user to select from a list of choices.
  */
-public class ListEditorPane extends SwingPropertyEditor {
+public class ListEditorPane extends LabelValuePropertyEditor {
   protected int originalIndex;
   protected String mOriginalValue;
   protected JLabel label;

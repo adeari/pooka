@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
  * button which will bring up a JFileChooser to choose any other file(s).
  */
 
-public class FileSelectorPane extends SwingPropertyEditor {
+public class FileSelectorPane extends LabelValuePropertyEditor {
   
   JLabel label;
   JTextField valueDisplay;

@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * This is a class which lets you choose SearchTerms as properties.
  */
-public class SearchEditorPane extends SwingPropertyEditor {
+public class SearchEditorPane extends LabelValuePropertyEditor {
     
     Properties originalProperties;
     

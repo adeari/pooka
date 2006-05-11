@@ -20,8 +20,8 @@ public class PropertyEditorPane extends Box {
    * properties in the properties List.
    */     
   public PropertyEditorPane(PropertyEditorManager newManager, 
-			    List properties, 
-			    Container newContainer) {
+                            List properties, 
+                            Container newContainer) {
     this(newManager, properties, properties, newContainer);
   }
 
@@ -33,8 +33,8 @@ public class PropertyEditorPane extends Box {
    * List for each property to be edited.
    */     
   public PropertyEditorPane(PropertyEditorManager newManager, 
-			    List properties, List templates,
-			    Container newContainer) {
+                            List properties, List templates,
+                            Container newContainer) {
     super(BoxLayout.Y_AXIS);
     
     manager = newManager;
@@ -44,16 +44,19 @@ public class PropertyEditorPane extends Box {
 
     editorBox = new Box(BoxLayout.X_AXIS);
 
-    if (editor.getValueComponent() != null) {
-      if (editor.getLabelComponent() != null)
-	editorBox.add(editor.getLabelComponent());
-      editorBox.add(editor.getValueComponent());
+    if (editor instanceof LabelValuePropertyEditor) {
+      LabelValuePropertyEditor lvEditor = (LabelValuePropertyEditor) editor;
+      editorBox.add(lvEditor.getLabelComponent());
+      editorBox.add(lvEditor.getValueComponent());
     } else {
       editorBox.add(editor);
+      //editor.setSize(200,200);
+      //editorBox.setSize(200,200);
     }
     this.add(editorBox);
     
     this.addButtons();
+    //this.setSize(400,400);
   }
   
   /**
@@ -61,8 +64,8 @@ public class PropertyEditorPane extends Box {
    * SwingPropertyEditor.
    */     
   public PropertyEditorPane(PropertyEditorManager newManager, 
-			    SwingPropertyEditor newEditor,
-			    Container newContainer) {
+                            SwingPropertyEditor newEditor,
+                            Container newContainer) {
     super(BoxLayout.Y_AXIS);
     
     manager = newManager;
@@ -104,48 +107,50 @@ public class PropertyEditorPane extends Box {
     buttonBox = new Box(BoxLayout.X_AXIS);
     
     buttonBox.add(createButton("Ok", new AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  try {
-	    setValue();
-	    manager.commit();
-	    if (container instanceof JInternalFrame) {
-	      try {
-		((JInternalFrame)container).setClosed(true);
-	      } catch (java.beans.PropertyVetoException pve) {
-	      }
-	    } else if (container instanceof JFrame) {
-	      ((JFrame)container).dispose();
-	    }
-	  } catch (PropertyValueVetoException pvve) {
-	    manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
-	  }
-	}
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+          try {
+            setValue();
+            manager.commit();
+            if (container instanceof JInternalFrame) {
+              try {
+                ((JInternalFrame)container).setClosed(true);
+              } catch (java.beans.PropertyVetoException pve) {
+              }
+            } else if (container instanceof JFrame) {
+              ((JFrame)container).dispose();
+            }
+          } catch (PropertyValueVetoException pvve) {
+            manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+          }
+        }
       }, true));
     
     buttonBox.add(createButton("Apply", new AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  try {
-	    setValue();
-	    manager.commit();
-	  } catch (PropertyValueVetoException pvve) {
-	    manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
-	  }
-	}
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+          try {
+            setValue();
+            manager.commit();
+          } catch (PropertyValueVetoException pvve) {
+            manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+          }
+        }
       }, false));
     
     buttonBox.add(createButton("Cancel", new AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent e) {
-	  if (container instanceof JInternalFrame) {
-	    try {
-	      ((JInternalFrame)container).setClosed(true);
-	    } catch (java.beans.PropertyVetoException pve) {
-	    }
-	  } else if (container instanceof JFrame) {
-	    ((JFrame)container).dispose();
-	  }
-	}
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+          if (container instanceof JInternalFrame) {
+            try {
+              ((JInternalFrame)container).setClosed(true);
+            } catch (java.beans.PropertyVetoException pve) {
+            }
+          } else if (container instanceof JFrame) {
+            ((JFrame)container).dispose();
+          }
+        }
       }, false));
-    
+
+    //System.err.println("adding button box.");
+    //buttonBox.setSize(300,300);
     this.add(buttonBox);
   }
   

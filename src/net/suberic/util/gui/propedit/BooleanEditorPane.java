@@ -7,7 +7,7 @@ import java.awt.FlowLayout;
 /**
  * This is a Swing implemenation of a boolean PropertyEditorUI.
  */
-public class BooleanEditorPane extends SwingPropertyEditor {
+public class BooleanEditorPane extends LabelValuePropertyEditor {
   JCheckBox inputField;
   JLabel label;
   boolean originalBoolean = false;

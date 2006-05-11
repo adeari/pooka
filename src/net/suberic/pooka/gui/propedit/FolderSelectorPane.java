@@ -12,7 +12,7 @@ import javax.swing.filechooser.FileSystemView;
  * button which will bring up a dialog to select another folder.
  */
 
-public class FolderSelectorPane extends SwingPropertyEditor {
+public class FolderSelectorPane extends LabelValuePropertyEditor {
 
   JLabel label;
   JTextField valueDisplay;

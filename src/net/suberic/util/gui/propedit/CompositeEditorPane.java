@@ -78,33 +78,21 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     
     this.setBorder(BorderFactory.createEtchedBorder());
 
-    debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-
-    if (debug) {
-      System.out.println("creating CompositeEditorPane for " + property + " with template " + editorTemplate);
-    }
+    getLogger().fine("creating CompositeEditorPane for " + property + " with template " + editorTemplate);
     
     scoped = manager.getProperty(template + ".scoped", "false").equalsIgnoreCase("true");
 
-    if (debug) {
-      System.out.println("manager.getProperty (" + template + ".scoped) = " +  manager.getProperty(template + ".scoped", "false") + " = " + scoped);
-    }
-
+    getLogger().fine("manager.getProperty (" + template + ".scoped) = " +  manager.getProperty(template + ".scoped", "false") + " = " + scoped);
+    
     List properties = new Vector();
     List templates = new Vector();
     
     if (scoped) {
-      if (debug) {
-        System.out.println("testing for template " + template);
-      }
+      getLogger().fine("testing for template " + template);
       String scopeRoot = manager.getProperty(template + ".scopeRoot", template);
-      if (debug) {
-        System.out.println("scopeRoot is " + scopeRoot);
-      }
+      getLogger().fine("scopeRoot is " + scopeRoot);
       List templateNames = manager.getPropertyAsList(template, "");
-      if (debug) {
-        System.out.println("templateNames = getProp(" + template + ") = " + manager.getProperty(template, ""));
-      }
+      getLogger().fine("templateNames = getProp(" + template + ") = " + manager.getProperty(template, ""));
       
       for (int i = 0; i < templateNames.size() ; i++) {
         String propToEdit = null;
@@ -117,14 +105,10 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
         String templateToEdit = scopeRoot + "." + (String) templateNames.get(i);
         properties.add(propToEdit);
         templates.add(templateToEdit);
-        if (debug) {
-          System.out.println("adding " + propToEdit + ", template " + templateToEdit);
-        }
+        getLogger().fine("adding " + propToEdit + ", template " + templateToEdit);
       }
     } else {
-      if (debug) {
-        System.out.println("creating prop list for Composite EP using " + property + ", " + template);
-      }
+      getLogger().fine("creating prop list for Composite EP using " + property + ", " + template);
       properties = manager.getPropertyAsList(property, "");
       templates = manager.getPropertyAsList(template, "");
     }
@@ -138,9 +122,8 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     editors = new Vector();
 
     SpringLayout layout = new SpringLayout();
-    JPanel contentPanel = new JPanel();
 
-    contentPanel.setLayout(new SpringLayout());
+    this.setLayout(new SpringLayout());
     Component[] labelComponents = new Component[properties.size()];
     Component[] valueComponents = new Component[properties.size()];
     for (int i = 0; i < properties.size(); i++) {
@@ -148,25 +131,18 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
       currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
       
-      if (currentEditor.valueComponent != null) {
-        if (currentEditor.labelComponent != null) {
-          contentPanel.add(currentEditor.labelComponent);
-          labelComponents[i] = currentEditor.labelComponent;
-          contentPanel.add(currentEditor.valueComponent);
-          valueComponents[i] = currentEditor.valueComponent;
-        } else {
-          labelComponents[i] = currentEditor.valueComponent;
-          contentPanel.add(currentEditor.valueComponent);
-        }
+      if (currentEditor instanceof LabelValuePropertyEditor) {
+        LabelValuePropertyEditor lvEditor = (LabelValuePropertyEditor) currentEditor;
+        this.add(lvEditor.labelComponent);
+        labelComponents[i] = lvEditor.labelComponent;
+        this.add(lvEditor.valueComponent);
+        valueComponents[i] = lvEditor.valueComponent;
       } else {
-        contentPanel.add(currentEditor);
+        this.add(currentEditor);
         labelComponents[i] = currentEditor;
       }
     }
-    
-    this.add(contentPanel);
-    makeCompactGrid(contentPanel, labelComponents, valueComponents, 5, 5, 5, 5);
-
+    makeCompactGrid(this, labelComponents, valueComponents, 5, 5, 5, 5);
     manager.registerPropertyEditor(property, this);
   }
   
@@ -186,102 +162,7 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
 
     this.setBorder(BorderFactory.createEtchedBorder());
 
-    debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-
     addEditors(properties, templates);
   }
   
-  /**
-   */
-  protected void makeCompactGrid(Container parent,
-                                 Component[] labelComponents,
-                                 Component[] valueComponents,
-                                 int initialX, int initialY,
-                                 int xPad, int yPad) {
-    SpringLayout layout;
-    try {
-      layout = (SpringLayout)parent.getLayout();
-    } catch (ClassCastException exc) {
-      System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
-      return;
-    }
-
-    // go through both columns.
-    Spring labelX = Spring.constant(initialX);
-    Spring valueX = Spring.constant(initialX);
-    Spring labelWidth = Spring.constant(0);
-    Spring valueWidth = Spring.constant(0);
-    Spring fullWidth = Spring.constant(0);
-    for (int i = 0; i < labelComponents.length; i++) {
-      // for components with a label and a value, add to labelWidth and 
-      // valueWidth.
-      if (valueComponents[i] != null) {
-        labelWidth = Spring.max(labelWidth, layout.getConstraints(labelComponents[i]).getWidth());
-        valueWidth = Spring.max(valueWidth, layout.getConstraints(valueComponents[i]).getWidth());
-      } else {
-        // otherwise just add to fullWidth.
-        fullWidth = Spring.max(fullWidth, layout.getConstraints(labelComponents[i]).getWidth());
-      }
-    }
-
-    // make sure fullWidth and labelWidth + valueWidth match.
-    if (fullWidth.getValue() <= labelWidth.getValue() + xPad + valueWidth.getValue()) {
-      fullWidth = Spring.sum(labelWidth, Spring.sum(Spring.constant(xPad), valueWidth));
-    } else {
-      valueWidth = Spring.sum(fullWidth, Spring.minus(Spring.sum(Spring.constant(xPad), labelWidth)));
-    }
-
-    // recalculate valueX.
-    valueX = Spring.sum(labelX, Spring.sum(labelWidth, Spring.constant(xPad)));
-    
-    // now set the widths and x values for all of our components.
-    for (int i = 0; i < labelComponents.length; i++) {
-      if (valueComponents[i] != null) {
-        SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-        constraints.setX(labelX);
-        constraints.setWidth(labelWidth);
-
-        constraints = layout.getConstraints(valueComponents[i]);
-        constraints.setX(valueX);
-        constraints.setWidth(valueWidth);
-      } else {
-        // set for the full width.
-        SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-        constraints.setX(labelX);
-        constraints.setWidth(fullWidth);
-      }
-    }
-
-    //Align all cells in each row and make them the same height.
-    Spring y = Spring.constant(initialY);
-    for (int i = 0; i < labelComponents.length; i++) {
-      Spring height = Spring.constant(0);
-      if (valueComponents[i] != null) {
-        height = Spring.max(layout.getConstraints(labelComponents[i]).getHeight(), layout.getConstraints(valueComponents[i]).getHeight());
-        layout.getConstraints(labelComponents[i]).setY(y);
-        layout.getConstraints(valueComponents[i]).setY(y);
-
-        layout.getConstraints(labelComponents[i]).setHeight(height);
-        layout.getConstraints(valueComponents[i]).setHeight(height);
-      } else {
-        height = layout.getConstraints(labelComponents[i]).getHeight();
-        layout.getConstraints(labelComponents[i]).setY(y);
-      }
-      y = Spring.sum(y, Spring.sum(height, Spring.constant(yPad)));
-    }
-
-    //Set the parent's size.
-    SpringLayout.Constraints pCons = layout.getConstraints(parent);
-    pCons.setConstraint(SpringLayout.SOUTH, y);
-    pCons.setConstraint(SpringLayout.EAST, Spring.sum(fullWidth, Spring.constant(initialX)));
-  }
-
-  private static SpringLayout.Constraints getConstraintsForCell(int row, int col,Container parent, int cols) {
-    SpringLayout layout = (SpringLayout) parent.getLayout();
-    Component c = parent.getComponent(row * cols + col);
-    return layout.getConstraints(c);
-  }
 }
-
-
-

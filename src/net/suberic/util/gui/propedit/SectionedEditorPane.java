@@ -32,7 +32,6 @@ import javax.swing.*;
 public class SectionedEditorPane extends CompositeSwingPropertyEditor implements ListSelectionListener {
 
   JList optionList;
-  JLabel label;
   JPanel entryPanel;
   boolean changed = false;
   DefaultListModel optionListModel;
@@ -59,38 +58,45 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     // create the editors list.
     editors = new Vector();
 
-    // set the default label.
-    
-    label = createLabel();
-    
     // create the list of properties to be edited.
 
     List propertyList = manager.getPropertyAsList(propertyName + ".editableFields", "");
     
     optionList = createOptionList(propertyList);
     
-    optionBox = createOptionBox(label, optionList);
+    optionBox = createOptionBox(optionList);
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
+
     this.add(optionBox);
+    layout.putConstraint(SpringLayout.WEST, optionBox, 5, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, optionBox, 5, SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, optionBox);
     
     // create entryPanels (the panels which show the editors for each
     // property in the optionList) for each option.
     
     entryPanel = createEntryPanel(propertyList);
     
+    java.awt.Component entryComponent = entryPanel;
     if (manager.getProperty(template + "._useScrollPane", "false").equalsIgnoreCase("true")) {
       JScrollPane jsp = new JScrollPane(entryPanel);
+      /*
       java.awt.Dimension size = jsp.getPreferredSize();
-      size.height = Math.min(size.height, 300);
+      size.height = Math.min(size.height, 400);
       size.width = Math.min(size.width, 475);
       jsp.setPreferredSize(size);
-      this.add(jsp);
-      valueComponent = jsp;
-    } else {
-      this.add(entryPanel);
-      valueComponent = entryPanel;
+      */
+      entryComponent = jsp;
     }
     
-    labelComponent = optionBox;
+    this.add(entryComponent);
+
+    layout.putConstraint(SpringLayout.WEST, entryComponent, 5 ,SpringLayout.EAST, optionBox);
+
+    layout.putConstraint(SpringLayout.NORTH, entryComponent, 5 ,SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5 ,SpringLayout.SOUTH, entryComponent);
+    layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, entryComponent);
     
     this.setEnabled(isEnabled);
 
@@ -124,9 +130,8 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   /**
    * Creates the option box.
    */
-  private Box createOptionBox(JLabel label, JList itemList) {
+  private Box createOptionBox(JList itemList) {
     Box optBox = new Box(BoxLayout.Y_AXIS);
-    optBox.add(label);
     
     optionList.addListSelectionListener(this);
     JScrollPane listScrollPane = new JScrollPane(optionList);

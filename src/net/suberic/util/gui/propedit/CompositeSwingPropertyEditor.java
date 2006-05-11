@@ -1,5 +1,7 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
+import java.awt.Component;
+import java.awt.Container;
 import java.util.Vector;
 import java.util.List;
 import java.util.logging.Logger;
@@ -59,6 +61,101 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     }
     enabled=newValue;
   }
+
+  /**
+   * Makes a grid for sub components of this editor.
+   */
+  protected void makeCompactGrid(Container parent,
+                                 Component[] labelComponents,
+                                 Component[] valueComponents,
+                                 int initialX, int initialY,
+                                 int xPad, int yPad) {
+    SpringLayout layout;
+    try {
+      layout = (SpringLayout)parent.getLayout();
+    } catch (ClassCastException exc) {
+      System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+      return;
+    }
+
+    // go through both columns.
+    Spring labelX = Spring.constant(initialX);
+    Spring valueX = Spring.constant(initialX);
+    Spring labelWidth = Spring.constant(0);
+    Spring valueWidth = Spring.constant(0);
+    Spring fullWidth = Spring.constant(0);
+    for (int i = 0; i < labelComponents.length; i++) {
+      // for components with a label and a value, add to labelWidth and 
+      // valueWidth.
+      if (valueComponents[i] != null) {
+        labelWidth = Spring.max(labelWidth, layout.getConstraints(labelComponents[i]).getWidth());
+        valueWidth = Spring.max(valueWidth, layout.getConstraints(valueComponents[i]).getWidth());
+      } else {
+        // otherwise just add to fullWidth.
+        fullWidth = Spring.max(fullWidth, layout.getConstraints(labelComponents[i]).getWidth());
+      }
+    }
+
+    // make sure fullWidth and labelWidth + valueWidth match.
+    if (fullWidth.getValue() <= labelWidth.getValue() + xPad + valueWidth.getValue()) {
+      fullWidth = Spring.sum(labelWidth, Spring.sum(Spring.constant(xPad), valueWidth));
+    } else {
+      valueWidth = Spring.sum(fullWidth, Spring.minus(Spring.sum(Spring.constant(xPad), labelWidth)));
+    }
+
+    // recalculate valueX.
+    valueX = Spring.sum(labelX, Spring.sum(labelWidth, Spring.constant(xPad)));
+    
+    // now set the widths and x values for all of our components.
+    for (int i = 0; i < labelComponents.length; i++) {
+      if (valueComponents[i] != null) {
+        SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
+        constraints.setX(labelX);
+        constraints.setWidth(labelWidth);
+
+        constraints = layout.getConstraints(valueComponents[i]);
+        constraints.setX(valueX);
+        constraints.setWidth(valueWidth);
+      } else {
+        // set for the full width.
+        SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
+        constraints.setX(labelX);
+        constraints.setWidth(fullWidth);
+      }
+    }
+
+    //Align all cells in each row and make them the same height.
+    Spring y = Spring.constant(initialY);
+    for (int i = 0; i < labelComponents.length; i++) {
+      Spring height = Spring.constant(0);
+      if (valueComponents[i] != null) {
+        height = Spring.max(layout.getConstraints(labelComponents[i]).getHeight(), layout.getConstraints(valueComponents[i]).getHeight());
+        layout.getConstraints(labelComponents[i]).setY(y);
+        layout.getConstraints(valueComponents[i]).setY(y);
+
+        layout.getConstraints(labelComponents[i]).setHeight(height);
+        layout.getConstraints(valueComponents[i]).setHeight(height);
+      } else {
+        height = layout.getConstraints(labelComponents[i]).getHeight();
+        layout.getConstraints(labelComponents[i]).setY(y);
+      }
+      y = Spring.sum(y, Spring.sum(height, Spring.constant(yPad)));
+    }
+
+    //Set the parent's size.
+    SpringLayout.Constraints pCons = layout.getConstraints(parent);
+    pCons.setConstraint(SpringLayout.SOUTH, y);
+    pCons.setConstraint(SpringLayout.EAST, Spring.sum(fullWidth, Spring.constant(initialX)));
+  }
+
+  /**
+   * Gets the parent PropertyEditorPane for the given component.
+   */
+  public PropertyEditorPane getPropertyEditorPane() {
+    return getPropertyEditorPane(this);
+  }
+
+
 }
     
 

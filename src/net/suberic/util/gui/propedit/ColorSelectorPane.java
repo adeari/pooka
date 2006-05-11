@@ -18,7 +18,7 @@ import java.awt.event.*;
  * there, property.enabled.  the property value itself is not set.
  */
 
-public class ColorSelectorPane extends SwingPropertyEditor {
+public class ColorSelectorPane extends LabelValuePropertyEditor {
 
   JLabel label;
   JButton inputButton;
