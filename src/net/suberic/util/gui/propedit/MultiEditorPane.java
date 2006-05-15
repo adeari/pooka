@@ -75,14 +75,22 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     this.add(optionScrollPane);
     this.add(buttonPanel);
 
+    SpringLayout.Constraints ospConstraints = layout.getConstraints(optionScrollPane);
+    SpringLayout.Constraints buttonConstraints = layout.getConstraints(buttonPanel);
+
+    Spring panelHeight = Spring.constant(0);
+    panelHeight = Spring.max(panelHeight, ospConstraints.getHeight());
+    panelHeight = Spring.max(panelHeight, buttonConstraints.getHeight());
+
+    ospConstraints.setHeight(panelHeight);
+    buttonConstraints.setHeight(panelHeight);
+
     layout.putConstraint(SpringLayout.WEST, optionScrollPane, 5, SpringLayout.WEST, this);
     layout.putConstraint(SpringLayout.NORTH, optionScrollPane, 5, SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.SOUTH, optionScrollPane, -5, SpringLayout.SOUTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, optionScrollPane);
     
     layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.EAST, optionScrollPane);
 
-    layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5 ,SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.SOUTH, this, 5 ,SpringLayout.SOUTH, buttonPanel);
     layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, buttonPanel);
 
     System.err.println("optionTable.getSize, maxsize, prefsize:  " + optionTable.getSize() + ", " + optionTable.getMaximumSize() + ", " + optionTable.getPreferredSize());
@@ -174,15 +182,13 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     layout.putConstraint(SpringLayout.NORTH, addButton, 0, SpringLayout.NORTH, returnValue);
     layout.putConstraint(SpringLayout.WEST, addButton, 5 ,SpringLayout.WEST, returnValue);
-    layout.putConstraint(SpringLayout.EAST, addButton, -5 ,SpringLayout.EAST, returnValue);
+    layout.putConstraint(SpringLayout.EAST, returnValue, 5 ,SpringLayout.EAST, addButton);
 
     layout.putConstraint(SpringLayout.NORTH, editButton, 5, SpringLayout.SOUTH, addButton);
     layout.putConstraint(SpringLayout.WEST, editButton, 5 ,SpringLayout.WEST, returnValue);
-    layout.putConstraint(SpringLayout.EAST, editButton, -5 ,SpringLayout.EAST, returnValue);
 
     layout.putConstraint(SpringLayout.NORTH, removeButton, 5, SpringLayout.SOUTH, editButton);
-    layout.putConstraint(SpringLayout.WEST, editButton, 5 ,SpringLayout.WEST, returnValue);
-    layout.putConstraint(SpringLayout.EAST, removeButton, -5 ,SpringLayout.EAST, returnValue);
+    layout.putConstraint(SpringLayout.WEST, removeButton, 5 ,SpringLayout.WEST, returnValue);
 
     Spring buttonWidth = Spring.constant(0);
     

@@ -164,7 +164,6 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
    */
   public void valueChanged(ListSelectionEvent e) {
     
-    boolean resize = false;
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
     System.err.println("got layout for entryPanel.");
     
@@ -179,8 +178,6 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
       entryLayout.show(entryPanel, selectedId);
     }
     
-    if (resize)
-      doResize();
   }
   
   /**
