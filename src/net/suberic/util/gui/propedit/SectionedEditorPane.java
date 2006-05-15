@@ -165,15 +165,12 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   public void valueChanged(ListSelectionEvent e) {
     
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
-    System.err.println("got layout for entryPanel.");
     
     String selectedId = ((SEPListEntry)((JList)e.getSource()).getSelectedValue()).getKey();
     
     getLogger().fine("selectedId = " + selectedId);
-    System.err.println("selectedId = " + selectedId);
     if (selectedId != null) {
       SwingPropertyEditor newSelected = currentPanels.get(selectedId);
-      System.err.println("newSelected = " + newSelected);
       getLogger().fine("newSelected = " + newSelected);
       entryLayout.show(entryPanel, selectedId);
     }

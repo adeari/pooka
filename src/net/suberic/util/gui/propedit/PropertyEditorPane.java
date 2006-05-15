@@ -99,9 +99,6 @@ public class PropertyEditorPane extends JPanel {
     layout.putConstraint(SpringLayout.EAST, buttonPanel, -5, SpringLayout.EAST, this);
     layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, buttonPanel);
 
-    System.err.println("buttonPanel.getPrefsize() = " + buttonPanel.getPreferredSize());
-    System.err.println("editorPanel.getPrefsize() = " + editorPanel.getPreferredSize());
-    System.err.println("pep.getPrefsize() = " + this.getPreferredSize());
   }
 
   /**

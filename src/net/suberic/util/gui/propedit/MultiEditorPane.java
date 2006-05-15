@@ -86,15 +86,13 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     buttonConstraints.setHeight(panelHeight);
 
     layout.putConstraint(SpringLayout.WEST, optionScrollPane, 5, SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.NORTH, optionScrollPane, 5, SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.NORTH, optionScrollPane, 0, SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, optionScrollPane);
     
     layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.EAST, optionScrollPane);
-
+    layout.putConstraint(SpringLayout.NORTH, buttonPanel, 0, SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, buttonPanel);
 
-    System.err.println("optionTable.getSize, maxsize, prefsize:  " + optionTable.getSize() + ", " + optionTable.getMaximumSize() + ", " + optionTable.getPreferredSize());
-    System.err.println("optionScrollPane.getSize, maxsize, prefsize, minsize:  " + optionScrollPane.getSize() + ", " + optionScrollPane.getMaximumSize() + ", " + optionScrollPane.getPreferredSize() + ", " + optionScrollPane.getMinimumSize());
     getLogger().fine("MultiEditorPane for property " + propertyName + ", template " + template);
 
     this.setEnabled(isEnabled);
