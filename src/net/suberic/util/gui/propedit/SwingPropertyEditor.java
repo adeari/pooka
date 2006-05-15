@@ -186,16 +186,6 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
-   * Does a resize on the parent PropertyEditorPane, if any.
-   */
-  public void doResize() {
-    PropertyEditorPane pep = getPropertyEditorPane();
-    if (pep != null) {
-      pep.resizeEditor();
-    }
-  }
-
-  /**
    * Adds the appropriate listeners.
    */
   public void addDefaultListeners() {

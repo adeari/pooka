@@ -8,12 +8,10 @@ import java.awt.*;
  * This is a top-level editor for properties.  It includes buttons for
  * activating changes, accepting and closing, and cancelling the action.
  */
-public class PropertyEditorPane extends Box {
+public class PropertyEditorPane extends JPanel {
   SwingPropertyEditor editor;
   PropertyEditorManager manager;
   Container container;
-  Box buttonBox;
-  Box editorBox;
 
   /**
    * This contructor creates a PropertyEditor for the list of 
@@ -35,28 +33,7 @@ public class PropertyEditorPane extends Box {
   public PropertyEditorPane(PropertyEditorManager newManager, 
                             List properties, List templates,
                             Container newContainer) {
-    super(BoxLayout.Y_AXIS);
-    
-    manager = newManager;
-    container = newContainer;
-    
-    editor = (SwingPropertyEditor) manager.createEditor(properties, templates);
-
-    editorBox = new Box(BoxLayout.X_AXIS);
-
-    if (editor instanceof LabelValuePropertyEditor) {
-      LabelValuePropertyEditor lvEditor = (LabelValuePropertyEditor) editor;
-      editorBox.add(lvEditor.getLabelComponent());
-      editorBox.add(lvEditor.getValueComponent());
-    } else {
-      editorBox.add(editor);
-      //editor.setSize(200,200);
-      //editorBox.setSize(200,200);
-    }
-    this.add(editorBox);
-    
-    this.addButtons();
-    //this.setSize(400,400);
+    this(newManager, (SwingPropertyEditor) newManager.createEditor(properties, templates), newContainer);
   }
   
   /**
@@ -66,16 +43,65 @@ public class PropertyEditorPane extends Box {
   public PropertyEditorPane(PropertyEditorManager newManager, 
                             SwingPropertyEditor newEditor,
                             Container newContainer) {
-    super(BoxLayout.Y_AXIS);
-    
     manager = newManager;
     container = newContainer;
-    
     editor = newEditor;
     
-    this.add(newEditor);
+    Component editorComponent = editor;
+
+    if (editor instanceof LabelValuePropertyEditor) {
+      JPanel editorPanel = new JPanel();
+      SpringLayout editorPanelLayout = new SpringLayout();
+      editorPanel.setLayout(editorPanelLayout);
+      
+      LabelValuePropertyEditor lvEditor = (LabelValuePropertyEditor) editor;
+      editorPanel.add(lvEditor.getLabelComponent());
+      editorPanel.add(lvEditor.getValueComponent());
+      
+      editorPanelLayout.putConstraint(SpringLayout.WEST, lvEditor.getLabelComponent(), 5, SpringLayout.WEST, editorPanel);
+      editorPanelLayout.putConstraint(SpringLayout.NORTH, lvEditor.getLabelComponent(), 5, SpringLayout.NORTH, editorPanel);
+      editorPanelLayout.putConstraint(SpringLayout.SOUTH, lvEditor.getLabelComponent(), -5, SpringLayout.SOUTH, editorPanel);
+      
+      editorPanelLayout.putConstraint(SpringLayout.WEST, lvEditor.getValueComponent(), 5 ,SpringLayout.EAST, lvEditor.getLabelComponent());
+      
+      editorPanelLayout.putConstraint(SpringLayout.NORTH, lvEditor.getValueComponent(), 5 ,SpringLayout.NORTH, editorPanel);
+      editorPanelLayout.putConstraint(SpringLayout.SOUTH, editorPanel, 5 ,SpringLayout.SOUTH, lvEditor.getValueComponent());
+      editorPanelLayout.putConstraint(SpringLayout.EAST, editorPanel, 5 ,SpringLayout.EAST, lvEditor.getValueComponent());
+      
+      editorComponent = editorPanel;
+    }
+
+    JPanel buttonPanel = createButtonPanel();
+
+    pepLayout(editorComponent, buttonPanel);
+
+  }
+
+  /**
+   * Does the layout for the PropertyEditorPane.
+   */
+  private void pepLayout(Component editorPanel, Component buttonPanel) {
     
-    this.addButtons();
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
+
+    this.add(editorPanel);
+
+    layout.putConstraint(SpringLayout.WEST, editorPanel, 5, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, editorPanel, 5, SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, editorPanel);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, editorPanel);
+    
+    this.add(buttonPanel);
+    layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.SOUTH, editorPanel);
+    
+    layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.EAST, buttonPanel, -5, SpringLayout.EAST, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, buttonPanel);
+
+    System.err.println("buttonPanel.getPrefsize() = " + buttonPanel.getPreferredSize());
+    System.err.println("editorPanel.getPrefsize() = " + editorPanel.getPreferredSize());
+    System.err.println("pep.getPrefsize() = " + this.getPreferredSize());
   }
 
   /**
@@ -101,12 +127,12 @@ public class PropertyEditorPane extends Box {
   }
   
   /**
-   * Adds the appropriate buttons (Ok, Accept, Cancel) to this component.
+   * Creates the appropriate buttons (Ok, Accept, Cancel) to this component.
    */
-  public void addButtons() {
-    buttonBox = new Box(BoxLayout.X_AXIS);
+  public JPanel createButtonPanel() {
+    JPanel buttonPanel = new JPanel();
     
-    buttonBox.add(createButton("Ok", new AbstractAction() {
+    buttonPanel.add(createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             setValue();
@@ -125,7 +151,7 @@ public class PropertyEditorPane extends Box {
         }
       }, true));
     
-    buttonBox.add(createButton("Apply", new AbstractAction() {
+    buttonPanel.add(createButton("Apply", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             setValue();
@@ -136,7 +162,7 @@ public class PropertyEditorPane extends Box {
         }
       }, false));
     
-    buttonBox.add(createButton("Cancel", new AbstractAction() {
+    buttonPanel.add(createButton("Cancel", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (container instanceof JInternalFrame) {
             try {
@@ -149,9 +175,7 @@ public class PropertyEditorPane extends Box {
         }
       }, false));
 
-    //System.err.println("adding button box.");
-    //buttonBox.setSize(300,300);
-    this.add(buttonBox);
+    return buttonPanel;
   }
   
   /**
@@ -173,12 +197,5 @@ public class PropertyEditorPane extends Box {
     return thisButton;
   }
   
-
-  /**
-   * Resizes this component.  Called when a subcomponent changes its size.
-   */
-  public void resizeEditor() {
-    container.setSize(container.getPreferredSize());
-  }
 
 }

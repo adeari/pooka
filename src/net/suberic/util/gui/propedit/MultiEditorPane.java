@@ -1,11 +1,11 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import net.suberic.util.*;
-import java.awt.CardLayout;
 import javax.swing.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 
 /**
  * This class will make an editor for a list of elements, where each of 
@@ -34,7 +34,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   JTable optionTable;
   JPanel entryPanel;
   JPanel buttonPanel;
-  JLabel label;
 
   List buttonList;
   boolean changed = false;
@@ -58,8 +57,9 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     editorTemplate = template;
     originalValue = manager.getProperty(property, "");
 
-    // set the default label.
-    
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
+
     // create the current list of edited items.  so if this is a User list,
     // these values might be 'allen', 'deborah', 'marc', 'jessica', etc.
     
@@ -68,44 +68,31 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     List<String> displayProperties = manager.getPropertyAsList(editorTemplate + ".displayProperties", "");
 
     optionTable = createOptionTable(optionList, displayProperties);
-    
+    JScrollPane optionScrollPane = new JScrollPane(optionTable);
+
     buttonPanel = createButtonPanel();
     
-    this.setEnabled(isEnabled);
+    this.add(optionScrollPane);
+    this.add(buttonPanel);
+
+    layout.putConstraint(SpringLayout.WEST, optionScrollPane, 5, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, optionScrollPane, 5, SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, optionScrollPane, -5, SpringLayout.SOUTH, this);
     
-    manager.registerPropertyEditor(property, this);
+    layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.EAST, optionScrollPane);
 
-    Box mainBox = new Box(BoxLayout.X_AXIS);
-    mainBox.add(optionTable);
-    mainBox.add(buttonPanel);
+    layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5 ,SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5 ,SpringLayout.SOUTH, buttonPanel);
+    layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, buttonPanel);
 
-    this.add(mainBox);
-
+    System.err.println("optionTable.getSize, maxsize, prefsize:  " + optionTable.getSize() + ", " + optionTable.getMaximumSize() + ", " + optionTable.getPreferredSize());
+    System.err.println("optionScrollPane.getSize, maxsize, prefsize, minsize:  " + optionScrollPane.getSize() + ", " + optionScrollPane.getMaximumSize() + ", " + optionScrollPane.getPreferredSize() + ", " + optionScrollPane.getMinimumSize());
     getLogger().fine("MultiEditorPane for property " + propertyName + ", template " + template);
-    /*
-    // create entryPanels (the panels which show the subproperties
-    // of each item in the optionList) for each option.
-    entryPanel = createEntryPanel(optionVector, true);
-    
-    if (manager.getProperty(template + "._useScrollPane", "false").equalsIgnoreCase("true")) {
-    JScrollPane jsp = new JScrollPane(entryPanel);
-    java.awt.Dimension size = jsp.getPreferredSize();
-    size.height = Math.min(size.height, 300);
-    size.width = Math.min(size.width, 475);
-    jsp.setPreferredSize(size);
-    this.add(jsp);
-    valueComponent = jsp;
-    } else {
-    this.add(entryPanel);
-    valueComponent = entryPanel;
-    }
-    
-    labelComponent = optionBox;
-    
-    this.setEnabled(isEnabled);
 
+    this.setEnabled(isEnabled);
+    
     manager.registerPropertyEditor(property, this);
-    */
+
   }
   
   /**
@@ -143,7 +130,12 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     returnValue.setCellSelectionEnabled(false);
     returnValue.setColumnSelectionAllowed(false);
     returnValue.setRowSelectionAllowed(true);
-    
+    returnValue.setShowGrid(false);
+    /*
+    JTableHeader header = new JTableHeader(columnLabels);
+    returnValue.setTableHeader(header);
+    */
+
     returnValue.getSelectionModel().addListSelectionListener(this);
     return returnValue;
   }
@@ -155,27 +147,60 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     getLogger().fine("creating buttons.");
     buttonList = new ArrayList();
     JPanel returnValue = new JPanel();
-    Box buttonBox = new Box(BoxLayout.Y_AXIS);
+    SpringLayout layout = new SpringLayout();
+    returnValue.setLayout(layout);
     
-    buttonBox.add(createButton("Add", new AbstractAction() {
+    JButton addButton = createButton("Add", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           addNewValue(getNewValueName());
         }
-      }, true));
+      }, true);
     
-    buttonBox.add(createButton("Edit", new AbstractAction() {
+    JButton editButton = createButton("Edit", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           editSelectedValue();
         }
-      }, true));
+      }, true);
     
-    buttonBox.add(createButton("Remove", new AbstractAction() {
+    JButton removeButton = createButton("Remove", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           removeSelectedValue();
         }
-      }, false));
+      }, false);
     
-    returnValue.add(buttonBox);
+    returnValue.add(addButton);
+    returnValue.add(editButton);
+    returnValue.add(removeButton);
+
+    layout.putConstraint(SpringLayout.NORTH, addButton, 0, SpringLayout.NORTH, returnValue);
+    layout.putConstraint(SpringLayout.WEST, addButton, 5 ,SpringLayout.WEST, returnValue);
+    layout.putConstraint(SpringLayout.EAST, addButton, -5 ,SpringLayout.EAST, returnValue);
+
+    layout.putConstraint(SpringLayout.NORTH, editButton, 5, SpringLayout.SOUTH, addButton);
+    layout.putConstraint(SpringLayout.WEST, editButton, 5 ,SpringLayout.WEST, returnValue);
+    layout.putConstraint(SpringLayout.EAST, editButton, -5 ,SpringLayout.EAST, returnValue);
+
+    layout.putConstraint(SpringLayout.NORTH, removeButton, 5, SpringLayout.SOUTH, editButton);
+    layout.putConstraint(SpringLayout.WEST, editButton, 5 ,SpringLayout.WEST, returnValue);
+    layout.putConstraint(SpringLayout.EAST, removeButton, -5 ,SpringLayout.EAST, returnValue);
+
+    Spring buttonWidth = Spring.constant(0);
+    
+    SpringLayout.Constraints addConstraints = layout.getConstraints(addButton);
+    SpringLayout.Constraints editConstraints = layout.getConstraints(editButton);
+    SpringLayout.Constraints removeConstraints = layout.getConstraints(removeButton);
+
+    buttonWidth = Spring.max(buttonWidth, addConstraints.getWidth());
+    buttonWidth = Spring.max(buttonWidth, editConstraints.getWidth());
+    buttonWidth = Spring.max(buttonWidth, removeConstraints.getWidth());
+
+    addConstraints.setWidth(buttonWidth);
+    editConstraints.setWidth(buttonWidth);
+    removeConstraints.setWidth(buttonWidth);
+    
+    SpringLayout.Constraints panelConstraints = layout.getConstraints(returnValue);    
+    //panelConstraints.setWidth(Spring.sum(buttonWidth, Spring.constant(10)));
+
     return returnValue;
   }
   
@@ -245,7 +270,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       
       this.setChanged(true);
     } catch (PropertyValueVetoException pvve) {
-      manager.getFactory().showError(this, "Error removing value " + selValue + " from " + label.getText() + ":  " + pvve.getReason());
+      manager.getFactory().showError(this, "Error removing value " + selValue + " from " + property + ":  " + pvve.getReason());
     }
     
   }

@@ -62,8 +62,11 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    */
   public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
     JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates, mgr);
+    jif.setSize(jif.getPreferredSize());
     desktop.add(jif);
     jif.setVisible(true);
+    jif.setSize(jif.getPreferredSize());
+    System.err.println("1");
     try {
       jif.setSelected(true);
     } catch (java.beans.PropertyVetoException pve) {
@@ -77,7 +80,9 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
     jif.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jif));
     
-    jif.pack();
+    //jif.pack();
+    System.err.println("2");
+    jif.setSize(jif.getPreferredSize());
     desktop.add(jif);
     jif.setVisible(true);
     try {
@@ -96,8 +101,12 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
     PropertyEditorPane pep = new PropertyEditorPane(mgr, properties, templates, jif);
     jif.getContentPane().add(pep);
-    jif.setSize(100,100);
+    System.err.println("pep.getSize(), getMinSize(), getPrefSize() = " + pep.getSize() + ", " + pep.getMinimumSize() + ", " + pep.getPreferredSize() + ". ");
     jif.pack();
+    System.err.println("pep.getSize(), getMinSize(), getPrefSize() = " + pep.getSize() + ", " + pep.getMinimumSize() + ", " + pep.getPreferredSize() + ". ");
+    System.err.println("3");
+    //jif.setSize(pep.getPreferredSize());
+    jif.setSize(jif.getPreferredSize());
     return jif; 
   }
   
