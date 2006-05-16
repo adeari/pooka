@@ -664,7 +664,7 @@ public class StartupManager {
   public boolean checkJavaVersion() {
     // Pooka 1.1 only runs on JDK 1.4 or higher.
     String javaVersion = System.getProperty("java.version");
-    if (javaVersion.compareTo("1.4") >= 0) {
+    if (javaVersion.compareTo("1.6") >= 0) {
       return true;
     } else {
       return false;
@@ -677,7 +677,7 @@ public class StartupManager {
   private void versionError() {
     Runnable runMe = new Runnable() {
   public void run() {
-    String errorString = Pooka.getProperty("error.incorrectJavaVersion", "Error running Pooka.  This version (1.0 beta) \nof Pooka requires a 1.2 or 1.3 JDK.  \n\nFor JDK 1.4, please use a release of Pooka 1.1.\n\nPooka can be downloaded from\nhttp://pooka.sourceforge.net/\n\nYour JDK version:  ");
+    String errorString = Pooka.getProperty("error.incorrectJavaVersion", "Error running Pooka.  This version (2.0) \nof Pooka requires a 1.6 JDK.  \n\nFor JDK 1.4, please use a release of Pooka 1.1.\n\nPooka can be downloaded from\nhttp://pooka.sourceforge.net/\n\nYour JDK version:  ");
     javax.swing.JOptionPane.showMessageDialog(null, errorString + System.getProperty("java.version"));
   }
       };

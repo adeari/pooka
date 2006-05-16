@@ -4,6 +4,7 @@ import net.suberic.util.gui.IconManager;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
+import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JFrame;
@@ -139,10 +140,10 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
    * each entry in the properties Vector.
    */
   public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
-    JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
-    jf.pack();
-    applyNewWindowLocation(jf);
-    jf.setVisible(true);
+    JDialog jd = (JDialog)getEditorFactory().createEditorWindow(title, properties, templates);
+    jd.pack();
+    applyNewWindowLocation(jd);
+    jd.setVisible(true);
   }
   
   /**
@@ -382,15 +383,11 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   /**
    * Determines the location for new windows.
    */
-  public void applyNewWindowLocation(JFrame f) {
-    String javaVersion = System.getProperty("java.version");
-    
-    if (javaVersion.compareTo("1.3") >= 0) {
-      try {
-        Point newLocation = getNewWindowLocation(f);
-        f.setLocation(newLocation);
-      } catch (Exception e) {
-      }
+  public void applyNewWindowLocation(Window f) {
+    try {
+      Point newLocation = getNewWindowLocation(f);
+      f.setLocation(newLocation);
+    } catch (Exception e) {
     }
   }
 
@@ -401,7 +398,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   /**
    * Determines the location for new windows.
    */
-  public Point getNewWindowLocation(JFrame f) throws Exception {
+  public Point getNewWindowLocation(Window f) throws Exception {
     if (firstPlacement) {
       Point location = Pooka.getMainPanel().getParentFrame().getLocation();
       lastX = location.x;

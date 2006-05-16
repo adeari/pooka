@@ -392,9 +392,6 @@ public class NewMessageProxy extends MessageProxy {
     if (! Pooka.getProperty("Pooka.checkUnsentMessages", "false").equalsIgnoreCase("true")) {
       return false;
     }
-    if (System.getProperty("java.version").compareTo("1.3") < 0) {
-      return false;
-    }
 
     NewMessageUI nmui = getNewMessageUI();
 

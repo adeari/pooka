@@ -5,6 +5,8 @@ import net.suberic.util.gui.IconManager;
 import java.util.*;
 import java.awt.Container;
 import java.awt.Component;
+import java.awt.Frame;
+import java.awt.Dialog;
 
 /**
  * A factory which can be used to create PropertyEditorUI's.
@@ -93,24 +95,43 @@ public class PropertyEditorFactory {
    * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
-    JFrame jf = (JFrame) createEditorWindow(title, properties, templates, mgr);
-    jf.setVisible(true);
+    showNewEditorWindow(title, properties, templates, mgr, null);
   }
 
+  /**
+   * Creates and displays an editor window.
+   */
+  public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
+    JDialog jd = (JDialog) createEditorWindow(title, properties, templates, mgr, window);
+    jd.setVisible(true);
+  }
 
   /**
    * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, PropertyEditorUI editor) {
-    JFrame jf = new JFrame(title);
-    jf.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jf));
-    jf.setSize(200,200);
-    jf.pack();
-    jf.setVisible(true);
+    showNewEditorWindow(title, editor, null);
+  }
+  /**
+   * Creates and displays an editor window.
+   */
+  public void showNewEditorWindow(String title, PropertyEditorUI editor, Container window) {
+    JDialog jd = null;
+    if (window instanceof Dialog) {
+      jd = new JDialog((Dialog) window, title, true);
+    } else if (window instanceof Frame) {
+      jd = new JDialog((Frame) window, title, true);
+    } else {
+      jd = new JDialog();
+      jd.setTitle(title);
+      jd.setModal(true);
+    }
+    jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jd));
+    jd.setVisible(true);
   }
 
   /**
-   * This method returns an EditorWindow (a JFrame in this
+   * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
    * properties List.  The title string is the title of the
    * JInternalFrame.
@@ -120,27 +141,43 @@ public class PropertyEditorFactory {
   }
 
   /**
-   * This method returns an EditorWindow (a JFrame in this
+   * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
    * properties List.  The title string is the title of the
-   * JFrame.
+   * JDialog.
    */
   public Container createEditorWindow(String title, List properties, List templates ) {
     return createEditorWindow(title, properties, templates, new PropertyEditorManager(sourceBundle, this, iconManager));
   }
 
   /**
-   * This method returns an EditorWindow (a JFrame in this
+   * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
    * properties Vector.  The title string is the title of the
    * JInternalFrame.
    */
   public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
-    JFrame jf = new JFrame(title);
-    jf.getContentPane().add(new PropertyEditorPane(mgr, properties, templates, jf));
-    jf.setSize(200,200);
-    jf.pack();
-    return jf;
+    return createEditorWindow(title, properties, templates, mgr, null);
+  }
+  /**
+   * This method returns an EditorWindow (a JDialog in this
+   * implementation) which has an editor for each property in the
+   * properties Vector.  The title string is the title of the
+   * JInternalFrame.
+   */
+  public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
+    JDialog jd = null;
+    if (window instanceof Dialog) {
+      jd = new JDialog((Dialog) window, title, true);
+    } else if (window instanceof Frame) {
+      jd = new JDialog((Frame) window, title, true);
+    } else {
+      jd = new JDialog();
+      jd.setTitle(title);
+      jd.setModal(true);
+    }
+    jd.getContentPane().add(new PropertyEditorPane(mgr, properties, templates, jd));
+    return jd;
   }
 
 

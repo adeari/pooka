@@ -247,7 +247,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     Vector newValueVector = new Vector();
     newValueVector.add(newValueName);
     ((DefaultTableModel)optionTable.getModel()).addRow(newValueVector);
-    optionTable.getSelectionModel().setSelectionInterval(optionTable.getModel().getRowCount(), optionTable.getModel().getRowCount());
+    optionTable.getSelectionModel().setSelectionInterval(optionTable.getModel().getRowCount(), optionTable.getModel().getRowCount() -1);
     editSelectedValue();
   }
   
@@ -297,7 +297,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
         templateList.add(editorTemplate + ".editableFields." + subEditor);
         getLogger().fine("adding " + editorTemplate + ".editableFields." + subEditor + " to the editor list.");
       }
-      manager.getFactory().showNewEditorWindow("testing", propList, templateList, manager);
+      manager.getFactory().showNewEditorWindow("testing", propList, templateList, manager, this.getPropertyEditorPane().getContainer());
     } else {
       getLogger().fine("editSelectedValue():  no selected value.");
     }

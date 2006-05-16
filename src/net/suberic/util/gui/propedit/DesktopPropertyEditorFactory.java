@@ -60,9 +60,13 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
   /**
    * Creates and displays an editor window.  
    */
-  public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
-    JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates, mgr);
+  public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
+    JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates, mgr, window);
     jif.setSize(jif.getPreferredSize());
+    if (window != null && window instanceof JInternalFrame) {
+      System.err.println("setting x to ( (" + jif.getWidth() + " - " + window.getWidth() + ") / 2) + " + window.getX() + ", (( " + jif.getHeight() + " - " + window.getHeight() + ") / 2) + " +  window.getY() + "))");
+      jif.setLocation(Math.max(0, ((window.getWidth() - jif.getWidth()) / 2) + window.getX()), Math.max(0, ((window.getHeight() - jif.getHeight()) / 2) + window.getY()));
+    }
     desktop.add(jif);
     jif.setVisible(true);
     jif.setSize(jif.getPreferredSize());
@@ -75,12 +79,16 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
   /**
    * Creates and displays an editor window.  
    */
-  public void showNewEditorWindow(String title, PropertyEditorUI editor) {
+  public void showNewEditorWindow(String title, PropertyEditorUI editor, Container window) {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
     jif.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jif));
     
     //jif.pack();
     jif.setSize(jif.getPreferredSize());
+    if (window != null && window instanceof JInternalFrame) {
+      System.err.println("setting x to ( (" + jif.getWidth() + " - " + window.getWidth() + ") / 2) + " + window.getX() + ", (( " + jif.getHeight() + " - " + window.getHeight() + ") / 2) + " +  window.getY() + "))");
+      jif.setLocation(Math.max(0, ((window.getWidth() - jif.getWidth()) / 2) + window.getX()), Math.max(0, ((window.getHeight() - jif.getHeight()) / 2) + window.getY()));
+    }
     desktop.add(jif);
     jif.setVisible(true);
     try {
@@ -95,7 +103,7 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    * properties Vector.  The title string is the title of the 
    * JInternalFrame.
    */
-  public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
+  public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
     PropertyEditorPane pep = new PropertyEditorPane(mgr, properties, templates, jif);
     jif.getContentPane().add(pep);

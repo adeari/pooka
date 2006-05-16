@@ -1,3 +1,45 @@
+----- ui update
+*) new editor system.
+   *) reorganize properties
+	*) store:
+	   *) type
+	     *) servername
+	     *) username
+	     *) secure connection
+	        *) never / when possible / always
+	     *) auth type???
+	     *) port (??)
+	   *) receiving options
+	     *) check every x minutes
+	     *) new messages in all folders (umm, duh)
+	     *) custom connection (good idea - make it just an option.)
+	     *) only subscribed folders
+	     *) override namespace
+	   *) filters
+	   *) caching
+	   *) expunge on exit
+	   *) use subscribed folders list
+	   *) trash folder
+	     *) empty trash on exit?
+	   *) ? select for offline use by folder?
+	   *) option for not caching messages over x kb.
+   *) fix layout
+   *) add in help.
+
+*) make required fields for the gui properties.
+*)  implement a way to make a custom FolderCellRenderer for a property.
+*) write help screens along with 
+*)  implement (likely similar) way to put constraints/checks on the values
+entered through a propertyEditor.
+*) NewAccountPooka should be callable anytime, so you can use it to create
+	any new account, not just your first account.
+*) NewAccountPooka should allow user to enter smtp authentication info.
+*) NewAccountPooka should aggregate errors, so if you have no username and
+	no mail server, you should get a single error screen saying both
+	'no username' and 'no mail server'.
+----- /ui update
+
+
 *) create a way to cache local headers so we don't have to download
    those all the time.  sort of like running offline, but not really.
 	*) make this the default IMAP setting, barring running diskless
@@ -94,48 +136,6 @@ online:
 *) javahelp 2.0
 *) linspire default icons
 
------ ui update
-*) new editor system.
-   *) reorganize properties
-	*) store:
-	   *) type
-	     *) servername
-	     *) username
-	     *) secure connection
-	        *) never / when possible / always
-	     *) auth type???
-	     *) port (??)
-	   *) receiving options
-	     *) check every x minutes
-	     *) new messages in all folders (umm, duh)
-	     *) custom connection (good idea - make it just an option.)
-	     *) only subscribed folders
-	     *) override namespace
-	   *) filters
-	   *) caching
-	   *) expunge on exit
-	   *) use subscribed folders list
-	   *) trash folder
-	     *) empty trash on exit?
-	   *) ? select for offline use by folder?
-	   *) option for not caching messages over x kb.
-   *) fix layout
-   *) add in help.
-
-
-
-*) make required fields for the gui properties.
-*)  implement a way to make a custom FolderCellRenderer for a property.
-*) write help screens along with 
-*)  implement (likely similar) way to put constraints/checks on the values
-entered through a propertyEditor.
-*) NewAccountPooka should be callable anytime, so you can use it to create
-	any new account, not just your first account.
-*) NewAccountPooka should allow user to enter smtp authentication info.
-*) NewAccountPooka should aggregate errors, so if you have no username and
-	no mail server, you should get a single error screen saying both
-	'no username' and 'no mail server'.
------ /ui update
 
 *) fix 'failed to open folder' message in v. 2.0.
 

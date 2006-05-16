@@ -117,21 +117,6 @@ public class SimpleAuthenticator extends Authenticator {
 
   authPane.selectInitialValue();
 
-  // work around a bug in jdk 1.4
-  String javaVersion = System.getProperty("java.version");
-  if (javaVersion.compareTo("1.5") < 0) {
-    dialog.addWindowFocusListener(new WindowAdapter() {
-        private boolean gotFocus = false;
-        public void windowGainedFocus(WindowEvent we) {
-                // Once window gets focus, set initial focus
-                if (!gotFocus) {
-      authPane.selectInitialValue();
-      gotFocus = true;
-                }
-        }
-      });
-  }
-
   dialog.setVisible(true);
 
   Object result = authPane.getValue();

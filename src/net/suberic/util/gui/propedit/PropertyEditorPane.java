@@ -141,6 +141,8 @@ public class PropertyEditorPane extends JPanel {
               }
             } else if (container instanceof JFrame) {
               ((JFrame)container).dispose();
+            } else if (container instanceof JDialog) {
+              ((JDialog)container).dispose();
             }
           } catch (PropertyValueVetoException pvve) {
             manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
@@ -168,6 +170,8 @@ public class PropertyEditorPane extends JPanel {
             }
           } else if (container instanceof JFrame) {
             ((JFrame)container).dispose();
+          } else if (container instanceof JDialog) {
+            ((JDialog)container).dispose();
           }
         }
       }, false));
@@ -194,5 +198,11 @@ public class PropertyEditorPane extends JPanel {
     return thisButton;
   }
   
-
+  /**
+   * Returns the Container for this PropertyEditorPane.
+   */
+  public Container getContainer() {
+    return container;
+  }
+  
 }
