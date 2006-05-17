@@ -55,6 +55,16 @@ public interface PropertyEditorUI {
   public void configureEditor(String propertyName, PropertyEditorManager mgr);
   
   /**
+   * Returns the currently edited property.
+   */
+  public String getProperty();
+
+  /**
+   * Returns the template for the current property.
+   */
+  public String getEditorTemplate();
+
+  /**
    * This writes the currently configured value in the PropertyEditorUI
    * to the source VariableBundle.
    */
@@ -97,5 +107,10 @@ public interface PropertyEditorUI {
    * Removes a PropertyEditorListener from the ListenerList.
    */
   public void removePropertyEditorListener(PropertyEditorListener pel);
+
+  /**
+   * Returns the helpId for this editor.
+   */
+  public String getHelpID();
 
 }

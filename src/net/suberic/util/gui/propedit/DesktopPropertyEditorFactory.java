@@ -64,7 +64,6 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates, mgr, window);
     jif.setSize(jif.getPreferredSize());
     if (window != null && window instanceof JInternalFrame) {
-      System.err.println("setting x to ( (" + jif.getWidth() + " - " + window.getWidth() + ") / 2) + " + window.getX() + ", (( " + jif.getHeight() + " - " + window.getHeight() + ") / 2) + " +  window.getY() + "))");
       jif.setLocation(Math.max(0, ((window.getWidth() - jif.getWidth()) / 2) + window.getX()), Math.max(0, ((window.getHeight() - jif.getHeight()) / 2) + window.getY()));
     }
     desktop.add(jif);
@@ -86,7 +85,6 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     //jif.pack();
     jif.setSize(jif.getPreferredSize());
     if (window != null && window instanceof JInternalFrame) {
-      System.err.println("setting x to ( (" + jif.getWidth() + " - " + window.getWidth() + ") / 2) + " + window.getX() + ", (( " + jif.getHeight() + " - " + window.getHeight() + ") / 2) + " +  window.getY() + "))");
       jif.setLocation(Math.max(0, ((window.getWidth() - jif.getWidth()) / 2) + window.getX()), Math.max(0, ((window.getHeight() - jif.getHeight()) / 2) + window.getY()));
     }
     desktop.add(jif);

@@ -1,5 +1,13 @@
 ----- ui update
 *) new editor system.
+  (order notes:  add in help ability first.  then start setting up the
+	store editor.  once store editor is technically set up properly,
+	add in help screens.  then go to next editor.)
+ *) technical:
+   *) add in help.
+   *) entry editors (numeric only; FormattedTextField and such)
+   *) add in dependency filters - if a, then disable b.
+   *) wizard editor pane?
    *) reorganize properties
 	*) store:
 	   *) type
@@ -24,8 +32,6 @@
 	   *) ? select for offline use by folder?
 	   *) option for not caching messages over x kb.
    *) fix layout
-   *) add in help.
-
 *) make required fields for the gui properties.
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with 

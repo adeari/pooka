@@ -129,6 +129,12 @@ public class PropertyEditorPane extends JPanel {
   public JPanel createButtonPanel() {
     JPanel buttonPanel = new JPanel();
     
+    buttonPanel.add(createButton("Help", new AbstractAction() {
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+          System.err.println("showing help for " + editor.getHelpID());
+        }
+      }, true));
+    
     buttonPanel.add(createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {

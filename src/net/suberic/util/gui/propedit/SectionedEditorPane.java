@@ -54,6 +54,8 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     manager=newManager;
     editorTemplate = template;
     
+    System.err.println("editorTemplate='" + editorTemplate + "'");
+
     // create the editors list.
     editors = new Vector();
 
@@ -272,6 +274,25 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     enabled = newValue;
   }
   
+  /**
+   * Returns the helpId for this editor.
+   */
+  public String getHelpID() {
+    System.err.println("getting help id.");
+    CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
+    SEPListEntry selectedValue = (SEPListEntry) optionList.getSelectedValue();
+    if (selectedValue != null) {
+      String selectedId = selectedValue.getKey();
+      
+      if (selectedId != null) {
+        SwingPropertyEditor newSelected = currentPanels.get(selectedId);
+        System.err.println("returning help id for " + newSelected);
+        return newSelected.getHelpID();
+      }
+    }
+    return getEditorTemplate();
+  }
+
   class SEPCellRenderer extends JLabel implements ListCellRenderer {
     
     public java.awt.Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {

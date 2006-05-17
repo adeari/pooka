@@ -365,8 +365,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       
       removeValues = new Vector();
       
-      super.setValue();
-      
       if (isChanged()) {
         getLogger().fine("setting property.  property is " + property + "; value is " + getCurrentValue());
         manager.setProperty(property, getCurrentValue());
@@ -391,19 +389,22 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   public void resetDefaultValue() throws PropertyValueVetoException {
     
     //FIXME
+    throw new UnsupportedOperationException("reset not yet implemented for MultiEditorPane.");
+
+    /*
     removeValues = new Vector();
     
     if (isChanged()) {
       firePropertyChangedEvent(originalValue);
     }
-    
+    */
   }
   
   /**
    * Returns the currently edited values as a Properties object.
    */
   public java.util.Properties getValue() {
-    java.util.Properties currentRetValue = super.getValue();
+    java.util.Properties currentRetValue = new java.util.Properties();
     currentRetValue.setProperty(property, getCurrentValue());
     return currentRetValue;
   }

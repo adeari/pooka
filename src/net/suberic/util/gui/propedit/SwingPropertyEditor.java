@@ -201,6 +201,27 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
+   * Returns the currently edited property.
+   */
+  public String getProperty() {
+    return property;
+  }
+
+  /**
+   * Returns the template for the current property.
+   */
+  public String getEditorTemplate() {
+    return editorTemplate;
+  }
+
+  /**
+   * Returns the helpId for this editor.
+   */
+  public String getHelpID() {
+    return getEditorTemplate();
+  }
+
+  /**
    * Gets the Logger for this Editor.
    *
    */
