@@ -2,6 +2,7 @@ package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import java.util.List;
 import java.util.LinkedList;
+import javax.help.CSH;
 import java.awt.*;
 
 /**
@@ -106,11 +107,16 @@ public class PropertyEditorPane extends JPanel {
   public JPanel createButtonPanel() {
     JPanel buttonPanel = new JPanel();
 
-    buttonPanel.add(createButton("Help", new AbstractAction() {
+    JButton helpButton = createButton("Help", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           System.err.println("showing help for " + editor.getHelpID());
+          //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
+          new CSH.DisplayHelpFromSource(manager.getFactory().getHelpBroker()).actionPerformed(e);
         }
-      }, true));
+      }, true);
+
+    CSH.setHelpIDString(helpButton, "UserProfile");
+    buttonPanel.add(helpButton);
 
     buttonPanel.add(createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
