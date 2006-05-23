@@ -79,18 +79,18 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     Pooka.getHelpBroker().enableHelpKey(this, "pooka.intro", Pooka.getHelpBroker().getHelpSet());
 
     getParentFrame().addWindowListener(new WindowAdapter() {
-  public void windowClosing(WindowEvent e) {
-    exitPooka(true);
-  }
+        public void windowClosing(WindowEvent e) {
+          exitPooka(true);
+        }
       });
 
     focusManager = new PookaFocusManager();
 
     this.addFocusListener(new FocusAdapter() {
-  public void focusGained(FocusEvent e) {
-    // we never want focus.
-    focusManager.passFocus();
-  }
+        public void focusGained(FocusEvent e) {
+          // we never want focus.
+          focusManager.passFocus();
+        }
       });
 
     // set the initial currentUser
@@ -121,23 +121,23 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     if (focusedComponent != null) {
       if (contentPanel != null) {
-  if (SwingUtilities.isDescendingFrom(focusedComponent, contentPanel.getUIComponent())) {
-    foundParent = true;
-    focusManager.setLastStatus(CONTENT_LAST);
-    if (contentPanel.getActions() != null) {
-      actions = TextAction.augmentList(contentPanel.getActions(), actions);
-    }
-  }
+        if (SwingUtilities.isDescendingFrom(focusedComponent, contentPanel.getUIComponent())) {
+          foundParent = true;
+          focusManager.setLastStatus(CONTENT_LAST);
+          if (contentPanel.getActions() != null) {
+            actions = TextAction.augmentList(contentPanel.getActions(), actions);
+          }
+        }
       }
 
       if (! foundParent && folderPanel != null) {
-  if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel)) {
-    foundParent = true;
-    focusManager.setLastStatus(FOLDER_LAST);
-    if (folderPanel.getActions() != null) {
-      actions = TextAction.augmentList(folderPanel.getActions(), actions);
-    }
-  }
+        if (SwingUtilities.isDescendingFrom(focusedComponent, folderPanel)) {
+          foundParent = true;
+          focusManager.setLastStatus(FOLDER_LAST);
+          if (folderPanel.getActions() != null) {
+            actions = TextAction.augmentList(folderPanel.getActions(), actions);
+          }
+        }
       }
     }
 
@@ -146,13 +146,13 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       // item.
       int lastStatus = focusManager.getLastStatus();
       if (lastStatus == CONTENT_LAST && contentPanel != null) {
-  if (contentPanel.getActions() != null) {
-    actions = TextAction.augmentList(contentPanel.getActions(), actions);
-  }
+        if (contentPanel.getActions() != null) {
+          actions = TextAction.augmentList(contentPanel.getActions(), actions);
+        }
       } else if (lastStatus == FOLDER_LAST && folderPanel != null) {
-  if (folderPanel.getActions() != null) {
-    actions = TextAction.augmentList(folderPanel.getActions(), actions);
-  }
+        if (folderPanel.getActions() != null) {
+          actions = TextAction.augmentList(folderPanel.getActions(), actions);
+        }
 
       }
     }
@@ -212,10 +212,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     if (returnValue != null)
       return returnValue;
 
-  if (folderPanel != null)
-    returnValue = folderPanel.getDefaultProfile();
+    if (folderPanel != null)
+      returnValue = folderPanel.getDefaultProfile();
 
-  return returnValue;
+    return returnValue;
 
   }
 
@@ -232,7 +232,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       return;
 
     if (contentPanel instanceof MessagePanel &&
-  ((MessagePanel)contentPanel).isSavingWindowLocations()) {
+        ((MessagePanel)contentPanel).isSavingWindowLocations()) {
       ((MessagePanel)contentPanel).saveWindowLocations();
     }
 
@@ -270,121 +270,121 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     for (int i = 0; !cancel && i < unsentCopy.size(); i++) {
       NewMessageProxy current = (NewMessageProxy)unsentCopy.get(i);
       if (current.promptForClose()) {
-  NewMessageUI nmui = current.getNewMessageUI();
-  // FIXME
-  if (nmui != null) {
-    nmui.openMessageUI();
-    int saveDraft = nmui.promptSaveDraft();
-    switch (saveDraft) {
-    case JOptionPane.YES_OPTION:
-      current.saveDraft();
-      break;
-    case JOptionPane.NO_OPTION:
-      nmui.setModified(false);
-      nmui.closeMessageUI();
-      break;
-    case JOptionPane.CANCEL_OPTION:
-      cancel = true;
-    }
-  }
+        NewMessageUI nmui = current.getNewMessageUI();
+        // FIXME
+        if (nmui != null) {
+          nmui.openMessageUI();
+          int saveDraft = nmui.promptSaveDraft();
+          switch (saveDraft) {
+          case JOptionPane.YES_OPTION:
+            current.saveDraft();
+            break;
+          case JOptionPane.NO_OPTION:
+            nmui.setModified(false);
+            nmui.closeMessageUI();
+            break;
+          case JOptionPane.CANCEL_OPTION:
+            cancel = true;
+          }
+        }
       }
     }
 
     return ! cancel;
   }
 
-    // Accessor methods.
-    // These shouldn't all be public.
+  // Accessor methods.
+  // These shouldn't all be public.
 
-    public ConfigurableMenuBar getMainMenu() {
-  return mainMenu;
-    }
+  public ConfigurableMenuBar getMainMenu() {
+    return mainMenu;
+  }
 
-    public InfoPanel getInfoPanel() {
-  return infoPanel;
-    }
+  public InfoPanel getInfoPanel() {
+    return infoPanel;
+  }
 
-    public void setMainMenu(ConfigurableMenuBar newMainMenu) {
-  mainMenu=newMainMenu;
-    }
+  public void setMainMenu(ConfigurableMenuBar newMainMenu) {
+    mainMenu=newMainMenu;
+  }
 
-    public ConfigurableToolbar getMainToolbar() {
-  return mainToolbar;
-    }
+  public ConfigurableToolbar getMainToolbar() {
+    return mainToolbar;
+  }
 
-    public ConfigurableKeyBinding getKeyBindings() {
-  return keyBindings;
-    }
+  public ConfigurableKeyBinding getKeyBindings() {
+    return keyBindings;
+  }
 
-    public void setKeyBindings(ConfigurableKeyBinding newKeyBindings) {
-  keyBindings = newKeyBindings;
-    }
+  public void setKeyBindings(ConfigurableKeyBinding newKeyBindings) {
+    keyBindings = newKeyBindings;
+  }
 
-    public void setMainToolbar(ConfigurableToolbar newMainToolbar) {
-        mainToolbar = newMainToolbar;
-    }
+  public void setMainToolbar(ConfigurableToolbar newMainToolbar) {
+    mainToolbar = newMainToolbar;
+  }
 
-    public ContentPanel getContentPanel() {
-  return contentPanel;
-    }
+  public ContentPanel getContentPanel() {
+    return contentPanel;
+  }
 
-    public void setContentPanel(ContentPanel newCp) {
-  contentPanel = newCp;
-  this.setRightComponent(newCp.getUIComponent());
-  this.repaint();
-    }
+  public void setContentPanel(ContentPanel newCp) {
+    contentPanel = newCp;
+    this.setRightComponent(newCp.getUIComponent());
+    this.repaint();
+  }
 
-    public FolderPanel getFolderPanel() {
-  return folderPanel;
-    }
+  public FolderPanel getFolderPanel() {
+    return folderPanel;
+  }
 
-    public Session getSession() {
-  return session;
-    }
+  public Session getSession() {
+    return session;
+  }
 
-    public MailQueue getMailQueue() {
-  return mailQueue;
-    }
+  public MailQueue getMailQueue() {
+    return mailQueue;
+  }
 
-    public Action[] getDefaultActions() {
-  return defaultActions;
-    }
+  public Action[] getDefaultActions() {
+    return defaultActions;
+  }
 
   public PookaFocusManager getFocusManager() {
     return focusManager;
   }
 
-    /**
-     * Find the hosting frame, for the file-chooser dialog.
-     */
-    public JFrame getParentFrame() {
-  return (JFrame) getTopLevelAncestor();
-    }
+  /**
+   * Find the hosting frame, for the file-chooser dialog.
+   */
+  public JFrame getParentFrame() {
+    return (JFrame) getTopLevelAncestor();
+  }
 
-    //-----------actions----------------
-    // Actions supported by the main Panel itself.  These should always
-    // be available, even when no documents are open.
+  //-----------actions----------------
+  // Actions supported by the main Panel itself.  These should always
+  // be available, even when no documents are open.
 
-    private Action[] defaultActions = {
-  new ExitAction(),
-  new EditUserConfigAction(),
-  new EditStoreConfigAction(),
-  new EditPreferencesAction(),
-  new EditAddressBookAction(),
-  new EditOutgoingServerAction(),
-  new EditConnectionAction(),
-  new EditInterfaceAction(),
-  new EditCryptoAction(),
-  new EditAllPreferencesAction(),
-  new HelpAboutAction(),
-  new HelpLicenseAction(),
-  new HelpAction(),
-  new HelpKeyBindingsAction(),
-  new SelectMessagePanelAction(),
-  new SelectFolderPanelAction(),
-  new NewMessageAction(),
-  new ExportConfigAction()
-    };
+  private Action[] defaultActions = {
+    new ExitAction(),
+    new EditUserConfigAction(),
+    new EditStoreConfigAction(),
+    new EditPreferencesAction(),
+    new EditAddressBookAction(),
+    new EditOutgoingServerAction(),
+    new EditConnectionAction(),
+    new EditInterfaceAction(),
+    new EditCryptoAction(),
+    new EditAllPreferencesAction(),
+    new HelpAboutAction(),
+    new HelpLicenseAction(),
+    new HelpAction(),
+    new HelpKeyBindingsAction(),
+    new SelectMessagePanelAction(),
+    new SelectFolderPanelAction(),
+    new NewMessageAction(),
+    new ExportConfigAction()
+  };
 
 
   /*
@@ -411,7 +411,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     public void actionPerformed(ActionEvent e) {
       try {
-  ((JInternalFrame)(((MessagePanel)contentPanel).getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
+        ((JInternalFrame)(((MessagePanel)contentPanel).getComponent(Integer.parseInt(e.getActionCommand())))).setSelected(true);
       } catch (java.beans.PropertyVetoException pve) {
       } catch (NumberFormatException nfe) {
       }
@@ -425,11 +425,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("UserProfile");
-      valuesToEdit.add("UserProfile.default");
-
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.userConfig", "Edit User Information"), "UserProfile.editor");
     }
   }
 
@@ -441,10 +437,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("Store");
 
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.storeConfig", "Edit Mailbox Information"), "Store");
     }
   }
 
@@ -455,9 +449,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("Preferences");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), "Preferences");
     }
   }
 
@@ -468,12 +460,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      //Vector valuesToEdit = Pooka.getResources().getPropertyAsVector("Preferences", "");
-
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("AddressBook");
-      valuesToEdit.add("AddressBook._default");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.addressBook", "Address Book Editor"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.addressBook", "Address Book Editor"), "AddressBook.editor");
     }
   }
 
@@ -484,10 +471,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("OutgoingServer");
-      valuesToEdit.add("OutgoingServer._default");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.outgoingServer", "Outgoing Mail Editor"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.outgoingServer", "Outgoing Mail Editor"), "OutgoingServer.editor");
     }
   }
 
@@ -498,10 +482,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("Connection");
-      valuesToEdit.add("Connection._default");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.connectionEditor", "Connection Editor"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.connectionEditor", "Connection Editor"), "Connection.editor");
     }
   }
 
@@ -512,9 +493,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("EncryptionManager");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.cryptoEditor", "Encryption Editor"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.cryptoEditor", "Encryption Editor"), "EncryptionManager");
     }
   }
 
@@ -525,12 +504,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("Pooka.theme");
-      valuesToEdit.add("Pooka.theme._default");
-      valuesToEdit.add("Pooka.looknfeel");
-      valuesToEdit.add("IconManager._default");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.interfaceEditor", "User Interface Editor"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.interfaceEditor", "User Interface Editor"), "Pooka.interface");
     }
   }
 
@@ -541,9 +515,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-      Vector valuesToEdit = new Vector();
-      valuesToEdit.add("Pooka.allPreferences");
-      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), valuesToEdit);
+      Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("title.preferences", "Edit Preferences"), "Pooka.allPreferences");
     }
   }
 
@@ -605,7 +577,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     }
 
     public void actionPerformed(ActionEvent e) {
-  contentPanel.getUIComponent().requestFocusInWindow();
+      contentPanel.getUIComponent().requestFocusInWindow();
     }
   }
 
@@ -627,10 +599,10 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
     public void actionPerformed(ActionEvent e) {
       try {
-  MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
-  nmu.openMessageUI();
+        MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
+        nmu.openMessageUI();
       } catch (MessagingException me) {
-  Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
+        Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
       }
 
     }
@@ -646,9 +618,9 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       JFileChooser jfc;
       String currentDirectoryPath = Pooka.getProperty("Pooka.tmp.currentDirectory", "");
       if (currentDirectoryPath == "")
-  jfc = new JFileChooser();
+        jfc = new JFileChooser();
       else
-  jfc = new JFileChooser(currentDirectoryPath);
+        jfc = new JFileChooser(currentDirectoryPath);
 
       jfc.setDialogTitle("Choose Export File");
       jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -658,13 +630,13 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       Pooka.getResources().setProperty("Pooka.tmp.currentDirectory", jfc.getCurrentDirectory().getPath(), true);
 
       if (a == JFileChooser.APPROVE_OPTION) {
-  File f = jfc.getSelectedFile();
-  try {
-    net.suberic.pooka.resource.DisklessResourceManager.exportResources(f, false);
-    Pooka.getUIFactory().showMessage("Resources exported successfully", "Export complete");
-  } catch (Exception exc) {
-    Pooka.getUIFactory().showError("Error exporting resources", exc);
-  }
+        File f = jfc.getSelectedFile();
+        try {
+          net.suberic.pooka.resource.DisklessResourceManager.exportResources(f, false);
+          Pooka.getUIFactory().showMessage("Resources exported successfully", "Export complete");
+        } catch (Exception exc) {
+          Pooka.getUIFactory().showError("Error exporting resources", exc);
+        }
 
       }
     }
@@ -698,23 +670,23 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
       Object oldValue = pce.getOldValue();
       // if seems like it, pass it on to a default.
       if ((newValue == null && oldValue == null) || newValue instanceof JFrame) {
-  passFocus();
+        passFocus();
       } else {
-  // see if the new value is actually part of this frame.
-  if (newValue != null && newValue instanceof Component) {
-    Window parentWindow = SwingUtilities.getWindowAncestor(MainPanel.this);
-    Window componentParentWindow = SwingUtilities.getWindowAncestor((Component) newValue);
-    if (parentWindow == componentParentWindow || componentParentWindow == null) {
-      refreshActiveMenus();
-      refreshCurrentUser();
-    } else {
+        // see if the new value is actually part of this frame.
+        if (newValue != null && newValue instanceof Component) {
+          Window parentWindow = SwingUtilities.getWindowAncestor(MainPanel.this);
+          Window componentParentWindow = SwingUtilities.getWindowAncestor((Component) newValue);
+          if (parentWindow == componentParentWindow || componentParentWindow == null) {
+            refreshActiveMenus();
+            refreshCurrentUser();
+          } else {
 
-      java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("component " + newValue + " got focus, but it's not part of the main window.  Ignoring.");
+            java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("component " + newValue + " got focus, but it's not part of the main window.  Ignoring.");
 
 
-      java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("main window = " + parentWindow  + "; component's parent = " + componentParentWindow);
-    }
-  }
+            java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("main window = " + parentWindow  + "; component's parent = " + componentParentWindow);
+          }
+        }
       }
     }
 
@@ -724,12 +696,12 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     public void passFocus() {
       java.util.logging.Logger.getLogger("Pooka.debug.gui.focus").fine("passing focus to subcomponent.");
       if (lastStatus == CONTENT_LAST && contentPanel != null) {
-  if (contentPanel instanceof JComponent)
-    ((JComponent)contentPanel).requestFocusInWindow();
-  else
-    contentPanel.getUIComponent().requestFocusInWindow();
+        if (contentPanel instanceof JComponent)
+          ((JComponent)contentPanel).requestFocusInWindow();
+        else
+          contentPanel.getUIComponent().requestFocusInWindow();
       } else if (lastStatus == FOLDER_LAST && folderPanel != null) {
-  folderPanel.requestFocusInWindow();
+        folderPanel.requestFocusInWindow();
       }
     }
 

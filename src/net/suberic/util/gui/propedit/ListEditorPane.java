@@ -18,22 +18,22 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   protected int currentIndex = -1;
 
   /**
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
-    
+
     label = createLabel();
 
     inputField = createComboBox();
-    
+
     Box inputBox = new Box(BoxLayout.X_AXIS);
     inputField.setPreferredSize(inputField.getMinimumSize());
     inputField.setMaximumSize(inputField.getMinimumSize());
@@ -47,7 +47,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     this.add(label);
     this.add(inputBox);
     this.setEnabled(isEnabled);
-    
+
     labelComponent = label;
     valueComponent = inputBox;
     //valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -59,12 +59,12 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     if (isChanged()) {
       String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
       try {
-	firePropertyChangingEvent(newValue);
-	firePropertyChangedEvent(newValue);
+  firePropertyChangingEvent(newValue);
+  firePropertyChangedEvent(newValue);
       } catch (PropertyValueVetoException pvve) {
-	manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
-	inputField.setSelectedIndex(currentIndex);
-      } 
+  manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
+  inputField.setSelectedIndex(currentIndex);
+      }
     }
   }
 
@@ -78,12 +78,12 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     mOriginalValue = originalValue;
     // now we get the default value.
     if (originalValue.equalsIgnoreCase(""))
-	originalValue = manager.getProperty(editorTemplate, "");
+  originalValue = manager.getProperty(editorTemplate, "");
     String currentItem;
     originalIndex=-1;
     Vector items = new Vector();
     StringTokenizer tokens;
-    
+
     String allowedValuesString = manager.getProperty(editorTemplate + ".allowedValues", "");
     if (manager.getProperty(allowedValuesString, "") != "") {
       tokens = new StringTokenizer(manager.getProperty(allowedValuesString, ""), ":");
@@ -91,55 +91,55 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     } else {
       tokens = new StringTokenizer(manager.getProperty(editorTemplate + ".allowedValues", ""), ":");
     }
-    
+
     for (int i=0; tokens.hasMoreTokens(); i++) {
       currentItem = tokens.nextToken();
-      
+
       String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
       if (itemLabel.equals(""))
-	itemLabel = currentItem.toString();
-      
+  itemLabel = currentItem.toString();
+
       String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
       if (itemValue.equals(""))
-	itemValue = currentItem.toString();
-      
+  itemValue = currentItem.toString();
+
       if (itemValue.equals(originalValue)) {
-	originalIndex=i;
-	currentIndex=i;
+  originalIndex=i;
+  currentIndex=i;
       }
       items.add(itemLabel);
       labelToValueMap.put(itemLabel, itemValue);
     }
-    
+
     if (originalIndex == -1) {
       items.add(originalValue);
       labelToValueMap.put(originalValue, originalValue);
       originalIndex = items.size() - 1;
     }
-      
+
     JComboBox jcb = new JComboBox(items);
     jcb.setSelectedIndex(originalIndex);
 
     jcb.addItemListener(new ItemListener() {
-	public void itemStateChanged(ItemEvent e) {
-	  int newIndex = inputField.getSelectedIndex();
-	  if (newIndex != currentIndex) {
-	    String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
-	    try {
-	      firePropertyChangingEvent(newValue);
-	      firePropertyChangedEvent(newValue);
-	      currentIndex = newIndex;
-	    } catch (PropertyValueVetoException pvve) {
-	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
-	      inputField.setSelectedIndex(currentIndex);
-	    } 
-	  }
-	}
+  public void itemStateChanged(ItemEvent e) {
+    int newIndex = inputField.getSelectedIndex();
+    if (newIndex != currentIndex) {
+      String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
+      try {
+        firePropertyChangingEvent(newValue);
+        firePropertyChangedEvent(newValue);
+        currentIndex = newIndex;
+      } catch (PropertyValueVetoException pvve) {
+        manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
+        inputField.setSelectedIndex(currentIndex);
+      }
+    }
+  }
       });
 
     return jcb;
   }
-  
+
   /**
    * Updates the combo box with the new value(s).
    */
@@ -151,20 +151,20 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     String currentItem;
     for (int i=0; tokens.hasMoreTokens(); i++) {
       currentItem = tokens.nextToken();
-      
+
       String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
       if (itemLabel.equals(""))
-	itemLabel = currentItem.toString();
-      
+  itemLabel = currentItem.toString();
+
       String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
       if (itemValue.equals(""))
-	itemValue = currentItem.toString();
-      
+  itemValue = currentItem.toString();
+
       if (itemValue.equals(originalValue)) {
-	originalIndex=i;
+  originalIndex=i;
       }
       if (itemValue.equals(currentValue)) {
-	currentIndex=i;
+  currentIndex=i;
       }
       items.add(itemLabel);
       labelToValueMap.put(itemLabel, itemValue);
@@ -182,11 +182,11 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   public JButton createAddButton() {
     JButton returnValue = new JButton("Add");
     returnValue.addActionListener(new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  addNewEntry();
-	}
+  public void actionPerformed(ActionEvent e) {
+    addNewEntry();
+  }
       });
-    
+
     return returnValue;
   }
 
@@ -195,13 +195,11 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    */
   public void addNewEntry() {
     String editedProperty = manager.getProperty(editorTemplate + ".allowedValues", "");
-    Vector v = new Vector();
-    v.add(editedProperty);
-    manager.getFactory().showNewEditorWindow("Add property", v, v, manager);
+    manager.getFactory().showNewEditorWindow("Add property", editedProperty, editedProperty, manager);
   }
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI
-  
+
   /**
    * This writes the currently configured value in the PropertyEditorUI
    * to the source VariableBundle.
@@ -211,34 +209,34 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     String currentValue = (String)labelToValueMap.get(inputField.getSelectedItem());
     try {
       if (newIndex != currentIndex) {
-	firePropertyChangingEvent(currentValue);
-	firePropertyChangedEvent(currentValue);
-	currentIndex = newIndex;
+  firePropertyChangingEvent(currentValue);
+  firePropertyChangedEvent(currentValue);
+  currentIndex = newIndex;
       }
-      
-      if (isEnabled() && isChanged()) { 
-	manager.setProperty(property, currentValue);
+
+      if (isEnabled() && isChanged()) {
+  manager.setProperty(property, currentValue);
       }
     } catch (PropertyValueVetoException pvve) {
       manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());
       inputField.setSelectedIndex(currentIndex);
-    } 
+    }
   }
-  
+
   /**
-   * Returns the current values of the edited properties as a 
+   * Returns the current values of the edited properties as a
    * java.util.Properties object.
    */
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
-    
+
     retProps.setProperty(property, (String)labelToValueMap.get(inputField.getSelectedItem()));
-    
+
     return retProps;
   }
-  
+
   /**
-   * This resets the editor to the original (or latest set, if setValue() 
+   * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() {
@@ -247,7 +245,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
     inputField.setSelectedIndex(originalIndex);
   }
-  
+
   /**
    * Returns whether or not the current list selection has changed from
    * the last save.
@@ -255,13 +253,13 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   public boolean isChanged() {
     if (mOriginalValue == null)
       return (mOriginalValue != (String)labelToValueMap.get(inputField.getSelectedItem()));
-    else 
+    else
       return (! mOriginalValue.equals((String)labelToValueMap.get(inputField.getSelectedItem())));
 
   }
-  
+
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled 
+   * Sets the enabled property of the PropertyEditorUI.  Disabled
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {
@@ -280,13 +278,13 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    * values list also is updated.
    */
   public class ListEditorListener extends PropertyEditorAdapter {
-    
+
     /**
      * Called after a property changes.
      */
     public void propertyChanged(PropertyEditorUI ui, String property, String newValue) {
       updateComboBox(newValue);
     }
-    
+
   }
 }

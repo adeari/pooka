@@ -20,7 +20,7 @@ import java.awt.*;
  * Frames, also.
  */
 public class PookaPreviewPaneUIFactory extends SwingUIFactory {
-   
+
   PreviewContentPanel contentPanel = null;
 
   /**
@@ -28,28 +28,28 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
    */
   public PookaPreviewPaneUIFactory(PookaUIFactory pSource) {
     if (pSource != null) {
-      editorFactory = new PropertyEditorFactory(Pooka.getResources(), pSource.getIconManager());
+      editorFactory = new PropertyEditorFactory(Pooka.getResources(), pSource.getIconManager(), Pooka.getPookaManager().getHelpBroker());
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mIconManager = pSource.getIconManager();
       mMessageNotificationManager = pSource.getMessageNotificationManager();
     } else {
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mIconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
-      editorFactory = new PropertyEditorFactory(Pooka.getResources(), mIconManager);
+      editorFactory = new PropertyEditorFactory(Pooka.getResources(), mIconManager, Pooka.getPookaManager().getHelpBroker());
       mMessageNotificationManager = new MessageNotificationManager();
 
     }
   }
-  
+
   /**
    * Constructor.
    */
   public PookaPreviewPaneUIFactory() {
     this(null);
   }
-  
+
   /**
-   * Creates an appropriate MessageUI object for the given MessageProxy, 
+   * Creates an appropriate MessageUI object for the given MessageProxy,
    * using the provided MessageUI as a guideline.
    *
    * Note that this implementation ignores the mui component.
@@ -58,19 +58,19 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     // each MessageProxy can have exactly one MessageUI.
     if (mp.getMessageUI() != null)
       return mp.getMessageUI();
-    
+
     MessageUI mui;
     if (mp instanceof NewMessageProxy) {
       mui = new NewMessageFrame((NewMessageProxy) mp);
     } else
       mui = new ReadMessageFrame(mp);
-    
+
     mp.setMessageUI(mui);
 
     applyNewWindowLocation((JFrame)mui);
     return mui;
   }
-  
+
   /**
    * Opens the given MessageProxy in the default manner for this UI.
    * Usually this will just be callen createMessageUI() and openMessageUI()
@@ -97,16 +97,16 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
    */
   public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
     // a FolderInfo can only have one FolderDisplayUI.
-    
+
     if (fi.getFolderDisplayUI() != null)
       return fi.getFolderDisplayUI();
 
     PreviewFolderPanel fw = new PreviewFolderPanel(contentPanel, fi);
     contentPanel.addPreviewPanel(fw, fi.getFolderID());
     return fw;
-    
+
   }
-  
+
   /**
    * Creates a JPanel which will be used to show messages and folders.
    *
@@ -115,10 +115,10 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   public ContentPanel createContentPanel() {
     contentPanel = new PreviewContentPanel();
     contentPanel.setSize(1000,1000);
-	
+
     return contentPanel;
   }
-  
+
   /**
    * Creates a JPanel which will be used to show messages and folders.
    *
@@ -128,10 +128,10 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   public ContentPanel createContentPanel(MessagePanel mp) {
     contentPanel = new PreviewContentPanel(mp);
     contentPanel.setSize(1000,1000);
-    
+
     return contentPanel;
   }
-  
+
   /**
    * Shows an Editor Window with the given title, which allows the user
    * to edit the values in the properties Vector.  The given properties
@@ -139,18 +139,18 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
    * Note that there should be an entry in the templates Vector for
    * each entry in the properties Vector.
    */
-  public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
-    JDialog jd = (JDialog)getEditorFactory().createEditorWindow(title, properties, templates);
+  public void showEditorWindow(String title, String property, String template) {
+    JDialog jd = (JDialog)getEditorFactory().createEditorWindow(title, property, template);
     jd.pack();
     applyNewWindowLocation(jd);
     jd.setVisible(true);
   }
-  
+
   /**
    * This shows an Confirm Dialog window.  We include this so that
    * the MessageProxy can call the method without caring abou the
    * actual implementation of the Dialog.
-   */    
+   */
   public int showConfirmDialog(String messageText, String title, int type) {
     String displayMessage = formatMessage(messageText);
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
@@ -162,7 +162,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fDisplayMessage, fTitle, fType));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -174,7 +174,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
 
     return fResponseWrapper.getInt();
   }
-  
+
 
   /**
    * Shows a Confirm dialog with the given Object[] as the Message.
@@ -189,7 +189,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fMessageComponents, fTitle, fType));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -201,7 +201,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
 
     return fResponseWrapper.getInt();
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -219,10 +219,10 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
         });
     } else
       System.out.println(errorMessage);
-    
-    
+
+
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -231,7 +231,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   public void showError(String errorMessage) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"));
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -240,7 +240,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   public void showError(String errorMessage, Exception e) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring about the
@@ -258,19 +258,19 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
         });
     } else
       System.out.println(errorMessage);
-    
+
     //e.printStackTrace();
   }
-  
+
   /**
    * This formats a display message.
    */
   public String formatMessage(String message) {
     return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
   }
-  
+
   /**
-   * This shows an Input window.  We include this so that the 
+   * This shows an Input window.  We include this so that the
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
@@ -284,7 +284,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -293,12 +293,12 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     } else {
       runMe.run();
     }
-    
+
     return fResponseWrapper.getString();
   }
-  
+
   /**
-   * This shows an Input window.  We include this so that the 
+   * This shows an Input window.  We include this so that the
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
@@ -312,7 +312,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -321,11 +321,11 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     } else {
       runMe.run();
     }
-    
+
     return fResponseWrapper.getString();
 
   }
-  
+
   /**
    * Shows a message.
    */
@@ -345,7 +345,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
           //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
           //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
           //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
-	  
+
           JOptionPane.showMessageDialog(contentPanel.getUIComponent(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
           //JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
         }
@@ -361,14 +361,14 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     }
 
   }
-  
+
   /**
    * Creates a ProgressDialog using the given values.
    */
   public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
     return new ProgressDialogImpl(min, max, initialValue, title, content);
   }
- 
+
   /**
    * Shows an Address Selection form for the given AddressEntryTextArea.
    */
@@ -406,13 +406,13 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
       firstPlacement = false;
     }
     GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    
+
     Rectangle bounds = conf.getBounds();
-    
+
     int baseDelta = 20;
-    
+
     Dimension componentSize = f.getSize();
-    
+
     int currentX = lastX + baseDelta;
     int currentY = lastY + baseDelta;
     if (currentX + componentSize.width > bounds.x + bounds.width) {
@@ -425,7 +425,7 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
 
     lastX = currentX;
     lastY = currentY;
-    
+
     return new Point(currentX, currentY);
   }
 

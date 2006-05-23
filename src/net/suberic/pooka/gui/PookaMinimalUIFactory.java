@@ -16,7 +16,7 @@ import java.util.*;
  * is started up just to send an email.
  */
 public class PookaMinimalUIFactory implements PookaUIFactory {
-   
+
   PropertyEditorFactory mEditorFactory = null;
   ThemeManager mThemeManager = null;
   MessageNotificationManager mMessageNotificationManager;
@@ -31,8 +31,8 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   StatusDisplay mStatusPanel = null;
 
   WindowAdapter mWindowAdapter = null;
-  
-  
+
+
   /**
    * Constructor.
    */
@@ -50,24 +50,24 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       };
 
     if (pSource != null) {
-      mEditorFactory = new PropertyEditorFactory(Pooka.getResources(), pSource.getIconManager());
+      mEditorFactory = new PropertyEditorFactory(Pooka.getResources(), pSource.getIconManager(), Pooka.getPookaManager().getHelpBroker());
       mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mMessageNotificationManager = pSource.getMessageNotificationManager();
       mMessageNotificationManager.setMainPanel(null);
     } else {
       mThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mMessageNotificationManager = new MessageNotificationManager();
-      mEditorFactory = new PropertyEditorFactory(Pooka.getResources(), mIconManager);
+      mEditorFactory = new PropertyEditorFactory(Pooka.getResources(), mIconManager, Pooka.getPookaManager().getHelpBroker());
     }
   }
-  
+
   /**
    * Constructor.
    */
   public PookaMinimalUIFactory() {
     this(null);
   }
-  
+
   /**
    * Returns the ThemeManager for fonts and colors.
    */
@@ -83,7 +83,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   }
 
   /**
-   * Creates an appropriate MessageUI object for the given MessageProxy, 
+   * Creates an appropriate MessageUI object for the given MessageProxy,
    * using the provided MessageUI as a guideline.
    *
    * Note that this implementation ignores the templateMui component.
@@ -92,7 +92,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     // each MessageProxy can have exactly one MessageUI.
     if (mp.getMessageUI() != null)
       return mp.getMessageUI();
-    
+
     MessageUI mui;
     if (mp instanceof NewMessageProxy) {
       NewMessageFrame nmf = new NewMessageFrame((NewMessageProxy) mp);
@@ -101,18 +101,18 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       mui = nmf;
     } else
       mui = new ReadMessageFrame(mp);
-    
+
     mp.setMessageUI(mui);
 
     //applyNewWindowLocation((JFrame)mui);
-    if (templateMui != null && templateMui instanceof JComponent) 
+    if (templateMui != null && templateMui instanceof JComponent)
       applyNewWindowLocation((JFrame)mui, (JComponent)templateMui);
     else
       applyNewWindowLocation((JFrame)mui, null);
 
     return mui;
   }
-  
+
   /**
    * Unregisters listeners for this Factory.  Should be called if this
    * ceases to be the active UIFactory.
@@ -144,7 +144,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
     return null;
   }
-  
+
   /**
    * Creates a JPanel which will be used to show messages and folders.
    *
@@ -153,7 +153,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public ContentPanel createContentPanel() {
     return null;
   }
-  
+
   /**
    * Shows an Editor Window with the given title, which allows the user
    * to edit the values in the properties Vector.  The given properties
@@ -161,8 +161,8 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    * Note that there should be an entry in the templates Vector for
    * each entry in the properties Vector.
    */
-  public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
-    JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, properties, templates);
+  public void showEditorWindow(String title, String property, String  template) {
+    JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, property, template);
     jf.pack();
     Component currentFocusedComponent = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     if (currentFocusedComponent != null && currentFocusedComponent instanceof JComponent) {
@@ -172,43 +172,20 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     }
     jf.setVisible(true);
   }
-  
-  /**
-   * Shows an Editor Window with the given title, which allows the user
-   * to edit the values in the properties Vector.
-   */
-  public void showEditorWindow(String title, java.util.Vector properties) {
-    showEditorWindow(title, properties, properties);
-  }
-  
+
   /**
    * Shows an Editor Window with the given title, which allows the user
    * to edit the given property.
    */
   public void showEditorWindow(String title, String property) {
-    java.util.Vector v = new java.util.Vector();
-    v.add(property);
-    showEditorWindow(title, v, v);
+    showEditorWindow(title, property, property);
   }
 
-  /**
-   * Shows an Editor Window with the given title, which allows the user
-   * to edit the given property, which is in turn defined by the 
-   * given template.
-   */
-  public void showEditorWindow(String title, String property, String template) {
-    java.util.Vector prop = new java.util.Vector();
-    prop.add(property);
-    java.util.Vector templ = new java.util.Vector();
-    templ.add(template);
-    showEditorWindow(title, prop, templ);
-  }
-  
   /**
    * This shows an Confirm Dialog window.  We include this so that
    * the MessageProxy can call the method without caring abou the
    * actual implementation of the Dialog.
-   */    
+   */
   public int showConfirmDialog(String messageText, String title, int type) {
     String displayMessage = formatMessage(messageText);
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
@@ -220,7 +197,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
           fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fDisplayMessage, fTitle, fType));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -232,7 +209,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
     return fResponseWrapper.getInt();
   }
-  
+
 
   /**
    * Shows a Confirm dialog with the given Object[] as the Message.
@@ -247,7 +224,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
           fResponseWrapper.setInt(JOptionPane.showConfirmDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fMessageComponents, fTitle, fType));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -259,7 +236,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
 
     return fResponseWrapper.getInt();
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -277,10 +254,10 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
         });
     } else
       System.out.println(errorMessage);
-    
-    
+
+
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -289,7 +266,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public void showError(String errorMessage) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"));
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring abou the
@@ -298,7 +275,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public void showError(String errorMessage, Exception e) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
   }
-  
+
   /**
    * This shows an Error Message window.  We include this so that
    * the MessageProxy can call the method without caring about the
@@ -316,19 +293,19 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
         });
     } else
       System.out.println(errorMessage);
-    
+
     //e.printStackTrace();
   }
-  
+
   /**
    * This formats a display message.
    */
   public String formatMessage(String message) {
     return net.suberic.pooka.MailUtilities.wrapText(message, mMaxErrorLine, "\r\n", 5);
   }
-  
+
   /**
-   * This shows an Input window.  We include this so that the 
+   * This shows an Input window.  We include this so that the
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
@@ -342,7 +319,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
           fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -351,12 +328,12 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     } else {
       runMe.run();
     }
-    
+
     return fResponseWrapper.getString();
   }
-  
+
   /**
-   * This shows an Input window.  We include this so that the 
+   * This shows an Input window.  We include this so that the
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
@@ -370,7 +347,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
           fResponseWrapper.setString(JOptionPane.showInputDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -379,18 +356,18 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     } else {
       runMe.run();
     }
-    
+
     return fResponseWrapper.getString();
 
   }
-  
+
   /**
    * Returns the PropertyEditorFactory used by this component.
    */
   public PropertyEditorFactory getEditorFactory() {
     return mEditorFactory;
   }
-  
+
   /**
    * Shows a message.
    */
@@ -404,7 +381,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
           java.awt.Dimension dpSize = displayPanel.getPreferredSize();
           JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
           scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
-	  
+
           JOptionPane.showMessageDialog(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
         }
       };
@@ -419,7 +396,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     }
 
   }
-  
+
   /**
    * Shows a status message.
    */
@@ -448,9 +425,9 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       runMe.run();
     else
       SwingUtilities.invokeLater(runMe);
-    
+
   }
-  
+
   /**
    * Creates a ProgressDialog using the given values.
    */
@@ -485,7 +462,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders, java.util.Vector allowedValues) {
   }
-  
+
   /**
    * Shows a SearchForm with the given FolderInfos selected.  The allowed
    * values will be the list of all available Folders.
@@ -495,7 +472,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public void showSearchForm(net.suberic.pooka.FolderInfo[] selectedFolders) {
     showSearchForm(selectedFolders, null);
   }
- 
+
   /**
    * Shows an Address Selection form for the given AddressEntryTextArea.
    */
@@ -540,23 +517,23 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     Window current = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusedWindow();
     if (current != null && current instanceof JFrame) {
       return (JFrame) current;
-    } 
-    
+    }
+
     // if we haven't gotten one yet...
     if (mNewMessages.size() > 0) {
       Object first = mNewMessages.get(0);
       if (first instanceof JFrame)
         return (JFrame) first;
     }
-    
+
     return null;
   }
-  
+
   /**
    * A window which shows status messages.
    */
   class StatusDisplay extends JDialog {
-    
+
     // the display area.
     JLabel mDisplayLabel = null;
 
@@ -574,7 +551,7 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       displayPanel.add(mDisplayLabel);
       this.getContentPane().add(displayPanel);
     }
-    
+
     /**
      * Shows a status message.
      */
@@ -587,14 +564,14 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
             mDisplayLabel.repaint();
           }
         };
-  
+
       if (SwingUtilities.isEventDispatchThread()) {
         runMe.run();
       } else {
         SwingUtilities.invokeLater(runMe);
       }
     }
-    
+
     /**
      * Clears the status panel.
      */

@@ -18,7 +18,7 @@ import javax.mail.MessagingException;
  * objects on a JDesktopPane.
  */
 public class PookaDesktopPaneUIFactory extends SwingUIFactory {
-  
+
   MessagePanel messagePanel = null;
 
   /**
@@ -26,18 +26,18 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    */
   public PookaDesktopPaneUIFactory(PookaUIFactory pSource) {
     if (pSource != null) {
-      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), pSource.getIconManager());
+      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), pSource.getIconManager(), Pooka.getPookaManager().getHelpBroker());
       pookaThemeManager = pSource.getPookaThemeManager();
       mIconManager = pSource.getIconManager();
       mMessageNotificationManager = pSource.getMessageNotificationManager();
     } else {
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mIconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
-      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), mIconManager);
+      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), mIconManager, Pooka.getPookaManager().getHelpBroker());
       mMessageNotificationManager = new MessageNotificationManager();
     }
   }
-  
+
   /**
    * Constructor.
    */
@@ -46,14 +46,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
   }
 
   /**
-   * Creates an appropriate MessageUI object for the given MessageProxy, 
+   * Creates an appropriate MessageUI object for the given MessageProxy,
    * using the provided MessageUI as a guideline.
    */
   public MessageUI createMessageUI(MessageProxy mp, MessageUI templateMui) throws javax.mail.MessagingException {
     // each MessageProxy can have exactly one MessageUI.
     if (mp.getMessageUI() != null)
       return mp.getMessageUI();
-    
+
     boolean createExternal = (templateMui != null && templateMui instanceof MessageFrame);
 
     MessageUI mui;
@@ -70,11 +70,11 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
         ((ReadMessageInternalFrame)mui).configureMessageInternalFrame();
       }
     }
-    
+
     mp.setMessageUI(mui);
     return mui;
   }
-  
+
   /**
    * Opens the given MessageProxy in the default manner for this UI.
    * Usually this will just be callen createMessageUI() and openMessageUI()
@@ -94,14 +94,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    */
   public FolderDisplayUI createFolderDisplayUI(net.suberic.pooka.FolderInfo fi) {
     // a FolderInfo can only have one FolderDisplayUI.
-    
+
     if (fi.getFolderDisplayUI() != null)
       return fi.getFolderDisplayUI();
-    
+
     FolderDisplayUI fw = new FolderInternalFrame(fi, getMessagePanel());
     return fw;
   }
-  
+
   /**
    * Shows an Editor Window with the given title, which allows the user
    * to edit the values in the properties Vector.  The given properties
@@ -109,11 +109,11 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    * Note that there should be an entry in the templates Vector for
    * each entry in the properties Vector.
    */
-  public void showEditorWindow(String title, java.util.Vector properties, java.util.Vector templates) {
-    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, properties, templates);
+  public void showEditorWindow(String title, String property, String template) {
+    JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, property, template);
     getMessagePanel().add(jif);
     jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
-    
+
     jif.setVisible(true);
 
     try {
@@ -121,7 +121,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     } catch (java.beans.PropertyVetoException pve) {
     }
   }
-  
+
   /**
    * Creates a JPanel which will be used to show messages and folders.
    *
@@ -133,11 +133,11 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
     messagePanel.setUIComponent(messageScrollPane);
-    
+
     ((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
     return messagePanel;
   }
-  
+
   /**
    * Creates a JPanel which will be used to show messages and folders.
    *
@@ -149,18 +149,18 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     JScrollPane messageScrollPane = new JScrollPane(messagePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
     messagePanel.setUIComponent(messageScrollPane);
-    
+
     ((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
     return messagePanel;
   }
-  
+
   /**
    * Returns the MessagePanel associated with this Factory.
    */
   public MessagePanel getMessagePanel() {
     return messagePanel;
   }
-  
+
   /**
    * Shows a Confirm dialog.
    */
@@ -175,7 +175,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fDisplayMessage, fTitle, fType));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -187,7 +187,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
 
     return fResponseWrapper.getInt();
   }
-  
+
   /**
    * Shows a Confirm dialog with the given Object[] as the Message.
    */
@@ -201,7 +201,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fMessageComponents, fTitle, fType));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -213,7 +213,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
 
     return fResponseWrapper.getInt();
   }
-  
+
   /**
    * This shows an Error Message window.
    */
@@ -229,23 +229,23 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
         });
     } else
       System.out.println(errorMessage);
-    
+
   }
-  
+
   /**
-   * This shows an Error Message window.  
+   * This shows an Error Message window.
    */
   public void showError(String errorMessage) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"));
   }
-  
+
   /**
-   * This shows an Error Message window.  
+   * This shows an Error Message window.
    */
   public void showError(String errorMessage, Exception e) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
   }
-  
+
   /**
    * This shows an Error Message window.
    */
@@ -264,7 +264,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
 
     //e.printStackTrace();
   }
-  
+
   /**
    * This formats a display message.
    */
@@ -285,7 +285,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -294,12 +294,12 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     } else {
       runMe.run();
     }
-    
+
     return fResponseWrapper.getString();
   }
-  
+
   /**
-   * This shows an Input window.  We include this so that the 
+   * This shows an Input window.  We include this so that the
    * MessageProxy can call the method without caring about the actual
    * implementation of the dialog.
    */
@@ -313,7 +313,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
           fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -322,10 +322,10 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     } else {
       runMe.run();
     }
-    
+
     return fResponseWrapper.getString();
   }
-  
+
   /**
    * Shows a message.
    */
@@ -352,7 +352,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
           //JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
         }
       };
-    
+
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
         SwingUtilities.invokeAndWait(runMe);
@@ -362,7 +362,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
       runMe.run();
     }
   }
-  
+
   /**
    * Creates a ProgressDialog using the given values.
    */

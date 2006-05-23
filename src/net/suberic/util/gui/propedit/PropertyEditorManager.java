@@ -22,6 +22,7 @@ public class PropertyEditorManager {
   protected Properties localProps = new Properties();
 
   protected IconManager iconManager;
+
   /**
    * Creates a new PropertyEditorManager.
    */
@@ -29,8 +30,8 @@ public class PropertyEditorManager {
   }
 
   /**
-   * Creates a PropertyEditorManager using the given VariableBundle and
-   * PropertyEditorFactory.
+   * Creates a PropertyEditorManager using the given VariableBundle,
+   * PropertyEditorFactory, and IconManager.
    */
   public PropertyEditorManager(VariableBundle vb, PropertyEditorFactory factory, IconManager manager) {
     sourceBundle = vb;
@@ -67,14 +68,14 @@ public class PropertyEditorManager {
   public PropertyEditorFactory getFactory() {
     return propertyFactory;
   }
-  
+
   /**
    * Gets the IconManager for this PropertyEditorManager.
    */
   public IconManager getIconManager() {
     return iconManager;
   }
-  
+
   /**
    * Gets the value of the given property.
    */
@@ -117,7 +118,7 @@ public class PropertyEditorManager {
    * Removes the given property.
    */
   public void removeProperty(String property) {
-    if (writeChanges) 
+    if (writeChanges)
       sourceBundle.removeProperty(property);
   }
 
@@ -125,23 +126,15 @@ public class PropertyEditorManager {
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using this PropertyEditorManager.
    */
-  public PropertyEditorUI createEditor(String property, String editorTemplate) {  
+  public PropertyEditorUI createEditor(String property, String editorTemplate) {
     return getFactory().createEditor(property, editorTemplate, this);
   }
-  
-  /**
-   * Creates an appropriate PropertyEditorUI for the given properties and
-   * editorTemplates, using this PropertyEditorManager.
-   */
-  public PropertyEditorUI createEditor(List properties, List editorTemplates) {  
-    return getFactory().createEditor(properties, editorTemplates, this);
-  }
-  
+
   /**
    * Commits the changes to the underlying VariableBundle.
    */
   public void commit() {
-    if (writeChanges) 
+    if (writeChanges)
       sourceBundle.saveProperties();
   }
 
@@ -165,7 +158,7 @@ public class PropertyEditorManager {
   }
 
   /**
-   * Creates an appropriate PropertyEditorListener from the given 
+   * Creates an appropriate PropertyEditorListener from the given
    * String.
    */
   public PropertyEditorListener createListener(String key) {
@@ -183,7 +176,7 @@ public class PropertyEditorManager {
 
   /**
    * Sets whether or not this PEM should write its changes to the source
-   * VariableBundle.  
+   * VariableBundle.
    */
   public void setWriteChanges(boolean newValue) {
     writeChanges = newValue;

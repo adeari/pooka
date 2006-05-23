@@ -7,6 +7,7 @@ import java.awt.Container;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Dialog;
+import javax.help.HelpBroker;
 
 /**
  * A factory which can be used to create PropertyEditorUI's.
@@ -23,6 +24,9 @@ public class PropertyEditorFactory {
   // the IconManager used for PropertyEditors that use icons.
   IconManager iconManager;
 
+  // the HelpBroker
+  HelpBroker helpBroker;
+
   // the propertyType to className mapping
   Map typeToClassMap = new HashMap();
 
@@ -30,9 +34,10 @@ public class PropertyEditorFactory {
    * Creates a PropertyEditorFactory using the given VariableBundle as
    * a source.
    */
-  public PropertyEditorFactory(VariableBundle bundle, IconManager manager) {
+  public PropertyEditorFactory(VariableBundle bundle, IconManager manager, HelpBroker broker) {
     sourceBundle = bundle;
     iconManager = manager;
+    helpBroker = broker;
     createTypeToClassMap();
   }
 
@@ -80,29 +85,29 @@ public class PropertyEditorFactory {
   /**
    * Creates and displays an editor window.
    */
-  public void showNewEditorWindow(String title, List properties) {
-    showNewEditorWindow(title, properties, properties);
+  public void showNewEditorWindow(String title, String property) {
+    showNewEditorWindow(title, property, property);
   }
 
   /**
    * Creates and displays an editor window.
    */
-  public void showNewEditorWindow(String title, List properties, List templates) {
-    showNewEditorWindow(title, properties, templates, null);
+  public void showNewEditorWindow(String title, String property, String template) {
+    showNewEditorWindow(title, property, template, null);
   }
 
   /**
    * Creates and displays an editor window.
    */
-  public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
-    showNewEditorWindow(title, properties, templates, mgr, null);
+  public void showNewEditorWindow(String title, String property, String template, PropertyEditorManager mgr) {
+    showNewEditorWindow(title, property, template, mgr, null);
   }
 
   /**
    * Creates and displays an editor window.
    */
-  public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
-    JDialog jd = (JDialog) createEditorWindow(title, properties, templates, mgr, window);
+  public void showNewEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
+    JDialog jd = (JDialog) createEditorWindow(title, property, template, mgr, window);
     jd.setVisible(true);
   }
 
@@ -133,39 +138,39 @@ public class PropertyEditorFactory {
   /**
    * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
-   * properties List.  The title string is the title of the
+   * property List.  The title string is the title of the
    * JInternalFrame.
    */
-  public Container createEditorWindow(String title, List properties) {
-    return createEditorWindow(title, properties, properties, new PropertyEditorManager(sourceBundle, this, iconManager));
+  public Container createEditorWindow(String title, String property) {
+    return createEditorWindow(title, property, property, new PropertyEditorManager(sourceBundle, this, iconManager));
   }
 
   /**
    * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
-   * properties List.  The title string is the title of the
+   * property List.  The title string is the title of the
    * JDialog.
    */
-  public Container createEditorWindow(String title, List properties, List templates ) {
-    return createEditorWindow(title, properties, templates, new PropertyEditorManager(sourceBundle, this, iconManager));
+  public Container createEditorWindow(String title, String property, String template ) {
+    return createEditorWindow(title, property, template, new PropertyEditorManager(sourceBundle, this, iconManager));
   }
 
   /**
    * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
-   * properties Vector.  The title string is the title of the
+   * property Vector.  The title string is the title of the
    * JInternalFrame.
    */
-  public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr) {
-    return createEditorWindow(title, properties, templates, mgr, null);
+  public Container createEditorWindow(String title, String property, String template, PropertyEditorManager mgr) {
+    return createEditorWindow(title, property, template, mgr, null);
   }
   /**
    * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
-   * properties Vector.  The title string is the title of the
+   * property Vector.  The title string is the title of the
    * JInternalFrame.
    */
-  public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
+  public Container createEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
     JDialog jd = null;
     if (window instanceof Dialog) {
       jd = new JDialog((Dialog) window, title, true);
@@ -176,7 +181,7 @@ public class PropertyEditorFactory {
       jd.setTitle(title);
       jd.setModal(true);
     }
-    jd.getContentPane().add(new PropertyEditorPane(mgr, properties, templates, jd));
+    jd.getContentPane().add(new PropertyEditorPane(mgr, (SwingPropertyEditor)createEditor(property, template, mgr), jd));
     return jd;
   }
 
@@ -223,25 +228,24 @@ public class PropertyEditorFactory {
   }
 
   /**
-   * Creates an appropriate PropertyEditorUI for the given property and
-   * editorTemplate, using the given PropertyEditorManager.
-   */
-  public PropertyEditorUI createEditor(List properties, List editorTemplates, PropertyEditorManager mgr) {
-    return new CompositeEditorPane(properties, editorTemplates, mgr);
-  }
-
-  /**
    * Gets the source bundle for this factory.
    */
   public VariableBundle getSourceBundle() {
     return sourceBundle;
   }
 
-  /** 
+  /**
    * Gets the IconManager for this factory.
    */
   public IconManager getIconManager() {
     return iconManager;
+  }
+
+  /**
+   * Returns the HelpBroker for this PropertyEditorManager.
+   */
+  public HelpBroker getHelpBroker() {
+    return helpBroker;
   }
 }
 

@@ -14,60 +14,37 @@ public class PropertyEditorPane extends JPanel {
   Container container;
 
   /**
-   * This contructor creates a PropertyEditor for the list of 
-   * properties in the properties List.
-   */     
-  public PropertyEditorPane(PropertyEditorManager newManager, 
-                            List properties, 
-                            Container newContainer) {
-    this(newManager, properties, properties, newContainer);
-  }
-
-  /**
-   * This contructor creates a PropertyEditor for the list of 
-   * properties in the properties List, using the template
-   * types in the templates List.  Note that there should be
-   * one entry in each of the properties List and the templates
-   * List for each property to be edited.
-   */     
-  public PropertyEditorPane(PropertyEditorManager newManager, 
-                            List properties, List templates,
-                            Container newContainer) {
-    this(newManager, (SwingPropertyEditor) newManager.createEditor(properties, templates), newContainer);
-  }
-  
-  /**
-   * This contructor creates a PropertyEditor using the given 
+   * This contructor creates a PropertyEditor using the given
    * SwingPropertyEditor.
-   */     
-  public PropertyEditorPane(PropertyEditorManager newManager, 
+   */
+  public PropertyEditorPane(PropertyEditorManager newManager,
                             SwingPropertyEditor newEditor,
                             Container newContainer) {
     manager = newManager;
     container = newContainer;
     editor = newEditor;
-    
+
     Component editorComponent = editor;
 
     if (editor instanceof LabelValuePropertyEditor) {
       JPanel editorPanel = new JPanel();
       SpringLayout editorPanelLayout = new SpringLayout();
       editorPanel.setLayout(editorPanelLayout);
-      
+
       LabelValuePropertyEditor lvEditor = (LabelValuePropertyEditor) editor;
       editorPanel.add(lvEditor.getLabelComponent());
       editorPanel.add(lvEditor.getValueComponent());
-      
+
       editorPanelLayout.putConstraint(SpringLayout.WEST, lvEditor.getLabelComponent(), 5, SpringLayout.WEST, editorPanel);
       editorPanelLayout.putConstraint(SpringLayout.NORTH, lvEditor.getLabelComponent(), 5, SpringLayout.NORTH, editorPanel);
       editorPanelLayout.putConstraint(SpringLayout.SOUTH, lvEditor.getLabelComponent(), -5, SpringLayout.SOUTH, editorPanel);
-      
+
       editorPanelLayout.putConstraint(SpringLayout.WEST, lvEditor.getValueComponent(), 5 ,SpringLayout.EAST, lvEditor.getLabelComponent());
-      
+
       editorPanelLayout.putConstraint(SpringLayout.NORTH, lvEditor.getValueComponent(), 5 ,SpringLayout.NORTH, editorPanel);
       editorPanelLayout.putConstraint(SpringLayout.SOUTH, editorPanel, 5 ,SpringLayout.SOUTH, lvEditor.getValueComponent());
       editorPanelLayout.putConstraint(SpringLayout.EAST, editorPanel, 5 ,SpringLayout.EAST, lvEditor.getValueComponent());
-      
+
       editorComponent = editorPanel;
     }
 
@@ -81,7 +58,7 @@ public class PropertyEditorPane extends JPanel {
    * Does the layout for the PropertyEditorPane.
    */
   private void pepLayout(Component editorPanel, Component buttonPanel) {
-    
+
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
 
@@ -91,10 +68,10 @@ public class PropertyEditorPane extends JPanel {
     layout.putConstraint(SpringLayout.NORTH, editorPanel, 5, SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, editorPanel);
     layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, editorPanel);
-    
+
     this.add(buttonPanel);
     layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.SOUTH, editorPanel);
-    
+
     layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.WEST, this);
     layout.putConstraint(SpringLayout.EAST, buttonPanel, -5, SpringLayout.EAST, this);
     layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, buttonPanel);
@@ -108,33 +85,33 @@ public class PropertyEditorPane extends JPanel {
   public void setValue() throws PropertyValueVetoException {
     editor.setValue();
   }
- 
+
   /**
    * Gets the currently selected values for the edited properties.
    */
   public java.util.Properties getValue() {
     return editor.getValue();
   }
-  
+
   /**
    * Resets the original values for the edited properties.
    */
   public void resetDefaultValue() throws PropertyValueVetoException {
     editor.resetDefaultValue();
   }
-  
+
   /**
    * Creates the appropriate buttons (Ok, Accept, Cancel) to this component.
    */
   public JPanel createButtonPanel() {
     JPanel buttonPanel = new JPanel();
-    
+
     buttonPanel.add(createButton("Help", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           System.err.println("showing help for " + editor.getHelpID());
         }
       }, true));
-    
+
     buttonPanel.add(createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
@@ -155,7 +132,7 @@ public class PropertyEditorPane extends JPanel {
           }
         }
       }, true));
-    
+
     buttonPanel.add(createButton("Apply", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
@@ -166,7 +143,7 @@ public class PropertyEditorPane extends JPanel {
           }
         }
       }, false));
-    
+
     buttonPanel.add(createButton("Cancel", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (container instanceof JInternalFrame) {
@@ -184,13 +161,13 @@ public class PropertyEditorPane extends JPanel {
 
     return buttonPanel;
   }
-  
+
   /**
    * Creates the appropriate Button.
    */
   private JButton createButton(String label, Action e, boolean isDefault) {
     JButton thisButton;
-    
+
     thisButton = new JButton(manager.getProperty("label." + label, label));
     String mnemonic = manager.getProperty("label." + label + ".mnemonic", "");
     if (mnemonic.length() > 0) {
@@ -198,17 +175,17 @@ public class PropertyEditorPane extends JPanel {
     }
 
     thisButton.setSelected(isDefault);
-    
+
     thisButton.addActionListener(e);
-    
+
     return thisButton;
   }
-  
+
   /**
    * Returns the Container for this PropertyEditorPane.
    */
   public Container getContainer() {
     return container;
   }
-  
+
 }

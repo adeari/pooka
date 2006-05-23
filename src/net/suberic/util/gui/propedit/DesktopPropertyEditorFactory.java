@@ -5,6 +5,7 @@ import net.suberic.util.gui.IconManager;
 import java.util.*;
 import java.awt.Container;
 import java.awt.Component;
+import javax.help.HelpBroker;
 
 /**
  * A factory which can be used to create PropertyEditorUI's.
@@ -16,8 +17,8 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    * Creates a PropertyEditorFactory using the given VariableBundle as
    * a source.
    */
-  public DesktopPropertyEditorFactory(VariableBundle bundle, JDesktopPane newDesktop, IconManager manager) {
-    super(bundle, manager);
+  public DesktopPropertyEditorFactory(VariableBundle bundle, JDesktopPane newDesktop, IconManager manager, HelpBroker broker) {
+    super(bundle, manager, broker);
     desktop = newDesktop;
   }
 
@@ -25,8 +26,8 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    * Creates a PropertyEditorFactory using the given VariableBundle as
    * a source.
    */
-  public DesktopPropertyEditorFactory(VariableBundle bundle, IconManager manager) {
-    super(bundle, manager);
+  public DesktopPropertyEditorFactory(VariableBundle bundle, IconManager manager, HelpBroker broker) {
+    this(bundle, null, manager, broker);
   }
 
   /**
@@ -35,7 +36,7 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
   public JDesktopPane getDesktop() {
     return desktop;
   }
-  
+
   /**
    * Sets the desktop.
    */
@@ -58,30 +59,19 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
   }
 
   /**
-   * Creates and displays an editor window.  
+   * Creates and displays an editor window.
    */
-  public void showNewEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
-    JInternalFrame jif = (JInternalFrame) createEditorWindow(title, properties, templates, mgr, window);
-    jif.setSize(jif.getPreferredSize());
-    if (window != null && window instanceof JInternalFrame) {
-      jif.setLocation(Math.max(0, ((window.getWidth() - jif.getWidth()) / 2) + window.getX()), Math.max(0, ((window.getHeight() - jif.getHeight()) / 2) + window.getY()));
-    }
-    desktop.add(jif);
-    jif.setVisible(true);
-    jif.setSize(jif.getPreferredSize());
-    try {
-      jif.setSelected(true);
-    } catch (java.beans.PropertyVetoException pve) {
-    }
+  public void showNewEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
+    showNewEditorWindow(title, (SwingPropertyEditor) createEditor(property, template, mgr), window);
   }
 
   /**
-   * Creates and displays an editor window.  
+   * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, PropertyEditorUI editor, Container window) {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
     jif.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jif));
-    
+
     //jif.pack();
     jif.setSize(jif.getPreferredSize());
     if (window != null && window instanceof JInternalFrame) {
@@ -94,28 +84,28 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     } catch (java.beans.PropertyVetoException pve) {
     }
   }
-  
+
   /**
    * This method returns an EditorWindow (a JFrame in this
    * implementation) which has an editor for each property in the
-   * properties Vector.  The title string is the title of the 
+   * properties Vector.  The title string is the title of the
    * JInternalFrame.
    */
-  public Container createEditorWindow(String title, List properties, List templates, PropertyEditorManager mgr, Container window) {
+  public Container createEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
     JInternalFrame jif = new JInternalFrame(title, true, false, false, false);
-    PropertyEditorPane pep = new PropertyEditorPane(mgr, properties, templates, jif);
+    PropertyEditorPane pep = new PropertyEditorPane(mgr, (SwingPropertyEditor) createEditor(property, template, mgr), jif);
     jif.getContentPane().add(pep);
     jif.pack();
     jif.setSize(jif.getPreferredSize());
-    return jif; 
+    return jif;
   }
-  
+
 
 }
 
 
 
-    
+
 
 
 
