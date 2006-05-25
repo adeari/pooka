@@ -106,6 +106,8 @@ public class PropertyEditorPane extends JPanel {
    */
   public JPanel createButtonPanel() {
     JPanel buttonPanel = new JPanel();
+    SpringLayout buttonLayout = new SpringLayout();
+    buttonPanel.setLayout(buttonLayout);
 
     JButton helpButton = createButton("Help", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -118,7 +120,7 @@ public class PropertyEditorPane extends JPanel {
     CSH.setHelpIDString(helpButton, "UserProfile");
     buttonPanel.add(helpButton);
 
-    buttonPanel.add(createButton("Ok", new AbstractAction() {
+    JButton okButton = createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             setValue();
@@ -137,9 +139,9 @@ public class PropertyEditorPane extends JPanel {
             manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
           }
         }
-      }, true));
+      }, true);
 
-    buttonPanel.add(createButton("Apply", new AbstractAction() {
+    JButton applyButton = createButton("Apply", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             setValue();
@@ -148,9 +150,9 @@ public class PropertyEditorPane extends JPanel {
             manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
           }
         }
-      }, false));
+      }, false);
 
-    buttonPanel.add(createButton("Cancel", new AbstractAction() {
+    JButton cancelButton = createButton("Cancel", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (container instanceof JInternalFrame) {
             try {
@@ -163,7 +165,37 @@ public class PropertyEditorPane extends JPanel {
             ((JDialog)container).dispose();
           }
         }
-      }, false));
+      }, false);
+
+    buttonPanel.add(helpButton);
+    buttonPanel.add(cancelButton);
+    buttonPanel.add(applyButton);
+    buttonPanel.add(okButton);
+
+    Spring buttonWidth = Spring.constant(0);
+    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(helpButton).getWidth());
+    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(cancelButton).getWidth());
+    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(applyButton).getWidth());
+    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(okButton).getWidth());
+    
+    buttonLayout.getConstraints(helpButton).setWidth(buttonWidth);
+    buttonLayout.getConstraints(cancelButton).setWidth(buttonWidth);
+    buttonLayout.getConstraints(applyButton).setWidth(buttonWidth);
+    buttonLayout.getConstraints(okButton).setWidth(buttonWidth);
+    
+    buttonLayout.putConstraint(SpringLayout.WEST, helpButton, 5, SpringLayout.WEST, buttonPanel);
+    buttonLayout.putConstraint(SpringLayout.NORTH, helpButton, 5, SpringLayout.NORTH, buttonPanel);
+    buttonLayout.putConstraint(SpringLayout.SOUTH, buttonPanel, 5, SpringLayout.SOUTH, helpButton);
+
+    buttonLayout.putConstraint(SpringLayout.WEST, cancelButton, Spring.constant(5, 5, 32000), SpringLayout.EAST, helpButton);
+    buttonLayout.putConstraint(SpringLayout.NORTH, cancelButton, 5, SpringLayout.NORTH, buttonPanel);
+
+    buttonLayout.putConstraint(SpringLayout.WEST, applyButton, 5, SpringLayout.EAST, cancelButton);
+    buttonLayout.putConstraint(SpringLayout.NORTH, applyButton, 5, SpringLayout.NORTH, buttonPanel);
+
+    buttonLayout.putConstraint(SpringLayout.WEST, okButton, 5, SpringLayout.EAST, applyButton);
+    buttonLayout.putConstraint(SpringLayout.NORTH, okButton, 5, SpringLayout.NORTH, buttonPanel);
+    buttonLayout.putConstraint(SpringLayout.EAST, buttonPanel, 5, SpringLayout.EAST, okButton);
 
     return buttonPanel;
   }

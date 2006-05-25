@@ -1,4 +1,11 @@
 ----- ui update
+  *) fix bottom layout--should be expandable in a composite pane.
+  *) fix window close.
+  *) fix open subeditor on multieditorpane.
+  *) fix composite editor -- centering isn't working correctly when top
+	is singlepanel and bottom is label/value.
+  *) fix value widths--some are expanding, some aren't, some aren't when
+	they should be.
 *) new editor system.
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,
@@ -32,6 +39,7 @@
 	   *) ? select for offline use by folder?
 	   *) option for not caching messages over x kb.
    *) fix layout
+   *) ??? add a boder/top line to the buttons?
 *) make required fields for the gui properties.
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with 

@@ -135,7 +135,8 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
         labelComponents[i] = currentEditor;
       }
     }
-    makeCompactGrid(this, labelComponents, valueComponents, 5, 5, 5, 5);
+    //makeCompactGrid(this, labelComponents, valueComponents, 5, 5, 5, 5);
+    layoutGrid(this, labelComponents, valueComponents, 5, 5, 5, 5);
     manager.registerPropertyEditor(property, this);
   }
 

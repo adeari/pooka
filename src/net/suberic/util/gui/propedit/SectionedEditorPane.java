@@ -94,11 +94,13 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     
     this.add(entryComponent);
 
-    layout.putConstraint(SpringLayout.WEST, entryComponent, 5 ,SpringLayout.EAST, optionScrollPane);
+    // the entry components should handle their offsets themselves, so
+    // put them on the very edges.
+    layout.putConstraint(SpringLayout.WEST, entryComponent, 0 ,SpringLayout.EAST, optionScrollPane);
 
-    layout.putConstraint(SpringLayout.NORTH, entryComponent, 5 ,SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.SOUTH, this, 5 ,SpringLayout.SOUTH, entryComponent);
-    layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, entryComponent);
+    layout.putConstraint(SpringLayout.NORTH, entryComponent, 0 ,SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 0 ,SpringLayout.SOUTH, entryComponent);
+    layout.putConstraint(SpringLayout.EAST, this, 0 ,SpringLayout.EAST, entryComponent);
     
     this.setEnabled(isEnabled);
 
@@ -129,7 +131,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     JList returnValue =  new JList(optionListModel);
     returnValue.setCellRenderer(new SEPCellRenderer());
     return returnValue;
-  }	      
+  }
   
   /**
    * This creates a panel for each option.  It uses a CardLayout.
