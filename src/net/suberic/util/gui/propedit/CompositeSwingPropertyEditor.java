@@ -224,6 +224,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
 	  layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
 	}
 	layout.putConstraint(SpringLayout.NORTH, valueComponents[i], 0, SpringLayout.NORTH, labelComponents[i]);
+	layout.putConstraint(SpringLayout.SOUTH, valueComponents[i], 0, SpringLayout.SOUTH, labelComponents[i]);
 
         layout.getConstraints(labelComponents[i]).setHeight(height);
         layout.getConstraints(valueComponents[i]).setHeight(height);

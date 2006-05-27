@@ -1,5 +1,6 @@
 ----- ui update
   *) fix bottom layout--should be expandable in a composite pane.
+	-- started.  need to limit size of components?
   *) fix window close.
   *) fix open subeditor on multieditorpane.
   *) fix composite editor -- centering isn't working correctly when top
