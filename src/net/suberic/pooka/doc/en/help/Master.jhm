@@ -19,5 +19,5 @@
 	<mapID target="ui.folderPanel" url="pooka/ui/folderpanel.html" />
 	<mapID target="ui.messagePanel" url="pooka/ui/messagepanel.html" />
 	<mapID target="ui.folderWindow" url="pooka/ui/folderwindow.html" />
-	<mapID target="UserProfile" url="pooka/config/UserProfile.html" />
+	<mapID target="UserProfile.editor" url="pooka/config/UserProfile.html" />
 </map>

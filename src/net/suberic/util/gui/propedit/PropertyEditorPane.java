@@ -113,11 +113,14 @@ public class PropertyEditorPane extends JPanel {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           System.err.println("showing help for " + editor.getHelpID());
           //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
-          new CSH.DisplayHelpFromSource(manager.getFactory().getHelpBroker()).actionPerformed(e);
+          //new CSH.DisplayHelpFromSource(manager.getFactory().getHelpBroker()).actionPerformed(e);
+          manager.getFactory().getHelpBroker().setCurrentID(editor.getHelpID());
+          manager.getFactory().getHelpBroker().setDisplayed(true);
+
         }
       }, true);
 
-    CSH.setHelpIDString(helpButton, "UserProfile");
+    //CSH.setHelpIDString(helpButton, "UserProfile");
     buttonPanel.add(helpButton);
 
     JButton okButton = createButton("Ok", new AbstractAction() {
@@ -177,12 +180,12 @@ public class PropertyEditorPane extends JPanel {
     buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(cancelButton).getWidth());
     buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(applyButton).getWidth());
     buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(okButton).getWidth());
-    
+
     buttonLayout.getConstraints(helpButton).setWidth(buttonWidth);
     buttonLayout.getConstraints(cancelButton).setWidth(buttonWidth);
     buttonLayout.getConstraints(applyButton).setWidth(buttonWidth);
     buttonLayout.getConstraints(okButton).setWidth(buttonWidth);
-    
+
     buttonLayout.putConstraint(SpringLayout.WEST, helpButton, 5, SpringLayout.WEST, buttonPanel);
     buttonLayout.putConstraint(SpringLayout.NORTH, helpButton, 5, SpringLayout.NORTH, buttonPanel);
     buttonLayout.putConstraint(SpringLayout.SOUTH, buttonPanel, 5, SpringLayout.SOUTH, helpButton);
