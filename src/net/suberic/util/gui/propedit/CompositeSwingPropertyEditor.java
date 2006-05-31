@@ -158,7 +158,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     try {
       layout = (SpringLayout)parent.getLayout();
     } catch (ClassCastException exc) {
-      System.err.println("The first argument to makeCompactGrid must use SpringLayout.");
+      System.err.println("The first argument to layoutGrid must use SpringLayout.");
       return;
     }
 

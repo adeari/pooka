@@ -289,7 +289,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       String valueToEdit = (String) optionTable.getValueAt(selectedRow, 0);
       String editProperty = property + "." + valueToEdit;
       getLogger().fine("editing " + editProperty);
-      manager.getFactory().showNewEditorWindow("testing", editProperty, editorTemplate + ".editableFields", manager, this.getPropertyEditorPane().getContainer());
+      manager.getFactory().showNewEditorWindow(editProperty, manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", "Composite", manager, true), this.getPropertyEditorPane().getContainer());
     } else {
       getLogger().fine("editSelectedValue():  no selected value.");
     }

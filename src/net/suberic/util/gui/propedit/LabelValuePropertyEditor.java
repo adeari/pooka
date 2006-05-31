@@ -61,7 +61,7 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
    * Gets the current labelComponent.
    */
   public java.awt.Container getLabelComponent() {
-    return valueComponent;
+    return labelComponent;
   }
 
   /**

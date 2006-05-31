@@ -54,8 +54,6 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     manager=newManager;
     editorTemplate = template;
     
-    System.err.println("editorTemplate='" + editorTemplate + "'");
-
     // create the editors list.
     editors = new Vector();
 
@@ -129,6 +127,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     }
     
     JList returnValue =  new JList(optionListModel);
+    returnValue.setSelectedIndex(0);
     returnValue.setCellRenderer(new SEPCellRenderer());
     return returnValue;
   }
@@ -280,7 +279,6 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
    * Returns the helpId for this editor.
    */
   public String getHelpID() {
-    System.err.println("getting help id.");
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
     SEPListEntry selectedValue = (SEPListEntry) optionList.getSelectedValue();
     if (selectedValue != null) {
