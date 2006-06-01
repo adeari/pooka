@@ -9,18 +9,18 @@ import java.awt.FlowLayout;
  * can enter a String.
  */
 public class StringEditorPane extends LabelValuePropertyEditor {
-  
+
   JLabel label;
   JTextField inputField;
   String currentValue;
 
   /**
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
@@ -29,40 +29,39 @@ public class StringEditorPane extends LabelValuePropertyEditor {
     originalValue = manager.getProperty(property, "");
     currentValue = originalValue;
 
-    if (debug) {
-      System.out.println("configuring StringEditorPane.  property is " + property + "; editorTemplate is " + editorTemplate);
-    }
+    getLogger().fine("configuring StringEditorPane.  property is " + property + "; editorTemplate is " + editorTemplate);
 
     label = createLabel();
     inputField = new JTextField(originalValue);
     inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
     inputField.setMinimumSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
+    inputField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, inputField.getMinimumSize().height));
     inputField.addFocusListener(new FocusAdapter() {
-	public void focusLost(FocusEvent e) {
-	  if (! inputField.getText().equals(currentValue)) {
-	    try {
-	      firePropertyChangingEvent(inputField.getText());
-	      currentValue = inputField.getText();
-	      firePropertyChangedEvent(currentValue);
-	    } catch (PropertyValueVetoException pvve) {
-	      inputField.setText(currentValue);
-	      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
-	      inputField.requestFocusInWindow();
-	    }
-	  }
-	}
+        public void focusLost(FocusEvent e) {
+          if (! inputField.getText().equals(currentValue)) {
+            try {
+              firePropertyChangingEvent(inputField.getText());
+              currentValue = inputField.getText();
+              firePropertyChangedEvent(currentValue);
+            } catch (PropertyValueVetoException pvve) {
+              inputField.setText(currentValue);
+              manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+              inputField.requestFocusInWindow();
+            }
+          }
+        }
       });
     this.add(label);
     this.add(inputField);
     this.setEnabled(isEnabled);
-    
+
     labelComponent = label;
     valueComponent = inputField;
 
     manager.registerPropertyEditor(property, this);
     addDefaultListeners();
   }
-  
+
   /**
    * This writes the currently configured value in the PropertyEditorUI
    * to the source PropertyEditorManager.
@@ -77,9 +76,9 @@ public class StringEditorPane extends LabelValuePropertyEditor {
       manager.setProperty(property, inputField.getText());
     }
   }
-  
+
   /**
-   * Returns the current values of the edited properties as a 
+   * Returns the current values of the edited properties as a
    * java.util.Properties object.
    */
   public java.util.Properties getValue() {
@@ -88,9 +87,9 @@ public class StringEditorPane extends LabelValuePropertyEditor {
     return retProps;
   }
 
-  
+
   /**
-   * This resets the editor to the original (or latest set, if setValue() 
+   * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() throws PropertyValueVetoException {
@@ -98,16 +97,16 @@ public class StringEditorPane extends LabelValuePropertyEditor {
     if (! (fieldValue.equals(currentValue) && fieldValue.equals(originalValue))) {
       // something has changed, so we'll have to deal with it.
       if (! currentValue.equals(originalValue)) {
-	firePropertyChangingEvent(originalValue);
-	currentValue = originalValue;
-	firePropertyChangedEvent(originalValue);
+        firePropertyChangingEvent(originalValue);
+        currentValue = originalValue;
+        firePropertyChangedEvent(originalValue);
       }
       inputField.setText(originalValue);
     }
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled 
+   * Sets the enabled property of the PropertyEditorUI.  Disabled
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {

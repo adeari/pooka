@@ -44,6 +44,8 @@ public class ListEditorPane extends LabelValuePropertyEditor {
       inputBox.add(addButton);
     }
 
+    inputBox.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, inputBox.getMinimumSize().height));
+
     this.add(label);
     this.add(inputBox);
     this.setEnabled(isEnabled);
@@ -59,11 +61,11 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     if (isChanged()) {
       String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
       try {
-  firePropertyChangingEvent(newValue);
-  firePropertyChangedEvent(newValue);
+        firePropertyChangingEvent(newValue);
+        firePropertyChangedEvent(newValue);
       } catch (PropertyValueVetoException pvve) {
-  manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
-  inputField.setSelectedIndex(currentIndex);
+        manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
+        inputField.setSelectedIndex(currentIndex);
       }
     }
   }
@@ -78,7 +80,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     mOriginalValue = originalValue;
     // now we get the default value.
     if (originalValue.equalsIgnoreCase(""))
-  originalValue = manager.getProperty(editorTemplate, "");
+      originalValue = manager.getProperty(editorTemplate, "");
     String currentItem;
     originalIndex=-1;
     Vector items = new Vector();
@@ -97,15 +99,15 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
       String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
       if (itemLabel.equals(""))
-  itemLabel = currentItem.toString();
+        itemLabel = currentItem.toString();
 
       String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
       if (itemValue.equals(""))
-  itemValue = currentItem.toString();
+        itemValue = currentItem.toString();
 
       if (itemValue.equals(originalValue)) {
-  originalIndex=i;
-  currentIndex=i;
+        originalIndex=i;
+        currentIndex=i;
       }
       items.add(itemLabel);
       labelToValueMap.put(itemLabel, itemValue);
@@ -121,20 +123,20 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     jcb.setSelectedIndex(originalIndex);
 
     jcb.addItemListener(new ItemListener() {
-  public void itemStateChanged(ItemEvent e) {
-    int newIndex = inputField.getSelectedIndex();
-    if (newIndex != currentIndex) {
-      String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
-      try {
-        firePropertyChangingEvent(newValue);
-        firePropertyChangedEvent(newValue);
-        currentIndex = newIndex;
-      } catch (PropertyValueVetoException pvve) {
-        manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
-        inputField.setSelectedIndex(currentIndex);
-      }
-    }
-  }
+        public void itemStateChanged(ItemEvent e) {
+          int newIndex = inputField.getSelectedIndex();
+          if (newIndex != currentIndex) {
+            String newValue = (String)labelToValueMap.get(inputField.getSelectedItem());
+            try {
+              firePropertyChangingEvent(newValue);
+              firePropertyChangedEvent(newValue);
+              currentIndex = newIndex;
+            } catch (PropertyValueVetoException pvve) {
+              manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue + ":  " + pvve.getReason());
+              inputField.setSelectedIndex(currentIndex);
+            }
+          }
+        }
       });
 
     return jcb;
@@ -154,17 +156,17 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
       String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
       if (itemLabel.equals(""))
-  itemLabel = currentItem.toString();
+        itemLabel = currentItem.toString();
 
       String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
       if (itemValue.equals(""))
-  itemValue = currentItem.toString();
+        itemValue = currentItem.toString();
 
       if (itemValue.equals(originalValue)) {
-  originalIndex=i;
+        originalIndex=i;
       }
       if (itemValue.equals(currentValue)) {
-  currentIndex=i;
+        currentIndex=i;
       }
       items.add(itemLabel);
       labelToValueMap.put(itemLabel, itemValue);
@@ -182,9 +184,9 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   public JButton createAddButton() {
     JButton returnValue = new JButton("Add");
     returnValue.addActionListener(new AbstractAction() {
-  public void actionPerformed(ActionEvent e) {
-    addNewEntry();
-  }
+        public void actionPerformed(ActionEvent e) {
+          addNewEntry();
+        }
       });
 
     return returnValue;
@@ -209,13 +211,13 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     String currentValue = (String)labelToValueMap.get(inputField.getSelectedItem());
     try {
       if (newIndex != currentIndex) {
-  firePropertyChangingEvent(currentValue);
-  firePropertyChangedEvent(currentValue);
-  currentIndex = newIndex;
+        firePropertyChangingEvent(currentValue);
+        firePropertyChangedEvent(currentValue);
+        currentIndex = newIndex;
       }
 
       if (isEnabled() && isChanged()) {
-  manager.setProperty(property, currentValue);
+        manager.setProperty(property, currentValue);
       }
     } catch (PropertyValueVetoException pvve) {
       manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());
