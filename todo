@@ -1,4 +1,5 @@
 ----- ui update
+  *) fix starting as minimal--throws exception now.
   *) fix bottom layout--should be expandable in a composite pane.
 	-- started.  need to limit size of components?
   *) fix composite editor -- centering isn't working correctly when top
