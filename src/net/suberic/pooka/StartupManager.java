@@ -514,21 +514,21 @@ public class StartupManager {
     mPookaManager.setSearchManager(new SearchTermManager("Search"));
     updateTime("created search manager");
 
-    if (mFullStartup) {
-      // set up help
-      if (startup != null)
-        startup.setStatus("Pooka.startup.help");
-      try {
-        ClassLoader cl = new Pooka().getClass().getClassLoader();
-        java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
-        HelpSet hs = new HelpSet(cl, hsURL);
-        mPookaManager.setHelpBroker(hs.createHelpBroker());
-      } catch (Exception ee) {
-        System.out.println("HelpSet net/suberic/pooka/doc/en/help/merge/Master.hs not found:  " + ee);
-        ee.printStackTrace();
-      }
-      updateTime("loaded help");
+    // set up help
+    if (startup != null)
+      startup.setStatus("Pooka.startup.help");
+    try {
+      ClassLoader cl = new Pooka().getClass().getClassLoader();
+      java.net.URL hsURL = HelpSet.findHelpSet(cl, "net/suberic/pooka/doc/en/help/Master.hs");
+      HelpSet hs = new HelpSet(cl, hsURL);
+      mPookaManager.setHelpBroker(hs.createHelpBroker());
+    } catch (Exception ee) {
+      System.out.println("HelpSet net/suberic/pooka/doc/en/help/merge/Master.hs not found:  " + ee);
+      ee.printStackTrace();
+    }
+    updateTime("loaded help");
 
+    if (mFullStartup) {
       if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
         mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
       else

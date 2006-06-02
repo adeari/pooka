@@ -1,11 +1,12 @@
 ----- ui update
-  *) fix starting as minimal--throws exception now.
-  *) fix bottom layout--should be expandable in a composite pane.
-	-- started.  need to limit size of components?
   *) fix composite editor -- centering isn't working correctly when top
 	is singlepanel and bottom is label/value.
+	-- figure out centering strategy.  what will look best?
   *) fix value widths--some are expanding, some aren't, some aren't when
 	they should be.
+	-- mosly fixed.
+  *) fix filters
+  *) change selection/add buttons
 *) new editor system.
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,
