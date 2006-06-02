@@ -15,9 +15,9 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
   JComboBox typeCombo;
   JPanel filterConfigPanel;
   java.awt.CardLayout layout;
-  
+
   java.util.HashMap editorTable;
-  
+
   /**
    * Configures the FilterEditorPane.
    */
@@ -27,31 +27,29 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
     editorTemplate = template;
     originalValue = manager.getProperty(property, "");
 
-    if (debug) {
-      System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
-    }
+    getLogger().fine("property is " + property + "; editorTemplate is " + editorTemplate);
 
     editorTable = new java.util.HashMap();
-    
+
     // create the label
     label = new JLabel(manager.getProperty(editorTemplate + ".label", "Action"));
-    
+
     // find out if we're a display filter or a backend filter
     String filterType = manager.getProperty(editorTemplate + ".filterType", "display");
-    
+
     // create the combo
     Vector filterLabels = null;
     if (filterType.equalsIgnoreCase("display"))
       filterLabels = Pooka.getSearchManager().getDisplayFilterLabels();
     else
       filterLabels = Pooka.getSearchManager().getBackendFilterLabels();
-    
+
     typeCombo = new JComboBox(filterLabels);
     typeCombo.addItemListener(this);
-    
-    
+
+
     // create the filterConfigPanel.
-    
+
     String currentClassValue = manager.getProperty(property + ".class", "");
     String selectedLabel = null;
 
@@ -62,52 +60,63 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
       String label = (String) filterLabels.elementAt(i);
       FilterEditor currentEditor = Pooka.getSearchManager().getEditorForFilterLabel(label);
       currentEditor.configureEditor(manager, property);
-      
+
       filterConfigPanel.add(label, currentEditor);
       editorTable.put(label, currentEditor);
 
       if (selectedLabel == null && currentClassValue != null &&  currentClassValue.equalsIgnoreCase(currentEditor.getFilterClassValue()))
-	selectedLabel = label;
+        selectedLabel = label;
     }
 
     if (selectedLabel != null)
       typeCombo.setSelectedItem(selectedLabel);
 
-    JPanel valuePanel = new JPanel();
-    
-    valuePanel.add(typeCombo);
-    valuePanel.add(filterConfigPanel);
-    
+    JPanel tmpPanel = new JPanel();
+    SpringLayout layout = new SpringLayout();
+    tmpPanel.setLayout(layout);
+
+    tmpPanel.add(typeCombo);
+    tmpPanel.add(filterConfigPanel);
+
+    layout.putConstraint(SpringLayout.NORTH, typeCombo, 0, SpringLayout.NORTH, tmpPanel);
+    layout.putConstraint(SpringLayout.WEST, typeCombo, 0, SpringLayout.WEST, tmpPanel);
+    layout.putConstraint(SpringLayout.SOUTH, tmpPanel, 0, SpringLayout.SOUTH, typeCombo);
+    layout.putConstraint(SpringLayout.WEST, filterConfigPanel, 5, SpringLayout.EAST, typeCombo);
+    layout.putConstraint(SpringLayout.EAST, tmpPanel, 5, SpringLayout.EAST, filterConfigPanel);
+
+    tmpPanel.setPreferredSize(new java.awt.Dimension(tmpPanel.getPreferredSize().width, typeCombo.getMinimumSize().height));
+    tmpPanel.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, typeCombo.getMinimumSize().height));
+
     this.add(label);
-    this.add(valuePanel);
-    
+    this.add(tmpPanel);
+
     labelComponent = label;
-    valueComponent = valuePanel;
-    
+    valueComponent = tmpPanel;
+
     resetDefaultValue();
   }
-  
+
   /**
    * Sets the value for this PropertyEditor.
    */
   public void setValue() {
     getFilterEditor().setValue();
   }
-  
+
   /**
    * Returns the currently selected FilterEditor.
    */
   public FilterEditor getFilterEditor() {
     return (FilterEditor) editorTable.get(typeCombo.getSelectedItem());
   }
-  
+
   /**
    * Gets the value that would be set by this PropertyEditor.
    */
   public java.util.Properties getValue() {
     return getFilterEditor().getValue();
   }
-  
+
   /**
    * Resets the current Editor to its original value.
    */
@@ -119,27 +128,27 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
     } else {
       typeCombo.setSelectedIndex(0);
     }
-    
+
     FilterEditor currentEditor = getFilterEditor();
-    
+
   }
-  
+
   /**
    * Enables or disables this editor.
    */
   public void setEnabled(boolean newValue) {
     typeCombo.setEnabled(newValue);
   }
-  
-  
+
+
   /**
    * This handles the switch of the filterConfigPanel when the typeCombo
    * value changes.
    */
   public void itemStateChanged(java.awt.event.ItemEvent e) {
     String selectedString = (String) typeCombo.getSelectedItem();
-    
+
     layout.show(filterConfigPanel, selectedString);
   }
-  
+
 }
