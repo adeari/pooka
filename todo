@@ -17,28 +17,47 @@
    *) add in dependency filters - if a, then disable b.
    *) wizard editor pane?
    *) reorganize properties
+     note:  kmail:  general / security / filtering
+	    evolution:  receiving / receiving options
+	    thunderbird:  just server settings
 	*) store:
-	   *) type
-	     *) servername
-	     *) username
-	     *) secure connection
-	        *) never / when possible / always
-	     *) auth type???
-	     *) port (??)
-	   *) receiving options
+	  tabs are ok, but no nested tabs
+	   *) type - just as a label?
+	     *) servername (p/i)
+	     *) username (p/i)
+	     *) password (optional) (p/i)
+	     *) secure connection (p/i)
+	        *) never / when possible / always (p/i)
+	     *) auth type??? (p/i)
+	     *) port (??) (p/i)
+	     *) inbox file (m)
+	     *) mail directory (m)
 	     *) check every x minutes
-	     *) new messages in all folders (umm, duh)
-	     *) custom connection (good idea - make it just an option.)
-	     *) only subscribed folders
-	     *) override namespace
-	   *) filters
-	   *) caching
-	   *) expunge on exit
-	   *) use subscribed folders list
+	   *) caching (i)
+	   *) cache headers only (i)
+	   *) cache full messages automatically (i)
 	   *) trash folder
 	     *) empty trash on exit?
 	   *) ? select for offline use by folder?
-	   *) option for not caching messages over x kb.
+	   *) default profile
+
+	   *) receiving options
+	     *) leave messages on server (p)
+	     *) delete messages on local delete (p)
+	     *) maildir backend (p) (?)
+	     *) new messages in all folders (umm, duh)
+	     *) custom connection (good idea - make it just an option.) (p/i)
+	     *) only subscribed folders (i)
+	     *) override namespace (i)
+	   *) filters (no?)
+	   *) expunge on exit (i)
+	   *) use subscribed folders list (i)
+	   *) option for not caching messages over x kb. (p/i)
+	   *) connection
+	   *) precommand
+	   *) store debug
+	   *) logging
+	   
    *) fix layout
    *) ??? add a boder/top line to the buttons?
 *) make required fields for the gui properties.
