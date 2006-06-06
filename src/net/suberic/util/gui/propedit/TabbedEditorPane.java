@@ -103,6 +103,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
         getLogger().fine("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
 
         currentEditor = createEditorPane(property, currentTemplate);
+
       } else {
 
         getLogger().fine("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
@@ -125,7 +126,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * Creates an editor pane for a group of values.
    */
   private SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subProperty, "Composite", manager, true);
 
   }
 

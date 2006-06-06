@@ -61,16 +61,8 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
   /**
    * Creates and displays an editor window.
    */
-  public void showNewEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
-    showNewEditorWindow(title, (SwingPropertyEditor) createEditor(property, template, mgr), window);
-  }
-
-  /**
-   * Creates and displays an editor window.
-   */
   public void showNewEditorWindow(String title, PropertyEditorUI editor, Container window) {
-    JInternalFrame jif = new JInternalFrame(title, true, true);
-    jif.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jif));
+    JInternalFrame jif = (JInternalFrame) createEditorWindow(title, editor, window);
 
     //jif.pack();
     jif.setSize(jif.getPreferredSize());
@@ -91,9 +83,9 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
    * properties Vector.  The title string is the title of the
    * JInternalFrame.
    */
-  public Container createEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
+  public Container createEditorWindow(String title, PropertyEditorUI editor, Container window) {
     JInternalFrame jif = new JInternalFrame(title, true, true);
-    PropertyEditorPane pep = new PropertyEditorPane(mgr, (SwingPropertyEditor) createEditor(property, template, mgr), jif);
+    PropertyEditorPane pep = new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jif);
     jif.getContentPane().add(pep);
     jif.pack();
     jif.setSize(jif.getPreferredSize());

@@ -107,7 +107,11 @@ public class PropertyEditorFactory {
    * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
-    JDialog jd = (JDialog) createEditorWindow(title, property, template, mgr, window);
+    showNewEditorWindow(title, property, template, property, mgr, window);
+  }
+
+  public void showNewEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
+    JDialog jd = (JDialog) createEditorWindow(title, property, template, propertyBase, mgr, window);
     jd.setVisible(true);
   }
 
@@ -121,17 +125,7 @@ public class PropertyEditorFactory {
    * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, PropertyEditorUI editor, Container window) {
-    JDialog jd = null;
-    if (window instanceof Dialog) {
-      jd = new JDialog((Dialog) window, title, true);
-    } else if (window instanceof Frame) {
-      jd = new JDialog((Frame) window, title, true);
-    } else {
-      jd = new JDialog();
-      jd.setTitle(title);
-      jd.setModal(true);
-    }
-    jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jd));
+    JDialog jd = (JDialog) createEditorWindow(title, editor, window);
     jd.setVisible(true);
   }
 
@@ -175,6 +169,10 @@ public class PropertyEditorFactory {
   }
 
   public Container createEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
+    return createEditorWindow(title, createEditor(property, template, propertyBase, mgr, true), window);
+  }
+
+  public Container createEditorWindow(String title, PropertyEditorUI editor, Container window) {
     JDialog jd = null;
     if (window instanceof Dialog) {
       jd = new JDialog((Dialog) window, title, true);
@@ -185,7 +183,7 @@ public class PropertyEditorFactory {
       jd.setTitle(title);
       jd.setModal(true);
     }
-    jd.getContentPane().add(new PropertyEditorPane(mgr, (SwingPropertyEditor)createEditor(property, template, propertyBase, mgr, true), jd));
+    jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jd));
     return jd;
   }
 
