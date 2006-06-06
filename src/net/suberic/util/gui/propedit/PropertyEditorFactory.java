@@ -171,6 +171,10 @@ public class PropertyEditorFactory {
    * JInternalFrame.
    */
   public Container createEditorWindow(String title, String property, String template, PropertyEditorManager mgr, Container window) {
+    return createEditorWindow(title, property, template, property, mgr, window);
+  }
+
+  public Container createEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
     JDialog jd = null;
     if (window instanceof Dialog) {
       jd = new JDialog((Dialog) window, title, true);
@@ -181,7 +185,7 @@ public class PropertyEditorFactory {
       jd.setTitle(title);
       jd.setModal(true);
     }
-    jd.getContentPane().add(new PropertyEditorPane(mgr, (SwingPropertyEditor)createEditor(property, template, mgr), jd));
+    jd.getContentPane().add(new PropertyEditorPane(mgr, (SwingPropertyEditor)createEditor(property, template, propertyBase, mgr, true), jd));
     return jd;
   }
 
@@ -200,14 +204,22 @@ public class PropertyEditorFactory {
    * editorTemplate, using the given PropertyEditorManager.
    */
   public PropertyEditorUI createEditor(String property, String editorTemplate, PropertyEditorManager mgr, boolean enabled) {
+    return createEditor(property, editorTemplate, property, mgr, enabled);
+  }
+
+  /**
+   * Creates an appropriate PropertyEditorUI for the given property and
+   * editorTemplate, using the given PropertyEditorManager.
+   */
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, PropertyEditorManager mgr, boolean enabled) {
     String type = sourceBundle.getProperty(editorTemplate + ".propertyType", "");
-    return createEditor(property, editorTemplate, type, mgr, enabled);
+    return createEditor(property, editorTemplate, propertyBase, type, mgr, enabled);
   }
   /**
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using the given PropertyEditorManager.
    */
-  public PropertyEditorUI createEditor(String property, String editorTemplate, String type, PropertyEditorManager mgr, boolean enabled) {
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, String type, PropertyEditorManager mgr, boolean enabled) {
 
     Class editorClass = (Class) typeToClassMap.get(type);
     if (editorClass == null) {
@@ -221,7 +233,7 @@ public class PropertyEditorFactory {
       System.err.println("error creating editor for property " + property + ":  " + e);
       returnValue = new StringEditorPane();
     }
-    returnValue.configureEditor(property, editorTemplate, mgr, enabled);
+    returnValue.configureEditor(property, editorTemplate, propertyBase, mgr, enabled);
     return returnValue;
   }
 

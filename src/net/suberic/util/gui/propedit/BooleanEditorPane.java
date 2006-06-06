@@ -13,18 +13,19 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
   boolean originalBoolean = false;
 
   /**
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     debug = newManager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
     property=propertyName;
     editorTemplate=template;
+    propertyBase=propertyBaseName;
     manager=newManager;
 
     if (debug) {
@@ -42,31 +43,31 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
     label = createLabel();
 
     inputField = new JCheckBox();
-    
+
     inputField.setSelected(originalBoolean);
 
     inputField.addChangeListener(new ChangeListener() {
-	public void stateChanged(ChangeEvent e) {
-	  String newValue;
-	  if (inputField.isSelected()) {
-	    newValue = "true";
-	  } else {
-	    newValue = "false";
-	  }
-	  try {
-	    firePropertyChangingEvent(newValue);
-	    firePropertyChangedEvent(newValue);
-	  } catch (PropertyValueVetoException pvve) {
-	    manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());
-	    inputField.setSelected(! inputField.isSelected());
-	  }
-	}
+  public void stateChanged(ChangeEvent e) {
+    String newValue;
+    if (inputField.isSelected()) {
+      newValue = "true";
+    } else {
+      newValue = "false";
+    }
+    try {
+      firePropertyChangingEvent(newValue);
+      firePropertyChangedEvent(newValue);
+    } catch (PropertyValueVetoException pvve) {
+      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());
+      inputField.setSelected(! inputField.isSelected());
+    }
+  }
       });
-    
+
     this.add(label);
     this.add(inputField);
     this.setEnabled(isEnabled);
-    
+
     labelComponent = label;
     valueComponent = inputField;
 
@@ -79,19 +80,19 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
   public void setValue() {
     if (isEnabled()) {
       if (inputField.isSelected() != originalBoolean || manager.getProperty(property, "unset").equals("unset")) {
-	String newValue;
-	if (inputField.isSelected())
-	  newValue = "true";
-	else
-	  newValue = "false";
-	
-	manager.setProperty(property, newValue);
-      } 
+  String newValue;
+  if (inputField.isSelected())
+    newValue = "true";
+  else
+    newValue = "false";
+
+  manager.setProperty(property, newValue);
+      }
     }
   }
-  
+
   /**
-   * Returns the current values of the edited properties as a 
+   * Returns the current values of the edited properties as a
    * java.util.Properties object.
    */
   public java.util.Properties getValue() {
@@ -103,9 +104,9 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
       retProps.setProperty(property, "false");
     return retProps;
   }
-  
+
   /**
-   * This resets the editor to the original (or latest set, if setValue() 
+   * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() {
@@ -113,9 +114,9 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
     // have to send any events here.
     inputField.setSelected(originalBoolean);
   }
-  
+
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled 
+   * Sets the enabled property of the PropertyEditorUI.  Disabled
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {
@@ -124,6 +125,6 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
       enabled=newValue;
     }
   }
-  
+
 }
 

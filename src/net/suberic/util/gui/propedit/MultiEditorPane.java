@@ -50,11 +50,12 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    *                   changes.
    * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     getLogger().fine("creating MultiEditorPane for property " + propertyName + ", template " + template);
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
+    propertyBase=propertyBaseName;
     originalValue = manager.getProperty(property, "");
 
     SpringLayout layout = new SpringLayout();

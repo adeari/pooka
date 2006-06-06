@@ -18,7 +18,7 @@ import java.util.ArrayList;
  *
  * Options:
  * TabbedList.templateScoped - add subproperty to the template.  for instance,
- *   if true, the example will edit using the template 
+ *   if true, the example will edit using the template
  *   TabbedList.tabOne.prop1.  if false, it will use the template prop1.
  * TabbedList.propertyScoped - add the subproperty to the property instead
  *   of using it as its own property.  if true, this example would edit,
@@ -32,53 +32,54 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
   JTabbedPane tabbedPane;
   protected boolean templateScoped = false;
   protected boolean propertyScoped = false;
-  
+
   /**
    * This configures this editor with the following values.
    *
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
+    propertyBase=propertyBaseName;
     originalValue = manager.getProperty(property, "");
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-    
+
     getLogger().fine("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
-    
+
     enabled=isEnabled;
-    
+
     templateScoped = manager.getProperty(editorTemplate + ".templateScoped", "false").equalsIgnoreCase("true");
     propertyScoped = manager.getProperty(editorTemplate + ".propertyScoped", "false").equalsIgnoreCase("true");
 
     tabbedPane = new JTabbedPane();
-    
+
     // first, get the strings that we're going to edit.
 
     getLogger().fine("creating prop from " + template + "=" + manager.getProperty(template, ""));
 
     List propsToEdit = manager.getPropertyAsList(template, "");
-    
+
     editors = createEditors(property, propsToEdit);
-    
+
     getLogger().fine("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
     getLogger().fine("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
     getLogger().fine("size for tabbedPane = " + tabbedPane.getSize());
-    
+
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
     this.add(tabbedPane);
-    layout.putConstraint(SpringLayout.WEST, tabbedPane, 5 ,SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.NORTH, tabbedPane, 5 ,SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.SOUTH, this, 5 ,SpringLayout.SOUTH, tabbedPane);
-    layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, tabbedPane);
+    layout.putConstraint(SpringLayout.WEST, tabbedPane, 0 ,SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, tabbedPane, 0 ,SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 0 ,SpringLayout.SOUTH, tabbedPane);
+    layout.putConstraint(SpringLayout.EAST, this, 0 ,SpringLayout.EAST, tabbedPane);
 
     manager.registerPropertyEditor(property, this);
   }
@@ -87,17 +88,17 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * Creates the appropriate editors for the given properties.
    */
   public List createEditors(String property, List propsToEdit) {
-    
+
     List editorList = new ArrayList();
     SwingPropertyEditor currentEditor;
-    
+
     for (int i = 0; i < propsToEdit.size(); i++) {
       String currentTemplate = (String)propsToEdit.get(i);
-      if (templateScoped) 
+      if (templateScoped)
         currentTemplate = editorTemplate + "." + currentTemplate;
 
       getLogger().fine("getting editor using template " + currentTemplate);
-      
+
       if (propertyScoped) {
         getLogger().fine("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
 
@@ -105,21 +106,21 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
       } else {
 
         getLogger().fine("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
-        
+
         currentEditor = createEditorPane(currentTemplate, currentTemplate);
       }
-      
+
       getLogger().fine("adding " + currentEditor);
       getLogger().fine("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
 
       editorList.add(currentEditor);
       tabbedPane.add(manager.getProperty(currentTemplate + ".label", currentTemplate), currentEditor);
     }
-    
+
     return editorList;
   }
-    
-  
+
+
   /**
    * Creates an editor pane for a group of values.
    */
@@ -127,8 +128,8 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
 
   }
-  
+
 }
-    
+
 
 

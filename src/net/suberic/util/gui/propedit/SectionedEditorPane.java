@@ -7,7 +7,7 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * This class will make an editor for a list of elements, where each 
+ * This class will make an editor for a list of elements, where each
  * element will be displayed on the left and, by selecting one of these
  * elements, the editor for that item will appear in the panel to the
  * right.
@@ -18,7 +18,7 @@ import javax.swing.*;
  *                                 uses a SectionedEditorPane
  *
  * Foo.editableFields=Foo.bar:Foo.baz -- shows which subfields are to be edited
- * 
+ *
  * Foo._default=Foo.bar -- shows that by default, the editor for Foo.bar
  *                         is shown.  If this is not included or blank,
  *                         then no editor is displayed by default.
@@ -26,7 +26,7 @@ import javax.swing.*;
  * The value for Foo itself is not used.
  *
  * If your Foo.editableFields=Foo.bar:.baz:Frotz.zork, then the values
- * edited will be defined by Foo.bar, Foo.baz, and Frotz.zork.  
+ * edited will be defined by Foo.bar, Foo.baz, and Frotz.zork.
  */
 
 public class SectionedEditorPane extends CompositeSwingPropertyEditor implements ListSelectionListener {
@@ -36,33 +36,34 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   boolean changed = false;
   DefaultListModel optionListModel;
   List templates;
-  
+
   Hashtable<String, SwingPropertyEditor> currentPanels = new Hashtable<String, SwingPropertyEditor>();
-  
+
   /**
    * This configures this editor with the following values.
    *
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
     manager=newManager;
+    propertyBase=propertyBaseName;
     editorTemplate = template;
-    
+
     // create the editors list.
     editors = new Vector();
 
     // create the list of properties to be edited.
 
     List propertyList = manager.getPropertyAsList(propertyName + ".editableFields", "");
-    
+
     optionList = createOptionList(propertyList);
-    
+
     JScrollPane optionScrollPane = new JScrollPane(optionList);
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
@@ -72,12 +73,12 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     layout.putConstraint(SpringLayout.NORTH, optionScrollPane, 5, SpringLayout.NORTH, this);
     //layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, optionScrollPane);
     layout.putConstraint(SpringLayout.SOUTH, optionScrollPane, -5, SpringLayout.SOUTH, this);
-    
+
     // create entryPanels (the panels which show the editors for each
     // property in the optionList) for each option.
-    
+
     entryPanel = createEntryPanel(propertyList);
-    
+
     java.awt.Component entryComponent = entryPanel;
     if (manager.getProperty(template + "._useScrollPane", "false").equalsIgnoreCase("true")) {
       JScrollPane jsp = new JScrollPane(entryPanel);
@@ -89,7 +90,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
       */
       entryComponent = jsp;
     }
-    
+
     this.add(entryComponent);
 
     // the entry components should handle their offsets themselves, so
@@ -99,21 +100,21 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     layout.putConstraint(SpringLayout.NORTH, entryComponent, 0 ,SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.SOUTH, this, 0 ,SpringLayout.SOUTH, entryComponent);
     layout.putConstraint(SpringLayout.EAST, this, 0 ,SpringLayout.EAST, entryComponent);
-    
+
     this.setEnabled(isEnabled);
 
     manager.registerPropertyEditor(property, this);
-    
+
     optionList.addListSelectionListener(this);
   }
-  
+
   /**
    * Creates the list of edited items.
    */
   private JList createOptionList(List editedProperties) {
 
     optionListModel = new DefaultListModel();
-  
+
     Iterator iter = editedProperties.iterator();
     while (iter.hasNext()) {
       String key = (String) iter.next();
@@ -125,23 +126,23 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
       SEPListEntry listEntry = new SEPListEntry(manager.getProperty(key + ".Label", key), icon, key);
       optionListModel.addElement(listEntry);
     }
-    
+
     JList returnValue =  new JList(optionListModel);
     returnValue.setSelectedIndex(0);
     returnValue.setCellRenderer(new SEPCellRenderer());
     return returnValue;
   }
-  
+
   /**
    * This creates a panel for each option.  It uses a CardLayout.
    *
-   * Note that this is also the section of code which determines which 
+   * Note that this is also the section of code which determines which
    * subproperties are to be edited.
    */
   private JPanel createEntryPanel (List itemList) {
     CardLayout entryLayout = new CardLayout();
     JPanel panel = new JPanel(entryLayout);
-    
+
     for (Object o: itemList) {
       String rootProp = (String) o;
       SwingPropertyEditor sep = createEditorPane(rootProp, rootProp);
@@ -150,7 +151,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
       // save reference to new pane in hash table
       currentPanels.put(rootProp, sep);
       editors.add(sep);
-        
+
       panel.add(rootProp, sep);
     }
     String defaultProperty = manager.getProperty(property + "._default", "");
@@ -160,32 +161,32 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
 
     return panel;
   }
-  
+
   /**
-   * Called when the selected value changed.  Should result in the 
+   * Called when the selected value changed.  Should result in the
    * entryPane changing.
    */
   public void valueChanged(ListSelectionEvent e) {
-    
+
     CardLayout entryLayout = (CardLayout)entryPanel.getLayout();
-    
+
     String selectedId = ((SEPListEntry)((JList)e.getSource()).getSelectedValue()).getKey();
-    
+
     getLogger().fine("selectedId = " + selectedId);
     if (selectedId != null) {
       SwingPropertyEditor newSelected = currentPanels.get(selectedId);
       getLogger().fine("newSelected = " + newSelected);
       entryLayout.show(entryPanel, selectedId);
     }
-    
+
   }
-  
+
   /**
    * Edits the currently selected value.
    */
   public void editSelectedValue() {
   }
-  
+
   /**
    * Sets the value for this SectionedEditorPane.
    */
@@ -194,26 +195,26 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
       super.setValue();
     }
   }
-  
+
   /**
    * Resets the default values.
    */
   public void resetDefaultValue() throws PropertyValueVetoException {
-    
+
     if (isChanged()) {
       firePropertyChangingEvent(originalValue);
       optionListModel.removeAllElements();
       entryPanel.removeAll();
-      
+
       firePropertyChangedEvent(originalValue);
     }
-    
+
     java.awt.Component[] components = entryPanel.getComponents();
     for (int i = 0; i < components.length; i++) {
       ((CompositeEditorPane)components[i]).resetDefaultValue();
     }
   }
-  
+
   /**
    * Returns the currently edited values as a Properties object.
    */
@@ -221,7 +222,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     java.util.Properties currentRetValue = super.getValue();
     return currentRetValue;
   }
-  
+
   /**
    * Returns whether or not the top-level edited values of this EditorPane
    * have changed.
@@ -229,7 +230,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   public boolean isChanged() {
     return changed;
   }
-  
+
   /**
    * Sets whether or not the top-level edited values of this EditorPane
    * have changed.
@@ -237,14 +238,14 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   public void setChanged(boolean newChanged) {
     changed=newChanged;
   }
-  
+
   /**
    * Returns the optionList.
    */
   public JList getOptionList() {
     return optionList;
   }
-  
+
   /**
    * Returns the entryPanel.
    */
@@ -259,7 +260,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     getLogger().fine("creating editor for " + subProperty + ", template " + subTemplate);
     return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, manager);
   }
-  
+
   /**
    * Sets this enabled or disabled.
    */
@@ -274,7 +275,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
 
     enabled = newValue;
   }
-  
+
   /**
    * Returns the helpId for this editor.
    */
@@ -283,7 +284,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     SEPListEntry selectedValue = (SEPListEntry) optionList.getSelectedValue();
     if (selectedValue != null) {
       String selectedId = selectedValue.getKey();
-      
+
       if (selectedId != null) {
         SwingPropertyEditor newSelected = currentPanels.get(selectedId);
         System.err.println("returning help id for " + newSelected);
@@ -294,7 +295,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   }
 
   class SEPCellRenderer extends JLabel implements ListCellRenderer {
-    
+
     public java.awt.Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
       SEPListEntry sepValue = (SEPListEntry) value;
       String label = sepValue.getLabel();
@@ -318,7 +319,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     String label;
     Icon icon;
     String key;
-    
+
     public SEPListEntry(String pLabel, Icon pIcon, String pKey) {
       label = pLabel;
       icon = pIcon;
@@ -328,7 +329,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     public String getLabel() {
       return label;
     }
-    
+
     public Icon getIcon() {
       return icon;
     }

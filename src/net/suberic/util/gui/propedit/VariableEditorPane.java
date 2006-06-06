@@ -6,42 +6,43 @@ import java.awt.event.ActionEvent;
 import java.awt.CardLayout;
 
 /**
- * This will made a panel which can change depending on 
- * exact properties which are then edited will depend on the value of 
- * another propery. 
+ * This will made a panel which can change depending on
+ * exact properties which are then edited will depend on the value of
+ * another propery.
  */
 public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
   String keyProperty;
   HashMap idToEditorMap = new HashMap();
-  
+
   boolean scoped;
-  
+
   /**
    * This configures this editor with the following values.
    *
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
     manager=newManager;
+    propertyBase=propertyBaseName;
     editorTemplate = template;
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-    
+
     enabled=isEnabled;
-    
+
     editors = new Vector();
 
     String remove = manager.getProperty(editorTemplate + ".removeString", "");
     if (! remove.equals(""))
       property = property.substring(0, property.lastIndexOf(remove));
-    
+
     scoped = manager.getProperty(editorTemplate + ".scoped", "false").equalsIgnoreCase("true");
     if (scoped) {
       keyProperty = property + "." + manager.getProperty(editorTemplate + ".keyProperty", "");
@@ -74,7 +75,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
     manager.registerPropertyEditor(property, this);
   }
-  
+
   /**
    * This shows the editor window for the configured value.
    */
@@ -100,23 +101,23 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
       } else {
 
         SwingPropertyEditor spe = createEditorPane(selectedId);
-	
+
         // save reference to new pane in hash table
         idToEditorMap.put(selectedId, spe);
         editors.add(spe);
-	
+
         spe.setEnabled(enableMe && enabled);
         this.add(selectedId, spe);
       }
     }
     layout.show(this, selectedId);
-  }    
- 
+  }
+
   /**
    * Creates a SwingPropertyEditor for the given subproperty.
    */
   public SwingPropertyEditor createEditorPane(String selectedId) {
-    
+
     String editValue = selectedId;
 
     if (scoped) {
@@ -125,10 +126,10 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
         System.out.println("scoped; editValue = " + editValue);
       }
     } else {
-      if (debug) 
+      if (debug)
         System.out.println("not scoped; editValue = " + editValue);
     }
-    
+
     SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.createEditor(property, editValue);
     return returnValue;
   }

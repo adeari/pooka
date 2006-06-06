@@ -7,7 +7,7 @@ import net.suberic.util.VariableBundle;
 public interface PropertyEditorUI {
 
   /**
-   * This configures an editor for the given propertyName using the 
+   * This configures an editor for the given propertyName using the
    * PropertyManager mgr.
    *
    * This version usees the template property to definte all things about
@@ -19,32 +19,60 @@ public interface PropertyEditorUI {
    *
    * UserProfile.showHeaders.propertyType=boolean
    *
-   * So you can use this just to call configureEditor(factory, 
+   * So you can use this just to call configureEditor(factory,
    * "UserProfile.userOne.showHeaders", "UserProfile.showHeaders", mgr,
    * true)
    *
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
+   *                 editor.
+   * @param propertyBase The property that is used for any relative
+   *                 property resolutions.
+   * @param manager The PropertyEditorManager that will manage the
+   *                   changes.
+   * @param isEnabled Whether or not this editor is enabled by default.
+   */
+  public void configureEditor(String propertyName, String template, String propertyBase, PropertyEditorManager manager, boolean isEnabled);
+
+  /**
+   * This configures an editor for the given propertyName using the
+   * PropertyManager mgr.
+   *
+   * This version usees the template property to definte all things about
+   * the editor for propertyName.  This is useful if you want to be able
+   * to edit, for instace, the properties of a particular user:
+   *
+   * UserProfile.userOne.showHeaders
+   * UserProfile.userTwo.showHeaders
+   *
+   * UserProfile.showHeaders.propertyType=boolean
+   *
+   * So you can use this just to call configureEditor(factory,
+   * "UserProfile.userOne.showHeaders", "UserProfile.showHeaders", mgr,
+   * true)
+   *
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, PropertyEditorManager manager, boolean isEnabled);
-  
+
   /**
-   * This configures an editor for the given propertyName in the 
+   * This configures an editor for the given propertyName in the
    * PropertyEditorManager mgr.
    * @param propertyName The property to be edited.  This will also be
    *                     used for the editor layout.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, PropertyEditorManager mgr, boolean isEnabled);
-  
+
   /**
-   * This configures an editor for the given propertyName in the 
+   * This configures an editor for the given propertyName in the
    * PropertyEditorManager mgr.
    *
    * @param propertyName The property to be edited.  This will also be
@@ -53,7 +81,7 @@ public interface PropertyEditorUI {
    *                   changes.
    */
   public void configureEditor(String propertyName, PropertyEditorManager mgr);
-  
+
   /**
    * Returns the currently edited property.
    */
@@ -69,25 +97,25 @@ public interface PropertyEditorUI {
    * to the source VariableBundle.
    */
   public void setValue() throws PropertyValueVetoException;
-  
+
   /**
-   * This resets the editor to the original (or latest set, if setValue() 
+   * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() throws PropertyValueVetoException;
-  
+
   /**
-   * Returns the current values of the edited properties as a 
+   * Returns the current values of the edited properties as a
    * java.util.Properties object.
    */
   public java.util.Properties getValue();
-  
+
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled 
+   * Sets the enabled property of the PropertyEditorUI.  Disabled
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue);
-  
+
   /**
    * Returns whether or not this editor is enabled.
    */

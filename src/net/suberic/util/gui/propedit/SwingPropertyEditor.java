@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 public abstract class SwingPropertyEditor extends JPanel implements PropertyEditorUI {
   // debug flag
   protected boolean debug = false;
-  
+
   // shows whether or not this component is enabled.
   protected boolean enabled;
 
@@ -22,12 +22,15 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   // the template to use
   protected String editorTemplate;
 
+  // the property base to use
+  protected String propertyBase;
+
   // the original value of the property.
   protected String originalValue;
 
   // the PorpertyEditorManager for this instance.
   protected PropertyEditorManager manager;
-  
+
   // the listener list.
   protected List listenerList = new LinkedList();
 
@@ -35,7 +38,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   protected static Logger sLogger =  Logger.getLogger("editors.debug");
 
   /**
-   * Creates a new SwingPropertyEditor, in this case a JPanel with a 
+   * Creates a new SwingPropertyEditor, in this case a JPanel with a
    * SpringLayout.  Note that configureEditor() will need to get called
    * on this component in order to make it useful.
    */
@@ -43,7 +46,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     super();
     this.setLayout(new java.awt.GridBagLayout());
   }
-  
+
   /**
    * Creates a SwingPropertyEditor using the given property and manager.
    *
@@ -54,12 +57,12 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *                     properties.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public SwingPropertyEditor(String propertyName, String template, String baseProperty, PropertyEditorManager newManager, boolean isEnabled) {
-    configureEditor(propertyName, template, newManager, isEnabled);
+    configureEditor(propertyName, template, baseProperty,  newManager, isEnabled);
   }
-  
+
   /**
    * Creates a SwingPropertyEditor using the given property and manager.
    *
@@ -67,17 +70,17 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *        also be used to define the layout of this Editor.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public SwingPropertyEditor(String propertyName, PropertyEditorManager newManager, boolean isEnabled) {
     configureEditor(propertyName, propertyName, newManager, isEnabled);
   }
-  
+
   /**
    * Creates a SwingPropertyEditor using the given property and manager.
    *
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
@@ -85,8 +88,8 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public SwingPropertyEditor(String propertyName, String template, PropertyEditorManager newManager ) {
     configureEditor(propertyName, template, newManager, true);
   }
-  
-  
+
+
   /**
    * Creates a SwingPropertyEditor using the given property and manager.
    *
@@ -98,7 +101,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public void configureEditor(String propertyName, PropertyEditorManager newManager) {
     configureEditor(propertyName, propertyName, newManager, true);
   }
-  
+
   /**
    * Creates a SwingPropertyEditor using the given property and manager.
    *
@@ -106,10 +109,14 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *        also be used to define the layout of this Editor.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, PropertyEditorManager newManager, boolean isEnabled) {
     configureEditor(propertyName, propertyName, newManager, isEnabled);
+  }
+
+  public void configureEditor(String propertyName, String template, PropertyEditorManager manager, boolean isEnabled) {
+    configureEditor(propertyName, template, propertyName, manager, isEnabled);
   }
 
   /**
@@ -118,7 +125,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public boolean isEnabled() {
     return enabled;
   }
-  
+
   /**
    * Gets the PropertyEditorManager
    */

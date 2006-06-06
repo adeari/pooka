@@ -13,7 +13,7 @@ import javax.swing.Action;
  * A property editor which edits an AddressBook.
  */
 public class AddressBookEditorPane extends LabelValuePropertyEditor {
-  
+
   AddressBook book;
   String bookName;
   JPanel editPanel;
@@ -34,20 +34,21 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
   ConfigurablePopupMenu popupMenu;
 
   /**
-   * @param propertyName The property to be edited.  
-   * @param template The property that will define the layout of the 
+   * @param propertyName The property to be edited.
+   * @param template The property that will define the layout of the
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default. 
+   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
+    propertyBase=propertyBaseName;
     originalValue = manager.getProperty(property, "");
 
-    // we're going to have "AddressBook." at the beginning, and 
+    // we're going to have "AddressBook." at the beginning, and
     // ".addressListEditor" at the end...
     bookName = property.substring(12, property.length() - 18);
     book = Pooka.getAddressBookManager().getAddressBook(bookName);
@@ -60,7 +61,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     createAddressTable();
 
     labelComponent = this;
-    
+
     this.add(searchEntryPanel);
     //this.add(new JScrollPane(addressTable));
     JScrollPane addressPane = new JScrollPane(addressTable);
@@ -95,61 +96,61 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     searchButton = new JButton(manager.getProperty("AddressBookEditor.title.Search", "Search"));
     searchButton.addActionListener(a);
     searchEntryPanel.add(searchButton);
-    
+
   }
 
   /**
    * Creates the AddressTable.
    */
-  public void createAddressTable() {    
+  public void createAddressTable() {
     addressTable = new JTable();
     addressTable.setCellSelectionEnabled(false);
     addressTable.setColumnSelectionAllowed(false);
     addressTable.setRowSelectionAllowed(true);
 
     addressTable.addMouseListener(new MouseAdapter() {
-	public void mouseClicked(MouseEvent e) {
-	  if (e.getClickCount() == 2) {
-	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
-	    if (rowIndex != -1) {
-	      addressTable.setRowSelectionInterval(rowIndex, rowIndex);
-	      AddressBookEntry selectedEntry = getSelectedEntry();
-	      if (selectedEntry != null) {
-		editEntry(selectedEntry);
-	      }
-	    }
-	  }
-	}
-	
-	public void mousePressed(MouseEvent e) {
-	  if (e.isPopupTrigger()) {
-	    // see if anything is selected
-	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
-	    if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
-	      addressTable.setRowSelectionInterval(rowIndex, rowIndex);
-	    }
-	    
-	    showPopupMenu(addressTable, e);
-	  }
-	}
-
-	public void mouseReleased(MouseEvent e) {
-	  if (e.isPopupTrigger()) {
-	    // see if anything is selected
-	    int rowIndex = addressTable.rowAtPoint(e.getPoint());
-	    if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
-	      addressTable.setRowSelectionInterval(rowIndex, rowIndex);
-	    }
-	    
-	    showPopupMenu(addressTable, e);
-	  }
-	}
-      });
-    
-    updateTableModel(new AddressBookEntry[0]);
-    
+  public void mouseClicked(MouseEvent e) {
+    if (e.getClickCount() == 2) {
+      int rowIndex = addressTable.rowAtPoint(e.getPoint());
+      if (rowIndex != -1) {
+        addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+        AddressBookEntry selectedEntry = getSelectedEntry();
+        if (selectedEntry != null) {
+    editEntry(selectedEntry);
+        }
+      }
+    }
   }
-  
+
+  public void mousePressed(MouseEvent e) {
+    if (e.isPopupTrigger()) {
+      // see if anything is selected
+      int rowIndex = addressTable.rowAtPoint(e.getPoint());
+      if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
+        addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+      }
+
+      showPopupMenu(addressTable, e);
+    }
+  }
+
+  public void mouseReleased(MouseEvent e) {
+    if (e.isPopupTrigger()) {
+      // see if anything is selected
+      int rowIndex = addressTable.rowAtPoint(e.getPoint());
+      if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
+        addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+      }
+
+      showPopupMenu(addressTable, e);
+    }
+  }
+      });
+
+    updateTableModel(new AddressBookEntry[0]);
+
+  }
+
   /**
    * Creates the panel which has the editor fields, such as add/delete/edit
    * buttons.
@@ -171,7 +172,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     deleteButton = new JButton(manager.getProperty("AddressBookEditor.title.Delete", "Delete"));
     deleteButton.addActionListener(a);
     editPanel.add(deleteButton);
-    
+
   }
 
   /**
@@ -255,30 +256,30 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
   public void setValue() {
     if (book != null) {
       try {
-	book.saveAddressBook();
+  book.saveAddressBook();
       } catch (Exception e) {
-	Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
-	e.printStackTrace();
+  Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
+  e.printStackTrace();
       }
     } else {
       // if we're setting the value on this editor, then we might also be
       // creating the edited AddressBook.  see if that's true.
       SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    AddressBook newBook = Pooka.getAddressBookManager().getAddressBook(bookName);
-	    if (newBook != null) {
-	      book = newBook;
-	      setEnabled(true);
-	    }
-	  }
-	});
+    public void run() {
+      AddressBook newBook = Pooka.getAddressBookManager().getAddressBook(bookName);
+      if (newBook != null) {
+        book = newBook;
+        setEnabled(true);
+      }
+    }
+  });
     }
   }
-  
+
   public java.util.Properties getValue() {
     return new java.util.Properties();
   }
-  
+
   public void resetDefaultValue() {
     try {
       book.loadAddressBook();
@@ -288,7 +289,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     }
     performSearch();
   }
-  
+
   public boolean isChanged() {
     return false;
   }
@@ -315,7 +316,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
   }
 
   public class AddressBookTableModel extends javax.swing.table.AbstractTableModel {
-    
+
     AddressBookEntry[] entries;
 
     public AddressBookTableModel(AddressBookEntry[] newEntries) {
@@ -332,35 +333,35 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
 
     public String getColumnName(int index) {
       if (index == 0) {
-	return Pooka.getProperty("AddressBookTable.personalName", "Name");
+  return Pooka.getProperty("AddressBookTable.personalName", "Name");
       } else if (index == 1) {
-	return Pooka.getProperty("AddressBookTable.firstName", "First Name");
+  return Pooka.getProperty("AddressBookTable.firstName", "First Name");
       } else if (index == 2) {
-	return Pooka.getProperty("AddressBookTable.lastName", "Last Name");
+  return Pooka.getProperty("AddressBookTable.lastName", "Last Name");
       } else if (index == 3) {
-	return Pooka.getProperty("AddressBookTable.address", "Email Address");
+  return Pooka.getProperty("AddressBookTable.address", "Email Address");
       } else {
-	return null;
+  return null;
       }
     }
 
     public Object getValueAt(int row, int column) {
       if (row < 0 || column < 0 || row >= getRowCount() || column >= getColumnCount())
-	return null;
+  return null;
 
       AddressBookEntry currentEntry = entries[row];
 
       if (column == 0) {
-	return currentEntry.getID();
+  return currentEntry.getID();
       }
       if (column == 1) {
-	return currentEntry.getFirstName();
+  return currentEntry.getFirstName();
       }
       if (column == 2) {
-	return currentEntry.getLastName();
+  return currentEntry.getLastName();
       }
       if (column == 3) {
-	return currentEntry.getAddressString();
+  return currentEntry.getAddressString();
       }
 
       return null;
@@ -372,21 +373,21 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     public AddressBookEntry getEntryAt(int index) {
       return entries[index];
     }
-    
+
     /**
      * Adds the given AddressBookEntry to the end of the table.
      */
     public void addEntry(AddressBookEntry e) {
       AddressBookEntry[] newEntries;
-      int length; 
+      int length;
 
       if (entries != null) {
-	length = entries.length;
-	newEntries = new AddressBookEntry[length + 1];
-	System.arraycopy(entries, 0, newEntries, 0, length);
+  length = entries.length;
+  newEntries = new AddressBookEntry[length + 1];
+  System.arraycopy(entries, 0, newEntries, 0, length);
       } else {
-	length = 0;
-	newEntries = new AddressBookEntry[1];
+  length = 0;
+  newEntries = new AddressBookEntry[1];
       }
       newEntries[length] = e;
 
@@ -402,19 +403,19 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
       boolean found = false;
 
       for (int i = 0; !found && i < entries.length; i++) {
-	if (e == entries[i]) {
-	  found = true;
-	  int removedRow = i;
-	  AddressBookEntry[] newEntries = new AddressBookEntry[entries.length - 1];
-	  if (removedRow != 0)
-	    System.arraycopy(entries, 0, newEntries, 0, removedRow);
+  if (e == entries[i]) {
+    found = true;
+    int removedRow = i;
+    AddressBookEntry[] newEntries = new AddressBookEntry[entries.length - 1];
+    if (removedRow != 0)
+      System.arraycopy(entries, 0, newEntries, 0, removedRow);
 
-	  if (removedRow != entries.length -1) 
-	    System.arraycopy(entries, removedRow + 1, newEntries, removedRow, entries.length - removedRow - 1);
+    if (removedRow != entries.length -1)
+      System.arraycopy(entries, removedRow + 1, newEntries, removedRow, entries.length - removedRow - 1);
 
-	  entries = newEntries;
-	  fireTableRowsDeleted(removedRow, removedRow);
-	}
+    entries = newEntries;
+    fireTableRowsDeleted(removedRow, removedRow);
+  }
       }
     }
   }
