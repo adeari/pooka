@@ -24,9 +24,9 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       }
     }
   }
-    
+
   /**
-   * This resets the editor to the original (or latest set, if setValue() 
+   * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */
   public void resetDefaultValue() throws PropertyValueVetoException {
@@ -36,9 +36,9 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       }
     }
   }
-  
+
   /**
-   * Returns the current values of the edited properties as a 
+   * Returns the current values of the edited properties as a
    * java.util.Properties object.
    */
   public java.util.Properties getValue() {
@@ -47,12 +47,12 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     while (iter.hasNext()) {
       currentRetValue.putAll(((SwingPropertyEditor)iter.next()).getValue());
     }
-    
+
     return currentRetValue;
   }
-  
+
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled 
+   * Sets the enabled property of the PropertyEditorUI.  Disabled
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {
@@ -86,7 +86,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     Spring valueWidth = Spring.constant(0);
     Spring fullWidth = Spring.constant(0);
     for (int i = 0; i < labelComponents.length; i++) {
-      // for components with a label and a value, add to labelWidth and 
+      // for components with a label and a value, add to labelWidth and
       // valueWidth.
       if (valueComponents[i] != null) {
         labelWidth = Spring.max(labelWidth, layout.getConstraints(labelComponents[i]).getWidth());
@@ -106,7 +106,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
 
     // recalculate valueX.
     valueX = Spring.sum(labelX, Spring.sum(labelWidth, Spring.constant(xPad)));
-    
+
     // now set the widths and x values for all of our components.
     for (int i = 0; i < labelComponents.length; i++) {
       if (valueComponents[i] != null) {
@@ -162,6 +162,11 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       return;
     }
 
+    if (labelComponents == null || labelComponents.length < 1) {
+      System.err.println("Attempt to layoutGrid with no components.");
+      return;
+    }
+
     // go through both columns.
     Spring labelWidth = Spring.constant(0);
     Spring valueWidth = Spring.constant(0);
@@ -172,7 +177,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     Spring fullXOffset = Spring.constant(initialX, initialX, 32000);
 
     for (int i = 0; i < labelComponents.length; i++) {
-      // for components with a label and a value, add to labelWidth and 
+      // for components with a label and a value, add to labelWidth and
       // valueWidth.
       if (valueComponents[i] != null) {
         labelWidth = Spring.max(labelWidth, layout.getConstraints(labelComponents[i]).getWidth());
@@ -193,23 +198,23 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     for (int i = 0; i < labelComponents.length; i++) {
       if (valueComponents[i] != null) {
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-	layout.putConstraint(SpringLayout.WEST, labelComponents[i], labelValueXOffset, SpringLayout.WEST, parent);
+  layout.putConstraint(SpringLayout.WEST, labelComponents[i], labelValueXOffset, SpringLayout.WEST, parent);
         constraints.setWidth(labelWidth);
 
         constraints = layout.getConstraints(valueComponents[i]);
-	layout.putConstraint(SpringLayout.WEST, valueComponents[i],  xPad, SpringLayout.EAST, labelComponents[i]);
+  layout.putConstraint(SpringLayout.WEST, valueComponents[i],  xPad, SpringLayout.EAST, labelComponents[i]);
         constraints.setWidth(valueWidth);
-	if (i == 0) {
-	  layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, valueComponents[i]);
-	}
+  if (i == 0) {
+    layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, valueComponents[i]);
+  }
       } else {
         // set for the full width.
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-	layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
+  layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
         constraints.setWidth(fullWidth);
-	if (i == 0) {
-	  layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, labelComponents[i]);
-	}
+  if (i == 0) {
+    layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, labelComponents[i]);
+  }
       }
     }
 
@@ -218,27 +223,27 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       Spring height = Spring.constant(0);
       if (valueComponents[i] != null) {
         height = Spring.max(layout.getConstraints(labelComponents[i]).getHeight(), layout.getConstraints(valueComponents[i]).getHeight());
-	if (i == 0) {
-	  layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
-	} else {
-	  layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
-	}
-	layout.putConstraint(SpringLayout.NORTH, valueComponents[i], 0, SpringLayout.NORTH, labelComponents[i]);
-	layout.putConstraint(SpringLayout.SOUTH, valueComponents[i], 0, SpringLayout.SOUTH, labelComponents[i]);
+  if (i == 0) {
+    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
+  } else {
+    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
+  }
+  layout.putConstraint(SpringLayout.NORTH, valueComponents[i], 0, SpringLayout.NORTH, labelComponents[i]);
+  layout.putConstraint(SpringLayout.SOUTH, valueComponents[i], 0, SpringLayout.SOUTH, labelComponents[i]);
 
         layout.getConstraints(labelComponents[i]).setHeight(height);
         layout.getConstraints(valueComponents[i]).setHeight(height);
       } else {
-	if (i == 0) {
-	  layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
-	} else {
-	  layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
-	}
+  if (i == 0) {
+    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
+  } else {
+    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
+  }
       }
     }
 
     Spring southBoundary = Spring.constant(yPad, yPad, 32000);
-    layout.putConstraint(SpringLayout.SOUTH, parent, southBoundary, SpringLayout.SOUTH, labelComponents[labelComponents.length - 1]);    
+    layout.putConstraint(SpringLayout.SOUTH, parent, southBoundary, SpringLayout.SOUTH, labelComponents[labelComponents.length - 1]);
     //Set the parent's size.
     //pCons.setConstraint(SpringLayout.EAST, Spring.sum(fullWidth, Spring.constant(initialX)));
   }
@@ -252,6 +257,6 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
 
 
 }
-    
+
 
 
