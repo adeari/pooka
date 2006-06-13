@@ -7,7 +7,16 @@ import java.util.List;
 import java.util.logging.Logger;
 
 /**
- * This will make an editor for a list of properties.
+ * <p>This will make an editor for a list of properties.</p>
+ *
+ * <p>Note that CompositeSwingPropertyEditors generally will append
+ * subProperties that start with "." to the source template and property.
+ * In addition, CompositeSwingPropertyEditors have two properties
+ * that can vary this behavior:  if "propertyScoped" is set to true and
+ * the subproperty does not start with ".", then the original property is
+ * passed through.  If "addSubProperty" is set to false, then the original
+ * property will be passed through even if the subProperty starts with "."
+ * </p>
  */
 public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   protected List editors;
@@ -66,17 +75,15 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    * Returns the appropriate property for this source property.
    */
   public String createSubProperty(String pSource) {
-    if (manager.getProperty(editorTemplate + ".propertyScoped", "").equalsIgnoreCase("true")) {
-      if (pSource.startsWith(".")) {
-        return propertyBase + pSource;
+    if (pSource.startsWith(".")) {
+      if (manager.getProperty(editorTemplate + ".addSubProperty", "").equalsIgnoreCase("false")) {
+        return property;
       } else {
-        return propertyBase;
+        return property + pSource;
       }
-    } else if (manager.getProperty(editorTemplate + ".propertyScoped", "").equalsIgnoreCase("false")) {
-        return pSource;
     } else {
-      if (pSource.startsWith(".")) {
-        return propertyBase + pSource;
+      if (manager.getProperty(editorTemplate + ".propertyScoped", "").equalsIgnoreCase("true")) {
+        return property;
       } else {
         return pSource;
       }
@@ -87,20 +94,21 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    * Returns the appropriate tempate for this source property.
    */
   public String createSubTemplate(String pSource) {
-    if (manager.getProperty(editorTemplate + ".templateScoped", "").equalsIgnoreCase("true")) {
-      if (pSource.startsWith(".")) {
-        return editorTemplate + pSource;
-      } else {
-        return editorTemplate;
-      }
-    } else if (manager.getProperty(editorTemplate + ".templateScoped", "").equalsIgnoreCase("false")) {
-        return pSource;
+    if (pSource.startsWith(".")) {
+      return editorTemplate + pSource;
     } else {
-      if (pSource.startsWith(".")) {
-        return editorTemplate + pSource;
-      } else {
-        return pSource;
-      }
+      return pSource;
+    }
+  }
+
+  /**
+   * Returns the appropriate propertyBase for this source property.
+   */
+  public String createSubPropertyBase(String pSource) {
+    if (! pSource.startsWith(".") && ! manager.getProperty(editorTemplate + ".propertyScoped", "").equalsIgnoreCase("true")) {
+      return pSource;
+    } else {
+      return propertyBase;
     }
   }
 
