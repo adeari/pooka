@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.Container;
 import java.awt.Component;
 import java.util.Vector;
+import java.util.ArrayList;
 import java.util.List;
 import net.suberic.util.VariableBundle;
 
@@ -43,7 +44,6 @@ import net.suberic.util.VariableBundle;
  *
  */
 public class CompositeEditorPane extends CompositeSwingPropertyEditor {
-  boolean scoped;
 
   /**
    * Creates a CompositeEditorPane.
@@ -64,48 +64,24 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
 
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    enabled=isEnabled;
-    originalValue = manager.getProperty(property, "");
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     this.setBorder(BorderFactory.createEtchedBorder());
 
     getLogger().fine("creating CompositeEditorPane for " + property + " with template " + editorTemplate);
 
-    scoped = manager.getProperty(template + ".scoped", "false").equalsIgnoreCase("true");
+    List<String> properties = new ArrayList<String>();
+    List<String> templates = new ArrayList<String>();
 
-    getLogger().fine("manager.getProperty (" + template + ".scoped) = " +  manager.getProperty(template + ".scoped", "false") + " = " + scoped);
+    getLogger().fine("testing for template " + template);
 
-    List properties = new Vector();
-    List templates = new Vector();
+    List<String> templateNames = manager.getPropertyAsList(template, "");
+    getLogger().fine("templateNames = getProp(" + template + ") = " + manager.getProperty(template, ""));
 
-    if (scoped) {
-      getLogger().fine("testing for template " + template);
-      String scopeRoot = manager.getProperty(template + ".scopeRoot", template);
-      getLogger().fine("scopeRoot is " + scopeRoot);
-      List templateNames = manager.getPropertyAsList(template, "");
-      getLogger().fine("templateNames = getProp(" + template + ") = " + manager.getProperty(template, ""));
-
-      for (int i = 0; i < templateNames.size() ; i++) {
-        String propToEdit = null;
-        String currentSubProperty =  (String) templateNames.get(i);
-        if (manager.getProperty(scopeRoot + "." + currentSubProperty + ".addSubProperty", "true").equalsIgnoreCase("false")) {
-          propToEdit = property;
-        } else {
-          propToEdit = property + "." + (String) templateNames.get(i);
-        }
-        String templateToEdit = scopeRoot + "." + (String) templateNames.get(i);
-        properties.add(propToEdit);
-        templates.add(templateToEdit);
-        getLogger().fine("adding " + propToEdit + ", template " + templateToEdit);
-      }
-    } else {
-      getLogger().fine("creating prop list for Composite EP using " + property + ", " + template);
-      properties = manager.getPropertyAsList(property, "");
-      templates = manager.getPropertyAsList(template, "");
+    for (int i = 0; i < templateNames.size() ; i++) {
+      String subTemplateString = templateNames.get(i);
+      properties.add(createSubProperty(subTemplateString));
+      templates.add(createSubTemplate(subTemplateString));
     }
 
     addEditors(properties, templates);

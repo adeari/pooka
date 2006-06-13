@@ -120,6 +120,22 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
+   * Loads the basic properties for all SwingPropertyEditors.
+   */
+  public void configureBasic(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+    manager=newManager;
+    propertyBase=propertyBaseName;
+    editorTemplate = template;
+    if (propertyBaseName == null || propertyBaseName.length() == 0 || propertyBaseName.equals(propertyName)) {
+      property = propertyName;
+    } else {
+      property = propertyBaseName + "." + propertyName;
+    }
+    originalValue = manager.getProperty(property, "");
+    enabled=isEnabled;
+  }
+
+  /**
    * Returns the enabled flag.
    */
   public boolean isEnabled() {

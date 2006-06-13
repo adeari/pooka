@@ -1,4 +1,9 @@
 ----- ui update
+  *) CPE where property = Store.foo@bar.com, propertyBase = Store.foo@bar.com,
+	template=Store.editableFields
+     CPE where property = Preferences.UI, proertyBase=Preferences.UI
+	template=Pooka.changeThis
+
   *) fix composite editor -- centering isn't working correctly when top
 	is singlepanel and bottom is label/value.
 	-- figure out centering strategy.  what will look best?

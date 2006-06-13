@@ -44,20 +44,11 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
     getLogger().fine("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
-
-    enabled=isEnabled;
-
-    templateScoped = manager.getProperty(editorTemplate + ".templateScoped", "false").equalsIgnoreCase("true");
-    propertyScoped = manager.getProperty(editorTemplate + ".propertyScoped", "false").equalsIgnoreCase("true");
 
     tabbedPane = new JTabbedPane();
 
@@ -65,9 +56,10 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
     getLogger().fine("creating prop from " + template + "=" + manager.getProperty(template, ""));
 
-    List propsToEdit = manager.getPropertyAsList(template, "");
+    List<String> propsToEdit = manager.getPropertyAsList(template, "");
 
-    editors = createEditors(property, propsToEdit);
+    //editors = createEditors(property, propsToEdit);
+    editors = createEditors(propsToEdit);
 
     getLogger().fine("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
     getLogger().fine("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
@@ -87,29 +79,15 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
   /**
    * Creates the appropriate editors for the given properties.
    */
-  public List createEditors(String property, List propsToEdit) {
-
+  public List createEditors(List<String> propsToEdit) {
     List editorList = new ArrayList();
     SwingPropertyEditor currentEditor;
 
     for (int i = 0; i < propsToEdit.size(); i++) {
-      String currentTemplate = (String)propsToEdit.get(i);
-      if (templateScoped)
-        currentTemplate = editorTemplate + "." + currentTemplate;
-
-      getLogger().fine("getting editor using template " + currentTemplate);
-
-      if (propertyScoped) {
-        getLogger().fine("TEP:  scoped.  getting editor for " + property + ", " + currentTemplate);
-
-        currentEditor = createEditorPane(property, currentTemplate);
-
-      } else {
-
-        getLogger().fine("TEP:  notPropScoped; getting editor for " + currentTemplate + ", " + currentTemplate);
-
-        currentEditor = createEditorPane(currentTemplate, currentTemplate);
-      }
+      String subTemplateString = propsToEdit.get(i);
+      String property = createSubProperty(subTemplateString);
+      String currentTemplate = createSubTemplate(subTemplateString);
+      currentEditor = createEditorPane(property, currentTemplate);
 
       getLogger().fine("adding " + currentEditor);
       getLogger().fine("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());

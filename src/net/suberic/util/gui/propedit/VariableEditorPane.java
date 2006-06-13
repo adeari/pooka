@@ -28,14 +28,8 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    propertyBase=propertyBaseName;
-    editorTemplate = template;
-
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-
-    enabled=isEnabled;
 
     editors = new Vector();
 

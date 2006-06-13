@@ -16,12 +16,12 @@ import javax.swing.table.JTableHeader;
  * Foo.propertyType=Multi  --  shows this is a property editor for an
  *                             attribute with multiple values.
  *
- * Foo.editableFields=bar:baz -- shows which subfields are to be edited
+ * Foo.editableFields=.bar:.baz -- shows which subfields are to be edited
  *
  *
  * So if your Foo property equals "fooOne:fooTwo", then you'll end up with
  * a MultiPropertyEditor that has an entry for fooOne and fooTwo, along with
- * ways to add and delete these properties.
+ * ways to add and remove items.
  *
  * If your Foo.editableFields=bar:baz, then your editor screen for, say,
  * fooOne will have two entries, one for Foo.fooOne.bar, and the other for
@@ -52,11 +52,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     getLogger().fine("creating MultiEditorPane for property " + propertyName + ", template " + template);
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
@@ -138,10 +134,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     returnValue.setColumnSelectionAllowed(false);
     returnValue.setRowSelectionAllowed(true);
     returnValue.setShowGrid(false);
-    /*
-    JTableHeader header = new JTableHeader(columnLabels);
-    returnValue.setTableHeader(header);
-    */
 
     returnValue.getSelectionModel().addListSelectionListener(this);
     return returnValue;
