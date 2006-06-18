@@ -17,6 +17,12 @@ import java.util.logging.Logger;
  * passed through.  If "addSubProperty" is set to false, then the original
  * property will be passed through even if the subProperty starts with "."
  * </p>
+ *
+ * <p>Also, for template properties, the value 'templateBase" can be set
+ * to indicate the template base to use for scoped subtemplates, so that
+ * you can use the same set of subproperty definitions for multiple templated
+ * locations (i.e. using Store.editor.main.server as the key for .server
+ * for both Store.editor.main.imap and Store.editor.main.pop3).</p>
  */
 public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   protected List editors;
@@ -95,7 +101,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    */
   public String createSubTemplate(String pSource) {
     if (pSource.startsWith(".")) {
-      return editorTemplate + pSource;
+      return manager.getProperty(editorTemplate + ".templateBase", editorTemplate) + pSource;
     } else {
       return pSource;
     }

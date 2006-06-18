@@ -104,7 +104,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * Creates an editor pane for a group of values.
    */
   private SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subProperty, "Composite", manager, true);
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subProperty, manager, true);
 
   }
 
