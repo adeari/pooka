@@ -166,23 +166,23 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     for (int i = 0; i < labelComponents.length; i++) {
       if (valueComponents[i] != null) {
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-  layout.putConstraint(SpringLayout.WEST, labelComponents[i], labelValueXOffset, SpringLayout.WEST, parent);
+        layout.putConstraint(SpringLayout.WEST, labelComponents[i], labelValueXOffset, SpringLayout.WEST, parent);
         constraints.setWidth(labelWidth);
 
         constraints = layout.getConstraints(valueComponents[i]);
-  layout.putConstraint(SpringLayout.WEST, valueComponents[i],  xPad, SpringLayout.EAST, labelComponents[i]);
+        layout.putConstraint(SpringLayout.WEST, valueComponents[i],  xPad, SpringLayout.EAST, labelComponents[i]);
         constraints.setWidth(valueWidth);
-  if (i == 0) {
-    layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, valueComponents[i]);
-  }
+        if (i == 0) {
+          layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, valueComponents[i]);
+        }
       } else {
         // set for the full width.
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-  layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
+        layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
         constraints.setWidth(fullWidth);
-  if (i == 0) {
-    layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, labelComponents[i]);
-  }
+        if (i == 0) {
+          layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, labelComponents[i]);
+        }
       }
     }
 
@@ -191,22 +191,22 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       Spring height = Spring.constant(0);
       if (valueComponents[i] != null) {
         height = Spring.max(layout.getConstraints(labelComponents[i]).getHeight(), layout.getConstraints(valueComponents[i]).getHeight());
-  if (i == 0) {
-    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
-  } else {
-    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
-  }
-  layout.putConstraint(SpringLayout.NORTH, valueComponents[i], 0, SpringLayout.NORTH, labelComponents[i]);
-  layout.putConstraint(SpringLayout.SOUTH, valueComponents[i], 0, SpringLayout.SOUTH, labelComponents[i]);
+        if (i == 0) {
+          layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
+        } else {
+          layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
+        }
+        layout.putConstraint(SpringLayout.NORTH, valueComponents[i], 0, SpringLayout.NORTH, labelComponents[i]);
+        layout.putConstraint(SpringLayout.SOUTH, valueComponents[i], 0, SpringLayout.SOUTH, labelComponents[i]);
 
         layout.getConstraints(labelComponents[i]).setHeight(height);
         layout.getConstraints(valueComponents[i]).setHeight(height);
       } else {
-  if (i == 0) {
-    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
-  } else {
-    layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
-  }
+        if (i == 0) {
+          layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.NORTH, parent);
+        } else {
+          layout.putConstraint(SpringLayout.NORTH, labelComponents[i], yPad, SpringLayout.SOUTH, labelComponents[i - 1]);
+        }
       }
     }
 
