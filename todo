@@ -11,6 +11,8 @@
   *) PEP should make sure that the editor is at least as big as the 
 	buttons.
   *) ??? switch checkbox to left side?
+  *) ??? sections in editors (like a 'cache settings' setting
+  *) ??? radio editor
 *) new editor system.
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,
