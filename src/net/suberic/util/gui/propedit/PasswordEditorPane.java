@@ -16,10 +16,12 @@ public class PasswordEditorPane extends StringEditorPane {
    *                   changes.
    * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
+    propertyBase = propertyBaseName;
+
     originalScrambledValue = manager.getProperty(property, "");
     if (!originalScrambledValue.equals(""))
       originalValue = descrambleString(originalScrambledValue);
