@@ -23,12 +23,7 @@ public class StringEditorPane extends LabelValuePropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    propertyBase=propertyBaseName;
-    editorTemplate = template;
-    originalValue = manager.getProperty(property, "");
-    currentValue = originalValue;
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     getLogger().fine("configuring StringEditorPane.  property is " + property + "; editorTemplate is " + editorTemplate);
 

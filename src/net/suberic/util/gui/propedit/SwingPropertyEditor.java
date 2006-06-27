@@ -131,8 +131,10 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     } else {
       property = propertyBaseName + "." + propertyName;
     }
-    originalValue = manager.getProperty(property, "");
+    addDefaultListeners();
     enabled=isEnabled;
+    originalValue = manager.getProperty(property, "");
+    firePropertyInitializedEvent(originalValue);
   }
 
   /**
@@ -188,6 +190,16 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
+   * Fires a propertyInitialized event to all of the PropertyEditorListeners.
+   */
+  public void firePropertyInitializedEvent(String newValue) {
+    for (int i = 0; i < listenerList.size(); i++) {
+      PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
+      current.propertyInitialized(this, property, newValue);
+    }
+  }
+
+  /**
    * Gets the parent PropertyEditorPane for the given component.
    */
   public abstract PropertyEditorPane getPropertyEditorPane();
@@ -216,7 +228,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     java.util.Iterator it = propertyListenerList.iterator();
     while (it.hasNext()) {
       String current = (String)it.next();
-      PropertyEditorListener pel = manager.createListener(current);
+      PropertyEditorListener pel = manager.createListener(current, property, propertyBase, editorTemplate);
       if (pel != null) {
         addPropertyEditorListener(pel);
       }
@@ -228,6 +240,13 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    */
   public String getProperty() {
     return property;
+  }
+
+  /**
+   * Sets the original value.
+   */
+  public void setOriginalValue(String pOriginalValue) {
+    originalValue = pOriginalValue;
   }
 
   /**

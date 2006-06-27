@@ -105,6 +105,11 @@ public interface PropertyEditorUI {
   public void resetDefaultValue() throws PropertyValueVetoException;
 
   /**
+   * Sets the original value of the editor.
+   */
+  public void setOriginalValue(String pOriginalValue);
+
+  /**
    * Returns the current values of the edited properties as a
    * java.util.Properties object.
    */

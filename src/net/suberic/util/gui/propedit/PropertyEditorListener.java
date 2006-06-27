@@ -15,4 +15,9 @@ public interface PropertyEditorListener {
    * Called after a property changes.
    */
   public void propertyChanged(PropertyEditorUI source, String property, String newValue);
+
+  /**
+   * Called when an editor is initialized with a set value.
+   */
+  public void propertyInitialized(PropertyEditorUI source, String property, String newValue);
 }

@@ -161,11 +161,11 @@ public class PropertyEditorManager {
    * Creates an appropriate PropertyEditorListener from the given
    * String.
    */
-  public PropertyEditorListener createListener(String key) {
+  public PropertyEditorListener createListener(String key, String property, String propertyBase, String editorTemplate) {
     try {
       Class pelClass = Class.forName(getProperty(key + ".class", ""));
       ConfigurablePropertyEditorListener pel = (ConfigurablePropertyEditorListener) pelClass.newInstance();
-      pel.configureListener(key, this);
+      pel.configureListener(key, property, propertyBase, editorTemplate, this);
       return pel;
     } catch (Exception e) {
 

@@ -19,4 +19,11 @@ public class PropertyEditorAdapter implements PropertyEditorListener {
   public void propertyChanged(PropertyEditorUI source, String property, String newValue) {
 
   }
+
+  /**
+   * Called when an editor is initialized with a set value.
+   */
+  public void propertyInitialized(PropertyEditorUI source, String property, String newValue) {
+
+  }
 }

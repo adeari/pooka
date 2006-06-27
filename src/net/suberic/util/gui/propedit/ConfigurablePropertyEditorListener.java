@@ -5,6 +5,6 @@ package net.suberic.util.gui.propedit;
  */
 public interface ConfigurablePropertyEditorListener extends PropertyEditorListener {
 
-  public abstract void configureListener(String key, PropertyEditorManager pem);
+  public abstract void configureListener(String key, String property, String propertyBase, String editorTemplate, PropertyEditorManager manager);
 
 }
