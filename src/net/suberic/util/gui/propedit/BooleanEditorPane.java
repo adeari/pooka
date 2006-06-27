@@ -1,8 +1,9 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import javax.swing.event.*;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 import net.suberic.util.*;
-import java.awt.FlowLayout;
 
 /**
  * This is a Swing implemenation of a boolean PropertyEditorUI.
@@ -21,18 +22,13 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
     debug = newManager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-
-    property=propertyName;
-    editorTemplate=template;
-    propertyBase=propertyBaseName;
-    manager=newManager;
 
     if (debug) {
       System.out.println("configuring Boolean editor with property " + propertyName + ", editorTemplate " + editorTemplate);
     }
 
-    originalValue = manager.getProperty(property, manager.getProperty(template, "false"));
     originalBoolean = originalValue.equalsIgnoreCase("true");
 
     if (debug) {
@@ -46,22 +42,28 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
 
     inputField.setSelected(originalBoolean);
 
-    inputField.addChangeListener(new ChangeListener() {
-  public void stateChanged(ChangeEvent e) {
-    String newValue;
-    if (inputField.isSelected()) {
-      newValue = "true";
-    } else {
-      newValue = "false";
-    }
-    try {
-      firePropertyChangingEvent(newValue);
-      firePropertyChangedEvent(newValue);
-    } catch (PropertyValueVetoException pvve) {
-      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());
-      inputField.setSelected(! inputField.isSelected());
-    }
-  }
+    inputField.addItemListener(new ItemListener() {
+        public void itemStateChanged(ItemEvent e) {
+          String newValue = null;
+          if (e.getStateChange() == ItemEvent.SELECTED) {
+            newValue = "true";
+          } else if (e.getStateChange() == ItemEvent.DESELECTED) {
+            newValue = "false";
+          }
+
+          try {
+            if (newValue != null) {
+              firePropertyChangingEvent(newValue);
+              System.err.println("firing propertyChangedEvent; newValue = " + newValue);
+              firePropertyChangedEvent(newValue);
+            } else {
+              System.err.println("neither selected nor deselected.");
+            }
+          } catch (PropertyValueVetoException pvve) {
+            manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());
+            inputField.setSelected(! inputField.isSelected());
+          }
+        }
       });
 
     this.add(label);
@@ -80,13 +82,13 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
   public void setValue() {
     if (isEnabled()) {
       if (inputField.isSelected() != originalBoolean || manager.getProperty(property, "unset").equals("unset")) {
-  String newValue;
-  if (inputField.isSelected())
-    newValue = "true";
-  else
-    newValue = "false";
+        String newValue;
+        if (inputField.isSelected())
+          newValue = "true";
+        else
+          newValue = "false";
 
-  manager.setProperty(property, newValue);
+        manager.setProperty(property, newValue);
       }
     }
   }

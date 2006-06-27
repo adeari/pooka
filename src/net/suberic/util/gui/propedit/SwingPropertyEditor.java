@@ -183,7 +183,9 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    * Fires a propertyChanged event to all of the PropertyEditorListeners.
    */
   public void firePropertyChangedEvent(String newValue) {
+    System.err.println("propChangedEvent:  listenerList.size() = " + listenerList.size());
     for (int i = 0; i < listenerList.size(); i++) {
+      System.err.println("notifying listener " + i);
       PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
       current.propertyChanged(this, property, newValue);
     }
@@ -228,8 +230,10 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     java.util.Iterator it = propertyListenerList.iterator();
     while (it.hasNext()) {
       String current = (String)it.next();
+      System.err.println("adding listener " + current + " to editor for " + getProperty());
       PropertyEditorListener pel = manager.createListener(current, property, propertyBase, editorTemplate);
       if (pel != null) {
+        System.err.println("adding listener " + current + " to editor for " + getProperty() + ":  listener is " + pel);
         addPropertyEditorListener(pel);
       }
     }

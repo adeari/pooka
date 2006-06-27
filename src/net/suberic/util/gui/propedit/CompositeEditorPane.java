@@ -98,7 +98,7 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     Component[] labelComponents = new Component[properties.size()];
     Component[] valueComponents = new Component[properties.size()];
     for (int i = 0; i < properties.size(); i++) {
-      currentEditor = (SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i));
+      currentEditor = (SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i), propertyBase);
       currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
 

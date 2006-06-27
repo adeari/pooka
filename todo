@@ -1,4 +1,7 @@
 ----- ui update
+  *) TabbedEditorPane should make sure to expand to fit its area.
+  *) PEP should make sure that the editor is at least as big as the 
+	buttons.
   *) fix composite editor -- centering isn't working correctly when top
 	is singlepanel and bottom is label/value.
 	-- figure out centering strategy.  what will look best?
@@ -7,9 +10,6 @@
 	-- mosly fixed.
   *) fix filters
   *) change selection/add buttons
-  *) TabbedEditorPane should make sure to expand to fit its area.
-  *) PEP should make sure that the editor is at least as big as the 
-	buttons.
   *) ??? switch checkbox to left side?
   *) ??? sections in editors (like a 'cache settings' setting
   *) ??? radio editor

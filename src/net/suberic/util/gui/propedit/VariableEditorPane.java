@@ -35,6 +35,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     keyProperty = createSubProperty(manager.getProperty(editorTemplate + ".keyProperty", ""));
 
     System.err.println("keyProperty = " + keyProperty);
+    System.err.println("propertyName = " + propertyName + "; propertyBaseName = " + propertyBaseName);
 
     editors = new Vector();
 
