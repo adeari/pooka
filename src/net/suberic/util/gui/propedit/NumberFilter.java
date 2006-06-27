@@ -5,6 +5,8 @@ package net.suberic.util.gui.propedit;
  * used for min/max settings.
  */
 public class NumberFilter extends PropertyEditorAdapter implements ConfigurablePropertyEditorListener {
+  String originalValue;
+
   boolean checkMin = false;
   int min;
   boolean checkMax = false;
@@ -14,6 +16,8 @@ public class NumberFilter extends PropertyEditorAdapter implements ConfigurableP
    * Configures this filter from the given key.
    */
   public void configureListener(String key, String property, String propertyBase, String editorTemplate, PropertyEditorManager manager) {
+    originalValue = manager.getProperty(property, "");
+
     String minProp = manager.getProperty(key + ".min", "");
     if (minProp != "") {
       try {
@@ -42,7 +46,7 @@ public class NumberFilter extends PropertyEditorAdapter implements ConfigurableP
    */
   public void propertyChanging(PropertyEditorUI source, String property, String newValue) throws PropertyValueVetoException {
     try {
-      if (newValue != null && newValue.length() > 0 ) {
+      if (newValue != null && newValue.length() > 0 && ! newValue.equals(originalValue)) {
         int currentValue = Integer.parseInt(newValue);
         if (checkMin) {
           if (currentValue < min) {

@@ -103,6 +103,13 @@ Pooka.standardTrayIcon=PookaTrayIcon
 Pooka.newMessageIcon=EnvelopeOpen
 Pooka.newMessageTrayIcon=NewMessageTray
 
+UserProfile.mailHeaders.fields=From:FromPersonal:ReplyTo:ReplyToPersonal:Organization
+UserProfile.mailHeaders.fields.FromPersonal.value=FromPersonal
+UserProfile.mailHeaders.fields.From.value=From
+UserProfile.mailHeaders.fields.Organization.value=Organization
+UserProfile.mailHeaders.fields.ReplyTo.value=Return-Path
+
+
 FolderPanel.2xClickAction=file-open
 
 #FolderTable=Flagged:New:Attachments:SentDate:From:Subject

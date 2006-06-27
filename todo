@@ -13,6 +13,7 @@
   *) ??? switch checkbox to left side?
   *) ??? sections in editors (like a 'cache settings' setting
   *) ??? radio editor
+  *) multieditorpane should autoselect first entry.
 *) new editor system.
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,

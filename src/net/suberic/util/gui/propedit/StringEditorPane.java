@@ -55,7 +55,6 @@ public class StringEditorPane extends LabelValuePropertyEditor {
     valueComponent = inputField;
 
     manager.registerPropertyEditor(property, this);
-    addDefaultListeners();
   }
 
   /**
