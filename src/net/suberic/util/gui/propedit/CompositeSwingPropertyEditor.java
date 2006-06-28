@@ -141,7 +141,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     Spring fullWidth = Spring.constant(0);
 
     Spring labelValueXOffset = Spring.constant(initialX, initialX, 32000);
-
+    Spring xOffset = Spring.constant(initialX, initialX, initialX);
     Spring fullXOffset = Spring.constant(initialX, initialX, 32000);
 
     for (int i = 0; i < labelComponents.length; i++) {
@@ -166,7 +166,8 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     for (int i = 0; i < labelComponents.length; i++) {
       if (valueComponents[i] != null) {
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-        layout.putConstraint(SpringLayout.WEST, labelComponents[i], labelValueXOffset, SpringLayout.WEST, parent);
+        //layout.putConstraint(SpringLayout.WEST, labelComponents[i], labelValueXOffset, SpringLayout.WEST, parent);
+        layout.putConstraint(SpringLayout.WEST, labelComponents[i], xOffset, SpringLayout.WEST, parent);
         constraints.setWidth(labelWidth);
 
         constraints = layout.getConstraints(valueComponents[i]);
@@ -178,7 +179,8 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       } else {
         // set for the full width.
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
-        layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
+        //layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
+        layout.putConstraint(SpringLayout.WEST, labelComponents[i], xOffset, SpringLayout.WEST, parent);
         constraints.setWidth(fullWidth);
         if (i == 0) {
           layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, labelComponents[i]);

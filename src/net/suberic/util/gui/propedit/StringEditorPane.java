@@ -107,7 +107,10 @@ public class StringEditorPane extends LabelValuePropertyEditor {
   public void setEnabled(boolean newValue) {
     if (inputField != null) {
       inputField.setEnabled(newValue);
-      enabled=newValue;
     }
+    if (label != null) {
+      label.setEnabled(newValue);
+    }
+    enabled=newValue;
   }
 }

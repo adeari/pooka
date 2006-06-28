@@ -219,6 +219,7 @@ public class PropertyEditorFactory {
    */
   public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, String type, PropertyEditorManager mgr, boolean enabled) {
 
+    System.err.println("factory:  creating editor for property " + property + ", template " + editorTemplate + ", propertyBase " + propertyBase);
     Class editorClass = (Class) typeToClassMap.get(type);
     if (editorClass == null) {
       editorClass = (Class) typeToClassMap.get("String");

@@ -51,11 +51,6 @@ public class PropertyEditorManager {
    * Property.
    */
   public void registerPropertyEditor(String property, PropertyEditorUI editor) {
-    System.err.println("registering editor for " + property);
-    if (editorMap.get(property) != null) {
-      System.err.println("duplicate.");
-      //Thread.currentThread().dumpStack();
-    }
     List listenerList = (List) pendingListenerMap.get(property);
     if (listenerList != null) {
       Iterator it = listenerList.iterator();
@@ -167,7 +162,6 @@ public class PropertyEditorManager {
    * String.
    */
   public PropertyEditorListener createListener(String key, String property, String propertyBase, String editorTemplate) {
-    System.err.println("creating listener for key " + key + ", property " + property + ", propertyBase " + propertyBase + ", editorTemplate " + editorTemplate);
     try {
       Class pelClass = Class.forName(getProperty(key + ".class", ""));
       ConfigurablePropertyEditorListener pel = (ConfigurablePropertyEditorListener) pelClass.newInstance();

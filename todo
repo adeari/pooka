@@ -1,5 +1,7 @@
 ----- ui update
   *) TabbedEditorPane should make sure to expand to fit its area.
+	-- it looks like it does.  maybe there's a problem with the
+	   CompositeEditorPane?
   *) PEP should make sure that the editor is at least as big as the 
 	buttons.
   *) fix composite editor -- centering isn't working correctly when top
@@ -39,7 +41,7 @@
 	     *) port (??) (p/i)
 	     *) inbox file (m)
 	     *) mail directory (m)
-	     *) check every x minutes
+	     *) check every x minutes (all?)
 	   *) caching (i)
 	   *) cache headers only (i)
 	   *) cache full messages automatically (i)

@@ -47,7 +47,6 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
-
     getLogger().fine("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
 
     tabbedPane = new JTabbedPane();
@@ -65,11 +64,15 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     getLogger().fine("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
     getLogger().fine("size for tabbedPane = " + tabbedPane.getSize());
 
+    System.err.println("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
+    System.err.println("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
+    System.err.println("size for tabbedPane = " + tabbedPane.getSize());
+
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
     this.add(tabbedPane);
-    layout.putConstraint(SpringLayout.WEST, tabbedPane, 0 ,SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.NORTH, tabbedPane, 0 ,SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.WEST, tabbedPane, 0, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, tabbedPane, 0, SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.SOUTH, this, 0 ,SpringLayout.SOUTH, tabbedPane);
     layout.putConstraint(SpringLayout.EAST, this, 0 ,SpringLayout.EAST, tabbedPane);
 
@@ -91,6 +94,10 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
       getLogger().fine("adding " + currentEditor);
       getLogger().fine("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+
+      System.err.println("adding " + currentEditor);
+      System.err.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
+      System.err.println("currentEditor.getPreferredSize() = " + currentEditor.getPreferredSize());
 
       editorList.add(currentEditor);
       tabbedPane.add(manager.getProperty(currentTemplate + ".label", currentTemplate), currentEditor);

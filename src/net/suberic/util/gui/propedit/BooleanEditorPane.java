@@ -8,7 +8,7 @@ import net.suberic.util.*;
 /**
  * This is a Swing implemenation of a boolean PropertyEditorUI.
  */
-public class BooleanEditorPane extends LabelValuePropertyEditor {
+public class BooleanEditorPane extends SwingPropertyEditor {
   JCheckBox inputField;
   JLabel label;
   boolean originalBoolean = false;
@@ -36,7 +36,14 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
     }
 
 
-    label = createLabel();
+    String defaultLabel;
+    int dotIndex = property.lastIndexOf(".");
+    if (dotIndex == -1)
+      defaultLabel = new String(property);
+    else
+      defaultLabel = property.substring(dotIndex+1);
+
+    label = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
 
     inputField = new JCheckBox();
 
@@ -66,12 +73,12 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
         }
       });
 
-    this.add(label);
     this.add(inputField);
+    this.add(label);
     this.setEnabled(isEnabled);
 
-    labelComponent = label;
-    valueComponent = inputField;
+    //labelComponent = label;
+    //valueComponent = inputField;
 
     manager.registerPropertyEditor(property, this);
   }
@@ -124,8 +131,18 @@ public class BooleanEditorPane extends LabelValuePropertyEditor {
   public void setEnabled(boolean newValue) {
     if (inputField != null) {
       inputField.setEnabled(newValue);
-      enabled=newValue;
     }
+    if (label != null) {
+      label.setEnabled(newValue);
+    }
+    enabled=newValue;
+  }
+
+  /**
+   * Gets the parent PropertyEditorPane for the given component.
+   */
+  public PropertyEditorPane getPropertyEditorPane() {
+    return getPropertyEditorPane(this);
   }
 
 }

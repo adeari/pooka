@@ -66,9 +66,14 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
 
     configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
-    this.setBorder(BorderFactory.createEtchedBorder());
-
     getLogger().fine("creating CompositeEditorPane for " + property + " with template " + editorTemplate);
+
+    //this.setBorder(BorderFactory.createEtchedBorder());
+
+    String borderLabel = manager.getProperty(editorTemplate + ".label.border", "");
+    if (borderLabel.length() > 0) {
+      this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), borderLabel));
+    }
 
     List<String> properties = new ArrayList<String>();
     List<String> templates = new ArrayList<String>();
@@ -87,7 +92,7 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     addEditors(properties, templates);
   }
 
-  public void addEditors(List properties, List templates) {
+  public void addEditors(List<String> properties, List<String> templates) {
     SwingPropertyEditor currentEditor;
 
     editors = new Vector();
@@ -98,7 +103,7 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
     Component[] labelComponents = new Component[properties.size()];
     Component[] valueComponents = new Component[properties.size()];
     for (int i = 0; i < properties.size(); i++) {
-      currentEditor = (SwingPropertyEditor) manager.createEditor((String)properties.get(i), (String) templates.get(i), propertyBase);
+      currentEditor = (SwingPropertyEditor) manager.createEditor(properties.get(i), templates.get(i), propertyBase);
       currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
 
