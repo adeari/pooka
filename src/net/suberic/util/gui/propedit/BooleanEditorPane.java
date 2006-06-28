@@ -80,6 +80,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     //labelComponent = label;
     //valueComponent = inputField;
 
+    this.setMaximumSize(this.getPreferredSize());
     manager.registerPropertyEditor(property, this);
   }
 
