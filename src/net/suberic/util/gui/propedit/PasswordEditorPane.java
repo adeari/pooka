@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 
 public class PasswordEditorPane extends StringEditorPane {
   String originalScrambledValue;
-  JLabel label;
 
   /**
    * @param propertyName The property to be edited.

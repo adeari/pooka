@@ -2,12 +2,6 @@
   *) TabbedEditorPane should make sure to expand to fit its area.
 	-- it looks like it does.  maybe there's a problem with the
 	   CompositeEditorPane?
-  *) fix composite editor -- centering isn't working correctly when top
-	is singlepanel and bottom is label/value.
-	-- figure out centering strategy.  what will look best?
-  *) fix value widths--some are expanding, some aren't, some aren't when
-	they should be.
-	-- mosly fixed.
   *) fix filters
   *) change selection/add buttons
   *) ??? switch checkbox to left side?

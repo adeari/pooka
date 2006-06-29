@@ -62,7 +62,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     List<String> optionList = manager.getPropertyAsList(property, "");
 
-    List<String> displayProperties = manager.getPropertyAsList(editorTemplate + ".displayProperties", "");
+    List<String> displayProperties = manager.getPropertyAsList(editorTemplate + "._displayProperties", "");
 
     optionTable = createOptionTable(optionList, displayProperties);
     JScrollPane optionScrollPane = new JScrollPane(optionTable);
@@ -106,11 +106,11 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     // first get the display properties and their labels.
     Vector columnLabels = new Vector();
     // first one is always the id.
-    columnLabels.add(manager.getProperty(editorTemplate + ".Label", editorTemplate));
+    columnLabels.add(manager.getProperty(editorTemplate + "._label", editorTemplate));
     for (String subProperty: displayProperties) {
       getLogger().fine("adding label for " + subProperty);
 
-      String label = manager.getProperty(editorTemplate + "." + subProperty + ".Label", subProperty);
+      String label = manager.getProperty(editorTemplate + "._displayProperties." + subProperty + ".label", subProperty);
       columnLabels.add(label);
     }
 
