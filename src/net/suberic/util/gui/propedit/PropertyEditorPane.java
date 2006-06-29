@@ -67,15 +67,20 @@ public class PropertyEditorPane extends JPanel {
 
     layout.putConstraint(SpringLayout.WEST, editorPanel, 5, SpringLayout.WEST, this);
     layout.putConstraint(SpringLayout.NORTH, editorPanel, 5, SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, editorPanel);
     layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, editorPanel);
+    //layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, editorPanel);
 
     this.add(buttonPanel);
     layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.SOUTH, editorPanel);
 
     layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.EAST, buttonPanel, -5, SpringLayout.EAST, this);
     layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, buttonPanel);
+
+    Spring widthSpring = Spring.constant(0);
+    widthSpring = Spring.max(widthSpring, layout.getConstraints(buttonPanel).getWidth());
+    widthSpring = Spring.max(widthSpring, layout.getConstraints(editorPanel).getWidth());
+
+    layout.putConstraint(SpringLayout.EAST, this, Spring.sum(widthSpring, Spring.constant(10)), SpringLayout.WEST, this);
 
   }
 
