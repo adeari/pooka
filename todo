@@ -4,7 +4,6 @@
 	   CompositeEditorPane?
   *) fix filters
   *) change selection/add buttons
-  *) ??? switch checkbox to left side?
   *) ??? sections in editors (like a 'cache settings' setting
   *) ??? radio editor
   *) multieditorpane should autoselect first entry.
