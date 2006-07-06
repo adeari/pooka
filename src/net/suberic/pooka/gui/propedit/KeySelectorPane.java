@@ -28,11 +28,7 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     if (debug) {
       System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
@@ -48,7 +44,7 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
     labelComponent = label;
     JPanel tmpPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0,0));
     tmpPanel.add(valueDisplay);
-    tmpPanel.setPreferredSize(new java.awt.Dimension(150, valueDisplay.getMinimumSize().height));
+    tmpPanel.setPreferredSize(new java.awt.Dimension(Math.max(150, tmpPanel.getMinimumSize().width), valueDisplay.getMinimumSize().height));
     valueComponent = tmpPanel;
     this.add(tmpPanel);
 

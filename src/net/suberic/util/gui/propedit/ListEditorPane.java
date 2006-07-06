@@ -26,10 +26,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     label = createLabel();
 
@@ -40,6 +37,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     inputField.setMaximumSize(inputField.getMinimumSize());
     inputBox.add(inputField);
     inputBox.add(Box.createGlue());
+
     if (manager.getProperty(editorTemplate + "._includeAddButton", "false").equalsIgnoreCase("true")) {
       addButton = createAddButton();
       inputBox.add(addButton);
@@ -53,8 +51,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
     labelComponent = label;
     valueComponent = inputBox;
-    //valueComponent.setLayout(new FlowLayout(FlowLayout.LEFT));
-    //valueComponent.add(inputField);
+
     manager.registerPropertyEditor(property, this);
 
     // if we're showing something other than the actually configured
