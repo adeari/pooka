@@ -136,6 +136,9 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     returnValue.setShowGrid(false);
 
     returnValue.getSelectionModel().addListSelectionListener(this);
+    if (returnValue.getRowCount() > 0) {
+      returnValue.setRowSelectionInterval(0,0);
+    }
     return returnValue;
   }
 
