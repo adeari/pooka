@@ -168,7 +168,8 @@ public class PropertyEditorManager {
       pel.configureListener(key, property, propertyBase, editorTemplate, this);
       return pel;
     } catch (Exception e) {
-
+      System.err.println("error configuring listener from key " + key + " for property " + property);
+      e.printStackTrace();
     }
 
     return null;

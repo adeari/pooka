@@ -193,6 +193,16 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
+   * Fires a propertyCommitting event to all of the PropertyEditorListeners.
+   */
+  public void firePropertyCommittingEvent(String newValue) throws PropertyValueVetoException {
+    for (int i = 0; i < listenerList.size(); i++) {
+      PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
+      current.propertyCommitting(this, property, newValue);
+    }
+  }
+
+  /**
    * Fires a propertyInitialized event to all of the PropertyEditorListeners.
    */
   public void firePropertyInitializedEvent(String newValue) {

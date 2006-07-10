@@ -61,10 +61,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
           try {
             if (newValue != null) {
               firePropertyChangingEvent(newValue);
-              System.err.println("firing propertyChangedEvent; newValue = " + newValue);
               firePropertyChangedEvent(newValue);
-            } else {
-              System.err.println("neither selected nor deselected.");
             }
           } catch (PropertyValueVetoException pvve) {
             manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());

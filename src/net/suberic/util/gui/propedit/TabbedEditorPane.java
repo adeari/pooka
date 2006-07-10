@@ -64,10 +64,6 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
     getLogger().fine("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
     getLogger().fine("size for tabbedPane = " + tabbedPane.getSize());
 
-    System.err.println("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
-    System.err.println("preferredSize for tabbedPane = " + tabbedPane.getPreferredSize());
-    System.err.println("size for tabbedPane = " + tabbedPane.getSize());
-
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
     this.add(tabbedPane);
@@ -94,10 +90,6 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
       getLogger().fine("adding " + currentEditor);
       getLogger().fine("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
-
-      System.err.println("adding " + currentEditor);
-      System.err.println("currentEditor.getMinimumSize() = " + currentEditor.getMinimumSize());
-      System.err.println("currentEditor.getPreferredSize() = " + currentEditor.getPreferredSize());
 
       editorList.add(currentEditor);
       tabbedPane.add(manager.getProperty(currentTemplate + ".label", currentTemplate), currentEditor);

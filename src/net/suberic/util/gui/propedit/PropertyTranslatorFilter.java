@@ -17,7 +17,6 @@ public class PropertyTranslatorFilter extends PropertyEditorAdapter implements C
     for (String translatorKey: translatorKeys) {
       String[] pair = translatorKey.split("=");
       if (pair != null && pair.length == 2) {
-        System.err.println("adding translation for " + pair[0] + " = " + pair[1]);
         translator.put(pair[0], pair[1]);
       }
     }
@@ -28,10 +27,8 @@ public class PropertyTranslatorFilter extends PropertyEditorAdapter implements C
    * be translated, we set the new value to the translated value.
    */
   public void propertyInitialized(PropertyEditorUI source, String property, String newValue) {
-    System.err.println("propertyInitialized.");
     String translatedValue = translator.get(newValue);
     if (translatedValue != null) {
-      System.err.println("changing selected value to " + translatedValue);
       source.setOriginalValue(translatedValue);
     }
   }
