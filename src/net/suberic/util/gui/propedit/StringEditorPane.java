@@ -65,8 +65,9 @@ public class StringEditorPane extends LabelValuePropertyEditor {
     if (isEnabled() && !(inputField.getText().equals(currentValue))) {
       firePropertyChangingEvent(inputField.getText());
       firePropertyChangedEvent(inputField.getText());
-      firePropertyCommittingEvent(inputField.getText());
     }
+
+    firePropertyCommittingEvent(inputField.getText());
 
     if (isEnabled() && !(inputField.getText().equals(originalValue))) {
       manager.setProperty(property, inputField.getText());

@@ -21,6 +21,7 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
     propertyBase = pPropertyBase;
     List<String> requiredKeys = manager.getPropertyAsList(key + ".map", "");
     if (requiredKeys.size() < 1) {
+      System.err.println("always.");
       always = true;
     } else {
       for (String requiredKey: requiredKeys) {
@@ -39,8 +40,10 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
    */
   public void propertyCommitting(PropertyEditorUI source, String property, String newValue) throws PropertyValueVetoException{
     System.err.println("propertyCommitting;  value=" + newValue);
-    if (newValue == null || newValue == "") {
+    if (newValue == null || newValue.trim().length() == 0) {
+      System.err.println("value is empty.");
       if (always) {
+        System.err.println("throwing exception.");
         throw new PropertyValueVetoException(property, newValue, "property is required", this);
       }
       Iterator<String> keys = requiredIfMap.keySet().iterator();
@@ -55,6 +58,7 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
           Properties uiValue = ui.getValue();
           String propertyValue = uiValue.getProperty(fullProperty);
           if (requiredIfMap.get(affectedProperty).equals(propertyValue)) {
+            System.err.println("throwing exception.");
             throw new PropertyValueVetoException(property, newValue, "property is required", this);
           }
         }
