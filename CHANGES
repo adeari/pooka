@@ -1,3 +1,7 @@
+overhaul of settings UI.
+
+Pooka now uses system browser by default for URLs.
+
 made the remove-self-from-reply-all code case-insensitive.
 
 added htmlparser library to handle replies to html-only email.
