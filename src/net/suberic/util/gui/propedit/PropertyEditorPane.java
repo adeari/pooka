@@ -144,7 +144,7 @@ public class PropertyEditorPane extends JPanel {
               ((JDialog)container).dispose();
             }
           } catch (PropertyValueVetoException pvve) {
-            manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+            manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
           }
         }
       }, true);
@@ -155,7 +155,8 @@ public class PropertyEditorPane extends JPanel {
             setValue();
             manager.commit();
           } catch (PropertyValueVetoException pvve) {
-            manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+            //manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+            manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
           }
         }
       }, false);

@@ -1,12 +1,13 @@
------ ui update
+ ----- ui update
   *) TabbedEditorPane should make sure to expand to fit its area.
 	-- it looks like it does.  maybe there's a problem with the
 	   CompositeEditorPane?
   *) fix filters
   *) change selection/add buttons
-  *) ??? sections in editors (like a 'cache settings' setting
-  *) ??? radio editor
-  *) multieditorpane should autoselect first entry.
+  *) ??? sections in editors (like a 'cache settings' setting)
+	-- a version is implemented.
+  *) radio editor
+	-- fix editor; make layout nicer.
 *) new editor system.
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,
@@ -60,9 +61,8 @@
 	   
    *) fix layout
    *) ??? add a boder/top line to the buttons?
-*) make required fields for the gui properties.
 *)  implement a way to make a custom FolderCellRenderer for a property.
-*) write help screens along with 
+*) write help screens along with images.
 *)  implement (likely similar) way to put constraints/checks on the values
 entered through a propertyEditor.
 *) NewAccountPooka should be callable anytime, so you can use it to create

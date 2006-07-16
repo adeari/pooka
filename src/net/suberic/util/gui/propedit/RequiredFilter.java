@@ -39,11 +39,8 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
    * the affectedEditors are enabled.  if not, then they are disabled.
    */
   public void propertyCommitting(PropertyEditorUI source, String property, String newValue) throws PropertyValueVetoException{
-    System.err.println("propertyCommitting;  value=" + newValue);
     if (newValue == null || newValue.trim().length() == 0) {
-      System.err.println("value is empty.");
       if (always) {
-        System.err.println("throwing exception.");
         throw new PropertyValueVetoException(property, newValue, "property is required", this);
       }
       Iterator<String> keys = requiredIfMap.keySet().iterator();

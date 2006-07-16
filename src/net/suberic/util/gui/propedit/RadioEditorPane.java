@@ -9,7 +9,7 @@ import java.util.*;
  *
  */
 public class RadioEditorPane extends SwingPropertyEditor implements ItemListener {
-  protected JLabel label;
+  String editorLabel = "";
   protected ButtonGroup buttonGroup = new ButtonGroup();
   protected ButtonModel lastSelected = null;
 
@@ -41,7 +41,9 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
     //JLabel mainLabel = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
 
     //this.add(mainLabel);
-    this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), manager.getProperty(editorTemplate + ".label", defaultLabel)));
+    editorLabel = manager.getProperty(editorTemplate + ".label", defaultLabel);
+    this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), editorLabel));
+
     //System.err.println("radioeditorpane:  mainLabel = " + mainLabel.getText());
     //layout.putConstraint(SpringLayout.WEST, mainLabel, 0, SpringLayout.WEST, this);
     //layout.putConstraint(SpringLayout.NORTH, mainLabel, 0, SpringLayout.NORTH, this);
@@ -91,7 +93,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
 
         lastSelected = button.getModel();
       } catch (PropertyValueVetoException pvve) {
-        manager.getFactory().showError(this, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());
+        manager.getFactory().showError(this, "Error changing value " + editorLabel + " to " + currentValue + ":  " + pvve.getReason());
         if (lastSelected != null) {
           lastSelected.setSelected(true);
         }
@@ -103,29 +105,23 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
    * This writes the currently configured value in the PropertyEditorUI
    * to the source VariableBundle.
    */
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
     ButtonModel selectedModel = buttonGroup.getSelection();
     String currentValue = "";
     if (selectedModel != null) {
       currentValue = selectedModel.getActionCommand();
     }
-    try {
-      if (! currentValue.equals(originalValue)) {
-        firePropertyChangingEvent(currentValue);
-        firePropertyChangedEvent(currentValue);
-      }
-
-      if (isEnabled() && isChanged()) {
-        manager.setProperty(property, currentValue);
-      }
-      lastSelected = selectedModel;
-    } catch (PropertyValueVetoException pvve) {
-      manager.getFactory().showError(this, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());
-      if (lastSelected != null) {
-        lastSelected.setSelected(true);
-      }
+    if (! currentValue.equals(originalValue)) {
+      firePropertyChangingEvent(currentValue);
+      firePropertyChangedEvent(currentValue);
     }
 
+    firePropertyCommittingEvent(currentValue);
+
+    if (isEnabled() && isChanged()) {
+      manager.setProperty(property, currentValue);
+    }
+    lastSelected = selectedModel;
   }
 
   /**
@@ -135,7 +131,11 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
 
-    String value = buttonGroup.getSelection().getActionCommand();
+    ButtonModel selectedModel = buttonGroup.getSelection();
+    String value = "";
+    if (selectedModel != null) {
+      value = buttonGroup.getSelection().getActionCommand();
+    }
     retProps.setProperty(property, value);
 
     return retProps;
@@ -161,7 +161,11 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
    * the last save.
    */
   public boolean isChanged() {
-    String currentValue = buttonGroup.getSelection().getActionCommand();
+    ButtonModel selectedModel = buttonGroup.getSelection();
+    String currentValue = "";
+    if (selectedModel != null) {
+      currentValue = buttonGroup.getSelection().getActionCommand();
+    }
     return (! currentValue.equals(originalValue));
   }
 
