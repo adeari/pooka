@@ -1,23 +1,24 @@
  ----- ui update
-  *) TabbedEditorPane should make sure to expand to fit its area.
-	-- it looks like it does.  maybe there's a problem with the
-	   CompositeEditorPane?
-  *) fix filters
-  *) change selection/add buttons
-  *) ??? sections in editors (like a 'cache settings' setting)
-	-- a version is implemented.
-  *) radio editor
-	-- fix editor; make layout nicer.
 *) new editor system.
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,
 	add in help screens.  then go to next editor.)
  *) technical:
-   *) add in help.
-   *) entry editors (numeric only; FormattedTextField and such)
-   *) add in dependency filters - if a, then disable b.
-   *) wizard editor pane?
-   *) reorganize properties
+  *) add spacer (?)
+  *) radio editor
+	-- fix editor; make layout nicer.
+  *) make sure sections (sub-composite panels with borders) work.
+  *) add in wizard editor.
+
+  *) TabbedEditorPane should make sure to expand to fit its area.
+	-- it looks like it does.  maybe there's a problem with the
+	   CompositeEditorPane?
+  *) change selection/add buttons
+   *) fix layout
+   *) ??? add a boder/top line to the buttons?
+  *) add in/make work text entries
+
+*) reorganize properties
      note:  kmail:  general / security / filtering
 	    evolution:  receiving / receiving options
 	    thunderbird:  just server settings
@@ -59,12 +60,8 @@
 	   *) store debug
 	   *) logging
 	   
-   *) fix layout
-   *) ??? add a boder/top line to the buttons?
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with images.
-*)  implement (likely similar) way to put constraints/checks on the values
-entered through a propertyEditor.
 *) NewAccountPooka should be callable anytime, so you can use it to create
 	any new account, not just your first account.
 *) NewAccountPooka should allow user to enter smtp authentication info.
