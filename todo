@@ -3,6 +3,11 @@
   (order notes:  add in help ability first.  then start setting up the
 	store editor.  once store editor is technically set up properly,
 	add in help screens.  then go to next editor.)
+  *) Store editor:
+	*) spacer *) sections *) imap labels *) pop3 *) maildir/mbox 
+	*) copy over settings
+	*) userprofile
+	*) wizard
  *) technical:
   *) add spacer (?)
   *) radio editor

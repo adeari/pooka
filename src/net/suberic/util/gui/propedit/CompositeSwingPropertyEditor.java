@@ -199,7 +199,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
         SpringLayout.Constraints constraints = layout.getConstraints(labelComponents[i]);
         //layout.putConstraint(SpringLayout.WEST, labelComponents[i], fullXOffset, SpringLayout.WEST, parent);
         layout.putConstraint(SpringLayout.WEST, labelComponents[i], xOffset, SpringLayout.WEST, parent);
-        //constraints.setWidth(fullWidth);
+        constraints.setWidth(fullWidth);
         if (i == 0) {
           layout.putConstraint(SpringLayout.EAST, parent, fullXOffset, SpringLayout.EAST, labelComponents[i]);
         }

@@ -1,6 +1,7 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import javax.swing.event.*;
+import java.awt.FlowLayout;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
 import net.suberic.util.*;
@@ -25,16 +26,8 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
     debug = newManager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
-    if (debug) {
-      System.out.println("configuring Boolean editor with property " + propertyName + ", editorTemplate " + editorTemplate);
-    }
-
+    this.setLayout(new FlowLayout(FlowLayout.LEFT));
     originalBoolean = originalValue.equalsIgnoreCase("true");
-
-    if (debug) {
-      System.out.println("configuring with value getProperty(" + property + ", manager.getProperty(" + template + ", \"false\")) = " + originalBoolean);
-    }
-
 
     String defaultLabel;
     int dotIndex = property.lastIndexOf(".");
