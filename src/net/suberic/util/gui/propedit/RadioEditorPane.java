@@ -9,7 +9,7 @@ import java.util.*;
  *
  */
 public class RadioEditorPane extends SwingPropertyEditor implements ItemListener {
-  String editorLabel = "";
+  String labelString = "";
   protected ButtonGroup buttonGroup = new ButtonGroup();
   protected ButtonModel lastSelected = null;
 
@@ -24,8 +24,8 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
-    //SpringLayout layout = new SpringLayout();
-    //this.setLayout(layout);
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
 
     String defaultLabel;
     int dotIndex = editorTemplate.lastIndexOf(".");
@@ -41,8 +41,8 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
     //JLabel mainLabel = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
 
     //this.add(mainLabel);
-    editorLabel = manager.getProperty(editorTemplate + ".label", defaultLabel);
-    this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), editorLabel));
+    labelString = manager.getProperty(editorTemplate + ".label", defaultLabel);
+    this.setBorder(BorderFactory.createTitledBorder(labelString));
 
     //System.err.println("radioeditorpane:  mainLabel = " + mainLabel.getText());
     //layout.putConstraint(SpringLayout.WEST, mainLabel, 0, SpringLayout.WEST, this);
@@ -52,6 +52,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
 
     //JComponent previous = mainLabel;
     JComponent previous = null;
+    JComponent widest = null;
     //Spring widthSpring = layout.getConstraints(mainLabel).getWidth();
     for(String allowedValue: allowedValues) {
       String label = manager.getProperty(editorTemplate + ".listMapping." + allowedValue + ".label", allowedValue);
@@ -64,19 +65,20 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
       if (allowedValue.equals(originalValue)) {
         button.setSelected(true);
       }
-      /*
-      System.err.println("adding button for " +allowedValue + ", label " + label);
-      layout.putConstraint(SpringLayout.WEST, button, 5, SpringLayout.WEST, this);
-      layout.putConstraint(SpringLayout.NORTH, button, 5, SpringLayout.SOUTH, previous);
-      */
+      layout.putConstraint(SpringLayout.WEST, button, 15, SpringLayout.WEST, this);
+      if (previous != null)
+        layout.putConstraint(SpringLayout.NORTH, button, 5, SpringLayout.SOUTH, previous);
+      else
+        layout.putConstraint(SpringLayout.NORTH, button, 0, SpringLayout.NORTH, this);
+
+      if (widest == null || widest.getPreferredSize().width < button.getPreferredSize().width) {
+        widest = button;
+      }
       previous = button;
-      //widthSpring = Spring.max(Spring.sum(layout.getConstraints(button).getWidth(), Spring.constant(5)), widthSpring);
-      //widthSpring = Spring.max(Spring.sum(layout.getConstraints(tmpLabel).getWidth(), Spring.constant(5)), widthSpring);
     }
 
-    //layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, tmpLabelOne);
-    //layout.putConstraint(SpringLayout.SOUTH, this, 35, SpringLayout.SOUTH, mainLabel);
-    //layout.putConstraint(SpringLayout.EAST, this, 35, SpringLayout.EAST, mainLabel);
+    layout.putConstraint(SpringLayout.SOUTH, this, 0, SpringLayout.SOUTH, previous);
+    layout.putConstraint(SpringLayout.EAST, this, Spring.constant(5, 5, Integer.MAX_VALUE), SpringLayout.EAST, widest);
 
   }
 
@@ -93,7 +95,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
 
         lastSelected = button.getModel();
       } catch (PropertyValueVetoException pvve) {
-        manager.getFactory().showError(this, "Error changing value " + editorLabel + " to " + currentValue + ":  " + pvve.getReason());
+        manager.getFactory().showError(this, "Error changing value " + labelString + " to " + currentValue + ":  " + pvve.getReason());
         if (lastSelected != null) {
           lastSelected.setSelected(true);
         }

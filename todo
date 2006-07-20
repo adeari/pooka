@@ -10,8 +10,6 @@
 	*) wizard
  *) technical:
   *) add spacer (?)
-  *) radio editor
-	-- fix editor; make layout nicer.
   *) make sure sections (sub-composite panels with borders) work.
   *) add in wizard editor.
 
