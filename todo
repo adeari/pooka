@@ -12,6 +12,7 @@
   *) add spacer (?)
   *) make sure sections (sub-composite panels with borders) work.
   *) add in wizard editor.
+  *) make editor modal
 
   *) TabbedEditorPane should make sure to expand to fit its area.
 	-- it looks like it does.  maybe there's a problem with the

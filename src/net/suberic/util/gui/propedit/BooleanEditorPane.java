@@ -11,7 +11,7 @@ import net.suberic.util.*;
  */
 public class BooleanEditorPane extends SwingPropertyEditor {
   JCheckBox inputField;
-  JLabel label;
+  String label;
   boolean originalBoolean = false;
 
   /**
@@ -26,7 +26,10 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
     debug = newManager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
-    this.setLayout(new FlowLayout(FlowLayout.LEFT));
+    //this.setLayout(new FlowLayout(FlowLayout.LEFT));
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
+
     originalBoolean = originalValue.equalsIgnoreCase("true");
 
     String defaultLabel;
@@ -36,9 +39,8 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     else
       defaultLabel = property.substring(dotIndex+1);
 
-    label = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
-
-    inputField = new JCheckBox();
+    label = manager.getProperty(editorTemplate + ".label", defaultLabel);
+    inputField = new JCheckBox(label);
 
     inputField.setSelected(originalBoolean);
 
@@ -57,20 +59,32 @@ public class BooleanEditorPane extends SwingPropertyEditor {
               firePropertyChangedEvent(newValue);
             }
           } catch (PropertyValueVetoException pvve) {
-            manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + newValue+ ":  " + pvve.getReason());
+            manager.getFactory().showError(inputField, "Error changing value " + label + " to " + newValue+ ":  " + pvve.getReason());
             inputField.setSelected(! inputField.isSelected());
           }
         }
       });
 
+    inputField.getInsets().set(0,0,0,0);
+    inputField.setMargin(new java.awt.Insets(0,0,0,5));
+
     this.add(inputField);
-    this.add(label);
     this.setEnabled(isEnabled);
 
-    //labelComponent = label;
-    //valueComponent = inputField;
+    //inputField.setBackground(java.awt.Color.RED);
+    //this.setBackground(java.awt.Color.BLUE);
 
-    this.setMaximumSize(this.getPreferredSize());
+    layout.putConstraint(SpringLayout.WEST, inputField, 0, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, inputField, 0, SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 0, SpringLayout.SOUTH, inputField);
+    layout.putConstraint(SpringLayout.EAST, this, Spring.constant(0, 0, Integer.MAX_VALUE), SpringLayout.EAST, inputField);
+    //layout.putConstraint(SpringLayout.BASELINE, label, 0, SpringLayout.SOUTH, inputField);
+
+    this.getInsets().set(0,0,0,0);
+
+    //this.setBackground(java.awt.Color.BLACK);
+
+    this.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, this.getPreferredSize().height));
     manager.registerPropertyEditor(property, this);
   }
 
@@ -122,9 +136,6 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   public void setEnabled(boolean newValue) {
     if (inputField != null) {
       inputField.setEnabled(newValue);
-    }
-    if (label != null) {
-      label.setEnabled(newValue);
     }
     enabled=newValue;
   }
