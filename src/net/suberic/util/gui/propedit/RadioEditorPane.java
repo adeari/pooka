@@ -67,7 +67,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
       }
       layout.putConstraint(SpringLayout.WEST, button, 15, SpringLayout.WEST, this);
       if (previous != null)
-        layout.putConstraint(SpringLayout.NORTH, button, 5, SpringLayout.SOUTH, previous);
+        layout.putConstraint(SpringLayout.NORTH, button, 0, SpringLayout.SOUTH, previous);
       else
         layout.putConstraint(SpringLayout.NORTH, button, 0, SpringLayout.NORTH, this);
 

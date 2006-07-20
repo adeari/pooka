@@ -136,7 +136,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     property = propertyName;
     addDefaultListeners();
     enabled=isEnabled;
-    originalValue = manager.getProperty(property, "");
+    originalValue = manager.getProperty(property, manager.getProperty(editorTemplate, ""));
     firePropertyInitializedEvent(originalValue);
   }
 
