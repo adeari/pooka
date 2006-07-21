@@ -6,7 +6,7 @@ import java.util.*;
  * certain values are set.
  */
 public class SelfDisableFilter extends PropertyEditorAdapter implements ConfigurablePropertyEditorListener {
-  Map<String,Set<String>> disableValues;
+  Map<String,Set<String>> disableValues = new HashMap<String, Set<String>>();
   PropertyEditorManager manager;
   String propertyBase;
   String property;
@@ -38,9 +38,14 @@ public class SelfDisableFilter extends PropertyEditorAdapter implements Configur
    */
   public void propertyInitialized(PropertyEditorUI source, String property, String newValue) {
     for (String key: disableValues.keySet()) {
+      String fullProperty = key;
+      if (key != null && key.startsWith(".")) {
+        fullProperty = propertyBase + key;
+      }
+      String propValue = manager.getProperty(fullProperty, "");
       Set<String> valueSet = disableValues.get(key);
       for (String value: valueSet) {
-        if (manager.getProperty(key, "").equals(value)) {
+        if (propValue.equals(value)) {
           source.setEnabled(false);
         }
       }

@@ -49,10 +49,13 @@ public class StringEditorPane extends LabelValuePropertyEditor {
       });
     this.add(label);
     this.add(inputField);
-    this.setEnabled(isEnabled);
 
     labelComponent = label;
     valueComponent = inputField;
+
+    // have to set enabled now, with the current enabled value, since it
+    // may have changed.
+    this.setEnabled(enabled);
 
     manager.registerPropertyEditor(property, this);
   }

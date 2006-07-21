@@ -93,10 +93,15 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {
-    for (int i = 0; i < editors.size() ; i++) {
-      ((PropertyEditorUI) editors.get(i)).setEnabled(newValue);
-    }
-    enabled=newValue;
+    // commented out for now; if we re-enable this, we need to make sure
+    // that the original values are kept (i.e. if an editor were disabled,
+    // and all of the editors were then disabled and then enabled, the
+    // disabled editor should stay disabled.
+
+    //for (int i = 0; i < editors.size() ; i++) {
+    //  ((PropertyEditorUI) editors.get(i)).setEnabled(newValue);
+    //}
+    //enabled=newValue;
   }
 
   /**
