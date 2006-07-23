@@ -21,13 +21,13 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
     propertyBase = pPropertyBase;
     List<String> requiredKeys = manager.getPropertyAsList(key + ".map", "");
     if (requiredKeys.size() < 1) {
-      System.err.println("always.");
       always = true;
+      System.err.println("always.");
     } else {
       for (String requiredKey: requiredKeys) {
         String[] pair = requiredKey.split("=");
         if (pair != null && pair.length == 2) {
-          System.err.println("adding requirement for " + pair[0] + " = " + pair[1]);
+          System.err.println("adding requirement for " + pair[0] + " = '" + pair[1] + "'");
           requiredIfMap.put(pair[0], pair[1]);
         }
       }

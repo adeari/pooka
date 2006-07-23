@@ -4,8 +4,12 @@
 	store editor.  once store editor is technically set up properly,
 	add in help screens.  then go to next editor.)
   *) Store editor:
-	*) spacer *) sections *) imap labels *) pop3 *) maildir/mbox 
+	*) fix add new profile/list entry 
+		-- also add 
+	*) imap options
+	*) imap labels *) pop3 *) maildir/mbox 
 	*) copy over settings
+	*) make settings work
 	*) userprofile
 	*) wizard
  *) technical:
@@ -13,6 +17,7 @@
   *) make sure sections (sub-composite panels with borders) work.
   *) add in wizard editor.
   *) make editor modal
+  *) change veto errors to use display name, not full property.
 
   *) TabbedEditorPane should make sure to expand to fit its area.
 	-- it looks like it does.  maybe there's a problem with the
