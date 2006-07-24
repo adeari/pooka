@@ -16,18 +16,18 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
    * Configures this filter from the given key.
    */
   public void configureListener(String key, String property, String pPropertyBase, String editorTemplate, PropertyEditorManager pManager) {
-    System.err.println("configuring requiredfilter for property " + property);
+    //System.err.println("configuring requiredfilter for property " + property);
     manager = pManager;
     propertyBase = pPropertyBase;
     List<String> requiredKeys = manager.getPropertyAsList(key + ".map", "");
     if (requiredKeys.size() < 1) {
       always = true;
-      System.err.println("always.");
+      //System.err.println("always.");
     } else {
       for (String requiredKey: requiredKeys) {
         String[] pair = requiredKey.split("=");
         if (pair != null && pair.length == 2) {
-          System.err.println("adding requirement for " + pair[0] + " = '" + pair[1] + "'");
+          //System.err.println("adding requirement for " + pair[0] + " = '" + pair[1] + "'");
           requiredIfMap.put(pair[0], pair[1]);
         }
       }
@@ -55,7 +55,7 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
           Properties uiValue = ui.getValue();
           String propertyValue = uiValue.getProperty(fullProperty);
           if (requiredIfMap.get(affectedProperty).equals(propertyValue)) {
-            System.err.println("throwing exception.");
+            //System.err.println("throwing exception.");
             throw new PropertyValueVetoException(property, newValue, "property is required", this);
           }
         }

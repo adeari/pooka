@@ -38,13 +38,16 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
    * Sets all affected editors as enabled or disabled.
    */
   void setAllEnabled(boolean pEnabled) {
+    //System.err.println("setting enabled.");
     for (String affectedProperty: affectedEditors) {
       String fullProperty = affectedProperty;
       if (affectedProperty != null && affectedProperty.startsWith(".")) {
         fullProperty = propertyBase + affectedProperty;
       }
+      //System.err.println("setting enabled/disabled for " + fullProperty);
       PropertyEditorUI ui = manager.getPropertyEditor(fullProperty);
       if (ui != null) {
+        //System.err.println("found.  setting.");
         ui.setEnabled(pEnabled);
       }
     }
