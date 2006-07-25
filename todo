@@ -13,6 +13,8 @@
 	*) userprofile
 	*) wizard
  *) technical:
+  *) fix PEManager so that it does proper commits, and so that you can
+	have a nested PEManager that commits to the source PEM.
   *) add in wizard editor.
   *) make editor modal
   *) change veto errors to use display name, not full property.

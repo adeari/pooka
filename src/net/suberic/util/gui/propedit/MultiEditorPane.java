@@ -248,10 +248,15 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       return;
 
     try {
+      List<String> newValueList = new ArrayList<String>();
+      for (int i = 0; i < optionTable.getRowCount(); i++) {
+        newValueList.add((String) optionTable.getValueAt(i, 0));
+      }
+      newValueList.add(newValueName);
+      String newValue = VariableBundle.convertToString(newValueList);
+      firePropertyChangingEvent(newValue) ;
       Vector newValueVector = new Vector();
       newValueVector.add(newValueName);
-      String newValue = VariableBundle.convertToString(newValueVector);
-      firePropertyChangingEvent(newValue) ;
       ((DefaultTableModel)optionTable.getModel()).addRow(newValueVector);
       firePropertyChangedEvent(newValue);
       this.setChanged(true);
