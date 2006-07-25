@@ -5,16 +5,14 @@
 	add in help screens.  then go to next editor.)
   *) Store editor:
 	*) fix add new profile/list entry 
-		-- also add 
-	*) imap options
-	*) imap labels *) pop3 *) maildir/mbox 
+		-- also add from the MultiEditorPane
+		-- fix MultiEditorPane saving; it doesn't keep added values.
+	*) pop3 *) maildir/mbox 
 	*) copy over settings
 	*) make settings work
 	*) userprofile
 	*) wizard
  *) technical:
-  *) add spacer (?)
-  *) make sure sections (sub-composite panels with borders) work.
   *) add in wizard editor.
   *) make editor modal
   *) change veto errors to use display name, not full property.
@@ -79,6 +77,9 @@
 	'no username' and 'no mail server'.
 ----- /ui update
 
+*) open up local folder using open button:  icons fail to update.
+
+*) toolbar:  put it on folder panel (?)
 
 *) create a way to cache local headers so we don't have to download
    those all the time.  sort of like running offline, but not really.

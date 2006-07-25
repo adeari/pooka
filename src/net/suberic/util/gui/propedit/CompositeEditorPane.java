@@ -100,7 +100,7 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
       }
     }
     //makeCompactGrid(this, labelComponents, valueComponents, 5, 5, 5, 5);
-    layoutGrid(this, labelComponents, valueComponents, 5, 5, 5, 5);
+    layoutGrid(this, labelComponents, valueComponents, 5, 5, 5, 5, manager.getProperty(editorTemplate + ".nested", "false").equalsIgnoreCase("true"));
     manager.registerPropertyEditor(property, this);
   }
 

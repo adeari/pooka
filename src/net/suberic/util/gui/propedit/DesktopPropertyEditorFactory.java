@@ -77,6 +77,21 @@ public class DesktopPropertyEditorFactory extends PropertyEditorFactory {
     }
   }
 
+  public void showNewEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
+    JInternalFrame jif = (JInternalFrame) createEditorWindow(title, property, template, propertyBase, mgr, window);
+    //jif.pack();
+    jif.setSize(jif.getPreferredSize());
+    if (window != null && window instanceof JInternalFrame) {
+      jif.setLocation(Math.max(0, ((window.getWidth() - jif.getWidth()) / 2) + window.getX()), Math.max(0, ((window.getHeight() - jif.getHeight()) / 2) + window.getY()));
+    }
+    desktop.add(jif);
+    jif.setVisible(true);
+    try {
+      jif.setSelected(true);
+    } catch (java.beans.PropertyVetoException pve) {
+    }
+  }
+
   /**
    * This method returns an EditorWindow (a JFrame in this
    * implementation) which has an editor for each property in the

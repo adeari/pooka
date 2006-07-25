@@ -148,7 +148,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   /**
    * Lays out the composite property editor in a grid.
    */
-  protected void layoutGrid(Container parent, Component[] labelComponents, Component[] valueComponents, int initialX, int initialY, int xPad, int yPad) {
+  protected void layoutGrid(Container parent, Component[] labelComponents, Component[] valueComponents, int initialX, int initialY, int xPad, int yPad, boolean nested) {
     SpringLayout layout;
     try {
       layout = (SpringLayout)parent.getLayout();
@@ -240,6 +240,10 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     }
 
     Spring southBoundary = Spring.constant(yPad, yPad, 32000);
+    if (nested) {
+      southBoundary = Spring.constant(yPad);
+    }
+
     layout.putConstraint(SpringLayout.SOUTH, parent, southBoundary, SpringLayout.SOUTH, labelComponents[labelComponents.length - 1]);
     //Set the parent's size.
     //pCons.setConstraint(SpringLayout.EAST, Spring.sum(fullWidth, Spring.constant(initialX)));

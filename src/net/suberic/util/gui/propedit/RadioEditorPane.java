@@ -42,7 +42,12 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
 
     //this.add(mainLabel);
     labelString = manager.getProperty(editorTemplate + ".label", defaultLabel);
-    this.setBorder(BorderFactory.createTitledBorder(labelString));
+
+    if (manager.getProperty(editorTemplate + ".showBorder", "true").equalsIgnoreCase("false")) {
+      this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), labelString));
+    } else {
+      this.setBorder(BorderFactory.createTitledBorder(labelString));
+    }
 
     //System.err.println("radioeditorpane:  mainLabel = " + mainLabel.getText());
     //layout.putConstraint(SpringLayout.WEST, mainLabel, 0, SpringLayout.WEST, this);

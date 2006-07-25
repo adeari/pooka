@@ -195,7 +195,16 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    */
   public void addNewEntry() {
     String editedProperty = manager.getProperty(editorTemplate + ".allowedValues", "");
-    manager.getFactory().showNewEditorWindow("Add property", editedProperty, editedProperty, manager);
+    //
+    //manager.getFactory().showNewEditorWindow("Add property", editedProperty, editedProperty, manager);
+    PropertyEditorUI sourceEditor = manager.getPropertyEditor(editedProperty);
+    if (sourceEditor == null) {
+      sourceEditor = manager.getFactory().createEditor(editedProperty, editedProperty, manager);
+    }
+    if (sourceEditor instanceof MultiEditorPane) {
+      MultiEditorPane multiEditor = (MultiEditorPane) sourceEditor;
+      multiEditor.addNewValue(multiEditor.getNewValueName(), this.getPropertyEditorPane().getContainer());
+    }
   }
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI

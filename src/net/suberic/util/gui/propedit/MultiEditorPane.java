@@ -1,11 +1,11 @@
 package net.suberic.util.gui.propedit;
 import javax.swing.*;
 import net.suberic.util.*;
-import javax.swing.event.*;
 import java.util.*;
-import javax.swing.*;
+import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import java.awt.Container;
 
 /**
  * This class will make an editor for a list of elements, where each of
@@ -237,14 +237,30 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Adds a new value to the edited List.
    */
   public void addNewValue(String newValueName) {
+    addNewValue(newValueName, this.getPropertyEditorPane().getContainer());
+  }
+
+  /**
+   * Adds a new value to the edited List.
+   */
+  void addNewValue(String newValueName, Container container) {
     if (newValueName == null || newValueName.length() == 0)
       return;
 
-    Vector newValueVector = new Vector();
-    newValueVector.add(newValueName);
-    ((DefaultTableModel)optionTable.getModel()).addRow(newValueVector);
-    optionTable.getSelectionModel().setSelectionInterval(optionTable.getModel().getRowCount(), optionTable.getModel().getRowCount() -1);
-    editSelectedValue();
+    try {
+      Vector newValueVector = new Vector();
+      newValueVector.add(newValueName);
+      String newValue = VariableBundle.convertToString(newValueVector);
+      firePropertyChangingEvent(newValue) ;
+      ((DefaultTableModel)optionTable.getModel()).addRow(newValueVector);
+      firePropertyChangedEvent(newValue);
+      this.setChanged(true);
+
+      optionTable.getSelectionModel().setSelectionInterval(optionTable.getModel().getRowCount(), optionTable.getModel().getRowCount() -1);
+      editSelectedValue(container);
+    } catch (PropertyValueVetoException pvve) {
+      manager.getFactory().showError(container, "Error adding value " + newValueName + " to " + property + ":  " + pvve.getReason());
+    }
   }
 
   /**
@@ -279,13 +295,21 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Edits the currently selected value.
    */
   public void editSelectedValue() {
+    editSelectedValue(this.getPropertyEditorPane().getContainer());
+  }
+
+  /**
+   * Edits the currently selected value, using the given Container as an
+   * editor source.
+   */
+  void editSelectedValue(Container container) {
     getLogger().fine("calling editSelectedValue().");
     int selectedRow = optionTable.getSelectedRow();
     if (selectedRow != -1) {
       String valueToEdit = (String) optionTable.getValueAt(selectedRow, 0);
       String editProperty = property + "." + valueToEdit;
       getLogger().fine("editing " + editProperty);
-      manager.getFactory().showNewEditorWindow(editProperty, manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", editProperty, "Composite", manager, true), this.getPropertyEditorPane().getContainer());
+      manager.getFactory().showNewEditorWindow(editProperty, manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", editProperty, "Composite", manager, true), container);
     } else {
       getLogger().fine("editSelectedValue():  no selected value.");
     }
