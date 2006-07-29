@@ -13,6 +13,7 @@ public class PropertyEditorPane extends JPanel {
   SwingPropertyEditor editor;
   PropertyEditorManager manager;
   Container container;
+  boolean doCommit;
 
   /**
    * This contructor creates a PropertyEditor using the given
@@ -21,9 +22,21 @@ public class PropertyEditorPane extends JPanel {
   public PropertyEditorPane(PropertyEditorManager newManager,
                             SwingPropertyEditor newEditor,
                             Container newContainer) {
+    this(newManager, newEditor, newContainer, true);
+  }
+
+  /**
+   * This contructor creates a PropertyEditor using the given
+   * SwingPropertyEditor.
+   */
+  public PropertyEditorPane(PropertyEditorManager newManager,
+                            SwingPropertyEditor newEditor,
+                            Container newContainer,
+                            boolean newCommit) {
     manager = newManager;
     container = newContainer;
     editor = newEditor;
+    doCommit = newCommit;
 
     Component editorComponent = editor;
 
@@ -131,8 +144,13 @@ public class PropertyEditorPane extends JPanel {
     JButton okButton = createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
+            System.err.println("hit ok.");
             setValue();
-            manager.commit();
+            System.err.println("setvalue completed.");
+            if (doCommit) {
+              System.err.println("doCommit; calling commit().");
+              manager.commit();
+            }
             if (container instanceof JInternalFrame) {
               try {
                 ((JInternalFrame)container).setClosed(true);
@@ -152,8 +170,13 @@ public class PropertyEditorPane extends JPanel {
     JButton applyButton = createButton("Apply", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
+            System.err.println("apply hit.");
             setValue();
-            manager.commit();
+            System.err.println("setvalue complete.");
+            if (doCommit) {
+              System.err.println("doCommit; calling commit()");
+              manager.commit();
+            }
           } catch (PropertyValueVetoException pvve) {
             //manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
             manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());

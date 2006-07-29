@@ -21,7 +21,12 @@ public class PropertyEditorManager {
 
   protected Properties localProps = new Properties();
 
+  protected HashSet<String> removeProps = new HashSet<String>();
+
   protected IconManager iconManager;
+
+  // whether or not we've created a PropertyEditorPane for this Manager.
+  public boolean createdEditorPane = false;
 
   /**
    * Creates a new PropertyEditorManager.
@@ -81,11 +86,9 @@ public class PropertyEditorManager {
    */
   public String getProperty(String property, String defaultValue) {
     // check the localProps first
-    if (! writeChanges) {
-      String tmpValue = (String) localProps.get(property);
-      if (tmpValue != null)
-        return tmpValue;
-    }
+    String tmpValue = (String) localProps.get(property);
+    if (tmpValue != null)
+      return tmpValue;
     return sourceBundle.getProperty(property, defaultValue);
   }
 
@@ -94,32 +97,26 @@ public class PropertyEditorManager {
    */
   public List<String> getPropertyAsList(String property, String defaultValue) {
     // check the localProps first
-    if (! writeChanges) {
-      String tmpValue = (String) localProps.get(property);
-      if (tmpValue != null) {
-        return VariableBundle.convertToVector(tmpValue);
-      }
+    String tmpValue = (String) localProps.get(property);
+    if (tmpValue != null) {
+      return VariableBundle.convertToVector(tmpValue);
     }
-    return sourceBundle.getPropertyAsVector(property, defaultValue);
+    return sourceBundle.getPropertyAsList(property, defaultValue);
   }
 
   /**
    * Sets the given property to the given value.
    */
   public void setProperty(String property, String value) {
-    if (! writeChanges) {
-      localProps.setProperty(property, value);
-    } else {
-      sourceBundle.setProperty(property, value);
-    }
+    localProps.setProperty(property, value);
+    removeProps.remove(property);
   }
 
   /**
    * Removes the given property.
    */
   public void removeProperty(String property) {
-    if (writeChanges)
-      sourceBundle.removeProperty(property);
+    removeProps.add(property);
   }
 
   /**
@@ -134,8 +131,20 @@ public class PropertyEditorManager {
    * Commits the changes to the underlying VariableBundle.
    */
   public void commit() {
-    if (writeChanges)
+    if (writeChanges) {
+      System.err.println("committing.");
+      for (String removeProp: removeProps) {
+        System.err.println("removing property " + removeProp);
+        sourceBundle.removeProperty(removeProp);
+      }
+
+      for (String property: localProps.stringPropertyNames()) {
+        System.err.println("setting property " + property);
+        sourceBundle.setProperty(property, localProps.getProperty(property));
+      }
+
       sourceBundle.saveProperties();
+    }
   }
 
   /**

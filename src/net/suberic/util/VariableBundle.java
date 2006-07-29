@@ -275,6 +275,37 @@ public class VariableBundle extends Object {
   }
 
   /**
+   * Returns all property keys in this VariableBundle.
+   */
+  public Set<String> getPropertyNames() {
+    HashSet<String> returnValue = new HashSet<String>();
+    returnValue.addAll(temporaryProperties.stringPropertyNames());
+    returnValue.addAll(writableProperties.stringPropertyNames());
+    returnValue.addAll(properties.stringPropertyNames());
+    if (parentProperties != null)
+      returnValue.addAll(parentProperties.getPropertyNames());
+    if (resources != null)
+      returnValue.addAll(resources.keySet());
+
+    return returnValue;
+  }
+
+  /**
+   * Returns all property keys in this VariableBundle that start with
+   * the given string.
+   */
+  public Set<String> getPropertyNamesStartingWith(String startsWith) {
+    Set<String> returnValue = new HashSet<String>();
+    Set<String> allProps = getPropertyNames();
+    for (String prop: allProps) {
+      if (prop.startsWith(startsWith))
+        returnValue.add(prop);
+    }
+
+    return returnValue;
+  }
+
+  /**
    * Saves the current properties in the VariableBundle to a file.  Note
    * that this only saves the writableProperties of this particular
    * VariableBundle--underlying defaults are not written.

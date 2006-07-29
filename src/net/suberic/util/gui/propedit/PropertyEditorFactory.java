@@ -183,7 +183,12 @@ public class PropertyEditorFactory {
       jd.setTitle(title);
       jd.setModal(true);
     }
-    jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor)editor, jd));
+    if (editor.getManager().createdEditorPane) {
+      jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd, false));
+    } else {
+      jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd));
+      editor.getManager().createdEditorPane = true;
+    }
     return jd;
   }
 
