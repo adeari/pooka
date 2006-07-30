@@ -289,6 +289,8 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       ((DefaultTableModel)optionTable.getModel()).removeRow(selectedRow);
       firePropertyChangedEvent(newValue);
 
+      removeValues.add(property + "." + selValue);
+
       this.setChanged(true);
     } catch (PropertyValueVetoException pvve) {
       manager.getFactory().showError(this, "Error removing value " + selValue + " from " + property + ":  " + pvve.getReason());
@@ -378,14 +380,19 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   public void setValue() throws PropertyValueVetoException {
     if (isEnabled()) {
 
-      for (int i = 0; i < removeValues.size() ; i++)
-        manager.removeProperty(removeValues.get(i));
-
-      removeValues = new Vector();
-
       if (isChanged()) {
         getLogger().fine("setting property.  property is " + property + "; value is " + getCurrentValue());
         manager.setProperty(property, getCurrentValue());
+
+        for (String removeProp: removeValues) {
+          //manager.removeProperty(removeValues.get(i));
+          Set<String> subProperties = manager.getPropertyNamesStartingWith(removeProp + ".");
+          for (String subProp: subProperties) {
+            manager.removeProperty(subProp);
+          }
+        }
+        removeValues = new ArrayList<String>();
+
       }
     }
   }

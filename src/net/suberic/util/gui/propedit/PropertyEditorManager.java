@@ -105,6 +105,21 @@ public class PropertyEditorManager {
   }
 
   /**
+   * Gets the value of the given property.
+   */
+  public Set<String> getPropertyNamesStartingWith(String startsWith) {
+    Set<String> returnValue = new HashSet<String>();
+    // check local properties first.
+    Set<String> lProps = localProps.stringPropertyNames();
+    for (String prop: lProps) {
+      if (prop.startsWith(startsWith))
+        returnValue.add(prop);
+    }
+    returnValue.addAll(sourceBundle.getPropertyNamesStartingWith(startsWith));
+    return returnValue;
+  }
+
+  /**
    * Sets the given property to the given value.
    */
   public void setProperty(String property, String value) {
@@ -132,14 +147,11 @@ public class PropertyEditorManager {
    */
   public void commit() {
     if (writeChanges) {
-      System.err.println("committing.");
       for (String removeProp: removeProps) {
-        System.err.println("removing property " + removeProp);
         sourceBundle.removeProperty(removeProp);
       }
 
       for (String property: localProps.stringPropertyNames()) {
-        System.err.println("setting property " + property);
         sourceBundle.setProperty(property, localProps.getProperty(property));
       }
 

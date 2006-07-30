@@ -4,10 +4,6 @@
 	store editor.  once store editor is technically set up properly,
 	add in help screens.  then go to next editor.)
   *) Store editor:
-	*) fix add new profile/list entry 
-		-- also add from the MultiEditorPane
-		-- fix MultiEditorPane saving; it doesn't keep added values.
-	*) pop3 *) maildir/mbox 
 	*) copy over settings
 	*) make settings work
 	*) userprofile
