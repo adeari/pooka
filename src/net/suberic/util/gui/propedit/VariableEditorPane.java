@@ -15,8 +15,9 @@ import java.awt.CardLayout;
  */
 public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
-  HashMap idToEditorMap = new HashMap();
+  HashMap<String, PropertyEditorUI> idToEditorMap = new HashMap<String, PropertyEditorUI>();
   String keyProperty;
+  String currentKeyValue = null;
 
   /**
    * This configures this editor with the following values.
@@ -69,7 +70,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
     CardLayout layout = (CardLayout) getLayout();
 
-    Object newSelected = idToEditorMap.get(selectedId);
+    PropertyEditorUI newSelected = idToEditorMap.get(selectedId);
     if (newSelected == null) {
       // we'll have to make a new window.
       if (selectedId == null || selectedId.equals("")) {
@@ -87,6 +88,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
       }
     }
     layout.show(this, selectedId);
+    currentKeyValue = selectedId;
   }
 
   /**
@@ -96,23 +98,33 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
     String editValue = createSubTemplate("." + selectedId);
 
-    /*
-    if (scoped) {
-      editValue = editorTemplate + "." + selectedId;
-      if (debug) {
-        System.out.println("scoped; editValue = " + editValue);
-      }
-    } else {
-      if (debug)
-        System.out.println("not scoped; editValue = " + editValue);
-    }
-
-    SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.createEditor(property, editValue);
-    */
-
     SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.getFactory().createEditor(property, editValue, propertyBase, manager, enabled);
     return returnValue;
   }
+
+
+  /**
+   * Returns the helpId for this editor.
+   */
+  public String getHelpID() {
+    String subProperty = manager.getProperty(editorTemplate + ".helpController", "");
+    if (subProperty.length() == 0) {
+      if (currentKeyValue != null) {
+        PropertyEditorUI selectedEditor = idToEditorMap.get(currentKeyValue);
+        if (selectedEditor == null) {
+          return super.getHelpID();
+        } else {
+          return selectedEditor.getHelpID();
+        }
+      } else {
+        return super.getHelpID();
+      }
+    } else {
+      return super.getHelpID();
+    }
+  }
+
+
 }
 
 

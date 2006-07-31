@@ -57,7 +57,6 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
 
     List<String> propsToEdit = manager.getPropertyAsList(template, "");
 
-    //editors = createEditors(property, propsToEdit);
     editors = createEditors(propsToEdit);
 
     getLogger().fine("minimumSize for tabbedPane = " + tabbedPane.getMinimumSize());
@@ -105,6 +104,23 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
   private SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
     return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subProperty, manager, true);
 
+  }
+
+  /**
+   * Returns the helpId for this editor.
+   */
+  public String getHelpID() {
+    String subProperty = manager.getProperty(editorTemplate + ".helpController", "");
+    if (subProperty.length() == 0) {
+      java.awt.Component selectedComponent = tabbedPane.getSelectedComponent();
+      if (selectedComponent == null || ! (selectedComponent instanceof PropertyEditorUI)) {
+        return super.getHelpID();
+      } else {
+        return ((PropertyEditorUI) selectedComponent).getHelpID();
+      }
+    } else {
+      return super.getHelpID();
+    }
   }
 
 }

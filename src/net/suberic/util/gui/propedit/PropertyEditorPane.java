@@ -144,11 +144,8 @@ public class PropertyEditorPane extends JPanel {
     JButton okButton = createButton("Ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
-            System.err.println("hit ok.");
             setValue();
-            System.err.println("setvalue completed.");
             if (doCommit) {
-              System.err.println("doCommit; calling commit().");
               manager.commit();
             }
             if (container instanceof JInternalFrame) {
@@ -170,11 +167,8 @@ public class PropertyEditorPane extends JPanel {
     JButton applyButton = createButton("Apply", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
-            System.err.println("apply hit.");
             setValue();
-            System.err.println("setvalue complete.");
             if (doCommit) {
-              System.err.println("doCommit; calling commit()");
               manager.commit();
             }
           } catch (PropertyValueVetoException pvve) {

@@ -256,6 +256,26 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     return getPropertyEditorPane(this);
   }
 
+  /**
+   * Returns the helpId for this editor.
+   */
+  public String getHelpID() {
+    String subProperty = manager.getProperty(editorTemplate + ".helpController", "");
+    if (subProperty.length() == 0)
+      return getEditorTemplate();
+    else {
+      String controllerProperty = createSubTemplate(subProperty);
+      Iterator iter = editors.iterator();
+      while(iter.hasNext()) {
+        PropertyEditorUI ui = (PropertyEditorUI) iter.next();
+        if (ui.getEditorTemplate().equals(controllerProperty)) {
+          return ui.getHelpID();
+        }
+      }
+    }
+
+    return getEditorTemplate();
+  }
 
 }
 

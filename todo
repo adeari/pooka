@@ -5,6 +5,8 @@
 	add in help screens.  then go to next editor.)
   *) Store editor:
 	*) copy over settings
+		-- updateCheck.
+		-- fix TLS
 	*) make settings work
 	*) userprofile
 	*) wizard
