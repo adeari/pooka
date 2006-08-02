@@ -1,18 +1,29 @@
  ----- ui update
-*) new editor system.
-  (order notes:  add in help ability first.  then start setting up the
-	store editor.  once store editor is technically set up properly,
-	add in help screens.  then go to next editor.)
   *) Store editor:
 	*) copy over settings
-		-- updateCheck.
 		-- fix TLS
 	*) make settings work
+		-- namespace support
+		-- test autoCheckSeconds
 	*) userprofile
+	  *) email address
+	  *) your name
+	  *) reply-to address
+	  *) reply-to name
+	  *) organization
+	  *) default domain (if different)
+	  *) signature file
+	  *) sent folder
+   	  *) smtp server
+ 	  *) encryption - signature - s/mime key - pgp key
+	  *) theme
+	  *) vcard (??)
+	  *) auto-bcc (??)
+	  *) reply format (??)
+	  *) address book (??)
+	  *) dictionary (??)
 	*) wizard
  *) technical:
-  *) fix PEManager so that it does proper commits, and so that you can
-	have a nested PEManager that commits to the source PEM.
   *) add in wizard editor.
   *) make editor modal
   *) change veto errors to use display name, not full property.
@@ -25,48 +36,6 @@
    *) ??? add a boder/top line to the buttons?
   *) add in/make work text entries
 
-*) reorganize properties
-     note:  kmail:  general / security / filtering
-	    evolution:  receiving / receiving options
-	    thunderbird:  just server settings
-	*) store:
-	  tabs are ok, but no nested tabs
-	   *) type - just as a label?
-	     *) servername (p/i)
-	     *) username (p/i)
-	     *) password (optional) (p/i)
-	     *) secure connection (p/i)
-	        *) never / when possible / always (p/i)
-	     *) auth type??? (p/i)
-	     *) port (??) (p/i)
-	     *) inbox file (m)
-	     *) mail directory (m)
-	     *) check every x minutes (all?)
-	   *) caching (i)
-	   *) cache headers only (i)
-	   *) cache full messages automatically (i)
-	   *) trash folder
-	     *) empty trash on exit?
-	   *) ? select for offline use by folder?
-	   *) default profile
-
-	   *) receiving options
-	     *) leave messages on server (p)
-	     *) delete messages on local delete (p)
-	     *) maildir backend (p) (?)
-	     *) new messages in all folders (umm, duh)
-	     *) custom connection (good idea - make it just an option.) (p/i)
-	     *) only subscribed folders (i)
-	     *) override namespace (i)
-	   *) filters (no?)
-	   *) expunge on exit (i)
-	   *) use subscribed folders list (i)
-	   *) option for not caching messages over x kb. (p/i)
-	   *) connection
-	   *) precommand
-	   *) store debug
-	   *) logging
-	   
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with images.
 *) NewAccountPooka should be callable anytime, so you can use it to create
@@ -209,7 +178,6 @@ online:
 	  disconnected:  1xclick=show status?  2xclick=start up?
 		      rightclick=show menu?
   add preferences dialog
-  bug:  first call of right-click menu vanishes immediately. -- jdic bug?
   add in open message support?
 	make the display nice?
   add support for showing disconnection messages?

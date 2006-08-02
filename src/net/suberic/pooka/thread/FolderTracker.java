@@ -8,7 +8,7 @@ import java.util.logging.*;
 import java.awt.event.ActionEvent;
 
 /**
- * This class polls the underlying Folder of a FolderInfo in order to make 
+ * This class polls the underlying Folder of a FolderInfo in order to make
  * sure that the UnreadMessageCount is current and to make sure that the
  * Folder stays open.
  */
@@ -31,9 +31,9 @@ public class FolderTracker extends Thread {
     long nextFolderUpdate;
     // whether or not we're waiting on this to complete.
     boolean updateRunning = false;
-    
+
     /**
-     * Creates a new UpdateInfo for FolderInfo <code>info</code>, with 
+     * Creates a new UpdateInfo for FolderInfo <code>info</code>, with
      * <code>updateCheck</code> milliseconds between checks.
      */
     public UpdateInfo(FolderInfo info, long updateCheck) {
@@ -41,7 +41,7 @@ public class FolderTracker extends Thread {
       updateCheckMilliseconds = updateCheck;
       nextFolderUpdate = Calendar.getInstance().getTime().getTime() + updateCheckMilliseconds;
     }
-    
+
     /**
      * Updates the Folder.
      */
@@ -79,14 +79,14 @@ public class FolderTracker extends Thread {
     public FolderInfo getFolderInfo() { return folder; }
 
     /**
-     * Returns whether or not this is waiting on an outstaning update 
+     * Returns whether or not this is waiting on an outstaning update
      * action.
      */
     public boolean isUpdateRunning() { return updateRunning; }
 
   } // end UpdateInfo.
 
-  
+
   /**
    * This creates a new FolderTracker from a FolderInfo object.
    */
@@ -107,21 +107,21 @@ public class FolderTracker extends Thread {
     getLogger().fine("adding folder " + newFolder.getFolderID());
     long updateCheckMilliseconds;
     String updateString = Pooka.getProperty("Pooka.updateCheckMilliseconds", "60000");
-    
+
     if (newFolder.getParentStore() != null) {
-      updateString = Pooka.getProperty(newFolder.getFolderProperty() + ".updateCheckMilliseconds", Pooka.getProperty(newFolder.getParentStore().getStoreProperty() + ".updateCheckMilliseconds", Pooka.getProperty("Pooka.updateCheckMilliseconds", "60000")));
+      updateString = Pooka.getProperty(newFolder.getFolderProperty() + ".updateCheckSeconds", Pooka.getProperty(newFolder.getParentStore().getStoreProperty() + ".updateCheckSeconds", Pooka.getProperty("Pooka.updateCheckSeconds", "300")));
     }
     try {
-      updateCheckMilliseconds = Long.parseLong(updateString);
+      updateCheckMilliseconds = Long.parseLong(updateString) *1000;
     } catch (Exception e) {
       updateCheckMilliseconds = 60000;
     }
-    
-    UpdateInfo info = new UpdateInfo(newFolder, updateCheckMilliseconds); 
+
+    UpdateInfo info = new UpdateInfo(newFolder, updateCheckMilliseconds);
     mUpdateInfos.add(info);
     updateTrackerNextTime(info.getNextFolderUpdate());
   }
-  
+
   /**
    * This removes a FolderInfo from the FolderTracker.
    */
@@ -130,10 +130,10 @@ public class FolderTracker extends Thread {
       return;
 
     getLogger().fine("removing folder " + folder.getFolderID() + " from tracker.");
-    
-    for (int i = 0 ; i < mUpdateInfos.size() ; i++) 
+
+    for (int i = 0 ; i < mUpdateInfos.size() ; i++)
       if (((UpdateInfo) mUpdateInfos.elementAt(i)).folder == folder)
-	mUpdateInfos.removeElementAt(i);
+  mUpdateInfos.removeElementAt(i);
   }
 
   // end folder administration
@@ -167,13 +167,13 @@ public class FolderTracker extends Thread {
     while (iter.hasNext()) {
       UpdateInfo current = (UpdateInfo) iter.next();
       if (! current.isUpdateRunning()) {
-	if (nextTime == -1)
-	  nextTime = current.getNextFolderUpdate();
-	else
-	  nextTime = Math.min(nextTime, current.getNextFolderUpdate());
+  if (nextTime == -1)
+    nextTime = current.getNextFolderUpdate();
+  else
+    nextTime = Math.min(nextTime, current.getNextFolderUpdate());
       }
     }
-    
+
     if (nextTime == -1)
       nextTime = currentTime + 120000;
 
@@ -182,39 +182,39 @@ public class FolderTracker extends Thread {
 
     return mTrackerNextUpdateTime;
   }
-  
+
   // end update time admin
 
   // main method(s)
 
   /**
-   * This runs the thread, running checkFolder() every 
+   * This runs the thread, running checkFolder() every
    * updateCheckMilliseconds until the thread is interrupted.
    */
   public void run() {
     while (true && ! mStopped) {
       try {
-	getLogger().fine("running folder tracker update.");
-	
-	long currentTime = Calendar.getInstance().getTime().getTime();
-	updateFolders(currentTime);
-	long sleepTime = calculateNextUpdateTime(currentTime) - currentTime;
-	if (sleepTime > 0) {
-	  getLogger().finer("sleeping for " + sleepTime + " milliseconds.");
-	  
-	  sleep(sleepTime);
-	} else {
-	  getLogger().finer("sleep time is negative; not sleeping.");
-	}
+  getLogger().fine("running folder tracker update.");
+
+  long currentTime = Calendar.getInstance().getTime().getTime();
+  updateFolders(currentTime);
+  long sleepTime = calculateNextUpdateTime(currentTime) - currentTime;
+  if (sleepTime > 0) {
+    getLogger().finer("sleeping for " + sleepTime + " milliseconds.");
+
+    sleep(sleepTime);
+  } else {
+    getLogger().finer("sleep time is negative; not sleeping.");
+  }
       } catch (InterruptedException ie) {
-	// on interrupt, just continue.
-	getLogger().finer("caught InterruptedException.");
+  // on interrupt, just continue.
+  getLogger().finer("caught InterruptedException.");
       }
     }
 
     getLogger().fine("Stopped.  Shutting down Folder Tracker.");
   }
-  
+
   /**
    * Goes through the list of folders and updates the ones that are
    * due for an update.
@@ -223,21 +223,21 @@ public class FolderTracker extends Thread {
     for (int i = 0; i < mUpdateInfos.size(); i++) {
       UpdateInfo info = (UpdateInfo)mUpdateInfos.elementAt(i);
       if (info.shouldUpdate(currentTime))
-	info.update();
+  info.update();
     }
   }
-  
+
   // end main methods
 
   // thread control
-  
+
   /**
    * Singals that the tracker thread should stop.
    */
   public void setStopped(boolean pStopped) {
     mStopped = pStopped;
     getLogger().fine("setting FolderTracker stopped to " + mStopped);
-    if (mStopped == true) 
+    if (mStopped == true)
       interrupt();
   }
 
@@ -251,7 +251,7 @@ public class FolderTracker extends Thread {
   public javax.swing.Action getAction() {
     return mAction;
   }
-  
+
   /**
    * The Action that's put in the queue for checking the folder
    * status.
@@ -260,20 +260,20 @@ public class FolderTracker extends Thread {
     public CheckFolderAction() {
       super("folder-check");
     }
-    
+
     public void actionPerformed(java.awt.event.ActionEvent e) {
       UpdateInfo info = (UpdateInfo) e.getSource();
       try {
-	getLogger().fine("running checkFolder on " + info.getFolderInfo().getFolderID());
-	info.getFolderInfo().checkFolder();
+  getLogger().fine("running checkFolder on " + info.getFolderInfo().getFolderID());
+  info.getFolderInfo().checkFolder();
       } catch (MessagingException me) {
-	// ignore; only show if we're debugging.
-	if (getLogger().isLoggable(Level.FINE)) {
-	  getLogger().fine("caught exception checking folder " + info.getFolderInfo().getFolderID() + ":  " + me);
-	  me.printStackTrace();
-	} 
+  // ignore; only show if we're debugging.
+  if (getLogger().isLoggable(Level.FINE)) {
+    getLogger().fine("caught exception checking folder " + info.getFolderInfo().getFolderID() + ":  " + me);
+    me.printStackTrace();
+  }
       } finally {
-	info.newUpdateTime();
+  info.newUpdateTime();
       }
     }
   }
@@ -281,7 +281,7 @@ public class FolderTracker extends Thread {
   // end action section
 
   // logging
- 
+
   /**
    * Gets the Logger for this class.
    */
@@ -289,7 +289,7 @@ public class FolderTracker extends Thread {
     if (mLogger == null) {
       mLogger = java.util.logging.Logger.getLogger("Pooka.debug.folderTracker");
     }
-    
+
     return mLogger;
   }
 }
