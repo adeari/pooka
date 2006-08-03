@@ -6,6 +6,7 @@
 		-- namespace support
 		-- test autoCheckSeconds
 	*) userprofile
+	  -- address info
 	  *) email address
 	  *) your name
 	  *) reply-to address
@@ -23,6 +24,13 @@
 	  *) address book (??)
 	  *) dictionary (??)
 	*) wizard
+	*) folder
+	*) preferences
+	*) address book
+	*) outgoing servers
+	*) connections
+	*) encryption
+	*) theme
  *) technical:
   *) add in wizard editor.
   *) make editor modal
