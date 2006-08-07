@@ -20,6 +20,7 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
     propertyBase = pPropertyBase;
     disableValues = manager.getPropertyAsList(key + ".disableValues", "");
     affectedEditors = manager.getPropertyAsList(key + ".affectedEditors", "");
+    //System.err.println("setting for " + property + ", disableValue= " + manager.getPropertyAsList(key + ".disableValues", "") + ", affectedEditors=" + manager.getPropertyAsList(key + ".affectedEditors", ""));
   }
 
   /**
@@ -27,6 +28,7 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
    * the affectedEditors are enabled.  if not, then they are disabled.
    */
   public void propertyChanged(PropertyEditorUI source, String property, String newValue) {
+    //System.err.println("property " + property + " Changed.");
     if (disableValues.contains(newValue)) {
       setAllEnabled(false);
     } else {

@@ -27,12 +27,7 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
-
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
     getLogger().fine("property is " + property + "; editorTemplate is " + editorTemplate);
 
     label = createLabel();
@@ -65,8 +60,9 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
 
     this.add(tmpPanel);
 
-    this.setEnabled(isEnabled);
+    manager.registerPropertyEditor(property, this);
 
+    setEnabled(enabled);
   }
 
   /**
@@ -218,6 +214,9 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
     }
     if (valueDisplay != null) {
       valueDisplay.setEnabled(newValue);
+    }
+    if (label != null) {
+      label.setEnabled(newValue);
     }
     getLogger().fine("set enabled to " + newValue);
 
