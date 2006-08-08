@@ -5,24 +5,9 @@
 	*) make settings work
 		-- namespace support
 		-- test autoCheckSeconds
-	*) userprofile
-	  -- address info
-	  *) email address
-	  *) your name
-	  *) reply-to address
-	  *) reply-to name
-	  *) organization
-	  *) default domain (if different)
-	  *) signature file
-	  *) sent folder
-   	  *) smtp server
- 	  *) encryption - signature - s/mime key - pgp key
-	  *) theme
-	  *) vcard (??)
-	  *) auto-bcc (??)
-	  *) reply format (??)
-	  *) address book (??)
-	  *) dictionary (??)
+	*) UserProfile settings:
+		-- append sig to each message option
+		-- save to sent folder option
 	*) wizard
 	*) folder
 	*) preferences

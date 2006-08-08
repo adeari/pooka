@@ -694,7 +694,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
    *
    */
   public void messagesAdded(MessageCountEvent e) {
-    getFolderStatusBar().messagesAdded(e);
+    if (getFolderStatusBar() != null)
+      getFolderStatusBar().messagesAdded(e);
   }
 
   /**
@@ -702,7 +703,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
    * called on the parent FolderThread.
    */
   public void messagesRemoved(MessageCountEvent e) {
-    getFolderStatusBar().messagesRemoved(e);
+    if (getFolderStatusBar() != null)
+      getFolderStatusBar().messagesRemoved(e);
 
     Runnable updateAdapter = new Runnable() {
         public void run() {
