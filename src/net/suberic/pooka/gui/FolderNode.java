@@ -98,39 +98,6 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     return folderInfo.getFolder();
   }
 
-
-
-  /**
-   * return the number of children for this folder node. The first
-   * time this method is called we load up all of the folders
-   * under the store's defaultFolder
-   */
-
-  /**
-     public int getChildCount() {
-     if (!hasLoaded) {
-     loadChildren();
-     }
-     return super.getChildCount();
-     }
-  */
-
-  /**
-   * returns the children of this folder node.  The first
-   * time this method is called we load up all of the folders
-   * under the store's defaultFolder
-   */
-
-  /*
-    public java.util.Enumeration children() {
-    if (!hasLoaded) {
-    loadChildren();
-    }
-    return super.children();
-    }
-
-  */
-
   /**
    * This loads (or reloads) the children of the FolderNode from
    * the list of Children on the FolderInfo.

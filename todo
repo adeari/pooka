@@ -1,8 +1,7 @@
  ----- ui update
   *) Store editor:
-	*) copy over settings
-		-- fix TLS
 	*) make settings work
+		-- fix TLS
 		-- namespace support
 		-- test autoCheckSeconds
 	*) UserProfile settings:
@@ -28,9 +27,9 @@
    *) fix layout
    *) ??? add a boder/top line to the buttons?
   *) add in/make work text entries
-
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with images.
+
 *) NewAccountPooka should be callable anytime, so you can use it to create
 	any new account, not just your first account.
 *) NewAccountPooka should allow user to enter smtp authentication info.
@@ -39,7 +38,21 @@
 	'no username' and 'no mail server'.
 ----- /ui update
 
+  trayicon support:
+    *) new custom click support:
+	*) change click display so that we show a clickable dialog
+		with the new messages, etc.
+	*) change timeout support:  we should now handle timeout with
+		mouseover
+	*) should be able to tell if balloon is showing or not.
+	*) autoupdate on balloon--if it's showing, either queue up 
+		another one or update the current one (?)
+	*) get rid of right-click new message opening.
+	*) fix new message notification on folders if you read a message
+		from the Open Message menu from the TrayIcon.
+
 *) open up local folder using open button:  icons fail to update.
+	-- that's a bug with the mbox/maildir providers
 
 *) toolbar:  put it on folder panel (?)
 
@@ -91,9 +104,6 @@ online:
     *) add blog/rss feed
 
 *) add unread message count to folder display.
-
-*) look at thunderbird.
-*) look at balsa?
 
 *) exit:  closing window should pop up a notice saying pooka is still
 	running; file->exit should exit.
@@ -177,15 +187,6 @@ online:
   add disconnect/offline mode to right-click menu
 	-- sort of done.
   figure out virtual desktop support???
-  trayicon support:
-	*) add changing message display timeout support
-		should be codeable with custom action????
-	*) fix tooltip display code so it doesn't show off screen
-		check in new API
-	*) should be able to tell if balloon is showing or not.
-	*) new new-message-list support
-	*) fix new message notification on folders if you read a message
-		from the Open Message menu from the TrayIcon.
 
 *) update locking code with new mechanism.
 -----------

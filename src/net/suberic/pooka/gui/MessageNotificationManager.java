@@ -13,11 +13,16 @@ import java.awt.event.WindowEvent;
 import java.awt.PopupMenu;
 import javax.swing.ImageIcon;
 import javax.swing.JPopupMenu;
+import javax.swing.JDialog;
+import javax.swing.JTextPane;
+import javax.swing.JPanel;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
 import javax.mail.event.MessageCountEvent;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsConfiguration;
@@ -36,7 +41,7 @@ public class MessageNotificationManager implements ValueChangeListener {
   private MainPanel mPanel;
   private boolean mNewMessageFlag = false;
   private TrayIcon mTrayIcon = null;
-  private Map mNewMessageMap;
+  private Map<String, List<MessageInfo>> mNewMessageMap;
   private int mNewMessageCount = 0;
   private RecentMessageMenu mRecentMessageMenu;
 
@@ -55,11 +60,14 @@ public class MessageNotificationManager implements ValueChangeListener {
   private boolean mShowNewMailMessage = true;
   private boolean mBlinkNewMail = false;
 
+  private boolean messageDisplaying = false;
+  private Thread messageDisplayThread = null;
+
   /**
    * Creates a new MessageNotificationManager.
    */
   public MessageNotificationManager() {
-    mNewMessageMap = new HashMap();
+    mNewMessageMap = new HashMap<String, List<MessageInfo>>();
 
     mOfflineActions = new Action[] {
       new NewMessageAction(),
@@ -102,13 +110,22 @@ public class MessageNotificationManager implements ValueChangeListener {
               System.err.println("got action " + e);
               if (getMainPanel() != null) {
                 mTrayIcon.displayMessage("Pooka", createStatusMessage(), INFO_MESSAGE_TYPE);
-                bringToFront();
+                //bringToFront();
               } else {
                 startMainWindow();
               }
             }
           });
-
+        mTrayIcon.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent me) {
+              if (! messageDisplaying) {
+                JDialog dialog = createMessageDialog();
+                dialog.setLocation(me.getX(), me.getY());
+                dialog.setVisible(true);
+                messageDisplaying = true;
+              }
+            }
+          });
         /*
         mTrayIcon.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent e) {
@@ -214,7 +231,7 @@ public class MessageNotificationManager implements ValueChangeListener {
     if (getRecentMessageMenu() != null)
       getRecentMessageMenu().reset();
 
-    mNewMessageMap = new HashMap();
+    mNewMessageMap = new HashMap<String, List<MessageInfo>>();
     if (mTrayIcon != null) {
       mTrayIcon.setToolTip("Pooka: No new messages.");
     }
@@ -230,9 +247,9 @@ public class MessageNotificationManager implements ValueChangeListener {
   public synchronized void notifyNewMessagesReceived(MessageCountEvent e, String pFolderId) {
     // note:  called on the FolderThread that produced this event.
     mNewMessageCount+= e.getMessages().length;
-    List newMessageList = (List) mNewMessageMap.get(pFolderId);
+    List<MessageInfo> newMessageList = mNewMessageMap.get(pFolderId);
     if (newMessageList == null) {
-      newMessageList = new ArrayList();
+      newMessageList = new ArrayList<MessageInfo>();
     }
 
     // get the MessageInfo for each of the added messages and add it to
@@ -246,7 +263,7 @@ public class MessageNotificationManager implements ValueChangeListener {
           MessageInfo current = folder.getMessageInfo(e.getMessages()[i]);
           newMessageList.add(current);
           if (i < 3)
-            infoLines.append("From: " + current.getMessageProperty("From") + ", Subj: " + current.getMessageProperty("Subject") + "\n\n");
+            infoLines.append("From: " + current.getMessageProperty("From") + ", Subj: " + current.getMessageProperty("Subject") + "\r\n\r\n");
           else if (i == 3)
             infoLines.append("...");
         }
@@ -259,7 +276,7 @@ public class MessageNotificationManager implements ValueChangeListener {
     mNewMessageMap.put(pFolderId, newMessageList);
 
     // build the message
-    final String fDisplayMessage = new String(e.getMessages().length + " messages received in " + pFolderId + "\n\n" + infoLines.toString());
+    final String fDisplayMessage = new String(e.getMessages().length + " messages received in " + pFolderId + "\r\n\r\n" + infoLines.toString());
     final String fToolTip = "Pooka: " + mNewMessageCount + " new messages.";
     boolean doUpdateStatus = false;
     if (! mNewMessageFlag) {
@@ -332,9 +349,9 @@ public class MessageNotificationManager implements ValueChangeListener {
    */
   public synchronized void removeFromNewMessages(MessageInfo pMessageInfo) {
     String folderId = pMessageInfo.getFolderInfo().getFolderID();
-    Object newMessageList = mNewMessageMap.get(folderId);
-    if (newMessageList != null && newMessageList instanceof List) {
-      ((List) newMessageList).remove(pMessageInfo);
+    List<MessageInfo> newMessageList = mNewMessageMap.get(folderId);
+    if (newMessageList != null) {
+      newMessageList.remove(pMessageInfo);
       mNewMessageCount --;
       if (mNewMessageCount == 0)
         clearNewMessageFlag();
@@ -364,10 +381,10 @@ public class MessageNotificationManager implements ValueChangeListener {
     if (mNewMessageMap.isEmpty()) {
       buffer.append("No new messages.");
     } else {
-      Iterator folders = mNewMessageMap.keySet().iterator();
+      Iterator<String> folders = mNewMessageMap.keySet().iterator();
       while (folders.hasNext()) {
-        String current = (String) folders.next();
-        buffer.append(current + ":  " + ((List)mNewMessageMap.get(current)).size() + " new messages.\n");
+        String current = folders.next();
+        buffer.append(current + ":  " + mNewMessageMap.get(current).size() + " new messages.\n");
       }
     }
 
@@ -493,6 +510,73 @@ public class MessageNotificationManager implements ValueChangeListener {
   }
 
   /**
+   * Creates a display component to show the available messages.
+   */
+  public JDialog createMessageDialog() {
+    StringBuffer textBuffer = new StringBuffer();
+    textBuffer.append("<html><body><b>Status</b><a href = \"close\">x</a><br/>");
+    textBuffer.append("<ul>");
+    Iterator<String> folderIds = mNewMessageMap.keySet().iterator();
+    while (folderIds.hasNext()) {
+      textBuffer.append("<li>");
+      String folderId = folderIds.next();
+      textBuffer.append(folderId);
+      textBuffer.append("<ul>");
+      Iterator<MessageInfo> messageIter = mNewMessageMap.get(folderId).iterator();
+      while (messageIter.hasNext()) {
+        try {
+          MessageInfo messageInfo = messageIter.next();
+          textBuffer.append("<li><a href = \"foo\">");
+          textBuffer.append("From: " + messageInfo.getMessageProperty("From") + ", Subj: " + messageInfo.getMessageProperty("Subject"));
+          textBuffer.append("</a></li>");
+        } catch (Exception e) {
+          textBuffer.append("<li>Error:  " + e.getMessage() + "</li>");
+        }
+      }
+      textBuffer.append("</ul>");
+      textBuffer.append("</li>");
+    }
+    textBuffer.append("</ul>");
+    textBuffer.append("</body></html>");
+
+    //JTextArea pookaMessage = new JTextArea(createStatusMessage());
+    JTextPane pookaMessage = new JTextPane();
+    pookaMessage.setContentType("text/html");
+    pookaMessage.setText(textBuffer.toString());
+
+    final JDialog dialog = new JDialog();
+    pookaMessage.setEditable(false);
+    dialog.add(pookaMessage);
+    dialog.setUndecorated(true);
+    dialog.pack();
+    pookaMessage.addMouseListener(new MouseAdapter() {
+        public void mouseClicked(MouseEvent me) {
+          dialog.setVisible(false);
+          dialog.dispose();
+          messageDisplaying = false;
+        }
+      });
+    messageDisplayThread = new Thread(new Runnable() {
+        public void run() {
+          try {
+            Thread.currentThread().sleep(5000);
+          } catch(Exception e) {
+          }
+          if (messageDisplaying) {
+            dialog.setVisible(false);
+            dialog.dispose();
+            messageDisplaying = false;
+          }
+        }
+      });
+
+    messageDisplayThread.start();
+
+    return dialog;
+
+  }
+
+  /**
    * Returns the newMessageFlag.
    */
   public boolean getNewMessageFlag() {
@@ -502,7 +586,7 @@ public class MessageNotificationManager implements ValueChangeListener {
   /**
    * Returns the current new message map.
    */
-  public Map getNewMessageMap() {
+  public Map<String, List<MessageInfo>> getNewMessageMap() {
     return mNewMessageMap;
   }
 
