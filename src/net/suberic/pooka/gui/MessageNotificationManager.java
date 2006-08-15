@@ -19,6 +19,8 @@ import javax.swing.JPanel;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.mail.event.MessageCountEvent;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -514,7 +516,7 @@ public class MessageNotificationManager implements ValueChangeListener {
    */
   public JDialog createMessageDialog() {
     StringBuffer textBuffer = new StringBuffer();
-    textBuffer.append("<html><body><b>Status</b><a href = \"close\">x</a><br/>");
+    textBuffer.append("<html><body><b>Status</b><a href = \"close://\">x</a><br/>");
     textBuffer.append("<ul>");
     Iterator<String> folderIds = mNewMessageMap.keySet().iterator();
     while (folderIds.hasNext()) {
@@ -526,7 +528,7 @@ public class MessageNotificationManager implements ValueChangeListener {
       while (messageIter.hasNext()) {
         try {
           MessageInfo messageInfo = messageIter.next();
-          textBuffer.append("<li><a href = \"foo\">");
+          textBuffer.append("<li><a href = \"mailopen://\">");
           textBuffer.append("From: " + messageInfo.getMessageProperty("From") + ", Subj: " + messageInfo.getMessageProperty("Subject"));
           textBuffer.append("</a></li>");
         } catch (Exception e) {
@@ -549,6 +551,7 @@ public class MessageNotificationManager implements ValueChangeListener {
     dialog.add(pookaMessage);
     dialog.setUndecorated(true);
     dialog.pack();
+    /*
     pookaMessage.addMouseListener(new MouseAdapter() {
         public void mouseClicked(MouseEvent me) {
           dialog.setVisible(false);
@@ -556,6 +559,23 @@ public class MessageNotificationManager implements ValueChangeListener {
           messageDisplaying = false;
         }
       });
+    */
+    pookaMessage.addHyperlinkListener(new HyperlinkListener() {
+        public void hyperlinkUpdate(HyperlinkEvent e) {
+          if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            System.err.println("hyperlinkEvent:  " + e);
+            java.net.URL url = e.getURL();
+            System.err.println("url = " + url);
+            System.err.println("description = " + e.getDescription());
+            if (e.getDescription().startsWith("close")) {
+              dialog.setVisible(false);
+              dialog.dispose();
+              messageDisplaying = false;
+            }
+          }
+        }
+      });
+
     messageDisplayThread = new Thread(new Runnable() {
         public void run() {
           try {
