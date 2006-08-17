@@ -515,8 +515,10 @@ public class MessageNotificationManager implements ValueChangeListener {
    * Creates a display component to show the available messages.
    */
   public JDialog createMessageDialog() {
+    HashMap<String, MessageInfo> messageMap = new HashMap<String, MessageInfo>();
+
     StringBuffer textBuffer = new StringBuffer();
-    textBuffer.append("<html><body><b>Status</b><a href = \"close://\">x</a><br/>");
+    textBuffer.append("<html><body style=\" font-size: 9px; \"><b>Status</b><a href = \"close://\">x</a><br/>");
     textBuffer.append("<ul>");
     Iterator<String> folderIds = mNewMessageMap.keySet().iterator();
     while (folderIds.hasNext()) {
@@ -525,10 +527,13 @@ public class MessageNotificationManager implements ValueChangeListener {
       textBuffer.append(folderId);
       textBuffer.append("<ul>");
       Iterator<MessageInfo> messageIter = mNewMessageMap.get(folderId).iterator();
+      int counter = 0;
       while (messageIter.hasNext()) {
         try {
           MessageInfo messageInfo = messageIter.next();
-          textBuffer.append("<li><a href = \"mailopen://\">");
+          String messageUri = "mailopen://" + folderId + "/" + counter++;
+          textBuffer.append("<li><a href = \"" + messageUri + "\">");
+          messageMap.put(messageUri, messageInfo);
           textBuffer.append("From: " + messageInfo.getMessageProperty("From") + ", Subj: " + messageInfo.getMessageProperty("Subject"));
           textBuffer.append("</a></li>");
         } catch (Exception e) {
@@ -540,6 +545,8 @@ public class MessageNotificationManager implements ValueChangeListener {
     }
     textBuffer.append("</ul>");
     textBuffer.append("</body></html>");
+
+    final HashMap<String, MessageInfo> fMessageMap = messageMap;
 
     //JTextArea pookaMessage = new JTextArea(createStatusMessage());
     JTextPane pookaMessage = new JTextPane();
@@ -571,6 +578,17 @@ public class MessageNotificationManager implements ValueChangeListener {
               dialog.setVisible(false);
               dialog.dispose();
               messageDisplaying = false;
+            } else if (e.getDescription().startsWith("mailopen://")) {
+              MessageInfo openMessage = fMessageMap.get(e.getDescription());
+              try {
+                MessageProxy proxy = openMessage.getMessageProxy();
+                MessageUI mui = Pooka.getUIFactory().createMessageUI(proxy, new NewMessageFrame(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(Pooka.getDefaultSession())))));
+                mui.openMessageUI();
+                // and if that works, remove it from the new message map.
+                removeFromNewMessages(openMessage);
+              } catch (Exception ex) {
+                ex.printStackTrace();
+              }
             }
           }
         }
