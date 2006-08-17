@@ -47,9 +47,9 @@
 	*) should be able to tell if balloon is showing or not.
 	*) autoupdate on balloon--if it's showing, either queue up 
 		another one or update the current one (?)
-	*) get rid of right-click new message opening.
 	*) fix new message notification on folders if you read a message
 		from the Open Message menu from the TrayIcon.
+	*) focus problem.  fix.
 
 *) open up local folder using open button:  icons fail to update.
 	-- that's a bug with the mbox/maildir providers

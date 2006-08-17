@@ -11,13 +11,7 @@ import java.util.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.PopupMenu;
-import javax.swing.ImageIcon;
-import javax.swing.JPopupMenu;
-import javax.swing.JDialog;
-import javax.swing.JTextPane;
-import javax.swing.JPanel;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import javax.swing.*;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -109,7 +103,7 @@ public class MessageNotificationManager implements ValueChangeListener {
         mTrayIcon.setPopupMenu(createPopupMenu());
         mTrayIcon.addActionListener(new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-              System.err.println("got action " + e);
+              //System.err.println("got action " + e);
               if (getMainPanel() != null) {
                 mTrayIcon.displayMessage("Pooka", createStatusMessage(), INFO_MESSAGE_TYPE);
                 //bringToFront();
@@ -120,8 +114,14 @@ public class MessageNotificationManager implements ValueChangeListener {
           });
         mTrayIcon.addMouseListener(new MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent me) {
-              if (! messageDisplaying) {
+              if ((!me.isPopupTrigger()) && ! messageDisplaying) {
                 JDialog dialog = createMessageDialog();
+                //System.err.println("x,y= " + me.getX() + ", " + me.getY());
+                java.awt.GraphicsEnvironment ge = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment();
+                java.awt.GraphicsDevice[] gs = ge.getScreenDevices();
+                for (int i = 0; i < gs.length; i++) {
+                  //System.err.println("graphics:  " + gs[i].getDisplayMode().getWidth() + ", " +  gs[i].getDisplayMode().getHeight());
+                }
                 dialog.setLocation(me.getX(), me.getY());
                 dialog.setVisible(true);
                 messageDisplaying = true;
@@ -516,46 +516,74 @@ public class MessageNotificationManager implements ValueChangeListener {
    */
   public JDialog createMessageDialog() {
     HashMap<String, MessageInfo> messageMap = new HashMap<String, MessageInfo>();
+    Box messageBox = new Box(BoxLayout.Y_AXIS);
+    Box headerBox = new Box(BoxLayout.X_AXIS);
+
+    // header
+    JTextPane headerPane = new JTextPane();
+    headerPane.setContentType("text/html");
+    headerPane.setText("<html><body style=\" font-size: 9px; \"><b>Pooka</b></body></html> ");
+    headerPane.setEditable(false);
+
+    headerBox.add(headerPane);
+    JButton closeButton = new JButton(javax.swing.plaf.metal.MetalIconFactory.getInternalFrameCloseIcon(5));
+    closeButton.setMinimumSize(new java.awt.Dimension(15,15));
+    closeButton.setPreferredSize(new java.awt.Dimension(15,15));
+    closeButton.setMaximumSize(new java.awt.Dimension(15,15));
+    headerBox.add(closeButton);
+
+    messageBox.add(headerBox);
 
     StringBuffer textBuffer = new StringBuffer();
-    textBuffer.append("<html><body style=\" font-size: 9px; \"><b>Status</b><a href = \"close://\">x</a><br/>");
-    textBuffer.append("<ul>");
-    Iterator<String> folderIds = mNewMessageMap.keySet().iterator();
-    while (folderIds.hasNext()) {
-      textBuffer.append("<li>");
-      String folderId = folderIds.next();
-      textBuffer.append(folderId);
+    //textBuffer.append("<html><body style=\" font-size: 9px; \"><b>Status</b><box style=\" position: absolute; margin: 0 0 0 90%; \"><a href = \"close://\">x</a></box>");
+    textBuffer.append("<html><body style=\" font-size: 9px; \">");
+    if (! mNewMessageMap.isEmpty()) {
       textBuffer.append("<ul>");
-      Iterator<MessageInfo> messageIter = mNewMessageMap.get(folderId).iterator();
-      int counter = 0;
-      while (messageIter.hasNext()) {
-        try {
-          MessageInfo messageInfo = messageIter.next();
-          String messageUri = "mailopen://" + folderId + "/" + counter++;
-          textBuffer.append("<li><a href = \"" + messageUri + "\">");
-          messageMap.put(messageUri, messageInfo);
-          textBuffer.append("From: " + messageInfo.getMessageProperty("From") + ", Subj: " + messageInfo.getMessageProperty("Subject"));
-          textBuffer.append("</a></li>");
-        } catch (Exception e) {
-          textBuffer.append("<li>Error:  " + e.getMessage() + "</li>");
+      Iterator<String> folderIds = mNewMessageMap.keySet().iterator();
+      while (folderIds.hasNext()) {
+        textBuffer.append("<li>");
+        String folderId = folderIds.next();
+        textBuffer.append(folderId);
+        textBuffer.append("<ul>");
+        Iterator<MessageInfo> messageIter = mNewMessageMap.get(folderId).iterator();
+        int counter = 0;
+        while (messageIter.hasNext()) {
+          try {
+            MessageInfo messageInfo = messageIter.next();
+            String messageUri = "mailopen://" + folderId + "/" + counter++;
+            textBuffer.append("<li><a href = \"" + messageUri + "\">");
+            messageMap.put(messageUri, messageInfo);
+            textBuffer.append("From: " + messageInfo.getMessageProperty("From") + ", Subj: " + messageInfo.getMessageProperty("Subject"));
+            textBuffer.append("</a></li>");
+          } catch (Exception e) {
+            textBuffer.append("<li>Error:  " + e.getMessage() + "</li>");
+          }
         }
+        textBuffer.append("</ul>");
+        textBuffer.append("</li>");
       }
+
       textBuffer.append("</ul>");
-      textBuffer.append("</li>");
+    } else {
+      textBuffer.append("No new messages.");
     }
-    textBuffer.append("</ul>");
     textBuffer.append("</body></html>");
 
     final HashMap<String, MessageInfo> fMessageMap = messageMap;
+
+    System.out.println(textBuffer.toString());
 
     //JTextArea pookaMessage = new JTextArea(createStatusMessage());
     JTextPane pookaMessage = new JTextPane();
     pookaMessage.setContentType("text/html");
     pookaMessage.setText(textBuffer.toString());
 
+    messageBox.add(pookaMessage);
+
     final JDialog dialog = new JDialog();
     pookaMessage.setEditable(false);
-    dialog.add(pookaMessage);
+    //dialog.add(pookaMessage);
+    dialog.add(messageBox);
     dialog.setUndecorated(true);
     dialog.pack();
     /*
@@ -567,13 +595,21 @@ public class MessageNotificationManager implements ValueChangeListener {
         }
       });
     */
+    closeButton.addActionListener(new AbstractAction() {
+        public void actionPerformed(ActionEvent e) {
+          dialog.setVisible(false);
+          dialog.dispose();
+          messageDisplaying = false;
+        }
+      });
+
     pookaMessage.addHyperlinkListener(new HyperlinkListener() {
         public void hyperlinkUpdate(HyperlinkEvent e) {
           if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            System.err.println("hyperlinkEvent:  " + e);
+            //System.err.println("hyperlinkEvent:  " + e);
             java.net.URL url = e.getURL();
-            System.err.println("url = " + url);
-            System.err.println("description = " + e.getDescription());
+            //System.err.println("url = " + url);
+            //System.err.println("description = " + e.getDescription());
             if (e.getDescription().startsWith("close")) {
               dialog.setVisible(false);
               dialog.dispose();
