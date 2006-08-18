@@ -571,8 +571,6 @@ public class MessageNotificationManager implements ValueChangeListener {
 
     final HashMap<String, MessageInfo> fMessageMap = messageMap;
 
-    System.out.println(textBuffer.toString());
-
     //JTextArea pookaMessage = new JTextArea(createStatusMessage());
     JTextPane pookaMessage = new JTextPane();
     pookaMessage.setContentType("text/html");
