@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File for Pooka -->
+<jnlp
+ spec="1.0+"
+ codebase="${BASE_URL}"
+ href="pooka.jnlp">
+ <information>
+   <title>Pooka Email Client</title>
+   <vendor>Suberic Networks</vendor>
+   <homepage href="http://www.suberic.net/pooka/index.html"/>
+   <description>Pooka Email Client</description>
+   <description kind="short">An IMAP/POP3 email client.</description>
+   <icon href="images/PookaIcon.jpg"/>
+   <offline-allowed/>
+ </information>
+ <security>
+     <all-permissions/>
+ </security>
+ <resources>
+   <j2se version="1.6+" initial-heap-size="24m" max-heap-size="128m"/>
+   <!-- main pooka files -->
+   <jar href="jars/pooka.jar"/>
+   <jar href="jars/pooka_images.jar"/>
+   <jar href="jars/pooka_help.jar" download="lazy"/>
+   <jar href="jars/linspire_clear.jar"/>
+
+   <!-- support libraries -->
+   <jar href="lib/mbox.jar"/>
+   <jar href="lib/javamaildir.jar"/>
+   <jar href="lib/kunststoff.jar"/>
+
+   <!-- crypto -->
+   <jar href="lib/javamail-crypto.jar"/>
+   <jar href="lib/javamail-crypto-cryptix-openpgp.jar"/>
+   <jar href="lib/javamail-crypto-bouncycastle-smime.jar"/>
+   <jar href="lib/cryptix-openpgp-provider.jar"/>
+   <jar href="lib/cryptix-pki-api.jar"/>
+   <jar href="lib/cryptix-message-api.jar"/> 
+
+   <!-- extensions -->
+   <extension name="Cryptix JCE" href="lib/cryptix.jnlp"/>
+   <extension name="BouncyCastle S/MIME" href="lib/bouncy.jnlp"/>
+   <extension name="JavaMail" href="lib/javamail.jnlp"/>
+   <extension name="JavaHelp" href="lib/javahelp.jnlp"/>
+   <extension name="Java Activation Framework" href="lib/jaf.jnlp"/>
+ </resources>
+ <application-desc/>
+</jnlp>

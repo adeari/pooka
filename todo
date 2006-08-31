@@ -25,7 +25,7 @@
 	   CompositeEditorPane?
   *) change selection/add buttons
    *) fix layout
-   *) ??? add a boder/top line to the buttons?
+   *) ??? add a border/top line to the buttons?
   *) add in/make work text entries
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with images.
