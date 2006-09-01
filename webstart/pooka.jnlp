@@ -22,13 +22,15 @@
    <jar href="jars/pooka.jar"/>
    <jar href="jars/pooka_images.jar"/>
    <jar href="jars/pooka_help.jar" download="lazy"/>
-   <jar href="jars/linspire_clear.jar"/>
 
    <!-- support libraries -->
+   <jar href="lib/linspire_clear.jar"/>
+
    <jar href="lib/mbox.jar"/>
    <jar href="lib/javamaildir.jar"/>
    <jar href="lib/kunststoff.jar"/>
-
+   <jar href="lib/htmlparser.jar"/>
+   
    <!-- crypto -->
    <jar href="lib/javamail-crypto.jar"/>
    <jar href="lib/javamail-crypto-cryptix-openpgp.jar"/>

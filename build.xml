@@ -320,6 +320,8 @@
   </target>
 
   
+  <property name="webstart_url" value="http://localhost/pooka/webstart"/>
+
   <target name="jnlp-deploy" depends="sign">
     <mkdir dir="${webstart_build}"/>
     <!-- copy jar files in jars directory -->
@@ -330,22 +332,57 @@
         <include name="pooka_help.jar"/>
         <include name="pooka_images.jar"/>
       </fileset>
-      <fileset dir="${importdir}">
-        <include name="linspire_clear.jar"/>
-      </fileset>
     </copy>
 
     <!-- copy jar files in libs directory -->
     <mkdir dir="${webstart_build}/lib"/>
     <copy todir="${webstart_build}/lib">
       <fileset dir="${importdir}">
+        <include name="activation.jar"/>
         <include name="bcmail.jar"/>
         <include name="bcprov.jar"/>
-        <include name="cryptix-jce-provider.jar"/>
-        <include name="activation.jar"/>
-        <include name="mail.jar"/>
+        <include name="cryptix*.jar"/>
+        <include name="htmlparser.jar"/>
+	<include name="javamail-crypto*.jar"/>
+	<include name="javamaildir.jar"/>
         <include name="jh.jar"/>
+        <include name="kunststoff.jar"/>
+        <include name="linspire_clear.jar"/>
+        <include name="mail.jar"/>
+	<include name="mbox.jar"/>
       </fileset>
     </copy>
+    
+    <!-- sign jar files that need signing. -->
+    <signjar jar="${webstart_build}/lib/linspire_clear.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/mbox.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/htmlparser.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/javamaildir.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/kunststoff.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/javamail-crypto.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/javamail-crypto-cryptix-openpgp.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/javamail-crypto-bouncycastle-smime.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/cryptix-openpgp-provider.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/cryptix-pki-api.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/cryptix-message-api.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+
+    <!-- copy over main jnlp file -->
+    <copy file="${webstart_source}/pooka.jnlp" todir="${webstart_build}"/>
+
+    <replace file="${webstart_build}/pooka.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+    <!-- copy over library jnlp files -->
+    <copy todir="${webstart_build}/lib">
+      <fileset dir="${webstart_source}/lib">
+        <include name="*.jnlp"/>
+      </fileset>
+    </copy>
+
+    <replace file="${webstart_build}/lib/bouncy.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+    <replace file="${webstart_build}/lib/cryptix.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+    <replace file="${webstart_build}/lib/jaf.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+    <replace file="${webstart_build}/lib/javahelp.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+    <replace file="${webstart_build}/lib/javamail.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+
+    
   </target>
 </project>
