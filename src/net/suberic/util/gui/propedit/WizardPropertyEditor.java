@@ -1,48 +1,31 @@
 package net.suberic.util.gui.propedit;
+import java.awt.Component;
+import java.awt.Container;
 import javax.swing.*;
-import java.util.List;
-import java.util.LinkedList;
-import javax.help.CSH;
-import java.awt.*;
+
 
 /**
- * This is a top-level editor for properties.  It includes buttons for
- * activating changes, accepting and closing, and cancelling the action.
+ * A top-level editor for wizard properties.  Instead of having a single
+ * panel with properties and a set of 'help', 'apply', 'ok', and 'cancel'
+ * buttons, this has a series of panels with 'help', 'canel', and 'next'
+ * buttons.  You must go through the workflow for the Wizard before
+ * you reach an 'ok' stage.
  */
-public class PropertyEditorPane extends JPanel {
-  SwingPropertyEditor editor;
-  PropertyEditorManager manager;
-  Container container;
-  boolean doCommit;
-
-  /**
-   * Constructor for subclasses.
-   */
-  PropertyEditorPane() {
-
-  }
+public class WizardPropertyEditor extends PropertyEditorPane {
+  WizardEditorPane wizard = null;
 
   /**
    * This contructor creates a PropertyEditor using the given
    * SwingPropertyEditor.
    */
-  public PropertyEditorPane(PropertyEditorManager newManager,
-                            SwingPropertyEditor newEditor,
-                            Container newContainer) {
-    this(newManager, newEditor, newContainer, true);
-  }
-
-  /**
-   * This contructor creates a PropertyEditor using the given
-   * SwingPropertyEditor.
-   */
-  public PropertyEditorPane(PropertyEditorManager newManager,
+  public WizardPropertyEditor(PropertyEditorManager newManager,
                             SwingPropertyEditor newEditor,
                             Container newContainer,
                             boolean newCommit) {
     manager = newManager;
     container = newContainer;
     editor = newEditor;
+    wizard = (WizardEditorPane) newEditor;
     doCommit = newCommit;
 
     Component editorComponent = editor;
@@ -72,58 +55,8 @@ public class PropertyEditorPane extends JPanel {
 
     JPanel buttonPanel = createButtonPanel();
 
-    pepLayout(editorComponent, buttonPanel);
+    //pepLayout(editorComponent, buttonPanel);
 
-  }
-
-  /**
-   * Does the layout for the PropertyEditorPane.
-   */
-  private void pepLayout(Component editorPanel, Component buttonPanel) {
-    SpringLayout layout = new SpringLayout();
-    this.setLayout(layout);
-
-    this.add(editorPanel);
-
-    layout.putConstraint(SpringLayout.WEST, editorPanel, 5, SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.NORTH, editorPanel, 5, SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, editorPanel);
-    //layout.putConstraint(SpringLayout.EAST, this, 5, SpringLayout.EAST, editorPanel);
-
-    this.add(buttonPanel);
-    layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.SOUTH, editorPanel);
-
-    layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, buttonPanel);
-
-    Spring widthSpring = Spring.constant(0);
-    widthSpring = Spring.max(widthSpring, layout.getConstraints(buttonPanel).getWidth());
-    widthSpring = Spring.max(widthSpring, layout.getConstraints(editorPanel).getWidth());
-
-    layout.putConstraint(SpringLayout.EAST, this, Spring.sum(widthSpring, Spring.constant(10)), SpringLayout.WEST, this);
-
-  }
-
-  /**
-   * Accepts the changes for the edited properties, and writes them to
-   * the PropertyEditorManager.
-   */
-  public void setValue() throws PropertyValueVetoException {
-    editor.setValue();
-  }
-
-  /**
-   * Gets the currently selected values for the edited properties.
-   */
-  public java.util.Properties getValue() {
-    return editor.getValue();
-  }
-
-  /**
-   * Resets the original values for the edited properties.
-   */
-  public void resetDefaultValue() throws PropertyValueVetoException {
-    editor.resetDefaultValue();
   }
 
   /**
@@ -131,6 +64,7 @@ public class PropertyEditorPane extends JPanel {
    */
   public JPanel createButtonPanel() {
     JPanel buttonPanel = new JPanel();
+    /*
     SpringLayout buttonLayout = new SpringLayout();
     buttonPanel.setLayout(buttonLayout);
 
@@ -166,7 +100,7 @@ public class PropertyEditorPane extends JPanel {
               ((JDialog)container).dispose();
             }
           } catch (PropertyValueVetoException pvve) {
-            manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
+            manager.getFactory().showError(WizardPropertyEditor.this, pvve.getMessage());
           }
         }
       }, true);
@@ -179,8 +113,8 @@ public class PropertyEditorPane extends JPanel {
               manager.commit();
             }
           } catch (PropertyValueVetoException pvve) {
-            //manager.getFactory().showError(PropertyEditorPane.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
-            manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
+            //manager.getFactory().showError(WizardPropertyEditor.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
+            manager.getFactory().showError(WizardPropertyEditor.this, pvve.getMessage());
           }
         }
       }, false);
@@ -230,33 +164,8 @@ public class PropertyEditorPane extends JPanel {
     buttonLayout.putConstraint(SpringLayout.NORTH, okButton, 5, SpringLayout.NORTH, buttonPanel);
     buttonLayout.putConstraint(SpringLayout.EAST, buttonPanel, 5, SpringLayout.EAST, okButton);
 
+    */
     return buttonPanel;
-  }
-
-  /**
-   * Creates the appropriate Button.
-   */
-  private JButton createButton(String label, Action e, boolean isDefault) {
-    JButton thisButton;
-
-    thisButton = new JButton(manager.getProperty("label." + label, label));
-    String mnemonic = manager.getProperty("label." + label + ".mnemonic", "");
-    if (mnemonic.length() > 0) {
-      thisButton.setMnemonic(mnemonic.charAt(0));
-    }
-
-    thisButton.setSelected(isDefault);
-
-    thisButton.addActionListener(e);
-
-    return thisButton;
-  }
-
-  /**
-   * Returns the Container for this PropertyEditorPane.
-   */
-  public Container getContainer() {
-    return container;
   }
 
 }
