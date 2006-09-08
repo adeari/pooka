@@ -7,9 +7,9 @@ import javax.swing.*;
 /**
  * A top-level editor for wizard properties.  Instead of having a single
  * panel with properties and a set of 'help', 'apply', 'ok', and 'cancel'
- * buttons, this has a series of panels with 'help', 'canel', and 'next'
- * buttons.  You must go through the workflow for the Wizard before
- * you reach an 'ok' stage.
+ * buttons, this has a series of panels with 'help', 'cancel', 'back',
+ * and 'next' buttons.  You must go through the workflow for the Wizard
+ * before you reach an 'ok' stage.
  */
 public class WizardPropertyEditor extends PropertyEditorPane {
   WizardEditorPane wizard = null;
@@ -30,32 +30,9 @@ public class WizardPropertyEditor extends PropertyEditorPane {
 
     Component editorComponent = editor;
 
-    if (editor instanceof LabelValuePropertyEditor) {
-      JPanel editorPanel = new JPanel();
-      SpringLayout editorPanelLayout = new SpringLayout();
-      editorPanel.setLayout(editorPanelLayout);
-
-      LabelValuePropertyEditor lvEditor = (LabelValuePropertyEditor) editor;
-      editorPanel.add(lvEditor.getLabelComponent());
-      editorPanel.add(lvEditor.getValueComponent());
-
-      editorPanelLayout.putConstraint(SpringLayout.WEST, lvEditor.getLabelComponent(), 5, SpringLayout.WEST, editorPanel);
-      editorPanelLayout.putConstraint(SpringLayout.NORTH, lvEditor.getLabelComponent(), 5, SpringLayout.NORTH, editorPanel);
-      editorPanelLayout.putConstraint(SpringLayout.SOUTH, editorPanel, 5 ,SpringLayout.SOUTH, lvEditor.getLabelComponent());
-      //editorPanelLayout.putConstraint(SpringLayout.SOUTH, lvEditor.getLabelComponent(), -5, SpringLayout.SOUTH, editorPanel);
-
-      editorPanelLayout.putConstraint(SpringLayout.WEST, lvEditor.getValueComponent(), 5 ,SpringLayout.EAST, lvEditor.getLabelComponent());
-
-      editorPanelLayout.putConstraint(SpringLayout.NORTH, lvEditor.getValueComponent(), 5 ,SpringLayout.NORTH, editorPanel);
-      //editorPanelLayout.putConstraint(SpringLayout.SOUTH, editorPanel, 5 ,SpringLayout.SOUTH, lvEditor.getValueComponent());
-      editorPanelLayout.putConstraint(SpringLayout.EAST, editorPanel, 5 ,SpringLayout.EAST, lvEditor.getValueComponent());
-
-      editorComponent = editorPanel;
-    }
-
     JPanel buttonPanel = createButtonPanel();
 
-    //pepLayout(editorComponent, buttonPanel);
+    pepLayout(editorComponent, buttonPanel);
 
   }
 
@@ -64,7 +41,7 @@ public class WizardPropertyEditor extends PropertyEditorPane {
    */
   public JPanel createButtonPanel() {
     JPanel buttonPanel = new JPanel();
-    /*
+
     SpringLayout buttonLayout = new SpringLayout();
     buttonPanel.setLayout(buttonLayout);
 
@@ -82,42 +59,22 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     //CSH.setHelpIDString(helpButton, "UserProfile");
     buttonPanel.add(helpButton);
 
-    JButton okButton = createButton("Ok", new AbstractAction() {
+    JButton backButton = createButton("Back", new AbstractAction() {
+        public void actionPerformed(java.awt.event.ActionEvent e) {
+          wizard.back();
+        }
+      }, false);
+
+
+    JButton nextButton = createButton("Next", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
-            setValue();
-            if (doCommit) {
-              manager.commit();
-            }
-            if (container instanceof JInternalFrame) {
-              try {
-                ((JInternalFrame)container).setClosed(true);
-              } catch (java.beans.PropertyVetoException pve) {
-              }
-            } else if (container instanceof JFrame) {
-              ((JFrame)container).dispose();
-            } else if (container instanceof JDialog) {
-              ((JDialog)container).dispose();
-            }
+            wizard.next();
           } catch (PropertyValueVetoException pvve) {
             manager.getFactory().showError(WizardPropertyEditor.this, pvve.getMessage());
           }
         }
       }, true);
-
-    JButton applyButton = createButton("Apply", new AbstractAction() {
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-          try {
-            setValue();
-            if (doCommit) {
-              manager.commit();
-            }
-          } catch (PropertyValueVetoException pvve) {
-            //manager.getFactory().showError(WizardPropertyEditor.this, "Error changing value " + pvve.getProperty() + " to " + pvve.getRejectedValue() + ":  " + pvve.getReason());
-            manager.getFactory().showError(WizardPropertyEditor.this, pvve.getMessage());
-          }
-        }
-      }, false);
 
     JButton cancelButton = createButton("Cancel", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -136,19 +93,19 @@ public class WizardPropertyEditor extends PropertyEditorPane {
 
     buttonPanel.add(helpButton);
     buttonPanel.add(cancelButton);
-    buttonPanel.add(applyButton);
-    buttonPanel.add(okButton);
+    buttonPanel.add(backButton);
+    buttonPanel.add(nextButton);
 
     Spring buttonWidth = Spring.constant(0);
     buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(helpButton).getWidth());
     buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(cancelButton).getWidth());
-    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(applyButton).getWidth());
-    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(okButton).getWidth());
+    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(backButton).getWidth());
+    buttonWidth = Spring.max(buttonWidth, buttonLayout.getConstraints(nextButton).getWidth());
 
     buttonLayout.getConstraints(helpButton).setWidth(buttonWidth);
     buttonLayout.getConstraints(cancelButton).setWidth(buttonWidth);
-    buttonLayout.getConstraints(applyButton).setWidth(buttonWidth);
-    buttonLayout.getConstraints(okButton).setWidth(buttonWidth);
+    buttonLayout.getConstraints(backButton).setWidth(buttonWidth);
+    buttonLayout.getConstraints(nextButton).setWidth(buttonWidth);
 
     buttonLayout.putConstraint(SpringLayout.WEST, helpButton, 5, SpringLayout.WEST, buttonPanel);
     buttonLayout.putConstraint(SpringLayout.NORTH, helpButton, 5, SpringLayout.NORTH, buttonPanel);
@@ -157,14 +114,13 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     buttonLayout.putConstraint(SpringLayout.WEST, cancelButton, Spring.constant(5, 5, 32000), SpringLayout.EAST, helpButton);
     buttonLayout.putConstraint(SpringLayout.NORTH, cancelButton, 5, SpringLayout.NORTH, buttonPanel);
 
-    buttonLayout.putConstraint(SpringLayout.WEST, applyButton, 5, SpringLayout.EAST, cancelButton);
-    buttonLayout.putConstraint(SpringLayout.NORTH, applyButton, 5, SpringLayout.NORTH, buttonPanel);
+    buttonLayout.putConstraint(SpringLayout.WEST, backButton, 5, SpringLayout.EAST, cancelButton);
+    buttonLayout.putConstraint(SpringLayout.NORTH, backButton, 5, SpringLayout.NORTH, buttonPanel);
 
-    buttonLayout.putConstraint(SpringLayout.WEST, okButton, 5, SpringLayout.EAST, applyButton);
-    buttonLayout.putConstraint(SpringLayout.NORTH, okButton, 5, SpringLayout.NORTH, buttonPanel);
-    buttonLayout.putConstraint(SpringLayout.EAST, buttonPanel, 5, SpringLayout.EAST, okButton);
+    buttonLayout.putConstraint(SpringLayout.WEST, nextButton, 5, SpringLayout.EAST, backButton);
+    buttonLayout.putConstraint(SpringLayout.NORTH, nextButton, 5, SpringLayout.NORTH, buttonPanel);
+    buttonLayout.putConstraint(SpringLayout.EAST, buttonPanel, 5, SpringLayout.EAST, nextButton);
 
-    */
     return buttonPanel;
   }
 

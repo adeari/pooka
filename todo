@@ -8,6 +8,8 @@
 		-- append sig to each message option
 		-- save to sent folder option
 	*) wizard
+		-- identity, receiving, options, sending
+		-- protocol, settings
 	*) folder
 	*) preferences
 	*) address book

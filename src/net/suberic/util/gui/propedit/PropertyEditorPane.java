@@ -79,7 +79,7 @@ public class PropertyEditorPane extends JPanel {
   /**
    * Does the layout for the PropertyEditorPane.
    */
-  private void pepLayout(Component editorPanel, Component buttonPanel) {
+  void pepLayout(Component editorPanel, Component buttonPanel) {
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
 
@@ -236,7 +236,7 @@ public class PropertyEditorPane extends JPanel {
   /**
    * Creates the appropriate Button.
    */
-  private JButton createButton(String label, Action e, boolean isDefault) {
+  JButton createButton(String label, Action e, boolean isDefault) {
     JButton thisButton;
 
     thisButton = new JButton(manager.getProperty("label." + label, label));

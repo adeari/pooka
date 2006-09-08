@@ -183,12 +183,7 @@ public class PropertyEditorFactory {
       jd.setTitle(title);
       jd.setModal(true);
     }
-    if (editor.getManager().createdEditorPane) {
-      jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd, false));
-    } else {
-      jd.getContentPane().add(new PropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd));
-      editor.getManager().createdEditorPane = true;
-    }
+    jd.getContentPane().add(createPropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd));
     return jd;
   }
 
@@ -239,6 +234,23 @@ public class PropertyEditorFactory {
     returnValue.configureEditor(property, editorTemplate, propertyBase, mgr, enabled);
     return returnValue;
   }
+
+  /**
+   * Creates the PropertyEditoPane for this editor.
+   */
+  public PropertyEditorPane createPropertyEditorPane(PropertyEditorManager manager, SwingPropertyEditor editor, Container container) {
+    boolean commit = ! editor.getManager().createdEditorPane;
+    String template = editor.getEditorTemplate();
+    PropertyEditorPane returnValue = null;
+    if (manager.getProperty(template + ".editorType", "").equalsIgnoreCase("wizard")) {
+      returnValue =new  WizardPropertyEditor(manager,  editor, container, commit);
+    } else {
+      returnValue =  new PropertyEditorPane(manager,  editor, container, commit);
+    }
+    manager.createdEditorPane = true;
+    return returnValue;
+  }
+
 
   /**
    * Gets the source bundle for this factory.

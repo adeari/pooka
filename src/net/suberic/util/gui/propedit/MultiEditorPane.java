@@ -154,7 +154,15 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     JButton addButton = createButton("Add", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          addNewValue(getNewValueName());
+          // check to see if we want to add a new value using a
+          // wizard
+          String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
+          if (newValueTemplate.length() > 0) {
+            manager.getFactory().showNewEditorWindow(newValueTemplate, manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager, true), getPropertyEditorPane().getContainer());
+
+          } else {
+            addNewValue(getNewValueName());
+          }
         }
       }, true);
 
