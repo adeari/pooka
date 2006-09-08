@@ -37,8 +37,10 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
     editors = new Vector();
 
+    System.err.println("adding listener for " + keyProperty);
     manager.addPropertyEditorListener(keyProperty, new PropertyEditorAdapter() {
         public void propertyChanged(PropertyEditorUI ui, String prop, String newValue) {
+          System.err.println("property " + prop + " changed.");
           showPanel(newValue);
         }
       });
@@ -63,6 +65,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
    * This shows the editor window for the configured value.
    */
   public void showPanel(String selectedId) {
+    System.err.println("showing panel " + selectedId);
     boolean enableMe = true;
     if (selectedId == null || selectedId.equals("")) {
       enableMe = false;

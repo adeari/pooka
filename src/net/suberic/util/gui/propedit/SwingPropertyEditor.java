@@ -31,9 +31,6 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   // the PorpertyEditorManager for this instance.
   protected PropertyEditorManager manager;
 
-  // the listener list.
-  protected List listenerList = new LinkedList();
-
   // the logger
   protected static Logger sLogger =  Logger.getLogger("editors.debug");
 
@@ -158,17 +155,16 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    * Adds a PropertyEditorListener to the ListenerList.
    */
   public void addPropertyEditorListener(PropertyEditorListener pel) {
-    if (pel != null && ! listenerList.contains(pel))
-      listenerList.add(pel);
+    manager.addPropertyEditorListener(getProperty(), pel);
   }
 
   /**
    * Removes a PropertyEditorListener from the ListenerList.
    */
   public void removePropertyEditorListener(PropertyEditorListener pel) {
-    if (pel != null && listenerList.contains(pel))
-      listenerList.remove(pel);
+    manager.removePropertyEditorListener(getProperty(), pel);
   }
+
 
   /**
    * Fires a propertyChanging event to all of the PropertyEditorListeners.
@@ -176,40 +172,28 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    * Otherwise, returns true.
    */
   public void firePropertyChangingEvent(String newValue) throws PropertyValueVetoException {
-    for (int i = 0; i < listenerList.size(); i++) {
-      PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
-      current.propertyChanging(this, property, newValue);
-    }
+    manager.firePropertyChangingEvent(this, newValue);
   }
 
   /**
    * Fires a propertyChanged event to all of the PropertyEditorListeners.
    */
   public void firePropertyChangedEvent(String newValue) {
-    for (int i = 0; i < listenerList.size(); i++) {
-      PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
-      current.propertyChanged(this, property, newValue);
-    }
+    manager.firePropertyChangedEvent(this, newValue);
   }
 
   /**
    * Fires a propertyCommitting event to all of the PropertyEditorListeners.
    */
   public void firePropertyCommittingEvent(String newValue) throws PropertyValueVetoException {
-    for (int i = 0; i < listenerList.size(); i++) {
-      PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
-      current.propertyCommitting(this, property, newValue);
-    }
+    manager.firePropertyCommittingEvent(this, newValue);
   }
 
   /**
    * Fires a propertyInitialized event to all of the PropertyEditorListeners.
    */
   public void firePropertyInitializedEvent(String newValue) {
-    for (int i = 0; i < listenerList.size(); i++) {
-      PropertyEditorListener current = (PropertyEditorListener) listenerList.get(i);
-      current.propertyInitialized(this, property, newValue);
-    }
+    manager.firePropertyInitializedEvent(this, newValue);
   }
 
   /**

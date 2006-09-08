@@ -9,13 +9,13 @@ import java.util.*;
  */
 public class PropertyEditorManager {
 
-  protected HashMap editorMap = new HashMap();
+  protected HashMap<String,PropertyEditorUI> editorMap = new HashMap<String,PropertyEditorUI>();
 
   protected VariableBundle sourceBundle;
 
   protected PropertyEditorFactory propertyFactory;
 
-  protected HashMap pendingListenerMap = new HashMap();
+  protected HashMap<String,List<PropertyEditorListener>> listenerMap = new HashMap<String,List<PropertyEditorListener>>();
 
   protected boolean writeChanges = true;
 
@@ -56,14 +56,6 @@ public class PropertyEditorManager {
    * Property.
    */
   public void registerPropertyEditor(String property, PropertyEditorUI editor) {
-    List listenerList = (List) pendingListenerMap.get(property);
-    if (listenerList != null) {
-      Iterator it = listenerList.iterator();
-      while (it.hasNext()) {
-        editor.addPropertyEditorListener((PropertyEditorListener) it.next());
-      }
-    }
-
     editorMap.put(property, editor);
   }
 
@@ -160,25 +152,6 @@ public class PropertyEditorManager {
   }
 
   /**
-   * Adds the given PropertyEditorListener as a listener to the editor
-   * for the given property.  If no editor exists yet, then the listener
-   * is saved until a PropertyEditorUI is registered.
-   */
-  public void addPropertyEditorListener(String property, PropertyEditorListener listener) {
-    PropertyEditorUI editor = (PropertyEditorUI) editorMap.get(property);
-    if ( editor != null) {
-      editor.addPropertyEditorListener(listener);
-    } else {
-      List listenerList = (List) pendingListenerMap.get(property);
-      if (listenerList == null) {
-        listenerList = new ArrayList();
-      }
-      listenerList.add(listener);
-      pendingListenerMap.put(property, listenerList);
-    }
-  }
-
-  /**
    * Creates an appropriate PropertyEditorListener from the given
    * String.
    */
@@ -203,6 +176,90 @@ public class PropertyEditorManager {
   public void setWriteChanges(boolean newValue) {
     writeChanges = newValue;
   }
+
+  /**
+   * Adds a PropertyEditorListener to the ListenerList.
+   */
+  public void addPropertyEditorListener(String property, PropertyEditorListener pel) {
+    if (property != null) {
+      List<PropertyEditorListener> listenerList = listenerMap.get(property);
+      if (listenerList == null) {
+        listenerList = new ArrayList<PropertyEditorListener>();
+        listenerMap.put(property, listenerList);
+      }
+      if (pel != null && ! listenerList.contains(pel))
+        listenerList.add(pel);
+    }
+  }
+
+  /**
+   * Removes a PropertyEditorListener from the ListenerList.
+   */
+  public void removePropertyEditorListener(String property, PropertyEditorListener pel) {
+    if (property != null) {
+      List<PropertyEditorListener> listenerList = listenerMap.get(property);
+      if (listenerList != null) {
+        if (pel != null && listenerList.contains(pel))
+          listenerList.remove(pel);
+      }
+    }
+  }
+
+  /**
+   * Fires a propertyChanging event to all of the PropertyEditorListeners.
+   * If any of the listeners veto the new value, then this returns false.
+   * Otherwise, returns true.
+   */
+  public void firePropertyChangingEvent(PropertyEditorUI propertyEditor, String newValue) throws PropertyValueVetoException {
+    String property = propertyEditor.getProperty();
+    List<PropertyEditorListener> listenerList = listenerMap.get(property);
+    if (listenerList != null) {
+      for (PropertyEditorListener current: listenerList) {
+        current.propertyChanging(propertyEditor, property, newValue);
+      }
+    }
+  }
+
+  /**
+   * Fires a propertyChanged event to all of the PropertyEditorListeners.
+   */
+  public void firePropertyChangedEvent(PropertyEditorUI propertyEditor, String newValue) {
+    String property = propertyEditor.getProperty();
+    List<PropertyEditorListener> listenerList = listenerMap.get(property);
+    if (listenerList != null) {
+      for (PropertyEditorListener current: listenerList) {
+        current.propertyChanged(propertyEditor, property, newValue);
+      }
+    }
+  }
+
+  /**
+   * Fires a propertyCommitting event to all of the PropertyEditorListeners.
+   */
+  public void firePropertyCommittingEvent(PropertyEditorUI propertyEditor, String newValue) throws PropertyValueVetoException {
+    String property = propertyEditor.getProperty();
+    List<PropertyEditorListener> listenerList = listenerMap.get(property);
+    if (listenerList != null) {
+      for (PropertyEditorListener current: listenerList) {
+        current.propertyCommitting(propertyEditor, property, newValue);
+      }
+    }
+  }
+
+  /**
+   * Fires a propertyInitialized event to all of the PropertyEditorListeners.
+   */
+  public void firePropertyInitializedEvent(PropertyEditorUI propertyEditor, String newValue) {
+    String property = propertyEditor.getProperty();
+    List<PropertyEditorListener> listenerList = listenerMap.get(property);
+    if (listenerList != null) {
+      for (PropertyEditorListener current: listenerList) {
+        current.propertyInitialized(propertyEditor, property, newValue);
+      }
+    }
+  }
+
+
 
 }
 
