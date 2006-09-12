@@ -127,6 +127,29 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     }
   }
 
+  /**
+   * This writes the currently configured values in the PropertyEditorUI
+   * to the source VariableBundle.
+   */
+  public void setValue() throws PropertyValueVetoException {
+    if (currentKeyValue != null) {
+      PropertyEditorUI selectedEditor = idToEditorMap.get(currentKeyValue);
+      selectedEditor.setValue();
+    }
+  }
+
+  /**
+   * Returns the current values of the edited properties as a
+   * java.util.Properties object.
+   */
+  public java.util.Properties getValue() {
+    java.util.Properties currentRetValue = new java.util.Properties();
+    if (currentKeyValue != null) {
+      PropertyEditorUI selectedEditor = idToEditorMap.get(currentKeyValue);
+      currentRetValue.putAll(selectedEditor.getValue());
+    }
+    return currentRetValue;
+  }
 
 }
 

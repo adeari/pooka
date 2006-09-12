@@ -10,6 +10,14 @@
 	*) wizard
 		-- identity, receiving, options, sending
 		-- protocol, settings
+		   imap:  autocache not disabled properly
+		   general:  should only have one editor per property
+			(so entering servername in imap should still
+			have it there if you switch to pop)
+		   maildir:  need to configure editor.
+		   mbox:  need to configure editor.
+		-- user:  do user config
+		-- outgoing:  do smtp config.
 	*) folder
 	*) preferences
 	*) address book

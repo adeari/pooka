@@ -158,7 +158,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
           // wizard
           String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
           if (newValueTemplate.length() > 0) {
-            manager.getFactory().showNewEditorWindow(newValueTemplate, manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager, true), getPropertyEditorPane().getContainer());
+            manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager, true), getPropertyEditorPane().getContainer());
 
           } else {
             addNewValue(getNewValueName());
@@ -325,7 +325,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       String editProperty = property + "." + valueToEdit;
       getLogger().fine("editing " + editProperty);
 
-      manager.getFactory().showNewEditorWindow(editProperty, manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", editProperty, "Composite", manager, true), container);
+      manager.getFactory().showNewEditorWindow(manager.getProperty(editorTemplate + ".label", editProperty), manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", editProperty, "Composite", manager, true), container);
     } else {
       getLogger().fine("editSelectedValue():  no selected value.");
     }
