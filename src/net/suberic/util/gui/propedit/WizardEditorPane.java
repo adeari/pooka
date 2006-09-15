@@ -30,10 +30,7 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
     for (String stateString: mStateList) {
       String subProperty = createSubProperty(manager.getProperty(template + "._states." + stateString + ".editor", ""));
       String subTemplate = createSubTemplate(manager.getProperty(template + "._states." + stateString + ".editor", ""));
-      System.err.println("checking for " + template + "._states." + stateString + ".editor, " + template + "._states." + stateString + ".editor");
-      System.err.println("creating subeditor for " + subProperty + ", template " + subTemplate + ", propertyBase " + subTemplate + ", manager, true.");
       SwingPropertyEditor newEditor = (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subTemplate, manager, true);
-      System.err.println("got " + newEditor.getClass().getName());
       layoutMap.put(stateString, newEditor);
       this.add(stateString, newEditor);
     }
@@ -47,7 +44,6 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
    */
   public void loadState(String state) {
     mState = state;
-    System.err.println("showing state " + mState);
     layout.show(this, mState);
   }
 

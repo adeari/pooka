@@ -69,7 +69,6 @@ public class BooleanEditorPane extends SwingPropertyEditor {
     inputField.setMargin(new java.awt.Insets(0,0,0,5));
 
     this.add(inputField);
-    this.setEnabled(isEnabled);
 
     //inputField.setBackground(java.awt.Color.RED);
     //this.setBackground(java.awt.Color.BLUE);
@@ -86,6 +85,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
 
     this.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, this.getPreferredSize().height));
     manager.registerPropertyEditor(property, this);
+    this.setEnabled(enabled);
   }
 
   /**
@@ -134,7 +134,9 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {
+    //System.err.println("setting enabled for " + getProperty() + " to " + newValue);
     if (inputField != null) {
+      //System.err.println("setting enabled for " + getProperty() + "; setting enabled on input field to " + newValue);
       inputField.setEnabled(newValue);
     }
     enabled=newValue;
