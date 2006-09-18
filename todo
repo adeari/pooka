@@ -10,12 +10,6 @@
 	*) wizard
 		-- identity, receiving, options, sending
 		-- protocol, settings
-		   imap:  autocache not disabled properly (initally)
-		   general:  should only have one editor per property
-			(so entering servername in imap should still
-			have it there if you switch to pop)
-		   maildir:  need to configure editor.
-		   mbox:  need to configure editor.
 		-- user:  do user config
 		-- outgoing:  do smtp config.
 	*) folder
@@ -65,6 +59,10 @@
 	-- that's a bug with the mbox/maildir providers
 
 *) toolbar:  put it on folder panel (?)
+
+*) fix ability to create new smtp server from first failure.
+
+*) add an option to folders not to connect to them on store connect.
 
 *) create a way to cache local headers so we don't have to download
    those all the time.  sort of like running offline, but not really.
