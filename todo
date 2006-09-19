@@ -8,11 +8,9 @@
 		-- append sig to each message option
 		-- save to sent folder option
 	*) wizard
-	  *) change ListEditor to work with default / add new
-		-- _includeDefaultOption
-		-- _includeNewOption
 	  *) make basic wizard work
-	  *) add controller
+		-- pull out extendable Controller, then implement
+		   one for Store???
 	  *) check all settings/required/etc
 	    *) smtp auth
 	    *) defaults and new enabling/disabled

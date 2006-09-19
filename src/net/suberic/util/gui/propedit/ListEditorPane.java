@@ -122,6 +122,11 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
         if (itemValue.length() < 1)
           itemValue = currentItem;
+
+        // and set a blank entry as equal to the default option.
+        if (originalValue.length() < 1) {
+          originalValue = itemValue;
+        }
       } else if (currentItem.equals(SELECTION_NEW)) {
         if (itemLabel.length() < 1)
           itemLabel = manager.getProperty("ListEditorPane.button.new", "< Create New Value >");

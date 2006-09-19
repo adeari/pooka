@@ -226,7 +226,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   /**
    * This exits Pooka.
    */
-
   public void exitPooka(boolean exitToIcon) {
     if (! processUnsentMessages())
       return;

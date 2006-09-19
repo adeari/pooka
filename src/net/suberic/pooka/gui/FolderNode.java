@@ -498,10 +498,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
     return getFolderInfo().getFolderName();
   }
 
-  /**
-   * As specified by interface net.suberic.pooka.UserProfileContainer
-   */
 
+  //As specified by interface net.suberic.pooka.UserProfileContainer
   public UserProfile getDefaultProfile() {
     if (getFolderInfo() != null)
       return getFolderInfo().getDefaultProfile();

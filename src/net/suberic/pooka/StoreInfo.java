@@ -225,7 +225,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       storeThread.start();
     }
 
-    defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(getStoreProperty() + ".defaultProfile", ""));
+    String defProfileString = Pooka.getProperty(getStoreProperty() + ".defaultProfile", "");
+    if (defProfileString.length() < 1 || defProfileString.equalsIgnoreCase(UserProfile.S_DEFAULT_PROFILE_KEY)) {
+      defaultProfile = null;
+    } else {
+      defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(defProfileString);
+    }
 
     connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
     if (connection == null) {
@@ -498,7 +503,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
           if (changedValue.equals(getStoreProperty() + ".folderList")) {
             updateChildren();
           } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
-            defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
+            String defProfileString = Pooka.getProperty(getStoreProperty() + ".defaultProfile", "");
+            if (defProfileString.length() < 1 || defProfileString.equalsIgnoreCase(UserProfile.S_DEFAULT_PROFILE_KEY)) {
+              defaultProfile = null;
+            } else {
+              defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(defProfileString);
+            }
           } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
 
             if (storeNode != null) {

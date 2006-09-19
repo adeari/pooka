@@ -2625,21 +2625,15 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       return parentStore;
   }
 
-  /**
-   * Gets the default profile for this Folder.
-   */
   public UserProfile getDefaultProfile() {
     if (defaultProfile != null) {
       return defaultProfile;
-    }
-    else if (parentFolder != null) {
+    } else if (parentFolder != null) {
       return parentFolder.getDefaultProfile();
-    }
-    else if (parentStore != null) {
+    } else if (parentStore != null) {
       return parentStore.getDefaultProfile();
-    }
-    else {
-      return Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
+    } else {
+      return null;
     }
   }
 
