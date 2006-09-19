@@ -12,6 +12,7 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
   List<String> mStateList = null;
   Map<String, SwingPropertyEditor> layoutMap = new HashMap<String, SwingPropertyEditor>();
   CardLayout layout;
+  WizardPropertyEditor wizardContainer = null;
 
   /**
    * Configures the editor.
@@ -45,6 +46,10 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
   public void loadState(String state) {
     mState = state;
     layout.show(this, mState);
+    if (getWizardContainer() != null) {
+      getWizardContainer().setBeginningState(inBeginningState());
+      getWizardContainer().setEndState(inEndState());
+    }
   }
 
   /**
@@ -105,5 +110,19 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
         loadState(newState);
       }
     }
+  }
+
+  /**
+   * Sets the WizardPropertyEditor container.
+   */
+  public void setWizardContainer(WizardPropertyEditor wpe) {
+    wizardContainer = wpe;
+  }
+
+  /**
+   * Gets the WizardPropertyEditor container.
+   */
+  public WizardPropertyEditor getWizardContainer() {
+    return wizardContainer;
   }
 }

@@ -390,7 +390,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     Pooka.getLogManager().addLogger(getFolderProperty());
 
     String defProfile = Pooka.getProperty(getFolderProperty() + ".defaultProfile", "");
-    if (!defProfile.equals(""))
+    if ((!defProfile.equals("")) && (!defProfile.equals(UserProfile.S_DEFAULT_PROFILE_KEY)))
       defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(defProfile);
 
     // if we got to this point, we should assume that the open worked.
@@ -1510,10 +1510,11 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
         }
       }
     } else if (changedValue.equals(getFolderProperty() + ".defaultProfile")) {
-      if (Pooka.getProperty(changedValue, "").equals(""))
+      String newProfileValue = Pooka.getProperty(changedValue, "");
+      if (newProfileValue.length() < 1 || newProfileValue.equals(UserProfile.S_DEFAULT_PROFILE_KEY))
         defaultProfile = null;
       else
-        defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(Pooka.getProperty(changedValue, ""));
+        defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(newProfileValue);
     } else if (changedValue.equals(getFolderProperty() + ".backendFilters")) {
       createFilters();
 

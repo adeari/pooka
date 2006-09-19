@@ -13,6 +13,9 @@ import javax.swing.*;
  */
 public class WizardPropertyEditor extends PropertyEditorPane {
   WizardEditorPane wizard = null;
+  JButton backButton;
+  JButton nextButton;
+
 
   /**
    * This contructor creates a PropertyEditor using the given
@@ -26,6 +29,7 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     container = newContainer;
     editor = newEditor;
     wizard = (WizardEditorPane) newEditor;
+    wizard.setWizardContainer(this);
     doCommit = newCommit;
 
     Component editorComponent = editor;
@@ -45,7 +49,7 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     SpringLayout buttonLayout = new SpringLayout();
     buttonPanel.setLayout(buttonLayout);
 
-    JButton helpButton = createButton("Help", new AbstractAction() {
+    JButton helpButton = createButton(manager.getProperty("button.help", "Help"), new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           System.err.println("showing help for " + editor.getHelpID());
           //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
@@ -59,14 +63,14 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     //CSH.setHelpIDString(helpButton, "UserProfile");
     buttonPanel.add(helpButton);
 
-    JButton backButton = createButton("Back", new AbstractAction() {
+    backButton = createButton(manager.getProperty("Wizard.button.back", "Back"), new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           wizard.back();
         }
       }, false);
 
 
-    JButton nextButton = createButton("Next", new AbstractAction() {
+    nextButton = createButton(manager.getProperty("Wizard.button.next", "Next"), new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             wizard.next();
@@ -76,7 +80,8 @@ public class WizardPropertyEditor extends PropertyEditorPane {
         }
       }, true);
 
-    JButton cancelButton = createButton("Cancel", new AbstractAction() {
+    JButton cancelButton = createButton(manager.getProperty("button.cancel",
+"Cancel"), new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (container instanceof JInternalFrame) {
             try {
@@ -122,6 +127,32 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     buttonLayout.putConstraint(SpringLayout.EAST, buttonPanel, 5, SpringLayout.EAST, nextButton);
 
     return buttonPanel;
+  }
+
+  /**
+   * Sets the propertyEditor into beginning state.
+   */
+  public void setBeginningState(boolean beginningState) {
+    if (beginningState) {
+      backButton.setEnabled(false);
+    } else {
+      backButton.setEnabled(true);
+    }
+  }
+
+  /**
+   * Sets the propertyEditor into end state.
+   */
+  public void setEndState(boolean endState) {
+    if (endState) {
+      if (! nextButton.getText().equals(manager.getProperty("Wizard.button.end", "Finish"))) {
+        nextButton.setText(manager.getProperty("Wizard.button.end", "Finish"));
+      }
+          } else {
+      if (! nextButton.getText().equals(manager.getProperty("Wizard.button.next", "Next"))) {
+        nextButton.setText(manager.getProperty("Wizard.button.next", "Next"));
+      }
+    }
   }
 
 }

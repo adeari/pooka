@@ -27,15 +27,18 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   private String pgpEncryptionKeyId;
   private boolean signAsDefault = false;
   private String cryptoDefaultType = "PGP";
-  
+
   private Vector excludeAddresses;
-  
+
+  // default value
+  public static String S_DEFAULT_PROFILE_KEY = "__default";
+
   public UserProfile(String newName, VariableBundle mainProperties) {
     name = newName;
-    
+
     registerChangeListeners();
   }
-  
+
   /**
    * This populates the UserProfile from the Pooka properties list.
    * Useful on creation as well as when any of the properties change.
@@ -43,23 +46,23 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   public void initializeFromProperties(VariableBundle mainProperties, List mailPropertiesList) {
     mailProperties = new Properties();
     String profileKey;
-    
+
     for (int i = 0; i < mailPropertiesList.size(); i++) {
       profileKey = (String)mailPropertiesList.get(i);
       mailProperties.put(profileKey, mainProperties.getProperty("UserProfile." + name + ".mailHeaders." + profileKey, ""));
     }
-    
+
     setSentFolderName(mainProperties.getProperty("UserProfile." + name + ".sentFolder", ""));
-    
+
     mailServerName = mainProperties.getProperty("UserProfile." + name + ".mailServer", "_default");
     mailServer = null; // reload it next time it's requested.
-    
+
     //sendMailURL=new URLName(mainProperties.getProperty("UserProfile." + name + ".sendMailURL", ""));
     //sendPrecommand=(String)mainProperties.getProperty("UserProfile." + name + ".sendPrecommand", "");
     sigGenerator=createSignatureGenerator();
-    
+
     setDefaultDomain(mainProperties.getProperty("UserProfile." + name + ".defaultDomain", ""));
-    
+
     String fromAddr = (String)mailProperties.get("From");
     excludeAddresses = new Vector();
     excludeAddresses.add(fromAddr);
@@ -68,19 +71,19 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     }
     Vector excludeProp = mainProperties.getPropertyAsVector("UserProfile." + name + ".excludeAddresses", "");
     excludeAddresses.addAll(excludeProp);
-    
+
     pgpEncryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".pgpKey", "");
-    
+
     smimeEncryptionKeyId = mainProperties.getProperty("UserProfile." + name + ".smimeKey", "");
-    
+
     signAsDefault = (! mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("manual"));
-    
+
     if (! signAsDefault) {
       if ( mainProperties.getProperty("UserProfile." + name + ".sigPolicy", "").equalsIgnoreCase("smime")) {
         cryptoDefaultType="SMIME";
       }
     }
-    
+
     String addressBookId = mainProperties.getProperty("UserProfile." + name + ".addressBook", "");
     if (!addressBookId.equals("")) {
       addressBook = Pooka.getAddressBookManager().getAddressBook(addressBookId);
@@ -96,7 +99,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     VariableBundle resources = Pooka.getResources();
     resources.addValueChangeListener(this, "UserProfile." + name + ".*");
   }
-  
+
   /**
    * Modifies the UserProfile if any of its source values change.
    *
@@ -107,20 +110,20 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     UserProfileManager manager = Pooka.getPookaManager().getUserProfileManager();
     initializeFromProperties(bundle, manager.getMailPropertiesList());
   }
-  
+
   /**
    * Populates the given message with the headers for this UserProfile.
    */
   public void populateMessage(MimeMessage mMsg) throws MessagingException {
     // I hate this.  I hate having to grab half of these headers on my
     // own.
-    
+
     Enumeration keys = mailProperties.propertyNames();
     String fromAddr = null, fromPersonal = null, replyAddr = null, replyPersonal = null;
-    
+
     while (keys.hasMoreElements()) {
       String key = (String)(keys.nextElement());
-      
+
       if (key.equals("FromPersonal")) {
         fromPersonal = mailProperties.getProperty(key);
       } else if (key.equals("From")) {
@@ -132,40 +135,40 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       } else {
         mMsg.setHeader(key, mailProperties.getProperty(key));
       }
-      
+
       try {
-        if (fromAddr != null) 
-          if (fromPersonal != null && !(fromPersonal.equals(""))) 
+        if (fromAddr != null)
+          if (fromPersonal != null && !(fromPersonal.equals("")))
             mMsg.setFrom(new InternetAddress(fromAddr, fromPersonal));
           else
             mMsg.setFrom(new InternetAddress(fromAddr));
-	
+
         if (replyAddr != null && !(replyAddr.equals("")))
           if (replyPersonal != null)
             mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr, replyPersonal)});
           else
             mMsg.setReplyTo(new InternetAddress[] {new InternetAddress(replyAddr)});
-	
+
       } catch (java.io.UnsupportedEncodingException uee) {
         throw new MessagingException("", uee);
       }
     }
   }
-  
+
   /**
-   * Populates the given InternetHeaders object with the headers for this 
+   * Populates the given InternetHeaders object with the headers for this
    * UserProfile.
    */
   public void populateHeaders(InternetHeaders pHeaders) throws MessagingException {
     // I hate this.  I hate having to grab half of these headers on my
     // own.
-    
+
     Enumeration keys = mailProperties.propertyNames();
     String fromAddr = null, fromPersonal = null, replyAddr = null, replyPersonal = null;
-    
+
     while (keys.hasMoreElements()) {
       String key = (String)(keys.nextElement());
-      
+
       if (key.equals("FromPersonal")) {
         fromPersonal = mailProperties.getProperty(key);
       } else if (key.equals("From")) {
@@ -177,26 +180,26 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       } else {
         pHeaders.setHeader(key, mailProperties.getProperty(key));
       }
-      
+
       try {
-        if (fromAddr != null) 
-          if (fromPersonal != null && !(fromPersonal.equals(""))) 
+        if (fromAddr != null)
+          if (fromPersonal != null && !(fromPersonal.equals("")))
             pHeaders.setHeader("From", new InternetAddress(fromAddr, fromPersonal).toString());
           else
             pHeaders.setHeader("From", new InternetAddress(fromAddr).toString());
-	
+
         if (replyAddr != null && !(replyAddr.equals("")))
           if (replyPersonal != null)
             pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr, replyPersonal).toString());
           else
             pHeaders.setHeader("Reply-To", new InternetAddress(replyAddr).toString());
-	
+
       } catch (java.io.UnsupportedEncodingException uee) {
         throw new MessagingException("", uee);
       }
     }
   }
-  
+
   /**
    * This removes the email addresses that define this user from the
    * given message's to fields.
@@ -209,14 +212,14 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       toRecs = filterAddressArray(toRecs);
       ccRecs = filterAddressArray(ccRecs);
       bccRecs = filterAddressArray(bccRecs);
-      
+
       m.setRecipients(Message.RecipientType.TO, toRecs);
       m.setRecipients(Message.RecipientType.CC, ccRecs);
       m.setRecipients(Message.RecipientType.BCC, bccRecs);
     } catch (MessagingException me) {
     }
   }
-  
+
   /**
    * Filters out this address from the given array of addresses.
    */
@@ -234,17 +237,17 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
         if (!found)
           returnVector.add(addresses[i]);
       }
-      
+
       Object[] retArr = returnVector.toArray();
       Address[] returnValue = new Address[retArr.length];
       for (int i = 0; i < retArr.length; i++)
         returnValue[i] = (Address) retArr[i];
-      
+
       return returnValue;
     } else
       return addresses;
   }
-  
+
   public String getName() {
     return name;
   }
@@ -252,7 +255,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   public String getUserProperty() {
     return "UserProfile." + getName();
   }
-  
+
   public String getItemID() {
     return getName();
   }
@@ -260,11 +263,11 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   public String getItemProperty() {
     return getUserProperty();
   }
-  
+
   public Properties getMailProperties() {
     return mailProperties;
   }
-  
+
   public String toString() {
     return name;
   }
@@ -278,30 +281,30 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     return sendPrecommand;
     }
   */
-  
+
   public FolderInfo getSentFolder() {
     if (sentFolder == null)
       loadSentFolder();
-    
+
     return sentFolder;
   }
-  
+
   public void setSentFolderName(String newValue) {
     sentFolderName = newValue;
-    
+
     loadSentFolder();
   }
 
   public OutgoingMailServer getMailServer() {
     if (mailServer == null)
       loadMailServer();
-    
+
     return mailServer;
   }
-  
+
   public void setMailServerName(String newValue) {
     mailServerName = newValue;
-    
+
     loadMailServer();
   }
 
@@ -315,7 +318,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   }
 
   /**
-   * Returns the default domain.  This will be appended to any email 
+   * Returns the default domain.  This will be appended to any email
    * address which doesn't include a domain.
    */
   public String getDefaultDomain() {
@@ -334,22 +337,22 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   }
 
   /**
-   * Loads the sent folder from the UserProfile.username.sentFolder 
+   * Loads the sent folder from the UserProfile.username.sentFolder
    * property.
    */
   public void loadSentFolder() {
     StoreManager sm = Pooka.getStoreManager();
     if (sm != null) {
       sentFolder = Pooka.getStoreManager().getFolder(sentFolderName);
-      
+
       if (sentFolder != null) {
         sentFolder.setSentFolder(true);
-      } 
+      }
     }
   }
 
   /**
-   * Loads the MailServer from the UserProfile.username.mailServer 
+   * Loads the MailServer from the UserProfile.username.mailServer
    * property.
    */
   public void loadMailServer() {
@@ -358,14 +361,14 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
 
       return;
     }
-    
+
     mailServer = Pooka.getOutgoingMailManager().getOutgoingMailServer(mailServerName);
     if (mailServer == null) {
       mailServer = Pooka.getOutgoingMailManager().getDefaultOutgoingMailServer();
     }
   }
 
-  
+
   /**
    * Creates the signatureGenerator for this Profile.
    */
@@ -382,7 +385,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       return sigGen;
     }
   }
-  
+
   /**
    * This returns a signature appropriate for the given text.
    */
@@ -392,9 +395,9 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     else
       return null;
   }
-  
+
   /**
-   * Returns the default signature for this UserProfile.  Use 
+   * Returns the default signature for this UserProfile.  Use
    * getSignature(String text) instead.
    */
   public String getSignature() {
@@ -404,11 +407,11 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
       return null;
     //return (Pooka.getProperty("UserProfile." + name + ".signature", null));
   }
-  
+
   public void setSignature(String newValue) {
     Pooka.setProperty("UserProfile." + name + ".signature", newValue);
   }
-  
+
   /**
    * Returns the default encryption key for this profile, if any.
    */
@@ -430,7 +433,7 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
         if (Pooka.getCryptoManager().privateKeyAliases(type).contains(keyAlias)) {
           try {
             java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
-	    
+
             return returnValue;
           } catch (java.security.UnrecoverableKeyException uke) {
             // we just haven't accessed the key yet.  skip.

@@ -17,6 +17,15 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   protected HashMap labelToValueMap = new HashMap();
   protected int currentIndex = -1;
 
+  // configuration settings
+  static String INCLUDE_ADD_BUTTON = "_includeAddButton";
+  static String ALLOWED_VALUES = "allowedValues";
+  static String LIST_MAPPING = "listMapping";
+  static String INCLUDE_DEFAULT_OPTION = "_includeDefault";
+  static String INCLUDE_NEW_OPTION = "_includeNew";
+  static String SELECTION_DEFAULT = "__default";
+  static String SELECTION_NEW = "__new";
+
   /**
    * @param propertyName The property to be edited.
    * @param template The property that will define the layout of the
@@ -38,7 +47,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     inputBox.add(inputField);
     inputBox.add(Box.createGlue());
 
-    if (manager.getProperty(editorTemplate + "._includeAddButton", "false").equalsIgnoreCase("true")) {
+    if (manager.getProperty(editorTemplate + "." + INCLUDE_ADD_BUTTON, "false").equalsIgnoreCase("true")) {
       addButton = createAddButton();
       inputBox.add(addButton);
     }
@@ -82,27 +91,52 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     String currentItem;
     originalIndex=-1;
     Vector items = new Vector();
-    StringTokenizer tokens;
+    List<String> tokens;
 
-    String allowedValuesString = manager.getProperty(editorTemplate + ".allowedValues", "");
+    String allowedValuesString = manager.getProperty(editorTemplate + "." + ALLOWED_VALUES, "");
     if (manager.getProperty(allowedValuesString, "") != "") {
-      tokens = new StringTokenizer(manager.getProperty(allowedValuesString, ""), ":");
+      tokens = manager.getPropertyAsList(allowedValuesString, "");
       manager.addPropertyEditorListener(allowedValuesString, new ListEditorListener());
+      // if we're loading this from a property list, check for options for
+      // default values and adding new values.
+      if (manager.getProperty(editorTemplate + "." + INCLUDE_NEW_OPTION, "false").equalsIgnoreCase("true")) {
+        tokens.add(0, SELECTION_NEW);
+      }
+      if (manager.getProperty(editorTemplate + "." + INCLUDE_DEFAULT_OPTION, "false").equalsIgnoreCase("true")) {
+        tokens.add(0, SELECTION_DEFAULT);
+      }
     } else {
-      tokens = new StringTokenizer(manager.getProperty(editorTemplate + ".allowedValues", ""), ":");
+      tokens = manager.getPropertyAsList(editorTemplate + "." + ALLOWED_VALUES, "");
     }
 
-    for (int i=0; tokens.hasMoreTokens(); i++) {
-      currentItem = tokens.nextToken();
+    for (int i = 0; i < tokens.size(); i++) {
+      currentItem = tokens.get(i);
 
-      String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
-      if (itemLabel.equals(""))
-        itemLabel = currentItem.toString();
+      String itemLabel = manager.getProperty(editorTemplate + "." + LIST_MAPPING + "." + currentItem.toString() + ".label", "");
+      String itemValue = manager.getProperty(editorTemplate + "." + LIST_MAPPING + "." + currentItem.toString() + ".value", "");
 
-      String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
-      if (itemValue.equals(""))
-        itemValue = currentItem.toString();
+      // special cases
+      if (currentItem.equals(SELECTION_DEFAULT)) {
+        if (itemLabel.length() < 1)
+          itemLabel = manager.getProperty("ListEditorPane.button.default", "< Default Value >");
 
+        if (itemValue.length() < 1)
+          itemValue = currentItem;
+      } else if (currentItem.equals(SELECTION_NEW)) {
+        if (itemLabel.length() < 1)
+          itemLabel = manager.getProperty("ListEditorPane.button.new", "< Create New Value >");
+
+        if (itemValue.length() < 1)
+          itemValue = currentItem;
+      } else {
+        // default case
+        if (itemLabel.length() < 1)
+          itemLabel = currentItem;
+
+        if (itemValue.length() < 1)
+          itemValue = currentItem;
+
+      }
       if (itemValue.equals(originalValue)) {
         originalIndex=i;
         currentIndex=i;
@@ -152,12 +186,12 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     for (int i=0; tokens.hasMoreTokens(); i++) {
       currentItem = tokens.nextToken();
 
-      String itemLabel = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".label", "");
-      if (itemLabel.equals(""))
+      String itemLabel = manager.getProperty(editorTemplate + "." + LIST_MAPPING + "." + currentItem.toString() + ".label", "");
+      if (itemLabel.length() < 1)
         itemLabel = currentItem.toString();
 
-      String itemValue = manager.getProperty(editorTemplate + ".listMapping." + currentItem.toString() + ".value", "");
-      if (itemValue.equals(""))
+      String itemValue = manager.getProperty(editorTemplate + "." + LIST_MAPPING + "." + currentItem.toString() + ".value", "");
+      if (itemValue.length() < 1)
         itemValue = currentItem.toString();
 
       if (itemValue.equals(originalValue)) {
@@ -180,7 +214,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    * Creates a button to add a new value to the List.
    */
   public JButton createAddButton() {
-    JButton returnValue = new JButton("Add");
+    JButton returnValue = new JButton(manager.getProperty("button.add", "Add"));
     returnValue.addActionListener(new AbstractAction() {
         public void actionPerformed(ActionEvent e) {
           addNewEntry();
@@ -194,7 +228,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    * Opens up an editor to add a new Item to the List.
    */
   public void addNewEntry() {
-    String editedProperty = manager.getProperty(editorTemplate + ".allowedValues", "");
+    String editedProperty = manager.getProperty(editorTemplate + "." + ALLOWED_VALUES, "");
     //
     //manager.getFactory().showNewEditorWindow("Add property", editedProperty, editedProperty, manager);
     PropertyEditorUI sourceEditor = manager.getPropertyEditor(editedProperty);

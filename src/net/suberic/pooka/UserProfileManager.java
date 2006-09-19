@@ -14,7 +14,7 @@ import net.suberic.util.*;
  * @version $Revision$
  */
 public class UserProfileManager implements ItemCreator, ItemListChangeListener {
-  
+
   private ItemManager manager;
   private LinkedList listenerList = new LinkedList();
 
@@ -30,9 +30,9 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
 
   //-----------------------
   // public interface.
-  
+
   /**
-   * This listens for ItemListChangeEvents, which result from changes to the 
+   * This listens for ItemListChangeEvents, which result from changes to the
    * "UserProfile" property. The event is passed to listeners to this object.
    */
   public void itemListChanged(ItemListChangeEvent e) {
@@ -46,22 +46,22 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
   public java.util.List getUserProfileList() {
     return manager.getItems();
   }
-  
+
   /**
-   * This adds the UserProfile with the given UserProfileName to the 
+   * This adds the UserProfile with the given UserProfileName to the
    * allUserProfiles list.
    */
   public void addUserProfile(String UserProfileName) {
     manager.addItem(UserProfileName);
   }
-  
+
   /**
    * This adds the UserProfiles with the given UserProfileNames to the allUserProfiles list.
    */
   public void addUserProfile(String[] UserProfileName) {
     manager.addItem(UserProfileName);
   }
-  
+
   /**
    * This removes the UserProfile with the given UserProfileName.
    */
@@ -82,7 +82,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
   public void removeUserProfile(UserProfile UserProfile) {
     manager.removeItem(UserProfile);
   }
-  
+
   /**
    * This removes the given UserProfiles.
    */
@@ -91,7 +91,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
   }
 
   /**
-   * This returns the UserProfile with the given UserProfileName if it 
+   * This returns the UserProfile with the given UserProfileName if it
    * exists; otherwise, returns null.
    */
   public UserProfile getUserProfile(String UserProfileID) {
@@ -99,7 +99,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
   }
 
   /**
-   * This returns the UserProfile with the given UserProfileName if it 
+   * This returns the UserProfile with the given UserProfileName if it
    * exists; otherwise, returns null.
    */
   public UserProfile getProfile(String UserProfileID) {
@@ -107,7 +107,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
   }
 
   /**
-   * This returns the UserProfile with the given UserProfileName if it 
+   * This returns the UserProfile with the given UserProfileName if it
    * exists; otherwise, returns null.
    */
   public UserProfile getDefaultProfile() {
@@ -115,12 +115,12 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
     if (defaultUser == null) {
       List profileList = manager.getItems();
       if (profileList != null && profileList.size() > 0) {
-	defaultUser = (UserProfile) profileList.get(0);
+        defaultUser = (UserProfile) profileList.get(0);
       }
     }
     return defaultUser;
   }
-  
+
   /**
    * This adds a ItemListChangeListener to the local listener list.
    */
@@ -128,7 +128,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
     if (! listenerList.contains(ilcl))
       listenerList.add(ilcl);
   }
-  
+
   /**
    * This removes a ItemListChangeListener from the local listener list.
    */
@@ -143,7 +143,7 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
     for (int i = 0; i < listenerList.size(); i++)
       ((ItemListChangeListener)listenerList.get(i)).itemListChanged(e);
   }
-  
+
 
   /**
    * This creates a new UserProfile.
@@ -152,14 +152,14 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
     UserProfile newProfile = new UserProfile(itemID, sourceBundle);
     newProfile.initializeFromProperties(sourceBundle, mailPropertiesList);
     return newProfile;
-    
+
   }
 
   //---------------------------
   // the background stuff.
-  
+
   /**
-   * This loads and creates all the UserProfiles using the "UserProfile" 
+   * This loads and creates all the UserProfiles using the "UserProfile"
    * property of the main Pooka VariableBundle.
    */
   private void createUserProfileList(VariableBundle sourceBundle) {
@@ -169,21 +169,21 @@ public class UserProfileManager implements ItemCreator, ItemListChangeListener {
   }
 
   /**
-   * This creates the profile map that we'll use to create new 
+   * This creates the profile map that we'll use to create new
    * Profile objects.
    */
   public void createMailPropertiesList(VariableBundle mainProperties) {
     mailPropertiesList = new ArrayList();
-    
+
     // Initialize Profile Map
-    
+
     StringTokenizer tokens = new StringTokenizer(mainProperties.getProperty("UserProfile.mailHeaders.fields", "From:FromPersonal:ReplyTo:ReplyToPersonal:Organization"), ":");
     while (tokens.hasMoreTokens()) {
       mailPropertiesList.add(tokens.nextToken());
     }
-    
+
   }
-  
+
   public List getMailPropertiesList() {
     return mailPropertiesList;
   }
