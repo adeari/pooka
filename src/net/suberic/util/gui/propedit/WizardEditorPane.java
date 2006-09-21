@@ -1,5 +1,6 @@
 package net.suberic.util.gui.propedit;
 import java.awt.CardLayout;
+import java.lang.reflect.Constructor;
 import java.util.*;
 import javax.swing.*;
 
@@ -8,11 +9,10 @@ import javax.swing.*;
  */
 public class WizardEditorPane extends CompositeSwingPropertyEditor {
 
-  String mState = null;
-  List<String> mStateList = null;
   Map<String, SwingPropertyEditor> layoutMap = new HashMap<String, SwingPropertyEditor>();
   CardLayout layout;
   WizardPropertyEditor wizardContainer = null;
+  WizardController controller = null;
 
   /**
    * Configures the editor.
@@ -23,93 +23,89 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
     layout = new CardLayout();
     this.setLayout(layout);
 
-    mStateList = newManager.getPropertyAsList(template + "._states", "");
-    if (mStateList.size() > 0) {
-      mState = mStateList.get(0);
+    // see about loading the WizardController
+    String controllerClassString = manager.getProperty(template + ".controllerClass", "");
+    if (controllerClassString.length() > 0) {
+      try {
+        Class controllerClass = Class.forName(controllerClassString);
+        Constructor constructor = controllerClass.getConstructor(Class.forName("java.lang.String"), Class.forName("net.suberic.util.gui.propedit.WizardEditorPane"));
+        controller = (WizardController) constructor.newInstance(template, this);
+      } catch (Exception e) {
+        getLogger().log(java.util.logging.Level.SEVERE, "Error loading controller class " + controllerClassString, e);
+        controller = new WizardController(template, this);
+      }
+    } else {
+      controller = new WizardController(template, this);
     }
+    controller.initialize();
+  }
 
-    for (String stateString: mStateList) {
-      String subProperty = createSubProperty(manager.getProperty(template + "._states." + stateString + ".editor", ""));
-      String subTemplate = createSubTemplate(manager.getProperty(template + "._states." + stateString + ".editor", ""));
+  /**
+   * Creates the editors for each state.
+   */
+  public void createEditors(List<String> stateList) {
+    for (String stateString: stateList) {
+      String subProperty = createSubProperty(manager.getProperty(editorTemplate + "._states." + stateString + ".editor", ""));
+      String subTemplate = createSubTemplate(manager.getProperty(editorTemplate + "._states." + stateString + ".editor", ""));
       SwingPropertyEditor newEditor = (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subTemplate, manager, true);
       layoutMap.put(stateString, newEditor);
       this.add(stateString, newEditor);
     }
+  }
 
-    loadState(mState);
-
+  /**
+   *
+   */
+  public void setValue(String state) throws PropertyValueVetoException {
+    SwingPropertyEditor editor = layoutMap.get(state);
+    editor.setValue();
   }
 
   /**
    * Loads the current state.
    */
   public void loadState(String state) {
-    mState = state;
-    layout.show(this, mState);
+    layout.show(this, state);
     if (getWizardContainer() != null) {
       getWizardContainer().setBeginningState(inBeginningState());
       getWizardContainer().setEndState(inEndState());
     }
   }
 
+
   /**
    * Returns the current Wizard state.
    */
   public String getState() {
-    return mState;
+    return controller.getState();
   }
 
   /**
    * Returns if this is the beginning state.
    */
   public boolean inBeginningState() {
-    if (mState == mStateList.get(0))
-      return true;
-    else
-      return false;
+    return controller.inBeginningState();
   }
 
   /**
    * Returns if this is in a valid end state.
    */
   public boolean inEndState() {
-    if (mState == mStateList.get(mStateList.size() - 1))
-      return true;
-    else
-      return false;
+    return controller.inEndState();
   }
 
   /**
    * Goes back a state.
    */
   public void back() {
-    if (inBeginningState())
-      return;
-    else {
-      int current = mStateList.indexOf(mState);
-      if (current >= 1) {
-        String newState = mStateList.get(current - 1);
-        loadState(newState);
-      }
-    }
-
+    controller.back();
   }
 
   /**
    * Goes forward a state.
    */
   public void next() throws PropertyValueVetoException {
-    if (inEndState())
-      return;
-    else {
-      int current = mStateList.indexOf(mState);
-      if (current > -1 && current < (mStateList.size() -1)) {
-        SwingPropertyEditor editor = layoutMap.get(mState);
-        editor.setValue();
-        String newState = mStateList.get(current + 1);
-        loadState(newState);
-      }
-    }
+    controller.next();
   }
 
   /**
