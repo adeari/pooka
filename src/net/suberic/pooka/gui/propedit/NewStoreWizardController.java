@@ -29,6 +29,10 @@ public class NewStoreWizardController extends WizardController {
         String server = getManager().getProperty("NewStoreWizard.editors.store.server", "");
         System.err.println("setting username to " + user + "@" + server);
         getManager().setProperty("NewStoreWizard.editors.user.from", user + "@" + server);
+        PropertyEditorUI fromEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.from");
+        System.err.println("got fromEditor " + fromEditor);
+        fromEditor.setOriginalValue(user + "@" + server);
+        fromEditor.resetDefaultValue();
 
       } else {
         System.err.println("local store");

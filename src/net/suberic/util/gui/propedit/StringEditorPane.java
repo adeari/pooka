@@ -10,9 +10,9 @@ import java.awt.FlowLayout;
  */
 public class StringEditorPane extends LabelValuePropertyEditor {
 
+  String currentValue = "";
   JLabel label;
   JTextField inputField;
-  String currentValue;
 
   /**
    * @param propertyName The property to be edited.
@@ -28,6 +28,8 @@ public class StringEditorPane extends LabelValuePropertyEditor {
     getLogger().fine("configuring StringEditorPane.  property is " + property + "; editorTemplate is " + editorTemplate);
 
     label = createLabel();
+    currentValue = originalValue == null ? "" : originalValue;
+
     inputField = new JTextField(originalValue);
     inputField.setPreferredSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
     inputField.setMinimumSize(new java.awt.Dimension(150, inputField.getMinimumSize().height));
