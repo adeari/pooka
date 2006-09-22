@@ -4,25 +4,25 @@ import java.awt.Dimension;
 import java.util.logging.Logger;
 
 /**
- * This provides the base class for a simple, label-on-the-left 
+ * This provides the base class for a simple, label-on-the-left
  * value-on-the-right property editor.
  */
 public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
   // the label component.  this is used for a default implementation
   // of the sizing code we have below.
   protected java.awt.Container labelComponent;
-  
+
   // the value component.  this is used for a default implementation
   // of the sizing code we have below.
   protected java.awt.Container valueComponent;
 
   /**
    * A default implementation of setEnabled.  This simply sets the
-   * enabled flag to the newValue.  If the labelComponent and 
+   * enabled flag to the newValue.  If the labelComponent and
    * valueComponent attributes are set, it will also call setEnabled
    * on those.
    *
-   * Subclasses which do not use the default labelComponent and 
+   * Subclasses which do not use the default labelComponent and
    * valueComponent attributes, or which require additional functionality,
    * should override this method.
    */
@@ -33,20 +33,20 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
     if (labelComponent != null)
       labelComponent.setEnabled(newValue);
   }
-  
+
   /**
    * Creates a JLabel for this component.
    */
   public JLabel createLabel() {
     String defaultLabel;
     int dotIndex = property.lastIndexOf(".");
-    if (dotIndex == -1) 
+    if (dotIndex == -1)
       defaultLabel = new String(property);
     else
       defaultLabel = property.substring(dotIndex+1);
-    
+
     JLabel returnValue = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
-    
+
     return returnValue;
   }
 
@@ -74,7 +74,7 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
       return new Dimension(0,0);
     }
   }
-  
+
   /**
    * Gets the minimum size for the valueComponent.
    */
@@ -85,7 +85,7 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
       return new Dimension(0,0);
     }
   }
-  
+
   /**
    * Returns the calculated minimum size for this component.
    */
@@ -102,7 +102,7 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
     if (valueComponent != null)
       valueComponent.setSize(valueSize);
   }
-  
+
   /**
    * Sets the widths for the label component and the value component.
    */
@@ -112,7 +112,7 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
     if (valueComponent != null)
       valueComponent.setSize(new Dimension(valueWidth, valueComponent.getSize().height));
   }
-  
+
   /**
    * Sets the heights for the label component and the value component.
    */
@@ -122,11 +122,23 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
     if (valueComponent != null)
       valueComponent.setSize(new Dimension(valueComponent.getSize().width, valueHeight));
   }
-  
+
   /**
    * Gets the parent PropertyEditorPane for the given component.
    */
   public PropertyEditorPane getPropertyEditorPane() {
     return getPropertyEditorPane(valueComponent);
+  }
+
+  /**
+   * Returns the display value for this property.
+   */
+  public String getDisplayValue() {
+    java.awt.Container labelComponent = getLabelComponent();
+    if (labelComponent instanceof JLabel) {
+      return ((JLabel) labelComponent).getText();
+    } else {
+      return getProperty();
+    }
   }
 }

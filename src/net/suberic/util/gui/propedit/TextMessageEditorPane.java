@@ -102,5 +102,11 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
     return getPropertyEditorPane(this);
   }
 
+  /**
+   * Returns the display value for this property.
+   */
+  public String getDisplayValue() {
+    return getProperty();
+  }
 
 }

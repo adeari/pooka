@@ -193,5 +193,11 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
     return getPropertyEditorPane(this);
   }
 
+  /**
+   * Returns the display value for this property.
+   */
+  public String getDisplayValue() {
+    return labelString;
+  }
 
 }

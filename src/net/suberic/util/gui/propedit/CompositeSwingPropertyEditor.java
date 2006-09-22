@@ -277,6 +277,14 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     return getEditorTemplate();
   }
 
+  /**
+   * Returns the display value for this property.
+   */
+  public String getDisplayValue() {
+    return getProperty();
+  }
+
+
 }
 
 

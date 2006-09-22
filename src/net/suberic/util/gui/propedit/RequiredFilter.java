@@ -41,7 +41,7 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
   public void propertyCommitting(PropertyEditorUI source, String property, String newValue) throws PropertyValueVetoException{
     if (newValue == null || newValue.trim().length() == 0) {
       if (always) {
-        throw new PropertyValueVetoException(property, newValue, "property is required", this);
+        throw new PropertyValueVetoException(source.getDisplayValue(), newValue, "property is required", this);
       }
       Iterator<String> keys = requiredIfMap.keySet().iterator();
       while ( keys.hasNext()) {
@@ -56,7 +56,7 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
           String propertyValue = uiValue.getProperty(fullProperty);
           if (requiredIfMap.get(affectedProperty).equals(propertyValue)) {
             //System.err.println("throwing exception.");
-            throw new PropertyValueVetoException(property, newValue, "property is required", this);
+            throw new PropertyValueVetoException(source.getDisplayValue(), newValue, "property is required", this);
           }
         }
       }

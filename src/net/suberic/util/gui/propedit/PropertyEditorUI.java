@@ -146,4 +146,9 @@ public interface PropertyEditorUI {
    */
   public String getHelpID();
 
+  /**
+   * Returns the display value for this property.
+   */
+  public String getDisplayValue();
+
 }
