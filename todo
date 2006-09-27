@@ -1,5 +1,9 @@
  ----- ui update
   *) Store editor:
+    *) fix disable filters.  all disable filters should be selfdisablefilters.
+		that way we get rid of the problem where, if there are two
+	 	different settings that can enable/disable, then if both are
+		on disable, and you change one, then the property gets enabled.
 	*) make settings work
 		-- fix TLS
 		-- namespace support

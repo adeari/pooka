@@ -16,10 +16,7 @@ public class PasswordEditorPane extends StringEditorPane {
    * @param isEnabled Whether or not this editor is enabled by default.
    */
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase = propertyBaseName;
+    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
     originalScrambledValue = manager.getProperty(property, "");
     if (!originalScrambledValue.equals(""))
@@ -52,12 +49,12 @@ public class PasswordEditorPane extends StringEditorPane {
       });
     this.add(label);
     this.add(inputField);
-    this.setEnabled(isEnabled);
+    this.setEnabled(enabled);
 
     labelComponent = label;
     valueComponent = inputField;
 
-    manager.registerPropertyEditor(property, this);
+    //manager.registerPropertyEditor(property, this);
   }
 
   /**

@@ -87,6 +87,26 @@ public class PropertyEditorManager {
   /**
    * Gets the value of the given property.
    */
+  public String getCurrentProperty(String property, String defaultValue) {
+    String tmpValue = null;
+    // check the PropertyEditor first.
+    PropertyEditorUI editor = getPropertyEditor(property);
+    if (editor != null) {
+      Properties value = editor.getValue();
+      tmpValue = value.getProperty(property);
+      if (tmpValue != null)
+        return tmpValue;
+    }
+    // then check the localProps
+    tmpValue = (String) localProps.get(property);
+    if (tmpValue != null)
+      return tmpValue;
+    return sourceBundle.getProperty(property, defaultValue);
+  }
+
+  /**
+   * Gets the value of the given property.
+   */
   public List<String> getPropertyAsList(String property, String defaultValue) {
     // check the localProps first
     String tmpValue = (String) localProps.get(property);
