@@ -31,7 +31,11 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
         newPair[1] = "";
         pair = newPair;
       }
+
       if (pair != null && pair.length == 2) {
+        if (pair[0].startsWith(".")) {
+          pair[0] = propertyBase + pair[0];
+        }
         Set<String> valueSet = disableValues.get(pair[0]);
         if (valueSet == null) {
           manager.addPropertyEditorListener(pair[0], this);
@@ -53,6 +57,9 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
         pair = newPair;
       }
       if (pair != null && pair.length == 2) {
+        if (pair[0].startsWith(".")) {
+          pair[0] = propertyBase + pair[0];
+        }
         Set<String> valueSet = enableValues.get(pair[0]);
         if (valueSet == null) {
           valueSet = new HashSet<String>();
@@ -95,9 +102,6 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
     for (String key: enableValues.keySet()) {
       boolean enableFound = false;
       String fullProperty = key;
-      if (key != null && key.startsWith(".")) {
-        fullProperty = propertyBase + key;
-      }
       String propValue = manager.getCurrentProperty(fullProperty, "");
       System.err.println("fullProperty to check is " + fullProperty + ", value = '" + propValue + "'");
       Set<String> valueSet = enableValues.get(key);
@@ -114,9 +118,6 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
 
     for (String key: disableValues.keySet()) {
       String fullProperty = key;
-      if (key != null && key.startsWith(".")) {
-        fullProperty = propertyBase + key;
-      }
       String propValue = manager.getCurrentProperty(fullProperty, "");
       System.err.println("fullProperty to check is " + fullProperty + ", value = '" + propValue + "'");
       Set<String> valueSet = disableValues.get(key);

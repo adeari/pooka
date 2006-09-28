@@ -1,9 +1,11 @@
  ----- ui update
   *) Store editor:
-    *) fix disable filters.  all disable filters should be selfdisablefilters.
-		that way we get rid of the problem where, if there are two
-	 	different settings that can enable/disable, then if both are
-		on disable, and you change one, then the property gets enabled.
+	*) check disablefilters; make sure they all work
+	*) fix listener setup; it's possible now that you could have 
+		multiple listeners set up for a single editor if you 
+		open and close the editor multiple times
+	*) fix getCurrentProperty(); right now a default property isn't
+		returned properly.
 	*) make settings work
 		-- fix TLS
 		-- namespace support
@@ -13,8 +15,6 @@
 		-- save to sent folder option
 	*) wizard
 	  *) make basic wizard work
-		-- pull out extendable Controller, then implement
-		   one for Store???
 	  *) check all settings/required/etc
 	    *) smtp auth
 	    *) defaults and new enabling/disabled
