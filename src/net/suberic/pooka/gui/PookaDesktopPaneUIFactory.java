@@ -1,11 +1,20 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
-import net.suberic.util.gui.propedit.DesktopPropertyEditorFactory;
+//import net.suberic.util.gui.propedit.DesktopPropertyEditorFactory;
 import net.suberic.util.gui.IconManager;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
+
+import java.awt.Dimension;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Window;
+
 import javax.swing.JInternalFrame;
+import javax.swing.JDialog;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JLabel;
@@ -26,14 +35,14 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    */
   public PookaDesktopPaneUIFactory(PookaUIFactory pSource) {
     if (pSource != null) {
-      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), pSource.getIconManager(), Pooka.getPookaManager().getHelpBroker());
+      editorFactory = new PropertyEditorFactory(Pooka.getResources(), pSource.getIconManager(), Pooka.getPookaManager().getHelpBroker());
       pookaThemeManager = pSource.getPookaThemeManager();
       mIconManager = pSource.getIconManager();
       mMessageNotificationManager = pSource.getMessageNotificationManager();
     } else {
       pookaThemeManager = new ThemeManager("Pooka.theme", Pooka.getResources());
       mIconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
-      editorFactory = new DesktopPropertyEditorFactory(Pooka.getResources(), mIconManager, Pooka.getPookaManager().getHelpBroker());
+      editorFactory = new PropertyEditorFactory(Pooka.getResources(), mIconManager, Pooka.getPookaManager().getHelpBroker());
       mMessageNotificationManager = new MessageNotificationManager();
     }
   }
@@ -110,6 +119,11 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    * each entry in the properties Vector.
    */
   public void showEditorWindow(String title, String property, String template) {
+    JDialog jd = (JDialog)getEditorFactory().createEditorWindow(title, property, template);
+    jd.pack();
+    applyNewWindowLocation(jd);
+    jd.setVisible(true);
+  /*
     JInternalFrame jif = (JInternalFrame)getEditorFactory().createEditorWindow(title, property, template);
     getMessagePanel().add(jif);
     jif.setLocation(getMessagePanel().getNewWindowLocation(jif, true));
@@ -120,7 +134,58 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
       jif.setSelected(true);
     } catch (java.beans.PropertyVetoException pve) {
     }
+  */
   }
+
+  /**
+   * Determines the location for new windows.
+   */
+  public void applyNewWindowLocation(Window f) {
+    try {
+      Point newLocation = getNewWindowLocation(f);
+      f.setLocation(newLocation);
+    } catch (Exception e) {
+    }
+  }
+
+  int lastX = 20;
+  int lastY = 20;
+  boolean firstPlacement = true;
+
+  /**
+   * Determines the location for new windows.
+   */
+  public Point getNewWindowLocation(Window f) throws Exception {
+    if (firstPlacement) {
+      Point location = Pooka.getMainPanel().getParentFrame().getLocation();
+      lastX = location.x;
+      lastY = location.y;
+      firstPlacement = false;
+    }
+    GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+
+    Rectangle bounds = conf.getBounds();
+
+    int baseDelta = 20;
+
+    Dimension componentSize = f.getSize();
+
+    int currentX = lastX + baseDelta;
+    int currentY = lastY + baseDelta;
+    if (currentX + componentSize.width > bounds.x + bounds.width) {
+      currentX = bounds.x;
+    }
+
+    if (currentY + componentSize.height > bounds.y + bounds.height) {
+      currentY = bounds.y;
+    }
+
+    lastX = currentX;
+    lastY = currentY;
+
+    return new Point(currentX, currentY);
+  }
+
 
   /**
    * Creates a JPanel which will be used to show messages and folders.
@@ -134,7 +199,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
     messagePanel.setUIComponent(messageScrollPane);
 
-    ((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+    //((PropertyEditorFactory) editorFactory).setDesktop(messagePanel);
     return messagePanel;
   }
 
@@ -150,7 +215,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     messagePanel.setDesktopManager(messagePanel.new ExtendedDesktopManager(messagePanel, messageScrollPane));
     messagePanel.setUIComponent(messageScrollPane);
 
-    ((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
+    //((DesktopPropertyEditorFactory) editorFactory).setDesktop(messagePanel);
     return messagePanel;
   }
 

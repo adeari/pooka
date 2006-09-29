@@ -152,6 +152,16 @@ public class PropertyEditorFactory {
   /**
    * This method returns an EditorWindow (a JDialog in this
    * implementation) which has an editor for each property in the
+   * property List.  The title string is the title of the
+   * JDialog.
+   */
+  public Container createEditorWindow(String title, String property, String template, Container window ) {
+    return createEditorWindow(title, property, template, new PropertyEditorManager(sourceBundle, this, iconManager), window);
+  }
+
+  /**
+   * This method returns an EditorWindow (a JDialog in this
+   * implementation) which has an editor for each property in the
    * property Vector.  The title string is the title of the
    * JInternalFrame.
    */
@@ -175,15 +185,16 @@ public class PropertyEditorFactory {
   public Container createEditorWindow(String title, PropertyEditorUI editor, Container window) {
     JDialog jd = null;
     if (window instanceof Dialog) {
-      jd = new JDialog((Dialog) window, title, true);
+      jd = new JDialog((Dialog) window, title, Dialog.ModalityType.APPLICATION_MODAL);
     } else if (window instanceof Frame) {
-      jd = new JDialog((Frame) window, title, true);
+      jd = new JDialog((Frame) window, title, Dialog.ModalityType.APPLICATION_MODAL);
     } else {
       jd = new JDialog();
       jd.setTitle(title);
-      jd.setModal(true);
+      jd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
     }
     jd.getContentPane().add(createPropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd));
+    jd.pack();
     return jd;
   }
 
