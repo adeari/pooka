@@ -482,4 +482,10 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     enabled = newValue;
   }
 
+  /**
+   * Removes the PropertyEditor.
+   */
+  public void remove() {
+    manager.removePropertyEditorListeners(getProperty());
+  }
 }

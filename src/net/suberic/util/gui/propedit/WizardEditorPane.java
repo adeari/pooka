@@ -20,6 +20,8 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
     configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
 
+    editors = new ArrayList<SwingPropertyEditor>();
+
     layout = new CardLayout();
     this.setLayout(layout);
 
@@ -50,6 +52,7 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
       SwingPropertyEditor newEditor = (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subTemplate, manager, true);
       layoutMap.put(stateString, newEditor);
       this.add(stateString, newEditor);
+      editors.add(newEditor);
     }
   }
 

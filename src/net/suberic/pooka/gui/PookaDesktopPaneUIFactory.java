@@ -148,42 +148,16 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     }
   }
 
-  int lastX = 20;
-  int lastY = 20;
-  boolean firstPlacement = true;
-
   /**
    * Determines the location for new windows.
    */
   public Point getNewWindowLocation(Window f) throws Exception {
-    if (firstPlacement) {
-      Point location = Pooka.getMainPanel().getParentFrame().getLocation();
-      lastX = location.x;
-      lastY = location.y;
-      firstPlacement = false;
-    }
-    GraphicsConfiguration conf = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-
-    Rectangle bounds = conf.getBounds();
-
-    int baseDelta = 20;
-
-    Dimension componentSize = f.getSize();
-
-    int currentX = lastX + baseDelta;
-    int currentY = lastY + baseDelta;
-    if (currentX + componentSize.width > bounds.x + bounds.width) {
-      currentX = bounds.x;
-    }
-
-    if (currentY + componentSize.height > bounds.y + bounds.height) {
-      currentY = bounds.y;
-    }
-
-    lastX = currentX;
-    lastY = currentY;
-
-    return new Point(currentX, currentY);
+    Point location = Pooka.getMainPanel().getParentFrame().getLocation();
+    Dimension mainWindowSize = Pooka.getMainPanel().getParentFrame().getSize();
+    Dimension windowSize = f.getSize();
+    int yValue = ((mainWindowSize.height - windowSize.height) / 2) + location.y;
+    int xValue = ((mainWindowSize.width - windowSize.width) / 2) + location.x;
+    return new Point(xValue, yValue);
   }
 
 

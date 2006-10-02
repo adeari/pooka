@@ -151,4 +151,8 @@ public interface PropertyEditorUI {
    */
   public String getDisplayValue();
 
+  /**
+   * Removes the PropertyEditor.
+   */
+  public void remove();
 }

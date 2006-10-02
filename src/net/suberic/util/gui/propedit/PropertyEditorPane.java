@@ -165,6 +165,7 @@ public class PropertyEditorPane extends JPanel {
             } else if (container instanceof JDialog) {
               ((JDialog)container).dispose();
             }
+            editor.remove();
           } catch (PropertyValueVetoException pvve) {
             manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
           }
@@ -197,6 +198,7 @@ public class PropertyEditorPane extends JPanel {
           } else if (container instanceof JDialog) {
             ((JDialog)container).dispose();
           }
+          editor.remove();
         }
       }, false);
 

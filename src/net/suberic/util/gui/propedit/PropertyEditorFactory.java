@@ -7,6 +7,8 @@ import java.awt.Container;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Point;
 import javax.help.HelpBroker;
 
 /**
@@ -112,6 +114,7 @@ public class PropertyEditorFactory {
 
   public void showNewEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
     JDialog jd = (JDialog) createEditorWindow(title, property, template, propertyBase, mgr, window);
+
     jd.setVisible(true);
   }
 
@@ -126,6 +129,14 @@ public class PropertyEditorFactory {
    */
   public void showNewEditorWindow(String title, PropertyEditorUI editor, Container window) {
     JDialog jd = (JDialog) createEditorWindow(title, editor, window);
+    if (window != null) {
+      Point location = window.getLocationOnScreen();
+      Dimension windowSize = window.getSize();
+      Dimension editorWindowSize = jd.getSize();
+      int yValue = ((windowSize.height - editorWindowSize.height) / 2) + location.y;
+      int xValue = ((windowSize.width - editorWindowSize.width) / 2) + location.x;
+      jd.setLocation(new Point(xValue, yValue));
+    }
     jd.setVisible(true);
   }
 

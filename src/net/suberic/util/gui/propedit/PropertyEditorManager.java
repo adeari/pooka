@@ -172,6 +172,14 @@ public class PropertyEditorManager {
   }
 
   /**
+   * Clears modified values.
+   */
+  public void clearValues() {
+    localProps = new Properties();
+    removeProps = new HashSet<String>();
+  }
+
+  /**
    * Creates an appropriate PropertyEditorListener from the given
    * String.
    */
@@ -222,6 +230,16 @@ public class PropertyEditorManager {
         if (pel != null && listenerList.contains(pel))
           listenerList.remove(pel);
       }
+    }
+  }
+
+  /**
+   * Removes all PropertyEditorListeners from the ListenerList for this
+   * property.
+   */
+  public void removePropertyEditorListeners(String property) {
+    if (property != null) {
+      listenerMap.remove(property);
     }
   }
 

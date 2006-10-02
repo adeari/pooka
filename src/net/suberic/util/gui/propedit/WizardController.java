@@ -83,9 +83,9 @@ public class WizardController {
    * Goes forward a state.
    */
   public void next() throws PropertyValueVetoException {
-    if (inEndState())
-      return;
-    else {
+    if (inEndState()) {
+      finishWizard();
+    } else {
       String newState = getNextState(mState);
       if (newState != null) {
         checkStateTransition(mState, newState);
@@ -129,6 +129,14 @@ public class WizardController {
   }
 
   /**
+   * Finsihes the wizard.
+   */
+  public void finishWizard() throws PropertyValueVetoException {
+    getManager().commit();
+    getEditorPane().getWizardContainer().closeWizard();
+  }
+
+  /**
    * Returns the PropertyEditorManager.
    */
   public PropertyEditorManager getManager() {
@@ -142,3 +150,4 @@ public class WizardController {
     return editorPane;
   }
 }
+

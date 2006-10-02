@@ -83,16 +83,7 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     JButton cancelButton = createButton(manager.getProperty("button.cancel",
 "Cancel"), new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          if (container instanceof JInternalFrame) {
-            try {
-              ((JInternalFrame)container).setClosed(true);
-            } catch (java.beans.PropertyVetoException pve) {
-            }
-          } else if (container instanceof JFrame) {
-            ((JFrame)container).dispose();
-          } else if (container instanceof JDialog) {
-            ((JDialog)container).dispose();
-          }
+          closeWizard();
         }
       }, false);
 
@@ -155,4 +146,20 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     }
   }
 
+  /**
+   * Closes the editor.
+   */
+  public void closeWizard() {
+    if (container instanceof JInternalFrame) {
+      try {
+        ((JInternalFrame)container).setClosed(true);
+      } catch (java.beans.PropertyVetoException pve) {
+      }
+    } else if (container instanceof JFrame) {
+      ((JFrame)container).dispose();
+    } else if (container instanceof JDialog) {
+      ((JDialog)container).dispose();
+    }
+    editor.remove();
+  }
 }

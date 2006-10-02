@@ -1,35 +1,32 @@
  ----- ui update
   *) Store editor:
-	*) check disablefilters; make sure they all work
-	*) fix listener setup; it's possible now that you could have 
-		multiple listeners set up for a single editor if you 
-		open and close the editor multiple times
-	*) fix getCurrentProperty(); right now a default property isn't
-		returned properly.
 	*) make settings work
 		-- fix TLS
 		-- namespace support
 		-- test autoCheckSeconds
-	*) UserProfile settings:
-		-- append sig to each message option
-		-- save to sent folder option
-	*) wizard
+  *) UserProfile settings:
+	-- append sig to each message option
+	-- save to sent folder option
+  *) wizard
+	*) check disablefilters; make sure they all work
+	*) fix getCurrentProperty(); right now a default property isn't
+		returned properly.
+	*) smtp server - server, username, and password should be prepopulated
+	*) smtp server - add requireds
+	*) mbox - maildirectory default needs fixing
+	*) fix default value for user when local store is selected
 	  *) make basic wizard work
 	  *) check all settings/required/etc
 	    *) smtp auth
 	    *) defaults and new enabling/disabled
-	*) folder
-	*) preferences
-	*) address book
-	*) outgoing servers
-	*) connections
+  *) folder
+  *) preferences
+  *) address book
+  *) outgoing servers
+  *) connections
 	*) encryption
 	*) theme
  *) technical:
-  *) add in wizard editor.
-  *) make editor modal
-  *) change veto errors to use display name, not full property.
-
   *) TabbedEditorPane should make sure to expand to fit its area.
 	-- it looks like it does.  maybe there's a problem with the
 	   CompositeEditorPane?

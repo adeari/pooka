@@ -270,4 +270,10 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     return sLogger;
   }
 
+  /**
+   * Removes the PropertyEditor.
+   */
+  public void remove() {
+    manager.removePropertyEditorListeners(getProperty());
+  }
 }

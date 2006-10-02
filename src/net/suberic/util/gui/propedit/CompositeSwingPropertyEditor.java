@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * being added to the property itself.</p>
  */
 public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
-  protected List editors;
+  protected List<SwingPropertyEditor> editors;
   protected Logger mLogger = Logger.getLogger("editors.debug");
 
   /**
@@ -43,7 +43,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       List<PropertyValueVetoException> exceptionList = new ArrayList<PropertyValueVetoException>();
       for (int i = 0; i < editors.size() ; i++) {
         try {
-          ((PropertyEditorUI) editors.get(i)).setValue();
+          editors.get(i).setValue();
         } catch (PropertyValueVetoException pvve) {
           exceptionList.add(pvve);
         }
@@ -69,7 +69,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
   public void resetDefaultValue() throws PropertyValueVetoException {
     if (isEnabled()) {
       for (int i = 0; i < editors.size() ; i++) {
-        ((PropertyEditorUI) editors.get(i)).resetDefaultValue();
+        editors.get(i).resetDefaultValue();
       }
     }
   }
@@ -80,9 +80,9 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    */
   public java.util.Properties getValue() {
     java.util.Properties currentRetValue = new java.util.Properties();
-    java.util.Iterator iter = editors.iterator();
+    java.util.Iterator<SwingPropertyEditor> iter = editors.iterator();
     while (iter.hasNext()) {
-      currentRetValue.putAll(((SwingPropertyEditor)iter.next()).getValue());
+      currentRetValue.putAll(iter.next().getValue());
     }
 
     return currentRetValue;
@@ -265,9 +265,9 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
       return getEditorTemplate();
     else {
       String controllerProperty = createSubTemplate(subProperty);
-      Iterator iter = editors.iterator();
+      Iterator<SwingPropertyEditor> iter = editors.iterator();
       while(iter.hasNext()) {
-        PropertyEditorUI ui = (PropertyEditorUI) iter.next();
+        PropertyEditorUI ui = iter.next();
         if (ui.getEditorTemplate().equals(controllerProperty)) {
           return ui.getHelpID();
         }
@@ -282,6 +282,16 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    */
   public String getDisplayValue() {
     return getProperty();
+  }
+
+  /**
+   * Removes the PropertyEditor.
+   */
+  public void remove() {
+    manager.removePropertyEditorListeners(getProperty());
+    for (PropertyEditorUI editor: editors) {
+      editor.remove();
+    }
   }
 
 
