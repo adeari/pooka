@@ -112,10 +112,14 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
 
-    if (inputField.isSelected())
-      retProps.setProperty(property, "true");
-    else
-      retProps.setProperty(property, "false");
+    if (! isEnabled()) {
+      return retProps;
+    } else {
+      if (inputField.isSelected())
+        retProps.setProperty(property, "true");
+      else
+        retProps.setProperty(property, "false");
+    }
     return retProps;
   }
 

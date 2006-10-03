@@ -4,21 +4,20 @@
 		-- fix TLS
 		-- namespace support
 		-- test autoCheckSeconds
+	*) check disablefilters; make sure they all work
   *) UserProfile settings:
 	-- append sig to each message option
 	-- save to sent folder option
-  *) wizard
 	*) check disablefilters; make sure they all work
+  *) wizard
 	*) fix getCurrentProperty(); right now a default property isn't
 		returned properly.
-	*) smtp server - server, username, and password should be prepopulated
-	*) smtp server - add requireds
+	*) imap to pop -- losing server name setting?
 	*) mbox - maildirectory default needs fixing
 	*) fix default value for user when local store is selected
 	  *) make basic wizard work
 	  *) check all settings/required/etc
 	    *) smtp auth
-	    *) defaults and new enabling/disabled
   *) folder
   *) preferences
   *) address book

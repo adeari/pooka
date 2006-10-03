@@ -36,8 +36,21 @@ public class NewStoreWizardController extends WizardController {
 
       } else {
         System.err.println("local store");
-        getManager().setProperty("NewStoreWizard.editors.user.from", "user@localhost");
+        String username = System.getProperty("user.name");
+        String hostname = "localhost";
+        try {
+          java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
+          hostname = localMachine.getHostName();
 
+        } catch(java.net.UnknownHostException uhe) {
+          // just use 'localhost'
+        }
+        String address = username + "@" + hostname;
+        getManager().setProperty("NewStoreWizard.editors.user.from", address);
+        PropertyEditorUI fromEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.from");
+        System.err.println("got fromEditor " + fromEditor);
+        fromEditor.setOriginalValue(address);
+        fromEditor.resetDefaultValue();
       }
     } else if (newState.equals("outgoingServer") && oldState.equals("userInfo")) {
       // load default values into the smtp configuration.
