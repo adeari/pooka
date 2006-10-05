@@ -51,7 +51,7 @@ public class WizardPropertyEditor extends PropertyEditorPane {
 
     JButton helpButton = createButton(manager.getProperty("button.help", "Help"), new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          System.err.println("showing help for " + editor.getHelpID());
+          //System.err.println("showing help for " + editor.getHelpID());
           //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
           //new CSH.DisplayHelpFromSource(manager.getFactory().getHelpBroker()).actionPerformed(e);
           manager.getFactory().getHelpBroker().setCurrentID(editor.getHelpID());

@@ -16,15 +16,15 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
    * Configures this filter from the given key.
    */
   public void configureListener(String key, String pProperty, String pPropertyBase, String editorTemplate, PropertyEditorManager pManager) {
-    System.err.println("");
-    System.err.println("init for " + key);
+    //System.err.println("");
+    //System.err.println("init for " + key);
     manager = pManager;
     propertyBase = pPropertyBase;
     property = pProperty;
     List<String> disableKeys = manager.getPropertyAsList(key + ".disableValues", "");
     for (String keyString: disableKeys) {
       String[] pair = keyString.split("=");
-      System.err.println("split '" + keyString + "'; pair.length = " + pair.length);
+      //System.err.println("split '" + keyString + "'; pair.length = " + pair.length);
       if (pair != null && pair.length == 1) {
         String[] newPair = new String[2];
         newPair[0] = pair[0];
@@ -49,7 +49,7 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
     List<String> enableKeys = manager.getPropertyAsList(key + ".enableValues", "");
     for (String keyString: enableKeys) {
       String[] pair = keyString.split("=");
-      System.err.println("split '" + keyString + "'; pair.length = " + pair.length);
+      //System.err.println("split '" + keyString + "'; pair.length = " + pair.length);
       if (pair != null && pair.length == 1) {
         String[] newPair = new String[2];
         newPair[0] = pair[0];
@@ -76,7 +76,7 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
    * values to be disabled, disable the editor.
    */
   public void propertyInitialized(PropertyEditorUI source, String pProperty, String newValue) {
-    System.err.println("property " + pProperty + " initializing.");
+    //System.err.println("property " + pProperty + " initializing.");
     if (property.equals(pProperty)) {
       checkEnabledStatus(source);
     }
@@ -87,7 +87,7 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
    * values to be disabled, disable the editor.
    */
   public void propertyChanged(PropertyEditorUI source, String pProperty, String newValue) {
-    System.err.println("property " + pProperty + " changed.");
+    //System.err.println("property " + pProperty + " changed.");
     if (enableValues.keySet().contains(pProperty) || disableValues.keySet().contains(pProperty)) {
       checkEnabledStatus(null);
     }
@@ -97,18 +97,18 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
    * Checks the enabled status of the affected editor.
    */
   public void checkEnabledStatus(PropertyEditorUI source) {
-    System.err.println("checking enabled status for property " + property );
+    //System.err.println("checking enabled status for property " + property );
     boolean enable = true;
     for (String key: enableValues.keySet()) {
       boolean enableFound = false;
       String fullProperty = key;
       String propValue = manager.getCurrentProperty(fullProperty, "");
-      System.err.println("fullProperty to check is " + fullProperty + ", value = '" + propValue + "'");
+      //System.err.println("fullProperty to check is " + fullProperty + ", value = '" + propValue + "'");
       Set<String> valueSet = enableValues.get(key);
       for (String value: valueSet) {
-        System.err.println("checking value " + value);
+        //System.err.println("checking value " + value);
         if (propValue.equals(value)) {
-          System.err.println("found enable value for " + key);
+          //System.err.println("found enable value for " + key);
           enableFound=true;
         }
       }
@@ -119,21 +119,21 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
     for (String key: disableValues.keySet()) {
       String fullProperty = key;
       String propValue = manager.getCurrentProperty(fullProperty, "");
-      System.err.println("fullProperty to check is " + fullProperty + ", value = '" + propValue + "'");
+      //System.err.println("fullProperty to check is " + fullProperty + ", value = '" + propValue + "'");
       Set<String> valueSet = disableValues.get(key);
       for (String value: valueSet) {
-        System.err.println("checking value " + value);
+        //System.err.println("checking value " + value);
         if (propValue.equals(value)) {
-          System.err.println("match found; setting enabled to false.");
+          //System.err.println("match found; setting enabled to false.");
           enable = false;
         }
       }
     }
     if (source != null) {
-      System.err.println("setting source editor to " + enable);
+      //System.err.println("setting source editor to " + enable);
       source.setEnabled(enable);
     } else {
-      System.err.println("getPropertyEditor(" + property + ")=" + manager.getPropertyEditor(property));
+      //System.err.println("getPropertyEditor(" + property + ")=" + manager.getPropertyEditor(property));
       if (manager.getPropertyEditor(property) != null)
         manager.getPropertyEditor(property).setEnabled(enable);
     }

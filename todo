@@ -86,6 +86,13 @@
 
 **) make wheel scroll customizable
 
+*) fix:  java.lang.IllegalStateException: Can't overwrite cause
+        at java.lang.Throwable.initCause(Throwable.java:320)
+        at net.suberic.pooka.MessageInfo.moveMessage(MessageInfo.java:421)
+ 	at net.suberic.pooka.gui.MessageProxy.moveMessage(MessageProxy.java:800)
+	at net.suberic.pooka.filter.MoveFilterAction.performFilter(MoveFilterAction.java:33)
+        at net.suberic.pooka.MessageInfo.runSpamAction(MessageInfo.java:795)
+
 -----
 
 

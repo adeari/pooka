@@ -95,7 +95,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
       JRadioButton button = (JRadioButton) e.getSource();
       String currentValue = button.getActionCommand();
       try {
-        System.err.println("firing propertyChangedEvent for " + property);
+        //System.err.println("firing propertyChangedEvent for " + property);
         firePropertyChangingEvent(currentValue);
         firePropertyChangedEvent(currentValue);
 
@@ -121,7 +121,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
     }
     if (! currentValue.equals(originalValue)) {
       firePropertyChangingEvent(currentValue);
-      System.err.println("firing propertyChangedEvent for " + property);
+      //System.err.println("firing propertyChangedEvent for " + property);
       firePropertyChangedEvent(currentValue);
     }
 
