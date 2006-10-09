@@ -28,7 +28,7 @@ import net.suberic.util.gui.*;
 
 public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer, ActionContainer {
   private ConfigurableMenuBar mainMenu;
-  private ConfigurableToolbar mainToolbar;
+  //private ConfigurableToolbar mainToolbar;
   private FolderPanel folderPanel;
   private ContentPanel contentPanel;
   private InfoPanel infoPanel;
@@ -70,7 +70,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     this.setDividerLocation(folderPanel.getPreferredSize().width + 1);
 
     mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
-    mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
+    //mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
 
     keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
     //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -171,7 +171,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   public void refreshActiveMenus() {
     Action[] currentActions = getActions();
     mainMenu.setActive(currentActions);
-    mainToolbar.setActive(currentActions);
+    //mainToolbar.setActive(currentActions);
     contentPanel.refreshActiveMenus();
     keyBindings.setActive(currentActions);
     if (Pooka.getUIFactory().getMessageNotificationManager() != null)
@@ -307,9 +307,11 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     mainMenu=newMainMenu;
   }
 
+  /*
   public ConfigurableToolbar getMainToolbar() {
     return mainToolbar;
   }
+  */
 
   public ConfigurableKeyBinding getKeyBindings() {
     return keyBindings;
@@ -319,9 +321,11 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     keyBindings = newKeyBindings;
   }
 
+  /*
   public void setMainToolbar(ConfigurableToolbar newMainToolbar) {
     mainToolbar = newMainToolbar;
   }
+  */
 
   public ContentPanel getContentPanel() {
     return contentPanel;

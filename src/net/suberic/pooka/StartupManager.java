@@ -136,7 +136,9 @@ public class StartupManager {
 
           updateTime("configured main panel");
 
-          finalFrame.getContentPane().add("North", panel.getMainToolbar());
+
+          //finalFrame.getContentPane().add("North", panel.getMainToolbar());
+
           finalFrame.setJMenuBar(panel.getMainMenu());
           finalFrame.getContentPane().add("South", panel.getInfoPanel());
           finalFrame.pack();
