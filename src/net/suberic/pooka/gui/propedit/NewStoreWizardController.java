@@ -108,30 +108,43 @@ public class NewStoreWizardController extends WizardController {
    */
   public Properties createStoreProperties() {
     Properties returnValue = new Properties();
-    /*
-    String accountName = manager.getCurrentValue("");
-    String protocol = manager.getCurrentValue("");
+
+    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+    String protocol = getManager().getCurrentProperty("NewStoreWizard.editors.store.protocol", "imap");
     if (protocol.equalsIgnoreCase("imap")) {
-      props.setProperty("Store." + accountName + ".useSubscribed", "true");
-      props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
-      props.setProperty("Store." + accountName + ".cachingEnabled", manager.getProperty("NewAccountPooka.enableDisconnected", "false"));
+      returnValue.setProperty("Store." + accountName + ".server", getManager().getCurrentProperty("NewStoreWizard.editors.store.server", ""));
+      returnValue.setProperty("Store." + accountName + ".user", getManager().getCurrentProperty("NewStoreWizard.editors.store.user", ""));
+      returnValue.setProperty("Store." + accountName + ".password", getManager().getCurrentProperty("NewStoreWizard.editors.store.password", ""));
+      returnValue.setProperty("Store." + accountName + ".port", getManager().getCurrentProperty("NewStoreWizard.editors.store.port", ""));
+
+      returnValue.setProperty("Store." + accountName + ".useSubscribed", "true");
+      returnValue.setProperty("Store." + accountName + ".SSL", getManager().getCurrentProperty("NewStoreWizard.editors.store.SSL", "none"));
+      returnValue.setProperty("Store." + accountName + ".cacheMode", getManager().getCurrentProperty("NewStoreWizard.editors.store.cacheMode", "headersOnly"));
     } else if (protocol.equalsIgnoreCase("pop3")) {
-      props.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
-      props.setProperty("Store." + accountName + ".SSL", manager.getProperty("NewAccountPooka.useSSL", "false"));
-      props.setProperty("Store." + accountName + ".leaveMessagesOnServer", manager.getProperty("NewAccountPooka.leaveOnServer", "true"));
-      props.setProperty("Store." + accountName + ".useMaildir", "true");
-      if (manager.getProperty("NewAccountPooka.leaveOnServer", "true").equalsIgnoreCase("true")) {
-        props.setProperty("Store." + accountName + ".deleteOnServerOnLocalDelete", "true");
+      returnValue.setProperty("Store." + accountName + ".server", getManager().getCurrentProperty("NewStoreWizard.editors.store.server", ""));
+      returnValue.setProperty("Store." + accountName + ".user", getManager().getCurrentProperty("NewStoreWizard.editors.store.user", ""));
+      returnValue.setProperty("Store." + accountName + ".password", getManager().getCurrentProperty("NewStoreWizard.editors.store.password", ""));
+      returnValue.setProperty("Store." + accountName + ".port", getManager().getCurrentProperty("NewStoreWizard.editors.store.port", ""));
+
+      returnValue.setProperty("Store." + accountName + ".SSL", getManager().getCurrentProperty("NewStoreWizard.editors.store.SSL", "none"));
+      returnValue.setProperty("Store." + accountName + ".useMaildir", "true");
+      /*
+      returnValue.setProperty("Store." + accountName + ".leaveMessagesOnServer", getManager().getCurrentProperty("NewStoreWizard.editors.store.leaveOnServer", "true"));
+      if (manager.getCurrentProperty("NewStoreWizard.editors.store.leaveOnServer", "true").equalsIgnoreCase("true")) {
+        returnValue.setProperty("Store." + accountName + ".deleteOnServerOnLocalDelete", "true");
       }
+      */
     } else if (protocol.equalsIgnoreCase("mbox")) {
-      props.setProperty("Store." + accountName + ".inboxLocation", manager.getProperty("NewAccountPooka.inboxLocation", "/var/spool/mail/" + System.getProperty("user.name")));
+      returnValue.setProperty("Store." + accountName + ".inboxLocation", getManager().getCurrentProperty("NewStoreWizard.editors.store.inboxLocation", "/var/spool/mail/" + System.getProperty("user.name")));
+      returnValue.setProperty("Store." + accountName + ".mailDirectory", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDirectory", getManager().getCurrentProperty("Pooka.cacheDirectory", System.getProperty("user.home") + java.io.File.separator + ".pooka")));
+    } else if (protocol.equalsIgnoreCase("maildir")) {
+      returnValue.setProperty("Store." + accountName + ".mailDir", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDir", System.getProperty("user.home") + java.io.File.separator + "Maildir"));
     }
-    returnValue.setProperty("Store." + accountName + ".server", serverName);
-    returnValue.setProperty("Store." + accountName + ".user", userName);
-    returnValue.setProperty("Store." + accountName + ".password", password);
-    returnValue.setProperty("Store." + accountName + ".defaultProfile", accountName);
-    returnValue.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
-    */
+
+    List<String> storeList = getManager().getPropertyAsList("Store", "");
+    storeList.add(accountName);
+
+    returnValue.setProperty("Store", net.suberic.util.VariableBundle.convertToString(storeList));
 
     return returnValue;
   }
@@ -142,6 +155,14 @@ public class NewStoreWizardController extends WizardController {
   public Properties createUserProperties() {
     Properties returnValue = new Properties();
 
+    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+
+    String defaultUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
+    if (defaultUser.equals("__new")) {
+
+    } else {
+      returnValue.setProperty("Store." + accountName + ".defaultProfile", defaultUser);
+    }
     return returnValue;
   }
 
@@ -151,6 +172,16 @@ public class NewStoreWizardController extends WizardController {
   public Properties createSmtpProperties() {
     Properties returnValue = new Properties();
 
+    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+
+    String smtpServer = getManager().getCurrentProperty("NewStoreWizard.editors.user.smtp.outgoingServer", "__default");
+    if (smtpServer.equals("__new")) {
+
+    } else {
+      //returnValue.setProperty("Store." + accountName + ".defaultProfile", defaultUser);
+    }
+    //returnValue.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
+    //returnValue.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
     return returnValue;
   }
 
@@ -161,6 +192,7 @@ public class NewStoreWizardController extends WizardController {
   void addAll(Properties props) {
     Set<String> names = props.stringPropertyNames();
     for (String name: names) {
+      System.err.println("setting property " + name + ", value " + props.getProperty(name));
       getManager().setProperty(name, props.getProperty(name));
     }
   }
