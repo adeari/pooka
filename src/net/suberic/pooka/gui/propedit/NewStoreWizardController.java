@@ -13,20 +13,21 @@ public class NewStoreWizardController extends WizardController {
   public NewStoreWizardController(String sourceTemplate, WizardEditorPane wep) {
     super(sourceTemplate, wep);
   }
+
   /**
    * Checks the state transition to make sure that we can move from
    * state to state.
    */
   public void checkStateTransition(String oldState, String newState) throws PropertyValueVetoException {
-    getEditorPane().setValue(oldState);
+    //getEditorPane().setValue(oldState);
     if (newState.equals("userInfo") && oldState.equals("storeConfig")) {
       // load default values into the user configuration.
       //System.err.println("moving to userInfo; setting default values.");
-      String protocol = getManager().getProperty("NewStoreWizard.editors.store.protocol", "imap");
+      String protocol = getManager().getCurrentProperty("NewStoreWizard.editors.store.protocol", "imap");
       //System.err.println("protocol = " + protocol);
       if (protocol.equalsIgnoreCase("imap") || protocol.equalsIgnoreCase("pop3")) {
-        String user = getManager().getProperty("NewStoreWizard.editors.store.user", "");
-        String server = getManager().getProperty("NewStoreWizard.editors.store.server", "");
+        String user = getManager().getCurrentProperty("NewStoreWizard.editors.store.user", "");
+        String server = getManager().getCurrentProperty("NewStoreWizard.editors.store.server", "");
         //System.err.println("setting username to " + user + "@" + server);
         getManager().setProperty("NewStoreWizard.editors.user.from", user + "@" + server);
         PropertyEditorUI fromEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.from");
@@ -54,11 +55,11 @@ public class NewStoreWizardController extends WizardController {
       }
     } else if (newState.equals("outgoingServer") && oldState.equals("userInfo")) {
       // load default values into the smtp configuration.
-      String protocol = getManager().getProperty("NewStoreWizard.editors.store.protocol", "imap");
+      String protocol = getManager().getCurrentProperty("NewStoreWizard.editors.store.protocol", "imap");
       //System.err.println("protocol = " + protocol);
       if (protocol.equalsIgnoreCase("imap") || protocol.equalsIgnoreCase("pop3")) {
-        String user = getManager().getProperty("NewStoreWizard.editors.store.user", "");
-        String server = getManager().getProperty("NewStoreWizard.editors.store.server", "");
+        String user = getManager().getCurrentProperty("NewStoreWizard.editors.store.user", "");
+        String server = getManager().getCurrentProperty("NewStoreWizard.editors.store.server", "");
         getManager().setProperty("NewStoreWizard.editors.smtp.user", user);
         PropertyEditorUI userEditor = getManager().getPropertyEditor("NewStoreWizard.editors.smtp.user");
         userEditor.setOriginalValue(user);
@@ -76,8 +77,8 @@ public class NewStoreWizardController extends WizardController {
 
       }
     } else if (newState.equals("storeName") && oldState.equals("outgoingServer")) {
-      String user = getManager().getProperty("NewStoreWizard.editors.store.user", "");
-      String server = getManager().getProperty("NewStoreWizard.editors.store.server", "");
+      String user = getManager().getCurrentProperty("NewStoreWizard.editors.store.user", "");
+      String server = getManager().getCurrentProperty("NewStoreWizard.editors.store.server", "");
       String storeName = user + "@" + server;
       getManager().setProperty("NewStoreWizard.editors.store.storeName", storeName);
       PropertyEditorUI storeNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.store.storeName");
@@ -87,19 +88,71 @@ public class NewStoreWizardController extends WizardController {
   }
 
   /**
+   * Gets the next state.
+   */
+  public String getNextState(String currentState) {
+    int current = mStateList.indexOf(mState);
+    if (current > -1 && current < (mStateList.size() -1)) {
+      String newState = mStateList.get(current + 1);
+      // if we're not creating a new user, skip the smtp server step.
+      System.err.println("nextState = " + newState);
+      if (newState.equals("outgoingServer")) {
+        String newUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", ListEditorPane.SELECTION_DEFAULT);
+        if (! newUser.equalsIgnoreCase(ListEditorPane.SELECTION_NEW)) {
+          System.err.println("not new.");
+          if (current < (mStateList.size() -2)) {
+            newState = mStateList.get(current + 2);
+            System.err.println("nextStore = " + newState);
+          }
+        }
+      }
+      return newState;
+    } else {
+      return null;
+    }
+  }
+
+  /**
+   * Gets the state that should be displayed next from a back request.
+   */
+  public String getBackState(String currentState) {
+    int current = mStateList.indexOf(currentState);
+    if (current >= 1) {
+      String newState = mStateList.get(current - 1);
+      // if we're not creating a new user, skip the smtp server step.
+      if (newState.equals("outgoingServer")) {
+        String newUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", ListEditorPane.SELECTION_DEFAULT);
+        if (! newUser.equalsIgnoreCase(ListEditorPane.SELECTION_NEW)) {
+          if (current >= 2) {
+            newState = mStateList.get(current - 2);
+          }
+        }
+      }
+      return newState;
+    } else {
+      return null;
+    }
+  }
+
+
+  /**
    * Finsihes the wizard.
    */
   public void finishWizard() throws PropertyValueVetoException {
     Properties storeProperties = createStoreProperties();
     Properties userProperties = createUserProperties();
     Properties smtpProperties = createSmtpProperties();
-    getManager().clearValues();
+    //getManager().clearValues();
 
     addAll(storeProperties);
     addAll(userProperties);
     addAll(smtpProperties);
 
-    getManager().commit();
+    // now add this value to the store editor.
+    MultiEditorPane mep = (MultiEditorPane) getManager().getPropertyEditor("Store");
+    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+    mep.addNewValue(accountName);
+
     getEditorPane().getWizardContainer().closeWizard();
   }
 
@@ -111,6 +164,8 @@ public class NewStoreWizardController extends WizardController {
 
     String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
     String protocol = getManager().getCurrentProperty("NewStoreWizard.editors.store.protocol", "imap");
+    returnValue.setProperty("Store." + accountName + ".protocol", protocol);
+
     if (protocol.equalsIgnoreCase("imap")) {
       returnValue.setProperty("Store." + accountName + ".server", getManager().getCurrentProperty("NewStoreWizard.editors.store.server", ""));
       returnValue.setProperty("Store." + accountName + ".user", getManager().getCurrentProperty("NewStoreWizard.editors.store.user", ""));
@@ -141,10 +196,12 @@ public class NewStoreWizardController extends WizardController {
       returnValue.setProperty("Store." + accountName + ".mailDir", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDir", System.getProperty("user.home") + java.io.File.separator + "Maildir"));
     }
 
+    /*
     List<String> storeList = getManager().getPropertyAsList("Store", "");
     storeList.add(accountName);
 
     returnValue.setProperty("Store", net.suberic.util.VariableBundle.convertToString(storeList));
+    */
 
     return returnValue;
   }

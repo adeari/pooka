@@ -23,8 +23,8 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   static String LIST_MAPPING = "listMapping";
   static String INCLUDE_DEFAULT_OPTION = "_includeDefault";
   static String INCLUDE_NEW_OPTION = "_includeNew";
-  static String SELECTION_DEFAULT = "__default";
-  static String SELECTION_NEW = "__new";
+  public static String SELECTION_DEFAULT = "__default";
+  public static String SELECTION_NEW = "__new";
 
   /**
    * @param propertyName The property to be edited.

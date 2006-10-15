@@ -39,6 +39,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   boolean changed = false;
   List<String> removeValues = new ArrayList<String>();
   String propertyTemplate;
+  List<String> displayProperties;
 
   /**
    * This configures this editor with the following values.
@@ -62,7 +63,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     List<String> optionList = manager.getPropertyAsList(property, "");
 
-    List<String> displayProperties = manager.getPropertyAsList(editorTemplate + "._displayProperties", "");
+    displayProperties = manager.getPropertyAsList(editorTemplate + "._displayProperties", "");
 
     optionTable = createOptionTable(optionList, displayProperties);
     JScrollPane optionScrollPane = new JScrollPane(optionTable);
@@ -102,12 +103,12 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Creates the Option Table.  This is a JTable that lists the various
    * items that have been created.
    */
-  private JTable createOptionTable(List<String> optionList, List<String> displayProperties) {
+  private JTable createOptionTable(List<String> optionList, List<String> pDisplayProperties) {
     // first get the display properties and their labels.
     Vector columnLabels = new Vector();
     // first one is always the id.
     columnLabels.add(manager.getProperty(editorTemplate + "._label", editorTemplate));
-    for (String subProperty: displayProperties) {
+    for (String subProperty: pDisplayProperties) {
       getLogger().fine("adding label for " + subProperty);
 
       String label = manager.getProperty(editorTemplate + "._displayProperties." + subProperty + ".label", subProperty);
@@ -119,13 +120,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     // now add the properties.
 
     for (String option: optionList) {
-      Vector optionValues = new Vector();
-      // first one is always the id, at least for now.
-      optionValues.add(option);
-      for (String subProperty: displayProperties) {
-        getLogger().fine("adding display property for " + option + "." + subProperty);
-        optionValues.add(manager.getProperty(property + "." + option + "." + subProperty, subProperty));
-      }
+      Vector optionValues = createTableEntry(option, pDisplayProperties);
       dtm.addRow(optionValues);
     }
 
@@ -140,6 +135,21 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       returnValue.setRowSelectionInterval(0,0);
     }
     return returnValue;
+  }
+
+  /**
+   * Adds the given property to the property table.
+   */
+  public Vector createTableEntry(String option, List<String> pDisplayProperties) {
+    Vector optionValues = new Vector();
+    // first one is always the id, at least for now.
+    optionValues.add(option);
+    for (String subProperty: pDisplayProperties) {
+      getLogger().fine("adding display property for " + option + "." + subProperty);
+      optionValues.add(manager.getProperty(property + "." + option + "." + subProperty, subProperty));
+    }
+
+    return optionValues;
   }
 
   /**
@@ -161,7 +171,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
             manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager, true), getPropertyEditorPane().getContainer());
 
           } else {
-            addNewValue(getNewValueName());
+            addNewValue(getNewValueName(), getPropertyEditorPane().getContainer());
           }
         }
       }, true);
@@ -245,7 +255,23 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Adds a new value to the edited List.
    */
   public void addNewValue(String newValueName) {
-    addNewValue(newValueName, this.getPropertyEditorPane().getContainer());
+    try {
+      List<String> newValueList = new ArrayList<String>();
+      for (int i = 0; i < optionTable.getRowCount(); i++) {
+        newValueList.add((String) optionTable.getValueAt(i, 0));
+      }
+      newValueList.add(newValueName);
+      String newValue = VariableBundle.convertToString(newValueList);
+      firePropertyChangingEvent(newValue) ;
+      Vector newValueVector = createTableEntry(newValueName, displayProperties);
+      ((DefaultTableModel)optionTable.getModel()).addRow(newValueVector);
+      firePropertyChangedEvent(newValue);
+      this.setChanged(true);
+
+      optionTable.getSelectionModel().setSelectionInterval(optionTable.getModel().getRowCount(), optionTable.getModel().getRowCount() -1);
+    } catch (PropertyValueVetoException pvve) {
+      manager.getFactory().showError(getPropertyEditorPane().getContainer(), "Error adding value " + newValueName + " to " + property + ":  " + pvve.getReason());
+    }
   }
 
   /**

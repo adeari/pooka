@@ -10,6 +10,11 @@
 	-- save to sent folder option
 	*) check disablefilters; make sure they all work
   *) wizard
+	*) fix new user / smtp server; make sure that new smtp server
+		is only given if there is a new user.
+		*) done.  make sure that naming of user / smtp server
+		   only happens if you are creating a new one.
+	*) make sure it works from new startup
 	*) fix getCurrentProperty(); right now a default property isn't
 		returned properly.
 	*) imap to pop -- losing server name setting?
@@ -18,6 +23,7 @@
 	  *) make basic wizard work
 	  *) check all settings/required/etc
 	    *) smtp auth
+	*) add server checks.
   *) folder
   *) preferences
   *) address book

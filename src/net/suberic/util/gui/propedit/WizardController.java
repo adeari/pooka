@@ -6,8 +6,8 @@ import java.util.*;
  */
 public class WizardController {
   String template;
-  String mState;
-  List<String> mStateList = null;
+  protected String mState;
+  protected List<String> mStateList = null;
   WizardEditorPane editorPane;
   PropertyEditorManager manager;
 
@@ -100,7 +100,7 @@ public class WizardController {
    * state to state.
    */
   public void checkStateTransition(String oldState, String newState) throws PropertyValueVetoException {
-    editorPane.setValue(oldState);
+    //editorPane.setValue(oldState);
   }
 
   /**
@@ -132,7 +132,7 @@ public class WizardController {
    * Finsihes the wizard.
    */
   public void finishWizard() throws PropertyValueVetoException {
-    getManager().commit();
+    //getManager().commit();
     getEditorPane().getWizardContainer().closeWizard();
   }
 
