@@ -1,3 +1,9 @@
+*) editors:
+  *)  get new store wizard working.
+  *)  update other editors
+  *)  add new user wizard (?)
+  *)  do help
+
  ----- ui update
   *) Store editor:
 	*) make settings work
@@ -25,6 +31,16 @@
 	    *) smtp auth
 	*) add server checks.
   *) folder
+	*) defaultProfile
+	*) useTrashFolder (???)
+	*) notification 
+	*) (if imap) caching
+	*) display variables
+	*) backend filters
+	*) ui
+	*) logging
+	*) automatically check for new messages & check interval
+
   *) preferences
   *) address book
   *) outgoing servers
@@ -98,6 +114,8 @@
  	at net.suberic.pooka.gui.MessageProxy.moveMessage(MessageProxy.java:800)
 	at net.suberic.pooka.filter.MoveFilterAction.performFilter(MoveFilterAction.java:33)
         at net.suberic.pooka.MessageInfo.runSpamAction(MessageInfo.java:795)
+
+*) fix:  waiting for search to run dialog looks terrible.
 
 -----
 
