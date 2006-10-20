@@ -1,5 +1,8 @@
 *) editors:
   *)  get new store wizard working.
+	*) get new user and new smtp server working.
+	*) get wizard working from new user startup
+	*) add in explanatory text/help
   *)  update other editors
   *)  add new user wizard (?)
   *)  do help

@@ -148,10 +148,32 @@ public class NewStoreWizardController extends WizardController {
     addAll(userProperties);
     addAll(smtpProperties);
 
-    // now add this value to the store editor.
+    // now add the values to the store, user, and smtp server editors,
+    // if necessary.
     MultiEditorPane mep = (MultiEditorPane) getManager().getPropertyEditor("Store");
-    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
-    mep.addNewValue(accountName);
+    if (mep != null) {
+      String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+      mep.addNewValue(accountName);
+    }
+
+    String defaultUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
+    if (defaultUser.equals("__new")) {
+      String userName = getManager().getCurrentProperty("NewStoreWizard.editors.user.userName", "");
+      mep = (MultiEditorPane) getManager().getPropertyEditor("User");
+      if (mep != null) {
+        mep.addNewValue(userName);
+      }
+
+      String defaultSmtpServer = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
+      if (defaultSmtpServer.equals("__new")) {
+        String smtpServerName = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.smtpServerName", "");
+        mep = (MultiEditorPane) getManager().getPropertyEditor("OutgoingServer");
+        if (mep != null) {
+          mep.addNewValue(smtpServerName);
+        }
+      }
+    }
+
 
     getEditorPane().getWizardContainer().closeWizard();
   }
@@ -212,13 +234,25 @@ public class NewStoreWizardController extends WizardController {
   public Properties createUserProperties() {
     Properties returnValue = new Properties();
 
-    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+    String storeName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
 
     String defaultUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
     if (defaultUser.equals("__new")) {
+      String from = getManager().getCurrentProperty("NewStoreWizard.editors.user.from", "test@example.com");
+      String fromPersonal = getManager().getCurrentProperty("NewStoreWizard.editors.user.fromPersonal", "");
+      String replyTo = getManager().getCurrentProperty("NewStoreWizard.editors.user.replyTo", "");
+      String replyToPersonal = getManager().getCurrentProperty("NewStoreWizard.editors.user.replyToPersonal", "");
 
+      String userName = getManager().getCurrentProperty("NewStoreWizard.editors.user.userName", from);
+
+      returnValue.setProperty("User." + userName + ".mailHeaders.From", from );
+      returnValue.setProperty("User." + userName + ".mailHeaders.FromPersonal", fromPersonal);
+      returnValue.setProperty("User." + userName + ".mailHeaders.ReplyTo", replyTo);
+      returnValue.setProperty("User." + userName + ".mailHeaders.ReplyToPersonal", replyToPersonal);
+
+      returnValue.setProperty("Store." + storeName + ".defaultProfile", userName);
     } else {
-      returnValue.setProperty("Store." + accountName + ".defaultProfile", defaultUser);
+      returnValue.setProperty("Store." + storeName + ".defaultProfile", defaultUser);
     }
     return returnValue;
   }
@@ -229,16 +263,34 @@ public class NewStoreWizardController extends WizardController {
   public Properties createSmtpProperties() {
     Properties returnValue = new Properties();
 
-    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
+    String defaultUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
+    // only make smtp server changes if there's a new user.
+    if (defaultUser.equals("__new")) {
+      String userName = getManager().getCurrentProperty("NewStoreWizard.editors.user.userName", "newuser");
 
-    String smtpServer = getManager().getCurrentProperty("NewStoreWizard.editors.user.smtp.outgoingServer", "__default");
-    if (smtpServer.equals("__new")) {
+      String defaultSmtpServer = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
+      if (defaultSmtpServer.equals("__new")) {
+        String serverName = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.smtpServerName", "newSmtpServer");
+        String server = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.server", "");
+        String port = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.port", "");
+        String authenticated = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.authenticated", "");
+        String user = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.user", "");
+        String password = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.password", "");
 
-    } else {
-      //returnValue.setProperty("Store." + accountName + ".defaultProfile", defaultUser);
+        returnValue.setProperty("OutgoingServer." + serverName + ".server", server);
+        returnValue.setProperty("OutgoingServer." + serverName + ".port", port);
+        returnValue.setProperty("OutgoingServer." + serverName + ".authenticated", authenticated);
+        if (authenticated.equalsIgnoreCase("true")) {
+
+          returnValue.setProperty("OutgoingServer." + serverName + ".user", user );
+          returnValue.setProperty("OutgoingServer." + serverName + ".password", password);
+        }
+
+        returnValue.setProperty("user." + userName + ".mailServer", serverName);
+      } else {
+        returnValue.setProperty("User." + userName + ".mailServer", defaultSmtpServer);
+      }
     }
-    //returnValue.setProperty("Store." + accountName + ".connection", Pooka.getProperty("Pooka.connection.defaultName", "default"));
-    //returnValue.setProperty("OutgoingServer." + smtpServerName + ".sendOnConnect", "true");
     return returnValue;
   }
 
