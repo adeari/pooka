@@ -159,7 +159,7 @@ public class NewStoreWizardController extends WizardController {
     String defaultUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
     if (defaultUser.equals("__new")) {
       String userName = getManager().getCurrentProperty("NewStoreWizard.editors.user.userName", "");
-      mep = (MultiEditorPane) getManager().getPropertyEditor("User");
+      mep = (MultiEditorPane) getManager().getPropertyEditor("UserProfile");
       if (mep != null) {
         mep.addNewValue(userName);
       }
@@ -245,10 +245,10 @@ public class NewStoreWizardController extends WizardController {
 
       String userName = getManager().getCurrentProperty("NewStoreWizard.editors.user.userName", from);
 
-      returnValue.setProperty("User." + userName + ".mailHeaders.From", from );
-      returnValue.setProperty("User." + userName + ".mailHeaders.FromPersonal", fromPersonal);
-      returnValue.setProperty("User." + userName + ".mailHeaders.ReplyTo", replyTo);
-      returnValue.setProperty("User." + userName + ".mailHeaders.ReplyToPersonal", replyToPersonal);
+      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.From", from );
+      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.FromPersonal", fromPersonal);
+      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyTo", replyTo);
+      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyToPersonal", replyToPersonal);
 
       returnValue.setProperty("Store." + storeName + ".defaultProfile", userName);
     } else {
@@ -286,9 +286,9 @@ public class NewStoreWizardController extends WizardController {
           returnValue.setProperty("OutgoingServer." + serverName + ".password", password);
         }
 
-        returnValue.setProperty("user." + userName + ".mailServer", serverName);
+        returnValue.setProperty("UserProfile." + userName + ".mailServer", serverName);
       } else {
-        returnValue.setProperty("User." + userName + ".mailServer", defaultSmtpServer);
+        returnValue.setProperty("UserProfile." + userName + ".mailServer", defaultSmtpServer);
       }
     }
     return returnValue;

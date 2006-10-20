@@ -7,6 +7,10 @@
   *)  add new user wizard (?)
   *)  do help
 
+*) major bug:  make sure that internal error messages aren't bigger than
+	the screen view.
+*) major bug:  removing a store current doesn't close the open connection(s).
+
  ----- ui update
   *) Store editor:
 	*) make settings work
