@@ -405,7 +405,6 @@ public class MessageInfo {
       return baos.toString();
     } catch (IOException ioe) {
       MessagingException returnValue = new MessagingException("Error reading Message Stream", ioe);
-      returnValue.initCause(ioe);
       throw returnValue;
     }
   }
@@ -418,7 +417,6 @@ public class MessageInfo {
       folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
     } catch (MessagingException me) {
       MessagingException returnValue = new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
-      returnValue.initCause(me);
       throw returnValue;
     }
 
@@ -426,7 +424,6 @@ public class MessageInfo {
       remove(expunge);
     } catch (MessagingException me) {
       MessagingException returnValue = new MessagingException(Pooka.getProperty("error.Message.RemoveErrorMessage", "Error:  could not remove messages from folder:  ") + targetFolder.toString() +"\n", me);
-      returnValue.initCause(me);
       throw returnValue;
     }
   }
@@ -439,7 +436,6 @@ public class MessageInfo {
       folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
     } catch (MessagingException me) {
       MessagingException returnValue = new MessagingException (Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
-      returnValue.initCause(me);
       throw returnValue;
     }
 
