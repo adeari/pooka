@@ -21,7 +21,7 @@ import net.suberic.pooka.gui.FolderTableModel;
 
 public class UIDFolderInfo extends FolderInfo {
   protected HashMap uidToInfoTable = new HashMap();
-  protected long uidValidity;
+  protected long uidValidity = -1000;
 
   // the resource for the folder disconnected message
   protected static String disconnectedMessage = "error.UIDFolder.disconnected";
@@ -129,7 +129,9 @@ public class UIDFolderInfo extends FolderInfo {
     if (isNowOpen) {
       setStatus(CONNECTED);
       try {
-        uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
+        if (uidValidity == -1000) {
+          uidValidity = ((UIDFolder) getFolder()).getUIDValidity();
+        }
         if (getFolderTableModel() != null)
           synchronizeCache();
       } catch (Exception e) { }

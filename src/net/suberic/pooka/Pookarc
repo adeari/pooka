@@ -143,6 +143,7 @@ FolderTable.Attachments.value=attachments
 FolderTable.Attachments.profileItems=Content-Type
 FolderTable.Attachments.icon=Attachment.small
 FolderTable.Crypto.value=crypto
+FolderTable.Crypto.size=15
 FolderTable.Crypto.profileItems=Content-Type
 FolderTable.Crypto.icon=Encrypted.small
 #FolderTable.Attachments.class=net.suberic.pooka.gui.AttachmentCellRenderer
