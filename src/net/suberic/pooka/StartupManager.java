@@ -1,8 +1,10 @@
 package net.suberic.pooka;
 import net.suberic.pooka.gui.*;
-import net.suberic.util.VariableBundle;
 import net.suberic.pooka.resource.*;
 import net.suberic.pooka.messaging.*;
+import net.suberic.util.VariableBundle;
+import net.suberic.util.gui.propedit.PropertyEditorFactory;
+import net.suberic.util.gui.propedit.PropertyEditorManager;
 
 import java.awt.*;
 import javax.swing.*;
@@ -160,8 +162,9 @@ public class StartupManager {
             if (panel.getContentPanel() instanceof MessagePanel) {
               SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                    NewAccountPooka nap = new NewAccountPooka((MessagePanel) Pooka.getMainPanel().getContentPanel());
-                    nap.start();
+                    PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
+                    System.err.println("Pooka.getMainPanel() = " + Pooka.getMainPanel());
+                    factory.showNewEditorWindow(Pooka.getProperty("Store._newValueWizard.label", "Create New Account"), "Store._newValueWizard", "Store._newValueWizard", "Store._newValueWizard", new PropertyEditorManager(factory.getSourceBundle(), factory, factory.getIconManager() ), Pooka.getMainPanel());
                   }
                 });
             }

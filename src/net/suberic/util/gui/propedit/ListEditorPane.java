@@ -102,11 +102,18 @@ public class ListEditorPane extends LabelValuePropertyEditor {
       if (manager.getProperty(editorTemplate + "." + INCLUDE_NEW_OPTION, "false").equalsIgnoreCase("true")) {
         tokens.add(0, SELECTION_NEW);
       }
-      if (manager.getProperty(editorTemplate + "." + INCLUDE_DEFAULT_OPTION, "false").equalsIgnoreCase("true")) {
-        tokens.add(0, SELECTION_DEFAULT);
+      if (tokens != null && tokens.size() > 0) {
+        if (manager.getProperty(editorTemplate + "." + INCLUDE_DEFAULT_OPTION, "false").equalsIgnoreCase("true")) {
+          tokens.add(0, SELECTION_DEFAULT);
+        }
       }
     } else {
-      tokens = manager.getPropertyAsList(editorTemplate + "." + ALLOWED_VALUES, "");
+      if (manager.getProperty(editorTemplate + "." + INCLUDE_NEW_OPTION, "false").equalsIgnoreCase("true")) {
+        tokens = new ArrayList<String>();
+        tokens.add(0, SELECTION_NEW);
+      } else {
+        tokens = manager.getPropertyAsList(editorTemplate + "." + ALLOWED_VALUES, "");
+      }
     }
 
     for (int i = 0; i < tokens.size(); i++) {
@@ -151,9 +158,15 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     }
 
     if (originalIndex == -1) {
-      items.add(originalValue);
-      labelToValueMap.put(originalValue, originalValue);
-      originalIndex = items.size() - 1;
+      // if there are no valid values and we have a new value option, then
+      // don't add the current value if it's the default option.
+      if (! (manager.getProperty(editorTemplate + "." + INCLUDE_NEW_OPTION, "false").equalsIgnoreCase("true") && SELECTION_DEFAULT.equalsIgnoreCase(originalValue))) {
+        items.add(originalValue);
+        labelToValueMap.put(originalValue, originalValue);
+        originalIndex = items.size() - 1;
+      } else {
+        originalIndex = 0;
+      }
     }
 
     JComboBox jcb = new JComboBox(items);

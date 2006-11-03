@@ -76,14 +76,13 @@ public class NewStoreWizardController extends WizardController {
         serverEditor.resetDefaultValue();
 
       }
-    } else if (newState.equals("storeName") && oldState.equals("outgoingServer")) {
+    } else if (newState.equals("storeName")) {
       String user = getManager().getCurrentProperty("NewStoreWizard.editors.store.user", "");
       String server = getManager().getCurrentProperty("NewStoreWizard.editors.store.server", "");
       String storeName = user + "@" + server;
-      getManager().setProperty("NewStoreWizard.editors.store.storeName", storeName);
       PropertyEditorUI storeNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.store.storeName");
-      storeNameEditor.setOriginalValue(storeName);
-      storeNameEditor.resetDefaultValue();
+
+      setUniqueProperty(storeNameEditor, storeName, "NewStoreWizard.editors.store.storeName");
 
       String smtpServerName = "";
 
@@ -101,15 +100,11 @@ public class NewStoreWizardController extends WizardController {
       } else if (userProfileName.equalsIgnoreCase("__default")) {
         userProfileName = getManager().getProperty("NewStoreWizard.editors.user.userProfile.listMapping.__default.label", "< Global Default Profile >");
       }
-      getManager().setProperty("NewStoreWizard.editors.user.userName", userProfileName);
       PropertyEditorUI userProfileNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.userName");
-      userProfileNameEditor.setOriginalValue(userProfileName);
-      userProfileNameEditor.resetDefaultValue();
+      setUniqueProperty(userProfileNameEditor, userProfileName, "NewStoreWizard.editors.user.userName");
 
-      getManager().setProperty("NewStoreWizard.editors.smtp.smtpServerName", smtpServerName);
       PropertyEditorUI smtpServerNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.smtp.smtpServerName");
-      smtpServerNameEditor.setOriginalValue(smtpServerName);
-      smtpServerNameEditor.resetDefaultValue();
+      setUniqueProperty(smtpServerNameEditor, smtpServerName, "NewStoreWizard.editors.smtp.smtpServerName");
     }
   }
 
@@ -121,14 +116,11 @@ public class NewStoreWizardController extends WizardController {
     if (current > -1 && current < (mStateList.size() -1)) {
       String newState = mStateList.get(current + 1);
       // if we're not creating a new user, skip the smtp server step.
-      System.err.println("nextState = " + newState);
       if (newState.equals("outgoingServer")) {
         String newUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", ListEditorPane.SELECTION_DEFAULT);
         if (! newUser.equalsIgnoreCase(ListEditorPane.SELECTION_NEW)) {
-          System.err.println("not new.");
           if (current < (mStateList.size() -2)) {
             newState = mStateList.get(current + 2);
-            System.err.println("nextStore = " + newState);
           }
         }
       }
@@ -327,8 +319,25 @@ public class NewStoreWizardController extends WizardController {
   void addAll(Properties props) {
     Set<String> names = props.stringPropertyNames();
     for (String name: names) {
-      System.err.println("setting property " + name + ", value " + props.getProperty(name));
       getManager().setProperty(name, props.getProperty(name));
+    }
+  }
+
+  public void setUniqueProperty(PropertyEditorUI editor, String originalValue, String propertyName) {
+    String value = originalValue;
+    boolean success = false;
+    for (int i = 0 ; ! success &&  i < 10; i++) {
+      if (i != 0) {
+        value = originalValue + "_" + i;
+      }
+      try {
+        editor.setOriginalValue(value);
+        editor.resetDefaultValue();
+        getManager().setProperty(propertyName, value);
+        success = true;
+      } catch (PropertyValueVetoException pvve) {
+        // on an exception, just start over.
+      }
     }
   }
 }

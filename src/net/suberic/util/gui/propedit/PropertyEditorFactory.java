@@ -95,7 +95,7 @@ public class PropertyEditorFactory {
    * Creates and displays an editor window.
    */
   public void showNewEditorWindow(String title, String property, String template) {
-    showNewEditorWindow(title, property, template, null);
+    showNewEditorWindow(title, property, template, new PropertyEditorManager(sourceBundle, this, iconManager));
   }
 
   /**
