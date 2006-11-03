@@ -155,6 +155,15 @@ public class PropertyEditorManager {
   }
 
   /**
+   * Returns a formatted message using the given key and the appropriate
+   * objects.  If no message corresponding to the given key exists, uses
+   * the key string as the pattern instead.
+   */
+  public String formatMessage(String key, Object... arguments) {
+    return sourceBundle.formatMessage(key, arguments);
+  }
+
+  /**
    * Commits the changes to the underlying VariableBundle.
    */
   public void commit() {

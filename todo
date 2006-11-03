@@ -1,6 +1,10 @@
 *) editors:
   *)  get new store wizard working.
-	*) get new user and new smtp server working.
+	*) fix unique filter.
+	*) ? test creating stores; make sure that we're getting the
+	   correct editor al the time
+	*) make sure that removing stores, users, etc. removes all
+	   subsettings too.
 	*) get wizard working from new user startup
 	*) add in explanatory text/help
   *)  update other editors

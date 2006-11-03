@@ -84,6 +84,32 @@ public class NewStoreWizardController extends WizardController {
       PropertyEditorUI storeNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.store.storeName");
       storeNameEditor.setOriginalValue(storeName);
       storeNameEditor.resetDefaultValue();
+
+      String smtpServerName = "";
+
+      // set the username
+      String userProfileName= getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
+      if (userProfileName.equalsIgnoreCase("__new")) {
+        userProfileName = getManager().getCurrentProperty("NewStoreWizard.editors.user.from", "");
+        // set the smtp server name only for new users
+        smtpServerName= getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
+        if (smtpServerName.equalsIgnoreCase("__new")) {
+          smtpServerName = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.server", "");
+        } else if (smtpServerName.equalsIgnoreCase("__default")) {
+          smtpServerName = getManager().getProperty("NewStoreWizard.editors.smtp.outgoingServer.listMapping.__default.label", "< Global Default SMTP Server >");
+        }
+      } else if (userProfileName.equalsIgnoreCase("__default")) {
+        userProfileName = getManager().getProperty("NewStoreWizard.editors.user.userProfile.listMapping.__default.label", "< Global Default Profile >");
+      }
+      getManager().setProperty("NewStoreWizard.editors.user.userName", userProfileName);
+      PropertyEditorUI userProfileNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.userName");
+      userProfileNameEditor.setOriginalValue(userProfileName);
+      userProfileNameEditor.resetDefaultValue();
+
+      getManager().setProperty("NewStoreWizard.editors.smtp.smtpServerName", smtpServerName);
+      PropertyEditorUI smtpServerNameEditor = getManager().getPropertyEditor("NewStoreWizard.editors.smtp.smtpServerName");
+      smtpServerNameEditor.setOriginalValue(smtpServerName);
+      smtpServerNameEditor.resetDefaultValue();
     }
   }
 
