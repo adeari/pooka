@@ -24,8 +24,8 @@ Pooka.exitToIcon.notify=false
 
 Message.sendImmediately=true
 
-Pooka.hsize=800
-Pooka.vsize=600
+Pooka.hsize=900
+Pooka.vsize=675
 
 Pooka.guiType=Desktop
 

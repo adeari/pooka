@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui.propedit;
 import java.util.*;
 import net.suberic.util.gui.propedit.*;
+import net.suberic.util.VariableBundle;
 
 /**
  * The controller class for the NewStoreWizard.
@@ -168,10 +169,12 @@ public class NewStoreWizardController extends WizardController {
 
     // now add the values to the store, user, and smtp server editors,
     // if necessary.
+    String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
     MultiEditorPane mep = (MultiEditorPane) getManager().getPropertyEditor("Store");
     if (mep != null) {
-      String accountName = getManager().getCurrentProperty("NewStoreWizard.editors.store.storeName", "testStore");
       mep.addNewValue(accountName);
+    } else {
+      appendProperty("Store", accountName);
     }
 
     String defaultUser = getManager().getCurrentProperty("NewStoreWizard.editors.user.userProfile", "__default");
@@ -180,6 +183,8 @@ public class NewStoreWizardController extends WizardController {
       mep = (MultiEditorPane) getManager().getPropertyEditor("UserProfile");
       if (mep != null) {
         mep.addNewValue(userName);
+      } else {
+        appendProperty("UserProfile", userName);
       }
 
       String defaultSmtpServer = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
@@ -188,6 +193,9 @@ public class NewStoreWizardController extends WizardController {
         mep = (MultiEditorPane) getManager().getPropertyEditor("OutgoingServer");
         if (mep != null) {
           mep.addNewValue(smtpServerName);
+        } else {
+          // if there's no editor, then set the value itself.
+          appendProperty("OutgoingServer", smtpServerName);
         }
       }
     }
@@ -339,5 +347,14 @@ public class NewStoreWizardController extends WizardController {
         // on an exception, just start over.
       }
     }
+  }
+
+  /**
+   * Appends the given value to the property.
+   */
+  public void appendProperty(String property, String value) {
+    List<String> current = getManager().getPropertyAsList(property, "");
+    current.add(value);
+    getManager().setProperty(property, VariableBundle.convertToString(current));
   }
 }

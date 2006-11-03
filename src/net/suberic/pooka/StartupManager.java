@@ -162,9 +162,7 @@ public class StartupManager {
             if (panel.getContentPanel() instanceof MessagePanel) {
               SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                    PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
-                    System.err.println("Pooka.getMainPanel() = " + Pooka.getMainPanel());
-                    factory.showNewEditorWindow(Pooka.getProperty("Store._newValueWizard.label", "Create New Account"), "Store._newValueWizard", "Store._newValueWizard", "Store._newValueWizard", new PropertyEditorManager(factory.getSourceBundle(), factory, factory.getIconManager() ), Pooka.getMainPanel());
+                    new FirstRunWizard().start();
                   }
                 });
             }
