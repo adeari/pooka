@@ -37,7 +37,7 @@ public class FirstRunWizard {
       PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
       System.err.println("Pooka.getMainPanel() = " + Pooka.getMainPanel());
       PropertyEditorManager manager = new PropertyEditorManager(factory.getSourceBundle(), factory, factory.getIconManager());
-      factory.showNewEditorWindow(Pooka.getProperty("Store._newValueWizard.label", "Create New Account"), "Store._newValueWizard", "Store._newValueWizard", "Store._newValueWizard", manager, Pooka.getMainPanel());
+      factory.showNewEditorWindow(Pooka.getProperty("Pooka._firstRunWizard.label", "Create New Account"), "Pooka._firstRunWizard", "Pooka._firstRunWizard", "Pooka._firstRunWizard", manager, Pooka.getMainPanel());
 
       manager.commit();
       //useLocalFiles = Pooka.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("true");

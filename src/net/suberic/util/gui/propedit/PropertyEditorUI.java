@@ -99,6 +99,11 @@ public interface PropertyEditorUI {
   public void setValue() throws PropertyValueVetoException;
 
   /**
+   * This checks that the currently configured value is valid.
+   */
+  public void validateProperty() throws PropertyValueVetoException;
+
+  /**
    * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */

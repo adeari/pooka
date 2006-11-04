@@ -129,9 +129,20 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
    * to the source VariableBundle.
    */
   public void setValue() throws PropertyValueVetoException {
+    validateProperty();
     if (currentKeyValue != null) {
       PropertyEditorUI selectedEditor = idToEditorMap.get(currentKeyValue);
       selectedEditor.setValue();
+    }
+  }
+
+  /**
+   * Validates the currently selected editor.
+   */
+  public void validateProperty() throws PropertyValueVetoException {
+    if (currentKeyValue != null) {
+      PropertyEditorUI selectedEditor = idToEditorMap.get(currentKeyValue);
+      selectedEditor.validateProperty();
     }
   }
 

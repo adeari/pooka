@@ -8,7 +8,8 @@ import net.suberic.util.*;
  */
 public class TextMessageEditorPane extends SwingPropertyEditor {
   protected JLabel label;
-  protected JTextField textField = null;
+  //protected JTextField textField = null;
+
 
   /**
    * @param propertyName The property to be edited.
@@ -36,8 +37,8 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
     //layout.putConstraint(SpringLayout.WEST, mainLabel, 0, SpringLayout.WEST, this);
     //layout.putConstraint(SpringLayout.NORTH, mainLabel, 0, SpringLayout.NORTH, this);
 
-    textField = new JTextField(manager.getProperty(editorTemplate + ".message", "No message."));
-    this.add(textField);
+    label = new JLabel(manager.getProperty(editorTemplate + ".message", "No message."));
+    this.add(label);
 
   }
 
@@ -48,6 +49,16 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
    * A no-op in this case.
    */
   public void setValue() {
+
+  }
+
+  /**
+   * This writes the currently configured value in the PropertyEditorUI
+   * to the source VariableBundle.
+   *
+   * A no-op in this case.
+   */
+  public void validateProperty() {
 
   }
 
@@ -91,8 +102,10 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
   public void setEnabled(boolean newValue) {
     if (label != null)
       label.setEnabled(newValue);
+    /*
     if (textField != null)
       textField.setEnabled(newValue);
+    */
   }
 
   /**

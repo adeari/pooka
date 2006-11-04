@@ -100,8 +100,16 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
   /**
    * Sets the value for this PropertyEditor.
    */
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
+    validateProperty();
     getFilterEditor().setValue();
+  }
+
+  /**
+   * Validates this PropertyEditor.
+   */
+  public void validateProperty() throws PropertyValueVetoException {
+    getFilterEditor().validate();
   }
 
   /**

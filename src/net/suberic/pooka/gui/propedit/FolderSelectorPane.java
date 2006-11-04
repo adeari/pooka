@@ -185,10 +185,17 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI
 
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
+    validateProperty();
     getLogger().fine("calling fsp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
     if (isEnabled() && isChanged())
       manager.setProperty(property, (String)valueDisplay.getText());
+  }
+
+  public void validateProperty() throws PropertyValueVetoException {
+    getLogger().fine("calling fsp.validateProperty().  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
+    if (isEnabled())
+      firePropertyCommittingEvent((String)valueDisplay.getText());
   }
 
   public java.util.Properties getValue() {

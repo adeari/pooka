@@ -29,7 +29,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     new AddAction(),
     new EditAction(),
     new DeleteAction()
-      };
+  };
 
   ConfigurablePopupMenu popupMenu;
 
@@ -109,42 +109,42 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     addressTable.setRowSelectionAllowed(true);
 
     addressTable.addMouseListener(new MouseAdapter() {
-  public void mouseClicked(MouseEvent e) {
-    if (e.getClickCount() == 2) {
-      int rowIndex = addressTable.rowAtPoint(e.getPoint());
-      if (rowIndex != -1) {
-        addressTable.setRowSelectionInterval(rowIndex, rowIndex);
-        AddressBookEntry selectedEntry = getSelectedEntry();
-        if (selectedEntry != null) {
-    editEntry(selectedEntry);
+        public void mouseClicked(MouseEvent e) {
+          if (e.getClickCount() == 2) {
+            int rowIndex = addressTable.rowAtPoint(e.getPoint());
+            if (rowIndex != -1) {
+              addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+              AddressBookEntry selectedEntry = getSelectedEntry();
+              if (selectedEntry != null) {
+                editEntry(selectedEntry);
+              }
+            }
+          }
         }
-      }
-    }
-  }
 
-  public void mousePressed(MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      // see if anything is selected
-      int rowIndex = addressTable.rowAtPoint(e.getPoint());
-      if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
-        addressTable.setRowSelectionInterval(rowIndex, rowIndex);
-      }
+        public void mousePressed(MouseEvent e) {
+          if (e.isPopupTrigger()) {
+            // see if anything is selected
+            int rowIndex = addressTable.rowAtPoint(e.getPoint());
+            if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
+              addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+            }
 
-      showPopupMenu(addressTable, e);
-    }
-  }
+            showPopupMenu(addressTable, e);
+          }
+        }
 
-  public void mouseReleased(MouseEvent e) {
-    if (e.isPopupTrigger()) {
-      // see if anything is selected
-      int rowIndex = addressTable.rowAtPoint(e.getPoint());
-      if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
-        addressTable.setRowSelectionInterval(rowIndex, rowIndex);
-      }
+        public void mouseReleased(MouseEvent e) {
+          if (e.isPopupTrigger()) {
+            // see if anything is selected
+            int rowIndex = addressTable.rowAtPoint(e.getPoint());
+            if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
+              addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+            }
 
-      showPopupMenu(addressTable, e);
-    }
-  }
+            showPopupMenu(addressTable, e);
+          }
+        }
       });
 
     updateTableModel(new AddressBookEntry[0]);
@@ -256,24 +256,28 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
   public void setValue() {
     if (book != null) {
       try {
-  book.saveAddressBook();
+        book.saveAddressBook();
       } catch (Exception e) {
-  Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
-  e.printStackTrace();
+        Pooka.getUIFactory().showError(Pooka.getProperty("error.AddressBook.saveAddressBook", "Error saving Address Book:  ") + e.getMessage());
+        e.printStackTrace();
       }
     } else {
       // if we're setting the value on this editor, then we might also be
       // creating the edited AddressBook.  see if that's true.
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      AddressBook newBook = Pooka.getAddressBookManager().getAddressBook(bookName);
-      if (newBook != null) {
-        book = newBook;
-        setEnabled(true);
-      }
+          public void run() {
+            AddressBook newBook = Pooka.getAddressBookManager().getAddressBook(bookName);
+            if (newBook != null) {
+              book = newBook;
+              setEnabled(true);
+            }
+          }
+        });
     }
-  });
-    }
+  }
+
+  public void validateProperty() {
+
   }
 
   public java.util.Properties getValue() {
@@ -333,35 +337,35 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
 
     public String getColumnName(int index) {
       if (index == 0) {
-  return Pooka.getProperty("AddressBookTable.personalName", "Name");
+        return Pooka.getProperty("AddressBookTable.personalName", "Name");
       } else if (index == 1) {
-  return Pooka.getProperty("AddressBookTable.firstName", "First Name");
+        return Pooka.getProperty("AddressBookTable.firstName", "First Name");
       } else if (index == 2) {
-  return Pooka.getProperty("AddressBookTable.lastName", "Last Name");
+        return Pooka.getProperty("AddressBookTable.lastName", "Last Name");
       } else if (index == 3) {
-  return Pooka.getProperty("AddressBookTable.address", "Email Address");
+        return Pooka.getProperty("AddressBookTable.address", "Email Address");
       } else {
-  return null;
+        return null;
       }
     }
 
     public Object getValueAt(int row, int column) {
       if (row < 0 || column < 0 || row >= getRowCount() || column >= getColumnCount())
-  return null;
+        return null;
 
       AddressBookEntry currentEntry = entries[row];
 
       if (column == 0) {
-  return currentEntry.getID();
+        return currentEntry.getID();
       }
       if (column == 1) {
-  return currentEntry.getFirstName();
+        return currentEntry.getFirstName();
       }
       if (column == 2) {
-  return currentEntry.getLastName();
+        return currentEntry.getLastName();
       }
       if (column == 3) {
-  return currentEntry.getAddressString();
+        return currentEntry.getAddressString();
       }
 
       return null;
@@ -382,12 +386,12 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
       int length;
 
       if (entries != null) {
-  length = entries.length;
-  newEntries = new AddressBookEntry[length + 1];
-  System.arraycopy(entries, 0, newEntries, 0, length);
+        length = entries.length;
+        newEntries = new AddressBookEntry[length + 1];
+        System.arraycopy(entries, 0, newEntries, 0, length);
       } else {
-  length = 0;
-  newEntries = new AddressBookEntry[1];
+        length = 0;
+        newEntries = new AddressBookEntry[1];
       }
       newEntries[length] = e;
 
@@ -403,19 +407,19 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
       boolean found = false;
 
       for (int i = 0; !found && i < entries.length; i++) {
-  if (e == entries[i]) {
-    found = true;
-    int removedRow = i;
-    AddressBookEntry[] newEntries = new AddressBookEntry[entries.length - 1];
-    if (removedRow != 0)
-      System.arraycopy(entries, 0, newEntries, 0, removedRow);
+        if (e == entries[i]) {
+          found = true;
+          int removedRow = i;
+          AddressBookEntry[] newEntries = new AddressBookEntry[entries.length - 1];
+          if (removedRow != 0)
+            System.arraycopy(entries, 0, newEntries, 0, removedRow);
 
-    if (removedRow != entries.length -1)
-      System.arraycopy(entries, removedRow + 1, newEntries, removedRow, entries.length - removedRow - 1);
+          if (removedRow != entries.length -1)
+            System.arraycopy(entries, removedRow + 1, newEntries, removedRow, entries.length - removedRow - 1);
 
-    entries = newEntries;
-    fireTableRowsDeleted(removedRow, removedRow);
-  }
+          entries = newEntries;
+          fireTableRowsDeleted(removedRow, removedRow);
+        }
       }
     }
   }

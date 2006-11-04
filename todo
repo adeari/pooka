@@ -1,11 +1,23 @@
 *) editors:
   *)  get new store wizard working.
-	*) fix unique filter.
+	*) problem:  we're not actually running validation between 
+		screens, it seems.
 	*) ? test creating stores; make sure that we're getting the
 	   correct editor al the time
 	*) make sure that removing stores, users, etc. removes all
 	   subsettings too.
 	*) get wizard working from new user startup
+	   -- new user startup needs to set the following in addition
+	      to current values:
+	  	*) set up default connection for smtp server
+		*) and for the store.
+		*) test connections:  mail store, smtp server
+		*) set up sent folder and outbox
+		*) set up Pooka.cacheDirectory
+		*) connect sent folder and outbox to user and smtp server
+		*) set Pooka.defaultMailSubDir????
+		*) set Pooka.sslCertFile
+		*) create default address book
 	*) add in explanatory text/help
   *)  update other editors
   *)  add new user wizard (?)

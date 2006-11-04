@@ -265,23 +265,28 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    * This writes the currently configured value in the PropertyEditorUI
    * to the source VariableBundle.
    */
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
     int newIndex = inputField.getSelectedIndex();
     String currentValue = (String)labelToValueMap.get(inputField.getSelectedItem());
-    try {
-      if (newIndex != currentIndex) {
-        firePropertyChangingEvent(currentValue);
-        firePropertyChangedEvent(currentValue);
-        currentIndex = newIndex;
-      }
 
-      if (isEnabled() && isChanged()) {
-        manager.setProperty(property, currentValue);
-      }
-    } catch (PropertyValueVetoException pvve) {
-      manager.getFactory().showError(inputField, "Error changing value " + label.getText() + " to " + currentValue + ":  " + pvve.getReason());
-      inputField.setSelectedIndex(currentIndex);
+    if (isEnabled() && isChanged()) {
+      manager.setProperty(property, currentValue);
     }
+  }
+
+
+  /**
+   * This checks that the currently configured value is valid.
+   */
+  public void validateProperty() throws PropertyValueVetoException {
+    int newIndex = inputField.getSelectedIndex();
+    String currentValue = (String)labelToValueMap.get(inputField.getSelectedItem());
+    if (newIndex != currentIndex) {
+      firePropertyChangingEvent(currentValue);
+      firePropertyChangedEvent(currentValue);
+      currentIndex = newIndex;
+    }
+    firePropertyCommittingEvent(currentValue);
   }
 
   /**

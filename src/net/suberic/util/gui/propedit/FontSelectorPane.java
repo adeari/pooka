@@ -173,6 +173,13 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
     }
   }
 
+  public void validateProperty() throws PropertyValueVetoException {
+    if (isEnabled()) {
+      //System.err.println("setting value for " + property);
+      firePropertyCommittingEvent((String)valueDisplay.getText());
+    }
+  }
+
   /**
    * Returns the current values of the edited properties as a
    * java.util.Properties object.

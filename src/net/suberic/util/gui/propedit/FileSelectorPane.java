@@ -145,9 +145,21 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
    * This writes the currently configured value in the PropertyEditorUI
    * to the source PropertyEditorManager.
    */
-  public void setValue() {
-    if (isEnabled() && isChanged())
-      manager.setProperty(property, (String)valueDisplay.getText());
+  public void setValue() throws PropertyValueVetoException {
+    if (isEnabled()) {
+      validateProperty();
+      if (isChanged())
+        manager.setProperty(property, (String)valueDisplay.getText());
+    }
+  }
+
+  /**
+   * Validates the selected value.
+   */
+  public void validateProperty() throws PropertyValueVetoException {
+    if (isEnabled()) {
+      firePropertyCommittingEvent((String)valueDisplay.getText());
+    }
   }
 
   /**

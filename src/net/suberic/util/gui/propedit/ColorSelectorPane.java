@@ -167,6 +167,12 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
     }
   }
 
+  public void validateProperty() throws PropertyValueVetoException {
+    if (isEnabled()) {
+      firePropertyCommittingEvent(Integer.toString(currentColor.getRGB()));
+    }
+  }
+
   /**
    * Returns the current values of the edited properties as a
    * java.util.Properties object.

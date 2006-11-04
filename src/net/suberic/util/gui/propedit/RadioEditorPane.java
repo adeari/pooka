@@ -114,6 +114,25 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
    * to the source VariableBundle.
    */
   public void setValue() throws PropertyValueVetoException {
+    validateProperty();
+    ButtonModel selectedModel = buttonGroup.getSelection();
+    String currentValue = "";
+    if (selectedModel != null) {
+      currentValue = selectedModel.getActionCommand();
+    }
+
+    firePropertyCommittingEvent(currentValue);
+
+    if (isEnabled() && isChanged()) {
+      manager.setProperty(property, currentValue);
+    }
+    lastSelected = selectedModel;
+  }
+
+  /**
+   * This checks that the currently configured value is valid.
+   */
+  public void validateProperty() throws PropertyValueVetoException {
     ButtonModel selectedModel = buttonGroup.getSelection();
     String currentValue = "";
     if (selectedModel != null) {
@@ -126,11 +145,6 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
     }
 
     firePropertyCommittingEvent(currentValue);
-
-    if (isEnabled() && isChanged()) {
-      manager.setProperty(property, currentValue);
-    }
-    lastSelected = selectedModel;
   }
 
   /**

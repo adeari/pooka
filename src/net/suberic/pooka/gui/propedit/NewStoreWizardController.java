@@ -20,7 +20,7 @@ public class NewStoreWizardController extends WizardController {
    * state to state.
    */
   public void checkStateTransition(String oldState, String newState) throws PropertyValueVetoException {
-    //getEditorPane().setValue(oldState);
+    getEditorPane().validateProperty(oldState);
     if (newState.equals("userInfo") && oldState.equals("storeConfig")) {
       // load default values into the user configuration.
       //System.err.println("moving to userInfo; setting default values.");

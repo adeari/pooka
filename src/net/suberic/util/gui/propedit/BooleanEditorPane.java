@@ -91,8 +91,9 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   /**
    * as defined in net.suberic.util.gui.PropertyEditorUI
    */
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
     if (isEnabled()) {
+      validateProperty();
       if (inputField.isSelected() != originalBoolean || manager.getProperty(property, "unset").equals("unset")) {
         String newValue;
         if (inputField.isSelected())
@@ -102,6 +103,21 @@ public class BooleanEditorPane extends SwingPropertyEditor {
 
         manager.setProperty(property, newValue);
       }
+    }
+  }
+
+  /**
+   * as defined in net.suberic.util.gui.PropertyEditorUI
+   */
+  public void validateProperty() throws PropertyValueVetoException {
+    if (isEnabled()) {
+      String newValue;
+      if (inputField.isSelected())
+        newValue = "true";
+      else
+        newValue = "false";
+
+      firePropertyCommittingEvent(newValue);
     }
   }
 

@@ -57,11 +57,19 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
   }
 
   /**
-   *
+   * Commits the value for the given state.
    */
   public void setValue(String state) throws PropertyValueVetoException {
     SwingPropertyEditor editor = layoutMap.get(state);
     editor.setValue();
+  }
+
+  /**
+   * Validates the given state.
+   */
+  public void validateProperty(String state) throws PropertyValueVetoException {
+    SwingPropertyEditor editor = layoutMap.get(state);
+    editor.validateProperty();
   }
 
   /**

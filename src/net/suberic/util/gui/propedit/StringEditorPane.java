@@ -67,17 +67,24 @@ public class StringEditorPane extends LabelValuePropertyEditor {
    * to the source PropertyEditorManager.
    */
   public void setValue() throws PropertyValueVetoException {
+    validateProperty();
+    if (isEnabled() && !(inputField.getText().equals(originalValue))) {
+      manager.setProperty(property, inputField.getText());
+    }
+  }
+
+  /**
+   * This checks that the currently configured value is valid.
+   */
+  public void validateProperty() throws PropertyValueVetoException {
     if (isEnabled() && !(inputField.getText().equals(currentValue))) {
       firePropertyChangingEvent(inputField.getText());
       firePropertyChangedEvent(inputField.getText());
     }
 
     firePropertyCommittingEvent(inputField.getText());
-
-    if (isEnabled() && !(inputField.getText().equals(originalValue))) {
-      manager.setProperty(property, inputField.getText());
-    }
   }
+
 
   /**
    * Returns the current values of the edited properties as a

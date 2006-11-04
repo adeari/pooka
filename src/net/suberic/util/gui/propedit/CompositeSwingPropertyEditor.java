@@ -62,11 +62,36 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     }
   }
 
+  public void validateProperty() throws PropertyValueVetoException {
+
+    if (isEnabled()) {
+      List<PropertyValueVetoException> exceptionList = new ArrayList<PropertyValueVetoException>();
+      for (int i = 0; i < editors.size() ; i++) {
+        try {
+          editors.get(i).validateProperty();
+        } catch (PropertyValueVetoException pvve) {
+          exceptionList.add(pvve);
+        }
+      }
+      if (exceptionList.size() > 0) {
+        StringBuilder builder = new StringBuilder();
+        Iterator<PropertyValueVetoException> iter = exceptionList.iterator();
+        while (iter.hasNext()) {
+          PropertyValueVetoException pvve = iter.next();
+          builder.append(pvve.getMessage());
+          if (iter.hasNext())
+            builder.append("\r\n");
+        }
+        throw new PropertyValueVetoException(builder.toString());
+      }
+    }
+  }
+
   /**
    * This resets the editor to the original (or latest set, if setValue()
    * has been called) value of the edited property.
    */
-  public void resetDefaultValue() throws PropertyValueVetoException {
+    public void resetDefaultValue() throws PropertyValueVetoException {
     if (isEnabled()) {
       for (int i = 0; i < editors.size() ; i++) {
         editors.get(i).resetDefaultValue();

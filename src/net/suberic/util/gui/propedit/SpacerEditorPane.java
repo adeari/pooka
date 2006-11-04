@@ -44,6 +44,9 @@ public class SpacerEditorPane extends SwingPropertyEditor {
   public void setValue() {
 
   }
+  public void validateProperty() {
+
+  }
 
   /**
    * Returns the current values of the edited properties as a

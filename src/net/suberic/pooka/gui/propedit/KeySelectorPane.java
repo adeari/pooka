@@ -70,9 +70,9 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
 
     try {
       if (keyType.equalsIgnoreCase("private"))
-  keySet = Pooka.getCryptoManager().privateKeyAliases(encryptionType);
+        keySet = Pooka.getCryptoManager().privateKeyAliases(encryptionType);
       else
-  keySet = Pooka.getCryptoManager().publicKeyAliases(encryptionType);
+        keySet = Pooka.getCryptoManager().publicKeyAliases(encryptionType);
     } catch (java.security.KeyStoreException kse) {
       keySet = null;
     }
@@ -87,7 +87,7 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
 
     if (originalValue != null && originalValue != "") {
       if (! listModel.contains(originalValue))
-  listModel.add(originalValue);
+        listModel.add(originalValue);
       JComboBox returnValue = new JComboBox(listModel);
       returnValue.setSelectedItem(originalValue);
 
@@ -101,7 +101,8 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI
 
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
+    validateProperty();
     if (Pooka.isDebug())
       System.out.println("calling ksp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
 
@@ -111,6 +112,16 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
 
     if (isEnabled() && isChanged()) {
       manager.setProperty(property, newValue);
+    }
+  }
+
+  public void validateProperty() throws PropertyValueVetoException {
+    String newValue = (String) valueDisplay.getSelectedItem();
+    if (newValue == null)
+      newValue = "";
+
+    if (isEnabled()) {
+      firePropertyCommittingEvent(newValue);
     }
   }
 
