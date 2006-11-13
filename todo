@@ -1,7 +1,5 @@
 *) editors:
   *)  get new store wizard working.
-	*) problem:  we're not actually running validation between 
-		screens, it seems.
 	*) ? test creating stores; make sure that we're getting the
 	   correct editor al the time
 	*) make sure that removing stores, users, etc. removes all
@@ -19,6 +17,8 @@
 		*) set Pooka.sslCertFile
 		*) create default address book
 	*) add in explanatory text/help
+	*) make welcome screen look/read better
+	*) fix new store creation -- get no protocol error, then it works.
   *)  update other editors
   *)  add new user wizard (?)
   *)  do help

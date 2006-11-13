@@ -7,7 +7,7 @@ import net.suberic.util.*;
  *
  */
 public class TextMessageEditorPane extends SwingPropertyEditor {
-  protected JLabel label;
+  protected JTextArea textArea;
   //protected JTextField textField = null;
 
 
@@ -32,13 +32,19 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
     //JLabel mainLabel = new JLabel(manager.getProperty(editorTemplate + ".label", defaultLabel));
 
     //this.add(mainLabel);
-    this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), manager.getProperty(editorTemplate + ".label", defaultLabel)));
+    this.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), manager.getProperty(editorTemplate + ".label", defaultLabel)));
     //System.err.println("radioeditorpane:  mainLabel = " + mainLabel.getText());
     //layout.putConstraint(SpringLayout.WEST, mainLabel, 0, SpringLayout.WEST, this);
     //layout.putConstraint(SpringLayout.NORTH, mainLabel, 0, SpringLayout.NORTH, this);
 
-    label = new JLabel(manager.getProperty(editorTemplate + ".message", "No message."));
-    this.add(label);
+    //label = new JLabel(manager.getProperty(editorTemplate + ".message", "No message."));
+    //this.add(label);
+    textArea = new JTextArea(manager.getProperty(editorTemplate + ".message", "No message."));
+    textArea.setEditable(false);
+    JLabel testLab = new JLabel();
+    textArea.setBackground(testLab.getBackground());
+    textArea.setFont(testLab.getFont());
+    this.add(textArea);
 
   }
 
@@ -100,8 +106,8 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
    * editors should not be able to do setValue() calls.
    */
   public void setEnabled(boolean newValue) {
-    if (label != null)
-      label.setEnabled(newValue);
+    if (textArea != null)
+      textArea.setEnabled(newValue);
     /*
     if (textField != null)
       textField.setEnabled(newValue);
