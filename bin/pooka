@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Runs Pooka.
+script_dir=`dirname $0`
+pooka_home=${script_dir}/..
+p_impdir=${pooka_home}/Imported
+
+pooka_cp=${p_impdir}/activation.jar:${p_impdir}/mail.jar:${p_impdir}/mbox.jar:${p_impdir}/jh.jar:${p_impdir}/javamaildir.jar:${pooka_home}/Build/classes:${p_impdir}/bcprov-jdk15-133.jar:${p_impdir}/bcmail-jdk15-133.jar:${p_impdir}/linspire_clear.jar
+pooka_cp=${pooka_cp}:${p_impdir}/htmlparser.jar
+pooka_cp=${pooka_cp}:${p_impdir}/cryptix-jce-provider.jar:${p_impdir}/cryptix-jce-api.jar:${p_impdir}/cryptix-pki-api.jar:${p_impdir}/cryptix-openpgp-provider.jar:${p_impdir}/cryptix-message-api.jar:${p_impdir}/javamail-crypto.jar
+pooka_cp=${pooka_cp}:${pooka_impdir}/providers/cryptix/Dist/javamail-crypto-cryptix-openpgp.jar:${pooka_impdir}/providers/bouncycastle/Dist/javamail-crypto-bouncycastle-smime.jar:${p_impdir}/jdic.jar
+
+java -client -Xmx128M -splash:${pooka_home}/Build/classes/net/suberic/pooka/gui/images/PookaSplashscreen.jpg -cp ${pooka_cp} net.suberic.pooka.Pooka
