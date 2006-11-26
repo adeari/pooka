@@ -153,6 +153,10 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    */
   public void openFolderWindow(FolderInternalFrame newFolderWindow, boolean selectWindow) {
 
+    if (! SwingUtilities.isEventDispatchThread()) {
+      System.err.println("running openFolderWindow while not on EventDispatchThread.");
+      Thread.currentThread().dumpStack();
+    }
     if (newFolderWindow.getDesktopPane() != this) {
       setLayer(newFolderWindow, JLayeredPane.DEFAULT_LAYER.intValue());
       String folderProperty = newFolderWindow.getFolderInfo().getFolderProperty();

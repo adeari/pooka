@@ -172,9 +172,7 @@ public class PropertyEditorManager {
         sourceBundle.removeProperty(removeProp);
       }
 
-      for (String property: localProps.stringPropertyNames()) {
-        sourceBundle.setProperty(property, localProps.getProperty(property));
-      }
+      sourceBundle.setAllProperties(localProps);
 
       sourceBundle.saveProperties();
     }

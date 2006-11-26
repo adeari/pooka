@@ -169,6 +169,9 @@ public class VariableBundle extends Object {
     return properties;
   }
 
+  /**
+   * Sets the Properties object for this VariableBundle.
+   */
   public void setProperties(Properties newProperties) {
     properties = newProperties;
   }
@@ -190,6 +193,26 @@ public class VariableBundle extends Object {
       unRemoveProperty(propertyName);
     }
     fireValueChanged(propertyName);
+  }
+
+  /**
+   * Sets a group of properties at once, not firing any valueChanged events
+   * until all properties are set.
+   */
+  public void setAllProperties(Properties properties) {
+    for (String propertyName: properties.stringPropertyNames()) {
+      String propertyValue = properties.getProperty(propertyName);
+      temporaryProperties.remove(propertyName);
+      writableProperties.setProperty(propertyName, propertyValue);
+      if (propertyValue == null || propertyValue.equalsIgnoreCase("")) {
+        removeProperty(propertyName);
+      } else {
+        unRemoveProperty(propertyName);
+      }
+    }
+    for (String propertyName: properties.stringPropertyNames()) {
+      fireValueChanged(propertyName);
+    }
   }
 
   /**

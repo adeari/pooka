@@ -35,7 +35,6 @@ public class FirstRunWizard {
       setupAddressBook();
 
       PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
-      System.err.println("Pooka.getMainPanel() = " + Pooka.getMainPanel());
       PropertyEditorManager manager = new PropertyEditorManager(factory.getSourceBundle(), factory, factory.getIconManager());
       factory.showNewEditorWindow(Pooka.getProperty("Pooka._firstRunWizard.label", "Create New Account"), "Pooka._firstRunWizard", "Pooka._firstRunWizard", "Pooka._firstRunWizard", manager, Pooka.getMainPanel());
 
@@ -48,6 +47,14 @@ public class FirstRunWizard {
       Pooka.getOutgoingMailManager().loadOutboxFolders();
     } catch (Exception e) {
       Pooka.getUIFactory().showError("Error setting up new account", e);
+    }
+
+    // now open the inbox.
+
+    try {
+      openInbox();
+    } catch (Exception e) {
+      Pooka.getUIFactory().showError("Error opening inbox", e);
     }
 
   }
@@ -300,7 +307,7 @@ public class FirstRunWizard {
   }
 
   public void showConfirmation() {
-    JOptionPane.showInternalMessageDialog(Pooka.getMainPanel(), Pooka.getProperty("FirstRunWizard.finishedMessage", "Email account configured!  If you need to make changes,\nor to add new accounts, go to the Configuration menu."), Pooka.getProperty("FirstRunWizard.finishedMessage.title", "Done!"), JOptionPane.INFORMATION_MESSAGE);
+    JOptionPane.showMessageDialog(Pooka.getMainPanel(), Pooka.getProperty("FirstRunWizard.finishedMessage", "Email account configured!  If you need to make changes,\nor to add new accounts, go to the Configuration menu."), Pooka.getProperty("FirstRunWizard.finishedMessage.title", "Done!"), JOptionPane.INFORMATION_MESSAGE);
 
   }
 
