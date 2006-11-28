@@ -36,7 +36,7 @@ public class FirstRunWizard {
 
       PropertyEditorFactory factory = Pooka.getUIFactory().getEditorFactory();
       PropertyEditorManager manager = new PropertyEditorManager(factory.getSourceBundle(), factory, factory.getIconManager());
-      factory.showNewEditorWindow(Pooka.getProperty("Pooka._firstRunWizard.label", "Create New Account"), "Pooka._firstRunWizard", "Pooka._firstRunWizard", "Pooka._firstRunWizard", manager, Pooka.getMainPanel());
+      factory.showNewEditorWindow(Pooka.getProperty("Pooka._firstRunWizard.label", "Create New Account"), "Pooka._firstRunWizard", "Pooka._firstRunWizard", "Pooka._firstRunWizard", manager, Pooka.getMainPanel().getParentFrame());
 
       manager.commit();
       //useLocalFiles = Pooka.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("true");
@@ -45,6 +45,7 @@ public class FirstRunWizard {
 
       Pooka.getStoreManager().loadAllSentFolders();
       Pooka.getOutgoingMailManager().loadOutboxFolders();
+      Pooka.getPookaManager().getResources().saveProperties();
     } catch (Exception e) {
       Pooka.getUIFactory().showError("Error setting up new account", e);
     }
@@ -56,6 +57,7 @@ public class FirstRunWizard {
     } catch (Exception e) {
       Pooka.getUIFactory().showError("Error opening inbox", e);
     }
+    showConfirmation();
 
   }
 
@@ -271,30 +273,15 @@ public class FirstRunWizard {
                       javax.swing.JTree folderTree = ((FolderPanel)mtn.getParentContainer()).getFolderTree();
                       folderTree.scrollPathToVisible(new javax.swing.tree.TreePath(mtn.getPath()));
                     }
-
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                          Pooka.getUIFactory().clearStatus();
-
-                          showConfirmation();
-                        }
-                      });
                   }
                 });
             } catch (MessagingException me) {
               final MessagingException error = me;
               me.printStackTrace();
               javax.swing.SwingUtilities.invokeLater( new Runnable() {
-
                   public void run() {
                     Pooka.getUIFactory().clearStatus();
-                    StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.FirstRunWizard.connectingToStore", "Failed to connect to store.  \nReceived the following error:\n"));
-                    errorMessage.append(error.getMessage());
-                    errorMessage.append("\n\n");
-                    errorMessage.append(Pooka.getProperty("error.FirstRunWizard.continueMessage.noCancel", "Would you like to re-enter your information?"));
-
-                    JLabel jta = new JLabel(errorMessage.toString());
-                    int continueResponse = JOptionPane.showOptionDialog(Pooka.getMainPanel().getContentPanel().getUIComponent(), errorMessage.toString(), "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE,  null, new Object[] { "Re-enter", "Continue" }, "Re-enter");
+                    Pooka.getUIFactory().showError("Error opening inbox", error);
                   }
                 });
             }

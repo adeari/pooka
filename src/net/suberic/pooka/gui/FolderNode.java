@@ -416,7 +416,6 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   public void openFolder(boolean pReconnect, boolean pSelectFolder) {
 
     try {
-      System.err.println("in open folder:  thread = " + Thread.currentThread());
       getFolderInfo().loadAllMessages();
 
       if (! getFolderInfo().isSortaOpen() || (pReconnect && ! getFolderInfo().isConnected())) {

@@ -113,9 +113,7 @@ public class PropertyEditorFactory {
   }
 
   public void showNewEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
-    JDialog jd = (JDialog) createEditorWindow(title, property, template, propertyBase, mgr, window);
-
-    jd.setVisible(true);
+    showNewEditorWindow(title, createEditor(property, template, propertyBase, mgr, true), window);
   }
 
   /**

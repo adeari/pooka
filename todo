@@ -1,10 +1,10 @@
 *) editors:
   *)  get new store wizard working.
-	*) ? test creating stores; make sure that we're getting the
-	   correct editor al the time
-	*) make sure that removing stores, users, etc. removes all
-	   subsettings too.
 	*) get wizard working from new user startup
+	  *) make welcome screen look/read better
+	  *) first field should be selected.
+	  *) fix on failure message.
+	  *) add success message (?)
 	   -- new user startup needs to set the following in addition
 	      to current values:
 	  	*) set up default connection for smtp server
@@ -17,8 +17,10 @@
 		*) set Pooka.sslCertFile
 		*) create default address book
 	*) add in explanatory text/help
-	*) make welcome screen look/read better
-	*) fix new store creation -- get no protocol error, then it works.
+	*) ? test creating stores; make sure that we're getting the
+	   correct editor al the time
+	*) make sure that removing stores, users, etc. removes all
+	   subsettings too.
   *)  update other editors
   *)  add new user wizard (?)
   *)  do help
