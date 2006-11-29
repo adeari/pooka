@@ -141,4 +141,15 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
       return getProperty();
     }
   }
+
+  /**
+   * Accepts or rejects the initial focus for this component.
+   */
+  public boolean acceptDefaultFocus() {
+    if (enabled) {
+      return valueComponent.requestFocusInWindow();
+    } else {
+      return false;
+    }
+  }
 }

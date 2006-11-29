@@ -214,4 +214,21 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
     return labelString;
   }
 
+  /**
+   * Accepts or rejects the initial focus for this component.
+   */
+  public boolean acceptDefaultFocus() {
+    if (enabled) {
+      Enumeration<AbstractButton> buttonEnum = buttonGroup.getElements();
+      while (buttonEnum.hasMoreElements()) {
+        AbstractButton button = buttonEnum.nextElement();
+        if (button.requestFocusInWindow())
+          return true;
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }
+
 }

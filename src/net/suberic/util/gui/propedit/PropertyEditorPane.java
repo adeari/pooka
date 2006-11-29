@@ -74,6 +74,8 @@ public class PropertyEditorPane extends JPanel {
 
     pepLayout(editorComponent, buttonPanel);
 
+    editor.acceptDefaultFocus();
+
   }
 
   /**

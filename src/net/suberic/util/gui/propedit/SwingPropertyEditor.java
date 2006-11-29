@@ -276,4 +276,11 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   public void remove() {
     manager.removePropertyEditorListeners(getProperty());
   }
+
+  /**
+   * Accepts or rejects the initial focus for this component.
+   */
+  public boolean acceptDefaultFocus() {
+    return false;
+  }
 }

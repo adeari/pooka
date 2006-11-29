@@ -319,6 +319,22 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     }
   }
 
+  /**
+   * Accepts or rejects the initial focus for this component.
+   */
+  public boolean acceptDefaultFocus() {
+    if (editors != null) {
+      for (SwingPropertyEditor editor: editors) {
+        if (editor.acceptDefaultFocus()) {
+          return true;
+        }
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }
+
 
 }
 

@@ -21,6 +21,7 @@
 	   correct editor al the time
 	*) make sure that removing stores, users, etc. removes all
 	   subsettings too.
+  *)  key bindings for editors (!!)
   *)  update other editors
   *)  add new user wizard (?)
   *)  do help

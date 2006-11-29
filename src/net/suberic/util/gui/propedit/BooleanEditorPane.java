@@ -175,5 +175,17 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   public String getDisplayValue() {
     return label;
   }
+
+  /**
+   * Accepts or rejects the initial focus for this component.
+   */
+  public boolean acceptDefaultFocus() {
+    if (enabled && inputField.isRequestFocusEnabled()) {
+      return inputField.requestFocusInWindow();
+    } else {
+      return false;
+    }
+  }
+
 }
 
