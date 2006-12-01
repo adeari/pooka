@@ -155,9 +155,9 @@ public class NewStoreWizardController extends WizardController {
 
 
   /**
-   * Finsihes the wizard.
+   * Saves all of the properties for this wizard.
    */
-  public void finishWizard() throws PropertyValueVetoException {
+  protected void saveProperties() throws PropertyValueVetoException {
     Properties storeProperties = createStoreProperties();
     Properties userProperties = createUserProperties();
     Properties smtpProperties = createSmtpProperties();
@@ -199,8 +199,13 @@ public class NewStoreWizardController extends WizardController {
         }
       }
     }
+  }
 
-
+  /**
+   * Finsihes the wizard.
+   */
+  public void finishWizard() throws PropertyValueVetoException {
+    saveProperties();
     getEditorPane().getWizardContainer().closeWizard();
   }
 
