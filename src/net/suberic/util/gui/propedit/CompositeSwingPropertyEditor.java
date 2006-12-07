@@ -39,7 +39,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    * to the source VariableBundle.
    */
   public void setValue() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       List<PropertyValueVetoException> exceptionList = new ArrayList<PropertyValueVetoException>();
       for (int i = 0; i < editors.size() ; i++) {
         try {
@@ -64,7 +64,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
 
   public void validateProperty() throws PropertyValueVetoException {
 
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       List<PropertyValueVetoException> exceptionList = new ArrayList<PropertyValueVetoException>();
       for (int i = 0; i < editors.size() ; i++) {
         try {
@@ -92,7 +92,7 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
    * has been called) value of the edited property.
    */
     public void resetDefaultValue() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       for (int i = 0; i < editors.size() ; i++) {
         editors.get(i).resetDefaultValue();
       }
@@ -111,22 +111,6 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     }
 
     return currentRetValue;
-  }
-
-  /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
-   */
-  public void setEnabled(boolean newValue) {
-    // commented out for now; if we re-enable this, we need to make sure
-    // that the original values are kept (i.e. if an editor were disabled,
-    // and all of the editors were then disabled and then enabled, the
-    // disabled editor should stay disabled.
-
-    //for (int i = 0; i < editors.size() ; i++) {
-    //  ((PropertyEditorUI) editors.get(i)).setEnabled(newValue);
-    //}
-    //enabled=newValue;
   }
 
   /**
@@ -272,6 +256,37 @@ public abstract class CompositeSwingPropertyEditor extends SwingPropertyEditor {
     layout.putConstraint(SpringLayout.SOUTH, parent, southBoundary, SpringLayout.SOUTH, labelComponents[labelComponents.length - 1]);
     //Set the parent's size.
     //pCons.setConstraint(SpringLayout.EAST, Spring.sum(fullWidth, Spring.constant(initialX)));
+  }
+
+  /**
+   * Adds a disable mask to the PropertyEditorUI.
+   */
+  public void addDisableMask(Object key) {
+    disableMaskSet.add(key);
+    updateEditorEnabled();
+  }
+
+  /**
+   * Removes the disable mask keyed by this Object.
+   */
+  public void removeDisableMask(Object key) {
+    disableMaskSet.remove(key);
+    updateEditorEnabled();
+  }
+
+  /**
+   * Run when the PropertyEditor may have changed enabled states.
+   */
+  protected void updateEditorEnabled() {
+    if (isEditorEnabled()) {
+      for(PropertyEditorUI editor: editors) {
+        editor.removeDisableMask(this);
+      }
+    } else {
+      for(PropertyEditorUI editor: editors) {
+        editor.addDisableMask(this);
+      }
+    }
   }
 
   /**

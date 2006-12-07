@@ -13,10 +13,9 @@ public class PasswordEditorPane extends StringEditorPane {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     originalScrambledValue = manager.getProperty(property, "");
     if (!originalScrambledValue.equals(""))
@@ -49,7 +48,7 @@ public class PasswordEditorPane extends StringEditorPane {
       });
     this.add(label);
     this.add(inputField);
-    this.setEnabled(enabled);
+    updateEditorEnabled();
 
     labelComponent = label;
     valueComponent = inputField;
@@ -64,12 +63,12 @@ public class PasswordEditorPane extends StringEditorPane {
   public void setValue() throws PropertyValueVetoException {
     String value = new String(((JPasswordField)inputField).getPassword());
 
-    if (isEnabled() && ! (value.equals(currentValue))) {
+    if (isEditorEnabled() && ! (value.equals(currentValue))) {
       firePropertyChangingEvent(value);
       firePropertyChangedEvent(value);
     }
 
-    if (isEnabled() && !(value.equals(originalValue))) {
+    if (isEditorEnabled() && !(value.equals(originalValue))) {
       manager.setProperty(property, scrambleString(value));
     }
   }

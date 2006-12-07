@@ -21,7 +21,6 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
   JTextField searchEntryField;
   JTable addressTable;
   JButton editButton, addButton, deleteButton, searchButton;
-  boolean enabled = true;
 
   PropertyEditorManager manager;
 
@@ -39,14 +38,9 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     // we're going to have "AddressBook." at the beginning, and
     // ".addressListEditor" at the end...
@@ -77,7 +71,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     popupMenu.configureComponent("AddressBookEditor.popupMenu", manager.getFactory().getSourceBundle());
     popupMenu.setActive(getActions());
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
   }
 
   /**
@@ -269,7 +263,7 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
             AddressBook newBook = Pooka.getAddressBookManager().getAddressBook(bookName);
             if (newBook != null) {
               book = newBook;
-              setEnabled(true);
+              updateEditorEnabled();
             }
           }
         });
@@ -298,17 +292,16 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     return false;
   }
 
-  public void setEnabled(boolean newValue) {
-    if (book != null)
-      enabled = newValue;
-    else
-      enabled = false;
+  /**
+   * Run when the PropertyEditor may have changed enabled states.
+   */
+  protected void updateEditorEnabled() {
 
-    searchButton.setEnabled(enabled);
-    addButton.setEnabled(enabled);
-    editButton.setEnabled(enabled);
-    deleteButton.setEnabled(enabled);
-    searchEntryField.setEnabled(enabled);
+    searchButton.setEnabled(isEditorEnabled());
+    addButton.setEnabled(isEditorEnabled());
+    editButton.setEnabled(isEditorEnabled());
+    deleteButton.setEnabled(isEditorEnabled());
+    searchEntryField.setEnabled(isEditorEnabled());
   }
 
 

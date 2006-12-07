@@ -31,13 +31,15 @@ public class FirstRunWizardController extends NewStoreWizardController {
    */
   public void finishWizard() throws PropertyValueVetoException {
     saveProperties();
-
+    getEditorPane().addDisableMask(this);
     getManager().commit();
     setupFolders();
+    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("Pooka._firstRunWizard.status.loadingFolders", "Loading folders..."));
     Pooka.getStoreManager().loadAllSentFolders();
     Pooka.getOutgoingMailManager().loadOutboxFolders();
     Pooka.getPookaManager().getResources().saveProperties();
 
+    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("Pooka._firstRunWizard.status.openingInbox", "Opening Inbox..."));
     openInbox();
 
   }
@@ -158,8 +160,13 @@ public class FirstRunWizardController extends NewStoreWizardController {
                   }
                 });
             } catch (MessagingException me) {
+              Pooka.getUIFactory().clearStatus();
+              me.printStackTrace();
               int continueValue = handleInvalidEntry(me.getMessage());
               if (continueValue == JOptionPane.YES_OPTION) {
+                getEditorPane().removeDisableMask(FirstRunWizardController.this);
+                // remove all of the properties we just set.
+                clearProperties();
                 mState = "storeConfig";
                 getEditorPane().loadState("storeConfig");
               } else {
@@ -175,10 +182,12 @@ public class FirstRunWizardController extends NewStoreWizardController {
   }
 
   private void openInboxSuccess() {
+    Pooka.getUIFactory().clearStatus();
     getEditorPane().getWizardContainer().closeWizard();
   }
 
   public int handleInvalidEntry(String message) {
+    System.err.println("invalid entry.");
     StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
     if (message != null && message.length() > 0) {
       errorMessage.append("\n");
@@ -198,4 +207,33 @@ public class FirstRunWizardController extends NewStoreWizardController {
   }
 
 
+  /**
+   * Clears the proprties for this wizard.
+   */
+  private void clearProperties() {
+
+    System.err.println("removing properties.");
+    /*
+    Set<String> removeProperties = getManager().getPropertyNamesStartingWith("Store");
+    for (String prop: removeProperties) {
+      System.err.println("removing property " + prop);
+      getManager().removeProperty(prop);
+    }
+    removeProperties = getManager().getPropertyNamesStartingWith("User");
+    for (String prop: removeProperties) {
+      System.err.println("removing property " + prop);
+      getManager().removeProperty(prop);
+    }
+    removeProperties = getManager().getPropertyNamesStartingWith("OutgoingServer");
+    for (String prop: removeProperties) {
+      System.err.println("removing property " + prop);
+      getManager().removeProperty(prop);
+    }
+    */
+    getManager().setProperty("Store", "");
+    getManager().commit();
+
+    System.err.println("getManager().getProperty(\"Store\") = " + getManager().getProperty("Store", ""));
+
+  }
 }

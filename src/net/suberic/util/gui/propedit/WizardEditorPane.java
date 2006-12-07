@@ -17,8 +17,8 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
   /**
    * Configures the editor.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     editors = new ArrayList<SwingPropertyEditor>();
 
@@ -49,7 +49,7 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
     for (String stateString: stateList) {
       String subProperty = createSubProperty(manager.getProperty(editorTemplate + "._states." + stateString + ".editor", ""));
       String subTemplate = createSubTemplate(manager.getProperty(editorTemplate + "._states." + stateString + ".editor", ""));
-      SwingPropertyEditor newEditor = (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subTemplate, manager, true);
+      SwingPropertyEditor newEditor = (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subTemplate, manager);
       layoutMap.put(stateString, newEditor);
       this.add(stateString, newEditor);
       editors.add(newEditor);

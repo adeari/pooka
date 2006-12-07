@@ -25,10 +25,9 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     if (debug) {
       System.out.println("property is " + property + "; editorTemplate is " + editorTemplate);
@@ -48,7 +47,7 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
     valueComponent = tmpPanel;
     this.add(tmpPanel);
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
 
   }
 
@@ -104,13 +103,13 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
   public void setValue() throws PropertyValueVetoException {
     validateProperty();
     if (Pooka.isDebug())
-      System.out.println("calling ksp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
+      System.out.println("calling ksp.setValue.  isEditorEnabled() = " + isEditorEnabled() + "; isChanged() = " + isChanged());
 
     String newValue = (String) valueDisplay.getSelectedItem();
     if (newValue == null)
       newValue = "";
 
-    if (isEnabled() && isChanged()) {
+    if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property, newValue);
     }
   }
@@ -120,7 +119,7 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
     if (newValue == null)
       newValue = "";
 
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       firePropertyCommittingEvent(newValue);
     }
   }
@@ -145,17 +144,16 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
     return (!(originalValue.equals(valueDisplay.getSelectedItem())));
   }
 
-  public void setEnabled(boolean newValue) {
+  /**
+   * Run when the PropertyEditor may have changed enabled states.
+   */
+  protected void updateEditorEnabled() {
     if (Pooka.isDebug())
-      System.out.println("calling ksp.setEnabled(" + newValue + ")");
+      System.out.println("calling ksp.updateEditorEnabled().  isEditorEnabled() = " + isEditorEnabled());
 
     if (valueDisplay != null) {
-      valueDisplay.setEnabled(newValue);
+      valueDisplay.setEnabled(isEditorEnabled());
     }
-    if (Pooka.isDebug())
-      System.out.println("set enabled to " + newValue);
-
-    enabled=newValue;
   }
 
 }

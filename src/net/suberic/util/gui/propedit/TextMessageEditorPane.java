@@ -8,7 +8,6 @@ import net.suberic.util.*;
  */
 public class TextMessageEditorPane extends SwingPropertyEditor {
   protected JTextArea textArea;
-  //protected JTextField textField = null;
 
 
   /**
@@ -17,10 +16,9 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     String defaultLabel;
     int dotIndex = editorTemplate.lastIndexOf(".");
@@ -102,16 +100,11 @@ public class TextMessageEditorPane extends SwingPropertyEditor {
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     if (textArea != null)
-      textArea.setEnabled(newValue);
-    /*
-    if (textField != null)
-      textField.setEnabled(newValue);
-    */
+      textArea.setEnabled(isEnabled());
   }
 
   /**

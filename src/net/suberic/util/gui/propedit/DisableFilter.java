@@ -131,11 +131,19 @@ public class DisableFilter extends PropertyEditorAdapter implements Configurable
     }
     if (source != null) {
       //System.err.println("setting source editor to " + enable);
-      source.setEnabled(enable);
+      if (enable) {
+        source.removeDisableMask(this);
+      } else {
+        source.addDisableMask(this);
+      }
     } else {
       //System.err.println("getPropertyEditor(" + property + ")=" + manager.getPropertyEditor(property));
       if (manager.getPropertyEditor(property) != null)
-        manager.getPropertyEditor(property).setEnabled(enable);
+        if (enable) {
+          manager.getPropertyEditor(property).removeDisableMask(this);
+        } else {
+          manager.getPropertyEditor(property).addDisableMask(this);
+        }
     }
   }
 }

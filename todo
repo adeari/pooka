@@ -1,10 +1,16 @@
 *) editors:
+  
   *)  get new store wizard working.
 	*) get wizard working from new user startup
-	  *) make welcome screen look/read better
-	  *) first field should be selected.
 	  *) fix on failure message.
-		-- need to clear out properties when connection fails.
+		-- works on failure to login but continue anyway.
+		-- connect fails takes too long without showing feedback.
+			looks like nothing is happening.
+		-- re-enter properties fails.
+		   need to clear out properties when connection fails.
+		-- cancelling out of wizard still shows success message.
+	  *) add key accelerators to buttons
+	  *) make welcome screen look/read better
 	  *) add success message (?)
 	*) add in explanatory text/help
 	*) ? test creating stores; make sure that we're getting the
@@ -15,7 +21,7 @@
   *)  update other editors
   *)  add new user wizard (?)
   *)  do help
-
+	*) fix help display w/new modal editor
 *) major bug:  make sure that internal error messages aren't bigger than
 	the screen view.
 *) major bug:  removing a store current doesn't close the open connection(s).

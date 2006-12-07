@@ -31,9 +31,8 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
@@ -87,7 +86,7 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
     //this.add(inputButton);
     this.add(tmpPanel);
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
 
     manager.registerPropertyEditor(property, this);
   }
@@ -160,7 +159,7 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
    * to the source PropertyEditorManager.
    */
   public void setValue() {
-    if (isEnabled() && isChanged()) {
+    if (isEditorEnabled() && isChanged()) {
       //System.err.println("setting value for " + property);
       manager.setProperty(property, (String)valueDisplay.getText());
 
@@ -174,7 +173,7 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
   }
 
   public void validateProperty() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       //System.err.println("setting value for " + property);
       firePropertyCommittingEvent((String)valueDisplay.getText());
     }
@@ -220,30 +219,28 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     if (useEnabledBox) {
-      enabledBox.setEnabled(newValue);
+      enabledBox.setEnabled(isEditorEnabled());
       //inputButton.setEnabled(newValue && enabledBox.isSelected());
 
       if (inputButton != null) {
-        inputButton.setEnabled(newValue && enabledBox.isSelected());
+        inputButton.setEnabled(isEditorEnabled() && enabledBox.isSelected());
       }
       if (valueDisplay != null) {
-        valueDisplay.setEnabled(newValue && enabledBox.isSelected());
+        valueDisplay.setEnabled(isEditorEnabled() && enabledBox.isSelected());
       }
 
     } else {
       if (inputButton != null) {
-        inputButton.setEnabled(newValue);
+        inputButton.setEnabled(isEditorEnabled());
       }
       if (valueDisplay != null) {
-        valueDisplay.setEnabled(newValue);
+        valueDisplay.setEnabled(isEditorEnabled());
       }
     }
-    enabled=newValue;
   }
 
   /**

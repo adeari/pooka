@@ -41,10 +41,9 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
     getLogger().fine("configuring editor with property " + propertyName + ", editorTemplate " + editorTemplate);
@@ -102,7 +101,7 @@ public class TabbedEditorPane extends CompositeSwingPropertyEditor {
    * Creates an editor pane for a group of values.
    */
   private SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subProperty, manager, true);
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, subProperty, manager);
 
   }
 

@@ -49,11 +49,10 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
     getLogger().fine("creating MultiEditorPane for property " + propertyName + ", template " + template);
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
@@ -93,7 +92,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     getLogger().fine("MultiEditorPane for property " + propertyName + ", template " + template);
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
 
     manager.registerPropertyEditor(property, this);
 
@@ -168,7 +167,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
           // wizard
           String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
           if (newValueTemplate.length() > 0) {
-            manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager, true), getPropertyEditorPane().getContainer());
+            manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager), getPropertyEditorPane().getContainer());
 
           } else {
             addNewValue(getNewValueName(), getPropertyEditorPane().getContainer());
@@ -351,7 +350,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
       String editProperty = property + "." + valueToEdit;
       getLogger().fine("editing " + editProperty);
 
-      manager.getFactory().showNewEditorWindow(manager.getProperty(editorTemplate + ".label", editProperty), manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", editProperty, "Composite", manager, true), container);
+      manager.getFactory().showNewEditorWindow(manager.getProperty(editorTemplate + ".label", editProperty), manager.getFactory().createEditor(editProperty, editorTemplate + ".editableFields", editProperty, "Composite", manager), container);
     } else {
       getLogger().fine("editSelectedValue():  no selected value.");
     }
@@ -412,7 +411,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Sets the value for this MultiEditorPane.
    */
   public void setValue() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
 
       if (isChanged()) {
         getLogger().fine("setting property.  property is " + property + "; value is " + getCurrentValue());
@@ -495,17 +494,16 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Creates an editor.
    */
   public SwingPropertyEditor createEditorPane(String subProperty, String subTemplate) {
-    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager, true);
+    return (SwingPropertyEditor) manager.getFactory().createEditor(subProperty, subTemplate, "Composite", manager);
   }
 
   /**
-   * Sets this enabled or disabled.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     for (int i = 0; i < buttonList.size(); i++) {
-      ((JButton) buttonList.get(i)).setEnabled(newValue);
+      ((JButton) buttonList.get(i)).setEnabled(isEditorEnabled());
     }
-    enabled = newValue;
   }
 
   /**

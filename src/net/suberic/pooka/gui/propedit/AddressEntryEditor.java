@@ -15,7 +15,7 @@ public class AddressEntryEditor extends CompositeEditorPane {
   AddressBookEntry entry;
 
   /**
-   * Creates an AddressEntryEditor from an AddressBookEntry and a 
+   * Creates an AddressEntryEditor from an AddressBookEntry and a
    * VariableBundle.
    */
   public AddressEntryEditor(PropertyEditorManager newManager, AddressBookEntry newEntry) {
@@ -24,16 +24,16 @@ public class AddressEntryEditor extends CompositeEditorPane {
     Properties props = entry.getProperties();
     VariableBundle wrappedBundle = new VariableBundle(props, newManager.getFactory().getSourceBundle());
     PropertyEditorManager wrappedManager = new PropertyEditorManager(wrappedBundle, newManager.getFactory(), newManager.getIconManager());
-    configureEditor("currentAddress", "currentAddress", wrappedManager, true);
+    configureEditor("currentAddress", "currentAddress", wrappedManager);
   }
 
   /**
    * Sets the values to the current entry.
    */
   public void setValue() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       for (int i = 0; i < editors.size(); i++) {
-	((SwingPropertyEditor)(editors.get(i))).setValue();
+  ((SwingPropertyEditor)(editors.get(i))).setValue();
       }
     }
 

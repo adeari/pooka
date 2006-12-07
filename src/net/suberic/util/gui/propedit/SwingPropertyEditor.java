@@ -2,9 +2,11 @@ package net.suberic.util.gui.propedit;
 import net.suberic.util.*;
 import javax.swing.*;
 import java.awt.Dimension;
+import java.util.HashSet;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.logging.Logger;
+import java.util.Set;
 
 /**
  * A Swing implementation of the PropertyEditorUI.
@@ -13,8 +15,8 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   // debug flag
   protected boolean debug = false;
 
-  // shows whether or not this component is enabled.
-  protected boolean enabled;
+  // a set of disable flags
+  protected Set disableMaskSet = new HashSet();
 
   // the property being edited.
   protected String property;
@@ -54,10 +56,9 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *                     properties.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public SwingPropertyEditor(String propertyName, String template, String baseProperty, PropertyEditorManager newManager, boolean isEnabled) {
-    configureEditor(propertyName, template, baseProperty,  newManager, isEnabled);
+  public SwingPropertyEditor(String propertyName, String template, String baseProperty, PropertyEditorManager newManager) {
+    configureEditor(propertyName, template, baseProperty,  newManager);
   }
 
   /**
@@ -67,25 +68,10 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *        also be used to define the layout of this Editor.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public SwingPropertyEditor(String propertyName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureEditor(propertyName, propertyName, newManager, isEnabled);
+  public SwingPropertyEditor(String propertyName, PropertyEditorManager newManager) {
+    configureEditor(propertyName, propertyName, newManager);
   }
-
-  /**
-   * Creates a SwingPropertyEditor using the given property and manager.
-   *
-   * @param propertyName The property to be edited.
-   * @param template The property that will define the layout of the
-   *                 editor.
-   * @param newManager The PropertyEditorManager that will manage the
-   *                   changes.
-   */
-  public SwingPropertyEditor(String propertyName, String template, PropertyEditorManager newManager ) {
-    configureEditor(propertyName, template, newManager, true);
-  }
-
 
   /**
    * Creates a SwingPropertyEditor using the given property and manager.
@@ -96,7 +82,7 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *                   changes.
    */
   public void configureEditor(String propertyName, PropertyEditorManager newManager) {
-    configureEditor(propertyName, propertyName, newManager, true);
+    configureEditor(propertyName, propertyName, newManager);
   }
 
   /**
@@ -104,22 +90,18 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
    *
    * @param propertyName The property to be edited.  This property will
    *        also be used to define the layout of this Editor.
+   * @param propertyName The template to use for this Property.
    * @param newManager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureEditor(propertyName, propertyName, newManager, isEnabled);
-  }
-
-  public void configureEditor(String propertyName, String template, PropertyEditorManager manager, boolean isEnabled) {
-    configureEditor(propertyName, template, propertyName, manager, isEnabled);
+  public void configureEditor(String propertyName, String template, PropertyEditorManager manager) {
+    configureEditor(propertyName, template, propertyName, manager);
   }
 
   /**
    * Loads the basic properties for all SwingPropertyEditors.
    */
-  public void configureBasic(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureBasic(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
     manager=newManager;
     propertyBase=propertyBaseName;
     editorTemplate = template;
@@ -132,7 +114,6 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
     */
     property = propertyName;
     addDefaultListeners();
-    enabled=isEnabled;
     originalValue = manager.getProperty(property, manager.getProperty(editorTemplate, ""));
     manager.registerPropertyEditor(property, this);
     firePropertyInitializedEvent(originalValue);
@@ -140,11 +121,32 @@ public abstract class SwingPropertyEditor extends JPanel implements PropertyEdit
   }
 
   /**
-   * Returns the enabled flag.
+   * Adds a disable mask to the PropertyEditorUI.
    */
-  public boolean isEnabled() {
-    return enabled;
+  public void addDisableMask(Object key) {
+    disableMaskSet.add(key);
+    updateEditorEnabled();
   }
+
+  /**
+   * Removes the disable mask keyed by this Object.
+   */
+  public void removeDisableMask(Object key) {
+    disableMaskSet.remove(key);
+    updateEditorEnabled();
+  }
+
+  /**
+   * Returns whether or not this Editor is currently enabled.
+   */
+  public boolean isEditorEnabled() {
+    return disableMaskSet.isEmpty();
+  }
+
+  /**
+   * Run when the PropertyEditor may have changed enabled states.
+   */
+  protected abstract void updateEditorEnabled();
 
   /**
    * Gets the PropertyEditorManager

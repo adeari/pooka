@@ -21,12 +21,8 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
   /**
    * Configures the FilterEditorPane.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     getLogger().fine("property is " + property + "; editorTemplate is " + editorTemplate);
 
@@ -143,14 +139,6 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
   }
 
   /**
-   * Enables or disables this editor.
-   */
-  public void setEnabled(boolean newValue) {
-    typeCombo.setEnabled(newValue);
-  }
-
-
-  /**
    * This handles the switch of the filterConfigPanel when the typeCombo
    * value changes.
    */
@@ -158,6 +146,13 @@ public class FilterEditorPane extends LabelValuePropertyEditor implements java.a
     String selectedString = (String) typeCombo.getSelectedItem();
 
     layout.show(filterConfigPanel, selectedString);
+  }
+
+  /**
+   * Run when the PropertyEditor may have changed enabled states.
+   */
+  protected void updateEditorEnabled() {
+    typeCombo.setEnabled(isEditorEnabled());
   }
 
 }

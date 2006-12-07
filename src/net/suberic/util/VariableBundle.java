@@ -381,7 +381,7 @@ public class VariableBundle extends Object {
                   properties.setProperty(key, writableProperties.getProperty(key, ""));
                   writableProperties.remove(key);
                 }
-                removeProperty(key);
+                //removeProperty(key);
               }
 
             } else {
@@ -567,13 +567,18 @@ public class VariableBundle extends Object {
   }
 
   /**
-   * This removes the property from the currently VariableBundle.  This
+   * This removes the property from the current VariableBundle.  This
    * is different than setting the value to "" (or null) in that, if the
    * property is removed, it is removed from the source property file.
    */
   public void removeProperty(String remProp) {
     if (! propertyIsRemoved(remProp))
       removeList.add(remProp);
+    if (remProp.equals("OutgoingServer")) {
+      Thread.currentThread().dumpStack();
+    }
+    System.err.println("removed " + remProp);
+    System.err.println("in vb:  getProperty(remProp) = " + getProperty(remProp));
   }
 
   /**

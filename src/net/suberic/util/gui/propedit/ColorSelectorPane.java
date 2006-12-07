@@ -36,9 +36,8 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
     property=propertyName;
     manager=newManager;
     editorTemplate = template;
@@ -92,7 +91,7 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
     valueComponent = tmpPanel;
     this.add(tmpPanel);
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
 
     manager.registerPropertyEditor(property, this);
   }
@@ -156,7 +155,7 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
    * to the source VariableBundle.
    */
   public void setValue() {
-    if (isEnabled() && isChanged()) {
+    if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property + ".rgb", Integer.toString(currentColor.getRGB()));
       if (useEnabledBox) {
         if (enabledBox.isSelected())
@@ -168,7 +167,7 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
   }
 
   public void validateProperty() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       firePropertyCommittingEvent(Integer.toString(currentColor.getRGB()));
     }
   }
@@ -213,20 +212,19 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
   }
 
   /**
-   * Sets whether or not this editor is enabled.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     if (useEnabledBox) {
-      enabledBox.setEnabled(newValue);
+      enabledBox.setEnabled(isEditorEnabled());
       if (inputButton != null) {
-        inputButton.setEnabled(newValue && enabledBox.isSelected());
+        inputButton.setEnabled(isEditorEnabled() && enabledBox.isSelected());
       }
     } else {
       if (inputButton != null) {
-        inputButton.setEnabled(newValue);
+        inputButton.setEnabled(isEditorEnabled());
       }
     }
-    enabled=newValue;
   }
 
   /**

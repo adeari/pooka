@@ -1,4 +1,5 @@
 package net.suberic.pooka.gui.filter;
+import net.suberic.util.gui.propedit.PropertyValueVetoException;
 
 /**
  * This is a class that lets you choose your filter actions.
@@ -23,7 +24,7 @@ public abstract class FilterEditor extends javax.swing.JPanel {
   /**
    * Sets the values represented by this FilterEditor in the sourceBundle.
    */
-  public abstract void setValue();
+  public abstract void setValue() throws PropertyValueVetoException;
 
   /**
    * Returns the class that will be set for this FilterEditor.

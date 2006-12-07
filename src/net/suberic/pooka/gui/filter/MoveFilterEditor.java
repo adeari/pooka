@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui.filter;
 import net.suberic.pooka.gui.propedit.FolderSelectorPane;
+import net.suberic.util.gui.propedit.PropertyValueVetoException;
 import java.util.Properties;
 import javax.swing.SpringLayout;
 
@@ -58,7 +59,7 @@ public class MoveFilterEditor extends FilterEditor {
   /**
    * Sets the values represented by this FilterEditor in the manager.
    */
-  public void setValue() {
+  public void setValue() throws PropertyValueVetoException {
 
     fsp.setValue();
 

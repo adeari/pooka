@@ -13,38 +13,38 @@ import javax.swing.Action;
  */
 
 public class ConfigurableMenu extends JMenu implements ConfigurableUI {
-  
-  // the latest commands list.  i'm storing this for now because i 
+
+  // the latest commands list.  i'm storing this for now because i
   // can't do a JButton.removeActionListeners().
-  
+
   protected Hashtable commands = new Hashtable();
-  
+
   public ConfigurableMenu() {
     super();
   }
-  
+
   /**
    * This creates a new ConfigurableMenu using the menuID as the
    * configuration key, and vars as the source for the values of all the
    * properties.
    *
-   * If menuID doesn't exist in vars, then this returns an empty 
+   * If menuID doesn't exist in vars, then this returns an empty
    * Menu.
    */
-  
+
   public ConfigurableMenu(String menuID, VariableBundle vars) {
     super();
-    
+
     configureComponent(menuID, vars);
   }
-  
+
   /**
-   * This configures the Menu using the given menuID and 
+   * This configures the Menu using the given menuID and
    * VariableBundle.
    *
    * As defined in interface net.suberic.util.gui.ConfigurableUI.
    */
-  
+
   public void configureComponent(String key, VariableBundle vars) {
     StringTokenizer iKeys = null;
     try {
@@ -52,109 +52,109 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
     } catch (MissingResourceException mre) {
       mre.printStackTrace();
       try {
-	System.err.println(vars.getProperty("error.NoSuchResource") + " " + mre.getKey());
+        System.err.println(vars.getProperty("error.NoSuchResource") + " " + mre.getKey());
       } catch (MissingResourceException mretwo) {
-	System.err.println("Unable to load resource " + mre.getKey());
-	return;
+        System.err.println("Unable to load resource " + mre.getKey());
+        return;
       }
       return;
     }
     String currentToken;
-    
+
     try {
       setText(vars.getProperty(key + ".Label"));
     } catch (MissingResourceException mre) {
     }
-    
+
     while (iKeys.hasMoreTokens()) {
       currentToken=iKeys.nextToken();
       if (currentToken.equals("-")) {
-	this.addSeparator();
+        this.addSeparator();
       } else {
-	JMenuItem mi = createMenuItem(key, currentToken, vars);
-	this.add(mi);
+        JMenuItem mi = createMenuItem(key, currentToken, vars);
+        this.add(mi);
       }
     }
-    
+
     String keyBinding = vars.getProperty(key + ".KeyBinding", "");
     if (!keyBinding.equals("")) {
       this.setMnemonic(keyBinding.charAt(0));
     }
 
   }
-  
+
   /**
    * And this actually creates the menu items themselves.
    */
   protected JMenuItem createMenuItem(String menuID, String menuItemID, VariableBundle vars) {
     // TODO:  should also make these undo-able.
-    
+
     if (vars.getProperty(menuID + "." + menuItemID + ".class", "") == "") {
-      
+
       if (vars.getProperty(menuID + "." + menuItemID, "") != "") {
-	return new ConfigurableMenu(menuID + "." + menuItemID, vars);
-      } 
-      
+        return new ConfigurableMenu(menuID + "." + menuItemID, vars);
+      }
+
       JMenuItem mi;
       try {
-	mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
+        mi = new JMenuItem(vars.getProperty(menuID + "." + menuItemID + ".Label"));
       } catch (MissingResourceException mre) {
-	mi = new JMenuItem(menuItemID);
+        mi = new JMenuItem(menuItemID);
       }
-      
+
       java.net.URL url = null;
-      
+
       try {
-	url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
+        url = this.getClass().getResource(vars.getProperty(menuID + "." + menuItemID + ".Image"));
       } catch (MissingResourceException mre) {
       }
-      
+
       if (url != null) {
-	mi.setHorizontalTextPosition(JButton.RIGHT);
-	mi.setIcon(new ImageIcon(url));
+        mi.setHorizontalTextPosition(JButton.RIGHT);
+        mi.setIcon(new ImageIcon(url));
       }
-      
+
       String cmd = vars.getProperty(menuID + "." + menuItemID + ".Action", menuItemID);
-      
-      mi.setActionCommand(cmd);	
-      
+
+      mi.setActionCommand(cmd);
+
       String keyBinding = vars.getProperty(menuID + "." + menuItemID + ".KeyBinding", "");
       if (!keyBinding.equals(""))
-	mi.setMnemonic(keyBinding.charAt(0));
-      
+        mi.setMnemonic(keyBinding.charAt(0));
+
       String accelBinding = vars.getProperty(menuID + "." + menuItemID + ".Accelerator", "");
       if (!accelBinding.equals("")) {
-	mi.setAccelerator(KeyStroke.getKeyStroke(accelBinding));
+        mi.setAccelerator(KeyStroke.getKeyStroke(accelBinding));
       }
 
       return mi;
     } else {
       // this means that we have a submenu.
       ConfigurableMenu m;
-      
+
       if (vars.getProperty(menuID + "." + menuItemID + ".class", "").equals("")) {
-	m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
-	
+        m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
+
       } else {
-	// this means we're using a custom Menu.
-	
-	try {
-	  Class menuClass = Class.forName(vars.getProperty(menuID + "." + menuItemID + ".class", "net.suberic.util.gui.ConfigurableMenu"));
-	  m = (ConfigurableMenu) menuClass.newInstance();
-	  m.configureComponent(menuID + "." + menuItemID, vars);
-	} catch (Exception e) {
-	  e.printStackTrace();
-	  // if we get any errors, just create a plain 
-	  // ConfigurableMenu.
-	  m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
-	}
+        // this means we're using a custom Menu.
+
+        try {
+          Class menuClass = Class.forName(vars.getProperty(menuID + "." + menuItemID + ".class", "net.suberic.util.gui.ConfigurableMenu"));
+          m = (ConfigurableMenu) menuClass.newInstance();
+          m.configureComponent(menuID + "." + menuItemID, vars);
+        } catch (Exception e) {
+          e.printStackTrace();
+          // if we get any errors, just create a plain
+          // ConfigurableMenu.
+          m = new ConfigurableMenu(menuID + "." + menuItemID, vars);
+        }
       }
-      
+
       return m;
-      
+
     }
   }
-  
+
   /**
    * As defined in net.suberic.util.gui.ConfigurableUI
    */
@@ -162,13 +162,13 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
     Hashtable tmpHash = new Hashtable();
     if (newActions != null && newActions.length > 0) {
       for (int i = 0; i < newActions.length; i++) {
-	String cmdName = (String)newActions[i].getValue(Action.NAME);
-	tmpHash.put(cmdName, newActions[i]);
+        String cmdName = (String)newActions[i].getValue(Action.NAME);
+        tmpHash.put(cmdName, newActions[i]);
       }
     }
-    setActive(tmpHash);	
+    setActive(tmpHash);
   }
-  
+
   /**
    * As defined in net.suberic.util.gui.ConfigurableUI
    */
@@ -177,53 +177,53 @@ public class ConfigurableMenu extends JMenu implements ConfigurableUI {
     commands = newCommands;
     setActiveMenuItems();
   }
-  
+
   protected void setActiveMenuItems() {
     for (int j = 0; j < getItemCount(); j++) {
       if (getItem(j) instanceof ConfigurableMenu) {
-	((ConfigurableMenu)getItem(j)).setActive(commands);
+        ((ConfigurableMenu)getItem(j)).setActive(commands);
       } else {
-	JMenuItem mi = getItem(j);
-	Action a = getAction(mi.getActionCommand());
-	if (a != null) {
-	  //mi.removeActionListener(a);
-	  mi.addActionListener(a);
-	  mi.setEnabled(true);
-	} else {
-	  mi.setEnabled(false);
-	}
-      }
-    }
-  }	    
-    
-  /**
-   * This clears all of the current listeners on the Menu.
-   */
-  
-  private void clearListeners() {
-    for (int j = 0; j < getItemCount(); j++) {
-      if (getItem(j) instanceof ConfigurableMenu) {
-	// we don't have to clear the listeners here because
-	// it will be done in setActive().
-	;
-      } else {
-	JMenuItem mi = getItem(j);
-	Action a = getAction(mi.getActionCommand());
-	if (a != null) {
-	  mi.removeActionListener(a);
-	}
+        JMenuItem mi = getItem(j);
+        Action a = getAction(mi.getActionCommand());
+        if (a != null) {
+          //mi.removeActionListener(a);
+          mi.addActionListener(a);
+          mi.setEnabled(true);
+        } else {
+          mi.setEnabled(false);
+        }
       }
     }
   }
-  
+
+  /**
+   * This clears all of the current listeners on the Menu.
+   */
+
+  private void clearListeners() {
+    for (int j = 0; j < getItemCount(); j++) {
+      if (getItem(j) instanceof ConfigurableMenu) {
+        // we don't have to clear the listeners here because
+        // it will be done in setActive().
+        ;
+      } else {
+        JMenuItem mi = getItem(j);
+        Action a = getAction(mi.getActionCommand());
+        if (a != null) {
+          mi.removeActionListener(a);
+        }
+      }
+    }
+  }
+
   /**
    * This gets an action from the supported commands.  If there is no
    * supported action, it returns null
    */
-  
+
   public Action getAction(String command) {
     return (Action)commands.get(command);
   }
-  
+
 
 }

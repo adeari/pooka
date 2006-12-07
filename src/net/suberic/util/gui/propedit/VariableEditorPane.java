@@ -27,10 +27,9 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
     keyProperty = createSubProperty(manager.getProperty(editorTemplate + ".keyProperty", ""));
@@ -83,7 +82,11 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
         idToEditorMap.put(selectedId, spe);
         editors.add(spe);
 
-        spe.setEnabled(enableMe && enabled);
+        if (enableMe && isEditorEnabled()) {
+          spe.removeDisableMask(this);
+        } else {
+          spe.addDisableMask(this);
+        }
         this.add(selectedId, spe);
       }
     }
@@ -98,7 +101,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
 
     String editValue = createSubTemplate("." + selectedId);
 
-    SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.getFactory().createEditor(property, editValue, propertyBase, manager, enabled);
+    SwingPropertyEditor returnValue = (SwingPropertyEditor)manager.getFactory().createEditor(property, editValue, propertyBase, manager);
     return returnValue;
   }
 

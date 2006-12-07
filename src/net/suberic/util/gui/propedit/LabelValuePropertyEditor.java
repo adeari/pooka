@@ -17,21 +17,21 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
   protected java.awt.Container valueComponent;
 
   /**
-   * A default implementation of setEnabled.  This simply sets the
-   * enabled flag to the newValue.  If the labelComponent and
-   * valueComponent attributes are set, it will also call setEnabled
-   * on those.
+   * Run when the PropertyEditor may have changed enabled states.
+   *
+   * This is a default implementation of updateEnabledState. If the
+   * labelComponent and valueComponent attributes are set, it will call
+   * setEnabled on those.
    *
    * Subclasses which do not use the default labelComponent and
    * valueComponent attributes, or which require additional functionality,
    * should override this method.
    */
-  public void setEnabled(boolean newValue) {
-    enabled=newValue;
+  protected void updateEditorEnabled() {
     if (valueComponent != null)
-      valueComponent.setEnabled(newValue);
+      valueComponent.setEnabled(isEditorEnabled());
     if (labelComponent != null)
-      labelComponent.setEnabled(newValue);
+      labelComponent.setEnabled(isEditorEnabled());
   }
 
   /**
@@ -146,7 +146,7 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
    * Accepts or rejects the initial focus for this component.
    */
   public boolean acceptDefaultFocus() {
-    if (enabled) {
+    if (isEditorEnabled()) {
       return valueComponent.requestFocusInWindow();
     } else {
       return false;

@@ -35,8 +35,7 @@ public class RequiredFilter extends PropertyEditorAdapter implements Configurabl
   }
 
   /**
-   * In this case, if the property value is in the enabled list, then
-   * the affectedEditors are enabled.  if not, then they are disabled.
+   * Checks to make sure that this value is set.
    */
   public void propertyCommitting(PropertyEditorUI source, String property, String newValue) throws PropertyValueVetoException{
     if (newValue == null || newValue.trim().length() == 0) {

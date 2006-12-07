@@ -113,7 +113,7 @@ public class PropertyEditorFactory {
   }
 
   public void showNewEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
-    showNewEditorWindow(title, createEditor(property, template, propertyBase, mgr, true), window);
+    showNewEditorWindow(title, createEditor(property, template, propertyBase, mgr), window);
   }
 
   /**
@@ -188,7 +188,7 @@ public class PropertyEditorFactory {
   }
 
   public Container createEditorWindow(String title, String property, String template, String propertyBase, PropertyEditorManager mgr, Container window) {
-    return createEditorWindow(title, createEditor(property, template, propertyBase, mgr, true), window);
+    return createEditorWindow(title, createEditor(property, template, propertyBase, mgr), window);
   }
 
   public Container createEditorWindow(String title, PropertyEditorUI editor, Container window) {
@@ -202,7 +202,9 @@ public class PropertyEditorFactory {
       jd.setTitle(title);
       jd.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
     }
-    jd.getContentPane().add(createPropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd));
+    PropertyEditorPane pep = createPropertyEditorPane(editor.getManager(), (SwingPropertyEditor) editor, jd);
+    jd.getContentPane().add(pep);
+    jd.getRootPane().setDefaultButton(pep.getDefaultButton());
     jd.pack();
     return jd;
   }
@@ -214,30 +216,22 @@ public class PropertyEditorFactory {
    */
   public PropertyEditorUI createEditor(String property, String editorTemplate, PropertyEditorManager mgr) {
 
-    return createEditor(property, editorTemplate, mgr, true);
+    return createEditor(property, editorTemplate, editorTemplate, mgr);
   }
 
   /**
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using the given PropertyEditorManager.
    */
-  public PropertyEditorUI createEditor(String property, String editorTemplate, PropertyEditorManager mgr, boolean enabled) {
-    return createEditor(property, editorTemplate, property, mgr, enabled);
-  }
-
-  /**
-   * Creates an appropriate PropertyEditorUI for the given property and
-   * editorTemplate, using the given PropertyEditorManager.
-   */
-  public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, PropertyEditorManager mgr, boolean enabled) {
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, PropertyEditorManager mgr) {
     String type = sourceBundle.getProperty(editorTemplate + ".propertyType", "");
-    return createEditor(property, editorTemplate, propertyBase, type, mgr, enabled);
+    return createEditor(property, editorTemplate, propertyBase, type, mgr);
   }
   /**
    * Creates an appropriate PropertyEditorUI for the given property and
    * editorTemplate, using the given PropertyEditorManager.
    */
-  public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, String type, PropertyEditorManager mgr, boolean enabled) {
+  public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase, String type, PropertyEditorManager mgr) {
 
     //System.err.println("creating editor for property '" + property + "', template '" + editorTemplate + "', propertyBase '" + propertyBase + "', type '" + type + "'");
     Class editorClass = (Class) typeToClassMap.get(type);
@@ -252,7 +246,7 @@ public class PropertyEditorFactory {
       System.err.println("error creating editor for property " + property + ":  " + e);
       returnValue = new StringEditorPane();
     }
-    returnValue.configureEditor(property, editorTemplate, propertyBase, mgr, enabled);
+    returnValue.configureEditor(property, editorTemplate, propertyBase, mgr);
     return returnValue;
   }
 
@@ -264,9 +258,9 @@ public class PropertyEditorFactory {
     String template = editor.getEditorTemplate();
     PropertyEditorPane returnValue = null;
     if (manager.getProperty(template + ".editorType", "").equalsIgnoreCase("wizard")) {
-      returnValue =new  WizardPropertyEditor(manager,  editor, container, commit);
+      returnValue = new WizardPropertyEditor(manager,  editor, container, commit);
     } else {
-      returnValue =  new PropertyEditorPane(manager,  editor, container, commit);
+      returnValue = new PropertyEditorPane(manager,  editor, container, commit);
     }
     manager.createdEditorPane = true;
     return returnValue;

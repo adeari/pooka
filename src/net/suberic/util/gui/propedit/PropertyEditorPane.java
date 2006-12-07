@@ -14,6 +14,7 @@ public class PropertyEditorPane extends JPanel {
   PropertyEditorManager manager;
   Container container;
   boolean doCommit;
+  JButton defaultButton = null;
 
   /**
    * Constructor for subclasses.
@@ -136,7 +137,7 @@ public class PropertyEditorPane extends JPanel {
     SpringLayout buttonLayout = new SpringLayout();
     buttonPanel.setLayout(buttonLayout);
 
-    JButton helpButton = createButton("Help", new AbstractAction() {
+    JButton helpButton = createButton("PropertyEditor.button.help", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           //System.err.println("showing help for " + editor.getHelpID());
           //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
@@ -145,12 +146,12 @@ public class PropertyEditorPane extends JPanel {
           manager.getFactory().getHelpBroker().setDisplayed(true);
 
         }
-      }, true);
+      });
 
     //CSH.setHelpIDString(helpButton, "UserProfile");
     buttonPanel.add(helpButton);
 
-    JButton okButton = createButton("Ok", new AbstractAction() {
+    JButton okButton = createButton("PropertyEditor.button.ok", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             setValue();
@@ -172,9 +173,9 @@ public class PropertyEditorPane extends JPanel {
             manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
           }
         }
-      }, true);
+      });
 
-    JButton applyButton = createButton("Apply", new AbstractAction() {
+    JButton applyButton = createButton("PropertyEditor.button.apply", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             setValue();
@@ -186,9 +187,9 @@ public class PropertyEditorPane extends JPanel {
             manager.getFactory().showError(PropertyEditorPane.this, pvve.getMessage());
           }
         }
-      }, false);
+      });
 
-    JButton cancelButton = createButton("Cancel", new AbstractAction() {
+    JButton cancelButton = createButton("PropertyEditor.button.cancel", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           if (container instanceof JInternalFrame) {
             try {
@@ -202,7 +203,7 @@ public class PropertyEditorPane extends JPanel {
           }
           editor.remove();
         }
-      }, false);
+      });
 
     buttonPanel.add(helpButton);
     buttonPanel.add(cancelButton);
@@ -240,16 +241,21 @@ public class PropertyEditorPane extends JPanel {
   /**
    * Creates the appropriate Button.
    */
-  JButton createButton(String label, Action e, boolean isDefault) {
+  JButton createButton(String key, Action e) {
+    System.err.println("creating button with key " + key);
     JButton thisButton;
 
-    thisButton = new JButton(manager.getProperty("label." + label, label));
-    String mnemonic = manager.getProperty("label." + label + ".mnemonic", "");
+    thisButton = new JButton(manager.getProperty(key +".label", key));
+    String mnemonic = manager.getProperty(key + ".keyBinding", "");
     if (mnemonic.length() > 0) {
+      System.err.println("Property " + key + "; setting mnemonic to " + mnemonic.charAt(0));
       thisButton.setMnemonic(mnemonic.charAt(0));
     }
 
-    thisButton.setSelected(isDefault);
+    if (manager.getProperty(key + ".default", "false").equalsIgnoreCase("true")) {
+      thisButton.setSelected(true);
+      setDefaultButton(thisButton);
+    }
 
     thisButton.addActionListener(e);
 
@@ -263,4 +269,17 @@ public class PropertyEditorPane extends JPanel {
     return container;
   }
 
+  /**
+   * Gets the default Button for this PropertyEditorPane.
+   */
+  public JButton getDefaultButton() {
+    return defaultButton;
+  }
+
+  /**
+   * Sets the default Button for this PropertyEditorPane.
+   */
+  public void setDefaultButton(JButton pDefaultButton) {
+    defaultButton = pDefaultButton;
+  }
 }

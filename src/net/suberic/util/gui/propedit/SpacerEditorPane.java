@@ -17,10 +17,9 @@ public class SpacerEditorPane extends SwingPropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
     int height = 10;
     try {
       height = Integer.parseInt(manager.getProperty(template + ".height", "10"));
@@ -82,14 +81,6 @@ public class SpacerEditorPane extends SwingPropertyEditor {
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
-   */
-  public void setEnabled(boolean newValue) {
-
-  }
-
-  /**
    * Gets the parent PropertyEditorPane for the given component.
    */
   public PropertyEditorPane getPropertyEditorPane() {
@@ -102,4 +93,12 @@ public class SpacerEditorPane extends SwingPropertyEditor {
   public String getDisplayValue() {
     return getProperty();
   }
+
+  /**
+   * Updates the editorEnabled value.  A no-op in this case.
+   */
+  protected void updateEditorEnabled() {
+
+  }
+
 }

@@ -19,14 +19,9 @@ public class SearchEditorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    property=propertyName;
-    manager=newManager;
-    editorTemplate = template;
-    propertyBase=propertyBaseName;
-    originalValue = manager.getProperty(property, "");
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     searchEntryPanel = new SearchEntryPanel(net.suberic.pooka.Pooka.getSearchManager(), property, manager.getFactory().getSourceBundle());
     originalProperties = searchEntryPanel.generateSearchTermProperties(property);
@@ -35,7 +30,7 @@ public class SearchEditorPane extends LabelValuePropertyEditor {
     labelComponent = new JLabel(manager.getProperty("title.search.where", "Where"));
     valueComponent = searchEntryPanel;
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
   }
 
   /**
@@ -88,9 +83,9 @@ public class SearchEditorPane extends LabelValuePropertyEditor {
   }
 
   /**
-   * Enables or disables this editor.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
-    searchEntryPanel.setEnabled(newValue);
+  protected void updateEditorEnabled() {
+    searchEntryPanel.setEnabled(isEditorEnabled());
   }
 }

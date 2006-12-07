@@ -41,11 +41,10 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
 
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     getLogger().fine("creating CompositeEditorPane for " + property + " with template " + editorTemplate);
 
@@ -87,7 +86,6 @@ public class CompositeEditorPane extends CompositeSwingPropertyEditor {
       getLogger().fine("creating editor for " + properties.get(i) + ", template " + templates.get(i) + ", propertyBase " + propertyBase);
       currentEditor = (SwingPropertyEditor) manager.createEditor(properties.get(i), templates.get(i), propertyBase);
       getLogger().fine("got " + currentEditor.getClass().getName());
-      //currentEditor.setEnabled(enabled);
       editors.add(currentEditor);
 
       if (currentEditor instanceof LabelValuePropertyEditor) {

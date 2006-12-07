@@ -32,10 +32,9 @@ public class ListEditorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     label = createLabel();
 
@@ -56,7 +55,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
     this.add(label);
     this.add(inputBox);
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
 
     labelComponent = label;
     valueComponent = inputBox;
@@ -269,7 +268,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
     int newIndex = inputField.getSelectedIndex();
     String currentValue = (String)labelToValueMap.get(inputField.getSelectedItem());
 
-    if (isEnabled() && isChanged()) {
+    if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property, currentValue);
     }
   }
@@ -325,17 +324,15 @@ public class ListEditorPane extends LabelValuePropertyEditor {
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     if (inputField != null) {
-      inputField.setEnabled(newValue);
+      inputField.setEnabled(isEditorEnabled());
     }
     if (addButton != null) {
-      addButton.setEnabled(newValue);
+      addButton.setEnabled(isEditorEnabled());
     }
-    enabled=newValue;
   }
 
   /**

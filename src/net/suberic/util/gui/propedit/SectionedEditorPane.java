@@ -47,10 +47,9 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     // create the editors list.
     editors = new Vector();
@@ -98,7 +97,7 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
     layout.putConstraint(SpringLayout.SOUTH, this, 0 ,SpringLayout.SOUTH, entryComponent);
     layout.putConstraint(SpringLayout.EAST, this, 0 ,SpringLayout.EAST, entryComponent);
 
-    this.setEnabled(isEnabled);
+    updateEditorEnabled();
 
     manager.registerPropertyEditor(property, this);
 
@@ -259,18 +258,20 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
   }
 
   /**
-   * Sets this enabled or disabled.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
 
-    optionList.setEnabled(newValue);
+    optionList.setEnabled(isEditorEnabled());
 
     for (int i = 0; i < editors.size() ; i++) {
       PropertyEditorUI current = (PropertyEditorUI) editors.get(i);
-      current.setEnabled(newValue);
+      if (isEditorEnabled()) {
+        current.removeDisableMask(this);
+      } else {
+        current.addDisableMask(this);
+      }
     }
-
-    enabled = newValue;
   }
 
   /**

@@ -30,9 +30,8 @@ public interface PropertyEditorUI {
    *                 property resolutions.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBase, PropertyEditorManager manager, boolean isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBase, PropertyEditorManager manager);
 
   /**
    * This configures an editor for the given propertyName using the
@@ -56,25 +55,12 @@ public interface PropertyEditorUI {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, PropertyEditorManager manager, boolean isEnabled);
+  public void configureEditor(String propertyName, String template, PropertyEditorManager manager);
 
   /**
    * This configures an editor for the given propertyName in the
    * PropertyEditorManager mgr.
-   * @param propertyName The property to be edited.  This will also be
-   *                     used for the editor layout.
-   * @param manager The PropertyEditorManager that will manage the
-   *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
-   */
-  public void configureEditor(String propertyName, PropertyEditorManager mgr, boolean isEnabled);
-
-  /**
-   * This configures an editor for the given propertyName in the
-   * PropertyEditorManager mgr.
-   *
    * @param propertyName The property to be edited.  This will also be
    *                     used for the editor layout.
    * @param manager The PropertyEditorManager that will manage the
@@ -121,15 +107,19 @@ public interface PropertyEditorUI {
   public java.util.Properties getValue();
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Adds a disable mask to the PropertyEditorUI.
    */
-  public void setEnabled(boolean newValue);
+  public void addDisableMask(Object key);
 
   /**
-   * Returns whether or not this editor is enabled.
+   * Removes the disable mask keyed by this Object.
    */
-  public boolean isEnabled();
+  public void removeDisableMask(Object key);
+
+  /**
+   * Returns whether or not this Editor is currently enabled.
+   */
+  public boolean isEditorEnabled();
 
   /**
    * Returns the PropertyEditorManager for this PropertyEditorUI.

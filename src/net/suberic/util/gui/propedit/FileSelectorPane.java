@@ -22,10 +22,9 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName,  PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName,  PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     String currentValue = parseValue(manager.getProperty(property, ""));
 
@@ -70,7 +69,7 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
 
     manager.registerPropertyEditor(property, this);
 
-    setEnabled(enabled);
+    updateEditorEnabled();
   }
 
   /**
@@ -146,7 +145,7 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
    * to the source PropertyEditorManager.
    */
   public void setValue() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       validateProperty();
       if (isChanged())
         manager.setProperty(property, (String)valueDisplay.getText());
@@ -157,7 +156,7 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
    * Validates the selected value.
    */
   public void validateProperty() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       firePropertyCommittingEvent((String)valueDisplay.getText());
     }
   }
@@ -190,20 +189,18 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     if (inputButton != null) {
-      inputButton.setEnabled(newValue);
+      inputButton.setEnabled(isEditorEnabled());
     }
     if (valueDisplay != null) {
-      valueDisplay.setEnabled(newValue);
+      valueDisplay.setEnabled(isEditorEnabled());
     }
     if (label != null) {
-      label.setEnabled(newValue);
+      label.setEnabled(isEditorEnabled());
     }
-      enabled=newValue;
   }
 
   /**

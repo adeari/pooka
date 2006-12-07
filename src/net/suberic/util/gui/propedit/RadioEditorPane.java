@@ -19,10 +19,9 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
 
     SpringLayout layout = new SpringLayout();
     this.setLayout(layout);
@@ -123,7 +122,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
 
     firePropertyCommittingEvent(currentValue);
 
-    if (isEnabled() && isChanged()) {
+    if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property, currentValue);
     }
     lastSelected = selectedModel;
@@ -193,12 +192,23 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Run when the PropertyEditor may have changed enabled states.
+   *
+   * This is a default implementation of updateEnabledState. If the
+   * labelComponent and valueComponent attributes are set, it will call
+   * setEnabled on those.
+   *
+   * Subclasses which do not use the default labelComponent and
+   * valueComponent attributes, or which require additional functionality,
+   * should override this method.
    */
-  public void setEnabled(boolean newValue) {
-
+  protected void updateEditorEnabled() {
+    Enumeration<AbstractButton> buttons = buttonGroup.getElements();
+    while (buttons.hasMoreElements()) {
+      buttons.nextElement().setEnabled(isEditorEnabled());
+    }
   }
+
 
   /**
    * Gets the parent PropertyEditorPane for the given component.
@@ -218,7 +228,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
    * Accepts or rejects the initial focus for this component.
    */
   public boolean acceptDefaultFocus() {
-    if (enabled) {
+    if (isEditorEnabled()) {
       Enumeration<AbstractButton> buttonEnum = buttonGroup.getElements();
       while (buttonEnum.hasMoreElements()) {
         AbstractButton button = buttonEnum.nextElement();

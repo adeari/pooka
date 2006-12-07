@@ -24,10 +24,9 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
     getLogger().fine("property is " + property + "; editorTemplate is " + editorTemplate);
 
     label = createLabel();
@@ -62,7 +61,7 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
 
     manager.registerPropertyEditor(property, this);
 
-    setEnabled(enabled);
+    updateEditorEnabled();
   }
 
   /**
@@ -188,13 +187,13 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
   public void setValue() throws PropertyValueVetoException {
     validateProperty();
     getLogger().fine("calling fsp.setValue.  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
-    if (isEnabled() && isChanged())
+    if (isEditorEnabled() && isChanged())
       manager.setProperty(property, (String)valueDisplay.getText());
   }
 
   public void validateProperty() throws PropertyValueVetoException {
-    getLogger().fine("calling fsp.validateProperty().  isEnabled() = " + isEnabled() + "; isChanged() = " + isChanged());
-    if (isEnabled())
+    getLogger().fine("calling fsp.validateProperty().  isEnabled() = " + isEditorEnabled() + "; isChanged() = " + isChanged());
+    if (isEditorEnabled())
       firePropertyCommittingEvent((String)valueDisplay.getText());
   }
 
@@ -214,20 +213,22 @@ public class FolderSelectorPane extends LabelValuePropertyEditor {
     return (!(originalValue.equals(valueDisplay.getText())));
   }
 
-  public void setEnabled(boolean newValue) {
-    getLogger().fine("calling fsp.setEnabled(" + newValue + ")");
+  /**
+   * Run when the PropertyEditor may have changed enabled states.
+   */
+  protected void updateEditorEnabled() {
+    getLogger().fine("calling fsp.updateEditorEnabled().  isEditorEnabled() = " + isEditorEnabled());
     if (inputButton != null) {
-      inputButton.setEnabled(newValue);
+      inputButton.setEnabled(isEditorEnabled());
     }
     if (valueDisplay != null) {
-      valueDisplay.setEnabled(newValue);
+      valueDisplay.setEnabled(isEditorEnabled());
     }
     if (label != null) {
-      label.setEnabled(newValue);
+      label.setEnabled(isEditorEnabled());
     }
-    getLogger().fine("set enabled to " + newValue);
+    getLogger().fine("set enabled to " + isEditorEnabled());
 
-    enabled=newValue;
   }
 
 }

@@ -20,10 +20,9 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    *                 editor.
    * @param manager The PropertyEditorManager that will manage the
    *                   changes.
-   * @param isEnabled Whether or not this editor is enabled by default.
    */
-  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager, boolean isEnabled) {
-    configureBasic(propertyName, template, propertyBaseName, newManager, isEnabled);
+  public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
+    configureBasic(propertyName, template, propertyBaseName, newManager);
     debug = newManager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
     //this.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -85,14 +84,14 @@ public class BooleanEditorPane extends SwingPropertyEditor {
 
     this.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, this.getPreferredSize().height));
     manager.registerPropertyEditor(property, this);
-    this.setEnabled(enabled);
+    updateEditorEnabled();
   }
 
   /**
    * as defined in net.suberic.util.gui.PropertyEditorUI
    */
   public void setValue() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       validateProperty();
       if (inputField.isSelected() != originalBoolean || manager.getProperty(property, "unset").equals("unset")) {
         String newValue;
@@ -110,7 +109,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    * as defined in net.suberic.util.gui.PropertyEditorUI
    */
   public void validateProperty() throws PropertyValueVetoException {
-    if (isEnabled()) {
+    if (isEditorEnabled()) {
       String newValue;
       if (inputField.isSelected())
         newValue = "true";
@@ -128,7 +127,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   public java.util.Properties getValue() {
     java.util.Properties retProps = new java.util.Properties();
 
-    if (! isEnabled()) {
+    if (! isEditorEnabled()) {
       return retProps;
     } else {
       if (inputField.isSelected())
@@ -150,16 +149,14 @@ public class BooleanEditorPane extends SwingPropertyEditor {
   }
 
   /**
-   * Sets the enabled property of the PropertyEditorUI.  Disabled
-   * editors should not be able to do setValue() calls.
+   * Run when the PropertyEditor may have changed enabled states.
    */
-  public void setEnabled(boolean newValue) {
+  protected void updateEditorEnabled() {
     //System.err.println("setting enabled for " + getProperty() + " to " + newValue);
     if (inputField != null) {
       //System.err.println("setting enabled for " + getProperty() + "; setting enabled on input field to " + newValue);
-      inputField.setEnabled(newValue);
+      inputField.setEnabled(isEditorEnabled());
     }
-    enabled=newValue;
   }
 
   /**
@@ -180,7 +177,7 @@ public class BooleanEditorPane extends SwingPropertyEditor {
    * Accepts or rejects the initial focus for this component.
    */
   public boolean acceptDefaultFocus() {
-    if (enabled && inputField.isRequestFocusEnabled()) {
+    if (isEditorEnabled() && inputField.isRequestFocusEnabled()) {
       return inputField.requestFocusInWindow();
     } else {
       return false;

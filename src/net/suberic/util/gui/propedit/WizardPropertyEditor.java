@@ -51,7 +51,7 @@ public class WizardPropertyEditor extends PropertyEditorPane {
     SpringLayout buttonLayout = new SpringLayout();
     buttonPanel.setLayout(buttonLayout);
 
-    JButton helpButton = createButton(manager.getProperty("button.help", "Help"), new AbstractAction() {
+    JButton helpButton = createButton("PropertyEditor.button.help", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           //System.err.println("showing help for " + editor.getHelpID());
           //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
@@ -60,19 +60,19 @@ public class WizardPropertyEditor extends PropertyEditorPane {
           manager.getFactory().getHelpBroker().setDisplayed(true);
 
         }
-      }, true);
+      });
 
     //CSH.setHelpIDString(helpButton, "UserProfile");
     buttonPanel.add(helpButton);
 
-    backButton = createButton(manager.getProperty("Wizard.button.back", "Back"), new AbstractAction() {
+    backButton = createButton("Wizard.button.back", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           wizard.back();
         }
-      }, false);
+      });
 
 
-    nextButton = createButton(manager.getProperty("Wizard.button.next", "Next"), new AbstractAction() {
+    nextButton = createButton("Wizard.button.next", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           try {
             wizard.next();
@@ -80,14 +80,13 @@ public class WizardPropertyEditor extends PropertyEditorPane {
             manager.getFactory().showError(WizardPropertyEditor.this, pvve.getMessage());
           }
         }
-      }, true);
+      });
 
-    JButton cancelButton = createButton(manager.getProperty("button.cancel",
-"Cancel"), new AbstractAction() {
+    JButton cancelButton = createButton("PropertyEditor.button.cancel", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
           closeWizard();
         }
-      }, false);
+      });
 
     buttonPanel.add(helpButton);
     buttonPanel.add(cancelButton);
@@ -138,12 +137,20 @@ public class WizardPropertyEditor extends PropertyEditorPane {
    */
   public void setEndState(boolean endState) {
     if (endState) {
-      if (! nextButton.getText().equals(manager.getProperty("Wizard.button.end", "Finish"))) {
-        nextButton.setText(manager.getProperty("Wizard.button.end", "Finish"));
+      if (! nextButton.getText().equals(manager.getProperty("Wizard.button.end.label", "Finish"))) {
+        nextButton.setText(manager.getProperty("Wizard.button.end.label", "Finish"));
+        String mnemonic = manager.getProperty("Wizard.button.end.keyBinding", "");
+        if (mnemonic.length() > 0) {
+          nextButton.setMnemonic(mnemonic.charAt(0));
+        }
       }
-          } else {
+    } else {
       if (! nextButton.getText().equals(manager.getProperty("Wizard.button.next", "Next"))) {
-        nextButton.setText(manager.getProperty("Wizard.button.next", "Next"));
+        nextButton.setText(manager.getProperty("Wizard.button.next.label", "Finish"));
+        String mnemonic = manager.getProperty("Wizard.button.next.keyBinding", "");
+        if (mnemonic.length() > 0) {
+          nextButton.setMnemonic(mnemonic.charAt(0));
+        }
       }
     }
   }

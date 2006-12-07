@@ -136,7 +136,11 @@ public class PropertyEditorManager {
    */
   public void setProperty(String property, String value) {
     localProps.setProperty(property, value);
-    removeProps.remove(property);
+    if (value != null && value.length() > 0) {
+      removeProps.remove(property);
+    } else {
+      removeProps.add(property);
+    }
   }
 
   /**
@@ -151,7 +155,7 @@ public class PropertyEditorManager {
    * editorTemplate, using this PropertyEditorManager.
    */
   public PropertyEditorUI createEditor(String property, String editorTemplate, String propertyBase) {
-    return getFactory().createEditor(property, editorTemplate, propertyBase, this, true);
+    return getFactory().createEditor(property, editorTemplate, propertyBase, this);
   }
 
   /**
@@ -167,9 +171,12 @@ public class PropertyEditorManager {
    * Commits the changes to the underlying VariableBundle.
    */
   public void commit() {
+    System.err.println("commit.");
     if (writeChanges) {
+      System.err.println("writeChanges.");
       for (String removeProp: removeProps) {
-        sourceBundle.removeProperty(removeProp);
+        System.err.println("removing property " + removeProp);
+        sourceBundle.setProperty(removeProp, "");
       }
 
       sourceBundle.setAllProperties(localProps);
