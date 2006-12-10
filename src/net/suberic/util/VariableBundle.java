@@ -21,7 +21,7 @@ public class VariableBundle extends Object {
   private ResourceBundle resources;
   private VariableBundle parentProperties;
   private File mSaveFile;
-  private Vector removeList = new Vector();
+  private Set removeSet = new HashSet();
   private Hashtable VCListeners = new Hashtable();
   private Hashtable VCGlobListeners = new Hashtable();
 
@@ -111,13 +111,19 @@ public class VariableBundle extends Object {
   }
 
   public String getProperty(String key, String defaultValue) {
-    String returnValue;
+    String returnValue = "";
 
-    returnValue = temporaryProperties.getProperty(key, "");
+    if (! propertyIsRemoved(key)) {
+      returnValue = temporaryProperties.getProperty(key, "");
+    }
     if (returnValue == "") {
-      returnValue = writableProperties.getProperty(key, "");
+      if (! propertyIsRemoved(key)) {
+        returnValue = writableProperties.getProperty(key, "");
+      }
       if (returnValue == "") {
-        returnValue = properties.getProperty(key, "");
+        if (! propertyIsRemoved(key)) {
+          returnValue = properties.getProperty(key, "");
+        }
         if (returnValue == "") {
           returnValue=getParentProperty(key, "");
           if (returnValue == "") {
@@ -185,14 +191,7 @@ public class VariableBundle extends Object {
   }
 
   public void setProperty(String propertyName, String propertyValue) {
-    temporaryProperties.remove(propertyName);
-    writableProperties.setProperty(propertyName, propertyValue);
-    if (propertyValue == null || propertyValue.equalsIgnoreCase("")) {
-      removeProperty(propertyName);
-    } else {
-      unRemoveProperty(propertyName);
-    }
-    fireValueChanged(propertyName);
+    internSetProperty(propertyName, propertyValue, true);
   }
 
   /**
@@ -202,15 +201,24 @@ public class VariableBundle extends Object {
   public void setAllProperties(Properties properties) {
     for (String propertyName: properties.stringPropertyNames()) {
       String propertyValue = properties.getProperty(propertyName);
-      temporaryProperties.remove(propertyName);
-      writableProperties.setProperty(propertyName, propertyValue);
-      if (propertyValue == null || propertyValue.equalsIgnoreCase("")) {
-        removeProperty(propertyName);
-      } else {
-        unRemoveProperty(propertyName);
-      }
+      internSetProperty(propertyName, propertyValue, false);
     }
     for (String propertyName: properties.stringPropertyNames()) {
+      fireValueChanged(propertyName);
+    }
+  }
+
+  private void internSetProperty(String propertyName, String propertyValue, boolean notify) {
+
+    temporaryProperties.remove(propertyName);
+    if (propertyValue == null || propertyValue.equalsIgnoreCase("")) {
+      removeProperty(propertyName);
+      writableProperties.remove(propertyName);
+    } else {
+      unRemoveProperty(propertyName);
+      writableProperties.setProperty(propertyName, propertyValue);
+    }
+    if (notify) {
       fireValueChanged(propertyName);
     }
   }
@@ -381,9 +389,9 @@ public class VariableBundle extends Object {
                   properties.setProperty(key, writableProperties.getProperty(key, ""));
                   writableProperties.remove(key);
                 }
-                //removeProperty(key);
+              } else {
+                properties.remove(key);
               }
-
             } else {
               writeSaveFile.write(currentLine);
               writeSaveFile.newLine();
@@ -393,9 +401,10 @@ public class VariableBundle extends Object {
 
           // write out the rest of the writableProperties
 
-          Enumeration propsLeft = writableProperties.keys();
-          while (propsLeft.hasMoreElements()) {
-            String nextKey = (String)propsLeft.nextElement();
+          Set<String> propsLeft = writableProperties.stringPropertyNames();
+          List<String> propsLeftList = new ArrayList<String>(propsLeft);
+          Collections.sort(propsLeftList);
+          for (String nextKey: propsLeftList) {
             String nextKeyEscaped = escapeWhiteSpace(nextKey);
             String nextValueEscaped = escapeWhiteSpace(writableProperties.getProperty(nextKey, ""));
             writeSaveFile.write(nextKeyEscaped + "=" + nextValueEscaped);
@@ -563,22 +572,16 @@ public class VariableBundle extends Object {
    * you do a writeProperties();
    */
   public void clearRemoveList() {
-    removeList.clear();
+    removeSet.clear();
   }
 
   /**
-   * This removes the property from the current VariableBundle.  This
-   * is different than setting the value to "" (or null) in that, if the
-   * property is removed, it is removed from the source property file.
+   * This removes the property from the current VariableBundle.
    */
-  public void removeProperty(String remProp) {
-    if (! propertyIsRemoved(remProp))
-      removeList.add(remProp);
-    if (remProp.equals("OutgoingServer")) {
-      Thread.currentThread().dumpStack();
+  private void removeProperty(String remProp) {
+    if (remProp != null) {
+      removeSet.add(remProp.intern());
     }
-    System.err.println("removed " + remProp);
-    System.err.println("in vb:  getProperty(remProp) = " + getProperty(remProp));
   }
 
   /**
@@ -587,26 +590,19 @@ public class VariableBundle extends Object {
    * value.  It's probably a good idea, though, to call this method any
    * time a property has its value set.
    */
-  public void unRemoveProperty(String unRemProp) {
-    for (int i = removeList.size() -1 ; i >= 0; i--) {
-      if (((String)removeList.elementAt(i)).equals(unRemProp))
-        removeList.removeElementAt(i);
+  private void unRemoveProperty(String unRemProp) {
+    if (unRemProp != null) {
+      removeSet.remove(unRemProp.intern());
     }
   }
 
   /**
-   * Returns true if the property is in the removeList for this
-   * VariableBundle.
+   * Returns true if the property has been removed.
    */
   public boolean propertyIsRemoved(String prop) {
-    if (removeList.size() < 1)
-      return false;
-
-    for (int i = 0; i < removeList.size(); i++) {
-      if (((String)removeList.elementAt(i)).equals(prop))
-        return true;
+    if (prop != null) {
+      return removeSet.contains(prop.intern());
     }
-
     return false;
   }
 
@@ -619,10 +615,12 @@ public class VariableBundle extends Object {
     Set notified = new HashSet();
 
     Vector listeners = (Vector)VCListeners.get(changedValue);
-    if (listeners != null && listeners.size() > 0) {
-      for (int i=0; i < listeners.size(); i++) {
-        ((ValueChangeListener)listeners.elementAt(i)).valueChanged(changedValue);
-        notified.add(listeners.elementAt(i));
+    if (listeners != null) {
+      Iterator iter = listeners.iterator();
+      while (iter.hasNext()) {
+        ValueChangeListener vcl = (ValueChangeListener) iter.next();
+        vcl.valueChanged(changedValue);
+        notified.add(vcl);
       }
     }
 

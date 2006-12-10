@@ -187,7 +187,6 @@ public class FirstRunWizardController extends NewStoreWizardController {
   }
 
   public int handleInvalidEntry(String message) {
-    System.err.println("invalid entry.");
     StringBuffer errorMessage = new StringBuffer(Pooka.getProperty("error.NewAccountPooka.invalidEntry", "invalid first entry."));
     if (message != null && message.length() > 0) {
       errorMessage.append("\n");
@@ -197,7 +196,7 @@ public class FirstRunWizardController extends NewStoreWizardController {
     errorMessage.append(Pooka.getProperty("error.NewAccountPooka.continueMessage", "Would you like to re-enter your information?"));
 
     JLabel jta = new JLabel(errorMessage.toString());
-    int continueResponse = JOptionPane.showOptionDialog(Pooka.getMainPanel().getContentPanel().getUIComponent(), errorMessage.toString(), "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE,  null, new Object[] { "Re-enter", "Continue" }, "Re-enter");
+    int continueResponse = JOptionPane.showOptionDialog(Pooka.getMainPanel(), errorMessage.toString(), "Failed to connect to Store.", javax.swing.JOptionPane.YES_NO_OPTION, javax.swing.JOptionPane.WARNING_MESSAGE,  null, new Object[] { "Re-enter", "Continue" }, "Re-enter");
     if (continueResponse == 0) {
       return JOptionPane.YES_OPTION;
     } else {
@@ -211,29 +210,31 @@ public class FirstRunWizardController extends NewStoreWizardController {
    * Clears the proprties for this wizard.
    */
   private void clearProperties() {
+    // we have to do this in two phases to make sure that we don't
+    // accidentally modify a Store/User/SMTP Server that is being
+    // removed.
+    getManager().removeProperty("Store");
+    getManager().removeProperty("User");
+    getManager().removeProperty("OutgoingServer");
 
-    System.err.println("removing properties.");
-    /*
+    getManager().commit();
+
     Set<String> removeProperties = getManager().getPropertyNamesStartingWith("Store");
     for (String prop: removeProperties) {
-      System.err.println("removing property " + prop);
+      //System.err.println("removing property " + prop);
       getManager().removeProperty(prop);
     }
     removeProperties = getManager().getPropertyNamesStartingWith("User");
     for (String prop: removeProperties) {
-      System.err.println("removing property " + prop);
+      //System.err.println("removing property " + prop);
       getManager().removeProperty(prop);
     }
     removeProperties = getManager().getPropertyNamesStartingWith("OutgoingServer");
     for (String prop: removeProperties) {
-      System.err.println("removing property " + prop);
+      //System.err.println("removing property " + prop);
       getManager().removeProperty(prop);
     }
-    */
-    getManager().setProperty("Store", "");
     getManager().commit();
-
-    System.err.println("getManager().getProperty(\"Store\") = " + getManager().getProperty("Store", ""));
 
   }
 }

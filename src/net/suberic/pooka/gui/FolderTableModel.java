@@ -3,7 +3,6 @@ import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.thread.MessageLoader;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.SwingUtilities;
-import net.suberic.util.swing.RunnableAdapter;
 import java.util.*;
 
 
@@ -164,7 +163,7 @@ public class FolderTableModel extends AbstractTableModel {
         data.addAll(changedMsg);
         if (! SwingUtilities.isEventDispatchThread())
           try {
-            SwingUtilities.invokeAndWait(new RunnableAdapter() {
+            SwingUtilities.invokeAndWait(new Runnable() {
                 public void run() {
                   fireTableRowsInserted(firstRow, lastRow);
                 }
@@ -182,7 +181,7 @@ public class FolderTableModel extends AbstractTableModel {
 
             if ( ! SwingUtilities.isEventDispatchThread())
               try {
-                SwingUtilities.invokeAndWait(new RunnableAdapter() {
+                SwingUtilities.invokeAndWait(new Runnable() {
                     public void run() {
                       fireTableRowsDeleted(rowNumber, rowNumber);
                     }

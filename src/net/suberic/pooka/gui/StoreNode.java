@@ -58,16 +58,16 @@ public class StoreNode extends MailTreeNode {
    */
   public void loadChildren() {
     Runnable runMe = new Runnable() {
-  public void run() {
-    doLoadChildren();
-  }
+        public void run() {
+          doLoadChildren();
+        }
       };
 
     if (SwingUtilities.isEventDispatchThread())
       doLoadChildren();
     else {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception ie) {
       }
     }
@@ -82,38 +82,38 @@ public class StoreNode extends MailTreeNode {
     logger.fine("calling loadChildren() for " + getStoreInfo().getStoreID());
 
     Enumeration origChildren = super.children();
-      Vector origChildrenVector = new Vector();
-      while (origChildren.hasMoreElements())
-  origChildrenVector.add(origChildren.nextElement());
+    Vector origChildrenVector = new Vector();
+    while (origChildren.hasMoreElements())
+      origChildrenVector.add(origChildren.nextElement());
 
-      logger.fine(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
+    logger.fine(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
 
-      Vector storeChildren = getStoreInfo().getChildren();
+    Vector storeChildren = getStoreInfo().getChildren();
 
-      logger.fine(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
+    logger.fine(getStoreInfo().getStoreID() + ":  storeChildren.size() = " + storeChildren.size());
 
-      if (storeChildren != null) {
-  for (int i = 0; i < storeChildren.size(); i++) {
-    FolderNode node = popChild(((FolderInfo)storeChildren.elementAt(i)).getFolderName(), origChildrenVector);
-    if (node == null) {
-      node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
-      // we used insert here, since add() would mak
-      // another recursive call to getChildCount();
-      insert(node, 0);
+    if (storeChildren != null) {
+      for (int i = 0; i < storeChildren.size(); i++) {
+        FolderNode node = popChild(((FolderInfo)storeChildren.elementAt(i)).getFolderName(), origChildrenVector);
+        if (node == null) {
+          node = new FolderNode((FolderInfo)storeChildren.elementAt(i), getParentContainer());
+          // we used insert here, since add() would mak
+          // another recursive call to getChildCount();
+          insert(node, 0);
+        }
+      }
+
     }
-  }
 
-      }
+    removeChildren(origChildrenVector);
 
-      removeChildren(origChildrenVector);
-
-      hasLoaded=true;
+    hasLoaded=true;
 
 
-      javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-      if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
-  ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
-      }
+    javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+    if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+      ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
+    }
 
   }
 
@@ -130,11 +130,11 @@ public class StoreNode extends MailTreeNode {
   public FolderNode popChild(String childName, Vector childrenList) {
     if (children != null) {
       for (int i = 0; i < childrenList.size(); i++)
-  if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
-    FolderNode fn = (FolderNode)childrenList.elementAt(i);
-    childrenList.remove(fn);
-    return fn;
-  }
+        if (((FolderNode)childrenList.elementAt(i)).getFolderInfo().getFolderName().equals(childName)) {
+          FolderNode fn = (FolderNode)childrenList.elementAt(i);
+          childrenList.remove(fn);
+          return fn;
+        }
     }
 
     // no match.
@@ -148,7 +148,7 @@ public class StoreNode extends MailTreeNode {
   public void removeChildren(Vector removeList) {
     for (int i = 0; i < removeList.size(); i++) {
       if (removeList.elementAt(i) instanceof javax.swing.tree.MutableTreeNode)
-  this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
+        this.remove((javax.swing.tree.MutableTreeNode)removeList.elementAt(i));
     }
   }
 
@@ -208,21 +208,21 @@ public class StoreNode extends MailTreeNode {
 
     if (response != null && response.length() > 0) {
       getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
-    public void actionPerformed(java.awt.event.ActionEvent e) {
-      try {
-        getStoreInfo().createSubFolder(response, finalType);
-      } catch (MessagingException me) {
-        final Exception fme = me;
-        SwingUtilities.invokeLater(new Runnable() {
-      public void run() {
-        Pooka.getUIFactory().showError(fme.getMessage());
-      }
-    });
+          public void actionPerformed(java.awt.event.ActionEvent e) {
+            try {
+              getStoreInfo().createSubFolder(response, finalType);
+            } catch (MessagingException me) {
+              final Exception fme = me;
+              SwingUtilities.invokeLater(new Runnable() {
+                  public void run() {
+                    Pooka.getUIFactory().showError(fme.getMessage());
+                  }
+                });
 
-        me.printStackTrace();
-      }
-    }
-  } , new java.awt.event.ActionEvent(this, 0, "folder-new"));
+              me.printStackTrace();
+            }
+          }
+        } , new java.awt.event.ActionEvent(this, 0, "folder-new"));
     }
   }
 
@@ -233,12 +233,12 @@ public class StoreNode extends MailTreeNode {
     final boolean newValue = newBusy;
 
     Runnable runMe = new Runnable() {
-  public void run() {
-    if (newValue)
-      getParentContainer().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    else
-      getParentContainer().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-  }
+        public void run() {
+          if (newValue)
+            getParentContainer().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          else
+            getParentContainer().setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
       };
 
     if (SwingUtilities.isEventDispatchThread())
@@ -301,12 +301,12 @@ public class StoreNode extends MailTreeNode {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       if (!store.isConnected())
-  try {
-    store.connectStore();
-  } catch (MessagingException me) {
-    // I should make this easier.
-    Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store.") + "\n" + Pooka.getProperty("error.sourceException", "The underlying exception reads:  ") + "\n" + me.getMessage());
-  }
+        try {
+          store.connectStore();
+        } catch (MessagingException me) {
+          // I should make this easier.
+          Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store.") + "\n" + Pooka.getProperty("error.sourceException", "The underlying exception reads:  ") + "\n" + me.getMessage());
+        }
       javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
       folderTree.expandPath(folderTree.getSelectionPath());
     }
@@ -321,69 +321,69 @@ public class StoreNode extends MailTreeNode {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      Pooka.getUIFactory().showStatusMessage("Connecting to " + getStoreInfo().getStoreID() + " to get list of folders...");
-      setBusy(true);
-    }
-  });
+          public void run() {
+            Pooka.getUIFactory().showStatusMessage("Connecting to " + getStoreInfo().getStoreID() + " to get list of folders...");
+            setBusy(true);
+          }
+        });
 
       // this is happening on the store thread.
       final MailFileSystemView mfsv = new MailFileSystemView(getStoreInfo());
 
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      final Logger storeLogger = Logger.getLogger("Store." + getStoreInfo().getStoreID());
-      final Logger guiLogger = Logger.getLogger("Pooka.debug.gui.filechooser");
-
-      JFileChooser jfc =
-        new JFileChooser(getStoreInfo().getStoreID(), mfsv);
-      jfc.setMultiSelectionEnabled(true);
-      jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-      int returnValue =
-        jfc.showDialog(getParentContainer(),
-           Pooka.getProperty("FolderEditorPane.Select",
-                 "Select"));
-      if (returnValue == JFileChooser.APPROVE_OPTION) {
-        guiLogger.fine("got " + jfc.getSelectedFile() + " as a return value.");
-
-        final java.io.File[] selectedFiles = jfc.getSelectedFiles();
-
-        getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
-      public void actionPerformed(java.awt.event.ActionEvent ae) {
-        for (int i = 0 ; selectedFiles != null && i < selectedFiles.length; i++) {
-          net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = (net.suberic.pooka.gui.filechooser.FolderFileWrapper) selectedFiles[i];
-          try {
-      // if it doesn't exist, try to create it.
-      if (! wrapper.exists()) {
-        wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
-      }
-      String absFileName = wrapper.getAbsolutePath();
-      int firstSlash = absFileName.indexOf('/');
-      String normalizedFileName = absFileName;
-      if (firstSlash >= 0)
-        normalizedFileName = absFileName.substring(firstSlash);
-
-      guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
-      storeLogger.fine("adding folder " + normalizedFileName);
-
-      getStoreInfo().subscribeFolder(normalizedFileName);
-          } catch (MessagingException me) {
-      final String folderName = wrapper.getName();
-      SwingUtilities.invokeLater(new Runnable() {
           public void run() {
-            Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
+            final Logger storeLogger = Logger.getLogger("Store." + getStoreInfo().getStoreID());
+            final Logger guiLogger = Logger.getLogger("Pooka.debug.gui.filechooser");
+
+            JFileChooser jfc =
+              new JFileChooser(getStoreInfo().getStoreID(), mfsv);
+            jfc.setMultiSelectionEnabled(true);
+            jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+            int returnValue =
+              jfc.showDialog(getParentContainer(),
+                             Pooka.getProperty("FolderEditorPane.Select",
+                                               "Select"));
+            if (returnValue == JFileChooser.APPROVE_OPTION) {
+              guiLogger.fine("got " + jfc.getSelectedFile() + " as a return value.");
+
+              final java.io.File[] selectedFiles = jfc.getSelectedFiles();
+
+              getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+                  public void actionPerformed(java.awt.event.ActionEvent ae) {
+                    for (int i = 0 ; selectedFiles != null && i < selectedFiles.length; i++) {
+                      net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = (net.suberic.pooka.gui.filechooser.FolderFileWrapper) selectedFiles[i];
+                      try {
+                        // if it doesn't exist, try to create it.
+                        if (! wrapper.exists()) {
+                          wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+                        }
+                        String absFileName = wrapper.getAbsolutePath();
+                        int firstSlash = absFileName.indexOf('/');
+                        String normalizedFileName = absFileName;
+                        if (firstSlash >= 0)
+                          normalizedFileName = absFileName.substring(firstSlash);
+
+                        guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
+                        storeLogger.fine("adding folder " + normalizedFileName);
+
+                        getStoreInfo().subscribeFolder(normalizedFileName);
+                      } catch (MessagingException me) {
+                        final String folderName = wrapper.getName();
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                              Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
+                            }
+                          });
+                      }
+                    }
+                  }
+                },  new java.awt.event.ActionEvent(this, 0, "folder-subscribe"));
+            }
+
+            Pooka.getUIFactory().clearStatus();
+            setBusy(false);
           }
         });
-          }
-        }
-      }
-    },  new java.awt.event.ActionEvent(this, 0, "folder-subscribe"));
-      }
-
-      Pooka.getUIFactory().clearStatus();
-      setBusy(false);
-    }
-  });
     }
   }
 
@@ -407,9 +407,9 @@ public class StoreNode extends MailTreeNode {
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
       try {
-  getStoreInfo().disconnectStore();
+        getStoreInfo().disconnectStore();
       } catch (Exception ex) {
-  System.out.println("caught exception:  " + ex.getMessage());
+        System.out.println("caught exception:  " + ex.getMessage());
       }
     }
   }

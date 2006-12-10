@@ -200,76 +200,6 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     return messagePanel;
   }
 
-  /**
-   * Shows a Confirm dialog.
-   */
-  public int showConfirmDialog(String message, String title, int type) {
-    String displayMessage = formatMessage(message);
-    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
-    final String fDisplayMessage = displayMessage;
-    final String fTitle = title;
-    final int fType = type;
-    Runnable runMe = new Runnable() {
-        public void run() {
-          fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fDisplayMessage, fTitle, fType));
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
-    return fResponseWrapper.getInt();
-  }
-
-  /**
-   * Shows a Confirm dialog with the given Object[] as the Message.
-   */
-  public int showConfirmDialog(Object[] messageComponents, String title, int type) {
-    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
-    final Object[] fMessageComponents = messageComponents;
-    final String fTitle = title;
-    final int fType = type;
-    Runnable runMe = new Runnable() {
-        public void run() {
-          fResponseWrapper.setInt(JOptionPane.showInternalConfirmDialog(messagePanel, fMessageComponents, fTitle, fType));
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
-    return fResponseWrapper.getInt();
-  }
-
-  /**
-   * This shows an Error Message window.
-   */
-  public void showError(String errorMessage, String title) {
-    final String displayErrorMessage = formatMessage(errorMessage);
-    final String fTitle = title;
-
-    if (showing) {
-      SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            JOptionPane.showInternalMessageDialog(getMessagePanel(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
-          }
-        });
-    } else
-      System.out.println(errorMessage);
-
-  }
 
   /**
    * This shows an Error Message window.
@@ -285,24 +215,6 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     showError(errorMessage, Pooka.getProperty("Error", "Error"), e);
   }
 
-  /**
-   * This shows an Error Message window.
-   */
-  public void showError(String errorMessage, String title, Exception e) {
-    final String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
-    final Exception fE = e;
-    final String fTitle = title;
-    if (showing) {
-      SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            JOptionPane.showInternalMessageDialog(getMessagePanel(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
-          }
-        });
-    } else
-      System.out.println(errorMessage);
-
-    //e.printStackTrace();
-  }
 
   /**
    * This formats a display message.
@@ -311,96 +223,6 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
   }
 
-  /**
-   * This shows an Input window.
-   */
-  public String showInputDialog(String inputMessage, String title) {
-    final String displayMessage = formatMessage(inputMessage);
-    final String fTitle = title;
-    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
-
-    Runnable runMe = new Runnable() {
-        public void run() {
-          fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
-    return fResponseWrapper.getString();
-  }
-
-  /**
-   * This shows an Input window.  We include this so that the
-   * MessageProxy can call the method without caring about the actual
-   * implementation of the dialog.
-   */
-  public String showInputDialog(Object[] inputPanes, String title) {
-    final String fTitle = title;
-    final Object[] fInputPanes = inputPanes;
-    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
-
-    Runnable runMe = new Runnable() {
-        public void run() {
-          fResponseWrapper.setString(JOptionPane.showInternalInputDialog(getMessagePanel(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
-    return fResponseWrapper.getString();
-  }
-
-  /**
-   * Shows a message.
-   */
-  public void showMessage(String newMessage, String title) {
-    //final String displayMessage = formatMessage(newMessage);
-    final String displayMessage = newMessage;
-    final String fTitle = title;
-
-    Runnable runMe = new Runnable() {
-        public void run() {
-          //JLabel displayPanel = new JLabel(displayMessage);
-          JTextArea displayPanel = new JTextArea(displayMessage);
-          displayPanel.setEditable(false);
-          java.awt.Dimension dpSize = displayPanel.getPreferredSize();
-          JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-          scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
-          //System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
-          //System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
-          //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-          //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
-          //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
-
-          JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
-          //JOptionPane.showInternalMessageDialog((MessagePanel)Pooka.getMainPanel().getContentPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-  }
 
   /**
    * Creates a ProgressDialog using the given values.
@@ -416,17 +238,6 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
     java.awt.Window mainWindow = SwingUtilities.getWindowAncestor(messagePanel);
     java.awt.Window componentWindow = SwingUtilities.getWindowAncestor(c);
     return (mainWindow == componentWindow);
-  }
-
-  /**
-   * Creates the panels for showing an error message.
-   */
-  public Object[] createErrorPanel(String message, Exception e) {
-    Object[] returnValue = new Object[2];
-    returnValue[0] = message;
-    returnValue[1] = new net.suberic.util.swing.ExceptionDisplayPanel(Pooka.getProperty("error.showStackTrace", "Stack Trace"), e);
-
-    return returnValue;
   }
 
 

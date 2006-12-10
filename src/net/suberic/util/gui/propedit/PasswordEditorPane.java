@@ -45,6 +45,14 @@ public class PasswordEditorPane extends StringEditorPane {
             }
           }
         }
+
+        public void focusGained(FocusEvent e) {
+          if (inputField.getText() != null && inputField.getText().length() > 0) {
+            inputField.setSelectionStart(0);
+            inputField.setSelectionEnd(inputField.getText().length());
+          }
+        }
+
       });
     this.add(label);
     this.add(inputField);

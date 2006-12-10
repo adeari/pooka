@@ -11,21 +11,21 @@ import net.suberic.util.*;
  */
 
 public class StoreManager implements ItemCreator, ItemListChangeListener {
-  
+
   private ItemManager manager;
   private LinkedList listenerList = new LinkedList();
-  
+
   public StoreManager() {
     createStoreList();
   }
-  
+
   //-----------------------
   // public interface.
-  
+
   /**
    * As defined in net.suberic.util.ValueChangeListener.
-   * 
-   * This listens for ItemListChangeEvents, which result from changes to the 
+   *
+   * This listens for ItemListChangeEvents, which result from changes to the
    * "Store" property.  The result is that refrestStoreInfos() is called,
    * and then the event is passed to listeners to this object.
    */
@@ -33,7 +33,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     fireItemListChanged(e);
     refreshStoreInfos(e);
   }
-  
+
   /**
    * This returns a Vector with all the currently registered StoreInfo
    * objects.
@@ -41,21 +41,21 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
   public java.util.Vector getStoreList() {
     return manager.getItems();
   }
-  
+
   /**
    * This adds the store with the given storeName to the allStores list.
    */
   public void addStore(String storeName) {
     manager.addItem(storeName);
   }
-  
+
   /**
    * This adds the stores with the given storeNames to the allStores list.
    */
   public void addStore(String[] storeName) {
     manager.addItem(storeName);
   }
-  
+
   /**
    * This removes the store with the given storeName.
    */
@@ -76,14 +76,14 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
   public void removeStore(StoreInfo store) {
     manager.removeItem(store);
   }
-  
+
   /**
    * This removes the given StoreInfos.
    */
   public void removeStore(StoreInfo[] stores) {
     manager.removeItem(stores);
   }
-  
+
   /**
    * This compares the storeList object with the Store property, and
    * updates the storeList appropriately.
@@ -94,7 +94,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
       ((StoreInfo) removedStores[i]).remove();
     }
   }
-  
+
   /**
    * This returns the FolderInfo which corresponds to the given folderName.
    * The folderName should be in the form "/storename/folder/subfolder".
@@ -103,44 +103,44 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     if (folderName != null && folderName.length() >= 1) {
       int divider = folderName.indexOf('/', 1);
       while (divider == 0) {
-	folderName = folderName.substring(1);
-	divider = folderName.indexOf('/');
+  folderName = folderName.substring(1);
+  divider = folderName.indexOf('/');
       }
-      
+
       if (divider > 0) {
-	String storeName = folderName.substring(0, divider);
-	StoreInfo store = getStoreInfo(storeName);
-	if (store != null) {
-	  return store.getChild(folderName.substring(divider +1));
-	} 
+  String storeName = folderName.substring(0, divider);
+  StoreInfo store = getStoreInfo(storeName);
+  if (store != null) {
+    return store.getChild(folderName.substring(divider +1));
+  }
       }
     }
-    
+
     return null;
   }
-  
+
   /**
    * This returns the FolderInfo which corresponds to the given folderID.
    * The folderName should be in the form "storename.folderID.folderID".
    */
   public FolderInfo getFolderById(String folderID) {
     // hurm.  the problem here is that '.' is a legal value in a name...
-    
+
     java.util.Vector allStores = getStoreList();
-    
+
     for (int i = 0; i < allStores.size(); i++) {
       StoreInfo currentStore = (StoreInfo) allStores.elementAt(i);
       if (folderID.startsWith(currentStore.getStoreID())) {
-	FolderInfo possibleMatch = currentStore.getFolderById(folderID);
-	if (possibleMatch != null) {
-	  return possibleMatch;
-	}
+  FolderInfo possibleMatch = currentStore.getFolderById(folderID);
+  if (possibleMatch != null) {
+    return possibleMatch;
+  }
       }
     }
-    
+
     return null;
   }
-  
+
   /**
    * Gets all of the open and available folders known by the system.
    */
@@ -150,10 +150,10 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     for (int i = 0; i < currentStores.size(); i++) {
       returnValue.addAll(((StoreInfo) currentStores.elementAt(i)).getAllFolders());
     }
-    
+
     return returnValue;
   }
-  
+
   /**
    * This returns the StoreInfo with the given storeName if it exists
    * in the allStores Vector; otherwise, returns null.
@@ -161,7 +161,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
   public StoreInfo getStoreInfo(String storeID) {
     return (StoreInfo) manager.getItem(storeID);
   }
-  
+
   /**
    * This loads all the Sent Folders on the UserProfile object.  This must
    * be called separately because UserProfiles have references to StoreInfos
@@ -169,12 +169,12 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
    */
   public void loadAllSentFolders() {
     List profileList = Pooka.getPookaManager().getUserProfileManager().getUserProfileList();
-    
+
     for (int i = 0; i < profileList.size(); i++) {
       ((UserProfile)profileList.get(i)).loadSentFolder();
     }
   }
-  
+
   /**
    * This adds a ItemListChangeListener to the local listener list.
    */
@@ -182,7 +182,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     if (! listenerList.contains(ilcl))
       listenerList.add(ilcl);
   }
-  
+
   /**
    * This removes a ItemListChangeListener from the local listener list.
    */
@@ -197,11 +197,11 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     for (int i = 0; i < listenerList.size(); i++)
       ((ItemListChangeListener)listenerList.get(i)).itemListChanged(e);
   }
-  
-  
+
+
   /**
    * This creates a new StoreInfo.
-   * 
+   *
    * As defined by interface net.suberic.util.ItemCreator.
    */
   public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID) {
@@ -210,7 +210,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
 
   //---------------------------
   // the background stuff.
-  
+
   /**
    * This loads and creates all the Stores using the "Store" property
    * of the main Pooka VariableBundle.
@@ -229,12 +229,12 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
     // we have to configure this or the sun jdks will fail.  however, this
     // also will make ibm jdks fail since they don't have the com.sun
     // classes.  so we have to be sneaky.
-    
+
     try {
       Object provider = Class.forName("com.sun.net.ssl.internal.ssl.Provider").newInstance();
-      
+
       java.security.Security.addProvider((java.security.Provider) provider);
-      
+
       //java.security.Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
     } catch (Exception e) {
       // if we catch an exception for this then we're probably running with
@@ -242,7 +242,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
       // explicitly
     }
     java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
-    
+
   }
 
   /**

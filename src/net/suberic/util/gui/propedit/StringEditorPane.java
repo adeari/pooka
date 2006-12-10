@@ -47,6 +47,14 @@ public class StringEditorPane extends LabelValuePropertyEditor {
             }
           }
         }
+
+        public void focusGained(FocusEvent e) {
+          if (inputField.getText() != null && inputField.getText().length() > 0) {
+            inputField.setSelectionStart(0);
+            inputField.setSelectionEnd(inputField.getText().length());
+          }
+        }
+
       });
     this.add(label);
     this.add(inputField);

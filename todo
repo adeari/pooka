@@ -1,22 +1,16 @@
 *) editors:
-  
   *)  get new store wizard working.
 	*) get wizard working from new user startup
 	  *) fix on failure message.
-		-- works on failure to login but continue anyway.
 		-- connect fails takes too long without showing feedback.
 			looks like nothing is happening.
-		-- re-enter properties fails.
-		   need to clear out properties when connection fails.
-		-- cancelling out of wizard still shows success message.
-	  *) add key accelerators to buttons
 	  *) make welcome screen look/read better
-	  *) add success message (?)
 	*) add in explanatory text/help
 	*) ? test creating stores; make sure that we're getting the
 	   correct editor al the time
 	*) make sure that removing stores, users, etc. removes all
 	   subsettings too.
+	*) make strings automatically select the current value.
   *)  key bindings for editors (!!)
   *)  update other editors
   *)  add new user wizard (?)

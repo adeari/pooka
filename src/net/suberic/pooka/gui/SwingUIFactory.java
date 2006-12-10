@@ -86,22 +86,107 @@ public abstract class SwingUIFactory implements PookaUIFactory {
   /**
    * Shows a Confirm dialog.
    */
-  public abstract int showConfirmDialog(String message, String title, int type);
+  public int showConfirmDialog(String message, String title, int type) {
+    String displayMessage = formatMessage(message);
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    final String fDisplayMessage = displayMessage;
+    final String fTitle = title;
+    final int fType = type;
+    Runnable runMe = new Runnable() {
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(Pooka.getMainPanel(), fDisplayMessage, fTitle, fType));
+        }
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+        SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getInt();
+  }
 
   /**
    * Shows a Confirm dialog with the given Object[] as the Message.
    */
-  public abstract int showConfirmDialog(Object[] messageComponents, String title, int type);
+  public int showConfirmDialog(Object[] messageComponents, String title, int type) {
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+    final Object[] fMessageComponents = messageComponents;
+    final String fTitle = title;
+    final int fType = type;
+    Runnable runMe = new Runnable() {
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(Pooka.getMainPanel(), fMessageComponents, fTitle, fType));
+        }
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+        SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getInt();
+  }
 
   /**
    * This shows an Input window.
    */
-  public abstract String showInputDialog(String inputMessage, String title);
+  public  String showInputDialog(String inputMessage, String title) {
+    final String displayMessage = formatMessage(inputMessage);
+    final String fTitle = title;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(Pooka.getMainPanel(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
+        }
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+        SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getString();
+  }
 
   /**
    * Shows an Input window.
    */
-  public abstract String showInputDialog(Object[] inputPanels, String title);
+  public  String showInputDialog(Object[] inputPanels, String title) {
+    final String fTitle = title;
+    final Object[] fInputPanes = inputPanels;
+    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
+
+    Runnable runMe = new Runnable() {
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(Pooka.getMainPanel(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
+        }
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+        SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+
+    return fResponseWrapper.getString();
+  }
 
   /**
    * Shows a status message.
@@ -139,7 +224,27 @@ public abstract class SwingUIFactory implements PookaUIFactory {
   /**
    * Shows a message.
    */
-  public abstract void showMessage(String newMessage, String title);
+  public void showMessage(String newMessage, String title) {
+    final String displayMessage = formatMessage(newMessage);
+    //final String displayMessage = newMessage;
+    final String fTitle = title;
+
+    Runnable runMe = new Runnable() {
+        public void run() {
+          JLabel displayPanel = new JLabel(displayMessage);
+          JOptionPane.showMessageDialog(Pooka.getMainPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+        }
+      };
+
+    if (! SwingUtilities.isEventDispatchThread()) {
+      try {
+        SwingUtilities.invokeAndWait(runMe);
+      } catch (Exception e) {
+      }
+    } else {
+      runMe.run();
+    }
+  }
 
   /**
    * Creates a ProgressDialog using the given values.
@@ -189,6 +294,44 @@ public abstract class SwingUIFactory implements PookaUIFactory {
 
 
   /**
+   * This shows an Error Message window.
+   */
+  public void showError(String errorMessage, String title) {
+    final String displayErrorMessage = formatMessage(errorMessage);
+    final String fTitle = title;
+
+    if (showing) {
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            JOptionPane.showMessageDialog(Pooka.getMainPanel(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
+          }
+        });
+    } else
+      System.out.println(errorMessage);
+
+  }
+
+  /**
+   * This shows an Error Message window.
+   */
+  public void showError(String errorMessage, String title, Exception e) {
+    final String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
+    final Exception fE = e;
+    final String fTitle = title;
+    if (showing) {
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            JOptionPane.showMessageDialog(Pooka.getMainPanel(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
+          }
+        });
+    } else
+      System.out.println(errorMessage);
+
+    //e.printStackTrace();
+  }
+
+
+  /**
    * Shows a SearchForm with the given FolderInfos selected.  The allowed
    * values will be the list of all available Folders.
    */
@@ -217,6 +360,17 @@ public abstract class SwingUIFactory implements PookaUIFactory {
    */
   public net.suberic.util.gui.IconManager getIconManager() {
     return mIconManager;
+  }
+
+  /**
+   * Creates the panels for showing an error message.
+   */
+  public Object[] createErrorPanel(String message, Exception e) {
+    Object[] returnValue = new Object[2];
+    returnValue[0] = message;
+    returnValue[1] = new net.suberic.util.swing.ExceptionDisplayPanel(Pooka.getProperty("error.showStackTrace", "Stack Trace"), e);
+
+    return returnValue;
   }
 
 }

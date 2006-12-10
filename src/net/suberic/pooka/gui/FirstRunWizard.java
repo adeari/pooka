@@ -42,7 +42,12 @@ public class FirstRunWizard {
     PropertyEditorManager manager = new PropertyEditorManager(factory.getSourceBundle(), factory, factory.getIconManager());
     factory.showNewEditorWindow(Pooka.getProperty("Pooka._firstRunWizard.label", "Create New Account"), "Pooka._firstRunWizard", "Pooka._firstRunWizard", "Pooka._firstRunWizard", manager, Pooka.getMainPanel().getParentFrame());
 
-    showConfirmation();
+    if (Pooka.getProperty("Store", "").length() > 0) {
+      showConfirmation();
+    } else {
+      showWizardCancelled();
+    }
+
   }
 
   /**
@@ -148,8 +153,23 @@ public class FirstRunWizard {
 
   }
 
+  /**
+   * Shows a confirmation message saying that the wizard has completed
+   * successfully.
+   */
+  public void showWizardCancelled() {
+    Pooka.getUIFactory().showMessage(Pooka.getProperty("FirstRunWizard.cancelledMessage", ""), Pooka.getProperty("FirstRunWizard.cancelledMessage.title", "Wizard cancelled."));
+    //JOptionPane.showMessageDialog(Pooka.getMainPanel(), Pooka.getProperty("FirstRunWizard.cancelledMessage", ""), Pooka.getProperty("FirstRunWizard.cancelledMessage.title", "Wizard cancelled."), JOptionPane.INFORMATION_MESSAGE);
+
+  }
+
+  /**
+   * Shows a confirmation message saying that the wizard has completed
+   * successfully.
+   */
   public void showConfirmation() {
-    JOptionPane.showMessageDialog(Pooka.getMainPanel(), Pooka.getProperty("FirstRunWizard.finishedMessage", "Email account configured!  If you need to make changes,\nor to add new accounts, go to the Configuration menu."), Pooka.getProperty("FirstRunWizard.finishedMessage.title", "Done!"), JOptionPane.INFORMATION_MESSAGE);
+    Pooka.getUIFactory().showMessage(Pooka.getProperty("FirstRunWizard.finishedMessage", "Email account configured!  If you need to make changes,\nor to add new accounts, go to the Configuration menu."), Pooka.getProperty("FirstRunWizard.finishedMessage.title", "Done!"));
+    //JOptionPane.showMessageDialog(Pooka.getMainPanel(), Pooka.getProperty("FirstRunWizard.finishedMessage", "Email account configured!  If you need to make changes,\nor to add new accounts, go to the Configuration menu."), Pooka.getProperty("FirstRunWizard.finishedMessage.title", "Done!"), JOptionPane.INFORMATION_MESSAGE);
 
   }
 

@@ -81,6 +81,11 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
       getWizardContainer().setBeginningState(inBeginningState());
       getWizardContainer().setEndState(inEndState());
     }
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          acceptDefaultFocus();
+        }
+      });
   }
 
 
@@ -117,11 +122,6 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
    */
   public void next() throws PropertyValueVetoException {
     controller.next();
-    SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          acceptDefaultFocus();
-        }
-      });
   }
 
   /**

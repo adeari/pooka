@@ -159,7 +159,6 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     final int fType = type;
     Runnable runMe = new Runnable() {
         public void run() {
-          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(contentPanel.getUIComponent(), fDisplayMessage, fTitle, fType));
         }
       };
 
@@ -207,27 +206,6 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
    * the MessageProxy can call the method without caring abou the
    * actual implementation of the Dialog.
    */
-  public void showError(String errorMessage, String title) {
-    final String displayErrorMessage = formatMessage(errorMessage);
-    final String fTitle = title;
-
-    if (showing) {
-      SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayErrorMessage, fTitle, JOptionPane.ERROR_MESSAGE);
-          }
-        });
-    } else
-      System.out.println(errorMessage);
-
-
-  }
-
-  /**
-   * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring abou the
-   * actual implementation of the Dialog.
-   */
   public void showError(String errorMessage) {
     showError(errorMessage, Pooka.getProperty("Error", "Error"));
   }
@@ -242,124 +220,10 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   }
 
   /**
-   * This shows an Error Message window.  We include this so that
-   * the MessageProxy can call the method without caring about the
-   * actual implementation of the Dialog.
-   */
-  public void showError(String errorMessage, String title, Exception e) {
-    final String displayErrorMessage = formatMessage(errorMessage + ":  " + e.getMessage());
-    final Exception fE = e;
-    final String fTitle = title;
-    if (showing) {
-      SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            JOptionPane.showMessageDialog(contentPanel.getUIComponent(), createErrorPanel(displayErrorMessage, fE), fTitle, JOptionPane.ERROR_MESSAGE);
-          }
-        });
-    } else
-      System.out.println(errorMessage);
-
-    //e.printStackTrace();
-  }
-
-  /**
    * This formats a display message.
    */
   public String formatMessage(String message) {
     return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
-  }
-
-  /**
-   * This shows an Input window.  We include this so that the
-   * MessageProxy can call the method without caring about the actual
-   * implementation of the dialog.
-   */
-  public String showInputDialog(String inputMessage, String title) {
-    final String displayMessage = formatMessage(inputMessage);
-    final String fTitle = title;
-    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
-
-    Runnable runMe = new Runnable() {
-        public void run() {
-          fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.QUESTION_MESSAGE));
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
-    return fResponseWrapper.getString();
-  }
-
-  /**
-   * This shows an Input window.  We include this so that the
-   * MessageProxy can call the method without caring about the actual
-   * implementation of the dialog.
-   */
-  public String showInputDialog(Object[] inputPanes, String title) {
-    final String fTitle = title;
-    final Object[] fInputPanes = inputPanes;
-    final ResponseWrapper fResponseWrapper = new ResponseWrapper();
-
-    Runnable runMe = new Runnable() {
-        public void run() {
-          fResponseWrapper.setString(JOptionPane.showInputDialog(contentPanel.getUIComponent(), fInputPanes, fTitle, JOptionPane.QUESTION_MESSAGE));
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
-    return fResponseWrapper.getString();
-
-  }
-
-  /**
-   * Shows a message.
-   */
-  public void showMessage(String newMessage, String title) {
-    final String displayMessage = formatMessage(newMessage);
-    final String fTitle = title;
-    Runnable runMe = new Runnable() {
-        public void run() {
-          //JLabel displayPanel = new JLabel(displayMessage);
-          JTextArea displayPanel = new JTextArea(displayMessage);
-          displayPanel.setEditable(false);
-          java.awt.Dimension dpSize = displayPanel.getPreferredSize();
-          JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-          scrollPane.setPreferredSize(new java.awt.Dimension(Math.min(dpSize.width + 10, 500), Math.min(dpSize.height + 10, 300)));
-          //System.err.println("scrollPane.getPreferredSize() = " + scrollPane.getPreferredSize());
-          //System.err.println("displayPanel.getPreferredSize() = " + displayPanel.getPreferredSize());
-          //JScrollPane scrollPane = new JScrollPane(displayPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-          //scrollPane.setMaximumSize(new java.awt.Dimension(300,300));
-          //scrollPane.setPreferredSize(new java.awt.Dimension(300,300));
-
-          JOptionPane.showMessageDialog(contentPanel.getUIComponent(), scrollPane, fTitle, JOptionPane.PLAIN_MESSAGE);
-          //JOptionPane.showMessageDialog(contentPanel.getUIComponent(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
-        }
-      };
-
-    if (! SwingUtilities.isEventDispatchThread()) {
-      try {
-        SwingUtilities.invokeAndWait(runMe);
-      } catch (Exception e) {
-      }
-    } else {
-      runMe.run();
-    }
-
   }
 
   /**

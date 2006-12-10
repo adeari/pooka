@@ -242,13 +242,11 @@ public class PropertyEditorPane extends JPanel {
    * Creates the appropriate Button.
    */
   JButton createButton(String key, Action e) {
-    System.err.println("creating button with key " + key);
     JButton thisButton;
 
     thisButton = new JButton(manager.getProperty(key +".label", key));
     String mnemonic = manager.getProperty(key + ".keyBinding", "");
     if (mnemonic.length() > 0) {
-      System.err.println("Property " + key + "; setting mnemonic to " + mnemonic.charAt(0));
       thisButton.setMnemonic(mnemonic.charAt(0));
     }
 

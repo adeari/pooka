@@ -20,8 +20,9 @@ public class PropertyEditorManager {
   protected boolean writeChanges = true;
 
   protected Properties localProps = new Properties();
+  protected Properties tempProps = new Properties();
 
-  protected HashSet<String> removeProps = new HashSet<String>();
+  //protected HashSet<String> removeProps = new HashSet<String>();
 
   protected IconManager iconManager;
 
@@ -77,8 +78,12 @@ public class PropertyEditorManager {
    * Gets the value of the given property.
    */
   public String getProperty(String property, String defaultValue) {
-    // check the localProps first
-    String tmpValue = (String) localProps.get(property);
+    // check the tempProps first
+    String tmpValue = (String) tempProps.get(property);
+    if (tmpValue != null)
+      return tmpValue;
+    // then check the localProps
+    tmpValue = (String) localProps.get(property);
     if (tmpValue != null)
       return tmpValue;
     return sourceBundle.getProperty(property, defaultValue);
@@ -97,6 +102,10 @@ public class PropertyEditorManager {
       if (tmpValue != null)
         return tmpValue;
     }
+    // then check the tempProps
+    tmpValue = (String) tempProps.get(property);
+    if (tmpValue != null)
+      return tmpValue;
     // then check the localProps
     tmpValue = (String) localProps.get(property);
     if (tmpValue != null)
@@ -108,8 +117,13 @@ public class PropertyEditorManager {
    * Gets the value of the given property.
    */
   public List<String> getPropertyAsList(String property, String defaultValue) {
-    // check the localProps first
-    String tmpValue = (String) localProps.get(property);
+    // check the tempProps first
+    String tmpValue = (String) tempProps.get(property);
+    if (tmpValue != null) {
+      return VariableBundle.convertToVector(tmpValue);
+    }
+    // check the localProps second
+    tmpValue = (String) localProps.get(property);
     if (tmpValue != null) {
       return VariableBundle.convertToVector(tmpValue);
     }
@@ -121,7 +135,13 @@ public class PropertyEditorManager {
    */
   public Set<String> getPropertyNamesStartingWith(String startsWith) {
     Set<String> returnValue = new HashSet<String>();
-    // check local properties first.
+    // check temporary properties first.
+    Set<String> tProps = tempProps.stringPropertyNames();
+    for (String prop: tProps) {
+      if (prop.startsWith(startsWith))
+        returnValue.add(prop);
+    }
+    // check local properties next
     Set<String> lProps = localProps.stringPropertyNames();
     for (String prop: lProps) {
       if (prop.startsWith(startsWith))
@@ -135,19 +155,31 @@ public class PropertyEditorManager {
    * Sets the given property to the given value.
    */
   public void setProperty(String property, String value) {
+    tempProps.remove(property);
     localProps.setProperty(property, value);
+    /*
     if (value != null && value.length() > 0) {
       removeProps.remove(property);
     } else {
       removeProps.add(property);
     }
+    */
+  }
+
+  /**
+   * Sets the given property to the given value.
+   */
+  public void setTemporaryProperty(String property, String value) {
+    tempProps.setProperty(property, value);
   }
 
   /**
    * Removes the given property.
    */
   public void removeProperty(String property) {
-    removeProps.add(property);
+    setProperty(property, "");
+    //removeProps.add(property);
+    //localProps.remove(property);
   }
 
   /**
@@ -171,17 +203,18 @@ public class PropertyEditorManager {
    * Commits the changes to the underlying VariableBundle.
    */
   public void commit() {
-    System.err.println("commit.");
     if (writeChanges) {
-      System.err.println("writeChanges.");
+      /*
       for (String removeProp: removeProps) {
-        System.err.println("removing property " + removeProp);
         sourceBundle.setProperty(removeProp, "");
       }
+      */
 
       sourceBundle.setAllProperties(localProps);
 
       sourceBundle.saveProperties();
+
+      clearValues();
     }
   }
 
@@ -190,7 +223,8 @@ public class PropertyEditorManager {
    */
   public void clearValues() {
     localProps = new Properties();
-    removeProps = new HashSet<String>();
+    tempProps = new Properties();
+    //removeProps = new HashSet<String>();
   }
 
   /**

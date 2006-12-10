@@ -253,17 +253,18 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
   private MailTreeNode createTreeRoot() {
     MailTreeNode root = new MailTreeNode("Pooka", this);
 
-    // Get the stores we have listed.
-    String storeID = null;
+    synchronized(root) {
+      // Get the stores we have listed.
+      String storeID = null;
 
-    Vector allStoreInfos = Pooka.getStoreManager().getStoreList();
-    for (int i = 0; i < allStoreInfos.size(); i++) {
-      StoreNode storenode = new StoreNode((StoreInfo)allStoreInfos.elementAt(i), this);
-      root.add(storenode);
+      Vector allStoreInfos = Pooka.getStoreManager().getStoreList();
+      for (int i = 0; i < allStoreInfos.size(); i++) {
+        StoreNode storenode = new StoreNode((StoreInfo)allStoreInfos.elementAt(i), this);
+        root.add(storenode);
+      }
+
+      Pooka.getStoreManager().addItemListChangeListener(this);
     }
-
-    Pooka.getStoreManager().addItemListChangeListener(this);
-
     return root;
   }
 
@@ -280,25 +281,42 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
    * This function is usually called in response to a ValueChanged
    * action on the "Store" property.
    */
-  public void refreshStores(ItemListChangeEvent e) {
-    Item[] removed = e.getRemoved();
-    Item[] added = e.getAdded();
-    MailTreeNode root = (MailTreeNode)getFolderTree().getModel().getRoot();
-    for (int i = 0; removed != null && i < removed.length; i++) {
-      StoreInfo currentStore = (StoreInfo) removed[i];
-      if (currentStore != null) {
-        StoreNode sn = currentStore.getStoreNode();
-        if (sn != null)
-          root.remove(sn);
-      }
-    }
+  public void refreshStores(ItemListChangeEvent ilce) {
+    final ItemListChangeEvent e = ilce;
+    SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          Item[] removed = e.getRemoved();
+          Item[] added = e.getAdded();
+          MailTreeNode root = (MailTreeNode)getFolderTree().getModel().getRoot();
+          synchronized(root) {
+            for (int i = 0; removed != null && i < removed.length; i++) {
+              StoreInfo currentStore = (StoreInfo) removed[i];
+              System.err.println("removing " + removed[i]);
+              if (currentStore != null) {
+                StoreNode sn = currentStore.getStoreNode();
+                if (sn != null) {
+                  System.err.println("removing node for " + removed[i] + "(" + sn + ")");
+                  root.remove(sn);
+                }
+              }
+            }
 
-    for (int i = 0; added != null && i < added.length ; i++) {
-      this.addStore((StoreInfo)added[i] , root);
-    }
+            if (added != null && added.length > 0) {
+              int[] addedIndices = new int[added.length];
+              for (int i = 0; added != null && i < added.length ; i++) {
+                StoreNode storenode = new StoreNode((StoreInfo)added[i], FolderPanel.this);
+                root.add(storenode);
+                addedIndices[i] = root.getIndex(storenode);
+                //addStore((StoreInfo)added[i] , root);
+              }
+              ((DefaultTreeModel)getFolderTree().getModel()).nodesWereInserted(root, addedIndices);
+            }
 
-    currentTheme = null;
-    configureInterfaceStyle();
+            currentTheme = null;
+            configureInterfaceStyle();
+          }
+        }
+      });
   }
 
 
@@ -306,10 +324,14 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
    * This creates a new StoreNode from the StoreInfo, and adds that
    * StoreNode to the root of the FolderTree.
    */
+  /*
   public void addStore(StoreInfo store, MailTreeNode root) {
-    StoreNode storenode = new StoreNode(store, this);
-    root.add(storenode);
+    synchronzied(root) {
+      StoreNode storenode = new StoreNode(store, this);
+      root.add(storenode);
+    }
   }
+  */
 
   public MainPanel getMainPanel() {
     return mainPanel;

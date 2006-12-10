@@ -30,7 +30,7 @@ public class NewStoreWizardController extends WizardController {
         String user = getManager().getCurrentProperty("NewStoreWizard.editors.store.user", "");
         String server = getManager().getCurrentProperty("NewStoreWizard.editors.store.server", "");
         //System.err.println("setting username to " + user + "@" + server);
-        getManager().setProperty("NewStoreWizard.editors.user.from", user + "@" + server);
+        getManager().setTemporaryProperty("NewStoreWizard.editors.user.from", user + "@" + server);
         PropertyEditorUI fromEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.from");
         //System.err.println("got fromEditor " + fromEditor);
         fromEditor.setOriginalValue(user + "@" + server);
@@ -48,7 +48,7 @@ public class NewStoreWizardController extends WizardController {
           // just use 'localhost'
         }
         String address = username + "@" + hostname;
-        getManager().setProperty("NewStoreWizard.editors.user.from", address);
+        getManager().setTemporaryProperty("NewStoreWizard.editors.user.from", address);
         PropertyEditorUI fromEditor = getManager().getPropertyEditor("NewStoreWizard.editors.user.from");
         //System.err.println("got fromEditor " + fromEditor);
         fromEditor.setOriginalValue(address);
@@ -61,17 +61,17 @@ public class NewStoreWizardController extends WizardController {
       if (protocol.equalsIgnoreCase("imap") || protocol.equalsIgnoreCase("pop3")) {
         String user = getManager().getCurrentProperty("NewStoreWizard.editors.store.user", "");
         String server = getManager().getCurrentProperty("NewStoreWizard.editors.store.server", "");
-        getManager().setProperty("NewStoreWizard.editors.smtp.user", user);
+        getManager().setTemporaryProperty("NewStoreWizard.editors.smtp.user", user);
         PropertyEditorUI userEditor = getManager().getPropertyEditor("NewStoreWizard.editors.smtp.user");
         userEditor.setOriginalValue(user);
         userEditor.resetDefaultValue();
 
-        getManager().setProperty("NewStoreWizard.editors.smtp.server", server);
+        getManager().setTemporaryProperty("NewStoreWizard.editors.smtp.server", server);
         PropertyEditorUI serverEditor = getManager().getPropertyEditor("NewStoreWizard.editors.smtp.server");
         serverEditor.setOriginalValue(server);
         serverEditor.resetDefaultValue();
       } else {
-        getManager().setProperty("NewStoreWizard.editors.smtp.server", "localhost");
+        getManager().setTemporaryProperty("NewStoreWizard.editors.smtp.server", "localhost");
         PropertyEditorUI serverEditor = getManager().getPropertyEditor("NewStoreWizard.editors.smtp.server");
         serverEditor.setOriginalValue("localhost");
         serverEditor.resetDefaultValue();
@@ -346,7 +346,7 @@ public class NewStoreWizardController extends WizardController {
       try {
         editor.setOriginalValue(value);
         editor.resetDefaultValue();
-        getManager().setProperty(propertyName, value);
+        getManager().setTemporaryProperty(propertyName, value);
         success = true;
       } catch (PropertyValueVetoException pvve) {
         // on an exception, just start over.
