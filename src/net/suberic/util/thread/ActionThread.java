@@ -5,8 +5,8 @@ import java.awt.event.*;
 import java.util.Vector;
 
 /**
- * This is a Thread which handles ActionEvents.  Instead of having the 
- * Action handled by the main thread, it is put into a queue on 
+ * This is a Thread which handles ActionEvents.  Instead of having the
+ * Action handled by the main thread, it is put into a queue on
  * this thread, which will then handle the Action.
  */
 public class ActionThread extends Thread {
@@ -33,9 +33,9 @@ public class ActionThread extends Thread {
     super(threadName);
     setPriority(Thread.NORM_PRIORITY);
   }
-  
+
   /**
-   * Represents an action/event pair.  This also stores the priority of 
+   * Represents an action/event pair.  This also stores the priority of
    * the event.
    */
   public class ActionEventPair {
@@ -59,45 +59,45 @@ public class ActionThread extends Thread {
       priority = newPriority;
     }
   }
-  
+
   // the action queue.
   private Vector actionQueue = new Vector();
-  
+
   private boolean sleeping;
-  
+
   public void run() {
     while(! stopMe ) {
       sleeping = false;
       ActionEventPair pair = popQueue();
       while (pair != null) {
-	try {
-	  synchronized(runLock) {
-	    mCurrentActionName = (String)pair.action.getValue(Action.SHORT_DESCRIPTION);
-	    if (mCurrentActionName == null) {
-	      mCurrentActionName = (String)pair.action.getValue(Action.NAME);
-	      if (mCurrentActionName == null) {
-		mCurrentActionName = "Unknown action";
-	      }
-	    }
-	    pair.action.actionPerformed(pair.event);
-	  }
-	} catch (Throwable e) {
-	  e.printStackTrace();
-	} finally {
-	  mCurrentActionName = "";
-	}
-	pair = popQueue();
+        try {
+          synchronized(runLock) {
+            mCurrentActionName = (String)pair.action.getValue(Action.SHORT_DESCRIPTION);
+            if (mCurrentActionName == null) {
+              mCurrentActionName = (String)pair.action.getValue(Action.NAME);
+              if (mCurrentActionName == null) {
+                mCurrentActionName = "Unknown action";
+              }
+            }
+            pair.action.actionPerformed(pair.event);
+          }
+        } catch (Throwable e) {
+          e.printStackTrace();
+        } finally {
+          mCurrentActionName = "";
+        }
+        pair = popQueue();
       }
       try {
-	sleeping = true;
-	while (true)
-	  Thread.sleep(100000000);
+        sleeping = true;
+        while (true)
+          Thread.sleep(100000000);
       } catch (InterruptedException ie) {
-	sleeping = false;
+        sleeping = false;
       }
     }
   }
-  
+
   /**
    * This returns the top item in the action queue, if one is available.
    * If not, the method returns null.
@@ -110,15 +110,15 @@ public class ActionThread extends Thread {
       return null;
     }
   }
-  
+
   /**
    * This adds an item to the queue.  It also starts up the Thread if it's
    * not already running.
    */
   public synchronized void addToQueue(Action action, ActionEvent event) {
     addToQueue(action, event, PRIORITY_NORMAL);
-  } 	
-  
+  }
+
   /**
    * This adds an item to the queue.  It also starts up the Thread if it's
    * not already running.
@@ -129,17 +129,17 @@ public class ActionThread extends Thread {
       int index = 0;
       boolean found = false;
       while (! found && index < actionQueue.size()) {
-	ActionEventPair current = (ActionEventPair) actionQueue.elementAt(index);
-	if (current.priority < priority)
-	  found = true;
-	else
-	  index++;
+        ActionEventPair current = (ActionEventPair) actionQueue.elementAt(index);
+        if (current.priority < priority)
+          found = true;
+        else
+          index++;
       }
       actionQueue.add(index, new ActionEventPair(action, event, priority));
       if (sleeping)
-	this.interrupt();
+        this.interrupt();
     }
-  } 	
+  }
 
   /**
    * Stops the ActionThread.

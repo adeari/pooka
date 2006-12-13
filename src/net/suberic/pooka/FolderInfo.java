@@ -397,8 +397,16 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
     if (getFolderTracker() == null) {
       FolderTracker tracker = Pooka.getFolderTracker();
-      tracker.addFolder(this);
-      this.setFolderTracker(tracker);
+      if (tracker != null) {
+        tracker.addFolder(this);
+        this.setFolderTracker(tracker);
+      } else {
+        if (Pooka.sStartupManager.isShuttingDown()) {
+          getLogger().fine("No FolderTracker available.");
+        } else {
+          getLogger().warning("Error:  No FolderTracker available for folder " + getFolderID());
+        }
+      }
     }
   }
 

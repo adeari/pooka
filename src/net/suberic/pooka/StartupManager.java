@@ -29,7 +29,7 @@ public class StartupManager {
   String mToAddress = null;
   String mFromProfile = null;
 
-
+  boolean mShuttingDown = false;
 
   /**
    * Creates a new StartupManager.
@@ -185,7 +185,6 @@ public class StartupManager {
    * Stops the main Pooka window.
    */
   public void stopMainPookaWindow(Object pSource) {
-
     checkUnsentMessages();
 
     //checkUncachedMessages();
@@ -194,13 +193,15 @@ public class StartupManager {
     if (ft != null)
       ft.setStopped(true);
 
-    mPookaManager.setFolderTracker(null);
-
     net.suberic.util.thread.ActionThread searchThread = mPookaManager.getSearchThread();
     if (searchThread != null)
       mPookaManager.getSearchThread().setStop(true);
 
     closeAllStores(pSource);
+
+    // wait to set the foldertracker as null until after we've closed all
+    // the stores.
+    mPookaManager.setFolderTracker(null);
 
     Pooka.getResources().saveProperties();
 
@@ -351,44 +352,49 @@ public class StartupManager {
     final Object fSource = pSource;
     Runnable runMe = new Runnable() {
         public void run() {
-          stopMainPookaWindow(fSource);
-          mFrame = null;
-          if (mPookaManager.getMainPanel() != null) {
-            KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
-            mPookaManager.getMainPanel().getInfoPanel().stopThread();
-          }
-          mPookaManager.setMainPanel(null);
-          mPookaManager.getUIFactory().setShowing(false);
-          /*
-            mPookaManager.setStoreManager(new StoreManager());
-            updateTime("created store manager.");
+          try {
+            mShuttingDown = true;
 
-            mPookaManager.getStoreManager().loadAllSentFolders();
-            mPookaManager.getOutgoingMailManager().loadOutboxFolders();
+            stopMainPookaWindow(fSource);
+            mFrame = null;
+            if (mPookaManager.getMainPanel() != null) {
+              KeyboardFocusManager.getCurrentKeyboardFocusManager().removePropertyChangeListener(mPookaManager.getMainPanel().getFocusManager());
+              mPookaManager.getMainPanel().getInfoPanel().stopThread();
+            }
+            mPookaManager.setMainPanel(null);
+            mPookaManager.getUIFactory().setShowing(false);
+            /*
+              mPookaManager.setStoreManager(new StoreManager());
+              updateTime("created store manager.");
+
+              mPookaManager.getStoreManager().loadAllSentFolders();
+              mPookaManager.getOutgoingMailManager().loadOutboxFolders();
             updateTime("loaded sent/outbox");
-          */
-          mPookaManager.setStoreManager(null);
-          mPookaManager.getUserProfileManager().shutdownManager();
-          mPookaManager.setUserProfileManager(null);
-          mPookaManager.getOutgoingMailManager().stopServers();
+            */
+            mPookaManager.setStoreManager(null);
+            mPookaManager.getUserProfileManager().shutdownManager();
+            mPookaManager.setUserProfileManager(null);
+            mPookaManager.getOutgoingMailManager().stopServers();
 
-          /*
-            java.util.Map allListeners = mPookaManager.getResources().getAllListeners();
-            java.util.Iterator keys = allListeners.keySet().iterator();
-            while (keys.hasNext()) {
-            Object o = keys.next();
-            Object value = allListeners.get(o);
-            if (value instanceof java.util.List) {
-            java.util.Iterator values = ((java.util.List) value).iterator();
-            while (values.hasNext()) {
-            System.err.println("key " + o + ", value " + values.next());
-            }
-            } else {
-            System.err.println("key " + o + ", value " + allListeners.get(o));
-            }
-            }
-          */
-
+            /*
+              java.util.Map allListeners = mPookaManager.getResources().getAllListeners();
+              java.util.Iterator keys = allListeners.keySet().iterator();
+              while (keys.hasNext()) {
+              Object o = keys.next();
+              Object value = allListeners.get(o);
+              if (value instanceof java.util.List) {
+              java.util.Iterator values = ((java.util.List) value).iterator();
+              while (values.hasNext()) {
+              System.err.println("key " + o + ", value " + values.next());
+              }
+              } else {
+              System.err.println("key " + o + ", value " + allListeners.get(o));
+              }
+              }
+            */
+          } finally {
+            mShuttingDown = false;
+          }
           PookaUIFactory newFactory = new PookaMinimalUIFactory(Pooka.getUIFactory());
 
           mFullStartup=false;
@@ -401,7 +407,6 @@ public class StartupManager {
               mnm.displayMessage(mPookaManager.getResources().getProperty("info.exitToIcon.title", "System Tray Notification"), mPookaManager.getResources().getProperty("info.exitToIcon", "Pooka has disconnected from you mail servers, but is still running in the System Tray.  To exit Pooka completely, use File->Exit from the toolbar or right-click on the Tray Icon and choose Exit."), MessageNotificationManager.INFO_MESSAGE_TYPE);
 
           }
-
         }
       };
     if (Pooka.getMainPanel() != null)
@@ -733,6 +738,13 @@ public class StartupManager {
       System.err.println(message + ", time " + (current - mLastUpdate) + ", total " + (current - mStartTime));
       mLastUpdate = current;
     }
+  }
+
+  /**
+   * Returns true if we're in the process of shutting down.
+   */
+  public boolean isShuttingDown() {
+    return mShuttingDown;
   }
 
   /**

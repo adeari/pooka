@@ -289,16 +289,24 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
           Item[] added = e.getAdded();
           MailTreeNode root = (MailTreeNode)getFolderTree().getModel().getRoot();
           synchronized(root) {
-            for (int i = 0; removed != null && i < removed.length; i++) {
-              StoreInfo currentStore = (StoreInfo) removed[i];
-              System.err.println("removing " + removed[i]);
-              if (currentStore != null) {
-                StoreNode sn = currentStore.getStoreNode();
-                if (sn != null) {
-                  System.err.println("removing node for " + removed[i] + "(" + sn + ")");
-                  root.remove(sn);
+            if (removed != null && removed.length > 0) {
+              int[] removedIndices = new int[removed.length];
+              Object[] removedObjects = new Object[removed.length];
+              for (int i = 0; removed != null && i < removed.length; i++) {
+
+                StoreInfo currentStore = (StoreInfo) removed[i];
+
+                if (currentStore != null) {
+                  StoreNode sn = currentStore.getStoreNode();
+                  if (sn != null) {
+                    removedObjects[i] = sn;
+                    removedIndices[i] = root.getIndex(sn);
+                    root.remove(sn);
+                  }
                 }
               }
+              java.util.Arrays.sort(removedIndices);
+              ((DefaultTreeModel)getFolderTree().getModel()).nodesWereRemoved(root, removedIndices, removedObjects);
             }
 
             if (added != null && added.length > 0) {

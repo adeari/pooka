@@ -1,4 +1,7 @@
 *) editors:
+  *)  update other editors
+	-- encryption first.
+  *)  key bindings for editors (!!)
   *)  get new store wizard working.
 	*) get wizard working from new user startup
 	  *) fix on failure message.
@@ -11,14 +14,12 @@
 	*) make sure that removing stores, users, etc. removes all
 	   subsettings too.
 	*) make strings automatically select the current value.
-  *)  key bindings for editors (!!)
-  *)  update other editors
   *)  add new user wizard (?)
   *)  do help
 	*) fix help display w/new modal editor
 *) major bug:  make sure that internal error messages aren't bigger than
 	the screen view.
-*) major bug:  removing a store current doesn't close the open connection(s).
+	-- started.  need to fix height.
 *) major bug:  forward as attachment doesn't work.
 
  ----- ui update

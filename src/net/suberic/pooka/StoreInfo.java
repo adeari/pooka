@@ -466,7 +466,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   public void remove() {
     // FIXME need to do a lot here.
-    System.err.println("calling remove() on store.");
     try {
       disconnectStore();
     } catch (Exception e) {
@@ -491,6 +490,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
     if (store != null) {
       store.removeConnectionListener(connectionListener);
+    }
+    if (getStoreThread() != null) {
+      getStoreThread().setStop(true);
     }
   }
 
@@ -881,7 +883,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   public void stopStoreThread() {
     if (storeThread != null) {
       storeThread.setStop(true);
-      storeThread = null;
+      //storeThread = null;
     }
   }
 
