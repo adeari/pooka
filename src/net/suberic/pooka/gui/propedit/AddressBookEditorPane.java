@@ -12,7 +12,7 @@ import javax.swing.Action;
 /**
  * A property editor which edits an AddressBook.
  */
-public class AddressBookEditorPane extends LabelValuePropertyEditor {
+public class AddressBookEditorPane extends SwingPropertyEditor {
 
   AddressBook book;
   String bookName;
@@ -21,8 +21,6 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
   JTextField searchEntryField;
   JTable addressTable;
   JButton editButton, addButton, deleteButton, searchButton;
-
-  PropertyEditorManager manager;
 
   Action[] defaultActions = new Action[] {
     new AddAction(),
@@ -53,8 +51,6 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
     createSearchEntryPanel();
     createEditPanel();
     createAddressTable();
-
-    labelComponent = this;
 
     this.add(searchEntryPanel);
     //this.add(new JScrollPane(addressTable));
@@ -471,5 +467,20 @@ public class AddressBookEditorPane extends LabelValuePropertyEditor {
       setBusy(false);
     }
   }
+
+  /**
+   * Gets the parent PropertyEditorPane for the given component.
+   */
+  public PropertyEditorPane getPropertyEditorPane() {
+    return getPropertyEditorPane(this);
+  }
+
+ /**
+   * Returns the display value for this property.
+   */
+  public String getDisplayValue() {
+    return bookName;
+  }
+
 
 }
