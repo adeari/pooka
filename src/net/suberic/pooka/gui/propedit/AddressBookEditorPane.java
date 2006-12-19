@@ -40,9 +40,8 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
   public void configureEditor(String propertyName, String template, String propertyBaseName, PropertyEditorManager newManager) {
     configureBasic(propertyName, template, propertyBaseName, newManager);
 
-    // we're going to have "AddressBook." at the beginning, and
-    // ".addressListEditor" at the end...
-    bookName = property.substring(12, property.length() - 18);
+    // we're going to have "AddressBook." at the beginning, so remove that.
+    bookName = propertyBase.substring(12, propertyBase.length());
     book = Pooka.getAddressBookManager().getAddressBook(bookName);
 
     this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
