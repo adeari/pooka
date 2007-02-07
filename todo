@@ -4,6 +4,8 @@
     -- fix connection -- maybe even move it somewhere else?
     -- fix theme
     -- on folder, fix cacheMode?
+    -- gui bug:  switch to preview mode.  apply.  it changes.  switch 
+	back to desktop mode.  apply.  it doesn't change back.
 2)  make sure brand new user configuration works
 
 *) editors:
@@ -69,12 +71,29 @@
 	*) automatically check for new messages & check interval
 
   *) preferences
-     * gui type
-       * preview pane mode
-	 automatically preview selected message
-       * automatically select first unready message (?? preview ??)
+     * appearance
+       * gui type
+         * preview pane mode
+	   automatically preview selected message
+         * automatically select first unread message (?? preview ??)
        * nav panel theme
        * desktop panel theme
+       * default message font
+       * read messages
+       * display text attachments
+         * text attach max length
+       * display html messages
+       * show html by default
+     * behavior
+       * delete 
+         * fast delete
+         * auto expunge
+       * html browser command
+       * startup
+         * open all folders on connect
+         * reopen folders on startup
+         * save open folders
+         * save window locations
      * new message UI
        * line wrap
        * line length
@@ -83,29 +102,14 @@
        * forward prefix
        * forward stype
        * signature -- REMOVE; make it per user.
-     * read messages
-       * display text attachments
-         * text attach max length
-       * display html messages
-       * show html by default
-     * html browser command
-     * delete 
-       * fast delete
-       * auto expunge
-     * default message font
      * tray icon
 	use it
 	minimize to icon on exit
-     * startup
-       * open all folders on connect
-       * reopen folders on startup
-       * save open folders
-       * save window locations
      * settings
        * pooka mail directory
        * ssl cert file
-     * spam action
-     * logging
+       * spam action
+       * logging
 
   *) address book
   *) outgoing servers
