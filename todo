@@ -10,8 +10,9 @@
 
 *) editors:
   *) address book -- fix it.
-  *)  update other editors
-	-- encryption first.
+	-- list shows type (ldap/file)
+        -- default pane is addresses
+	-- configuration pane just shows info for type.
   *)  key bindings for editors (!!)
   *)  get new store wizard working.
 	*) get wizard working from new user startup
