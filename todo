@@ -1,5 +1,7 @@
 1)  clean up editors.
-    -- fix address book.
+    -- fix address book. 
+	-- make address edit modified multieditorpane?
+    -- make wizards for all multieditorpanes
     -- clean up preferences. (see definition below)
     -- fix connection -- maybe even move it somewhere else?
     -- fix theme
@@ -13,7 +15,7 @@
 	-- list shows type (ldap/file)
         -- default pane is addresses
 	-- configuration pane just shows info for type.
-  *)  key bindings for editors (!!)
+   *)  key bindings for editors (!!)
   *)  get new store wizard working.
 	*) get wizard working from new user startup
 	  *) fix on failure message.

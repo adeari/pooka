@@ -32,7 +32,9 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     configureBasic(propertyName, template, propertyBaseName, newManager);
     debug = manager.getProperty("editors.debug", "false").equalsIgnoreCase("true");
 
+    getLogger().fine("VEP: editorTemplate=" + editorTemplate + ", getProperty template.keyProperty = '" + manager.getProperty(editorTemplate + ".keyProperty", "") + "'");
     keyProperty = createSubProperty(manager.getProperty(editorTemplate + ".keyProperty", ""));
+    getLogger().fine("VEP:  keying off property " + keyProperty);
 
     editors = new Vector();
 
@@ -45,6 +47,7 @@ public class VariableEditorPane extends CompositeSwingPropertyEditor {
     this.setLayout(new java.awt.CardLayout());
 
     String currentValue = manager.getProperty(keyProperty, "");
+    getLogger().fine("VEP:  currentValue for " + keyProperty + " = " + currentValue);
     if (currentValue == "") {
       // check the editor for this, if any.
       PropertyEditorUI keyEditor = manager.getPropertyEditor(keyProperty);
