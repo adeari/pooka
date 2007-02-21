@@ -6,29 +6,28 @@ import net.suberic.pooka.gui.propedit.*;
 import net.suberic.util.gui.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import javax.swing.Action;
 
 /**
  * A property editor which edits an AddressBook.
  */
-public class AddressBookEditorPane extends SwingPropertyEditor {
+public class AddressBookEditorPane extends MultiEditorPane {
 
   AddressBook book;
   String bookName;
-  JPanel editPanel;
-  JPanel searchEntryPanel;
   JTextField searchEntryField;
-  JTable addressTable;
-  JButton editButton, addButton, deleteButton, searchButton;
+  JButton searchButton;
+
+  ConfigurablePopupMenu popupMenu;
 
   Action[] defaultActions = new Action[] {
     new AddAction(),
     new EditAction(),
     new DeleteAction()
   };
-
-  ConfigurablePopupMenu popupMenu;
 
   /**
    * @param propertyName The property to be edited.
@@ -44,23 +43,23 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
     bookName = propertyBase.substring(12, propertyBase.length());
     book = Pooka.getAddressBookManager().getAddressBook(bookName);
 
-    this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-    this.setBorder(BorderFactory.createEtchedBorder());
-
-    createSearchEntryPanel();
-    createEditPanel();
+    JPanel searchEntryPanel = createSearchEntryPanel();
     createAddressTable();
+    buttonPanel = createButtonPanel();
 
-    this.add(searchEntryPanel);
-    //this.add(new JScrollPane(addressTable));
-    JScrollPane addressPane = new JScrollPane(addressTable);
+    JPanel addressPanel = new JPanel();
+    addressPanel.setLayout(new BoxLayout(addressPanel, BoxLayout.Y_AXIS));
+
+    addressPanel.add(searchEntryPanel);
+    JScrollPane addressScrollPane = new JScrollPane(optionTable);
     try {
-      addressPane.setPreferredSize(new java.awt.Dimension(Integer.parseInt(manager.getProperty("Pooka.addressBookEditor.hsize", "300")), Integer.parseInt(manager.getProperty("Pooka.addressBookEditor.vsize", "100"))));
+      addressScrollPane.setPreferredSize(new java.awt.Dimension(Integer.parseInt(manager.getProperty("Pooka.addressBookEditor.hsize", "300")), Integer.parseInt(manager.getProperty("Pooka.addressBookEditor.vsize", "100"))));
     } catch (Exception e) {
-      addressPane.setPreferredSize(new java.awt.Dimension(300, 100));
+      addressScrollPane.setPreferredSize(new java.awt.Dimension(300, 100));
     }
-    this.add(addressPane);
-    this.add(editPanel);
+    addressPanel.add(addressScrollPane);
+
+    doEditorPaneLayout(addressPanel, buttonPanel);
 
     popupMenu = new ConfigurablePopupMenu();
     popupMenu.configureComponent("AddressBookEditor.popupMenu", manager.getFactory().getSourceBundle());
@@ -73,8 +72,8 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
    * Creates the panel which has the entry fields -- i.e., "Enter string to
    * match", an entry field, and a search button.
    */
-  public void createSearchEntryPanel() {
-    searchEntryPanel = new JPanel();
+  public JPanel createSearchEntryPanel() {
+    JPanel searchEntryPanel = new JPanel();
     searchEntryPanel.add(new JLabel(manager.getProperty("AddressBookEditor.matchString", "Match String: ")));
 
     searchEntryField = new JTextField(30);
@@ -86,23 +85,24 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
     searchButton.addActionListener(a);
     searchEntryPanel.add(searchButton);
 
+    return searchEntryPanel;
   }
 
   /**
    * Creates the AddressTable.
    */
   public void createAddressTable() {
-    addressTable = new JTable();
-    addressTable.setCellSelectionEnabled(false);
-    addressTable.setColumnSelectionAllowed(false);
-    addressTable.setRowSelectionAllowed(true);
+    optionTable = new JTable();
+    optionTable.setCellSelectionEnabled(false);
+    optionTable.setColumnSelectionAllowed(false);
+    optionTable.setRowSelectionAllowed(true);
 
-    addressTable.addMouseListener(new MouseAdapter() {
+    optionTable.addMouseListener(new MouseAdapter() {
         public void mouseClicked(MouseEvent e) {
           if (e.getClickCount() == 2) {
-            int rowIndex = addressTable.rowAtPoint(e.getPoint());
+            int rowIndex = optionTable.rowAtPoint(e.getPoint());
             if (rowIndex != -1) {
-              addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+              optionTable.setRowSelectionInterval(rowIndex, rowIndex);
               AddressBookEntry selectedEntry = getSelectedEntry();
               if (selectedEntry != null) {
                 editEntry(selectedEntry);
@@ -114,24 +114,24 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
         public void mousePressed(MouseEvent e) {
           if (e.isPopupTrigger()) {
             // see if anything is selected
-            int rowIndex = addressTable.rowAtPoint(e.getPoint());
-            if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
-              addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+            int rowIndex = optionTable.rowAtPoint(e.getPoint());
+            if (rowIndex == -1 || !optionTable.isRowSelected(rowIndex) ) {
+              optionTable.setRowSelectionInterval(rowIndex, rowIndex);
             }
 
-            showPopupMenu(addressTable, e);
+            showPopupMenu(optionTable, e);
           }
         }
 
         public void mouseReleased(MouseEvent e) {
           if (e.isPopupTrigger()) {
             // see if anything is selected
-            int rowIndex = addressTable.rowAtPoint(e.getPoint());
-            if (rowIndex == -1 || !addressTable.isRowSelected(rowIndex) ) {
-              addressTable.setRowSelectionInterval(rowIndex, rowIndex);
+            int rowIndex = optionTable.rowAtPoint(e.getPoint());
+            if (rowIndex == -1 || !optionTable.isRowSelected(rowIndex) ) {
+              optionTable.setRowSelectionInterval(rowIndex, rowIndex);
             }
 
-            showPopupMenu(addressTable, e);
+            showPopupMenu(optionTable, e);
           }
         }
       });
@@ -141,32 +141,8 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
   }
 
   /**
-   * Creates the panel which has the editor fields, such as add/delete/edit
-   * buttons.
-   */
-  public void createEditPanel() {
-    editPanel = new JPanel();
-
-    Action a = new AddAction();
-    addButton = new JButton(manager.getProperty("AddressBookEditor.title.Add", "Add"));
-    addButton.addActionListener(a);
-    editPanel.add(addButton);
-
-    a = new EditAction();
-    editButton = new JButton(manager.getProperty("AddressBookEditor.title.Edit", "Edit"));
-    editButton.addActionListener(a);
-    editPanel.add(editButton);
-
-    a = new DeleteAction();
-    deleteButton = new JButton(manager.getProperty("AddressBookEditor.title.Delete", "Delete"));
-    deleteButton.addActionListener(a);
-    editPanel.add(deleteButton);
-
-  }
-
-  /**
    * Performs a search using the string value in the searchEntryField.  Updates
-   * the addressTable with the results.
+   * the optionTable with the results.
    */
   public void performSearch() {
     AddressBookEntry[] matchingEntries = book.getAddressMatcher().match(searchEntryField.getText());
@@ -183,7 +159,7 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
     } catch (Exception e) { }
     if (newEntry.getAddresses() != null) {
       book.addAddress(newEntry);
-      ((AddressBookTableModel)addressTable.getModel()).addEntry(newEntry);
+      ((AddressBookTableModel)optionTable.getModel()).addEntry(newEntry);
     }
     editEntry(newEntry);
   }
@@ -191,7 +167,7 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
   /**
    * Edits the current entry.
    */
-  public void performEdit() {
+  protected void editSelectedValue(Container container) {
     AddressBookEntry e = getSelectedEntry();
     if (e != null)
       editEntry(e);
@@ -204,7 +180,7 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
     AddressBookEntry e = getSelectedEntry();
     if (e != null) {
       book.removeAddress(e);
-      ((AddressBookTableModel)addressTable.getModel()).removeEntry(e);
+      ((AddressBookTableModel)optionTable.getModel()).removeEntry(e);
     }
   }
 
@@ -212,9 +188,9 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
    * Gets the currently selected entry.
    */
   public AddressBookEntry getSelectedEntry() {
-    int index = addressTable.getSelectedRow();
+    int index = optionTable.getSelectedRow();
     if (index > -1)
-      return ((AddressBookTableModel)addressTable.getModel()).getEntryAt(index);
+      return ((AddressBookTableModel)optionTable.getModel()).getEntryAt(index);
     else
       return null;
   }
@@ -239,7 +215,7 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
    */
   public void updateTableModel(AddressBookEntry[] entries) {
     AddressBookTableModel newTableModel = new AddressBookTableModel(entries);
-    addressTable.setModel(newTableModel);
+    optionTable.setModel(newTableModel);
   }
 
   public void setValue() {
@@ -291,11 +267,8 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
    * Run when the PropertyEditor may have changed enabled states.
    */
   protected void updateEditorEnabled() {
-
+    super.updateEditorEnabled();
     searchButton.setEnabled(isEditorEnabled());
-    addButton.setEnabled(isEditorEnabled());
-    editButton.setEnabled(isEditorEnabled());
-    deleteButton.setEnabled(isEditorEnabled());
     searchEntryField.setEnabled(isEditorEnabled());
   }
 
@@ -450,7 +423,7 @@ public class AddressBookEditorPane extends SwingPropertyEditor {
 
     public void actionPerformed(ActionEvent e) {
       setBusy(true);
-      performEdit();
+      editSelectedValue();
       setBusy(false);
     }
   }

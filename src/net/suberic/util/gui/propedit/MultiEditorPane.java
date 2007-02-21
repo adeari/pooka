@@ -6,6 +6,7 @@ import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.Container;
+import java.awt.Component;
 
 /**
  * This class will make an editor for a list of elements, where each of
@@ -31,11 +32,11 @@ import java.awt.Container;
  */
 
 public class MultiEditorPane extends CompositeSwingPropertyEditor implements ListSelectionListener {
-  JTable optionTable;
+  protected JTable optionTable;
   JPanel entryPanel;
-  JPanel buttonPanel;
+  protected JPanel buttonPanel;
 
-  List buttonList;
+  List<JButton> buttonList;
   boolean changed = false;
   List<String> removeValues = new ArrayList<String>();
   String propertyTemplate;
@@ -54,9 +55,6 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     getLogger().fine("creating MultiEditorPane for property " + propertyName + ", template " + template);
     configureBasic(propertyName, template, propertyBaseName, newManager);
 
-    SpringLayout layout = new SpringLayout();
-    this.setLayout(layout);
-
     // create the current list of edited items.  so if this is a User list,
     // these values might be 'allen', 'deborah', 'marc', 'jessica', etc.
 
@@ -69,10 +67,27 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
 
     buttonPanel = createButtonPanel();
 
-    this.add(optionScrollPane);
+    getLogger().fine("MultiEditorPane for property " + propertyName + ", template " + template);
+
+    doEditorPaneLayout(optionScrollPane, buttonPanel);
+
+    updateEditorEnabled();
+
+    manager.registerPropertyEditor(property, this);
+
+  }
+
+  /**
+   * Lays out the MultiEditorPane.
+   */
+  public void doEditorPaneLayout(Component listPanel, Component buttonPanel) {
+    SpringLayout layout = new SpringLayout();
+    this.setLayout(layout);
+
+    this.add(listPanel);
     this.add(buttonPanel);
 
-    SpringLayout.Constraints ospConstraints = layout.getConstraints(optionScrollPane);
+    SpringLayout.Constraints ospConstraints = layout.getConstraints(listPanel);
     SpringLayout.Constraints buttonConstraints = layout.getConstraints(buttonPanel);
 
     Spring panelHeight = Spring.constant(0);
@@ -82,19 +97,14 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     ospConstraints.setHeight(panelHeight);
     buttonConstraints.setHeight(panelHeight);
 
-    layout.putConstraint(SpringLayout.WEST, optionScrollPane, 5, SpringLayout.WEST, this);
-    layout.putConstraint(SpringLayout.NORTH, optionScrollPane, 5, SpringLayout.NORTH, this);
-    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, optionScrollPane);
+    layout.putConstraint(SpringLayout.WEST, listPanel, 5, SpringLayout.WEST, this);
+    layout.putConstraint(SpringLayout.NORTH, listPanel, 5, SpringLayout.NORTH, this);
+    layout.putConstraint(SpringLayout.SOUTH, this, 5, SpringLayout.SOUTH, listPanel);
 
-    layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.EAST, optionScrollPane);
+    layout.putConstraint(SpringLayout.WEST, buttonPanel, 5, SpringLayout.EAST, listPanel);
     layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.NORTH, this);
     layout.putConstraint(SpringLayout.EAST, this, 5 ,SpringLayout.EAST, buttonPanel);
 
-    getLogger().fine("MultiEditorPane for property " + propertyName + ", template " + template);
-
-    updateEditorEnabled();
-
-    manager.registerPropertyEditor(property, this);
 
   }
 
@@ -154,9 +164,9 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   /**
    * Creates the box which holds the "Add", "Edit", and "Remove" buttons.
    */
-  private JPanel createButtonPanel() {
+  protected JPanel createButtonPanel() {
     getLogger().fine("creating buttons.");
-    buttonList = new ArrayList();
+    buttonList = new ArrayList<JButton>();
     JPanel returnValue = new JPanel();
     SpringLayout layout = new SpringLayout();
     returnValue.setLayout(layout);
@@ -342,7 +352,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    * Edits the currently selected value, using the given Container as an
    * editor source.
    */
-  void editSelectedValue(Container container) {
+  protected void editSelectedValue(Container container) {
     getLogger().fine("calling editSelectedValue().");
     int selectedRow = optionTable.getSelectedRow();
     if (selectedRow != -1) {
@@ -502,7 +512,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    */
   protected void updateEditorEnabled() {
     for (int i = 0; i < buttonList.size(); i++) {
-      ((JButton) buttonList.get(i)).setEnabled(isEditorEnabled());
+      buttonList.get(i).setEnabled(isEditorEnabled());
     }
   }
 

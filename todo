@@ -1,6 +1,13 @@
 1)  clean up editors.
     -- fix address book. 
 	-- make address edit modified multieditorpane?
+	   -- make add work
+	   -- make edit work
+  	   -- make delete work
+	   -- thought.  make MultiEditorPane use registered actions.
+	      have AddressEditor override an action, such that once
+	      the entry editor is complete, it can get the given properties
+	      and add them as an entry.
     -- make wizards for all multieditorpanes
     -- clean up preferences. (see definition below)
     -- fix connection -- maybe even move it somewhere else?
@@ -104,7 +111,7 @@
        * reply prefix
        * forward prefix
        * forward stype
-       * signature -- REMOVE; make it per user.
+       * signature -- REMOVE; make it per user. (?)
      * tray icon
 	use it
 	minimize to icon on exit

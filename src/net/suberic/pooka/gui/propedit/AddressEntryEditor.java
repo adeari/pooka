@@ -33,7 +33,7 @@ public class AddressEntryEditor extends CompositeEditorPane {
   public void setValue() throws PropertyValueVetoException {
     if (isEditorEnabled()) {
       for (int i = 0; i < editors.size(); i++) {
-  ((SwingPropertyEditor)(editors.get(i))).setValue();
+        ((SwingPropertyEditor)(editors.get(i))).setValue();
       }
     }
 
