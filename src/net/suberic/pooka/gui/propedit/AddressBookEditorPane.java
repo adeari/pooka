@@ -23,12 +23,6 @@ public class AddressBookEditorPane extends MultiEditorPane {
 
   ConfigurablePopupMenu popupMenu;
 
-  Action[] defaultActions = new Action[] {
-    new AddAction(),
-    new EditAction(),
-    new DeleteAction()
-  };
-
   /**
    * @param propertyName The property to be edited.
    * @param template The property that will define the layout of the
@@ -385,13 +379,6 @@ public class AddressBookEditorPane extends MultiEditorPane {
     }
   }
 
-  /**
-   * Returns the actions associated with this editor.
-   */
-  public Action[] getActions() {
-    return defaultActions;
-  }
-
   public class SearchAction extends AbstractAction {
     public SearchAction() {
       super("address-search");
@@ -400,42 +387,6 @@ public class AddressBookEditorPane extends MultiEditorPane {
     public void actionPerformed(ActionEvent e) {
       setBusy(true);
       performSearch();
-      setBusy(false);
-    }
-  }
-
-  public class AddAction extends AbstractAction {
-    public AddAction() {
-      super("address-add");
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      setBusy(true);
-      performAdd();
-      setBusy(false);
-    }
-  }
-
-  public class EditAction extends AbstractAction {
-    public EditAction() {
-      super("address-edit");
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      setBusy(true);
-      editSelectedValue();
-      setBusy(false);
-    }
-  }
-
-  public class DeleteAction extends AbstractAction {
-    public DeleteAction() {
-      super("address-delete");
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      setBusy(true);
-      performDelete();
       setBusy(false);
     }
   }
@@ -453,6 +404,45 @@ public class AddressBookEditorPane extends MultiEditorPane {
   public String getDisplayValue() {
     return bookName;
   }
+
+  /**
+   * Creates the actions for this editor.
+   */
+  protected void createActions() {
+    mDefaultActions = new Action[] {
+      new SearchAction(),
+      new AddAddressAction(),
+      new EditAction(),
+      new DeleteAction()
+    };
+  }
+
+  public class AddAddressAction extends AbstractAction {
+    public AddAddressAction() {
+      //super("address-add");
+      super("editor-add");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      // check to see if we want to add a new value using a
+      // wizard
+      String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
+      if (newValueTemplate.length() > 0) {
+        PropertyEditorUI editor = manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager);
+        if (editor instanceof WizardEditorPane && ((WizardEditorPane)editor).getController() instanceof AddressEntryController) {
+          System.out.println("it's an AEC.");
+          AddressEntryController aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
+          aec.setAddressBook(book);
+        }
+          manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), editor, getPropertyEditorPane().getContainer());
+
+      } else {
+        addNewValue(getNewValueName(), getPropertyEditorPane().getContainer());
+      }
+
+    }
+  }
+
 
 
 }

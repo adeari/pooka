@@ -31,10 +31,15 @@ public interface AddressBook {
    * Loads the AddressBook.
    */
   public void loadAddressBook() throws java.io.IOException, java.text.ParseException;
-  
+
   /**
    * Saves the AddressBook.
    */
   public void saveAddressBook() throws java.io.IOException;
+
+  /**
+   * Creates a new, empty AddressBookEntry.
+   */
+  public AddressBookEntry newAddressBookEntry();
 
 }

@@ -879,7 +879,9 @@ public class MessageInfo {
       javax.mail.internet.InternetAddress addr = (javax.mail.internet.InternetAddress) fromAddresses[0];
 
       // let's not support multiple froms.
-      AddressBookEntry entry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
+      //AddressBookEntry entry = new net.suberic.pooka.vcard.Vcard(new java.util.Properties());
+      AddressBookEntry entry = book.newAddressBookEntry();
+
       String personalName = addr.getPersonal();
       if (personalName == null)
         personalName = addr.getAddress();

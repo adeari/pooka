@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 import java.awt.Container;
 import java.awt.Component;
+import java.awt.event.*;
 
 /**
  * This class will make an editor for a list of elements, where each of
@@ -41,6 +42,8 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   List<String> removeValues = new ArrayList<String>();
   String propertyTemplate;
   List<String> displayProperties;
+
+  protected Action[] mDefaultActions;
 
   /**
    * This configures this editor with the following values.
@@ -166,36 +169,20 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
    */
   protected JPanel createButtonPanel() {
     getLogger().fine("creating buttons.");
+
+    createActions();
+
     buttonList = new ArrayList<JButton>();
     JPanel returnValue = new JPanel();
     SpringLayout layout = new SpringLayout();
     returnValue.setLayout(layout);
 
-    JButton addButton = createButton("Add", new AbstractAction() {
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-          // check to see if we want to add a new value using a
-          // wizard
-          String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
-          if (newValueTemplate.length() > 0) {
-            manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager), getPropertyEditorPane().getContainer());
+    // FIXME i18n
+    JButton addButton = createButton("Add", getAction("editor-add"), true);
 
-          } else {
-            addNewValue(getNewValueName(), getPropertyEditorPane().getContainer());
-          }
-        }
-      }, true);
+    JButton editButton = createButton("Edit", getAction("editor-edit"), true);
 
-    JButton editButton = createButton("Edit", new AbstractAction() {
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-          editSelectedValue();
-        }
-      }, true);
-
-    JButton removeButton = createButton("Remove", new AbstractAction() {
-        public void actionPerformed(java.awt.event.ActionEvent e) {
-          removeSelectedValue();
-        }
-      }, false);
+    JButton removeButton = createButton("Remove", getAction("editor-delete"), false);
 
     returnValue.add(addButton);
     returnValue.add(editButton);
@@ -229,6 +216,17 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
     //panelConstraints.setWidth(Spring.sum(buttonWidth, Spring.constant(10)));
 
     return returnValue;
+  }
+
+  /**
+   * Creates the actions for this editor.
+   */
+  protected void createActions() {
+    mDefaultActions = new Action[] {
+      new AddAction(),
+      new EditAction(),
+      new DeleteAction()
+    };
   }
 
   /**
@@ -286,7 +284,7 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   /**
    * Adds a new value to the edited List.
    */
-  void addNewValue(String newValueName, Container container) {
+  protected void addNewValue(String newValueName, Container container) {
     if (newValueName == null || newValueName.length() == 0)
       return;
 
@@ -522,4 +520,80 @@ public class MultiEditorPane extends CompositeSwingPropertyEditor implements Lis
   public void remove() {
     manager.removePropertyEditorListeners(getProperty());
   }
+
+  /**
+   * Returns the actions associated with this editor.
+   */
+  public Action[] getActions() {
+    return mDefaultActions;
+  }
+
+  /**
+   * Returns the action for the given identifier.
+   */
+  public Action getAction(String name) {
+    for (Action action: mDefaultActions) {
+      if (action.getValue(Action.NAME) != null && action.getValue(Action.NAME).equals(name))
+        return action;
+    }
+
+    return null;
+  }
+
+  public class AddAction extends AbstractAction {
+    public AddAction() {
+      //super("address-add");
+      super("editor-add");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      /*
+      setBusy(true);
+      performAdd();
+      setBusy(false);
+      */
+      // check to see if we want to add a new value using a
+      // wizard
+      String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
+      if (newValueTemplate.length() > 0) {
+        manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager), getPropertyEditorPane().getContainer());
+
+      } else {
+        addNewValue(getNewValueName(), getPropertyEditorPane().getContainer());
+      }
+
+    }
+  }
+
+  public class EditAction extends AbstractAction {
+    public EditAction() {
+      super("editor-edit");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      /*
+      setBusy(true);
+      editSelectedValue();
+      setBusy(false);
+      */
+      editSelectedValue();
+    }
+  }
+
+  public class DeleteAction extends AbstractAction {
+    public DeleteAction() {
+      super("editor-delete");
+    }
+
+    public void actionPerformed(ActionEvent e) {
+      removeSelectedValue();
+      /*
+      setBusy(true);
+      performDelete();
+      setBusy(false);
+      */
+    }
+  }
+
+
 }

@@ -88,6 +88,13 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
       });
   }
 
+  /**
+   * Returns the controller.
+   */
+  public WizardController getController() {
+    return controller;
+  }
+
 
   /**
    * Returns the current Wizard state.

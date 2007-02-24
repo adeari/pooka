@@ -28,7 +28,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
    * Creates a new LDAPAddressBook.
    */
   public LDAPAddressBook() {
-    
+
   }
 
   /**
@@ -49,7 +49,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
 
     /* Specify host and port to use for directory service */
     env.put(Context.PROVIDER_URL, ldapUrl);
-    
+
     try {
       /* get a handle to an Initial DirContext */
       initialContext = new InitialDirContext(env);
@@ -84,7 +84,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
-   * Returns all of the AddressBookEntries whose FirstName matches the given 
+   * Returns all of the AddressBookEntries whose FirstName matches the given
    * String.
    */
   public AddressBookEntry[] matchFirstName(String matchString) {
@@ -101,7 +101,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
-   * Returns all of the AddressBookEntries whose LastName matches the given 
+   * Returns all of the AddressBookEntries whose LastName matches the given
    * String.
    */
   public AddressBookEntry[] matchLastName(String matchString) {
@@ -142,7 +142,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
   }
 
   /**
-   * Returns the AddressBookEntry which precedes the given String 
+   * Returns the AddressBookEntry which precedes the given String
    * alphabetically.
    */
   public AddressBookEntry getPreviousMatch(String matchString) {
@@ -198,7 +198,7 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
     /* specify search constraints to search subtree */
     SearchControls constraints = new SearchControls();
     constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-    
+
     NamingEnumeration results
       = initialContext.search("o=Ace Industry, c=US", "(sn=" + searchString + ")", constraints);
 
@@ -219,7 +219,14 @@ public class LDAPAddressBook implements AddressBook, AddressMatcher {
     resultList.toArray(returnValue);
 
     return returnValue;
-    
+
+  }
+
+  /**
+   * Creates a new, empty AddressBookEntry.
+   */
+  public AddressBookEntry newAddressBookEntry() {
+    return new LDAPAddressEntry(null);
   }
 
 }
