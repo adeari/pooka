@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui.propedit;
 import java.util.*;
+import net.suberic.pooka.*;
 import net.suberic.util.gui.propedit.*;
 import net.suberic.util.VariableBundle;
 
@@ -7,6 +8,8 @@ import net.suberic.util.VariableBundle;
  * The controller class for the AddressEntry.
  */
 public class AddressEntryController extends WizardController {
+
+  AddressBook mBook;
 
   /**
    * Creates an AddressEntryController.
@@ -21,10 +24,23 @@ public class AddressEntryController extends WizardController {
    */
   protected void saveProperties() throws PropertyValueVetoException {
     System.out.println("calling saveProperties.");
+
+    AddressBookEntry entry = mBook.newAddressBookEntry();
+
     System.out.println("personalname=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.personalName", ""));
     System.out.println("firstname=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.firstName", ""));
     System.out.println("lastname=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.lastName", ""));
     System.out.println("address=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.address", ""));
+
+    entry.setPersonalName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.personalName", ""));
+    entry.setFirstName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.firstName", ""));
+    entry.setLastName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.lastName", ""));
+    try {
+      entry.setAddress(new javax.mail.internet.InternetAddress (getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.address", "")));
+    } catch (Exception e) {
+      throw new PropertyValueVetoException(e.getMessage());
+    }
+
     /*
     Properties storeProperties = createStoreProperties();
     Properties userProperties = createUserProperties();
@@ -154,5 +170,12 @@ public class AddressEntryController extends WizardController {
     List<String> current = getManager().getPropertyAsList(property, "");
     current.add(value);
     getManager().setProperty(property, VariableBundle.convertToString(current));
+  }
+
+  /**
+   * Sets the AddressBook.
+   */
+  public void setAddressBook(AddressBook pBook) {
+    mBook = pBook;
   }
 }
