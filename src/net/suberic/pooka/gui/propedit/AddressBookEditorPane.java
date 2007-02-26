@@ -163,8 +163,22 @@ public class AddressBookEditorPane extends MultiEditorPane {
    */
   protected void editSelectedValue(Container container) {
     AddressBookEntry e = getSelectedEntry();
-    if (e != null)
-      editEntry(e);
+    if (e != null) {
+      String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
+      if (newValueTemplate.length() > 0) {
+        PropertyEditorUI editor = manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager);
+        if (editor instanceof WizardEditorPane && ((WizardEditorPane)editor).getController() instanceof AddressEntryController) {
+          System.out.println("it's an AEC.");
+          AddressEntryController aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
+          aec.setAddressBook(book);
+          aec.loadEntry(e);
+        }
+        manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), editor, getPropertyEditorPane().getContainer());
+
+      } else {
+        editEntry(e);
+      }
+    }
   }
 
   /**
@@ -193,8 +207,10 @@ public class AddressBookEditorPane extends MultiEditorPane {
    * Brings up an editor for the current entry.
    */
   public void editEntry(AddressBookEntry entry) {
+    /*
     AddressEntryEditor editor = new AddressEntryEditor(manager, entry);
     manager.getFactory().showNewEditorWindow(manager.getProperty("AddressEntryEditor.title", "Address Entry"), editor);
+    */
   }
 
   /**

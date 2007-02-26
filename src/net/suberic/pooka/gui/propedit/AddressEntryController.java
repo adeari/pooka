@@ -10,6 +10,7 @@ import net.suberic.util.VariableBundle;
 public class AddressEntryController extends WizardController {
 
   AddressBook mBook;
+  String mOriginalEntryName = null;
 
   /**
    * Creates an AddressEntryController.
@@ -35,57 +36,25 @@ public class AddressEntryController extends WizardController {
     entry.setPersonalName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.personalName", ""));
     entry.setFirstName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.firstName", ""));
     entry.setLastName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.lastName", ""));
+
+
     try {
       entry.setAddress(new javax.mail.internet.InternetAddress (getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.address", "")));
     } catch (Exception e) {
       throw new PropertyValueVetoException(e.getMessage());
     }
 
-    /*
-    Properties storeProperties = createStoreProperties();
-    Properties userProperties = createUserProperties();
-    Properties smtpProperties = createSmtpProperties();
-    //getManager().clearValues();
+    mBook.addAddress(entry);
 
-    addAll(storeProperties);
-    addAll(userProperties);
-    addAll(smtpProperties);
+    // and clear the property.
 
-    // now add the values to the store, user, and smtp server editors,
-    // if necessary.
-    String accountName = getManager().getCurrentProperty("AddressEntry.editors.store.storeName", "testStore");
-    MultiEditorPane mep = (MultiEditorPane) getManager().getPropertyEditor("Store");
-    if (mep != null) {
-      mep.addNewValue(accountName);
-    } else {
-      appendProperty("Store", accountName);
-    }
+    getManager().setProperty("AddressBook.editor.addressList._newAddress.personalName", "");
+    getManager().setProperty("AddressBook.editor.addressList._newAddress.firstName", "");
+    getManager().setProperty("AddressBook.editor.addressList._newAddress.lastName", "");
 
-    String defaultUser = getManager().getCurrentProperty("AddressEntry.editors.user.userProfile", "__default");
-    if (defaultUser.equals("__new")) {
-      String userName = getManager().getCurrentProperty("AddressEntry.editors.user.userName", "");
-      mep = (MultiEditorPane) getManager().getPropertyEditor("UserProfile");
-      if (mep != null) {
-        mep.addNewValue(userName);
-      } else {
-        appendProperty("UserProfile", userName);
-      }
+    getManager().setProperty("AddressBook.editor.addressList._newAddress.address", "");
 
-      String defaultSmtpServer = getManager().getCurrentProperty("AddressEntry.editors.smtp.outgoingServer", "__default");
-      if (defaultSmtpServer.equals("__new")) {
-        String smtpServerName = getManager().getCurrentProperty("AddressEntry.editors.smtp.smtpServerName", "");
-        mep = (MultiEditorPane) getManager().getPropertyEditor("OutgoingServer");
-        if (mep != null) {
-          mep.addNewValue(smtpServerName);
-        } else {
-          // if there's no editor, then set the value itself.
-          appendProperty("OutgoingServer", smtpServerName);
-        }
-      }
-    }
-    */
   }
-
   /**
    * Finsihes the wizard.
    */
@@ -95,54 +64,6 @@ public class AddressEntryController extends WizardController {
 
     saveProperties();
     getEditorPane().getWizardContainer().closeWizard();
-  }
-
-  /**
-   * Creates the smtpProperties from the wizard values.
-   */
-  public Properties createSmtpProperties() {
-    Properties returnValue = new Properties();
-
-    String defaultUser = getManager().getCurrentProperty("AddressEntry.editors.user.userProfile", "__default");
-    // only make smtp server changes if there's a new user.
-    if (defaultUser.equals("__new")) {
-      String userName = getManager().getCurrentProperty("AddressEntry.editors.user.userName", "newuser");
-
-      String defaultSmtpServer = getManager().getCurrentProperty("AddressEntry.editors.smtp.outgoingServer", "__default");
-      if (defaultSmtpServer.equals("__new")) {
-        String serverName = getManager().getCurrentProperty("AddressEntry.editors.smtp.smtpServerName", "newSmtpServer");
-        String server = getManager().getCurrentProperty("AddressEntry.editors.smtp.server", "");
-        String port = getManager().getCurrentProperty("AddressEntry.editors.smtp.port", "");
-        String authenticated = getManager().getCurrentProperty("AddressEntry.editors.smtp.authenticated", "");
-        String user = getManager().getCurrentProperty("AddressEntry.editors.smtp.user", "");
-        String password = getManager().getCurrentProperty("AddressEntry.editors.smtp.password", "");
-
-        returnValue.setProperty("OutgoingServer." + serverName + ".server", server);
-        returnValue.setProperty("OutgoingServer." + serverName + ".port", port);
-        returnValue.setProperty("OutgoingServer." + serverName + ".authenticated", authenticated);
-        if (authenticated.equalsIgnoreCase("true")) {
-
-          returnValue.setProperty("OutgoingServer." + serverName + ".user", user );
-          returnValue.setProperty("OutgoingServer." + serverName + ".password", password);
-        }
-
-        returnValue.setProperty("UserProfile." + userName + ".mailServer", serverName);
-      } else {
-        returnValue.setProperty("UserProfile." + userName + ".mailServer", defaultSmtpServer);
-      }
-    }
-    return returnValue;
-  }
-
-  /**
-   * Adds all of the values from the given Properties to the
-   * PropertyEditorManager.
-   */
-  void addAll(Properties props) {
-    Set<String> names = props.stringPropertyNames();
-    for (String name: names) {
-      getManager().setProperty(name, props.getProperty(name));
-    }
   }
 
   public void setUniqueProperty(PropertyEditorUI editor, String originalValue, String propertyName) {
@@ -164,12 +85,23 @@ public class AddressEntryController extends WizardController {
   }
 
   /**
-   * Appends the given value to the property.
+   * Loads the given entry.
    */
-  public void appendProperty(String property, String value) {
-    List<String> current = getManager().getPropertyAsList(property, "");
-    current.add(value);
-    getManager().setProperty(property, VariableBundle.convertToString(current));
+  public void loadEntry(AddressBookEntry pEntry) {
+    try {
+      System.err.println("loading entry " + pEntry);
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.personalName").setOriginalValue(pEntry.getPersonalName());
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.personalName").resetDefaultValue();
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.firstName").setOriginalValue(pEntry.getFirstName());
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.firstName").resetDefaultValue();
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.lastName").setOriginalValue(pEntry.getLastName());
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.lastName").resetDefaultValue();
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.address").setOriginalValue(pEntry.getAddressString() != null ? pEntry.getAddressString() : "");
+      getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.address").resetDefaultValue();
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    mOriginalEntryName = pEntry.getPersonalName();
   }
 
   /**
