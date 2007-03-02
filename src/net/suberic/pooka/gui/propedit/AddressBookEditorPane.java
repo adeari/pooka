@@ -167,14 +167,23 @@ public class AddressBookEditorPane extends MultiEditorPane {
       String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
       if (newValueTemplate.length() > 0) {
         PropertyEditorUI editor = manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager);
+        AddressEntryController aec = null;
         if (editor instanceof WizardEditorPane && ((WizardEditorPane)editor).getController() instanceof AddressEntryController) {
-          System.out.println("it's an AEC.");
-          AddressEntryController aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
+          aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
           aec.setAddressBook(book);
           aec.loadEntry(e);
         }
         manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), editor, getPropertyEditorPane().getContainer());
 
+        if (aec != null) {
+          AddressBookEntry editedEntry = aec.getEntry();
+          if (editedEntry == e) {
+            ((AddressBookTableModel)optionTable.getModel()).updateEntry(editedEntry);
+          } else {
+            book.addAddress(editedEntry);
+            ((AddressBookTableModel)optionTable.getModel()).addEntry(editedEntry);
+          }
+        }
       } else {
         editEntry(e);
       }
@@ -184,7 +193,7 @@ public class AddressBookEditorPane extends MultiEditorPane {
   /**
    * Deletes the current entry.
    */
-  public void performDelete() {
+  public void removeSelectedValue() {
     AddressBookEntry e = getSelectedEntry();
     if (e != null) {
       book.removeAddress(e);
@@ -359,17 +368,21 @@ public class AddressBookEditorPane extends MultiEditorPane {
       if (entries != null) {
         length = entries.length;
         newEntries = new AddressBookEntry[length + 1];
-        System.arraycopy(entries, 0, newEntries, 0, length);
+        System.arraycopy(entries, 0, newEntries, 1, length);
       } else {
         length = 0;
         newEntries = new AddressBookEntry[1];
       }
-      newEntries[length] = e;
+      newEntries[0] = e;
 
       entries = newEntries;
 
       fireTableRowsInserted(length, length);
-    }
+
+      optionTable.clearSelection();
+      optionTable.addRowSelectionInterval(0,0);
+      optionTable.scrollRectToVisible(optionTable.getCellRect(0, 1, true));
+  }
 
     /**
      * Removes the given AddressBookEntry from the table, if present.
@@ -390,6 +403,20 @@ public class AddressBookEditorPane extends MultiEditorPane {
 
           entries = newEntries;
           fireTableRowsDeleted(removedRow, removedRow);
+        }
+      }
+    }
+
+    /**
+     * Updates the given AddressBookEntry in the table.
+     */
+    public void updateEntry(AddressBookEntry e) {
+      boolean found = false;
+
+      for (int i = 0; !found && i < entries.length; i++) {
+        if (e == entries[i]) {
+          found = true;
+          fireTableRowsUpdated(i,i);
         }
       }
     }
@@ -447,7 +474,6 @@ public class AddressBookEditorPane extends MultiEditorPane {
         PropertyEditorUI editor = manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager);
         AddressEntryController aec = null;
         if (editor instanceof WizardEditorPane && ((WizardEditorPane)editor).getController() instanceof AddressEntryController) {
-          System.out.println("it's an AEC.");
           aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
           aec.setAddressBook(book);
         }

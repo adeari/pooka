@@ -76,7 +76,6 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
    * Loads the current state.
    */
   public void loadState(String state) {
-    System.err.println("loading state " + state);
     layout.show(this, state);
     loadContainerState();
     SwingUtilities.invokeLater(new Runnable() {
@@ -92,7 +91,6 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
   public void loadContainerState() {
     if (getWizardContainer() != null) {
       getWizardContainer().setBeginningState(inBeginningState());
-      System.err.println("setting end state to " + inEndState());
       getWizardContainer().setEndState(inEndState());
     }
   }
