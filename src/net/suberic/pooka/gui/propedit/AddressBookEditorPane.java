@@ -208,8 +208,8 @@ public class AddressBookEditorPane extends MultiEditorPane {
    */
   public void editEntry(AddressBookEntry entry) {
     /*
-    AddressEntryEditor editor = new AddressEntryEditor(manager, entry);
-    manager.getFactory().showNewEditorWindow(manager.getProperty("AddressEntryEditor.title", "Address Entry"), editor);
+      AddressEntryEditor editor = new AddressEntryEditor(manager, entry);
+      manager.getFactory().showNewEditorWindow(manager.getProperty("AddressEntryEditor.title", "Address Entry"), editor);
     */
   }
 
@@ -414,7 +414,7 @@ public class AddressBookEditorPane extends MultiEditorPane {
     return getPropertyEditorPane(this);
   }
 
- /**
+  /**
    * Returns the display value for this property.
    */
   public String getDisplayValue() {
@@ -445,13 +445,20 @@ public class AddressBookEditorPane extends MultiEditorPane {
       String newValueTemplate = manager.getProperty(editorTemplate + "._addValueTemplate", "");
       if (newValueTemplate.length() > 0) {
         PropertyEditorUI editor = manager.getFactory().createEditor(newValueTemplate, newValueTemplate, manager);
+        AddressEntryController aec = null;
         if (editor instanceof WizardEditorPane && ((WizardEditorPane)editor).getController() instanceof AddressEntryController) {
           System.out.println("it's an AEC.");
-          AddressEntryController aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
+          aec = (AddressEntryController) ((WizardEditorPane) editor).getController();
           aec.setAddressBook(book);
         }
-          manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), editor, getPropertyEditorPane().getContainer());
+        manager.getFactory().showNewEditorWindow(manager.getProperty(newValueTemplate + ".label", newValueTemplate), editor, getPropertyEditorPane().getContainer());
 
+        if (aec != null) {
+          AddressBookEntry newEntry = aec.getEntry();
+          if (newEntry != null) {
+            ((AddressBookTableModel)optionTable.getModel()).addEntry(newEntry);
+          }
+        }
       } else {
         addNewValue(getNewValueName(), getPropertyEditorPane().getContainer());
       }

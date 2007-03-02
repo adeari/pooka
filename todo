@@ -2,6 +2,7 @@
     -- fix address book. 
 	-- make address edit modified multieditorpane?
 	   -- make add work
+		-- make it test to make sure the name doens't exist.
 	   -- make edit work
   	   -- make delete work
 	   -- thought.  make MultiEditorPane use registered actions.

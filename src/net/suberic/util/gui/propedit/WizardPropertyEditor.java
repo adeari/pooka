@@ -38,6 +38,8 @@ public class WizardPropertyEditor extends PropertyEditorPane {
 
     pepLayout(editorComponent, buttonPanel);
 
+    wizard.loadContainerState();
+
     wizard.acceptDefaultFocus();
 
   }

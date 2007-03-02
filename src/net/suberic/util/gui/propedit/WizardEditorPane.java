@@ -76,16 +76,25 @@ public class WizardEditorPane extends CompositeSwingPropertyEditor {
    * Loads the current state.
    */
   public void loadState(String state) {
+    System.err.println("loading state " + state);
     layout.show(this, state);
-    if (getWizardContainer() != null) {
-      getWizardContainer().setBeginningState(inBeginningState());
-      getWizardContainer().setEndState(inEndState());
-    }
+    loadContainerState();
     SwingUtilities.invokeLater(new Runnable() {
         public void run() {
           acceptDefaultFocus();
         }
       });
+  }
+
+  /**
+   * Loads the state info into the container.
+   */
+  public void loadContainerState() {
+    if (getWizardContainer() != null) {
+      getWizardContainer().setBeginningState(inBeginningState());
+      System.err.println("setting end state to " + inEndState());
+      getWizardContainer().setEndState(inEndState());
+    }
   }
 
   /**

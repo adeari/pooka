@@ -10,6 +10,7 @@ import net.suberic.util.VariableBundle;
 public class AddressEntryController extends WizardController {
 
   AddressBook mBook;
+  AddressBookEntry mEntry = null;
   String mOriginalEntryName = null;
 
   /**
@@ -17,34 +18,41 @@ public class AddressEntryController extends WizardController {
    */
   public AddressEntryController(String sourceTemplate, WizardEditorPane wep) {
     super(sourceTemplate, wep);
-    System.out.println("editing property " + wep.getProperty());
   }
 
   /**
    * Saves all of the properties for this wizard.
    */
   protected void saveProperties() throws PropertyValueVetoException {
-    System.out.println("calling saveProperties.");
+    // check to make sure that the properties are valid.
+    String name = getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.personalName", "");
+    if (mOriginalEntryName == null || ! name.equalsIgnoreCase(mOriginalEntryName)) {
+      if (mBook.getAddressMatcher().matchExactly(name).length > 0) {
+        throw new PropertyValueVetoException("AddressBook.editor.addressList._newAddress.personalName", name, "Address already exists", null);
+      }
+      mEntry = mBook.newAddressBookEntry();
+    } else {
+      AddressBookEntry[] matches = mBook.getAddressMatcher().matchExactly(name);
+      if (matches != null && matches.length > 0) {
+        mEntry = matches[0];
+      } else {
+        mEntry = mBook.newAddressBookEntry();
+      }
+    }
 
-    AddressBookEntry entry = mBook.newAddressBookEntry();
 
-    System.out.println("personalname=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.personalName", ""));
-    System.out.println("firstname=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.firstName", ""));
-    System.out.println("lastname=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.lastName", ""));
-    System.out.println("address=" + getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.address", ""));
-
-    entry.setPersonalName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.personalName", ""));
-    entry.setFirstName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.firstName", ""));
-    entry.setLastName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.lastName", ""));
+    mEntry.setPersonalName(name);
+    mEntry.setFirstName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.firstName", ""));
+    mEntry.setLastName(getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.lastName", ""));
 
 
     try {
-      entry.setAddress(new javax.mail.internet.InternetAddress (getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.address", "")));
+      mEntry.setAddress(new javax.mail.internet.InternetAddress (getManager().getCurrentProperty("AddressBook.editor.addressList._newAddress.address", "")));
     } catch (Exception e) {
       throw new PropertyValueVetoException(e.getMessage());
     }
 
-    mBook.addAddress(entry);
+    mBook.addAddress(mEntry);
 
     // and clear the property.
 
@@ -59,7 +67,6 @@ public class AddressEntryController extends WizardController {
    * Finsihes the wizard.
    */
   public void finishWizard() throws PropertyValueVetoException {
-    System.out.println("checking state transition (finishWizard).");
     getEditorPane().validateProperty(mState);
 
     saveProperties();
@@ -89,7 +96,6 @@ public class AddressEntryController extends WizardController {
    */
   public void loadEntry(AddressBookEntry pEntry) {
     try {
-      System.err.println("loading entry " + pEntry);
       getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.personalName").setOriginalValue(pEntry.getPersonalName());
       getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.personalName").resetDefaultValue();
       getManager().getPropertyEditor("AddressBook.editor.addressList._newAddress.firstName").setOriginalValue(pEntry.getFirstName());
@@ -109,5 +115,12 @@ public class AddressEntryController extends WizardController {
    */
   public void setAddressBook(AddressBook pBook) {
     mBook = pBook;
+  }
+
+  /**
+   * Gets the AddressBookEntry created by this controller.
+   */
+  public AddressBookEntry getEntry() {
+    return mEntry;
   }
 }
