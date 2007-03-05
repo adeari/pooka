@@ -1,5 +1,10 @@
 1)  clean up editors.
     -- make wizards for all multieditorpanes
+	user
+	address book
+	mail server
+	network connection
+	theme
     -- clean up preferences. (see definition below)
     -- fix connection -- maybe even move it somewhere else?
     -- fix theme
@@ -29,9 +34,11 @@
   *)  add new user wizard (?)
   *)  do help
 	*) fix help display w/new modal editor
+
 *) major bug:  make sure that internal error messages aren't bigger than
 	the screen view.
 	-- started.  need to fix height.
+
 *) major bug:  forward as attachment doesn't work.
 
  ----- ui update
