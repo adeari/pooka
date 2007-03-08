@@ -39,8 +39,6 @@
 	the screen view.
 	-- started.  need to fix height.
 
-*) major bug:  forward as attachment doesn't work.
-
  ----- ui update
   *) Store editor:
 	*) make settings work

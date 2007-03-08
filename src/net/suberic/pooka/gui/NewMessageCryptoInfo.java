@@ -28,7 +28,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
 
   // whether or not we want to encrypt this message.
   int mEncryptMessage = CRYPTO_DEFAULT;
-  
+
   // whether or not we want to sign this message
   int mSignMessage = CRYPTO_DEFAULT;
 
@@ -46,7 +46,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
 
   // the signature key.
   Key mSignatureKey = null;
-  
+
   // the encryption key
   Key mEncryptionKey = null;
 
@@ -56,30 +56,30 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   public Key getSignatureKey() {
     return mSignatureKey;
   }
-  
+
   /**
    * Sets the encryption key for encrypting this message.
    */
   public void setSignatureKey(Key pSignatureKey) {
     mSignatureKey = pSignatureKey;
   }
-  
+
   /**
    * Sets the encryption key for encrypting this message.
    */
   public void setEncryptionKey(Key pEncryptionKey) {
     mEncryptionKey = pEncryptionKey;
   }
-  
+
   /**
    * Gets the encryption key we're using for this message.
    */
   public Key getEncryptionKey() {
     return mEncryptionKey;
   }
-  
+
   // sign message.
-  
+
   /**
    * Returns whether we're planning on signing this message or not.
    */
@@ -93,9 +93,9 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   public void setSignMessage(int pSignMessage) {
     mSignMessage = pSignMessage;
   }
-  
+
   // encrypt message.
-  
+
   /**
    * Returns whether we're planning on encrypting this message or not.
    */
@@ -109,7 +109,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   public void setEncryptMessage(int pEncryptMessage) {
     mEncryptMessage = pEncryptMessage;
   }
-  
+
   // attach keys.
 
   /**
@@ -127,9 +127,9 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     if (mAttachKeys.contains(key)) {
       mAttachKeys.remove(key);
     }
-    
+
   }
-  
+
   /**
    * Returns the keys to be attached.
    */
@@ -147,15 +147,15 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     List attachKeys = getAttachKeys();
     if (attachKeys != null) {
       for (int i = 0; i < attachKeys.size(); i++) {
-	EncryptionKey currentKey = (EncryptionKey)attachKeys.get(i);
-	try {
-	  EncryptionUtils utils = currentKey.getEncryptionUtils();
-	  keyParts.add(utils.createPublicKeyPart(new Key[] { currentKey }));
-	} catch (Exception e) {
-	  // FIXME ignore for now.
-	  System.out.println("caught exception adding key to message:  " + e);
-	  e.printStackTrace();
-	}
+        EncryptionKey currentKey = (EncryptionKey)attachKeys.get(i);
+        try {
+          EncryptionUtils utils = currentKey.getEncryptionUtils();
+          keyParts.add(utils.createPublicKeyPart(new Key[] { currentKey }));
+        } catch (Exception e) {
+          // FIXME ignore for now.
+          System.out.println("caught exception adding key to message:  " + e);
+          e.printStackTrace();
+        }
       }
     }
 
@@ -167,7 +167,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
    */
   public Map createEncryptedMessages(MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     Map returnValue = new HashMap();
-    
+
     List recipientInfoList = getCryptoRecipientInfos();
     for (int i = 0; i < recipientInfoList.size(); i++) {
       returnValue.put(((CryptoRecipientInfo) recipientInfoList.get(i)).handleMessage(mm),((CryptoRecipientInfo) recipientInfoList.get(i)).getAllRecipients() );
@@ -184,7 +184,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   }
 
   /**
-   * Updates the CryptoRecipientInfos with information from the 
+   * Updates the CryptoRecipientInfos with information from the
    * MessageUI.
    */
   public boolean updateRecipientInfos(UserProfile profile, InternetHeaders headers) throws javax.mail.internet.AddressException, javax.mail.MessagingException {
@@ -193,7 +193,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     String toHeader = headers.getHeader("To", ",");
     if (toHeader == null) {
       throw new MessagingException(Pooka.getProperty("error.NewMessage.noTo", "No To: recipient"));
-    }    
+    }
     InternetAddress[] toAddresses = InternetAddress.parse(headers.getHeader("To", ","), false);
     if (toAddresses == null || toAddresses.length == 0) {
       throw new MessagingException(Pooka.getProperty("error.NewMessage.noTo", "No To: recipient"));
@@ -223,9 +223,9 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     Key sigKey = null;
     if (getSignMessage() != CRYPTO_NO)
       sigKey = getSignatureKey();
-    
+
     CryptoRecipientInfo info = new CryptoRecipientInfo(sigKey, cryptKey, toAddresses, ccAddresses, bccAddresses);
-    
+
     mRecipientInfos = new LinkedList();
     mRecipientInfos.add(info);
 
@@ -279,13 +279,13 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
      */
     public Address[] getRecipients(Message.RecipientType type) {
       if (type == Message.RecipientType.TO)
-	return toList;
+        return toList;
       else if (type == Message.RecipientType.CC)
-	return ccList;
+        return ccList;
       else if (type == Message.RecipientType.BCC)
-	return bccList;
+        return bccList;
       else
-	return null;
+        return null;
     }
 
     /**
@@ -305,26 +305,26 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
      */
     private Address[] appendToArray(Address[] original, Address[] toAdd) {
       if (toAdd != null && toAdd.length > 0) {
-	int oldSize = original.length;
-	Address[] newReturnValue = new Address[original.length + toAdd.length];
-	System.arraycopy(original, 0, newReturnValue, 0, original.length);
-	System.arraycopy(toAdd, 0, newReturnValue, original.length, toAdd.length);
-	return newReturnValue;
+        int oldSize = original.length;
+        Address[] newReturnValue = new Address[original.length + toAdd.length];
+        System.arraycopy(original, 0, newReturnValue, 0, original.length);
+        System.arraycopy(toAdd, 0, newReturnValue, original.length, toAdd.length);
+        return newReturnValue;
       } else {
-	return original;
+        return original;
       }
-     }
+    }
 
     /**
      * Sets the recipients for the particular type.
      */
     public void setRecipients(Address[] pRecipients, Message.RecipientType type) {
       if (type == Message.RecipientType.TO)
-	toList = pRecipients;
+        toList = pRecipients;
       else if (type == Message.RecipientType.CC)
-	ccList = pRecipients;
+        ccList = pRecipients;
       else if (type == Message.RecipientType.BCC)
-	bccList = pRecipients;
+        bccList = pRecipients;
 
     }
 
@@ -348,7 +348,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     public void setEncryptionKey(Key pEncryptionKey) {
       mEncryptionKey = pEncryptionKey;
     }
-    
+
     /**
      * Gets the encryption key we're using for this message.
      */
@@ -359,36 +359,36 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     /**
      * Creates a new MimeMessage using the given recipients and encryption.
      */
-    public MimeMessage handleMessage(MimeMessage mm) 
-    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
+    public MimeMessage handleMessage(MimeMessage mm)
+      throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
       MimeMessage returnValue = new MimeMessage(mm);
 
       /*
-      returnValue.setRecipients(Message.RecipientType.TO, getRecipients(Message.RecipientType.TO));
-      returnValue.setRecipients(Message.RecipientType.CC, getRecipients(Message.RecipientType.CC));
-      returnValue.setRecipients(Message.RecipientType.BCC, getRecipients(Message.RecipientType.BCC));
+        returnValue.setRecipients(Message.RecipientType.TO, getRecipients(Message.RecipientType.TO));
+        returnValue.setRecipients(Message.RecipientType.CC, getRecipients(Message.RecipientType.CC));
+        returnValue.setRecipients(Message.RecipientType.BCC, getRecipients(Message.RecipientType.BCC));
       */
 
       Key sigKey = getSignatureKey();
       Key cryptoKey = getEncryptionKey();
 
       if (sigKey instanceof EncryptionKey && cryptoKey instanceof EncryptionKey) {
-	if (((EncryptionKey)sigKey).getType() != ((EncryptionKey)cryptoKey).getType()) {
-	  throw new MessagingException(Pooka.getProperty("error.NewMessage.differentEncryption", "Encryption and Signature Keys must be of same type (PGP or S/MIME)"));
-	}
+        if (((EncryptionKey)sigKey).getType() != ((EncryptionKey)cryptoKey).getType()) {
+          throw new MessagingException(Pooka.getProperty("error.NewMessage.differentEncryption", "Encryption and Signature Keys must be of same type (PGP or S/MIME)"));
+        }
       }
 
       if (getSignatureKey() != null) {
-	returnValue = Pooka.getCryptoManager().signMessage(returnValue, null, getSignatureKey());
+        returnValue = Pooka.getCryptoManager().signMessage(returnValue, null, getSignatureKey());
 
       }
-    
+
       if (getEncryptionKey() != null) {
-	returnValue = Pooka.getCryptoManager().encryptMessage(returnValue, getEncryptionKey());
+        returnValue = Pooka.getCryptoManager().encryptMessage(returnValue, getEncryptionKey());
       }
 
       return returnValue;
     }
   }
-  
+
 }

@@ -3,6 +3,7 @@ import net.suberic.pooka.filter.FilterAction;
 import net.suberic.pooka.gui.MessageProxy;
 import net.suberic.util.thread.*;
 import javax.mail.*;
+import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
 import javax.swing.*;
@@ -95,7 +96,7 @@ public class MessageInfo {
         String[] excludeList = (String[]) headerList.toArray(new String[0]);
         mimeMessage.writeTo(baos, excludeList);
         String content = baos.toString("ISO-8859-1");
-        javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+        MimeBodyPart mbp = new MimeBodyPart();
         mbp.setText(content);
         Attachment textPart = new Attachment(mbp);
         bundle.addAttachment(textPart);
@@ -392,13 +393,6 @@ public class MessageInfo {
    */
   public String getRawText() throws MessagingException {
     try {
-      /*
-        StringWriter writer = new StringWriter();
-        for (int i = 0; i > -1; i = is.read()) {
-        writer.write(i);
-        }
-        return writer.toString();
-      */
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
       MimeMessage mm = (MimeMessage) getMessage();
       mm.writeTo(baos);
@@ -592,7 +586,7 @@ public class MessageInfo {
             replaceMe = m.getSubject();
             if (replaceMe == null)
               replaceMe = "";
-            intro.replace(index, index + 2, m.getSubject());
+            intro.replace(index, index + 2, replaceMe);
           } else if (nextChar == '%') {
             intro.replace(index, index+1, "%");
           }
@@ -725,10 +719,21 @@ public class MessageInfo {
 
     // handle attachments.
     if (method == FORWARD_AS_ATTACHMENT) {
-      javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
-      mbp.setDataHandler(getRealMessage().getDataHandler());
-      returnValue.addAttachment(new MBPAttachment(mbp));
-      returnValue.attachmentsLoaded=true;
+      UpdatableMBP mbp = new UpdatableMBP();
+      mbp.setContent(getRealMessage(), "message/rfc822");
+      mbp.updateMyHeaders();
+      String subject = (String) getMessageProperty("Subject");
+      if (subject != null && subject.length() > 0) {
+        mbp.setFileName(subject);
+      } else {
+        mbp.setFileName("forwarded message");
+      }
+      mbp.setDisposition(Part.ATTACHMENT);
+
+      AttachmentBundle returnAttachments = returnValue.getAttachmentBundle();
+      Attachment messageAttachment = new MBPAttachment(mbp);
+      returnAttachments.addAttachment(messageAttachment, false);
+
 
     } else if (withAttachments) {
       returnValue.attachments = new AttachmentBundle();
@@ -739,12 +744,11 @@ public class MessageInfo {
           Attachment current = (Attachment) fromAttachments.elementAt(i);
           Attachment newAttachment = null;
 
-          javax.mail.internet.MimeBodyPart mbp = new javax.mail.internet.MimeBodyPart();
+          MimeBodyPart mbp = new MimeBodyPart();
           mbp.setDataHandler(current.getDataHandler());
           newAttachment = new MBPAttachment(mbp);
           returnAttachments.addAttachment(newAttachment, false);
         }
-        returnValue.attachmentsLoaded=true;
       }
     }
 

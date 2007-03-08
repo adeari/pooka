@@ -28,32 +28,33 @@ public class NewMessageInfo extends MessageInfo {
   public NewMessageInfo(Message newMessage) {
     message = newMessage;
     attachments = new AttachmentBundle();
+    attachmentsLoaded=true;
   }
 
   /**
-   * Sends the new message, using the given Profile, the given 
-   * InternetHeaders, the given messageText, the given ContentType, and 
+   * Sends the new message, using the given Profile, the given
+   * InternetHeaders, the given messageText, the given ContentType, and
    * the attachments already set for this object.
    */
   public void sendMessage(UserProfile profile, InternetHeaders headers, NewMessageCryptoInfo cryptoInfo, String messageText, String messageContentType) throws MessagingException {
-    
+
     try {
       net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
-      
+
       MimeMessage mMsg = (MimeMessage) message;
-      
+
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.settingHeaders", "Setting headers..."));
-      
+
       Enumeration individualHeaders = headers.getAllHeaders();
       while(individualHeaders.hasMoreElements()) {
-	Header currentHeader = (Header) individualHeaders.nextElement();
-	mMsg.setHeader(currentHeader.getName(), currentHeader.getValue());
+        Header currentHeader = (Header) individualHeaders.nextElement();
+        mMsg.setHeader(currentHeader.getName(), currentHeader.getValue());
       }
-      
+
       mMsg.setHeader("X-Mailer", Pooka.getProperty("Pooka.xmailer", "Pooka"));
-      
+
       if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
-	messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
+        messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
 
       // move this to another thread now.
 
@@ -67,28 +68,28 @@ public class NewMessageInfo extends MessageInfo {
 
       OutgoingMailServer mailServer = null;
       if (profile != null)
-	mailServer = profile.getMailServer();
+        mailServer = profile.getMailServer();
 
       if (mailServer != null) {
 
-	final OutgoingMailServer sMailServer = mailServer;
-	mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent ae) {
-	      internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo, sMailServer);
-	    }
-	  }, new java.awt.event.ActionEvent(this, 0, "message-send"));
+        final OutgoingMailServer sMailServer = mailServer;
+        mailServer.mailServerThread.addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent ae) {
+              internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo, sMailServer);
+            }
+          }, new java.awt.event.ActionEvent(this, 0, "message-send"));
       } else {
-	// oh well.
-	internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo, null);
-      } 
-      
+        // oh well.
+        internal_sendMessage(sProfile, sMimeMessage, sMessageText, sMessageContentType, sCryptoInfo, null);
+      }
+
     } catch (MessagingException me) {
       throw me;
     } catch (Throwable t) {
       String cause = t.getMessage();
       if (cause == null)
-	cause = t.toString();
-      
+        cause = t.toString();
+
       MessagingException me = new MessagingException(cause);
       me.initCause(t);
       throw me;
@@ -96,7 +97,7 @@ public class NewMessageInfo extends MessageInfo {
   }
 
   /**
-   * Does the part of message sending that should really not happen on 
+   * Does the part of message sending that should really not happen on
    * the AWTEventThread.
    */
   private void internal_sendMessage(UserProfile profile, MimeMessage mMsg, String messageText, String messageContentType, NewMessageCryptoInfo cryptoInfo, OutgoingMailServer mailServer) {
@@ -104,105 +105,105 @@ public class NewMessageInfo extends MessageInfo {
 
     try {
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.attachingKeys", "Attaching crypto keys (if any)..."));
-      
+
       // see if we need to add any keys.
       List keyParts = cryptoInfo.createAttachedKeyParts();
-      
+
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.addingMessageText", "Parsing message text..."));
       if (keyParts.size() > 0 || (attachments.getAttachments() != null && attachments.getAttachments().size() > 0)) {
-	MimeBodyPart mbp = new MimeBodyPart();
-	mbp.setContent(messageText, messageContentType);
-	MimeMultipart multipart = new MimeMultipart();
-	multipart.addBodyPart(mbp);
-	
-	if (attachments.getAttachments() != null) {
-	  // i should really use the text parsing code for this, but...
-	  String attachmentMessage=Pooka.getProperty("info.sendMessage.addingAttachment.1", "Adding attachment ");
-	  String ofMessage = Pooka.getProperty("info.sendMessage.addingAttachment.2", " of ");
-	  int attachmentCount = attachments.getAttachments().size();
-	  for (int i = 0; i < attachmentCount; i++) {
-	    factory.showStatusMessage(attachmentMessage + i + ofMessage + attachmentCount);
-	    Attachment currentAttachment = (Attachment) attachments.getAttachments().get(i);
-	    if (currentAttachment instanceof MBPAttachment)
-	      multipart.addBodyPart(((MBPAttachment) currentAttachment).getMimeBodyPart());
-	    else {
-	      MimeBodyPart attachmentMbp = new MimeBodyPart();
-	      //attachmentMbp.setContent(currentAttachment.getContent(), currentAttachment.getMimeType().toString());
-    
-	      DataHandler dh = currentAttachment.getDataHandler();
-	      attachmentMbp.setFileName(currentAttachment.getName());
-	      attachmentMbp.setDescription(currentAttachment.getName());
-	      attachmentMbp.setDataHandler( dh );
-	      attachmentMbp.setHeader("Content-Type", currentAttachment.getMimeType().toString());
-    
-	      multipart.addBodyPart(attachmentMbp);
-	    }
-	  }
-	}
-	
-	for (int i = 0; i < keyParts.size(); i++) {
-	  multipart.addBodyPart((MimeBodyPart) keyParts.get(i));
-	}
-	
-	factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
-	multipart.setSubType("mixed");
-	getMessage().setContent(multipart);
-	getMessage().saveChanges();
+        MimeBodyPart mbp = new MimeBodyPart();
+        mbp.setContent(messageText, messageContentType);
+        MimeMultipart multipart = new MimeMultipart();
+        multipart.addBodyPart(mbp);
+
+        if (attachments.getAttachments() != null) {
+          // i should really use the text parsing code for this, but...
+          String attachmentMessage=Pooka.getProperty("info.sendMessage.addingAttachment.1", "Adding attachment ");
+          String ofMessage = Pooka.getProperty("info.sendMessage.addingAttachment.2", " of ");
+          int attachmentCount = attachments.getAttachments().size();
+          for (int i = 0; i < attachmentCount; i++) {
+            factory.showStatusMessage(attachmentMessage + i + ofMessage + attachmentCount);
+            Attachment currentAttachment = (Attachment) attachments.getAttachments().get(i);
+            if (currentAttachment instanceof MBPAttachment)
+              multipart.addBodyPart(((MBPAttachment) currentAttachment).getMimeBodyPart());
+            else {
+              MimeBodyPart attachmentMbp = new MimeBodyPart();
+              //attachmentMbp.setContent(currentAttachment.getContent(), currentAttachment.getMimeType().toString());
+
+              DataHandler dh = currentAttachment.getDataHandler();
+              attachmentMbp.setFileName(currentAttachment.getName());
+              attachmentMbp.setDescription(currentAttachment.getName());
+              attachmentMbp.setDataHandler( dh );
+              attachmentMbp.setHeader("Content-Type", currentAttachment.getMimeType().toString());
+
+              multipart.addBodyPart(attachmentMbp);
+            }
+          }
+        }
+
+        for (int i = 0; i < keyParts.size(); i++) {
+          multipart.addBodyPart((MimeBodyPart) keyParts.get(i));
+        }
+
+        factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
+        multipart.setSubType("mixed");
+        getMessage().setContent(multipart);
+        getMessage().saveChanges();
       } else {
-	factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
-	getMessage().setContent(messageText, messageContentType);
+        factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
+        getMessage().setContent(messageText, messageContentType);
       }
-    
+
       getMessage().setSentDate(new java.util.Date(System.currentTimeMillis()));
 
       // do encryption stuff, if necessary.
-      
+
       // sigh
-      
+
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.encryptMessage", "Handing encryption..."));
-      
+
       mSendMessageMap = cryptoInfo.createEncryptedMessages((MimeMessage) getMessage());
-      
+
       if (mSendMessageMap.keySet().size() < 1) {
-	throw new MessagingException("failed to send message--no encrypted or unencrypted messages created.");
+        throw new MessagingException("failed to send message--no encrypted or unencrypted messages created.");
       }
-      
+
       if (mSendMessageMap.keySet().size() == 1) {
-	message = (Message) mSendMessageMap.keySet().iterator().next();
+        message = (Message) mSendMessageMap.keySet().iterator().next();
       }
-      
+
       boolean sent = false;
       if (mailServer != null) {
-	factory.showStatusMessage(Pooka.getProperty("info.sendMessage.sendingMessage", "Sending message to mailserver..."));
-	mailServer.sendMessage(this);
-	sent = true;
+        factory.showStatusMessage(Pooka.getProperty("info.sendMessage.sendingMessage", "Sending message to mailserver..."));
+        mailServer.sendMessage(this);
+        sent = true;
       }
-      
+
       /*
-      if (! sent) {
-	if (profile != null) {
-	  URLName urlName = profile.getSendMailURL();
-	  String sendPrecommand = profile.getSendPrecommand();
-	  factory.showStatusMessage(Pooka.getProperty("info.sendMessage.sendingMessage", "Sending message to mailserver..."));
-	  Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
-	  sent = true;
-	}
-      }
+        if (! sent) {
+        if (profile != null) {
+        URLName urlName = profile.getSendMailURL();
+        String sendPrecommand = profile.getSendPrecommand();
+        factory.showStatusMessage(Pooka.getProperty("info.sendMessage.sendingMessage", "Sending message to mailserver..."));
+        Pooka.getMainPanel().getMailQueue().sendMessage(this, urlName, sendPrecommand);
+        sent = true;
+        }
+        }
       */
 
       if (! sent) {
-	throw new MessagingException(Pooka.getProperty("error.noSMTPServer", "Error sending Message:  No mail server configured."));
+        throw new MessagingException(Pooka.getProperty("error.noSMTPServer", "Error sending Message:  No mail server configured."));
       }
     } catch (MessagingException me) {
-      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(null, me);	  
+      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(null, me);
     } catch (Throwable t) {
       String cause = t.getMessage();
       if (cause == null)
-	cause = t.toString();
-      
+        cause = t.toString();
+
       MessagingException me = new MessagingException(cause);
       me.initCause(t);
-      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(mailServer, me);	  
+      ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(mailServer, me);
     }
   }
 
@@ -218,20 +219,20 @@ public class NewMessageInfo extends MessageInfo {
     for (int i = 0; i < addresses.length; i++) {
       String currentAddress = addresses[i].getAddress();
       if (currentAddress.lastIndexOf('@') < 0) {
-	currentAddress = currentAddress + "@" + p.getDefaultDomain();
-	addresses[i].setAddress(currentAddress);
+        currentAddress = currentAddress + "@" + p.getDefaultDomain();
+        addresses[i].setAddress(currentAddress);
       }
 
       returnValue.append(addresses[i].toString());
       if (i+1 < addresses.length)
-	returnValue.append(", ");
+        returnValue.append(", ");
     }
 
     return returnValue.toString();
   }
 
   /**
-   * Saves the NewMessageInfo to the sentFolder associated with the 
+   * Saves the NewMessageInfo to the sentFolder associated with the
    * given Profile, if any.  Note that if there is a sent folder to
    * save to, this method will likely just place an action in the
    * queue.
@@ -242,37 +243,37 @@ public class NewMessageInfo extends MessageInfo {
     final FolderInfo sentFolder = profile.getSentFolder();
     if (sentFolder != null) {
       try {
-	final Message newMessage = new MimeMessage((MimeMessage) getMessage());
-	
-	sentFolder.getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
-	    public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
-	      net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
+        final Message newMessage = new MimeMessage((MimeMessage) getMessage());
 
-	      try {
-		if (sentFolder.getFolder() == null) {
-		  factory.showStatusMessage(Pooka.getProperty("info.sendMessage.openingSentFolder", "Opening sent folder..."));
-		  sentFolder.openFolder(Folder.READ_WRITE);
-		}
+        sentFolder.getFolderThread().addToQueue(new net.suberic.util.thread.ActionWrapper(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent actionEvent) {
+              net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
 
-		if (sentFolder.getFolder() == null) {
-		  throw new MessagingException("failed to load sent folder " + sentFolder);
-		}
-		
-		newMessage.setSentDate(java.util.Calendar.getInstance().getTime());
-		factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingToSentFolder", "Saving message to sent folder..."));
+              try {
+                if (sentFolder.getFolder() == null) {
+                  factory.showStatusMessage(Pooka.getProperty("info.sendMessage.openingSentFolder", "Opening sent folder..."));
+                  sentFolder.openFolder(Folder.READ_WRITE);
+                }
 
-		sentFolder.getFolder().appendMessages(new Message[] {newMessage});
-	      } catch (MessagingException me) {
-		me.printStackTrace();
-		Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
-	      } finally {
-		((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendSucceeded(false);
-	      }
-	    }
-	  }, sentFolder.getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-send"));
+                if (sentFolder.getFolder() == null) {
+                  throw new MessagingException("failed to load sent folder " + sentFolder);
+                }
+
+                newMessage.setSentDate(java.util.Calendar.getInstance().getTime());
+                factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingToSentFolder", "Saving message to sent folder..."));
+
+                sentFolder.getFolder().appendMessages(new Message[] {newMessage});
+              } catch (MessagingException me) {
+                me.printStackTrace();
+                Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+              } finally {
+                ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendSucceeded(false);
+              }
+            }
+          }, sentFolder.getFolderThread()), new java.awt.event.ActionEvent(this, 1, "message-send"));
       } catch (MessagingException me) {
-	me.printStackTrace();
-	Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
+        me.printStackTrace();
+        Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
 
       }
       return true;
@@ -285,22 +286,22 @@ public class NewMessageInfo extends MessageInfo {
    * Adds an attachment to this message.
    */
   public void addAttachment(Attachment attachment) {
-    attachments.addAttachment(attachment);
+    attachments.addAttachment(attachment, false);
   }
-  
+
   /**
    * Removes an attachment from this message.
    */
   public int removeAttachment(Attachment part) {
     if (attachments != null) {
-      int index = attachments.getAttachments().indexOf(part);	
+      int index = attachments.getAttachments().indexOf(part);
       attachments.removeAttachment(part);
       return index;
     }
-    
+
     return -1;
   }
-  
+
   /**
    * Attaches the given File to the message.
    */
@@ -313,42 +314,44 @@ public class NewMessageInfo extends MessageInfo {
    */
   public void attachFile(File f, String contentType) throws MessagingException {
     // borrowing liberally from ICEMail here.
-    
-    MimeBodyPart mbp = new MimeBodyPart();
-    
+
+    UpdatableMBP mbp = new UpdatableMBP();
+
     FileDataSource fds = new FileDataSource(f);
-    
+
     DataHandler dh = new DataHandler(fds);
-    
+
     mbp.setFileName(f.getName());
-    
+
     if (Pooka.getMimeTypesMap().getContentType(f).startsWith("text"))
       mbp.setDisposition(Part.INLINE);
     else
       mbp.setDisposition(Part.ATTACHMENT);
-    
+
     mbp.setDescription(f.getName());
-    
+
     mbp.setDataHandler( dh );
-    
+
     if (contentType == null) {
       String type = dh.getContentType();
-      
+
       mbp.setHeader("Content-Type", type);
     } else {
       mbp.setHeader("Content-Type", contentType);
     }
-    
+
+    mbp.updateMyHeaders();
+
     addAttachment(new MBPAttachment(mbp));
   }
-  
+
   /**
    * Returns the given header on the wrapped Message.
    */
   public String getHeader(String headerName, String delimeter) throws MessagingException {
     return ((MimeMessage)getMessage()).getHeader(headerName, delimeter);
   }
-  
+
   /**
    * Gets the text part of the wrapped message.
    */
@@ -356,59 +359,59 @@ public class NewMessageInfo extends MessageInfo {
     try {
       Object content = message.getContent();
       if (content instanceof String)
-	return (String) content;
+        return (String) content;
       else if (content instanceof Multipart) {
-	AttachmentBundle bundle = MailUtilities.parseAttachments((Multipart) content);
-	return bundle.getTextPart(false, false, 10000, getTruncationMessage());
+        AttachmentBundle bundle = MailUtilities.parseAttachments((Multipart) content);
+        return bundle.getTextPart(false, false, 10000, getTruncationMessage());
       } else
-	return null;
+        return null;
     } catch (java.io.IOException ioe) {
       // since this is a NewMessageInfo, there really shouldn't be an
       // IOException
       return null;
     } catch (MessagingException me) {
-	    // since this is a NewMessageInfo, there really shouldn't be a
+      // since this is a NewMessageInfo, there really shouldn't be a
       // MessagingException
       return null;
-    } 
+    }
   }
-  
+
   /**
    * Marks the message as a draft message and then saves it to the outbox
    * folder given.
    */
   public void saveDraft(FolderInfo outboxFolder, UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException {
     net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
-    
+
     MimeMessage mMsg = (MimeMessage) message;
-    
+
     factory.showStatusMessage(Pooka.getProperty("info.sendMessage.settingHeaders", "Setting headers..."));
-    
+
     Enumeration individualHeaders = headers.getAllHeaders();
     while(individualHeaders.hasMoreElements()) {
       Header currentHeader = (Header) individualHeaders.nextElement();
       mMsg.setHeader(currentHeader.getName(), currentHeader.getValue());
     }
-    
+
     if (Pooka.getProperty("Pooka.lineWrap", "").equalsIgnoreCase("true"))
       messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
-    
+
     factory.showStatusMessage(Pooka.getProperty("info.sendMessage.addingMessageText", "Parsing message text..."));
     if (attachments.getAttachments() != null && attachments.getAttachments().size() > 0) {
       MimeBodyPart mbp = new MimeBodyPart();
       mbp.setContent(messageText, messageContentType);
       MimeMultipart multipart = new MimeMultipart();
       multipart.addBodyPart(mbp);
-      
+
       // i should really use the text parsing code for this, but...
       String attachmentMessage=Pooka.getProperty("info.sendMessage.addingAttachment.1", "Adding attachment ");
       String ofMessage = Pooka.getProperty("info.sendMessage.addingAttachment.2", " of ");
       int attachmentCount = attachments.getAttachments().size();
       for (int i = 0; i < attachmentCount; i++) {
-	factory.showStatusMessage(attachmentMessage + i + ofMessage + attachmentCount);
-	multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
+        factory.showStatusMessage(attachmentMessage + i + ofMessage + attachmentCount);
+        multipart.addBodyPart(((MBPAttachment)attachments.getAttachments().elementAt(i)).getMimeBodyPart());
       }
-      
+
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
       multipart.setSubType("mixed");
       getMessage().setContent(multipart);
@@ -417,17 +420,17 @@ public class NewMessageInfo extends MessageInfo {
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingChangesToMessage", "Saving changes to message..."));
       getMessage().setContent(messageText, messageContentType);
     }
-    
+
     getMessage().setSentDate(new java.util.Date(System.currentTimeMillis()));
-    
+
     getMessage().setFlag(Flags.Flag.DRAFT, true);
     outboxFolder.appendMessages(new MessageInfo[] { this });
   }
-  
+
   /**
    * The full map of Messages to be sent, which in turn map to the
    * recipients they will go to.  If there is no Address array as the
-   * value in the map, then the message goes out to all recipients in 
+   * value in the map, then the message goes out to all recipients in
    * the headers.
    */
   public Map getSendMessageMap() {
@@ -437,7 +440,7 @@ public class NewMessageInfo extends MessageInfo {
   /**
    * The full map of Messages to be sent, which in turn map to the
    * recipients they will go to.  If there is no Address array as the
-   * value in the map, then the message goes out to all recipients in 
+   * value in the map, then the message goes out to all recipients in
    * the headers.
    */
   void setSendMessageMap(Map pSendMessageMap) {
@@ -447,7 +450,7 @@ public class NewMessageInfo extends MessageInfo {
   /**
    * As specified by interface net.suberic.pooka.UserProfileContainer.
    *
-   * If 
+   * If
    */
   public UserProfile getDefaultProfile() {
     if (mProfile == null)
@@ -457,7 +460,7 @@ public class NewMessageInfo extends MessageInfo {
   }
 
   /**
-   * Sets the default UserProfile for this NewMessageInfo.  Note that 
+   * Sets the default UserProfile for this NewMessageInfo.  Note that
    * this UserProfile is not necessarily the one that the message will be
    * sent using; rather, it's the one that will be selected in the UI
    * by default.
@@ -465,6 +468,6 @@ public class NewMessageInfo extends MessageInfo {
   public void setDefaultProfile(UserProfile pProfile) {
     mProfile = pProfile;
   }
-  
-  
+
+
 }

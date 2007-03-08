@@ -116,7 +116,6 @@ class AttachmentBundle {
         allAttachments.add(newAttach);
       }
     }
-
   }
 
   /**
