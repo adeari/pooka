@@ -23,31 +23,28 @@ public class NewUserProfileWizardController extends WizardController {
     getEditorPane().validateProperty(oldState);
     if (newState.equals("userName")) {
 
-      String userName = getManager().getCurrentProperty("UserProfile._newValueWizard.editors.user.from", "");
+      String userName = getManager().getCurrentProperty("UserProfile._newValueWizard.user.from", "");
       PropertyEditorUI userNameEditor = getManager().getPropertyEditor("UserProfile._newValueWizard.userName.userName");
 
-      setUniqueProperty(userNameEditor, userName, "NewUserProfileWizard.editors.store.storeName");
+      setUniqueProperty(userNameEditor, userName, "UserProfile._newValueWizard.userName.userName");
 
       String smtpServerName = "";
 
-      // set the username
-      String userProfileName= getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userProfile", "__default");
-      if (userProfileName.equalsIgnoreCase("__new")) {
-        userProfileName = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.from", "");
-        // set the smtp server name only for new users
-        smtpServerName= getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.outgoingServer", "__default");
-        if (smtpServerName.equalsIgnoreCase("__new")) {
-          smtpServerName = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.server", "");
-        } else if (smtpServerName.equalsIgnoreCase("__default")) {
-          smtpServerName = getManager().getProperty("NewUserProfileWizard.editors.smtp.outgoingServer.listMapping.__default.label", "< Global Default SMTP Server >");
-        }
+      // set the smtp servername
+      PropertyEditorUI smtpServerNameEditor = getManager().getPropertyEditor("UserProfile._newValueWizard.userName.smtpServerName");
+
+      smtpServerName= getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
+      if (smtpServerName.equalsIgnoreCase("__new")) {
+        smtpServerName = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.server", "");
+        setUniqueProperty(smtpServerNameEditor, smtpServerName, "UserProfile._newValueWizard.userName.smtpServerName");
+      } else if (smtpServerName.equalsIgnoreCase("__default")) {
+        smtpServerName = getManager().getProperty("NewStoreWizard.editors.smtp.outgoingServer.listMapping.__default.label", "< Global Default SMTP Server >");
+        smtpServerNameEditor.setOriginalValue(smtpServerName);
+        smtpServerNameEditor.resetDefaultValue();
+      } else {
+        smtpServerNameEditor.setOriginalValue("<" + smtpServerName + ">");
+        smtpServerNameEditor.resetDefaultValue();
       }
-
-      /*
-      PropertyEditorUI userProfileNameEditor = getManager().getPropertyEditor("NewUserProfileWizard.editors.user.userName");
-      setUniqueProperty(userProfileNameEditor, userProfileName, "NewUserProfileWizard.editors.user.userName");
-
-      */
     }
   }
 
@@ -91,7 +88,7 @@ public class NewUserProfileWizardController extends WizardController {
 
     // now add the values to the store, user, and smtp server editors,
     // if necessary.
-    String accountName = getManager().getCurrentProperty("NewUserProfileWizard.editors.store.storeName", "testUserProfile");
+    String accountName = getManager().getCurrentProperty("UserProfile._newValueWizard.userName.userName", "testUserProfile");
     MultiEditorPane mep = (MultiEditorPane) getManager().getPropertyEditor("UserProfile");
     if (mep != null) {
       mep.addNewValue(accountName);
@@ -99,26 +96,15 @@ public class NewUserProfileWizardController extends WizardController {
       appendProperty("UserProfile", accountName);
     }
 
-    String defaultUser = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userProfile", "__default");
-    if (defaultUser.equals("__new")) {
-      String userName = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userName", "");
-      mep = (MultiEditorPane) getManager().getPropertyEditor("UserProfile");
+    String defaultSmtpServer= getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
+    if (defaultSmtpServer.equals("__new")) {
+      String smtpServerName = getManager().getCurrentProperty("UserProfile._newValueWizard.userName.smtpServerName", "");
+      mep = (MultiEditorPane) getManager().getPropertyEditor("OutgoingServer");
       if (mep != null) {
-        mep.addNewValue(userName);
+        mep.addNewValue(smtpServerName);
       } else {
-        appendProperty("UserProfile", userName);
-      }
-
-      String defaultSmtpServer = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.outgoingServer", "__default");
-      if (defaultSmtpServer.equals("__new")) {
-        String smtpServerName = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.smtpServerName", "");
-        mep = (MultiEditorPane) getManager().getPropertyEditor("OutgoingServer");
-        if (mep != null) {
-          mep.addNewValue(smtpServerName);
-        } else {
-          // if there's no editor, then set the value itself.
-          appendProperty("OutgoingServer", smtpServerName);
-        }
+        // if there's no editor, then set the value itself.
+        appendProperty("OutgoingServer", smtpServerName);
       }
     }
   }
@@ -137,26 +123,20 @@ public class NewUserProfileWizardController extends WizardController {
   public Properties createUserProperties() {
     Properties returnValue = new Properties();
 
-    String storeName = getManager().getCurrentProperty("NewUserProfileWizard.editors.store.storeName", "testUserProfile");
+    String userName = getManager().getCurrentProperty("UserProfile._newValueWizard.userName.userName", "testUserProfile");
 
-    String defaultUser = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userProfile", "__default");
-    if (defaultUser.equals("__new")) {
-      String from = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.from", "test@example.com");
-      String fromPersonal = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.fromPersonal", "");
-      String replyTo = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.replyTo", "");
-      String replyToPersonal = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.replyToPersonal", "");
+    String from = getManager().getCurrentProperty("UserProfile._newValueWizard.user.from", "test@example.com");
+    String fromPersonal = getManager().getCurrentProperty("UserProfile._newValueWizard.user.fromPersonal", "");
+    String replyTo = getManager().getCurrentProperty("UserProfile._newValueWizard.user.replyTo", "");
+    String replyToPersonal = getManager().getCurrentProperty("UserProfile._newValueWizard.user.replyToPersonal", "");
 
-      String userName = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userName", from);
+    returnValue.setProperty("UserProfile." + userName + ".mailHeaders.From", from );
+    returnValue.setProperty("UserProfile." + userName + ".mailHeaders.FromPersonal", fromPersonal);
+    returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyTo", replyTo);
+    returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyToPersonal", replyToPersonal);
 
-      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.From", from );
-      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.FromPersonal", fromPersonal);
-      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyTo", replyTo);
-      returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyToPersonal", replyToPersonal);
+    returnValue.setProperty("UserProfile." + userName + ".mailHeaders.ReplyToPersonal", replyToPersonal);
 
-      returnValue.setProperty("UserProfile." + storeName + ".defaultProfile", userName);
-    } else {
-      returnValue.setProperty("UserProfile." + storeName + ".defaultProfile", defaultUser);
-    }
     return returnValue;
   }
 
@@ -166,33 +146,30 @@ public class NewUserProfileWizardController extends WizardController {
   public Properties createSmtpProperties() {
     Properties returnValue = new Properties();
 
-    String defaultUser = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userProfile", "__default");
-    // only make smtp server changes if there's a new user.
-    if (defaultUser.equals("__new")) {
-      String userName = getManager().getCurrentProperty("NewUserProfileWizard.editors.user.userName", "newuser");
+    String userName = getManager().getCurrentProperty("UserProfile._newValueWizard.userName.userName", "testUserProfile");
 
-      String defaultSmtpServer = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.outgoingServer", "__default");
-      if (defaultSmtpServer.equals("__new")) {
-        String serverName = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.smtpServerName", "newSmtpServer");
-        String server = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.server", "");
-        String port = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.port", "");
-        String authenticated = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.authenticated", "");
-        String user = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.user", "");
-        String password = getManager().getCurrentProperty("NewUserProfileWizard.editors.smtp.password", "");
+    String defaultSmtpServer = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.outgoingServer", "__default");
+    if (defaultSmtpServer.equals("__new")) {
+      String serverName = getManager().getCurrentProperty("UserProfile._newValueWizard.userName.smtpServerName", "");
 
-        returnValue.setProperty("OutgoingServer." + serverName + ".server", server);
-        returnValue.setProperty("OutgoingServer." + serverName + ".port", port);
-        returnValue.setProperty("OutgoingServer." + serverName + ".authenticated", authenticated);
-        if (authenticated.equalsIgnoreCase("true")) {
+      String server = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.server", "");
+      String port = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.port", "");
+      String authenticated = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.authenticated", "");
+      String user = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.user", "");
+      String password = getManager().getCurrentProperty("NewStoreWizard.editors.smtp.password", "");
 
-          returnValue.setProperty("OutgoingServer." + serverName + ".user", user );
-          returnValue.setProperty("OutgoingServer." + serverName + ".password", password);
-        }
+      returnValue.setProperty("OutgoingServer." + serverName + ".server", server);
+      returnValue.setProperty("OutgoingServer." + serverName + ".port", port);
+      returnValue.setProperty("OutgoingServer." + serverName + ".authenticated", authenticated);
+      if (authenticated.equalsIgnoreCase("true")) {
 
-        returnValue.setProperty("UserProfile." + userName + ".mailServer", serverName);
-      } else {
-        returnValue.setProperty("UserProfile." + userName + ".mailServer", defaultSmtpServer);
+        returnValue.setProperty("OutgoingServer." + serverName + ".user", user );
+        returnValue.setProperty("OutgoingServer." + serverName + ".password", password);
       }
+
+      returnValue.setProperty("UserProfile." + userName + ".mailServer", serverName);
+    } else {
+      returnValue.setProperty("UserProfile." + userName + ".mailServer", defaultSmtpServer);
     }
     return returnValue;
   }

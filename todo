@@ -1,10 +1,5 @@
 1)  clean up editors.
     -- make wizards for all multieditorpanes
-	user
-	 -- fix focus on first screen
-	 -- fix username and storename at end
-	 -- fix label for uname and storenaem at end
-	 -- make it work.  :)
 	address book
 	mail server
 	network connection

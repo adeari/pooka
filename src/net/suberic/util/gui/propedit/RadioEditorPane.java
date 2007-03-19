@@ -230,12 +230,18 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
   public boolean acceptDefaultFocus() {
     if (isEditorEnabled()) {
       Enumeration<AbstractButton> buttonEnum = buttonGroup.getElements();
-      while (buttonEnum.hasMoreElements()) {
+      // for some reason this returns false on dialogs.
+      /*
+        while (buttonEnum.hasMoreElements()) {
         AbstractButton button = buttonEnum.nextElement();
         if (button.requestFocusInWindow())
-          return true;
-      }
-      return false;
+        return true;
+        }
+        return false;
+      */
+      AbstractButton button = buttonEnum.nextElement();
+      button.requestFocusInWindow();
+      return true;
     } else {
       return false;
     }

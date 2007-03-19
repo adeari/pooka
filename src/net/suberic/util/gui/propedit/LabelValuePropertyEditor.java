@@ -147,7 +147,14 @@ public abstract class LabelValuePropertyEditor extends SwingPropertyEditor {
    */
   public boolean acceptDefaultFocus() {
     if (isEditorEnabled()) {
-      return valueComponent.requestFocusInWindow();
+      // for some reason this returns false in dialogs
+      /*
+      boolean returnValue = valueComponent.requestFocusInWindow();
+      System.err.println( getDisplayValue() + ":  returining " + returnValue);
+      return returnValue;
+      */
+      valueComponent.requestFocusInWindow();
+      return true;
     } else {
       return false;
     }
