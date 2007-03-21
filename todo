@@ -1,7 +1,6 @@
 1)  clean up editors.
     -- make wizards for all multieditorpanes
 	address book
-	mail server
 	network connection
 	theme
     -- clean up preferences. (see definition below)
@@ -18,6 +17,9 @@
         -- default pane is addresses
 	-- configuration pane just shows info for type.
    *)  key bindings for editors (!!)
+	-- include the main editor -- you should be able to hit first letter
+		and have it scan to first match.
+	-- also on multieditorpanes, C-A should add, C-E should edit, etc.
   *)  get new store wizard working.
 	*) get wizard working from new user startup
 	  *) fix on failure message.
