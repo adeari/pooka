@@ -229,4 +229,18 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
     }
     return newValue.toString();
   }
+
+  /**
+   * Accepts or rejects the initial focus for this component.
+   */
+  public boolean acceptDefaultFocus() {
+    if (isEditorEnabled()) {
+      // for some reason this returns false in dialogs
+      valueDisplay.requestFocusInWindow();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }
