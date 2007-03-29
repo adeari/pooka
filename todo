@@ -1,3 +1,5 @@
+*) add unread message count to folder display.
+
 1)  clean up editors.
     -- make wizards for all multieditorpanes
 	address book
@@ -230,8 +232,6 @@ online:
     *) make sure mailing list info is correct
     *) update website in general
     *) add blog/rss feed
-
-*) add unread message count to folder display.
 
 *) exit:  closing window should pop up a notice saying pooka is still
 	running; file->exit should exit.
