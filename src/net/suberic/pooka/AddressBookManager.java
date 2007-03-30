@@ -12,18 +12,18 @@ public class AddressBookManager implements ValueChangeListener {
 
   private Vector addressBookList;
   private Vector valueChangeListenerList = new Vector();
-  
+
   public AddressBookManager() {
     addressBookList = createAddressBookList();
     Pooka.getResources().addValueChangeListener(this, "AddressBook");
   }
-  
+
   //-----------------------
   // public interface.
-  
+
   /**
    * As defined in net.suberic.util.ValueChangeListener.
-   * 
+   *
    * This listens for changes to the "AddressBook" property and calls
    * refreshAddressBooks() when it gets one.
    */
@@ -31,7 +31,7 @@ public class AddressBookManager implements ValueChangeListener {
     if (changedValue.equals("AddressBook"))
       refreshAddressBooks();
   }
-  
+
   /**
    * This returns a Vector with all the currently registered AddressBook
    * objects.
@@ -39,9 +39,9 @@ public class AddressBookManager implements ValueChangeListener {
   public java.util.Vector getAddressBookList() {
     return new Vector(addressBookList);
   }
-  
+
   /**
-   * This adds the addressBook with the given addressBookName to the 
+   * This adds the addressBook with the given addressBookName to the
    * allAddressBooks list.
    */
   public void addAddressBook(String addressBookName) {
@@ -49,23 +49,23 @@ public class AddressBookManager implements ValueChangeListener {
       appendToAddressBookString(addressBookName);
     }
   }
-  
+
   /**
-   * This adds the addressBooks with the given addressBookNames to the 
+   * This adds the addressBooks with the given addressBookNames to the
    * allAddressBooks list.
    */
   public void addAddressBook(String[] addressBookName) {
     if (addressBookName != null && addressBookName.length > 0) {
       StringBuffer addressBookString = new StringBuffer();
       for (int i = 0 ; i < addressBookName.length; i++) {
-	if (getAddressBook(addressBookName[i]) == null) 
-	  addressBookString.append(addressBookName[i] + ":");
+        if (getAddressBook(addressBookName[i]) == null)
+          addressBookString.append(addressBookName[i] + ":");
       }
       if (addressBookString.length() > 0)
-	appendToAddressBookString(new String(addressBookString.deleteCharAt(addressBookString.length() -1)));
+        appendToAddressBookString(new String(addressBookString.deleteCharAt(addressBookString.length() -1)));
     }
   }
-  
+
   /**
    * This removes the addressBook with the given addressBookName.
    */
@@ -73,31 +73,31 @@ public class AddressBookManager implements ValueChangeListener {
     if (getAddressBook(addressBookName) != null)
       removeFromAddressBookString(new String[] { addressBookName });
   }
-  
+
   /**
    * This removes the addressBooks with the given addressBookNames.
    */
   public void removeAddressBook(String[] addressBookNames) {
     // this is probably not necessary at all, but what the hell?
-    
+
     if (addressBookNames == null || addressBookNames.length < 1)
       return;
-    
+
     Vector matches = new Vector();
     for ( int i = 0; i < addressBookNames.length; i++) {
       if (getAddressBook(addressBookNames[i]) != null)
-	matches.add(addressBookNames[i]);
-      
+        matches.add(addressBookNames[i]);
+
     }
-    
+
     if (matches.size() < 1)
       return;
-    
+
     String[] removedAddressBooks = new String[matches.size()];
-    
-    for (int i = 0; i < matches.size(); i++) 
+
+    for (int i = 0; i < matches.size(); i++)
       removedAddressBooks[i] = (String) matches.elementAt(i);
-    
+
     removeFromAddressBookString(removedAddressBooks);
   }
 
@@ -108,7 +108,7 @@ public class AddressBookManager implements ValueChangeListener {
     if (addressBook != null)
       removeAddressBook(addressBook.getAddressBookID());
   }
-  
+
   /**
    * This removes the given AddressBooks.
    */
@@ -116,41 +116,41 @@ public class AddressBookManager implements ValueChangeListener {
     if (addressBook != null && addressBook.length > 0) {
       String[] addressBookNames = new String[addressBook.length];
       for (int i = 0; i < addressBook.length; i++) {
-	if (addressBook[i] != null)
-	  addressBookNames[i] = addressBook[i].getAddressBookID();
+        if (addressBook[i] != null)
+          addressBookNames[i] = addressBook[i].getAddressBookID();
       }
-      
+
       removeAddressBook(addressBookNames);
     }
   }
-  
+
   /**
    * This compares the addressBookList object with the AddressBook property, and
    * updates the addressBookList appropriately.
    */
   public void refreshAddressBooks() {
     Vector newAddressBookList = new Vector();
-    
+
     StringTokenizer tokens =  new StringTokenizer(Pooka.getProperty("AddressBook", ""), ":");
-    
+
     String addressBookID;
     while (tokens.hasMoreTokens()) {
       addressBookID = tokens.nextToken();
       AddressBook currentAddressBook = getAddressBook(addressBookID);
       if (currentAddressBook != null) {
-	newAddressBookList.add(currentAddressBook);
+        newAddressBookList.add(currentAddressBook);
       } else {
-	currentAddressBook = createAddressBook(addressBookID);
-	if (currentAddressBook != null) {
-	  newAddressBookList.add(currentAddressBook);
-	  
-	  if (Pooka.getProperty("AddressBook._default", "").equalsIgnoreCase(""))
-	    Pooka.setProperty("AddressBook._default", addressBookID);
-	}
-	
+        currentAddressBook = createAddressBook(addressBookID);
+        if (currentAddressBook != null) {
+          newAddressBookList.add(currentAddressBook);
+
+          if (Pooka.getProperty("AddressBook._default", "").equalsIgnoreCase(""))
+            Pooka.setProperty("AddressBook._default", addressBookID);
+        }
+
       }
     }
-    
+
     if (! newAddressBookList.equals(addressBookList)) {
       addressBookList = newAddressBookList;
       fireAddressBookListChangedEvent();
@@ -167,10 +167,10 @@ public class AddressBookManager implements ValueChangeListener {
       returnValue.configureAddressBook(id);
       return returnValue;
     }
-    
+
     return null;
   }
-  
+
   /**
    * This returns the AddressBook which corresponds to the given name.
    */
@@ -181,12 +181,12 @@ public class AddressBookManager implements ValueChangeListener {
     for (int i = 0; i < addressBookList.size(); i++) {
       AddressBook currentBook = (AddressBook) addressBookList.elementAt(i);
       if (currentBook != null && currentBook.getAddressBookID().equals(name))
-	return currentBook;
+        return currentBook;
     }
 
     return null;
   }
-  
+
   /**
    * This adds a ValueChangeListener to the local listener list.
    */
@@ -194,45 +194,45 @@ public class AddressBookManager implements ValueChangeListener {
     if (! valueChangeListenerList.contains(vcl))
       valueChangeListenerList.add(vcl);
   }
-  
+
   /**
    * This removes a ValueChangeListener from the local listener list.
    */
   public void removeValueChangeListener(ValueChangeListener vcl) {
     valueChangeListenerList.remove(vcl);
   }
-  
+
   /**
    * This notifies all listeners that the AddressBookList has changed.
    */
-  
+
   public void fireAddressBookListChangedEvent() {
     for (int i = 0; i < valueChangeListenerList.size(); i++)
       ((ValueChangeListener)valueChangeListenerList.elementAt(i)).valueChanged("AddressBook");
   }
-  
-  
+
+
   //---------------------------
   // the background stuff.
-  
+
   /**
-   * This loads and creates all the AddressBooks using the "AddressBook" 
+   * This loads and creates all the AddressBooks using the "AddressBook"
    * property of the main Pooka VariableBundle.
    */
   private Vector createAddressBookList() {
     Vector allAddressBooks = new Vector();
     String addressBookID = null;
-    
+
     StringTokenizer tokens =  new StringTokenizer(Pooka.getProperty("AddressBook", ""), ":");
-    
+
     while (tokens.hasMoreTokens()) {
       addressBookID=(String)tokens.nextToken();
-      allAddressBooks.add(createAddressBook(addressBookID));	    
+      allAddressBooks.add(createAddressBook(addressBookID));
     }
-    
+
     return allAddressBooks;
   }
-  
+
   /**
    * This appends the newAddressBookString to the "AddressBook" property.
    */
@@ -244,39 +244,39 @@ public class AddressBookManager implements ValueChangeListener {
     } else {
       newValue = oldValue + newAddressBookString;
     }
-    
+
     Pooka.setProperty("AddressBook", newValue);
   }
-  
+
   /**
-   * This removes the addressBook names in the addressBookNames array from the 
+   * This removes the addressBook names in the addressBookNames array from the
    * "AddressBook" property.
    */
   private void removeFromAddressBookString(String[] addressBookNames) {
     StringTokenizer tokens =  new StringTokenizer(Pooka.getProperty("AddressBook", ""), ":");
-    
+
     boolean first = true;
     StringBuffer newValue = new StringBuffer();
     String addressBookID;
-    
+
     while (tokens.hasMoreTokens()) {
       addressBookID=tokens.nextToken();
       boolean keep=true;
-      
+
       for (int i = 0; keep == true && i < addressBookNames.length; i++) {
-	if (addressBookID.equals(addressBookNames[i]))
-	  keep = false;
+        if (addressBookID.equals(addressBookNames[i]))
+          keep = false;
       }
       if (keep) {
-	if (!first)
-	  newValue.append(":");
-	
-	newValue.append(addressBookID);
-	first = false;
+        if (!first)
+          newValue.append(":");
+
+        newValue.append(addressBookID);
+        first = false;
       }
-      
+
     }
-    
+
     Pooka.setProperty("AddressBook", newValue.toString());
   }
 
@@ -290,9 +290,9 @@ public class AddressBookManager implements ValueChangeListener {
       return defaultBook;
     } else
       return null;
-    
+
   }
-  
-    
+
+
 }
 

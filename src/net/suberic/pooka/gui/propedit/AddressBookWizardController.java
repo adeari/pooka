@@ -1,4 +1,5 @@
 package net.suberic.pooka.gui.propedit;
+import java.io.*;
 import java.util.*;
 import net.suberic.util.gui.propedit.*;
 import net.suberic.util.VariableBundle;
@@ -53,6 +54,20 @@ public class AddressBookWizardController extends WizardController {
    * Finsihes the wizard.
    */
   public void finishWizard() throws PropertyValueVetoException {
+    // check to make sure that the new file is valid.
+    String filename = getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", "");
+
+    File file = new File(filename);
+    try {
+      if (! file.exists()) {
+        file.createNewFile();
+      }
+      if (! file.canRead()) {
+        throw new PropertyValueVetoException("AddressBook._newValueWizard.config.filename", filename, getManager().getProperty("error.cannotReadFile", "Can not read file."), null);
+      }
+    } catch (java.io.IOException ioe) {
+      throw new PropertyValueVetoException("AddressBook._newValueWizard.config.filename", filename, ioe.getMessage(), null);
+    }
     saveProperties();
     getEditorPane().getWizardContainer().closeWizard();
   }
@@ -66,7 +81,7 @@ public class AddressBookWizardController extends WizardController {
     String addressBookName = getManager().getCurrentProperty("AddressBook._newValueWizard.name.bookName", "");
 
     String type = getManager().getCurrentProperty("AddressBook._newValueWizard.type.bookType", "");
-    String filename = getManager().getCurrentProperty("AddressBook._newValueWizard.config.vcard.filename", "");
+    String filename = getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", "");
 
     returnValue.setProperty("AddressBook." + addressBookName + ".type", type);
     returnValue.setProperty("AddressBook." + addressBookName + ".filename", filename);

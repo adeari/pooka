@@ -496,7 +496,16 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
    * name, and not the full path of the folder
    */
   public String toString() {
-    return getFolderInfo().getFolderName();
+    if (getFolderInfo() != null) {
+      String folderName = getFolderInfo().getFolderName();
+      if (getFolderInfo().hasUnread()) {
+        return folderName + " (" + getFolderInfo().getUnreadCount() + ")";
+      } else {
+        return folderName;
+      }
+    } else {
+      return "no folder name";
+    }
   }
 
 
