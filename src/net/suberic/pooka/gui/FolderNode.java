@@ -280,7 +280,9 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
         lastFolderStatus = currentStatus;
         lastUnread = hasUnread;
         lastNewMessages = hasNewMessages;
-        getParentContainer().repaint();
+        //getParentContainer().repaint();
+        javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+        ((DefaultTreeModel)folderTree.getModel()).nodeChanged(this);
       }
     }
   }

@@ -173,7 +173,6 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     //invalidate();
     String stringValue = tree.convertValueToText(value, sel, expanded, leaf, row, hasFocus);
     setText(stringValue);
-    setSize(getPreferredSize());
     return this;
   }
 

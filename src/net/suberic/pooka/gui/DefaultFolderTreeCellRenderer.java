@@ -180,26 +180,6 @@ public class DefaultFolderTreeCellRenderer extends DefaultTreeCellRenderer {
 
 
   /**
-   * Overrides <code>JComponent.getPreferredSize</code> to
-   * return slightly wider preferred size value.
-   */
-  public Dimension getPreferredSize() {
-    /*  this really sucks.  but i can't seem to figure out how to make
-        it change the size on the JTree, so I just have to set it to
-        larger than necessary here....
-    */
-
-    Dimension retDimension = super.getPreferredSize();
-
-
-    if(retDimension != null)
-      retDimension = new Dimension((int)((retDimension.width + 3) * 1.2),
-                                   retDimension.height);
-
-    return retDimension;
-  }
-
-  /**
    * Returns the color the text is drawn with when the node is selected.
    */
   public Color getTextSelectionColor() {
