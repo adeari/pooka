@@ -17,6 +17,8 @@ import net.suberic.pooka.gui.FolderTableModel;
 /**
  * A FolderInfo which keeps track of its messages' UIDs.  This allows
  * it to recover if the connection to the server is lost.
+ * @author Allen Petersen
+ * @version $Revision$
  */
 
 public class UIDFolderInfo extends FolderInfo {

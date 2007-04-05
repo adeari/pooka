@@ -41,65 +41,6 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
    */
   public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
     super.getTreeCellRendererComponent(tree,value,sel,expanded,leaf,row,hasFocus);
-    // from super().
-
-    /*
-    this.hasFocus = hasFocus;
-    // moved to bottom.
-    //setText(stringValue);
-
-    Color fg = null;
-    isDropCell = false;
-
-    JTree.DropLocation dropLocation = tree.getDropLocation();
-    if (dropLocation != null
-        && dropLocation.getChildIndex() == -1
-        && tree.getRowForPath(dropLocation.getPath()) == row) {
-
-      Color col = UIManager.getColor("Tree.dropCellForeground");
-      if (col != null) {
-        fg = col;
-      } else {
-        fg = getTextSelectionColor();
-      }
-
-      isDropCell = true;
-    } else if (sel) {
-      fg = getTextSelectionColor();
-    } else {
-      fg = getTextNonSelectionColor();
-    }
-
-    setForeground(fg);
-
-    // There needs to be a way to specify disabled icons.
-    if (!tree.isEnabled()) {
-      setEnabled(false);
-      if (leaf) {
-        setDisabledIcon(getLeafIcon());
-      } else if (expanded) {
-        setDisabledIcon(getOpenIcon());
-      } else {
-        setDisabledIcon(getClosedIcon());
-      }
-    }
-    else {
-      setEnabled(true);
-      if (leaf) {
-        setIcon(getLeafIcon());
-      } else if (expanded) {
-        setIcon(getOpenIcon());
-      } else {
-        setIcon(getClosedIcon());
-      }
-    }
-    setComponentOrientation(tree.getComponentOrientation());
-
-    selected = sel;
-
-    // end part from DefaultTreeCellRenderer
-    */
-
     TreePath tp = tree.getPathForRow(row);
 
     if (tp != null) {
@@ -170,7 +111,7 @@ public class EnhancedFolderTreeCellRenderer extends DefaultFolderTreeCellRendere
     } else {
       setIconToDisconnected();
     }
-    //invalidate();
+
     String stringValue = tree.convertValueToText(value, sel, expanded, leaf, row, hasFocus);
     setText(stringValue);
     return this;

@@ -1,6 +1,3 @@
-*) add unread message count to folder display.
-   -- started.  need to fix display of closed folders (the width isn't correct)
-
 1)  clean up editors.
     -- make wizards for all multieditorpanes
 	address book

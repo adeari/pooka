@@ -871,6 +871,14 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
 
   /**
+   * Notifies the FolderNode that it needs to be updated.
+   */
+  protected void updateNode() {
+    if (getFolderNode() != null)
+      getFolderNode().updateNode();
+  }
+
+  /**
    * Loads the MessageInfos and MesageProxies.  Returns a List of
    * newly created MessageProxies.
    */
@@ -2333,7 +2341,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   }
 
   /**
-   * This returns the property which defines this FolderNode, such as
+   * This returns the property which defines this FolderInfo, such as
    * "Store.myStore.INBOX".
    */
   public String getFolderProperty() {
@@ -2611,6 +2619,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       // messageCount and set the unreadCount to zero.
       unreadCount = 0;
     }
+    updateNode();
   }
 
   /**

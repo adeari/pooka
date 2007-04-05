@@ -1,3 +1,5 @@
+added unread message count to folder node.
+
 updated TrayIcon settings; we now get a nicer dialog for opening new 
 messages.
 

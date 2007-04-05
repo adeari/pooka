@@ -56,20 +56,11 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
           if ( folderInfo.notifyNewMessagesMain()) {
             Pooka.getUIFactory().getMessageNotificationManager().notifyNewMessagesReceived(e, getFolderInfo().getFolderID());
           }
-          final MessageCountEvent event = e;
-          javax.swing.SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                updateNode();
-              }
-            });
+          updateNode();
         }
 
         public void messagesRemoved(MessageCountEvent e) {
-          javax.swing.SwingUtilities.invokeLater(new Runnable() {
-              public void run() {
-                updateNode();
-              }
-            });
+          updateNode();
 
         }
       });
@@ -229,35 +220,19 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   }
 
   public void messageChanged(MessageChangedEvent mce) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          updateNode();
-        }
-      });
+    updateNode();
   }
 
   public void closed(ConnectionEvent e) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          updateNode();
-        }
-      });
+    updateNode();
   }
 
   public void opened(ConnectionEvent e) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          updateNode();
-        }
-      });
+    updateNode();
   }
 
   public void disconnected(ConnectionEvent e) {
-    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-        public void run() {
-          updateNode();
-        }
-      });
+    updateNode();
   }
 
 
@@ -270,21 +245,25 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
    * we redrew this node.  If it has, then we redraw the node.
    */
   public void updateNode() {
-    FolderInfo fi = getFolderInfo();
-    if (fi != null) {
-      int currentStatus = fi.getStatus();
-      boolean hasUnread = fi.hasUnread();
-      boolean hasNewMessages = fi.hasNewMessages();
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+        public void run() {
+          FolderInfo fi = getFolderInfo();
+          if (fi != null) {
+            int currentStatus = fi.getStatus();
+            boolean hasUnread = fi.hasUnread();
+            boolean hasNewMessages = fi.hasNewMessages();
 
-      if (currentStatus != lastFolderStatus || hasUnread != lastUnread || hasNewMessages != lastNewMessages) {
-        lastFolderStatus = currentStatus;
-        lastUnread = hasUnread;
-        lastNewMessages = hasNewMessages;
-        //getParentContainer().repaint();
-        javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-        ((DefaultTreeModel)folderTree.getModel()).nodeChanged(this);
-      }
-    }
+            if (currentStatus != lastFolderStatus || hasUnread != lastUnread || hasNewMessages != lastNewMessages) {
+              lastFolderStatus = currentStatus;
+              lastUnread = hasUnread;
+              lastNewMessages = hasNewMessages;
+              //getParentContainer().repaint();
+              javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+              ((DefaultTreeModel)folderTree.getModel()).nodeChanged(FolderNode.this);
+            }
+          }
+        }
+      });
   }
 
   /**
