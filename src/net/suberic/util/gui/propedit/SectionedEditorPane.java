@@ -285,7 +285,6 @@ public class SectionedEditorPane extends CompositeSwingPropertyEditor implements
 
       if (selectedId != null) {
         SwingPropertyEditor newSelected = currentPanels.get(selectedId);
-        System.err.println("returning help id for " + newSelected);
         return newSelected.getHelpID();
       }
     }

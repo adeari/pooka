@@ -3,6 +3,8 @@ import javax.swing.*;
 import java.util.List;
 import java.util.LinkedList;
 import javax.help.CSH;
+import javax.help.HelpBroker;
+import javax.help.DefaultHelpBroker;
 import java.awt.*;
 
 /**
@@ -139,12 +141,14 @@ public class PropertyEditorPane extends JPanel {
 
     JButton helpButton = createButton("PropertyEditor.button.help", new AbstractAction() {
         public void actionPerformed(java.awt.event.ActionEvent e) {
-          //System.err.println("showing help for " + editor.getHelpID());
-          //manager.getFactory().getHelpBroker().showID(editor.getHelpID(), null, null);
-          //new CSH.DisplayHelpFromSource(manager.getFactory().getHelpBroker()).actionPerformed(e);
+          HelpBroker broker = manager.getFactory().getHelpBroker();
+
+          if (container != null && container instanceof JDialog) {
+            ((DefaultHelpBroker)broker).setActivationWindow((JDialog) container);
+          }
+
           manager.getFactory().getHelpBroker().setCurrentID(editor.getHelpID());
           manager.getFactory().getHelpBroker().setDisplayed(true);
-
         }
       });
 

@@ -44,7 +44,6 @@
    <extension name="BouncyCastle S/MIME" href="lib/bouncy.jnlp"/>
    <extension name="JavaMail" href="lib/javamail.jnlp"/>
    <extension name="JavaHelp" href="lib/javahelp.jnlp"/>
-   <extension name="Java Activation Framework" href="lib/jaf.jnlp"/>
  </resources>
  <application-desc/>
 </jnlp>

@@ -1,13 +1,10 @@
-  *)  do help
-	*) fix help display w/new modal editor
-  *) fix drag & drop on jdk 1.6 -- fixed?
-  *) fix threading for drag and drop -- just try doing a big copy into a 
-	folder with a paste operation.
-
   *)  release
       *) write up changes
       *) switch around webstart site
       *) redo screenshots
+
+  *) fix threading for drag and drop -- just try doing a big copy into a 
+	folder with a paste operation.
 
    *)  key bindings for editors (!!)
 	-- include the main editor -- you should be able to hit first letter
