@@ -1,19 +1,23 @@
+moved to javamail 1.4, jdk 1.6.
+
+revamped Configuration UI; moved all main configuration properties to a single
+  Edit-Preferences dialog.
+
+switched default icon set to Linspire CrystalClear
+
+Pooka now uses system browser by default for URLs.
+
 added unread message count to folder node.
+
+added htmlparser library to handle replies to html-only email.
 
 updated TrayIcon settings; we now get a nicer dialog for opening new 
 messages.
 
-overhaul of settings UI.
-
-Pooka now uses system browser by default for URLs.
-
 made the remove-self-from-reply-all code case-insensitive.
-
-added htmlparser library to handle replies to html-only email.
 
 opening a message by keypress was incorrectly happening on the AwtEventThread.
 
-2.0 branch:  moved to javamail 1.4, jdk 1.6.
 
 060227 release
 --------------

@@ -1,25 +1,41 @@
-1)  clean up editors.
-    -- make wizards for all multieditorpanes
-	address book
-	network connection
-	theme
-    -- clean up preferences. (see definition below)
-    -- fix connection -- maybe even move it somewhere else?
-    -- fix theme
-    -- on folder, fix cacheMode?
-    -- gui bug:  switch to preview mode.  apply.  it changes.  switch 
-	back to desktop mode.  apply.  it doesn't change back.
-2)  make sure brand new user configuration works
+  *)  do help
+	*) fix help display w/new modal editor
+  *) fix drag & drop on jdk 1.6 -- fixed?
+  *) fix threading for drag and drop -- just try doing a big copy into a 
+	folder with a paste operation.
 
-*) editors:
-  *) address book -- fix it.
-	-- list shows type (ldap/file)
-        -- default pane is addresses
-	-- configuration pane just shows info for type.
+  *)  release
+      *) write up changes
+      *) switch around webstart site
+      *) redo screenshots
+
    *)  key bindings for editors (!!)
 	-- include the main editor -- you should be able to hit first letter
 		and have it scan to first match.
 	-- also on multieditorpanes, C-A should add, C-E should edit, etc.
+
+  trayicon support:
+    *) new custom click support:
+	*) change click display so that we show a clickable dialog
+		with the new messages, etc.
+	*) change timeout support:  we should now handle timeout with
+		mouseover
+	*) should be able to tell if balloon is showing or not.
+	*) autoupdate on balloon--if it's showing, either queue up 
+		another one or update the current one (?)
+	*) fix new message notification on folders if you read a message
+		from the Open Message menu from the TrayIcon.
+	*) focus problem.  fix.
+
+1)  clean up editors.
+    -- clean up preferences. (see definition below)
+    -- on folder, fix cacheMode?
+    -- gui bug:  switch to preview mode.  apply.  it changes.  switch 
+	back to desktop mode.  apply.  it doesn't change back.
+
+2)  make sure brand new user configuration works
+
+*) editors:
   *)  get new store wizard working.
 	*) get wizard working from new user startup
 	  *) fix on failure message.
@@ -32,9 +48,6 @@
 	*) make sure that removing stores, users, etc. removes all
 	   subsettings too.
 	*) make strings automatically select the current value.
-  *)  add new user wizard (?)
-  *)  do help
-	*) fix help display w/new modal editor
 
 *) major bug:  make sure that internal error messages aren't bigger than
 	the screen view.
@@ -120,9 +133,7 @@
 
   *) address book
   *) outgoing servers
-  *) connections
-	*) encryption
-	*) theme
+  *) encryption
  *) technical:
   *) TabbedEditorPane should make sure to expand to fit its area.
 	-- it looks like it does.  maybe there's a problem with the
@@ -133,27 +144,9 @@
   *) add in/make work text entries
 *)  implement a way to make a custom FolderCellRenderer for a property.
 *) write help screens along with images.
+*) fix:  waiting for search to run dialog looks terrible.
 
-*) NewAccountPooka should be callable anytime, so you can use it to create
-	any new account, not just your first account.
-*) NewAccountPooka should allow user to enter smtp authentication info.
-*) NewAccountPooka should aggregate errors, so if you have no username and
-	no mail server, you should get a single error screen saying both
-	'no username' and 'no mail server'.
 ----- /ui update
-
-  trayicon support:
-    *) new custom click support:
-	*) change click display so that we show a clickable dialog
-		with the new messages, etc.
-	*) change timeout support:  we should now handle timeout with
-		mouseover
-	*) should be able to tell if balloon is showing or not.
-	*) autoupdate on balloon--if it's showing, either queue up 
-		another one or update the current one (?)
-	*) fix new message notification on folders if you read a message
-		from the Open Message menu from the TrayIcon.
-	*) focus problem.  fix.
 
 *) open up local folder using open button:  icons fail to update.
 	-- that's a bug with the mbox/maildir providers
@@ -202,11 +195,11 @@ java.lang.IllegalStateException: Can't overwrite cause
         at net.suberic.pooka.FolderInfo.applyFilters(FolderInfo.java:2245)
         at net.suberic.pooka.UIDFolderInfo.runMessagesAdded(UIDFolderInfo.java:342)
 
-*) fix:  waiting for search to run dialog looks terrible.
 
 -----
 
-
+*) redo themes?
+*) redo connections?
 
 *) fix behavior when other mail client is connected; make sure we handle
 deleted messages, etc. gracefully.
@@ -407,9 +400,6 @@ online:
 *) add mark as unread 
 
 *) new message count in icon
-
-*) fix threading for drag and drop -- just try doing a big copy into a folder 
-	with a paste operation.
 
 *) start up disconnected.  connect.  have filters.  get error:
 javax.mail.MessagingException: Error:  could not copy messages to folder:  net.suberic.pooka.cache.CachingFolderInfo@1e081c5
