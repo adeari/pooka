@@ -1,3 +1,7 @@
+*) major bug:  make sure that internal error messages aren't bigger than
+	the screen view.
+	-- started.  need to fix height.
+
   *)  release
       *) write up changes
       *) switch around webstart site
@@ -45,10 +49,6 @@
 	*) make sure that removing stores, users, etc. removes all
 	   subsettings too.
 	*) make strings automatically select the current value.
-
-*) major bug:  make sure that internal error messages aren't bigger than
-	the screen view.
-	-- started.  need to fix height.
 
  ----- ui update
   *) Store editor:

@@ -241,7 +241,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
       // a non-sun jdk, in which case we shouldn't need to add a provider
       // explicitly
     }
-    java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
+    //java.security.Security.setProperty("ssl.SocketFactory.provider","net.suberic.pooka.ssl.PookaSSLSocketFactory");
 
   }
 

@@ -314,7 +314,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   void loadPop3Properties(Properties p) {
     if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
-      p.setProperty("mail.pop3s.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
+      //p.setProperty("mail.pop3s.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
       p.setProperty("mail.pop3s.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
       //p.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "995"));
     }
