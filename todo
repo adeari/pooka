@@ -1,6 +1,7 @@
 *) major bug:  make sure that internal error messages aren't bigger than
 	the screen view.
 	-- started.  need to fix height.
+*) 
 
   *)  release
       *) write up changes

@@ -217,14 +217,6 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
 
 
   /**
-   * This formats a display message.
-   */
-  public String formatMessage(String message) {
-    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
-  }
-
-
-  /**
    * Creates a ProgressDialog using the given values.
    */
   public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {

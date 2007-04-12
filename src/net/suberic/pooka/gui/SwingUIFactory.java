@@ -6,6 +6,7 @@ import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
 import net.suberic.pooka.gui.search.*;
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * An abstract base class for PookaUIFactories.
@@ -19,7 +20,7 @@ public abstract class SwingUIFactory implements PookaUIFactory {
 
   public boolean showing = false;
 
-  protected int maxErrorLine = 50;
+  protected int mMaxErrorLine = 50;
 
   /**
    * Returns the PookaThemeManager for fonts and colors.
@@ -225,14 +226,14 @@ public abstract class SwingUIFactory implements PookaUIFactory {
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
-    final String displayMessage = formatMessage(newMessage);
-    //final String displayMessage = newMessage;
+    //final String displayMessage = formatMessage(newMessage);
+    final String displayMessage = newMessage;
     final String fTitle = title;
 
     Runnable runMe = new Runnable() {
         public void run() {
-          JLabel displayPanel = new JLabel(displayMessage);
-          JOptionPane.showMessageDialog(Pooka.getMainPanel(), displayMessage, fTitle, JOptionPane.PLAIN_MESSAGE);
+          Component displayPanel = createMessageComponent(displayMessage, Pooka.getMainPanel());
+          JOptionPane.showMessageDialog(Pooka.getMainPanel(), displayPanel, fTitle, JOptionPane.PLAIN_MESSAGE);
         }
       };
 
@@ -363,6 +364,14 @@ public abstract class SwingUIFactory implements PookaUIFactory {
   }
 
   /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return net.suberic.pooka.MailUtilities.wrapText(message, mMaxErrorLine, "\r\n", 5);
+  }
+
+
+  /**
    * Creates the panels for showing an error message.
    */
   public Object[] createErrorPanel(String message, Exception e) {
@@ -373,4 +382,123 @@ public abstract class SwingUIFactory implements PookaUIFactory {
     return returnValue;
   }
 
+  /**
+   * Calculates a Dimension which defines a reasonably sized dialog window.
+   */
+  public Dimension calculateDisplaySize(Component parentComponent, Component displayComponent) {
+    //Point parentLocation = parentComponent.getLocationOnScreen();
+    Dimension parentSize = parentComponent.getSize();
+    // width and height should be mo more than 80%
+    int maxWidth = Math.max(30, (int) (parentSize.width * 0.8));
+    int maxHeight = Math.max(30, (int) (parentSize.height * 0.8));
+
+    Dimension displayPrefSize = displayComponent.getPreferredSize();
+
+    int newWidth = Math.min(maxWidth, displayPrefSize.width);
+    int newHeight = Math.min(maxHeight, displayPrefSize.height);
+    return new Dimension(newWidth +5, newHeight+5);
+  }
+
+  /**
+   * Returns either a properly-sized JLabel, or a JLabel inside of a
+   * properly-sized JScrollPane.
+   */
+  public Component createMessageComponent(String message, Component parentComponent) {
+    Component labelComponent = createLabel(message);
+    Dimension displaySize = calculateDisplaySize(parentComponent, labelComponent);
+    JScrollPane jsp = new JScrollPane(labelComponent);
+    // add on space for the scrollbar.
+    JScrollBar jsb = jsp.getVerticalScrollBar();
+    if (jsb != null) {
+      displaySize = new Dimension(displaySize.width + jsb.getPreferredSize().width, displaySize.height);
+    } else {
+      jsb = new JScrollBar(JScrollBar.VERTICAL);
+      displaySize = new Dimension(displaySize.width + jsb.getPreferredSize().width, displaySize.height);
+
+    }
+    jsp.setPreferredSize(displaySize);
+    return jsp;
+  }
+
+  /**
+   * Breaks up a String into proper JLabels.
+   */
+  public Component createLabel(String s) {
+    Container c = Box.createVerticalBox();
+
+    addMessageComponents(c, s, 160);
+
+    return c;
+  }
+
+  private void addMessageComponents(Container c, String s, int maxll) {
+    // taken from BasicOptionPaneUI
+    int nl = -1;
+    int nll = 0;
+
+    if ((nl = s.indexOf("\r\n")) >= 0) {
+      nll = 2;
+    } else if ((nl = s.indexOf('\n')) >= 0) {
+      nll = 1;
+    }
+
+    if (nl >= 0) {
+      // break up newlines
+      if (nl == 0) {
+        JPanel breakPanel = new JPanel() {
+            public Dimension getPreferredSize() {
+              Font f = getFont();
+
+              if (f != null) {
+                return new Dimension(1, f.getSize() + 2);
+              }
+              return new Dimension(0, 0);
+            }
+          };
+        breakPanel.setName("OptionPane.break");
+        c.add(breakPanel);
+      } else {
+        addMessageComponents(c, s.substring(0, nl), maxll);
+      }
+      addMessageComponents(c, s.substring(nl + nll), maxll);
+
+      /*
+    } else if (len > maxll) {
+      Container c = Box.createVerticalBox();
+      c.setName("OptionPane.verticalBox");
+      burstStringInto(c, s, maxll);
+      addMessageComponents(container, cons, c, maxll, true );
+      */
+    } else {
+      JLabel label;
+      label = new JLabel(s, JLabel.LEADING );
+      label.setName("OptionPane.label");
+      c.add(label);
+    }
+  }
+
+  /**
+   * Recursively creates new JLabel instances to represent <code>d</code>.
+   * Each JLabel instance is added to <code>c</code>.
+   */
+  private void burstStringInto(Container c, String d, int maxll) {
+    // Primitive line wrapping
+    int len = d.length();
+    if (len <= 0)
+      return;
+    if (len > maxll) {
+      int p = d.lastIndexOf(' ', maxll);
+      if (p <= 0)
+        p = d.indexOf(' ', maxll);
+      if (p > 0 && p < len) {
+        burstStringInto(c, d.substring(0, p), maxll);
+        burstStringInto(c, d.substring(p + 1), maxll);
+        return;
+      }
+    }
+    JLabel label = new JLabel(d, JLabel.LEFT);
+    label.setName("OptionPane.label");
+    c.add(label);
+  }
 }
+

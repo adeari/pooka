@@ -1038,15 +1038,23 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
           statusBuffer.append(queueString + "\r\n");
         }
       }
+      statusBuffer.append("Stack Trace:\r\n");
+      StackTraceElement[] stackTrace = storeThread.getStackTrace();
+      for (StackTraceElement stackLine: stackTrace) {
+        //System.out.println(stackLine);
+        statusBuffer.append("  " + stackLine + "\r\n");
+      }
+
     } else {
       getLogger().log(Level.INFO, "No Action Thread.");
+      StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+      for (StackTraceElement stackLine: stackTrace) {
+        //System.out.println(stackLine);
+        statusBuffer.append("  " + stackLine + "\r\n");
+      }
     }
 
-    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-    for (StackTraceElement stackLine: stackTrace) {
-      System.out.println(stackLine);
-      statusBuffer.append(stackLine + "\r\n");
-    }
+    System.out.println("---------------------");
 
     Pooka.getUIFactory().showMessage(statusBuffer.toString(), "Status for " + getStoreID());
   }

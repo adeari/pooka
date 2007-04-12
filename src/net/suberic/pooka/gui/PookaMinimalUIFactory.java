@@ -182,6 +182,13 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   }
 
   /**
+   * This formats a display message.
+   */
+  public String formatMessage(String message) {
+    return net.suberic.pooka.MailUtilities.wrapText(message, mMaxErrorLine, "\r\n", 5);
+  }
+
+  /**
    * This shows an Confirm Dialog window.  We include this so that
    * the MessageProxy can call the method without caring abou the
    * actual implementation of the Dialog.
@@ -295,13 +302,6 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
       System.out.println(errorMessage);
 
     //e.printStackTrace();
-  }
-
-  /**
-   * This formats a display message.
-   */
-  public String formatMessage(String message) {
-    return net.suberic.pooka.MailUtilities.wrapText(message, mMaxErrorLine, "\r\n", 5);
   }
 
   /**

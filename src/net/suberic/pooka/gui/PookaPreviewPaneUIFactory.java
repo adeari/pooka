@@ -220,13 +220,6 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
   }
 
   /**
-   * This formats a display message.
-   */
-  public String formatMessage(String message) {
-    return net.suberic.pooka.MailUtilities.wrapText(message, maxErrorLine, "\r\n", 5);
-  }
-
-  /**
    * Creates a ProgressDialog using the given values.
    */
   public ProgressDialog createProgressDialog(int min, int max, int initialValue, String title, String content) {
@@ -291,17 +284,6 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     lastY = currentY;
 
     return new Point(currentX, currentY);
-  }
-
-  /**
-   * Creates the panels for showing an error message.
-   */
-  public Object[] createErrorPanel(String message, Exception e) {
-    Object[] returnValue = new Object[2];
-    returnValue[0] = message;
-    returnValue[1] = new net.suberic.util.swing.ExceptionDisplayPanel(Pooka.getProperty("error.showStackTrace", "Stack Trace"), e);
-
-    return returnValue;
   }
 
 }
