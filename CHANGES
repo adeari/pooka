@@ -18,6 +18,10 @@ made the remove-self-from-reply-all code case-insensitive.
 
 opening a message by keypress was incorrectly happening on the AwtEventThread.
 
+fixed up error display messages.
+
+removed ability to connect to self-signed SSL providers due to incompatibility
+with WebStart.  this may be restored in the future.
 
 060227 release
 --------------

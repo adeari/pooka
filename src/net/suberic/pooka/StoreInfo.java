@@ -1054,8 +1054,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       }
     }
 
-    System.out.println("---------------------");
-
     Pooka.getUIFactory().showMessage(statusBuffer.toString(), "Status for " + getStoreID());
   }
 
