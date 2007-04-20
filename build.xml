@@ -185,7 +185,7 @@
     <tstamp>
       <format property="today" pattern="yyMMdd" locale="en"/>
     </tstamp>
-    <jar jarfile="${distdir}/pooka_11_${today}.jar" basedir="${classes_dir}" manifest="${importdir}/pooka_full.manifest"> 
+    <jar jarfile="${distdir}/pooka_${today}.jar" basedir="${classes_dir}" manifest="${importdir}/pooka_full.manifest"> 
       <zipfileset src="${javahelp_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${mail_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${localproviders_lib}"/>
@@ -236,14 +236,14 @@
       </fileset>
     </copy>
     
-    <zip zipfile="${distdir}/pooka_11_crypto_${today}.zip" basedir="${distdir}/cryptodist"/>
+    <zip zipfile="${distdir}/pooka_crypto_${today}.zip" basedir="${distdir}/cryptodist"/>
          
   </target>
 
 <!-- Webstart distributions -->
   <target name="dist-jnlp-noFile" depends="compile-jnlp">
     <copy file="${sourcedir}/net/suberic/pooka/Pookarc.noFile" tofile="${classes_dir}/net/suberic/pooka/Pookarc" overwrite="yes"/>
-    <jar jarfile="${distdir}/pooka_11_noFile.jar" basedir="${classes_dir}" manifest="${importdir}/pooka.manifest"> 
+    <jar jarfile="${distdir}/pooka_noFile.jar" basedir="${classes_dir}" manifest="${importdir}/pooka.manifest"> 
     </jar>
   </target>
 
