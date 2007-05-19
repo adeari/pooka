@@ -19,6 +19,8 @@ Pooka.autoPreview=true
 Pooka.autoSelectFirstUnread=true
 
 Pooka.trayIcon.enabled=true
+Pooka.trayIcon.showNewMailMessage=true
+Pooka.trayIcon.alwaysDisplay=true
 Pooka.exitToIcon=false
 Pooka.exitToIcon.notify=false
 

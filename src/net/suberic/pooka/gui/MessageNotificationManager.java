@@ -54,6 +54,8 @@ public class MessageNotificationManager implements ValueChangeListener {
   private ImageIcon mNewMessageTrayIcon = null;
 
   private boolean mShowNewMailMessage = true;
+  private boolean mAlwaysDisplay = true;
+  private boolean mIconShowing = false;
   private boolean mBlinkNewMail = false;
 
   private boolean messageDisplaying = false;
@@ -88,6 +90,9 @@ public class MessageNotificationManager implements ValueChangeListener {
     // add a listener so we can add/remove the tray icon if the setting
     // changes.
     Pooka.getResources().addValueChangeListener(this, "Pooka.trayIcon.enabled");
+    Pooka.getResources().addValueChangeListener(this, "Pooka.trayIcon.showNewMailMessage");
+    Pooka.getResources().addValueChangeListener(this, "Pooka.trayIcon.alwaysDisplay");
+    Pooka.getResources().addValueChangeListener(this, "Pooka.trayIcon.show");
   }
 
   /**
@@ -135,7 +140,10 @@ public class MessageNotificationManager implements ValueChangeListener {
             }
           });
         */
-        SystemTray.getSystemTray().add(mTrayIcon);
+        if (mAlwaysDisplay) {
+          SystemTray.getSystemTray().add(mTrayIcon);
+          mIconShowing = true;
+        }
       } catch (Error e) {
         System.err.println("Error starting up tray icon:  " + e.getMessage());
         e.printStackTrace();
@@ -143,10 +151,14 @@ public class MessageNotificationManager implements ValueChangeListener {
         System.err.println("Error starting up tray icon:  " + exc.getMessage());
         exc.printStackTrace();
       }
+      setShowNewMailMessage(Pooka.getProperty("Pooka.trayIcon.showNewMailMessage", "true").equalsIgnoreCase("true"));
+      setAlwaysDisplay(Pooka.getProperty("Pooka.trayIcon.alwaysDisplay", "true").equalsIgnoreCase("true"));
+
     } else if (mTrayIcon != null) {
       // remove the tray icon.
       SystemTray.getSystemTray().remove(mTrayIcon);
       mTrayIcon = null;
+      mIconShowing = false;
     }
   }
 
@@ -182,6 +194,15 @@ public class MessageNotificationManager implements ValueChangeListener {
   public void valueChanged(String pChangedValue) {
     if (pChangedValue.equals("Pooka.trayIcon.enabled")) {
       configureTrayIcon();
+    } else if (pChangedValue.equals("Pooka.trayIcon.showNewMailMessage")) {
+      setShowNewMailMessage(Pooka.getProperty("Pooka.trayIcon.showNewMailMessage", "true").equalsIgnoreCase("true"));
+    } else if (pChangedValue.equals("Pooka.trayIcon.alwaysDisplay")) {
+      setAlwaysDisplay(Pooka.getProperty("Pooka.trayIcon.alwaysDisplay", "true").equalsIgnoreCase("true"));
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            updateStatus();
+          }
+        });
     }
   }
 
@@ -197,11 +218,38 @@ public class MessageNotificationManager implements ValueChangeListener {
           getMainPanel().getParentFrame().setTitle(mNewMessageTitle);
         }
         setCurrentIcon(getNewMessageIcon());
-        if (getTrayIcon() != null)
+        if (getTrayIcon() != null) {
           getTrayIcon().setImage(mNewMessageTrayIcon.getImage());
+          if (! mIconShowing) {
+            try {
+              SystemTray.getSystemTray().add(mTrayIcon);
+              mIconShowing = true;
+            } catch (Exception exc) {
+              System.err.println("Error starting up tray icon:  " + exc.getMessage());
+              exc.printStackTrace();
+            }
+          }
+        }
       } else {
         if (getMainPanel() != null) {
           getMainPanel().getParentFrame().setTitle(mStandardTitle);
+        }
+
+        if (mAlwaysDisplay) {
+          if (! mIconShowing) {
+            try {
+              SystemTray.getSystemTray().add(mTrayIcon);
+              mIconShowing = true;
+            } catch (Exception exc) {
+              System.err.println("Error starting up tray icon:  " + exc.getMessage());
+              exc.printStackTrace();
+            }
+          }
+        } else {
+          if (mIconShowing) {
+            SystemTray.getSystemTray().remove(mTrayIcon);
+            mIconShowing = false;
+          }
         }
 
         setCurrentIcon(getStandardIcon());
@@ -503,7 +551,7 @@ public class MessageNotificationManager implements ValueChangeListener {
    * @return true if the message is displayed, false otherwise.
    */
   public boolean displayMessage(String pTitle, String pMessage, TrayIcon.MessageType pType) {
-    if (mTrayIcon != null) {
+    if (mTrayIcon != null && mShowNewMailMessage) {
       mTrayIcon.displayMessage(pTitle, pMessage, pType);
       return true;
     } else {
@@ -653,6 +701,38 @@ public class MessageNotificationManager implements ValueChangeListener {
    */
   public boolean getNewMessageFlag() {
     return mNewMessageFlag;
+  }
+
+  /**
+   * Returns whether or not we show new message notifications on the
+   * TrayIcon.
+   */
+  public boolean getShowNewMailMessage() {
+    return mShowNewMailMessage;
+  }
+
+  /**
+   * Sets whether or not we show new message notifications on the
+   * TrayIcon.
+   */
+  public void setShowNewMailMessage(boolean pShowNewMailMessage) {
+    mShowNewMailMessage = pShowNewMailMessage;
+  }
+
+  /**
+   * Returns whether or not the icon is always displayed, or just when there
+   * are new messages.
+   */
+  public boolean getAlwaysDisplay() {
+    return mAlwaysDisplay;
+  }
+
+  /**
+   * Sets whether or not the icon is always displayed, or just when there
+   * are new messages.
+   */
+  public void setAlwaysDisplay(boolean pAlwaysDisplay) {
+    mAlwaysDisplay = pAlwaysDisplay;
   }
 
   /**

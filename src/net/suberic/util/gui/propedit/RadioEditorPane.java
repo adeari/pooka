@@ -124,6 +124,7 @@ public class RadioEditorPane extends SwingPropertyEditor implements ItemListener
 
     if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property, currentValue);
+      originalValue = currentValue;
     }
     lastSelected = selectedModel;
   }

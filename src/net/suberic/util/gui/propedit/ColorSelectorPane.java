@@ -157,11 +157,14 @@ public class ColorSelectorPane extends LabelValuePropertyEditor {
   public void setValue() {
     if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property + ".rgb", Integer.toString(currentColor.getRGB()));
+      originalValue = Integer.toString(currentColor.getRGB());
       if (useEnabledBox) {
         if (enabledBox.isSelected())
           manager.setProperty(property + "._enabled", "true");
         else
           manager.setProperty(property + "._enabled", "false");
+
+        origEnabled = enabledBox.isSelected();
       }
     }
   }

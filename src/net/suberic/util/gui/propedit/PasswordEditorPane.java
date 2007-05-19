@@ -78,6 +78,7 @@ public class PasswordEditorPane extends StringEditorPane {
 
     if (isEditorEnabled() && !(value.equals(originalValue))) {
       manager.setProperty(property, scrambleString(value));
+      originalValue = value;
     }
   }
 

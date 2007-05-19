@@ -147,8 +147,10 @@ public class FileSelectorPane extends LabelValuePropertyEditor {
   public void setValue() throws PropertyValueVetoException {
     if (isEditorEnabled()) {
       validateProperty();
-      if (isChanged())
+      if (isChanged()) {
         manager.setProperty(property, (String)valueDisplay.getText());
+        originalValue = valueDisplay.getText();
+      }
     }
   }
 

@@ -162,12 +162,15 @@ public class FontSelectorPane extends LabelValuePropertyEditor {
     if (isEditorEnabled() && isChanged()) {
       //System.err.println("setting value for " + property);
       manager.setProperty(property, (String)valueDisplay.getText());
+      originalValue = valueDisplay.getText();
 
       if (useEnabledBox) {
         if (enabledBox.isSelected())
           manager.setProperty(property + "._enabled", "true");
         else
           manager.setProperty(property + "._enabled", "false");
+
+        origEnabled = enabledBox.isSelected();
       }
     }
   }

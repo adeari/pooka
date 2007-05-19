@@ -270,6 +270,7 @@ public class ListEditorPane extends LabelValuePropertyEditor {
 
     if (isEditorEnabled() && isChanged()) {
       manager.setProperty(property, currentValue);
+      mOriginalValue = (String)labelToValueMap.get(inputField.getSelectedItem());
     }
   }
 

@@ -101,7 +101,10 @@ public class BooleanEditorPane extends SwingPropertyEditor {
           newValue = "false";
 
         manager.setProperty(property, newValue);
+
+        originalBoolean = inputField.isSelected();
       }
+
     }
   }
 

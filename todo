@@ -1,3 +1,4 @@
+
   *)  release
       *) write up changes
       *) switch around webstart site
@@ -6,12 +7,18 @@
   *) fix threading for drag and drop -- just try doing a big copy into a 
 	folder with a paste operation.
 
+  *) switching store from ssl to non-ssl (or vice-versa) should work without a 
+	restart.
+
    *)  key bindings for editors (!!)
 	-- include the main editor -- you should be able to hit first letter
 		and have it scan to first match.
 	-- also on multieditorpanes, C-A should add, C-E should edit, etc.
 
   trayicon support:
+    *) fix close to icon
+    *) fix always display for a) minimized and b) switching to always display
+	doesn't show icon until new message comes in.
     *) new custom click support:
 	*) change click display so that we show a clickable dialog
 		with the new messages, etc.
