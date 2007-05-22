@@ -168,6 +168,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".server");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".port");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".connection");
+    Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".SSL");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".useSubscribed");
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".sessionDebug.level");
 
@@ -297,10 +298,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     // set up ssl
     if (sslSetting.equals("ssl")) {
       p.setProperty("mail.imaps.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
-    } else if (sslSetting.equals("tls")) {
-      // FIXME disallow failover, or allow failover on next setting.
+    } else if (sslSetting.equals("tlsrequired")) {
       p.setProperty("mail.imap.starttls.enable", "true");
-    } else if (sslSetting.equals("tlsifavailable")) {
+    } else if (sslSetting.equals("tls")) {
+      // failover is implemented in the connectStore() method.
       p.setProperty("mail.imap.starttls.enable", "true");
     }
 
@@ -518,7 +519,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
               } else {
                 defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(defProfileString);
               }
-            } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port")) {
+            } else if (changedValue.equals(getStoreProperty() + ".protocol") || changedValue.equals(getStoreProperty() + ".user") || changedValue.equals(getStoreProperty() + ".password") || changedValue.equals(getStoreProperty() + ".server") || changedValue.equals(getStoreProperty() + ".port") || changedValue.equals(getStoreProperty() + ".SSL") ) {
 
               if (storeNode != null) {
                 Enumeration childEnum = storeNode.children();
@@ -782,10 +783,22 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
         store.connect();
       } catch (MessagingException me) {
         Exception e = me.getNextException();
+
         if (e != null && e instanceof java.io.InterruptedIOException)
           store.connect();
-        else
-          throw me;
+        else {
+          if (e != null && e.toString().contains("SunCertPathBuilderException") && "tls".equalsIgnoreCase(sslSetting)) {
+            // fall back.
+            Properties p = mSession.getProperties();
+            p.setProperty("mail.imap.starttls.enable", "false");
+
+            store = mSession.getStore(url);
+
+            store.connect();
+          } else {
+            throw me;
+          }
+        }
       }
 
       getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection succeeded; connected = true.");

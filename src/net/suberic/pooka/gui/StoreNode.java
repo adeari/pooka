@@ -305,7 +305,7 @@ public class StoreNode extends MailTreeNode {
           store.connectStore();
         } catch (MessagingException me) {
           // I should make this easier.
-          Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store.") + "\n" + Pooka.getProperty("error.sourceException", "The underlying exception reads:  ") + "\n" + me.getMessage());
+          Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store."), me);
         }
       javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
       folderTree.expandPath(folderTree.getSelectionPath());

@@ -1,4 +1,6 @@
 
+  *) email javamail-interest list re tls optional/required vs 
+
   *)  release
       *) write up changes
       *) switch around webstart site
@@ -6,9 +8,6 @@
 
   *) fix threading for drag and drop -- just try doing a big copy into a 
 	folder with a paste operation.
-
-  *) switching store from ssl to non-ssl (or vice-versa) should work without a 
-	restart.
 
    *)  key bindings for editors (!!)
 	-- include the main editor -- you should be able to hit first letter
@@ -56,7 +55,6 @@
  ----- ui update
   *) Store editor:
 	*) make settings work
-		-- fix TLS
 		-- namespace support
 		-- test autoCheckSeconds
 	*) check disablefilters; make sure they all work
@@ -150,8 +148,6 @@
 
 *) open up local folder using open button:  icons fail to update.
 	-- that's a bug with the mbox/maildir providers
-
-*) toolbar:  put it on folder panel (?)
 
 *) fix ability to create new smtp server from first failure.
 
