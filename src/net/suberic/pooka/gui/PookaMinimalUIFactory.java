@@ -369,6 +369,13 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   }
 
   /**
+   * Sets the PropertyEditorFactory used by this component.
+   */
+  public void setEditorFactory(net.suberic.util.gui.propedit.PropertyEditorFactory pEditorFactory) {
+    mEditorFactory = pEditorFactory;
+  }
+
+  /**
    * Shows a message.
    */
   public void showMessage(String newMessage, String title) {
@@ -602,5 +609,13 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public net.suberic.util.gui.IconManager getIconManager() {
     return mIconManager;
   }
+
+  /**
+   * Sets the IconManager for this UI.
+   */
+  public void setIconManager(net.suberic.util.gui.IconManager pIconManager) {
+    mIconManager = pIconManager;
+  }
+
 
 }

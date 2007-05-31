@@ -386,6 +386,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".defaultProfile");
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".displayFilters");
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".backendFilters");
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".notifyNewMessagesMain");
+    Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".notifyNewMessagesNode");
 
     Pooka.getLogManager().addLogger(getFolderProperty());
 
@@ -1537,6 +1539,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     } else if (changedValue.equals(getFolderProperty() + ".displayFilters")) {
       createFilters();
       unloadMatchingFilters();
+    } else if (changedValue.equals(getFolderProperty() + ".notifyNewMessagesMain") || changedValue.equals(getFolderProperty() + ".notifyNewMessagesNode")) {
+      setNotifyNewMessagesMain(!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesMain", "").equalsIgnoreCase("false"));
+
+      setNotifyNewMessagesNode(!Pooka.getProperty(getFolderProperty() + ".notifyNewMessagesNode", "").equalsIgnoreCase("false"));
     }
   }
 

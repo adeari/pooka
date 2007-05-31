@@ -3,6 +3,7 @@ import net.suberic.pooka.gui.*;
 import net.suberic.pooka.resource.*;
 import net.suberic.pooka.messaging.*;
 import net.suberic.util.VariableBundle;
+import net.suberic.util.gui.IconManager;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
 import net.suberic.util.gui.propedit.PropertyEditorManager;
 
@@ -162,7 +163,7 @@ public class StartupManager {
             if (panel.getContentPanel() instanceof MessagePanel) {
               SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                    new FirstRunWizard().start();
+                    //new FirstRunWizard().start();
                   }
                 });
             }
@@ -560,6 +561,15 @@ public class StartupManager {
           }
         }
       }, "Pooka.guiType");
+
+    mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
+        public void valueChanged(String changedValue) {
+          PookaUIFactory factory = Pooka.getUIFactory();
+          IconManager iconManager = IconManager.getIconManager(Pooka.getResources(), "IconManager._default");
+          factory.setIconManager(iconManager);
+          factory.setEditorFactory(new PropertyEditorFactory(Pooka.getResources(), iconManager, Pooka.getPookaManager().getHelpBroker()));
+        }
+      }, "IconManager._default");
 
     mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
         public void valueChanged(String changedValue) {

@@ -56,6 +56,10 @@ public interface PookaUIFactory extends ErrorHandler {
    * Returns the PropertyEditorFactory used by this component.
    */
   public net.suberic.util.gui.propedit.PropertyEditorFactory getEditorFactory();
+  /**
+   * Sets the PropertyEditorFactory used by this component.
+   */
+  public void setEditorFactory(net.suberic.util.gui.propedit.PropertyEditorFactory pEditorFactory);
 
   /**
    * Shows a Confirm dialog.
@@ -124,6 +128,11 @@ public interface PookaUIFactory extends ErrorHandler {
    * Gets the IconManager for this UI.
    */
   public net.suberic.util.gui.IconManager getIconManager();
+
+  /**
+   * Sets the IconManager for this UI.
+   */
+  public void setIconManager(net.suberic.util.gui.IconManager pIconManager);
 
 
 }

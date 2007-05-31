@@ -5,6 +5,8 @@ revamped Configuration UI; moved all main configuration properties to a single
 
 switched default icon set to Linspire CrystalClear
 
+made it so switching icon set has an effect without a restart.
+
 Pooka now uses system browser by default for URLs.
 
 added unread message count to folder node.

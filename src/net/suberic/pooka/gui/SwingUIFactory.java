@@ -83,6 +83,13 @@ public abstract class SwingUIFactory implements PookaUIFactory {
     return editorFactory;
   }
 
+  /**
+   * Sets the PropertyEditorFactory used by this component.
+   */
+  public void setEditorFactory(net.suberic.util.gui.propedit.PropertyEditorFactory pEditorFactory) {
+    editorFactory = pEditorFactory;
+  }
+
 
   /**
    * Shows a Confirm dialog.
@@ -361,6 +368,13 @@ public abstract class SwingUIFactory implements PookaUIFactory {
    */
   public net.suberic.util.gui.IconManager getIconManager() {
     return mIconManager;
+  }
+
+  /**
+   * Sets the IconManager for this UI.
+   */
+  public void setIconManager(net.suberic.util.gui.IconManager pIconManager) {
+    mIconManager = pIconManager;
   }
 
   /**

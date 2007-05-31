@@ -13,11 +13,11 @@ public class IconManager {
 
   // the source VariableBundle
   VariableBundle mResources = null;
-  
+
   // the source property.
   String mProperty = null;
 
-  // the default location for icons 
+  // the default location for icons
   String mIconDirectory = null;
 
   // the default extension for icons
@@ -33,7 +33,7 @@ public class IconManager {
    * Creates a new IconManager from the given property.
    *
    * @param pResources the VariableBundle used to access the icons
-   * @param pResourceBase a property in the given VariableBundle that will resolve to provide the correct property base 
+   * @param pResourceBase a property in the given VariableBundle that will resolve to provide the correct property base
    */
   protected IconManager(VariableBundle pResources, String pResourceBase) {
     mResources = pResources;
@@ -47,14 +47,14 @@ public class IconManager {
    * return a cached copy if available.
    */
   public static IconManager getIconManager(VariableBundle pResources, String pResourceBase) {
-    IconManager returnValue = (IconManager) sManagers.get(pResourceBase + System.identityHashCode(pResources));
+    IconManager returnValue = (IconManager) sManagers.get(pResourceBase + pResources.getProperty(pResourceBase, "") + System.identityHashCode(pResources));
     if (returnValue == null) {
       synchronized(sManagers)  {
-	returnValue = (IconManager) sManagers.get(pResourceBase + System.identityHashCode(pResources));
-	if (returnValue == null) {
-	  returnValue = new IconManager(pResources, pResourceBase);
-	  sManagers.put(pResourceBase + System.identityHashCode(pResources), returnValue);
-	}
+        returnValue = (IconManager) sManagers.get(pResourceBase + pResources.getProperty(pResourceBase, "") + System.identityHashCode(pResources));
+        if (returnValue == null) {
+          returnValue = new IconManager(pResources, pResourceBase);
+          sManagers.put(pResourceBase + pResources.getProperty(pResourceBase, "") + System.identityHashCode(pResources), returnValue);
+        }
       }
     }
 
@@ -69,13 +69,13 @@ public class IconManager {
     if (imageURL != null) {
       ImageIcon returnValue = (ImageIcon) sImageMap.get(imageURL);
       if (returnValue == null) {
-	synchronized(sImageMap) {
-	  returnValue = (ImageIcon) sImageMap.get(imageURL);
-	  if (returnValue == null) {
-	    returnValue = new ImageIcon(imageURL);
-	    sImageMap.put(imageURL, returnValue);
-	  }
-	}
+        synchronized(sImageMap) {
+          returnValue = (ImageIcon) sImageMap.get(imageURL);
+          if (returnValue == null) {
+            returnValue = new ImageIcon(imageURL);
+            sImageMap.put(imageURL, returnValue);
+          }
+        }
       }
       return returnValue;
     } else {
@@ -84,6 +84,6 @@ public class IconManager {
     }
   }
 
-   
+
 }
 

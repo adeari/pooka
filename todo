@@ -1,10 +1,9 @@
-
-  *) email javamail-interest list re tls optional/required vs 
-
   *)  release
       *) write up changes
       *) switch around webstart site
       *) redo screenshots
+
+  *) email javamail-interest list re tls optional/required vs 
 
   *) fix threading for drag and drop -- just try doing a big copy into a 
 	folder with a paste operation.
@@ -145,7 +144,7 @@
 *) fix:  waiting for search to run dialog looks terrible.
 
 ----- /ui update
-
+ 
 *) open up local folder using open button:  icons fail to update.
 	-- that's a bug with the mbox/maildir providers
 
@@ -170,8 +169,6 @@
 
 *) (??) add in option to open html-only messages as parsed html instead
 	of 'real' html (??)
-
-*) icon set should update immediately, not only after a restart.
 
 **) make wheel scroll customizable
 
@@ -260,12 +257,6 @@ online:
 
 2.0 version
 -----------
-*) jdk 1.6 only
-*) javamail 1.4 
-   and jaf whatever
-*) javahelp 2.0
-*) linspire default icons
-
 *) fix 'failed to open folder' message in v. 2.0.
 
 *) add ldap support
@@ -280,8 +271,6 @@ online:
 		-- only do this in 2.0?
 
 *) check out SwingWorker?
-
-*) work out webstart code for tray icon.
 
 *) new splash screen.
 
