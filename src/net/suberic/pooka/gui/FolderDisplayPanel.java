@@ -174,10 +174,10 @@ public class FolderDisplayPanel extends JPanel {
    *
    * Called from within the FolderThread.
    */
-  public void removeRows(Vector removedProxies) {
+  public void removeRows(java.util.List removedProxies) {
     //This is here so that we can select the next row and remove the
     //removed rows together in one call to the AWTEventThread.
-    final Vector removedProxiesTmp = removedProxies;
+    final java.util.List removedProxiesTmp = removedProxies;
 
     try {
       SwingUtilities.invokeAndWait(new Runnable() {
@@ -252,7 +252,7 @@ public class FolderDisplayPanel extends JPanel {
    * Should be called on the AWTEventThread while the FolderThread
    * is locked.
    */
-  void moveSelectionOnRemoval(Vector removedProxies) {
+  void moveSelectionOnRemoval(java.util.List removedProxies) {
     MessageProxy selectedProxy = getSelectedMessage();
     if (selectedProxy != null)  {
       boolean selectNextMessage = false;
@@ -576,7 +576,7 @@ public class FolderDisplayPanel extends JPanel {
    * called on the FolderThread.  The change of selection itself, of course,
    * should be done on the AWTEventThread.
    */
-  public int getNextSelectableMessage(int selectedRow, Vector removedProxies) {
+  public int getNextSelectableMessage(int selectedRow, java.util.List removedProxies) {
     return getNextSelectableMessage(selectedRow, removedProxies, false);
   }
 
@@ -590,7 +590,7 @@ public class FolderDisplayPanel extends JPanel {
    * called on the FolderThread.  The change of selection itself, of course,
    * should be done on the AWTEventThread.
    */
-  public int getNextSelectableMessage(int selectedRow, Vector removedProxies, boolean unread) {
+  public int getNextSelectableMessage(int selectedRow, java.util.List removedProxies, boolean unread) {
     int newRow = selectedRow + 1;
     boolean done = false;
     while (! done && newRow < messageTable.getRowCount() ) {
@@ -652,7 +652,7 @@ public class FolderDisplayPanel extends JPanel {
    * called on the FolderThread.  The change of selection itself, of course,
    * should be done on the AWTEventThread.
    */
-  public int getPreviousSelectableMessage(int selectedRow, Vector removedProxies) {
+  public int getPreviousSelectableMessage(int selectedRow, java.util.List removedProxies) {
     return getPreviousSelectableMessage(selectedRow, removedProxies, false);
   }
 
@@ -665,7 +665,7 @@ public class FolderDisplayPanel extends JPanel {
    * called on the FolderThread.  The change of selection itself, of course,
    * should be done on the AWTEventThread.
    */
-  public int getPreviousSelectableMessage(int selectedRow, Vector removedProxies, boolean unread) {
+  public int getPreviousSelectableMessage(int selectedRow, java.util.List removedProxies, boolean unread) {
     int newRow = selectedRow - 1;
     boolean done = false;
     while (! done && newRow >= 0 ) {
@@ -757,6 +757,21 @@ public class FolderDisplayPanel extends JPanel {
     int row = getFolderTableModel().getRowForMessage(mp);
     if (row >=0) {
       getFolderTableModel().fireTableRowsUpdated(row, row);
+    }
+  }
+
+  /**
+   * Saves state for this display panel.
+   */
+  public void saveTableSettings() {
+    if (getFolderInfo() != null) {
+      String key = getFolderInfo().getFolderProperty();
+      // save the column information.
+      FolderTableModel ftm = getFolderTableModel();
+      for (int i = 0; i < ftm.getColumnCount(); i++) {
+        Pooka.setProperty(key + ".columnsize." + ftm.getColumnId(i) + ".value", Integer.toString(messageTable.getColumnModel().getColumn(i).getWidth()));
+
+      }
     }
   }
 

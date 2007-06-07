@@ -56,20 +56,20 @@ public class AttachmentPane extends JPanel {
      * This gets the displayed value for each column in the table.
      */
     public Object getValueAt(int row, int column) {
-      Vector v = null;
+      java.util.List v = null;
       try {
         v = msg.getAttachments();
 
         if (v != null && row < v.size()) {
           if (column == 0) {
-            String name = (((Attachment)v.elementAt(row)).getName());
+            String name = (((Attachment)v.get(row)).getName());
             if (name != null)
               return name;
             else
               return Pooka.getProperty("AttachmentPane.error.FileNameUnavailable", "Unavailable");
           } else if (column == 1) {
 
-            String contentType = ((Attachment)v.elementAt(row)).getMimeType().toString();
+            String contentType = ((Attachment)v.get(row)).getMimeType().toString();
             if (contentType.indexOf(';') != -1)
               contentType = contentType.substring(0, contentType.indexOf(';'));
             return contentType;
@@ -90,7 +90,7 @@ public class AttachmentPane extends JPanel {
     public Attachment getAttachmentAtRow(int row) {
       try {
         if ((row < msg.getAttachments().size()) && (row >= 0))
-          return (Attachment)msg.getAttachments().elementAt(row);
+          return (Attachment)msg.getAttachments().get(row);
       } catch (MessagingException me) {
       }
 
@@ -99,7 +99,7 @@ public class AttachmentPane extends JPanel {
 
     public String getColumnName(int columnIndex) {
       if (columnIndex >= 0 && columnIndex < columnNames.size())
-        return (String)columnNames.elementAt(columnIndex);
+        return (String)columnNames.get(columnIndex);
       else
         return null;
     }

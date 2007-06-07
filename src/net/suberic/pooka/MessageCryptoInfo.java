@@ -9,10 +9,10 @@ import java.util.*;
 import java.security.Key;
 
 /**
- * This stores the encyrption information about a particular MessageInfo. 
+ * This stores the encyrption information about a particular MessageInfo.
  */
 public class MessageCryptoInfo {
-  
+
   // the MessageInfo that we're analyzing.
   MessageInfo mMsgInfo;
 
@@ -50,26 +50,26 @@ public class MessageCryptoInfo {
 
     if (mEncryptionType != null) {
       try {
-	return net.suberic.crypto.EncryptionManager.getEncryptionUtils(mEncryptionType);
+        return net.suberic.crypto.EncryptionManager.getEncryptionUtils(mEncryptionType);
       } catch (java.security.NoSuchProviderException nspe) {
-	return null;
+        return null;
       }
     } else {
       return null;
     }
   }
-  
+
   /**
    * Checks the encryption of this message.
    */
   void checkEncryptionType() throws MessagingException {
     synchronized(this) {
       if (! mCheckedEncryption) {
-	mEncryptionType = net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) mMsgInfo.getMessage());
-	mCheckedEncryption = true;
+        mEncryptionType = net.suberic.crypto.EncryptionManager.checkEncryptionType((MimeMessage) mMsgInfo.getMessage());
+        mCheckedEncryption = true;
       }
     }
-    
+
   }
 
   /**
@@ -81,7 +81,7 @@ public class MessageCryptoInfo {
     return mEncryptionType;
   }
 
-   
+
   /**
    * Returns whether or not this message is signed.
    */
@@ -90,18 +90,18 @@ public class MessageCryptoInfo {
     if (mMsgInfo.hasLoadedAttachments()) {
       List attachments = mMsgInfo.getAttachments();
       for (int i = 0 ; i < attachments.size(); i++) {
-	if (attachments.get(i) instanceof SignedAttachment) {
-	  return true;
-	}
+        if (attachments.get(i) instanceof SignedAttachment) {
+          return true;
+        }
       }
 
       return false;
     } else {
       EncryptionUtils utils = getEncryptionUtils();
       if (utils != null) {
-	return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.SIGNED);
+        return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.SIGNED);
       } else
-	return false;
+        return false;
     }
   }
 
@@ -113,17 +113,17 @@ public class MessageCryptoInfo {
     if (mMsgInfo.hasLoadedAttachments()) {
       List attachments = mMsgInfo.getAttachments();
       for (int i = 0 ; i < attachments.size(); i++) {
-	if (attachments.get(i) instanceof CryptoAttachment) {
-	  return true;
-	}
+        if (attachments.get(i) instanceof CryptoAttachment) {
+          return true;
+        }
       }
       return false;
     } else {
       EncryptionUtils utils = getEncryptionUtils();
       if (utils != null) {
-	return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
+        return (utils.getEncryptionStatus((MimeMessage) mMsgInfo.getMessage()) == EncryptionUtils.ENCRYPTED);
       } else
-	return false;
+        return false;
     }
   }
 
@@ -179,13 +179,13 @@ public class MessageCryptoInfo {
       List attachments = mMsgInfo.getAttachments();
       boolean returnValue = false;
       for (int i = 0; i < attachments.size(); i++) {
-	Attachment current = (Attachment) attachments.get(i);
-	if (current instanceof SignedAttachment) {
-	  mSignatureValid = ((SignedAttachment) current).checkSignature(cryptoUtils, key);
-	}
+        Attachment current = (Attachment) attachments.get(i);
+        if (current instanceof SignedAttachment) {
+          mSignatureValid = ((SignedAttachment) current).checkSignature(cryptoUtils, key);
+        }
       }
       if (mSignatureValid || changeStatusOnFailure)
-	mCheckedSignature = true;
+        mCheckedSignature = true;
     }
 
     return mSignatureValid;
@@ -194,59 +194,59 @@ public class MessageCryptoInfo {
   /**
    * Tries to decrypt the message using the given Key.
    */
-  public boolean decryptMessage(java.security.Key key, boolean recheck) 
-  throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+  public boolean decryptMessage(java.security.Key key, boolean recheck)
+    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     return decryptMessage(key, recheck, true);
   }
 
   /**
    * Tries to decrypt the message using the given Key.
    */
-  public boolean decryptMessage(java.security.Key key, boolean recheck, boolean changeStatusOnFailure) 
-  throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+  public boolean decryptMessage(java.security.Key key, boolean recheck, boolean changeStatusOnFailure)
+    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     synchronized(this) {
       if (mCheckedDecryption && ! recheck) {
-	return mDecryptSuccessful;
+        return mDecryptSuccessful;
       } else {
-	if (changeStatusOnFailure)
-	  mCheckedDecryption = true;
+        if (changeStatusOnFailure)
+          mCheckedDecryption = true;
 
-	// run through all of the attachments and decrypt them.
-	AttachmentBundle bundle = mMsgInfo.getAttachmentBundle();
-	List attachmentList = bundle.getAttachmentsAndTextPart();
-	for (int i = 0; i < attachmentList.size(); i++) {
-	  Object o = attachmentList.get(i);
-	  if (o instanceof CryptoAttachment) {
-	    CryptoAttachment ca = (CryptoAttachment) o;
+        // run through all of the attachments and decrypt them.
+        AttachmentBundle bundle = mMsgInfo.getAttachmentBundle();
+        List attachmentList = bundle.getAttachmentsAndTextPart();
+        for (int i = 0; i < attachmentList.size(); i++) {
+          Object o = attachmentList.get(i);
+          if (o instanceof CryptoAttachment) {
+            CryptoAttachment ca = (CryptoAttachment) o;
 
-	    if (! ca.decryptedSuccessfully()) {
-	      // FIXME
-	      EncryptionUtils cryptoUtils = getEncryptionUtils();
-	      
-	      BodyPart bp = ca.decryptAttachment(cryptoUtils, key);
-	      
-	      // check to see what kind of attachment it is.  if it's a 
-	      // Multipart, then we need to expand it and add it to the 
-	      // attachment list.
-	      
-	    
-	      /*
-		if (bp.getContent() instanceof Multipart) {
-		AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
-		bundle.addAll(newBundle);
-		} else {
-		bundle.removeAttachment(ca);
-		bundle.addAttachment(ca);
-		}
-	      */
-	      //bundle.removeAttachment(ca);
-	      MailUtilities.handlePart((MimeBodyPart) bp, bundle);
-	    }
-	  }
-	}
+            if (! ca.decryptedSuccessfully()) {
+              // FIXME
+              EncryptionUtils cryptoUtils = getEncryptionUtils();
 
-	mDecryptSuccessful = true;
-	mCheckedDecryption = true;
+              BodyPart bp = ca.decryptAttachment(cryptoUtils, key);
+
+              // check to see what kind of attachment it is.  if it's a
+              // Multipart, then we need to expand it and add it to the
+              // attachment list.
+
+
+              /*
+                if (bp.getContent() instanceof Multipart) {
+                AttachmentBundle newBundle = MailUtilities.parseAttachments((Multipart) bp.getContent());
+                bundle.addAll(newBundle);
+                } else {
+                bundle.removeAttachment(ca);
+                bundle.addAttachment(ca);
+                }
+              */
+              //bundle.removeAttachment(ca);
+              MailUtilities.handlePart((MimeBodyPart) bp, bundle);
+            }
+          }
+        }
+
+        mDecryptSuccessful = true;
+        mCheckedDecryption = true;
       }
     }
 
@@ -259,39 +259,39 @@ public class MessageCryptoInfo {
   public boolean autoDecrypt(UserProfile defaultProfile) {
     try {
       String cryptType = getEncryptionType();
-      
+
       // why not just try all of the private keys?  at least, all the
       // ones we have available.
       //java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys(cryptType);
       java.security.Key[] privateKeys = Pooka.getCryptoManager().getCachedPrivateKeys();
-      
+
       if (privateKeys != null) {
-	for (int i = 0 ; i < privateKeys.length; i++) {
-	  try {
-	    if (privateKeys[i] instanceof EncryptionKey) {
-	      // only try if the encryption type matches.
-	      if (((EncryptionKey)privateKeys[i]).getEncryptionUtils().getType().equals(cryptType)) {
-		if (decryptMessage(privateKeys[i], true, false))
-		  return true;
-	      }
-	    } else {
-	      if (decryptMessage(privateKeys[i], true, false))
-		return true;
-	    }
-	  } catch (Exception e) {
-	    e.printStackTrace();
-	  }
-	}
-	
+        for (int i = 0 ; i < privateKeys.length; i++) {
+          try {
+            if (privateKeys[i] instanceof EncryptionKey) {
+              // only try if the encryption type matches.
+              if (((EncryptionKey)privateKeys[i]).getEncryptionUtils().getType().equals(cryptType)) {
+                if (decryptMessage(privateKeys[i], true, false))
+                  return true;
+              }
+            } else {
+              if (decryptMessage(privateKeys[i], true, false))
+                return true;
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
     return false;
-  }  
+  }
 
   /**
-   * Checks the signature of the given message as compared to the 
+   * Checks the signature of the given message as compared to the
    * given from address.
    */
   public boolean autoCheckSignature(InternetAddress sender) {
@@ -299,9 +299,9 @@ public class MessageCryptoInfo {
       String senderAddress = sender.getAddress();
       Key[] matchingKeys = Pooka.getCryptoManager().getPublicKeys(senderAddress,getEncryptionType());
       for (int i = 0 ; i < matchingKeys.length; i++) {
-	if (checkSignature(matchingKeys[i], true, true)) {
-	  return true;
-	}
+        if (checkSignature(matchingKeys[i], true, true)) {
+          return true;
+        }
       }
     } catch (Exception e) {
     }
@@ -316,11 +316,11 @@ public class MessageCryptoInfo {
       AttachmentBundle bundle = mMsgInfo.getAttachmentBundle();
       List attachmentList = bundle.getAttachmentsAndTextPart();
       for (int i = 0; i < attachmentList.size(); i++) {
-	Object o = attachmentList.get(i);
-	if (o instanceof KeyAttachment) {
-	  EncryptionUtils utils = getEncryptionUtils();
-	  return ((KeyAttachment) o).extractKeys(utils);
-	}
+        Object o = attachmentList.get(i);
+        if (o instanceof KeyAttachment) {
+          EncryptionUtils utils = getEncryptionUtils();
+          return ((KeyAttachment) o).extractKeys(utils);
+        }
       }
     }
 

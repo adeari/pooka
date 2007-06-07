@@ -1,3 +1,7 @@
+*) add ssmtp support.
+*) make it so when you hit send, it makes the message window read-only.
+
+  *) email javamail-interest list re tls optional/required vs 
   *)  release
       *) write up changes
       *) switch around webstart site
@@ -494,8 +498,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) printing
 	*) better layout of printer frame.  center things?
-
-*) make it so folder windows save their settings (column width, sort order)
 
 *) more doc
 

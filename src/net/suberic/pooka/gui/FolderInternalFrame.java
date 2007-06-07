@@ -241,6 +241,8 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
 
     Pooka.setProperty(folderProperty + ".windowLocation.height", Integer.toString(getHeight()));
     Pooka.setProperty(folderProperty + ".windowLocation.width", Integer.toString(getWidth()));
+
+    getFolderDisplay().saveTableSettings();
   }
 
   /**

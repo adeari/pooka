@@ -517,7 +517,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    */
   public void attachmentRemoved(int index) {
     try {
-      Vector attach = getNewMessageProxy().getAttachments();
+      java.util.List attach = getNewMessageProxy().getAttachments();
       if (attach == null || attach.size() == 0) {
         removeAttachmentPane();
       } else {

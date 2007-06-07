@@ -19,18 +19,20 @@ public class FolderTableModel extends AbstractTableModel {
   static int REMOVE_MESSAGES = 1;
 
   private List data;
-  private List columnNames;
+  private List<String> columnNames;
+  private List<String> columnIds;
   private List columnSizes;
   private int currentSortColumn = -1;
   private boolean currentAscending = true;
   //private List displayData;
   private List columnKeys;
 
-  public FolderTableModel(List newData, List newColumnNames, List newColumnSizes, List newColumnKeys) {
+  public FolderTableModel(List newData, List<String> newColumnNames, List<String> newColumnSizes, List newColumnKeys, List<String> newColumnIds) {
     data=newData;
     columnNames = newColumnNames;
     columnSizes = newColumnSizes;
     columnKeys = newColumnKeys;
+    columnIds = newColumnIds;
   }
 
   public int getColumnCount() {
@@ -42,7 +44,11 @@ public class FolderTableModel extends AbstractTableModel {
   }
 
   public String getColumnName(int col) {
-    return (String)columnNames.get(col);
+    return columnNames.get(col);
+  }
+
+  public String getColumnId(int col) {
+    return columnIds.get(col);
   }
 
   /**

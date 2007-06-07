@@ -85,9 +85,10 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   // Information for the FolderTable.
   protected FolderTableModel folderTableModel;
   protected Hashtable messageToInfoTable = new Hashtable();
-  private Vector columnValues;
-  private Vector columnNames;
-  private Vector columnSizes;
+  private List columnValues;
+  private List<String> columnNames;
+  private List<String> columnSizes;
+  private List<String> columnIds;
 
   // GUI information.
   private FolderDisplayUI folderDisplayUI;
@@ -777,15 +778,12 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     FetchProfile fp = new FetchProfile();
     fp.add(FetchProfile.Item.FLAGS);
     if (columnValues == null) {
-      Enumeration tokens = Pooka.getResources().getPropertyAsEnumeration(tableType, "");
+      List<String> colIds = Pooka.getResources().getPropertyAsList(tableType, "");
       Vector colvals = new Vector();
-      Vector colnames = new Vector();
-      Vector colsizes = new Vector();
+      Vector<String> colnames = new Vector<String>();
+      Vector<String> colsizes = new Vector<String>();
 
-      String tmp;
-
-      while (tokens.hasMoreElements()) {
-        tmp = (String)tokens.nextElement();
+      for (String tmp: colIds) {
         String type = Pooka.getProperty(tableType + "." + tmp + ".type", "");
         if (type.equalsIgnoreCase("Multi")) {
           SearchTermIconManager stm = new SearchTermIconManager(tableType + "." + tmp);
@@ -819,11 +817,13 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
         }
 
         colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
-        colsizes.addElement(Pooka.getProperty(tableType + "." + tmp + ".size", tmp));
+          String value = Pooka.getProperty(getFolderProperty() + ".columnsize." + tmp + ".value", Pooka.getProperty(tableType + "." + tmp + ".value", tmp));
+        colsizes.addElement(Pooka.getProperty(getFolderProperty() + ".columnsize." + tmp + ".value", Pooka.getProperty(tableType + "." + tmp + ".size", tmp)));
       }
       setColumnNames(colnames);
       setColumnValues(colvals);
       setColumnSizes(colsizes);
+      setColumnIds(colIds);
     }
 
     // if we've already loaded the filters, then add those in, too.
@@ -981,7 +981,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
         runFilters(messageProxies);
 
-        FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues());
+        FolderTableModel ftm = new FolderTableModel(messageProxies, getColumnNames(), getColumnSizes(), getColumnValues(), getColumnIds());
 
         setFolderTableModel(ftm);
 
@@ -2374,27 +2374,35 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     folderTableModel = newValue;
   }
 
-  public Vector getColumnValues() {
+  public List getColumnValues() {
     return columnValues;
   }
 
-  public void setColumnValues(Vector newValue) {
+  public void setColumnValues(List newValue) {
     columnValues = newValue;
   }
 
-  public Vector getColumnNames() {
+  public List<String> getColumnIds() {
+    return columnIds;
+  }
+
+  public void setColumnIds(List<String> newColumnIds) {
+    columnIds = newColumnIds;
+  }
+
+  public List<String> getColumnNames() {
     return columnNames;
   }
 
-  public void setColumnNames(Vector newValue) {
+  public void setColumnNames(List<String> newValue) {
     columnNames = newValue;
   }
 
-  public Vector getColumnSizes() {
+  public List<String> getColumnSizes() {
     return columnSizes;
   }
 
-  public void setColumnSizes(Vector newValue) {
+  public void setColumnSizes(List<String> newValue) {
     columnSizes = newValue;
   }
 

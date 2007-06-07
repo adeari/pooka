@@ -25,6 +25,8 @@ fixed up error display messages.
 removed ability to connect to self-signed SSL providers due to incompatibility
 with WebStart.  this may be restored in the future.
 
+folder tables now save their width settings.
+
 060227 release
 --------------
 

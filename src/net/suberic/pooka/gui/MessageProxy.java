@@ -12,9 +12,10 @@ import javax.print.*;
 import javax.print.attribute.*;
 import javax.print.attribute.standard.*;
 import javax.print.event.*;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.HashMap;
-import java.util.Vector;
+import java.util.List;
 import java.awt.event.*;
 import java.awt.print.*;
 import java.io.*;
@@ -33,32 +34,32 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       msg = newMsg;
       saveFile = newSaveFile;
     }
-    
+
     public void run() {
       InputStream decodedIS = null;
       BufferedOutputStream outStream = null;
-      
+
       int msgSize = 0;
-      
+
       try {
         msgSize = msg.getSize();
-        
+
         createDialog(msgSize);
         jd.setVisible(true);
-        
+
         outStream = new BufferedOutputStream(new FileOutputStream(saveFile));
         int b=0;
         byte[] buf = new byte[32768];
-        
+
         b = decodedIS.read(buf);
         while (b != -1 && running) {
           outStream.write(buf, 0, b);
           progressBar.setValue(progressBar.getValue() + b);
           b = decodedIS.read(buf);
         }
-        
+
         jd.dispose();
-        
+
       } catch (IOException ioe) {
         if (getMessageUI() != null)
           getMessageUI().showError(Pooka.getProperty("error.SaveFile", "Error saving file:  ") + ioe.getMessage());
@@ -80,12 +81,12 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         }
       }
     }
-    
+
     public void createDialog(int msgSize) {
       progressBar = new JProgressBar(0, msgSize);
       progressBar.setBorderPainted(true);
       progressBar.setStringPainted(true);
-      
+
       jd = new JDialog();
       jd.getContentPane().setLayout(new BoxLayout(jd.getContentPane(), BoxLayout.Y_AXIS));
       JLabel nameLabel = new JLabel(saveFile.getName());
@@ -97,14 +98,14 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
           }
         });
       buttonPanel.add(cancelButton);
-      
+
       jd.getContentPane().add(nameLabel);
       jd.getContentPane().add(progressBar);
       jd.getContentPane().add(buttonPanel);
-      
+
       jd.pack();
     }
-    
+
     public void cancelSave() {
       try {
         saveFile.delete();
@@ -122,9 +123,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   // matching Filters.
   MessageFilter[] matchingFilters;
 
-  // the column Headers for the FolderInfo Vector; used for loading the
+  // the column Headers for the FolderInfo List; used for loading the
   // tableInfo.
-  Vector columnHeaders;
+  List columnHeaders;
 
   // if the tableInfo has been loaded yet.
   boolean loaded = false;
@@ -278,7 +279,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * This creates a new MessageProxy from a set of Column Headers (for
    * the tableInfo), a Message, and a link to a FolderInfo object.
    */
-  public MessageProxy(Vector newColumnHeaders, MessageInfo newMessage) {
+  public MessageProxy(List newColumnHeaders, MessageInfo newMessage) {
     messageInfo = newMessage;
     messageInfo.setMessageProxy(this);
 
@@ -386,7 +387,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   }
 
   /**
-   * Creates a TableInfo Vector.
+   * Creates a TableInfo List.
    */
   protected HashMap createTableInfo() throws MessagingException {
     int columnCount = columnHeaders.size();
@@ -394,7 +395,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
     HashMap returnValue = new HashMap();
 
     for(int j=0; j < columnCount; j++) {
-      loadTableProperty(columnHeaders.elementAt(j), returnValue);
+      loadTableProperty(columnHeaders.get(j), returnValue);
     }
 
     return returnValue;
@@ -470,7 +471,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   private MessageFilter[] doFilterMatch() {
     MessageFilter[] folderFilters = getFolderInfo().getDisplayFilters();
     if (folderFilters != null) {
-      Vector tmpMatches = new Vector();
+      List tmpMatches = new ArrayList();
       for (int i = 0; i < folderFilters.length; i++) {
         if (folderFilters[i].getSearchTerm() instanceof net.suberic.pooka.filter.DeleteInProgressSearchTerm) {
           // big hack.
@@ -483,7 +484,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
       MessageFilter[] newMatchingFilters = new MessageFilter[tmpMatches.size()];
       for (int i = 0; i < tmpMatches.size(); i++) {
-        newMatchingFilters[i] = (MessageFilter) tmpMatches.elementAt(i);
+        newMatchingFilters[i] = (MessageFilter) tmpMatches.get(i);
       }
 
       return newMatchingFilters;
@@ -682,7 +683,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * Returns the attachments for this Message.
    */
-  public Vector getAttachments() throws MessagingException {
+  public List getAttachments() throws MessagingException {
     return messageInfo.getAttachments();
   }
 
@@ -1859,7 +1860,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         fw.setBusy(true);
 
       if (fw != null && Pooka.getProperty("Pooka.fastDelete", "false").equalsIgnoreCase("true")) {
-        Vector v = new Vector();
+        List v = new ArrayList();
         v.add(MessageProxy.this);
         FolderDisplayPanel fdp = null;
         if (fw instanceof FolderInternalFrame) {
