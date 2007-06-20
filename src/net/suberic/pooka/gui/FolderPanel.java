@@ -28,7 +28,7 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
   DefaultTreeModel folderModel;
   Session session;
   ConfigurableKeyBinding keyBindings;
-  ConfigurableToolbar folderToolbar;
+  ConfigurableToolbar folderPanelToolbar;
   MetalTheme currentTheme = null;
   DropTarget mDropTarget = null;
   TransferHandler mTransferHandler = null;
@@ -54,10 +54,13 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
     JScrollPane jsp = new JScrollPane(folderTree);
     //this.getViewport().add(folderTree);
 
-    folderToolbar = new ConfigurableToolbar("FolderToolbar", Pooka.getResources());
-    folderToolbar.setActive(getActions());
+    folderPanelToolbar = Pooka.getUIFactory().createFolderPanelToolbar();
+    //new ConfigurableToolbar("FolderToolbar", Pooka.getResources());
+    if (folderPanelToolbar != null) {
+      folderPanelToolbar.setActive(getActions());
+      this.add("North", folderPanelToolbar);
+    }
 
-    this.add("North", folderToolbar);
     this.add("Center", jsp);
 
     folderTree.addMouseListener(new MouseAdapter() {
@@ -395,10 +398,32 @@ public class FolderPanel extends JPanel implements ItemListChangeListener, UserP
   }
 
   /**
+   * Gets the FolderPanelToolbar.
+   */
+  public ConfigurableToolbar getFolderPanelToolbar() {
+    return folderPanelToolbar;
+  }
+
+  /**
+   * Sets the FolderPanelToolbar.
+   */
+  public void setFolderPanelToolbar(ConfigurableToolbar newFolderPanelToolbar) {
+    if (folderPanelToolbar != null)
+      this.remove(folderPanelToolbar);
+
+    folderPanelToolbar = newFolderPanelToolbar;
+
+    if (folderPanelToolbar != null)
+      this.add("North", folderPanelToolbar);
+
+  }
+
+  /**
    * Refreshes the active menus for the FolderPanel.
    */
   public void refreshActiveMenus() {
-    folderToolbar.setActive(getActions());
+    if (folderPanelToolbar != null)
+      folderPanelToolbar.setActive(getActions());
   }
 
   public Action[] getActions() {

@@ -3,6 +3,7 @@ package net.suberic.pooka.ssl;
 import java.io.*;
 
 import java.security.cert.*;
+import javax.mail.internet.MimeUtility;
 import javax.net.ssl.*;
 
 
@@ -34,19 +35,19 @@ public class PookaTrustManager implements X509TrustManager {
    */
   public PookaTrustManager(TrustManager[] pWrappedManagers, String pCertFile, boolean pUseCertFile) {
     super();
-    
+
     mUseCertFile = pUseCertFile;
     if (mUseCertFile)
       certificateRepositoryFile = pCertFile;
 
     for (int i = 0; i < pWrappedManagers.length; i++) {
       if (pWrappedManagers[i] instanceof X509TrustManager)
-	wrappedManager = (X509TrustManager) pWrappedManagers[i];
+        wrappedManager = (X509TrustManager) pWrappedManagers[i];
     }
-    
+
     loadAccepted();
   }
-  
+
   /**
    * Returns whether or not the client with the given certificates is
    * trusted or not.
@@ -55,15 +56,15 @@ public class PookaTrustManager implements X509TrustManager {
     if (wrappedManager != null) {
       CertificateException trustException = null;
       try {
-	wrappedManager.checkClientTrusted(cert, authType);
+        wrappedManager.checkClientTrusted(cert, authType);
       } catch (CertificateException e) {
-	trustException = e;
+        trustException = e;
       }
       if (trustException != null) {
-	if (localIsTrusted(cert))
-	  return;
-	else
-	  throw trustException;
+        if (localIsTrusted(cert))
+          return;
+        else
+          throw trustException;
       }
     }
     // if the respones from the wrappedManager was false, or if there is no
@@ -80,22 +81,22 @@ public class PookaTrustManager implements X509TrustManager {
     if (wrappedManager != null) {
       CertificateException trustException = null;
       try {
-	wrappedManager.checkServerTrusted(cert, authType);
+        wrappedManager.checkServerTrusted(cert, authType);
       }
       catch (CertificateException e) {
-	trustException = e;
+        trustException = e;
       }
-      
+
       if (trustException != null) {
-	// if this isn't acceptable by default, ask.
-	if (localIsTrusted(cert))
-	  return;
-	else
-	  throw trustException;
+        // if this isn't acceptable by default, ask.
+        if (localIsTrusted(cert))
+          return;
+        else
+          throw trustException;
       }
     } else
       if (! localIsTrusted(cert))
-	throw new CertificateException("Certificate not trusted.");
+        throw new CertificateException("Certificate not trusted.");
   }
 
   /**
@@ -120,9 +121,9 @@ public class PookaTrustManager implements X509TrustManager {
 
     for (int i = 0; ! found && ! rejected && i < cert.length; i++) {
       if (trustedCerts.contains(cert[i]))
-	found = true;
+        found = true;
       else if (rejectedCerts.contains(cert[i]))
-	rejected = true;
+        rejected = true;
     }
 
     if (found)
@@ -133,7 +134,7 @@ public class PookaTrustManager implements X509TrustManager {
     // if it hasn't been checked already, then ask.
 
     boolean response = askIsTrusted(cert);
-    
+
     if (response) {
       addToTrusted(cert);
     } else {
@@ -151,7 +152,7 @@ public class PookaTrustManager implements X509TrustManager {
     X509Certificate certToPrint = null;
     for (int i = 0; i < cert.length && certToPrint == null; i++) {
       if (cert[i] != null)
-	certToPrint = cert[i];
+        certToPrint = cert[i];
     }
 
     int response = -1;
@@ -179,54 +180,57 @@ public class PookaTrustManager implements X509TrustManager {
       BufferedWriter fw = null;
 
       if (mUseCertFile) {
-	if (certificateRepositoryFile != null && ! certificateRepositoryFile.equals("")) {
-	  try {
-	    // see if we can open the file.
-	    fw = new BufferedWriter(new FileWriter(certificateRepositoryFile, true));
-	  } catch (IOException ioe) {
-	    final Exception e = ioe;
-	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		  net.suberic.pooka.Pooka.getUIFactory().showError("Error opening SSL certificate file:  " + certificateRepositoryFile, e);
-		}
-	      });
-	  }
-	} else {
-	  // don't give warning if we're not using a local certificate file.
-	  javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	      public void run() {
-		net.suberic.pooka.Pooka.getUIFactory().showError("Warning:  no certificate file set.\nCertificate will only be accepted for this session.\nGo to Configuation->Preferences->SSL to set a certificate file.");
-	      }
-	    });
-	}
+        if (certificateRepositoryFile != null && ! certificateRepositoryFile.equals("")) {
+          try {
+            // see if we can open the file.
+            fw = new BufferedWriter(new FileWriter(certificateRepositoryFile, true));
+          } catch (IOException ioe) {
+            final Exception e = ioe;
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                  net.suberic.pooka.Pooka.getUIFactory().showError("Error opening SSL certificate file:  " + certificateRepositoryFile, e);
+                }
+              });
+          }
+        } else {
+          // don't give warning if we're not using a local certificate file.
+          javax.swing.SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                net.suberic.pooka.Pooka.getUIFactory().showError("Warning:  no certificate file set.\nCertificate will only be accepted for this session.\nGo to Configuation->Preferences->SSL to set a certificate file.");
+              }
+            });
+        }
       }
 
       try {
-	for (int i = 0; i < cert.length; i++) {
-	  if (cert[i] != null) {
-	    trustedCerts.add(cert[i]);
-	    
-	    if (fw != null) {
-	      fw.write("-----BEGIN CERTIFICATE-----");
-	      fw.newLine();
-	      fw.write(new sun.misc.BASE64Encoder().encode(cert[i].getEncoded()));
-	      fw.newLine();
-	      fw.write("-----END CERTIFICATE-----");
-	      fw.newLine();
-	    }
-	  }
-	}
+        for (int i = 0; i < cert.length; i++) {
+          if (cert[i] != null) {
+            trustedCerts.add(cert[i]);
 
-	fw.flush();
+            if (fw != null) {
+              fw.write("-----BEGIN CERTIFICATE-----");
+              fw.newLine();
+              ByteArrayOutputStream baos = new ByteArrayOutputStream();
+              OutputStream encOutputStream = MimeUtility.encode(baos, "base64");
+              encOutputStream.write(cert[i].getEncoded());
+              fw.write(baos.toString());
+              fw.newLine();
+              fw.write("-----END CERTIFICATE-----");
+              fw.newLine();
+            }
+          }
+        }
+
+        fw.flush();
       } catch (Exception e) {
-	// FIXME
+        // FIXME
       } finally {
-	if (fw != null) {
-	  try {
-	    fw.close();
-	  } catch (Exception e) {
-	  }
-	}
+        if (fw != null) {
+          try {
+            fw.close();
+          } catch (Exception e) {
+          }
+        }
       }
     }
 
@@ -238,8 +242,8 @@ public class PookaTrustManager implements X509TrustManager {
   public void addToRejected(X509Certificate[] cert) {
     if (cert != null) {
       for (int i = 0; i < cert.length; i++) {
-	if (cert[i] != null)
-	  rejectedCerts.add(cert[i]);
+        if (cert[i] != null)
+          rejectedCerts.add(cert[i]);
       }
     }
   }
@@ -251,29 +255,29 @@ public class PookaTrustManager implements X509TrustManager {
     FileInputStream fis = null;
     if (mUseCertFile && certificateRepositoryFile != null) {
       try {
-	fis = new FileInputStream(certificateRepositoryFile);
-	DataInputStream dis = new DataInputStream(fis);
-	CertificateFactory cf = CertificateFactory.getInstance("X.509");
-	byte[] bytes = new byte[dis.available()];
-	dis.readFully(bytes);
-	ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-	while (bais.available() > 0) {
-	  Certificate cert = cf.generateCertificate(bais);
-	  
-	  trustedCerts.add(cert);
-	}
+        fis = new FileInputStream(certificateRepositoryFile);
+        DataInputStream dis = new DataInputStream(fis);
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        byte[] bytes = new byte[dis.available()];
+        dis.readFully(bytes);
+        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+        while (bais.available() > 0) {
+          Certificate cert = cf.generateCertificate(bais);
+
+          trustedCerts.add(cert);
+        }
       } catch (Exception ioe) {
-	// FIXME -- nothing for now.
+        // FIXME -- nothing for now.
       } finally {
-	try {
-	  if (fis != null)
-	    fis.close();
-	} catch (Exception e) {
-	  
-	}
+        try {
+          if (fis != null)
+            fis.close();
+        } catch (Exception e) {
+
+        }
       }
     }
-      
+
   }
 }
 

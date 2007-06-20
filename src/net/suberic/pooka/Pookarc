@@ -160,6 +160,16 @@ FolderTable.2xClickAction=file-open
 FolderTable.UnreadStyle=BOLD
 FolderTable.showLines=true
 
+PreviewFolderTable.MsgNumber.size=30
+PreviewFolderTable.Status.size=15
+PreviewFolderTable.Flagged.size=15
+PreviewFolderTable.New.size=15
+PreviewFolderTable.Crypto.size=15
+PreviewFolderTable.Attachments.size=10
+PreviewFolderTable.SentDate.size=150
+PreviewFolderTable.From.size=250
+PreviewFolderTable.Subject.size=300
+
 SentFolderTable=SentDate:To:Subject
 SentFolderTable.SentDate.value=Date
 SentFolderTable.SentDate.size=100

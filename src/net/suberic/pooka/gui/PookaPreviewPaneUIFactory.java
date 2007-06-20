@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
+import net.suberic.util.gui.ConfigurableToolbar;
 import net.suberic.util.gui.IconManager;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
@@ -117,6 +118,19 @@ public class PookaPreviewPaneUIFactory extends SwingUIFactory {
     contentPanel.setSize(1000,1000);
 
     return contentPanel;
+  }
+
+  /**
+   * Creates a Toolbar for the MainPanel.
+   */
+  public ConfigurableToolbar createMainToolbar() {    return new ConfigurableToolbar("MainToolbar", Pooka.getResources());
+  }
+
+  /**
+   * Creates a Toolbar for the FolderPanel.
+   */
+  public ConfigurableToolbar createFolderPanelToolbar() {
+    return null;
   }
 
   /**

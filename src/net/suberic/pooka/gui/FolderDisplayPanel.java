@@ -34,6 +34,9 @@ public class FolderDisplayPanel extends JPanel {
   boolean enabled = true;
 
   boolean validated = false;
+  boolean useFolderColumnSizes = true;
+
+  public static String GLOBAL_COLUMN_PROPERTY_ROOT="PreviewFolderTable";
 
   /**
    * Creates an empty FolderDisplayPanel.
@@ -47,9 +50,17 @@ public class FolderDisplayPanel extends JPanel {
    * Creates a FolderDisplayPanel for the given FolderInfo.
    */
   public FolderDisplayPanel(FolderInfo newFolderInfo) {
+    this(newFolderInfo, true);
+  }
+
+  /**
+   * Creates a FolderDisplayPanel for the given FolderInfo.
+   */
+  public FolderDisplayPanel(FolderInfo newFolderInfo, boolean pUseFolderColumnSizes) {
     initWindow();
     setFolderInfo(newFolderInfo);
     addMessageTable();
+    useFolderColumnSizes = pUseFolderColumnSizes;
   }
 
   /**
@@ -136,8 +147,19 @@ public class FolderDisplayPanel extends JPanel {
       messageTable.setShowHorizontalLines(false);
     }
 
+    FolderTableModel ftm = getFolderInfo().getFolderTableModel();
     for (int i = 0; i < messageTable.getColumnCount(); i++) {
-      messageTable.getColumnModel().getColumn(i).setPreferredWidth(getFolderInfo().getFolderTableModel().getColumnSize(i));
+      if (useFolderColumnSizes) {
+        messageTable.getColumnModel().getColumn(i).setPreferredWidth(ftm.getColumnSize(i));
+      } else {
+        int colSize = 10;
+        try {
+          colSize = Integer.parseInt(Pooka.getProperty(GLOBAL_COLUMN_PROPERTY_ROOT + "." + ftm.getColumnId(i) + ".size", "10"));
+        } catch (Exception e) {
+          // just use the default.
+        }
+        messageTable.getColumnModel().getColumn(i).setPreferredWidth(colSize);
+      }
     }
 
     messageTable.setAutoResizeMode(JTable.AUTO_RESIZE_NEXT_COLUMN);

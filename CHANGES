@@ -27,6 +27,9 @@ with WebStart.  this may be restored in the future.
 
 folder tables now save their width settings.
 
+sending a message now sets the new message window to disable until the
+send is completed.
+
 060227 release
 --------------
 

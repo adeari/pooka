@@ -26,9 +26,10 @@ import net.suberic.util.gui.*;
  * @version $Id$
  */
 
-public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfileContainer, ActionContainer {
+public class MainPanel extends JPanel implements net.suberic.pooka.UserProfileContainer, ActionContainer {
+  private JSplitPane splitPane;
   private ConfigurableMenuBar mainMenu;
-  //private ConfigurableToolbar mainToolbar;
+  private ConfigurableToolbar mainToolbar;
   private FolderPanel folderPanel;
   private ContentPanel contentPanel;
   private InfoPanel infoPanel;
@@ -44,8 +45,6 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   private static int FOLDER_LAST = 5;
 
   public MainPanel(JFrame frame) {
-    super(JSplitPane.HORIZONTAL_SPLIT);
-
     session = Pooka.getDefaultSession();
 
     mailQueue = new MailQueue(Pooka.getDefaultSession());
@@ -60,17 +59,26 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     // this.setLayout(new BorderLayout());
     // create the menu bar.
 
+    this.setLayout(new BorderLayout());
+
     contentPanel = Pooka.getUIFactory().createContentPanel();
     folderPanel = new FolderPanel(this);
     infoPanel = new InfoPanel();
     infoPanel.setMessage("Pooka");
 
-    this.setLeftComponent(folderPanel);
-    this.setRightComponent(contentPanel.getUIComponent());
-    this.setDividerLocation(folderPanel.getPreferredSize().width + 1);
+    splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+
+    splitPane.setLeftComponent(folderPanel);
+    splitPane.setRightComponent(contentPanel.getUIComponent());
+    splitPane.setDividerLocation(folderPanel.getPreferredSize().width + 1);
+
+    this.add("Center", splitPane);
 
     mainMenu = new ConfigurableMenuBar("MenuBar", Pooka.getResources());
-    //mainToolbar = new ConfigurableToolbar("MainToolbar", Pooka.getResources());
+    mainToolbar = Pooka.getUIFactory().createMainToolbar();
+
+    if (mainToolbar != null)
+      this.add("North", mainToolbar);
 
     keyBindings = new ConfigurableKeyBinding(this, "MainPanel.keyBindings", Pooka.getResources());
     //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -171,7 +179,8 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
   public void refreshActiveMenus() {
     Action[] currentActions = getActions();
     mainMenu.setActive(currentActions);
-    //mainToolbar.setActive(currentActions);
+    if (mainToolbar != null)
+      mainToolbar.setActive(currentActions);
     contentPanel.refreshActiveMenus();
     keyBindings.setActive(currentActions);
     if (Pooka.getUIFactory().getMessageNotificationManager() != null)
@@ -307,11 +316,9 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     mainMenu=newMainMenu;
   }
 
-  /*
   public ConfigurableToolbar getMainToolbar() {
     return mainToolbar;
   }
-  */
 
   public ConfigurableKeyBinding getKeyBindings() {
     return keyBindings;
@@ -321,11 +328,17 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
     keyBindings = newKeyBindings;
   }
 
-  /*
+
   public void setMainToolbar(ConfigurableToolbar newMainToolbar) {
+    if (mainToolbar != null)
+      this.remove(mainToolbar);
+
     mainToolbar = newMainToolbar;
+
+    if (mainToolbar != null)
+      this.add("North", mainToolbar);
+
   }
-  */
 
   public ContentPanel getContentPanel() {
     return contentPanel;
@@ -333,7 +346,7 @@ public class MainPanel extends JSplitPane implements net.suberic.pooka.UserProfi
 
   public void setContentPanel(ContentPanel newCp) {
     contentPanel = newCp;
-    this.setRightComponent(newCp.getUIComponent());
+    splitPane.setRightComponent(newCp.getUIComponent());
     this.repaint();
   }
 

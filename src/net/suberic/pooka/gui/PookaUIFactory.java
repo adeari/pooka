@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.swing.ProgressDialog;
+import net.suberic.util.gui.ConfigurableToolbar;
 import net.suberic.util.gui.IconManager;
 
 public interface PookaUIFactory extends ErrorHandler {
@@ -38,6 +39,16 @@ public interface PookaUIFactory extends ErrorHandler {
    * Creates a ContentPanel which will be used to show messages and folders.
    */
   public ContentPanel createContentPanel();
+
+  /**
+   * Creates a Toolbar for the MainPanel.
+   */
+  public ConfigurableToolbar createMainToolbar();
+
+  /**
+   * Creates a Toolbar for the FolderPanel.
+   */
+  public ConfigurableToolbar createFolderPanelToolbar();
 
   /**
    * Shows an Editor Window with the given title, which allows the user

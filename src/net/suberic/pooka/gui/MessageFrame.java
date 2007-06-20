@@ -47,10 +47,10 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     }
 
     this.addFocusListener(new FocusAdapter() {
-  public void focusGained(FocusEvent e) {
-    if (getMessageDisplay() != null)
-      getMessageDisplay().requestFocusInWindow();
-  }
+        public void focusGained(FocusEvent e) {
+          if (getMessageDisplay() != null)
+            getMessageDisplay().requestFocusInWindow();
+        }
       });
 
 
@@ -66,13 +66,13 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     }
 
     this.addFocusListener(new FocusAdapter() {
-  public void focusGained(FocusEvent e) {
-    if (getMessageDisplay() != null)
-      getMessageDisplay().requestFocusInWindow();
-  }
+        public void focusGained(FocusEvent e) {
+          if (getMessageDisplay() != null)
+            getMessageDisplay().requestFocusInWindow();
+        }
       });
 
-    }
+  }
 
   /**
    * this method is expected to do all the implementation-specific
@@ -85,17 +85,17 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
    * Configures the InterfaceStyle for this component.
    */
   public void configureInterfaceStyle() {
-     Runnable runMe = new Runnable() {
-  public void run() {
-    try {
-      Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
-      getMessageDisplay().setDefaultFont();
-      getMessageDisplay().sizeToDefault();
-      MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
-    } catch (Exception e) {
-    }
-  }
-       };
+    Runnable runMe = new Runnable() {
+        public void run() {
+          try {
+            Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this);
+            getMessageDisplay().setDefaultFont();
+            getMessageDisplay().sizeToDefault();
+            MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
+          } catch (Exception e) {
+          }
+        }
+      };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       SwingUtilities.invokeLater(runMe);
@@ -133,17 +133,17 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     // but, hey, it never hurts to check.
     if (currentTheme != null && currentTheme == theme) {
       SwingUtilities.invokeLater(new Runnable() {
-    public void run() {
-      try {
-        Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
-        getMessageDisplay().setDefaultFont();
-        getMessageDisplay().sizeToDefault();
+          public void run() {
+            try {
+              Pooka.getUIFactory().getPookaThemeManager().updateUI(MessageFrame.this, MessageFrame.this, true);
+              getMessageDisplay().setDefaultFont();
+              getMessageDisplay().sizeToDefault();
               MessageFrame.this.setSize(MessageFrame.this.getPreferredSize());
-      } catch (Exception e) {
-      }
+            } catch (Exception e) {
+            }
 
-    }
-  });
+          }
+        });
     }
   }
 
@@ -178,14 +178,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
 
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setInt(JOptionPane.showConfirmDialog(MessageFrame.this, messageText, title, type));
-  }
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(MessageFrame.this, messageText, title, type));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -208,14 +208,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
 
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setInt(JOptionPane.showConfirmDialog(MessageFrame.this, messageText, title, optionType, iconType));
-  }
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(MessageFrame.this, messageText, title, optionType, iconType));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -235,14 +235,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     final String title = pTitle;
 
     Runnable runMe = new Runnable() {
-  public void run() {
-    JOptionPane.showMessageDialog(MessageFrame.this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
-  }
+        public void run() {
+          JOptionPane.showMessageDialog(MessageFrame.this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -297,14 +297,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
 
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setString(JOptionPane.showInputDialog(MessageFrame.this, inputMessage, title, JOptionPane.QUESTION_MESSAGE));
-  }
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(MessageFrame.this, inputMessage, title, JOptionPane.QUESTION_MESSAGE));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -325,14 +325,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
 
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setString(JOptionPane.showInputDialog(MessageFrame.this, inputPanes, title, JOptionPane.QUESTION_MESSAGE));
-  }
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(MessageFrame.this, inputPanes, title, JOptionPane.QUESTION_MESSAGE));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -352,14 +352,14 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
     final String title = pTitle;
 
     Runnable runMe = new Runnable() {
-  public void run() {
-    JOptionPane.showMessageDialog(MessageFrame.this, errorMessage, title, JOptionPane.PLAIN_MESSAGE);
-  }
+        public void run() {
+          JOptionPane.showMessageDialog(MessageFrame.this, errorMessage, title, JOptionPane.PLAIN_MESSAGE);
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -402,12 +402,12 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   public void setBusy(boolean newValue) {
     final boolean fNewValue = newValue;
     Runnable runMe = new Runnable() {
-  public void run() {
-    if (fNewValue)
-      setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-    else
-      setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-  }
+        public void run() {
+          if (fNewValue)
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+          else
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
       };
 
     if (SwingUtilities.isEventDispatchThread()) {
@@ -487,7 +487,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   public Action[] defaultActions = {
     new CloseAction(),
     new AttachAction()
-      };
+  };
 
   class CloseAction extends AbstractAction {
 

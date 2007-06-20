@@ -997,6 +997,14 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
     return returnValue;
   }
 
+  /**
+   * Sets this editor as enabled or disabled.
+   */
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    getEditorPane().setEnabled(enabled);
+  }
+
   public Action[] getDefaultActions() {
     return defaultActions;
   }

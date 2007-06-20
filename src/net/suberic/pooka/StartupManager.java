@@ -547,17 +547,25 @@ public class StartupManager {
     }
 
     mPookaManager.getResources().addValueChangeListener(new net.suberic.util.ValueChangeListener() {
+
         public void valueChanged(String changedValue) {
           if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview")) {
             MessagePanel mp = (MessagePanel) Pooka.getMainPanel().getContentPanel();
-            mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
-            ContentPanel cp = ((PookaPreviewPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(mp);
+            PookaPreviewPaneUIFactory newFactory = new PookaPreviewPaneUIFactory(Pooka.getUIFactory());
+            mPookaManager.setUIFactory(newFactory);
+
+            ContentPanel cp = newFactory.createContentPanel(mp);
             Pooka.getMainPanel().setContentPanel(cp);
+            Pooka.getMainPanel().setMainToolbar(newFactory.createMainToolbar());
+            Pooka.getMainPanel().getFolderPanel().setFolderPanelToolbar(newFactory.createFolderPanelToolbar());
           } else {
             PreviewContentPanel pcp = (PreviewContentPanel) Pooka.getMainPanel().getContentPanel();
-            mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(Pooka.getUIFactory()));
-            ContentPanel mp = ((PookaDesktopPaneUIFactory) mPookaManager.getUIFactory()).createContentPanel(pcp);
+            PookaDesktopPaneUIFactory newFactory = new PookaDesktopPaneUIFactory(Pooka.getUIFactory());
+            mPookaManager.setUIFactory(newFactory);
+            ContentPanel mp = newFactory.createContentPanel(pcp);
             Pooka.getMainPanel().setContentPanel(mp);
+            Pooka.getMainPanel().setMainToolbar(newFactory.createMainToolbar());
+            Pooka.getMainPanel().getFolderPanel().setFolderPanelToolbar(newFactory.createFolderPanelToolbar());
           }
         }
       }, "Pooka.guiType");

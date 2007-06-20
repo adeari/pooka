@@ -36,10 +36,10 @@ public class DndUtils {
     // first see if we're on linux.
     if (flavors != null) {
       for (int i = 0; i < flavors.length; i++) {
-  if (flavors[i]!= null && flavors[i].isFlavorJavaFileListType())
-    return true;
-  else if (isLinux && flavors[i] != null && flavors[i].isFlavorTextType())
-    return true;
+        if (flavors[i]!= null && flavors[i].isFlavorJavaFileListType())
+          return true;
+        else if (isLinux && flavors[i] != null && flavors[i].isFlavorTextType())
+          return true;
       }
     }
 
@@ -57,20 +57,20 @@ public class DndUtils {
     } else if (isLinux) {
       match = matchDataFlavor(new DataFlavor[] { DataFlavor.stringFlavor }, availableFlavors);
       if (match != null) {
-  ArrayList returnValue = new ArrayList();
-  Reader urlReader = match.getReaderForText(t);
-  BufferedReader br = new BufferedReader(urlReader);
-  for (String line = br.readLine(); line != null && line.length() > 0; line = br.readLine()) {
-    try {
-      java.net.URI fileUri = new java.net.URI(line);
-      File currentFile = new File(fileUri);
-      returnValue.add(currentFile);
-    } catch (java.net.URISyntaxException e) {
-      e.printStackTrace();
-    }
-  }
+        ArrayList returnValue = new ArrayList();
+        Reader urlReader = match.getReaderForText(t);
+        BufferedReader br = new BufferedReader(urlReader);
+        for (String line = br.readLine(); line != null && line.length() > 0; line = br.readLine()) {
+          try {
+            java.net.URI fileUri = new java.net.URI(line);
+            File currentFile = new File(fileUri);
+            returnValue.add(currentFile);
+          } catch (java.net.URISyntaxException e) {
+            e.printStackTrace();
+          }
+        }
 
-  return returnValue;
+        return returnValue;
       }
     }
 
@@ -84,10 +84,10 @@ public class DndUtils {
   public static DataFlavor matchDataFlavor(DataFlavor[] acceptableFlavors, DataFlavor[] availableFlavors) {
     if (acceptableFlavors != null && availableFlavors != null) {
       for (int i = 0; i < availableFlavors.length; i++) {
-  for (int j = 0; j < acceptableFlavors.length; j++) {
-    if (availableFlavors[i] != null && availableFlavors[i].match(acceptableFlavors[j]))
-      return availableFlavors[i];
-  }
+        for (int j = 0; j < acceptableFlavors.length; j++) {
+          if (availableFlavors[i] != null && availableFlavors[i].match(acceptableFlavors[j]))
+            return availableFlavors[i];
+        }
       }
     }
 
@@ -104,7 +104,7 @@ public class DndUtils {
     if (tmpDirString != null && tmpDirString.length() > 0) {
       File firstType = new File(tmpDirString);
       if (firstType != null && firstType.exists() && firstType.isDirectory() && firstType.canWrite()) {
-  tmpDir = firstType;
+        tmpDir = firstType;
       }
     }
 
@@ -117,7 +117,7 @@ public class DndUtils {
     if (tmpDir != null) {
       File testMe = new File(tmpDir, fileName);
       if (! testMe.exists()) {
-  returnValue = testMe;
+        returnValue = testMe;
       }
     }
 
@@ -137,21 +137,21 @@ public class DndUtils {
   public static FolderInfo getFolderInfo(JComponent c) {
     try {
       if (c instanceof FolderDisplayPanel) {
-  return ((FolderDisplayPanel) c).getFolderInfo();
+        return ((FolderDisplayPanel) c).getFolderInfo();
       }
 
       Object o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderDisplayPanel"), c);
       if (o != null) {
-  return ((net.suberic.pooka.gui.FolderDisplayPanel) o).getFolderInfo();
+        return ((net.suberic.pooka.gui.FolderDisplayPanel) o).getFolderInfo();
       }
 
       // check for the folder tree.
       o = SwingUtilities.getAncestorOfClass(Class.forName("net.suberic.pooka.gui.FolderPanel"), c);
       if (o != null) {
-  Object selected = ((net.suberic.pooka.gui.FolderPanel) o).getSelectedNode();
-  if (selected instanceof FolderNode) {
-    return ((FolderNode) selected).getFolderInfo();
-  }
+        Object selected = ((net.suberic.pooka.gui.FolderPanel) o).getSelectedNode();
+        if (selected instanceof FolderNode) {
+          return ((FolderNode) selected).getFolderInfo();
+        }
       }
 
       return null;
@@ -175,28 +175,28 @@ public class DndUtils {
     return clipboard;
   }
 
-/**
- * Returns true if it is safe to access the system Clipboard.
- * If the environment is headless or the security manager
- * does not allow access to the system clipboard, a private
- * clipboard is used.
- */
+  /**
+   * Returns true if it is safe to access the system Clipboard.
+   * If the environment is headless or the security manager
+   * does not allow access to the system clipboard, a private
+   * clipboard is used.
+   */
   public static boolean canAccessSystemClipboard() {
     if (canAccessSystemClipboard) {
       if (GraphicsEnvironment.isHeadless()) {
-  canAccessSystemClipboard = false;
-  return false;
+        canAccessSystemClipboard = false;
+        return false;
       }
 
       SecurityManager sm = System.getSecurityManager();
       if (sm != null) {
-  try {
-    sm.checkSystemClipboardAccess();
-    return true;
-  } catch (SecurityException se) {
-    canAccessSystemClipboard = false;
-    return false;
-  }
+        try {
+          sm.checkSystemClipboardAccess();
+          return true;
+        } catch (SecurityException se) {
+          canAccessSystemClipboard = false;
+          return false;
+        }
       }
       return true;
     }

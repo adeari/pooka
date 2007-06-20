@@ -1,13 +1,15 @@
-*) add ssmtp support.
-*) make it so when you hit send, it makes the message window read-only.
+*) fix preview pane mode; make it look nice
+	-- fix column widths; add in saving widths
 
-  *) email javamail-interest list re tls optional/required vs 
+*) add ssmtp support.
+
+  *) email javamail-interest list re tls optional/required vs ssl
   *)  release
       *) write up changes
       *) switch around webstart site
       *) redo screenshots
 
-  *) email javamail-interest list re tls optional/required vs 
+  *) email javamail-interest list re tls optional/required vs ssl only
 
   *) fix threading for drag and drop -- just try doing a big copy into a 
 	folder with a paste operation.
@@ -228,8 +230,6 @@ online:
 
 *) fix mbox to make it useful (now you can't create new folders).  make it
 	so you can make maildir-based folder.
-
-*) fix preview pane mode; make it look nice
 
 *) undelete?
 

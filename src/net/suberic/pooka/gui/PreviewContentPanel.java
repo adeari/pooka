@@ -425,8 +425,9 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Refreshes the currently available actions.
    */
   public void refreshActiveMenus() {
-    if (current != null)
-      current.getToolbar().setActive(getActions());
+    // does nothing; should only be called by the MainPanel.
+    //if (current != null)
+      //current.getToolbar().setActive(getActions());
     //Pooka.getMainPanel().refreshActiveMenus();
   }
 

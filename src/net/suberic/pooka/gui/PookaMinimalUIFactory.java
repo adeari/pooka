@@ -1,5 +1,6 @@
 package net.suberic.pooka.gui;
 import net.suberic.util.gui.propedit.PropertyEditorFactory;
+import net.suberic.util.gui.ConfigurableToolbar;
 import net.suberic.util.gui.IconManager;
 import net.suberic.util.swing.*;
 import net.suberic.pooka.*;
@@ -153,6 +154,24 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
   public ContentPanel createContentPanel() {
     return null;
   }
+
+  /**
+   * Creates a Toolbar for the MainPanel.
+   * This implementation returns null.
+   */
+  public ConfigurableToolbar createMainToolbar() {
+    return null;
+  }
+
+
+  /**
+   * Creates a Toolbar for the FolderPanel.
+   * This implementation returns null.
+   */
+  public ConfigurableToolbar createFolderPanelToolbar() {
+    return null;
+  }
+
 
   /**
    * Shows an Editor Window with the given title, which allows the user
