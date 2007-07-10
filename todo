@@ -1,3 +1,21 @@
+  trayicon support:
+    *) fix close to icon
+    *) fix always display for a) minimized and b) switching to always display
+	doesn't show icon until new message comes in.
+    *) new custom click support:
+	*) change click display so that we show a clickable dialog
+		with the new messages, etc.
+	*) change timeout support:  we should now handle timeout with
+		mouseover
+	*) should be able to tell if balloon is showing or not.
+	*) autoupdate on balloon--if it's showing, either queue up 
+		another one or update the current one (?)
+	*) fix new message notification on folders if you read a message
+		from the Open Message menu from the TrayIcon.
+	*) focus problem.  fix.
+
+---------
+
 *) fix preview pane mode; make it look nice
 	-- fix column widths; add in saving widths
 
@@ -18,22 +36,6 @@
 	-- include the main editor -- you should be able to hit first letter
 		and have it scan to first match.
 	-- also on multieditorpanes, C-A should add, C-E should edit, etc.
-
-  trayicon support:
-    *) fix close to icon
-    *) fix always display for a) minimized and b) switching to always display
-	doesn't show icon until new message comes in.
-    *) new custom click support:
-	*) change click display so that we show a clickable dialog
-		with the new messages, etc.
-	*) change timeout support:  we should now handle timeout with
-		mouseover
-	*) should be able to tell if balloon is showing or not.
-	*) autoupdate on balloon--if it's showing, either queue up 
-		another one or update the current one (?)
-	*) fix new message notification on folders if you read a message
-		from the Open Message menu from the TrayIcon.
-	*) focus problem.  fix.
 
 1)  clean up editors.
     -- clean up preferences. (see definition below)

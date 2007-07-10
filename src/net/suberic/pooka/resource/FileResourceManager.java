@@ -20,13 +20,13 @@ public class FileResourceManager extends ResourceManager {
     try {
       java.io.File f = new java.io.File(fileName);
       if (! f.exists())
-	f.createNewFile();
-      return new net.suberic.util.VariableBundle(f, defaults);
+  f.createNewFile();
+      return new net.suberic.util.FileVariableBundle(f, defaults);
     } catch (java.io.IOException ioe) {
       //new net.suberic.util.VariableBundle(url.openStream(), "net.suberic.pooka.Pooka");
       return defaults;
     }
-    
+
   }
 
   /**
@@ -43,7 +43,7 @@ public class FileResourceManager extends ResourceManager {
     return new PookaTrustManager(pTrustManagers, fileName);
   }
 
-  public java.io.InputStream getInputStream(String pFileName) 
+  public java.io.InputStream getInputStream(String pFileName)
     throws java.io.IOException {
     try {
       URL url = new URL(pFileName);
@@ -52,15 +52,15 @@ public class FileResourceManager extends ResourceManager {
       return new FileInputStream(new File(pFileName));
     }
   }
-  
 
-  public java.io.OutputStream getOutputStream(String pFileName) 
+
+  public java.io.OutputStream getOutputStream(String pFileName)
     throws java.io.IOException {
     return new FileOutputStream(new File(pFileName));
   }
 
   /**
-   * Creates an appropriate FolderInfo for the given StoreInfo.  
+   * Creates an appropriate FolderInfo for the given StoreInfo.
    */
   public FolderInfo createFolderInfo(StoreInfo pStore, String pName) {
     String storeProperty = pStore.getStoreProperty();

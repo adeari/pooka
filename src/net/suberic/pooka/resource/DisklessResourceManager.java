@@ -43,10 +43,10 @@ public class DisklessResourceManager extends ResourceManager {
     VariableBundle sourceBundle = Pooka.getResources();
 
     pOutputFile.createNewFile();
-    VariableBundle newWritableProperties = new VariableBundle(pOutputFile, null);
-    
+    VariableBundle newWritableProperties = new FileVariableBundle(pOutputFile, null);
+
     // first go through and edit out the inappropriate stores.
-    
+
     List allStores = Pooka.getStoreManager().getStoreList();
     List toRemoveList = new ArrayList();
     List keepList = new ArrayList();
@@ -64,14 +64,14 @@ public class DisklessResourceManager extends ResourceManager {
         toRemoveList.add(current.getStoreID());
       }
     }
-    
+
     //Enumeration names = newWritableProperties.propertyNames();
     //Enumeration names = sourceBundle.getWritableProperties().propertyNames();
     Enumeration names = sourceBundle.getProperties().propertyNames();
 
     while (names.hasMoreElements()) {
       String current = (String) names.nextElement();
-      
+
       boolean keep = true;
       if (current.startsWith("Store")) {
         if ((! pIncludePasswords) && current.endsWith("password")) {
@@ -100,20 +100,20 @@ public class DisklessResourceManager extends ResourceManager {
     newWritableProperties.setProperty("Store", VariableBundle.convertToString(keepList));
 
     //FileOutputStream outStream = new FileOutputStream(pOutputFile);
-    
+
     //newWritableProperties.setSaveFile(pOutputFile);
     newWritableProperties.saveProperties();
-    
+
     //outStream.close();
-    
-    
+
+
   }
 
   /**
    * Gets a resource for reading.  pFileName could be a URL or a file name
-   * or some similar identifier that the 
+   * or some similar identifier that the
    */
-  public java.io.InputStream getInputStream(String pFileName) 
+  public java.io.InputStream getInputStream(String pFileName)
     throws java.io.IOException {
     try {
       URL url = new URL(pFileName);
@@ -123,14 +123,14 @@ public class DisklessResourceManager extends ResourceManager {
     }
   }
 
-  public java.io.OutputStream getOutputStream(String pFileName) 
+  public java.io.OutputStream getOutputStream(String pFileName)
     throws java.io.IOException {
     // no writing to streams in this one.
     throw new IOException("Diskless mode:  no file modification available.");
   }
-  
+
   /**
-   * Creates an appropriate FolderInfo for the given StoreInfo.  
+   * Creates an appropriate FolderInfo for the given StoreInfo.
    */
   public FolderInfo createFolderInfo(StoreInfo pStore, String pName) {
     String storeProperty = pStore.getStoreProperty();
@@ -142,5 +142,5 @@ public class DisklessResourceManager extends ResourceManager {
       return new FolderInfo(pStore, pName);
     }
   }
-  
+
 }

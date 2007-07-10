@@ -41,18 +41,18 @@ public class Pooka {
       ClassLoader cl = new Pooka().getClass().getClassLoader();
       java.net.URL url;
       if (cl == null) {
-  url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
+        url = ClassLoader.getSystemResource("net/suberic/pooka/Pookarc");
       } else {
-  url = cl.getResource("net/suberic/pooka/Pookarc");
+        url = cl.getResource("net/suberic/pooka/Pookarc");
       }
 
       if (url == null) {
-  //sigh
-  url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
+        //sigh
+        url = new Pooka().getClass().getResource("/net/suberic/pooka/Pookarc");
       }
 
       java.io.InputStream is = url.openStream();
-      VariableBundle resources = new net.suberic.util.VariableBundle(is, "net.suberic.pooka.Pooka");
+      VariableBundle resources = new net.suberic.util.FileVariableBundle(is, "net.suberic.pooka.Pooka");
       sManager.setResources(resources);
     } catch (Exception e) {
       System.err.println("caught exception loading system resources:  " + e);
@@ -76,17 +76,17 @@ public class Pooka {
       ResourceManager resourceManager = null;
 
       if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
-  resourceManager = new DisklessResourceManager();
+        resourceManager = new DisklessResourceManager();
       } else {
-  resourceManager = new FileResourceManager();
+        resourceManager = new FileResourceManager();
       }
 
       sManager.setResourceManager(resourceManager);
 
       // if localrc hasn't been set, use the user's home directory.
       if (sManager.getLocalrc() == null) {
-  String localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc");
-  sManager.setLocalrc(localrc);
+        String localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc");
+        sManager.setLocalrc(localrc);
       }
       sManager.setResources(sManager.getResourceManager().createVariableBundle(sManager.getLocalrc(), pookaDefaultBundle));
     } catch (Exception e) {
@@ -107,10 +107,10 @@ public class Pooka {
     final int fExitValue = exitValue;
     final Object fSource = pSource;
     Runnable runMe = new Runnable() {
-  public void run() {
-    sStartupManager.stopMainPookaWindow(fSource);
-    System.exit(fExitValue);
-  }
+        public void run() {
+          sStartupManager.stopMainPookaWindow(fSource);
+          System.exit(fExitValue);
+        }
       };
 
     if (Pooka.getMainPanel() != null)

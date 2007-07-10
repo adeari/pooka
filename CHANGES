@@ -1,3 +1,6 @@
+070709 release (2.0)
+--------------------
+
 moved to javamail 1.4, jdk 1.6.
 
 revamped Configuration UI; moved all main configuration properties to a single

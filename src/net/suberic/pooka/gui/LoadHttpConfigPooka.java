@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui;
 
 import net.suberic.pooka.Pooka;
+import net.suberic.util.FileVariableBundle;
 import net.suberic.util.VariableBundle;
 
 import javax.swing.*;
@@ -52,7 +53,7 @@ public class LoadHttpConfigPooka {
     try {
       URL configUrl = new URL(urlString);
       InputStream is = configUrl.openStream();
-      VariableBundle newBundle = new VariableBundle(is, Pooka.getResources());
+      VariableBundle newBundle = new FileVariableBundle(is, Pooka.getResources());
       Pooka.setResources(newBundle);
     } catch (MalformedURLException mue) {
       JOptionPane.showMessageDialog(mFrame, "Malformed URL.");

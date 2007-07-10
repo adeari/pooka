@@ -22,7 +22,7 @@ public class AddressEntryEditor extends CompositeEditorPane {
     entry = newEntry;
 
     Properties props = entry.getProperties();
-    VariableBundle wrappedBundle = new VariableBundle(props, newManager.getFactory().getSourceBundle());
+    VariableBundle wrappedBundle = new FileVariableBundle(props, newManager.getFactory().getSourceBundle());
     PropertyEditorManager wrappedManager = new PropertyEditorManager(wrappedBundle, newManager.getFactory(), newManager.getIconManager());
     configureEditor("currentAddress", "currentAddress", wrappedManager);
   }
