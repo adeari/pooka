@@ -6,6 +6,7 @@ import net.suberic.pooka.resource.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.help.*;
+import java.io.File;
 import java.util.logging.*;
 
 public class Pooka {
@@ -83,9 +84,16 @@ public class Pooka {
 
       sManager.setResourceManager(resourceManager);
 
-      // if localrc hasn't been set, use the user's home directory.
+      // the PookaRoot hasn't been set, use the user's home directory.
+
+      if (sManager.getPookaRoot() == null) {
+        sManager.setPookaRoot(new File(System.getProperty("user.home")));
+      }
+
+      // if localrc hasn't been set, use the .pookarc file in the PookaRoot
+      // directory.
       if (sManager.getLocalrc() == null) {
-        String localrc = new String (System.getProperty("user.home") + System.getProperty("file.separator") + ".pookarc");
+        String localrc = new String (sManager.getPookaRoot().getAbsolutePath() + System.getProperty("file.separator") + ".pookarc");
         sManager.setLocalrc(localrc);
       }
       sManager.setResources(sManager.getResourceManager().createVariableBundle(sManager.getLocalrc(), pookaDefaultBundle));

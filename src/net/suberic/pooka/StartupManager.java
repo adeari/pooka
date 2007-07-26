@@ -10,6 +10,7 @@ import net.suberic.util.gui.propedit.PropertyEditorManager;
 import java.awt.*;
 import javax.swing.*;
 import javax.help.*;
+import java.io.File;
 import java.util.logging.*;
 
 /**
@@ -669,6 +670,35 @@ public class StartupManager {
         } else if (argv[i].equals("--help")) {
           printUsage();
           System.exit(0);
+        } else if (argv[i].equals("-r") || argv[i].equals("--root")) {
+          String filename = argv[++i];
+          if (filename == null) {
+            System.err.println("error:  no startup file specified.");
+            printUsage();
+            System.exit(-1);
+          }
+
+          try {
+            String error = null;
+            File f = new File(filename);
+            if (! f.exists()) {
+              error = "error:  root directory " + filename + " does not exist.";
+            } else if (! f.canRead()) {
+              error = "error:  root directory " + filename + " cannot be read.";
+            } else if (! f.isDirectory()) {
+              error = "error:  root directory " + filename + " cannot be read.";
+            }
+            if (error != null) {
+              System.err.println(error);
+              printUsage();
+              System.exit(-1);
+            }
+            mPookaManager.setPookaRoot(f);
+          } catch (Exception e) {
+            System.err.println("error:  no startup file specified.");
+            printUsage();
+            System.exit(-1);
+          }
         } else {
           // if invalid arguments are specified
           printUsage();

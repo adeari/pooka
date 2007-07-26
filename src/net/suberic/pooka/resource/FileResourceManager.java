@@ -7,11 +7,18 @@ import javax.activation.*;
 
 import java.net.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A ResourceManager which uses files.
  */
 public class FileResourceManager extends ResourceManager {
+
+  //static Pattern sVariablePattern = Pattern.compile("\\$\\{[^\\\\$]}");
+  static Pattern sRootDirPattern = Pattern.compile("\\$\\{pooka\\.root\\}");
 
   /**
    * Creates a VariableBundle to be used.
@@ -20,7 +27,7 @@ public class FileResourceManager extends ResourceManager {
     try {
       java.io.File f = new java.io.File(fileName);
       if (! f.exists())
-  f.createNewFile();
+        f.createNewFile();
       return new net.suberic.util.FileVariableBundle(f, defaults);
     } catch (java.io.IOException ioe) {
       //new net.suberic.util.VariableBundle(url.openStream(), "net.suberic.pooka.Pooka");
@@ -45,6 +52,7 @@ public class FileResourceManager extends ResourceManager {
 
   public java.io.InputStream getInputStream(String pFileName)
     throws java.io.IOException {
+    String translatedFile = translateName(pFileName);
     try {
       URL url = new URL(pFileName);
       return url.openStream();
@@ -75,6 +83,14 @@ public class FileResourceManager extends ResourceManager {
     } else {
       return new FolderInfo(pStore, pName);
     }
+  }
+
+  /**
+   * Translates the given file path.
+   */
+  public static String translateName(String pFileName) {
+    Matcher matcher = sRootDirPattern.matcher(pFileName);
+    return matcher.replaceAll(Matcher.quoteReplacement(Pooka.getPookaManager().getPookaRoot().getAbsolutePath()));
   }
 
 }

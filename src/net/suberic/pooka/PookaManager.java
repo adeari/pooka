@@ -6,6 +6,7 @@ import net.suberic.pooka.messaging.PookaMessageListener;
 
 import java.awt.*;
 import javax.swing.*;
+import java.io.File;
 import java.util.Vector;
 import javax.help.*;
 import java.util.logging.*;
@@ -32,13 +33,20 @@ public class PookaManager {
   /**  Sets the logManager for this instance of Pooka.*/
   public void setLogManager(PookaLogManager pLogManager) { mLogManager = pLogManager; }
 
-  
+
   // the startup/configuration file
   String mLocalrc = null;
   /** Gets the localrc for this instance of Pooka.*/
   public String getLocalrc() { return mLocalrc; }
   /**  Sets the localrc for this instance of Pooka.*/
   public void setLocalrc(String pLocalrc) { mLocalrc = pLocalrc; }
+
+  // the root directory
+  File mPookaRoot = null;
+  /** Gets the localrc for this instance of Pooka.*/
+  public File getPookaRoot() { return mPookaRoot; }
+  /**  Sets the localrc for this instance of Pooka.*/
+  public void setPookaRoot(File pPookaRoot) { mPookaRoot = pPookaRoot; }
 
   // mail globals
   /** The default mail Session for Pooka. */
@@ -118,7 +126,7 @@ public class PookaManager {
 
   // Pooka managers and factories
   /**
-   * The Address Book Manager keeps track of all of the configured Address 
+   * The Address Book Manager keeps track of all of the configured Address
    * Books.
    */
   AddressBookManager mAddressBookManager = null;
@@ -170,24 +178,24 @@ public class PookaManager {
   public void setUIFactory(PookaUIFactory pUIFactory) { mUiFactory = pUIFactory; }
 
   /**
-   * The Search Manager.  This manages the Search Terms that Pooka knows 
+   * The Search Manager.  This manages the Search Terms that Pooka knows
    * about, and also can be used to construct Search queries from sets
    * of properties.
    */
   SearchTermManager mSearchManager;
   /**
-   * The Search Manager.  This manages the Search Terms that Pooka knows 
+   * The Search Manager.  This manages the Search Terms that Pooka knows
    * about, and also can be used to construct Search queries from sets
    * of properties.
    */
   public SearchTermManager getSearchManager() { return mSearchManager; }
   /**
-   * The Search Manager.  This manages the Search Terms that Pooka knows 
+   * The Search Manager.  This manages the Search Terms that Pooka knows
    * about, and also can be used to construct Search queries from sets
    * of properties.
    */
   public void setSearchManager(SearchTermManager pSearchTermManager) { mSearchManager = pSearchTermManager; }
-  
+
   /** The ConnectionManager tracks the configured Network Connections. */
   NetworkConnectionManager mConnectionManager;
   /** The ConnectionManager tracks the configured Network Connections. */

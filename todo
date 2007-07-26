@@ -1,3 +1,5 @@
+*) make keybinding page printable (make it part of help, maybe?)
+
   trayicon support:
     *) fix close to icon
     *) fix always display for a) minimized and b) switching to always display
