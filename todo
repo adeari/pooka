@@ -1,3 +1,12 @@
+*) fix first run wizard
+
+*) add to address book needs some notification that it worked.
+*) need easier way to access address book.
+*) address book sorting should be case-insensitive
+**) make wheel scroll customizable
+*) trayicon stuff
+*) ldap (again?)
+
 *) make keybinding page printable (make it part of help, maybe?)
 
   trayicon support:
@@ -179,8 +188,6 @@
 
 *) (??) add in option to open html-only messages as parsed html instead
 	of 'real' html (??)
-
-**) make wheel scroll customizable
 
 *) fix:  java.lang.IllegalStateException: Can't overwrite cause
         at java.lang.Throwable.initCause(Throwable.java:320)
