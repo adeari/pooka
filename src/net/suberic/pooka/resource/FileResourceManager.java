@@ -54,17 +54,18 @@ public class FileResourceManager extends ResourceManager {
     throws java.io.IOException {
     String translatedFile = translateName(pFileName);
     try {
-      URL url = new URL(pFileName);
+      URL url = new URL(translatedFile);
       return url.openStream();
     } catch (MalformedURLException mue) {
-      return new FileInputStream(new File(pFileName));
+      return new FileInputStream(new File(translatedFile));
     }
   }
 
 
   public java.io.OutputStream getOutputStream(String pFileName)
     throws java.io.IOException {
-    return new FileOutputStream(new File(pFileName));
+    String translatedFile = translateName(pFileName);
+    return new FileOutputStream(new File(translatedFile));
   }
 
   /**
@@ -88,9 +89,40 @@ public class FileResourceManager extends ResourceManager {
   /**
    * Translates the given file path.
    */
-  public static String translateName(String pFileName) {
+  public String translateName(String pFileName) {
     Matcher matcher = sRootDirPattern.matcher(pFileName);
-    return matcher.replaceAll(Matcher.quoteReplacement(Pooka.getPookaManager().getPookaRoot().getAbsolutePath()));
+    String returnValue = matcher.replaceAll(Matcher.quoteReplacement(Pooka.getPookaManager().getPookaRoot().getAbsolutePath()));
+    System.err.println("testing " + pFileName + "; returning " + returnValue);
+    return returnValue;
+  }
+
+  /**
+   * Encodes the file path to use the pooka.root setting if the file
+   * path is below the pooka.root.
+   */
+  public String encodeFileName(String pFileName) {
+    File f = new File(pFileName);
+    String filePath = null;
+    String rootPath = null;
+    try {
+      filePath = f.getCanonicalPath();
+      rootPath = Pooka.getPookaManager().getPookaRoot().getCanonicalPath();
+    } catch (IOException ioe) {
+      // just use the absolute paths.
+      filePath = f.getAbsolutePath();
+      rootPath = Pooka.getPookaManager().getPookaRoot().getAbsolutePath();
+    }
+
+    System.err.println("filePath=" + filePath);
+    System.err.println("rootPath=" + rootPath);
+
+    if (filePath.startsWith(rootPath)) {
+      System.err.println("returning " + "${pooka.root}" + filePath.substring(rootPath.length()));
+      return "${pooka.root}" + filePath.substring(rootPath.length());
+    } else {
+      System.err.println("no match.");
+      return pFileName;
+    }
   }
 
 }

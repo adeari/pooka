@@ -500,9 +500,9 @@ public class StartupManager {
 
     String mailcapSource = null;
     if (System.getProperty("file.separator").equals("\\")) {
-      mailcapSource = System.getProperty("user.home") + "\\pooka_mailcap.txt";
+      mailcapSource = mPookaManager.getPookaRoot().getAbsolutePath() + "\\pooka_mailcap.txt";
     } else {
-      mailcapSource = System.getProperty("user.home") + System.getProperty("file.separator") + ".pooka_mailcap";
+      mailcapSource = mPookaManager.getPookaRoot().getAbsolutePath() + System.getProperty("file.separator") + ".pooka_mailcap";
     }
     try {
       mPookaManager.setMailcap(Pooka.getResourceManager().createMailcap(mailcapSource));
@@ -672,8 +672,9 @@ public class StartupManager {
           System.exit(0);
         } else if (argv[i].equals("-r") || argv[i].equals("--root")) {
           String filename = argv[++i];
+          System.err.println("root directory = " + filename);
           if (filename == null) {
-            System.err.println("error:  no startup file specified.");
+            System.err.println("error:  no root directory specified.");
             printUsage();
             System.exit(-1);
           }

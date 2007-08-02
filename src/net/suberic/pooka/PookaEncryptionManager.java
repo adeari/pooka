@@ -20,7 +20,7 @@ import net.suberic.util.VariableBundle;
 import net.suberic.util.ValueChangeListener;
 
 /**
- * The EncryptionManager manages Pooka's encryption facilities.  It's 
+ * The EncryptionManager manages Pooka's encryption facilities.  It's
  * basically one-stop shopping for all of your email encryption needs.
  */
 public class PookaEncryptionManager implements ValueChangeListener {
@@ -67,10 +67,10 @@ public class PookaEncryptionManager implements ValueChangeListener {
     final VariableBundle fBundle = sourceBundle;
     final String fKey = key;
     Thread storeLoadingThread = new Thread(new Runnable() {
-	public void run() {
-	  // load the given pgp and smime stores.
-	  loadStores(fBundle, fKey);
-	}
+        public void run() {
+          // load the given pgp and smime stores.
+          loadStores(fBundle, fKey);
+        }
       });
 
     storeLoadingThread.start();
@@ -90,28 +90,28 @@ public class PookaEncryptionManager implements ValueChangeListener {
     // if either store is configured, try loading.
     if (! (pgpPrivateFilename.equals("") && pgpPublicFilename.equals(""))) {
       try {
-	EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
-	if (pgpUtils != null) {
-	  pgpKeyMgr = pgpUtils.createKeyManager();
-	  try {
-	    pgpKeyMgr.loadPrivateKeystore(new FileInputStream(new File(pgpPrivateFilename)), pgpPrivatePwString.toCharArray());
-	  } catch (java.io.IOException fnfe) {
-	    System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + fnfe.getMessage());
-	  } catch (java.security.GeneralSecurityException gse) {
-	    System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + gse.getMessage());
-	  }
-	  try {
-	    pgpKeyMgr.loadPublicKeystore(new FileInputStream(new File(pgpPublicFilename)), null);
-	  } catch (java.io.IOException fnfe) {
-	    System.out.println("Error loading PGP public keystore from file " + pgpPublicFilename + ":  " + fnfe.getMessage());
-	  } catch (java.security.GeneralSecurityException gse) {
-	    System.out.println("Error loading PGP private keystore from file " + pgpPublicFilename + ":  " + gse.getMessage());
-	  }      
-	}
+        EncryptionUtils pgpUtils = EncryptionManager.getEncryptionUtils("PGP");
+        if (pgpUtils != null) {
+          pgpKeyMgr = pgpUtils.createKeyManager();
+          try {
+            pgpKeyMgr.loadPrivateKeystore(Pooka.getResourceManager().getInputStream(pgpPrivateFilename), pgpPrivatePwString.toCharArray());
+          } catch (java.io.IOException fnfe) {
+            System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + fnfe.getMessage());
+          } catch (java.security.GeneralSecurityException gse) {
+            System.out.println("Error loading PGP private keystore from file " + pgpPrivateFilename + ":  " + gse.getMessage());
+          }
+          try {
+            pgpKeyMgr.loadPublicKeystore(Pooka.getResourceManager().getInputStream(pgpPublicFilename), null);
+          } catch (java.io.IOException fnfe) {
+            System.out.println("Error loading PGP public keystore from file " + pgpPublicFilename + ":  " + fnfe.getMessage());
+          } catch (java.security.GeneralSecurityException gse) {
+            System.out.println("Error loading PGP private keystore from file " + pgpPublicFilename + ":  " + gse.getMessage());
+          }
+        }
       } catch (java.security.NoSuchProviderException nspe) {
-	System.out.println("Error loading PGP key store:  " + nspe.getMessage());
+        System.out.println("Error loading PGP key store:  " + nspe.getMessage());
       } catch (Exception e) {
-	System.out.println("Error loading PGP key store:  " + e.getMessage());
+        System.out.println("Error loading PGP key store:  " + e.getMessage());
       }
     }
 
@@ -125,34 +125,34 @@ public class PookaEncryptionManager implements ValueChangeListener {
     // if either store is configured, try loading.
     if (! (smimePrivateFilename.equals("") && smimePublicFilename.equals(""))) {
       try {
-	EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
-	if (smimeUtils != null) {
-	  smimeKeyMgr = smimeUtils.createKeyManager();
-	  try {
-	    smimeKeyMgr.loadPrivateKeystore(new FileInputStream(new File(smimePrivateFilename)), smimePrivatePwString.toCharArray());
-	  } catch (java.security.GeneralSecurityException gse) {
-	    System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
-	  } catch (java.io.IOException fnfe) {
-	    System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + fnfe.getMessage());
-	  }
-	  
-	  try {
-	    smimeKeyMgr.loadPublicKeystore(new FileInputStream(new File(smimePublicFilename)), smimePrivatePwString.toCharArray());
-	  } catch (java.io.IOException fnfe) {
-	    System.out.println("Error loading S/MIME public keystore from file " + smimePublicFilename + ":  " + fnfe.getMessage());
-	  } catch (java.security.GeneralSecurityException gse) {
-	    System.out.println("Error loading S/MIME private keystore from file " + smimePublicFilename + ":  " + gse.getMessage());
-	  }      
-	}
+        EncryptionUtils smimeUtils = EncryptionManager.getEncryptionUtils("S/MIME");
+        if (smimeUtils != null) {
+          smimeKeyMgr = smimeUtils.createKeyManager();
+          try {
+            smimeKeyMgr.loadPrivateKeystore(Pooka.getResourceManager().getInputStream(smimePrivateFilename), smimePrivatePwString.toCharArray());
+          } catch (java.security.GeneralSecurityException gse) {
+            System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + gse.getMessage());
+          } catch (java.io.IOException fnfe) {
+            System.out.println("Error loading S/MIME private keystore from file " + smimePrivateFilename + ":  " + fnfe.getMessage());
+          }
+
+          try {
+            smimeKeyMgr.loadPublicKeystore(Pooka.getResourceManager().getInputStream(smimePublicFilename), smimePrivatePwString.toCharArray());
+          } catch (java.io.IOException fnfe) {
+            System.out.println("Error loading S/MIME public keystore from file " + smimePublicFilename + ":  " + fnfe.getMessage());
+          } catch (java.security.GeneralSecurityException gse) {
+            System.out.println("Error loading S/MIME private keystore from file " + smimePublicFilename + ":  " + gse.getMessage());
+          }
+        }
       } catch (java.security.NoSuchProviderException nspe) {
-	System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
+        System.out.println("Error loading S/MIME key store:  " + nspe.getMessage());
       } catch (Exception e) {
-	System.out.println("Error loading S/MIME key store:  " + e.getMessage());
+        System.out.println("Error loading S/MIME key store:  " + e.getMessage());
       }
     }
 
     savePasswordsForSession = Pooka.getProperty(key + ".savePasswordsForSession", "false").equalsIgnoreCase("true");
-    
+
     cachedPrivateKeys = new HashMap();
 
     cachedPublicKeys = new HashMap();
@@ -163,7 +163,7 @@ public class PookaEncryptionManager implements ValueChangeListener {
 
   /**
    * As defined in net.suberic.util.ValueChangeListener.
-   * 
+   *
    */
   public void valueChanged(String changedValue) {
     if (changedValue.equals(key + ".savePasswordsForSession")) {
@@ -173,24 +173,24 @@ public class PookaEncryptionManager implements ValueChangeListener {
       needsReload = true;
       javax.swing.SwingUtilities.invokeLater(new Runnable() {
 
-	  public void run() {
-	    if (needsReload) {
-	      needsReload = false;
-	      
-	      Thread updateThread = new Thread(new Runnable() {
-		  public void run() {
-		    loadStores(sourceBundle, key);
-		  }
-		});
-	      
-	      updateThread.start();
-	    }
-	  }
-	});
+          public void run() {
+            if (needsReload) {
+              needsReload = false;
+
+              Thread updateThread = new Thread(new Runnable() {
+                  public void run() {
+                    loadStores(sourceBundle, key);
+                  }
+                });
+
+              updateThread.start();
+            }
+          }
+        });
     }
   }
-  
-  
+
+
   /**
    * Adds the private key to the store.
    */
@@ -206,9 +206,9 @@ public class PookaEncryptionManager implements ValueChangeListener {
   /**
    * Adds the public key to the store.
    */
-  public void addPublicKey(String alias, Key publicKey, String type) 
-  throws GeneralSecurityException {
-    
+  public void addPublicKey(String alias, Key publicKey, String type)
+    throws GeneralSecurityException {
+
     EncryptionKeyManager currentMgr = getKeyMgr(type);
     if (currentMgr != null) {
       currentMgr.setPublicKeyEntry(alias, publicKey);
@@ -225,7 +225,7 @@ public class PookaEncryptionManager implements ValueChangeListener {
   }
 
   /**
-   * Returns the private key(s) for the given email address and 
+   * Returns the private key(s) for the given email address and
    * the given encryption type, or all matching keys if type == null.
    */
   public Key[] getPrivateKeys(String address, String type) {
@@ -238,7 +238,7 @@ public class PookaEncryptionManager implements ValueChangeListener {
   public Key[] getCachedPrivateKeys() {
     return (Key[]) cachedPrivateKeys.values().toArray(new Key[0]);
   }
-  
+
   /**
    * Returns all available private key aliases.
    */
@@ -253,27 +253,27 @@ public class PookaEncryptionManager implements ValueChangeListener {
   public Set privateKeyAliases(String encryptionType) throws java.security.KeyStoreException {
     if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.PGP)) {
       if (pgpKeyMgr != null)
-	return new HashSet(pgpKeyMgr.privateKeyAliases());
+        return new HashSet(pgpKeyMgr.privateKeyAliases());
     } else if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.SMIME)) {
       if (smimeKeyMgr != null) {
-	return new HashSet(smimeKeyMgr.privateKeyAliases());
+        return new HashSet(smimeKeyMgr.privateKeyAliases());
       }
     } else {
       // return both.
       Set returnValue = new java.util.HashSet();
       if (pgpKeyMgr != null) {
-	try {
-	  returnValue.addAll(pgpKeyMgr.privateKeyAliases());
-	} catch (KeyStoreException kse) {
-	  // FIXME ignore for now?
-	}
+        try {
+          returnValue.addAll(pgpKeyMgr.privateKeyAliases());
+        } catch (KeyStoreException kse) {
+          // FIXME ignore for now?
+        }
       }
       if (smimeKeyMgr != null) {
-	try {
-	  returnValue.addAll(smimeKeyMgr.privateKeyAliases());
-	} catch (KeyStoreException kse) {
-	  // FIXME ignore for now?
-	}
+        try {
+          returnValue.addAll(smimeKeyMgr.privateKeyAliases());
+        } catch (KeyStoreException kse) {
+          // FIXME ignore for now?
+        }
       }
 
       return returnValue;
@@ -297,33 +297,33 @@ public class PookaEncryptionManager implements ValueChangeListener {
 
       // check to see if this exists anywhere.
       if (pgpKeyMgr != null) {
-	try {
-	  if (pgpKeyMgr.containsPrivateKeyAlias(alias)) {
-	    Key returnValue = pgpKeyMgr.getPrivateKey(alias, null);
-	    cachedPrivateKeys.put(alias, returnValue);
-	    return returnValue;
-	  }
-	} catch (KeyStoreException kse) {
-	  caughtException = kse;
-	}
-	
+        try {
+          if (pgpKeyMgr.containsPrivateKeyAlias(alias)) {
+            Key returnValue = pgpKeyMgr.getPrivateKey(alias, null);
+            cachedPrivateKeys.put(alias, returnValue);
+            return returnValue;
+          }
+        } catch (KeyStoreException kse) {
+          caughtException = kse;
+        }
+
       }
-      
+
       if (smimeKeyMgr!= null) {
-	try {
-	  if (smimeKeyMgr.containsPrivateKeyAlias(alias)) {
-	    Key returnValue = smimeKeyMgr.getPrivateKey(alias, null);
-	    cachedPrivateKeys.put(alias, returnValue);
-	    return returnValue;
-	  }
-	} catch (KeyStoreException kse) {
-	  if (caughtException == null)
-	    caughtException = kse;
-	}
-	
+        try {
+          if (smimeKeyMgr.containsPrivateKeyAlias(alias)) {
+            Key returnValue = smimeKeyMgr.getPrivateKey(alias, null);
+            cachedPrivateKeys.put(alias, returnValue);
+            return returnValue;
+          }
+        } catch (KeyStoreException kse) {
+          if (caughtException == null)
+            caughtException = kse;
+        }
+
       }
     }
-    
+
     if (caughtException != null)
       throw caughtException;
 
@@ -345,18 +345,18 @@ public class PookaEncryptionManager implements ValueChangeListener {
     Key returnValue = null;
     if (pgpKeyMgr != null) {
       try {
-	returnValue = pgpKeyMgr.getPrivateKey(alias, password);
+        returnValue = pgpKeyMgr.getPrivateKey(alias, password);
       } catch (KeyStoreException kse) {
-	  caughtException = kse;
+        caughtException = kse;
       }
     }
 
     if (returnValue == null && smimeKeyMgr != null) {
       try {
-	returnValue = smimeKeyMgr.getPrivateKey(alias, password);
+        returnValue = smimeKeyMgr.getPrivateKey(alias, password);
       } catch (KeyStoreException kse) {
-	if (caughtException == null)
-	  caughtException = kse;
+        if (caughtException == null)
+          caughtException = kse;
       }
     }
 
@@ -377,17 +377,17 @@ public class PookaEncryptionManager implements ValueChangeListener {
     Key returnValue = null;
     if (pgpKeyMgr != null) {
       try {
-	returnValue = pgpKeyMgr.getPublicKey(alias);
+        returnValue = pgpKeyMgr.getPublicKey(alias);
       } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+        // FIXME ignore for now?
       }
     }
 
     if (returnValue == null && smimeKeyMgr != null) {
       try {
-	returnValue = smimeKeyMgr.getPublicKey(alias);
+        returnValue = smimeKeyMgr.getPublicKey(alias);
       } catch (KeyStoreException kse) {
-	// FIXME ignore for now?
+        // FIXME ignore for now?
       }
     }
 
@@ -419,13 +419,13 @@ public class PookaEncryptionManager implements ValueChangeListener {
       ArrayList sortedList = new ArrayList();
       java.util.Iterator iter = list.iterator();
       while (iter.hasNext()) {
-	EncryptionKey current = (EncryptionKey) iter.next();
-	try {
-	  if (current.getEncryptionUtils().getType() == type) {
-	    sortedList.add(current);
-	  }
-	} catch (Exception e) {
-	}
+        EncryptionKey current = (EncryptionKey) iter.next();
+        try {
+          if (current.getEncryptionUtils().getType() == type) {
+            sortedList.add(current);
+          }
+        } catch (Exception e) {
+        }
       }
 
       return (Key[]) sortedList.toArray(new Key[0]);
@@ -441,23 +441,23 @@ public class PookaEncryptionManager implements ValueChangeListener {
       Set aliases = publicKeyAliases();
       java.util.Iterator iter = aliases.iterator();
       while (iter.hasNext()) {
-	Key current = getPublicKey((String) iter.next());
+        Key current = getPublicKey((String) iter.next());
 
-	if (current instanceof EncryptionKey) {
-	  String[] assocAddresses = ((EncryptionKey) current).getAssociatedAddresses();
-	  for (int i = 0; assocAddresses != null && i < assocAddresses.length; i++) {
-	    String address = assocAddresses[i];
-	    ArrayList matches = (ArrayList) addressToPublicKeyMap.get(address);
-	    if (matches != null) {
-	      if (! matches.contains(current))
-	      matches.add(current);
-	    } else {
-	      matches = new ArrayList();
-	      matches.add(current);
-	      addressToPublicKeyMap.put(address, matches);
-	    }
-	  }
-	}
+        if (current instanceof EncryptionKey) {
+          String[] assocAddresses = ((EncryptionKey) current).getAssociatedAddresses();
+          for (int i = 0; assocAddresses != null && i < assocAddresses.length; i++) {
+            String address = assocAddresses[i];
+            ArrayList matches = (ArrayList) addressToPublicKeyMap.get(address);
+            if (matches != null) {
+              if (! matches.contains(current))
+                matches.add(current);
+            } else {
+              matches = new ArrayList();
+              matches.add(current);
+              addressToPublicKeyMap.put(address, matches);
+            }
+          }
+        }
       }
     }
   }
@@ -477,29 +477,29 @@ public class PookaEncryptionManager implements ValueChangeListener {
 
     if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.PGP)) {
       if (pgpKeyMgr != null)
-	return new HashSet(pgpKeyMgr.publicKeyAliases());
+        return new HashSet(pgpKeyMgr.publicKeyAliases());
     } else if (encryptionType != null && encryptionType.equalsIgnoreCase(EncryptionManager.SMIME)) {
       if (smimeKeyMgr != null) {
-	return new HashSet(smimeKeyMgr.publicKeyAliases());
+        return new HashSet(smimeKeyMgr.publicKeyAliases());
       }
     } else {
       // return both.
       Set returnValue = new java.util.HashSet();
       if (pgpKeyMgr != null) {
-	try {
-	  returnValue.addAll(pgpKeyMgr.publicKeyAliases());
-	} catch (KeyStoreException kse) {
-	  // FIXME ignore for now?
-	}
+        try {
+          returnValue.addAll(pgpKeyMgr.publicKeyAliases());
+        } catch (KeyStoreException kse) {
+          // FIXME ignore for now?
+        }
       }
       if (smimeKeyMgr != null) {
-	try {
-	  returnValue.addAll(smimeKeyMgr.publicKeyAliases());
-	} catch (KeyStoreException kse) {
-	  // FIXME ignore for now?
-	}
+        try {
+          returnValue.addAll(smimeKeyMgr.publicKeyAliases());
+        } catch (KeyStoreException kse) {
+          // FIXME ignore for now?
+        }
       }
-      
+
       return returnValue;
     }
 
@@ -512,22 +512,22 @@ public class PookaEncryptionManager implements ValueChangeListener {
    * configured to see if we have a key for each one.
    */
   public MimeMessage encryptMessage(MimeMessage mMsg) throws MessagingException, java.security.GeneralSecurityException, java.io.IOException {
-    
+
     // if we don't have a key, see if we can get a default.
     Key key = null;
     Address[] recipients = mMsg.getRecipients(Message.RecipientType.TO);
     for (int i = 0; key == null && i < recipients.length; i++) {
       if (recipients[i] instanceof InternetAddress) {
-	String inetAddr = ((InternetAddress) recipients[i]).getAddress();
-	Key[] matchingKeys = getPublicKeys(inetAddr);
-	if (matchingKeys != null) {
-	  for (int j = 0; key != null && j < matchingKeys.length; j++) {
-	    key = matchingKeys[j];
-	  }
-	}
+        String inetAddr = ((InternetAddress) recipients[i]).getAddress();
+        Key[] matchingKeys = getPublicKeys(inetAddr);
+        if (matchingKeys != null) {
+          for (int j = 0; key != null && j < matchingKeys.length; j++) {
+            key = matchingKeys[j];
+          }
+        }
       }
     }
-    
+
     return encryptMessage(mMsg, key);
   }
 
@@ -538,11 +538,11 @@ public class PookaEncryptionManager implements ValueChangeListener {
     throws MessagingException, java.security.GeneralSecurityException, java.io.IOException {
     if (key != null) {
       if (key instanceof EncryptionKey) {
-	return ((EncryptionKey) key).getEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+        return ((EncryptionKey) key).getEncryptionUtils().encryptMessage(Pooka.getDefaultSession(), mMsg, key);
       } else {
-	return EncryptionManager.getEncryptionUtils("PGP").encryptMessage(Pooka.getDefaultSession(), mMsg, key);
+        return EncryptionManager.getEncryptionUtils("PGP").encryptMessage(Pooka.getDefaultSession(), mMsg, key);
       }
-      
+
     }
     return mMsg;
   }
@@ -550,21 +550,21 @@ public class PookaEncryptionManager implements ValueChangeListener {
   /**
    * Signs the given message.
    */
-  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, Key key) 
+  public MimeMessage signMessage(MimeMessage mMsg, UserProfile profile, Key key)
     throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
     if (key == null && profile != null) {
       key = profile.getEncryptionKey();
     }
-    
+
     if (key == null) {
       // get user input
     }
-    
+
     if (key != null) {
       if (key instanceof net.suberic.crypto.EncryptionKey) {
-	return ((EncryptionKey) key).getEncryptionUtils().signMessage(Pooka.getDefaultSession(), mMsg, key);
+        return ((EncryptionKey) key).getEncryptionUtils().signMessage(Pooka.getDefaultSession(), mMsg, key);
       } else {
-	return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
+        return EncryptionManager.getEncryptionUtils("PGP").signMessage(Pooka.getDefaultSession(), mMsg, key);
       }
     } else {
       return mMsg;
@@ -575,7 +575,7 @@ public class PookaEncryptionManager implements ValueChangeListener {
    * Returns the EncryptionKeyManager for this type.
    */
   EncryptionKeyManager getKeyMgr(String type) {
-    if (type == EncryptionManager.PGP) 
+    if (type == EncryptionManager.PGP)
       return pgpKeyMgr;
     else if (type == EncryptionManager.SMIME)
       return smimeKeyMgr;

@@ -54,9 +54,11 @@ public class PopInboxFolderInfo extends FolderInfo {
     mailHome = Pooka.getProperty("Store." + storeID + ".mailDir", "");
     if (mailHome.equals("")) {
       mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
-      if (mailHome.equals(""))
-        mailHome = System.getProperty("user.home") + File.separator + ".pooka";
-
+      if (mailHome.equals("")) {
+        mailHome = Pooka.getPookaManager().getPookaRoot().getAbsoluteFile() + File.separator + ".pooka";
+      } else {
+        mailHome = Pooka.getResourceManager().translateName(mailHome);
+      }
       mailHome = mailHome + File.separator + storeID;
     }
     String inboxFileName = mailHome + File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");

@@ -10,11 +10,11 @@ import java.awt.event.ActionEvent;
 
 public class FileSelectorPane extends LabelValuePropertyEditor {
 
-  JLabel label;
-  JTextField valueDisplay;
+  protected JLabel label;
+  protected JTextField valueDisplay;
   JButton inputButton;
 
-  int fileSelection;
+  protected int fileSelection;
 
   /**
    * @param propertyName The property to be edited.

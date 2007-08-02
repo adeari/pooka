@@ -330,12 +330,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (mailHome.equals("")) {
       mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
       if (mailHome.equals(""))
-        mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+        mailHome = Pooka.getPookaManager().getPookaRoot().getAbsolutePath() + java.io.File.separator + ".pooka";
 
       mailHome = mailHome + java.io.File.separator + storeID;
     }
 
-    String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
+    String userHomeName = Pooka.getPookaManager().getResourceManager().translateName(mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders"));
 
     //p.setProperty("mail.store.maildir.imapEmulation", "true");
     p.setProperty("mail.store.maildir.baseDir", userHomeName);
@@ -359,10 +359,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (mailHome.equals("")) {
       mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
       if (mailHome.equals(""))
-        mailHome = System.getProperty("user.home") + java.io.File.separator + ".pooka";
+        mailHome = Pooka.getPookaManager().getPookaRoot().getAbsolutePath() + java.io.File.separator + ".pooka";
 
       mailHome = mailHome + java.io.File.separator + storeID;
     }
+
+    mailHome = Pooka.getPookaManager().getResourceManager().translateName(mailHome);
 
     String inboxFileName;
     if (Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("pop3")) {

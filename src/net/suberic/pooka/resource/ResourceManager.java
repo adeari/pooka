@@ -29,20 +29,34 @@ public abstract class ResourceManager {
    * Gets a resource for reading.  pFileName could be a URL or a file name
    * or some similar identifier that the ResourceManager can use.
    */
-  public abstract java.io.InputStream getInputStream(String pFileName) 
+  public abstract java.io.InputStream getInputStream(String pFileName)
     throws java.io.IOException;
 
   /**
    * Gets a resource for writing.  pFileName could be a URL or a file name
    * or some similar identifier that the ResourceManager can use.
    */
-  public abstract java.io.OutputStream getOutputStream(String pFileName) 
+  public abstract java.io.OutputStream getOutputStream(String pFileName)
     throws java.io.IOException;
 
   /**
-   * Creates an appropriate FolderInfo for the given StoreInfo.  
+   * Creates an appropriate FolderInfo for the given StoreInfo.
    */
   public abstract FolderInfo createFolderInfo(StoreInfo pStore, String pName);
 
+  /**
+   * Translates the given file path. Default implementation just returns
+   * the original String.
+   */
+  public String translateName(String pFileName) {
+    return pFileName;
+  }
 
+  /**
+   * Encodes the file path, if needed.  Default implementation just returns
+   * the original String.
+   */
+  public String encodeFileName(String pFileName) {
+    return pFileName;
+  }
 }

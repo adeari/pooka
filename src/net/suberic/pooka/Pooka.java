@@ -97,6 +97,7 @@ public class Pooka {
         sManager.setLocalrc(localrc);
       }
       sManager.setResources(sManager.getResourceManager().createVariableBundle(sManager.getLocalrc(), pookaDefaultBundle));
+      System.err.println("localrc=" + sManager.getLocalrc());
     } catch (Exception e) {
       System.err.println("caught exception:  " + e);
       e.printStackTrace();

@@ -1367,13 +1367,15 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * Returns the cache directory for this FolderInfo.
    */
   public String getCacheDirectory() {
-    String localDir = Pooka.getProperty(getFolderProperty() + ".cacheDir", "");
+    String localDir = Pooka.getResourceManager().translateName(Pooka.getProperty(getFolderProperty() + ".cacheDir", ""));
     if (!localDir.equals(""))
       return localDir;
 
     localDir = Pooka.getProperty("Pooka.defaultMailSubDir", "");
     if (localDir.equals(""))
-      localDir = System.getProperty("user.home") + File.separator + ".pooka";
+      localDir = Pooka.getPookaManager().getPookaRoot().getAbsolutePath() + File.separator + ".pooka";
+
+    localDir = Pooka.getResourceManager().translateName(localDir);
 
     localDir = localDir + File.separatorChar + "cache";
     FolderInfo currentFolder = this;
