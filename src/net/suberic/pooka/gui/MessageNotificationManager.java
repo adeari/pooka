@@ -61,6 +61,8 @@ public class MessageNotificationManager implements ValueChangeListener {
   private boolean messageDisplaying = false;
   private Thread messageDisplayThread = null;
 
+  private boolean available = true;
+
   /**
    * Creates a new MessageNotificationManager.
    */
@@ -144,10 +146,13 @@ public class MessageNotificationManager implements ValueChangeListener {
           SystemTray.getSystemTray().add(mTrayIcon);
           mIconShowing = true;
         }
+        available = true;
       } catch (Error e) {
+        available = false;
         System.err.println("Error starting up tray icon:  " + e.getMessage());
         e.printStackTrace();
       } catch (Exception exc) {
+        available = false;
         System.err.println("Error starting up tray icon:  " + exc.getMessage());
         exc.printStackTrace();
       }
@@ -159,6 +164,9 @@ public class MessageNotificationManager implements ValueChangeListener {
       SystemTray.getSystemTray().remove(mTrayIcon);
       mTrayIcon = null;
       mIconShowing = false;
+      available = false;
+    } else {
+      available = false;
     }
   }
 
@@ -218,7 +226,7 @@ public class MessageNotificationManager implements ValueChangeListener {
           getMainPanel().getParentFrame().setTitle(mNewMessageTitle);
         }
         setCurrentIcon(getNewMessageIcon());
-        if (getTrayIcon() != null) {
+        if (getTrayIcon() != null && available) {
           getTrayIcon().setImage(mNewMessageTrayIcon.getImage());
           if (! mIconShowing) {
             try {
@@ -235,16 +243,17 @@ public class MessageNotificationManager implements ValueChangeListener {
           getMainPanel().getParentFrame().setTitle(mStandardTitle);
         }
 
-        if (mAlwaysDisplay) {
-          if (! mIconShowing) {
-            try {
-              SystemTray.getSystemTray().add(mTrayIcon);
-              mIconShowing = true;
-            } catch (Exception exc) {
-              System.err.println("Error starting up tray icon:  " + exc.getMessage());
-              exc.printStackTrace();
+        if (available) {
+          if (mAlwaysDisplay) {
+            if (! mIconShowing) {
+              try {
+                SystemTray.getSystemTray().add(mTrayIcon);
+                mIconShowing = true;
+              } catch (Exception exc) {
+                System.err.println("Error starting up tray icon:  " + exc.getMessage());
+                exc.printStackTrace();
+              }
             }
-          }
         } else {
           if (mIconShowing) {
             SystemTray.getSystemTray().remove(mTrayIcon);
@@ -252,9 +261,10 @@ public class MessageNotificationManager implements ValueChangeListener {
           }
         }
 
-        setCurrentIcon(getStandardIcon());
         if (getTrayIcon() != null)
           getTrayIcon().setImage(mStandardTrayIcon.getImage());
+        }
+        setCurrentIcon(getStandardIcon());
       }
     } //synchronized
   }

@@ -42,7 +42,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   public OutgoingMailServer (String newId) {
     id = newId;
     propertyName = "OutgoingServer." + newId;
-    
+
     configure();
   }
 
@@ -85,32 +85,32 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
     if (changedValue != null) {
       if (changedValue.equals(getItemProperty() + ".connection")) {
-	NetworkConnection currentConnection = getConnection();
-	if (currentConnection != null)
-	  currentConnection.removeConnectionListener(this);
+NetworkConnection currentConnection = getConnection();
+if (currentConnection != null)
+  currentConnection.removeConnectionListener(this);
 
-	connectionID = bundle.getProperty(getItemProperty() + ".connection", "");
-	currentConnection = getConnection();
-	if (currentConnection != null)
-	  currentConnection.addConnectionListener(this);
-	
+connectionID = bundle.getProperty(getItemProperty() + ".connection", "");
+currentConnection = getConnection();
+if (currentConnection != null)
+  currentConnection.addConnectionListener(this);
+
       } else if (changedValue.equals(getItemProperty() + ".server")) {
-	sendMailURL = new URLName(mProtocol + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
+sendMailURL = new URLName(mProtocol + bundle.getProperty(getItemProperty() + ".server", "") + ":" + bundle.getProperty(getItemProperty() + ".port", "") + "/");
       } else if (changedValue.equals(getItemProperty() + ".outbox")) {
-	String newOutboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
-	if (newOutboxID != outboxID) {
-	  FolderInfo outbox = getOutbox();
-	  if (outbox != null) {
-	    outbox.setOutboxFolder(null);
-	  }
+String newOutboxID = bundle.getProperty(getItemProperty() + ".outbox", "");
+if (newOutboxID != outboxID) {
+  FolderInfo outbox = getOutbox();
+  if (outbox != null) {
+    outbox.setOutboxFolder(null);
+  }
 
-	  outboxID = newOutboxID;
-	  loadOutboxFolder();
-	}
+  outboxID = newOutboxID;
+  loadOutboxFolder();
+}
       }
     }
   }
-  
+
   /**
    * Loads the outbox folders.
    */
@@ -122,7 +122,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   }
 
   /**
-   * Stops the server so that it will continue to send its current 
+   * Stops the server so that it will continue to send its current
    * message(s), but will not accept any new ones.
    */
   public void stopServer() {
@@ -145,13 +145,13 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    */
   public void sendAll() {
     mailServerThread.addToQueue(new javax.swing.AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent ae) {
-	  try {
-	    internal_sendAll();
-	  } catch (javax.mail.MessagingException me) {
-	    Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
-	  }
-	}
+public void actionPerformed(java.awt.event.ActionEvent ae) {
+  try {
+    internal_sendAll();
+  } catch (javax.mail.MessagingException me) {
+    Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
+  }
+}
       }, new java.awt.event.ActionEvent(this, 0, "message-send-all"));
   }
 
@@ -159,82 +159,82 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * Sends all available messages in the outbox.
    */
   protected synchronized void internal_sendAll() throws javax.mail.MessagingException {
-    
+
     try {
       sending = true;
-      
+
       Transport sendTransport = prepareTransport(true);
 
       try {
-	sendTransport.connect();
-	
-	sendAll(sendTransport);
+sendTransport.connect();
+
+sendAll(sendTransport);
       } finally {
-	sendTransport.close();
+sendTransport.close();
       }
     } finally {
       sending = false;
       if (connectionLock != null)
-	connectionLock.release();
+connectionLock.release();
     }
   }
-  
+
   /**
-   * Sends all available messages in the outbox using the given, already 
+   * Sends all available messages in the outbox using the given, already
    * open Transport object.  Leaves the Transport object open.
    */
   private void sendAll(Transport sendTransport) throws javax.mail.MessagingException {
-    
+
     LinkedList exceptionList = new LinkedList();
 
     FolderInfo outbox = getOutbox();
-    
+
     if (outbox != null) {
       // we need the thread lock for this folder.
       Object runLock = outbox.getFolderThread().getRunLock();
       synchronized(runLock) {
-	if ( ! outbox.isConnected()) {
-	  outbox.openFolder(Folder.READ_WRITE);
-	}
+if ( ! outbox.isConnected()) {
+  outbox.openFolder(Folder.READ_WRITE);
+}
 
-	Folder outboxFolder = outbox.getFolder();
-	
-	if (outboxFolder != null) {
-	  Message[] msgs = outboxFolder.getMessages();    
-	  
-	  try {
-	    for (int i = 0; i < msgs.length; i++) {
-	      Message m = msgs[i];
-	      if (! m.isSet(Flags.Flag.DRAFT)) {
-		try {
-		  sendTransport.sendMessage(m, m.getAllRecipients());
-		  m.setFlag(Flags.Flag.DELETED, true);
-		} catch (MessagingException me) {
-		  exceptionList.add(me);
-		}
-	      }
-	    }
-	  } finally {
-	    if (exceptionList.size() > 0) {
-	      final int exceptionCount = exceptionList.size();
-	      javax.swing.SwingUtilities.invokeLater( new Runnable() {
-		  public void run() {
-		    Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.queuedSendFailed", "Failed to send message(s) in the Outbox.  Number of errors:  ") +  exceptionCount );
-		}
-		} );
-	    }
-	    outboxFolder.expunge();
-	  }
-	}
+Folder outboxFolder = outbox.getFolder();
+
+if (outboxFolder != null) {
+  Message[] msgs = outboxFolder.getMessages();
+
+  try {
+    for (int i = 0; i < msgs.length; i++) {
+      Message m = msgs[i];
+      if (! m.isSet(Flags.Flag.DRAFT)) {
+try {
+  sendTransport.sendMessage(m, m.getAllRecipients());
+  m.setFlag(Flags.Flag.DELETED, true);
+} catch (MessagingException me) {
+  exceptionList.add(me);
+}
+      }
+    }
+  } finally {
+    if (exceptionList.size() > 0) {
+      final int exceptionCount = exceptionList.size();
+      javax.swing.SwingUtilities.invokeLater( new Runnable() {
+  public void run() {
+    Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.queuedSendFailed", "Failed to send message(s) in the Outbox.  Number of errors:  ") +  exceptionCount );
+}
+} );
+    }
+    outboxFolder.expunge();
+  }
+}
       }
     }
   }
 
   /**
    * Virtually sends a message.  If the current status is connected, then
-   * the message will actually be sent now.  If not, and the 
+   * the message will actually be sent now.  If not, and the
    * Message.sendImmediately setting is true, then we'll attempt to send
-   * the message anyway.  
+   * the message anyway.
    */
   public synchronized void sendMessage(NewMessageInfo nmi, boolean connect) {
     if (mStopped) {
@@ -243,11 +243,11 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
     final NewMessageInfo nmi_final = nmi;
     final boolean connect_final = connect;
-    
+
     mailServerThread.addToQueue(new javax.swing.AbstractAction() {
-	public void actionPerformed(java.awt.event.ActionEvent ae) {
-	  internal_sendMessage(nmi_final, connect_final);
-	}
+public void actionPerformed(java.awt.event.ActionEvent ae) {
+  internal_sendMessage(nmi_final, connect_final);
+}
       }, new java.awt.event.ActionEvent(this, 0, "message-send-all"));
   }
 
@@ -258,83 +258,83 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       boolean connected = false;
       Transport sendTransport = null;
       try {
-	Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.connecting", "Connecting to SMTP server..."));
+Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.connecting", "Connecting to SMTP server..."));
 
-	sendTransport = prepareTransport(connect);
-	sendTransport.connect();
-	connected = true;
+sendTransport = prepareTransport(connect);
+sendTransport.connect();
+connected = true;
       } catch (MessagingException me) {
-	if (Pooka.getProperty("Pooka.outbox.autoSave", "false").equalsIgnoreCase("true")) {
-	  try {
-	    saveToOutbox(nmi);
-	  } catch (MessagingException nme) {
-	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
-	  }
-	} else {
-	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);	  
-	}
+if (Pooka.getProperty("Pooka.outbox.autoSave", "false").equalsIgnoreCase("true")) {
+  try {
+    saveToOutbox(nmi);
+  } catch (MessagingException nme) {
+    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);
+  }
+} else {
+  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);
+}
       }
-      
+
       // if the connection worked.
       if (connected) {
-	try {
-	  try {
-	      /*
-		Message m = nmi.getMessage();
-		sendTransport.sendMessage(m, m.getAllRecipients());
-	      */
-	    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.sending", "Sending message over SMTP."));
+try {
+  try {
+      /*
+Message m = nmi.getMessage();
+sendTransport.sendMessage(m, m.getAllRecipients());
+      */
+    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.sending", "Sending message over SMTP."));
 
-	    Map sendMessageMap = nmi.getSendMessageMap();
-	    if (sendMessageMap != null && sendMessageMap.keySet().size() > 0) {
-	      Set keySet = sendMessageMap.keySet();
-	      Iterator iter = keySet.iterator();
-	      while (iter.hasNext()) {
-		Message m = (Message) iter.next();
-		Address[] recipients = (Address[]) sendMessageMap.get(m);
-		if (recipients == null)
-		  recipients = m.getAllRecipients();
-		
-		sendTransport.sendMessage(m, recipients);
-	      }
-	    } else {
-	      sendTransport.sendMessage(nmi.getMessage(), nmi.getMessage().getAllRecipients());
-	    }
-	    
-	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
-	  } catch (MessagingException me) {
-	    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);	  
-	  }
-	  // whether or not the send failed. try sending all the other 
-	  // messages in the queue, too.
-	  try {
-	    sendAll(sendTransport);
-	  } catch (MessagingException exp) {
-	    final MessagingException me = exp;
-	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		  Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.outboxSendFailed", "Failed to send all messages in Outbox:  "), me);
-		}
-	      });
-	  }
-	} finally {
-	  try {
-	    sendTransport.close();
-	  } catch (MessagingException me) {
-	    // we don't care.
-	  }
-	}
+    Map sendMessageMap = nmi.getSendMessageMap();
+    if (sendMessageMap != null && sendMessageMap.keySet().size() > 0) {
+      Set keySet = sendMessageMap.keySet();
+      Iterator iter = keySet.iterator();
+      while (iter.hasNext()) {
+Message m = (Message) iter.next();
+Address[] recipients = (Address[]) sendMessageMap.get(m);
+if (recipients == null)
+  recipients = m.getAllRecipients();
+
+sendTransport.sendMessage(m, recipients);
+      }
+    } else {
+      sendTransport.sendMessage(nmi.getMessage(), nmi.getMessage().getAllRecipients());
+    }
+
+    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
+  } catch (MessagingException me) {
+    ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);
+  }
+  // whether or not the send failed. try sending all the other
+  // messages in the queue, too.
+  try {
+    sendAll(sendTransport);
+  } catch (MessagingException exp) {
+    final MessagingException me = exp;
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+public void run() {
+  Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.outboxSendFailed", "Failed to send all messages in Outbox:  "), me);
+}
+      });
+  }
+} finally {
+  try {
+    sendTransport.close();
+  } catch (MessagingException me) {
+    // we don't care.
+  }
+}
       }
     } finally {
       sending = false;
       if (connectionLock != null)
-	connectionLock.release();
+connectionLock.release();
     }
   }
-  
+
   /**
    * Virtually sends a message.  If the current status is connected, then
-   * the message will actually be sent now.  
+   * the message will actually be sent now.
    */
   public void sendMessage(NewMessageInfo nmi) {
     sendMessage(nmi, false);
@@ -344,21 +344,21 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * Gets a Transport object for this OutgoingMailServer.
    */
   protected Transport prepareTransport(boolean connect) throws javax.mail.MessagingException {
-    
+
     NetworkConnection connection = getConnection();
-    
+
     if (connect) {
       if (connection.getStatus() == NetworkConnection.DISCONNECTED) {
-	connection.connect();
+connection.connect();
       }
     }
-    
+
     if (connection.getStatus() != NetworkConnection.CONNECTED) {
       throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Mail Server:  ") + getItemID());
     } else {
       connectionLock = connection.getConnectionLock();
     }
-    
+
     Session session = Pooka.getDefaultSession();
 
 
@@ -370,21 +370,21 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
       sysProps.setProperty("mail.smtp.auth", "true");
       String userName = Pooka.getProperty(getItemProperty() + ".user", "");
       if (! userName.equals(""))
-	sysProps.setProperty("mail.smtp.user", userName);
+sysProps.setProperty("mail.smtp.user", userName);
       String password = Pooka.getProperty(getItemProperty() + ".password", "");
 
       if (! password.equals("")) {
-	password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
-	sysProps.setProperty("mail.smtp.password", password);
+password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
+sysProps.setProperty("mail.smtp.password", password);
       }
 
       sysProps.setProperty("mail.smtp.starttls.enable", "true");
 
       session = javax.mail.Session.getInstance(sysProps, new FailoverAuthenticator (userName, password));
       if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
-	session.setDebug(true);
+session.setDebug(true);
     }
-    Transport sendTransport = session.getTransport(getSendMailURL()); 
+    Transport sendTransport = session.getTransport(getSendMailURL());
     return sendTransport;
   }
 
@@ -395,36 +395,36 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.connecting", "SMTP server not available; getting outbox."));
 
     FolderInfo outbox = getOutbox();
-    
+
     if (outbox != null) {
       Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.waitForLock", "SMTP server not available; waiting for outbox lock."));
-      
+
       // we need the lock
       Object runLock = outbox.getFolderThread().getRunLock();
       synchronized(runLock) {
-	try {
-	  if ( ! outbox.isConnected()) {
-	    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.opening", "SMTP server not available; opening outbox."));
-	    outbox.openFolder(Folder.READ_WRITE);
-	  }
-	  
-	  Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.appending", "SMTP server not available; appending to outbox."));
-	  outbox.appendMessages(new MessageInfo[] { nmi });
-	  
-	  if (Pooka.getProperty("Pooka.outbox.autoSave", "false").equalsIgnoreCase("true")) {
-	    // assume that if we aren't automatically saving to the outbox
-	    // that we did this explicitly.
-	    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-		public void run() {
-		  Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
-		}
-	      });
-	  }
+try {
+  if ( ! outbox.isConnected()) {
+    Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.opening", "SMTP server not available; opening outbox."));
+    outbox.openFolder(Folder.READ_WRITE);
+  }
 
-	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
-	} catch(MessagingException nme) {
-	  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);	  
-	}
+  Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.appending", "SMTP server not available; appending to outbox."));
+  outbox.appendMessages(new MessageInfo[] { nmi });
+
+  if (Pooka.getProperty("Pooka.outbox.autoSave", "false").equalsIgnoreCase("true")) {
+    // assume that if we aren't automatically saving to the outbox
+    // that we did this explicitly.
+    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+public void run() {
+  Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageWindow.sendDelayed", "Connection unavailable.  Message saved to Outbox."));
+}
+      });
+  }
+
+  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendSucceeded(true);
+} catch(MessagingException nme) {
+  ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);
+}
       }
     } else {
       throw new MessagingException("Error saving to Outbox -- no Outbox specified.");
@@ -458,7 +458,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * stored until they're ready to be sent.
    */
   public FolderInfo getOutbox() {
-    
+
     return Pooka.getStoreManager().getFolder(outboxID);
   }
 
@@ -509,9 +509,9 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
     String mUser;
     String mPassword;
     boolean firstTry = true;
-    
+
     Authenticator mAuth;
-    
+
     /**
      * Creates an Authenticator that will try using the given username and
      * password, and if that fails, then will try a ui dialog.
@@ -524,11 +524,11 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
 
     protected PasswordAuthentication getPasswordAuthentication() {
       if (firstTry) {
-	firstTry = false;
+firstTry = false;
 
-	return new PasswordAuthentication(mUser, mPassword);
+return new PasswordAuthentication(mUser, mPassword);
       } else {
-	return super.getPasswordAuthentication();
+return super.getPasswordAuthentication();
       }
     }
 

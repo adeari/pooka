@@ -11,7 +11,7 @@ import net.suberic.util.*;
  * @version $Revision$
  */
 public class NetworkConnectionManager implements ItemCreator, ItemListChangeListener {
-  
+
   private ItemManager manager;
   private LinkedList listenerList = new LinkedList();
 
@@ -24,9 +24,9 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
 
   //-----------------------
   // public interface.
-  
+
   /**
-   * This listens for ItemListChangeEvents, which result from changes to the 
+   * This listens for ItemListChangeEvents, which result from changes to the
    * "Connection" property.  The result is that refreshConnections() is called,
    * and then the event is passed to listeners to this object.
    */
@@ -41,22 +41,22 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
   public java.util.Vector getConnectionList() {
     return manager.getItems();
   }
-  
+
   /**
-   * This adds the connection with the given connectionName to the 
+   * This adds the connection with the given connectionName to the
    * allConnections list.
    */
   public void addConnection(String connectionName) {
     manager.addItem(connectionName);
   }
-  
+
   /**
    * This adds the connections with the given connectionNames to the allConnections list.
    */
   public void addConnection(String[] connectionName) {
     manager.addItem(connectionName);
   }
-  
+
   /**
    * This removes the connection with the given connectionName.
    */
@@ -77,7 +77,7 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
   public void removeConnection(NetworkConnection connection) {
     manager.removeItem(connection);
   }
-  
+
   /**
    * This removes the given NetworkConnections.
    */
@@ -86,7 +86,7 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
   }
 
   /**
-   * This returns the NetwordConnection with the given connectionName if it 
+   * This returns the NetwordConnection with the given connectionName if it
    * exists; otherwise, returns null.
    */
   public NetworkConnection getConnection(String connectionID) {
@@ -94,11 +94,13 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
   }
 
   /**
-   * This returns the NetwordConnection with the given connectionName if it 
+   * This returns the NetwordConnection with the given connectionName if it
    * exists; otherwise, returns null.
    */
   public NetworkConnection getDefaultConnection() {
+    System.err.println("getting default connection.");
     String defaultName = Pooka.getProperty("Connection._default", "_default");
+    System.err.println("defaultName=" + defaultName);
     return (NetworkConnection) manager.getItem(defaultName);
   }
 
@@ -109,7 +111,7 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
     if (! listenerList.contains(ilcl))
       listenerList.add(ilcl);
   }
-  
+
   /**
    * This removes a ItemListChangeListener from the local listener list.
    */
@@ -124,7 +126,7 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
     for (int i = 0; i < listenerList.size(); i++)
       ((ItemListChangeListener)listenerList.get(i)).itemListChanged(e);
   }
-  
+
 
   /**
    * This creates a new NetworkConnection.
@@ -137,13 +139,22 @@ public class NetworkConnectionManager implements ItemCreator, ItemListChangeList
 
   //---------------------------
   // the background stuff.
-  
+
   /**
-   * This loads and creates all the NetworkConnections using the "Connection" 
+   * This loads and creates all the NetworkConnections using the "Connection"
    * property of the main Pooka VariableBundle.
    */
   private void createConnectionList() {
     manager = new ItemManager("Connection", Pooka.getResources(), this);
+    List items = manager.getItems();
+    if (items.isEmpty()) {
+      System.err.println("no connection.");
+      // should always be a connection.
+      Pooka.setProperty("Connection", "Default");
+      Pooka.setProperty("Connection._default", "Default");
+      Pooka.setProperty("Connection.Default.valueOnStartup", "Connected");
+      manager = new ItemManager("Connection", Pooka.getResources(), this);
+    }
     manager.addItemListChangeListener(this);
   }
 }

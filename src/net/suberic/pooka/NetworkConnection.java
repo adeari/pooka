@@ -4,7 +4,7 @@ import java.net.*;
 import net.suberic.util.*;
 
 /**
- * <p>Represents a Network connection.  This is primarily used to keep 
+ * <p>Represents a Network connection.  This is primarily used to keep
  * track of connections, so that Pooka will know whether or not to attempt
  * to contact a particular server or not.</p>
  *
@@ -32,7 +32,7 @@ public class NetworkConnection implements net.suberic.util.Item {
   int status = DISCONNECTED;
 
   public static int CONNECTED = 0;
-  
+
   public static int DISCONNECTED = 5;
 
   public static int UNAVAILABLE = 10;
@@ -51,10 +51,10 @@ public class NetworkConnection implements net.suberic.util.Item {
   }
 
   /**
-   * <p>A command that should be run when this network connection is 
+   * <p>A command that should be run when this network connection is
    * brought up.</p>
    *
-   * <p>Returns <code>null</code> if no command needs to be run on 
+   * <p>Returns <code>null</code> if no command needs to be run on
    * connection.</p>
    */
   public String getConnectCommand() {
@@ -74,13 +74,13 @@ public class NetworkConnection implements net.suberic.util.Item {
     String testPortString = bundle.getProperty(getItemProperty() + ".testPort", "");
     if (testAddressString != "" && testPortString != "") {
       try {
-	testAddress = InetAddress.getByName(testAddressString);
-	testPort = Integer.parseInt(testPortString);
+        testAddress = InetAddress.getByName(testAddressString);
+        testPort = Integer.parseInt(testPortString);
       } catch (Exception e) {
-	testAddress = null;
-	testPort = -1;
+        testAddress = null;
+        testPort = -1;
       }
-    } 
+    }
 
     String onStartup = bundle.getProperty(getItemProperty() + ".valueOnStartup", "Unavailable");
 
@@ -91,12 +91,12 @@ public class NetworkConnection implements net.suberic.util.Item {
     }
 
   }
-  
+
   /**
    * <p>A command that should be run when this network connection is
    * brought down.</p>
    *
-   * <p>Returns <code>null</code> if no command needs to be run on 
+   * <p>Returns <code>null</code> if no command needs to be run on
    * disconnection.</p>
    */
   public String getDisconnectCommand() {
@@ -105,7 +105,7 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   /**
    * <p>Connect to this network service.</p>
-   * 
+   *
    * @param runConnectCommand whether or not we should run the
    *        <code>connectCommand</code>, if there is one.
    * @return the new status of the server.
@@ -116,7 +116,7 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   /**
    * <p>Connect to this network service.</p>
-   * 
+   *
    * @param runConnectCommand whether or not we should run the
    *        <code>connectCommand</code>, if there is one.
    * @param isInteractive whether or not we should prompt the user if
@@ -124,31 +124,31 @@ public class NetworkConnection implements net.suberic.util.Item {
    * @return the new status of the server.
    */
   public int connect(boolean runConnectCommand, boolean isInteractive) {
-    
+
     try {
       if (runConnectCommand) {
-	String preCommand = getConnectCommand();
-	if (preCommand != null && preCommand.length() > 0) {
-	  Process p = Runtime.getRuntime().exec(preCommand);
-	  p.waitFor();
-	}
+        String preCommand = getConnectCommand();
+        if (preCommand != null && preCommand.length() > 0) {
+          Process p = Runtime.getRuntime().exec(preCommand);
+          p.waitFor();
+        }
       }
 
       if (status != CONNECTED) {
-	boolean connectionSucceeded = checkConnection();
-	if (! connectionSucceeded && isInteractive) {
-	  // check to see if we want to mark this as connected anyway.
-	  int response = Pooka.getUIFactory().showConfirmDialog("Connection to test port " + testAddress.getHostAddress() + ":" + testPort + " failed.  Mark this connection as unavailable?", "Test of " + getItemID() + " failed.", javax.swing.JOptionPane.YES_NO_OPTION);
-	  if (response == javax.swing.JOptionPane.NO_OPTION)
-	    connectionSucceeded = true;
-	  else
-	    status = UNAVAILABLE;
-	}
+        boolean connectionSucceeded = checkConnection();
+        if (! connectionSucceeded && isInteractive) {
+          // check to see if we want to mark this as connected anyway.
+          int response = Pooka.getUIFactory().showConfirmDialog("Connection to test port " + testAddress.getHostAddress() + ":" + testPort + " failed.  Mark this connection as unavailable?", "Test of " + getItemID() + " failed.", javax.swing.JOptionPane.YES_NO_OPTION);
+          if (response == javax.swing.JOptionPane.NO_OPTION)
+            connectionSucceeded = true;
+          else
+            status = UNAVAILABLE;
+        }
 
-	if (connectionSucceeded) {
-	  status = CONNECTED;
-	  fireConnectionEvent();
-	}
+        if (connectionSucceeded) {
+          status = CONNECTED;
+          fireConnectionEvent();
+        }
       }
     } catch (Exception ex) {
       System.out.println("Could not run connect command:");
@@ -160,7 +160,7 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   /**
    * <p>Connect to this network service.</p>
-   * 
+   *
    * @return the new status of the server.
    */
   public int connect() {
@@ -169,7 +169,7 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   /**
    * <p>Disconnect from this network service.</p>
-   * 
+   *
    * @param runDisonnectCommand whether or not we should run the
    *        <code>disconnectCommand</code>, if there is one.
    * @return the new status of the server.
@@ -177,31 +177,31 @@ public class NetworkConnection implements net.suberic.util.Item {
   public int disconnect(boolean runDisconnectCommand) {
     synchronized(this) {
       if (lockList.isEmpty()) {
-	return doDisconnect(runDisconnectCommand);
+        return doDisconnect(runDisconnectCommand);
       } else {
-	disconnectRequested = true;
-	if (runDisconnectCommand)
-	  disconnectCommandRequested = true;
+        disconnectRequested = true;
+        if (runDisconnectCommand)
+          disconnectCommandRequested = true;
 
-	return status;
+        return status;
       }
-      
+
     }
   }
 
   private int doDisconnect(boolean runDisconnectCommand) {
     try {
       if (status != DISCONNECTED) {
-	if (runDisconnectCommand) {
-	  String postCommand = getDisconnectCommand();
-	  if (postCommand != null && postCommand.length() > 0) {
-	    Process p = Runtime.getRuntime().exec(postCommand);
-	    p.waitFor();
-	  }
-	}
-	
-	status = DISCONNECTED;
-	fireConnectionEvent();
+        if (runDisconnectCommand) {
+          String postCommand = getDisconnectCommand();
+          if (postCommand != null && postCommand.length() > 0) {
+            Process p = Runtime.getRuntime().exec(postCommand);
+            p.waitFor();
+          }
+        }
+
+        status = DISCONNECTED;
+        fireConnectionEvent();
       } else {
       }
     } catch (Exception ex) {
@@ -214,7 +214,7 @@ public class NetworkConnection implements net.suberic.util.Item {
 
   /**
    * <p>Disconnect from this network service.</p>
-   * 
+   *
    * @return the new status of the server.
    */
   public int disconnect() {
@@ -222,7 +222,7 @@ public class NetworkConnection implements net.suberic.util.Item {
   }
 
   /**
-   * <p>Checks this connection to see if it's actually up.  This 
+   * <p>Checks this connection to see if it's actually up.  This
    * implementation uses the testAddress and testPort settings to open
    * a TCP connection.  This returns whether or not the connection
    * succeeds.
@@ -230,11 +230,11 @@ public class NetworkConnection implements net.suberic.util.Item {
   public boolean checkConnection() {
     if (testAddress != null && testPort > -1) {
       try {
-	Socket testSocket = new Socket(testAddress, testPort);
-	testSocket.close();
-	return true;
+        Socket testSocket = new Socket(testAddress, testPort);
+        testSocket.close();
+        return true;
       } catch (Exception e) {
-	return false;
+        return false;
       }
     }
 
@@ -252,7 +252,7 @@ public class NetworkConnection implements net.suberic.util.Item {
     if (status != UNAVAILABLE) {
       status = UNAVAILABLE;
       fireConnectionEvent();
-    } 
+    }
     return status;
   }
 
@@ -341,7 +341,7 @@ public class NetworkConnection implements net.suberic.util.Item {
    */
   public class ConnectionLock {
     public ConnectionLock() {
-      
+
     }
 
     /**
