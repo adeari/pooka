@@ -15,8 +15,7 @@ public class PookaFileSelector extends FileSelectorPane {
    * selected file to use the pooka.root setting.
    */
   public void selectNewFolder() {
-    JFileChooser jfc =
-      new JFileChooser((String) valueDisplay.getText());
+    JFileChooser jfc = new JFileChooser(Pooka.getResourceManager().translateName((String) valueDisplay.getText()));
     jfc.setMultiSelectionEnabled(false);
     jfc.setFileSelectionMode(fileSelection);
     jfc.setFileHidingEnabled(false);
