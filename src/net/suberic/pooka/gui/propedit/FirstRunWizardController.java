@@ -65,20 +65,20 @@ public class FirstRunWizardController extends NewStoreWizardController {
       // we're fine if not.
       Pooka.setProperty("Store." + localStoreName + ".folderList", "INBOX:sent:outbox");
     }
-    String pookaDirName = Pooka.getProperty("FirstRunWizard.pookaDirectory", System.getProperty("user.home") + File.separator + ".pooka");
+    String pookaDirName = Pooka.getProperty("FirstRunWizard.pookaDirectory", "${pooka.root}" + File.separator + ".pooka");
     String mailDirName = pookaDirName + File.separator + localStoreName;
     String subFolderDirName = mailDirName + File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
 
     if (useLocalFiles) {
-      File mailDir = new File(mailDirName);
+      File mailDir = new File(Pooka.getResourceManager().translateName(mailDirName));
       if (! mailDir.exists())
         mailDir.mkdirs();
 
-      File subFolderDir = new File(subFolderDirName);
+      File subFolderDir = new File(Pooka.getResourceManager().translateName(subFolderDirName));
       if (! subFolderDir.exists())
         subFolderDir.mkdirs();
 
-      File sentFile = new File(subFolderDirName + File.separator + ".sent");
+      File sentFile = new File(Pooka.getResourceManager().translateName(subFolderDirName) + File.separator + ".sent");
       if (! sentFile.exists()) {
         sentFile.mkdir();
 
@@ -90,7 +90,7 @@ public class FirstRunWizardController extends NewStoreWizardController {
     }
 
     if (useLocalFiles) {
-      File outboxFile = new File(subFolderDirName + File.separator + ".outbox");
+      File outboxFile = new File(Pooka.getResourceManager().translateName(subFolderDirName) + File.separator + ".outbox");
       if (! outboxFile.exists()) {
         outboxFile.mkdir();
 

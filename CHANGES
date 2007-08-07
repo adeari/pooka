@@ -1,3 +1,7 @@
+added a -r (or --root) option to start up pooka against a different root directory than the user's home directory.
+
+fixed first run wizard so that it actually runs.
+
 070709 release (2.0)
 --------------------
 

@@ -244,9 +244,9 @@ public class NewStoreWizardController extends WizardController {
       */
     } else if (protocol.equalsIgnoreCase("mbox")) {
       returnValue.setProperty("Store." + accountName + ".inboxLocation", getManager().getCurrentProperty("NewStoreWizard.editors.store.inboxLocation", "/var/spool/mail/" + System.getProperty("user.name")));
-      returnValue.setProperty("Store." + accountName + ".mailDirectory", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDirectory", getManager().getCurrentProperty("Pooka.cacheDirectory", System.getProperty("user.home") + java.io.File.separator + ".pooka")));
+      returnValue.setProperty("Store." + accountName + ".mailDirectory", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDirectory", getManager().getCurrentProperty("Pooka.cacheDirectory", "${pooka.root}" + java.io.File.separator + ".pooka")));
     } else if (protocol.equalsIgnoreCase("maildir")) {
-      returnValue.setProperty("Store." + accountName + ".mailDir", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDir", System.getProperty("user.home") + java.io.File.separator + "Maildir"));
+      returnValue.setProperty("Store." + accountName + ".mailDir", getManager().getCurrentProperty("NewStoreWizard.editors.store.mailDir", "${pooka.root}" + java.io.File.separator + "Maildir"));
     }
 
     /*

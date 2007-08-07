@@ -1,4 +1,4 @@
-*) fix first run wizard
+*) make keybinding page printable (make it part of help, maybe?)
 
 *) add to address book needs some notification that it worked.
 *) need easier way to access address book.
@@ -6,8 +6,6 @@
 **) make wheel scroll customizable
 *) trayicon stuff
 *) ldap (again?)
-
-*) make keybinding page printable (make it part of help, maybe?)
 
   trayicon support:
     *) fix close to icon

@@ -164,7 +164,7 @@ public class StartupManager {
             if (panel.getContentPanel() instanceof MessagePanel) {
               SwingUtilities.invokeLater(new Runnable() {
                   public void run() {
-                    //new FirstRunWizard().start();
+                    Pooka.getUIFactory().showEditorWindow(Pooka.getProperty("Pooka._firstRunWizard.label", "Configure Pooka"), "Pooka._firstRunWizard");
                   }
                 });
             }
@@ -672,7 +672,6 @@ public class StartupManager {
           System.exit(0);
         } else if (argv[i].equals("-r") || argv[i].equals("--root")) {
           String filename = argv[++i];
-          System.err.println("root directory = " + filename);
           if (filename == null) {
             System.err.println("error:  no root directory specified.");
             printUsage();

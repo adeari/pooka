@@ -92,7 +92,6 @@ public class FileResourceManager extends ResourceManager {
   public String translateName(String pFileName) {
     Matcher matcher = sRootDirPattern.matcher(pFileName);
     String returnValue = matcher.replaceAll(Matcher.quoteReplacement(Pooka.getPookaManager().getPookaRoot().getAbsolutePath()));
-    System.err.println("testing " + pFileName + "; returning " + returnValue);
     return returnValue;
   }
 
@@ -113,14 +112,9 @@ public class FileResourceManager extends ResourceManager {
       rootPath = Pooka.getPookaManager().getPookaRoot().getAbsolutePath();
     }
 
-    System.err.println("filePath=" + filePath);
-    System.err.println("rootPath=" + rootPath);
-
     if (filePath.startsWith(rootPath)) {
-      System.err.println("returning " + "${pooka.root}" + filePath.substring(rootPath.length()));
       return "${pooka.root}" + filePath.substring(rootPath.length());
     } else {
-      System.err.println("no match.");
       return pFileName;
     }
   }
