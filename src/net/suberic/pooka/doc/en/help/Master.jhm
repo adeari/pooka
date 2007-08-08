@@ -31,4 +31,5 @@
 	<mapID target="UserProfile.editor.config" url="pooka/config/UserProfile.editor.config.html" />
 	<mapID target="UserProfile.editor.advanced" url="pooka/config/UserProfile.editor.advanced.html" />
 	<mapID target="Preferences" url="pooka/config/Preferences.html" />
+	<mapID target="keybindings" url="pooka/KeyBindings.html" />
 </map>

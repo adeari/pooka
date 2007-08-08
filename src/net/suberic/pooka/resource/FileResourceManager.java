@@ -91,7 +91,8 @@ public class FileResourceManager extends ResourceManager {
    */
   public String translateName(String pFileName) {
     Matcher matcher = sRootDirPattern.matcher(pFileName);
-    String returnValue = matcher.replaceAll(Matcher.quoteReplacement(Pooka.getPookaManager().getPookaRoot().getAbsolutePath()));
+    String super.translateName(pFileName);
+    returnValue = matcher.replaceAll(Matcher.quoteReplacement(Pooka.getPookaManager().getPookaRoot().getAbsolutePath()));
     return returnValue;
   }
 

@@ -580,9 +580,13 @@ public class MainPanel extends JPanel implements net.suberic.pooka.UserProfileCo
     }
 
     public void actionPerformed(ActionEvent e) {
+      /*
       String fileName="KeyBindings.html";
       String dir="/net/suberic/pooka/doc";
       contentPanel.showHelpScreen(Pooka.getProperty("MenuBar.Help.KeyBindings.Label", "Pooka KeyBindings"), this.getClass().getResource(dir + "/" + java.util.Locale.getDefault().getLanguage() + "/" + fileName));
+      */
+      Pooka.getHelpBroker().setCurrentID("keybindings");
+      Pooka.getHelpBroker().setDisplayed(true);
     }
   }
 

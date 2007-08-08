@@ -44,12 +44,18 @@ public abstract class ResourceManager {
    */
   public abstract FolderInfo createFolderInfo(StoreInfo pStore, String pName);
 
+  static Pattern sUserHomePattern = Pattern.compile("\\$\\{user\\.home\\}");
+  static Pattern sUserNamePattern = Pattern.compile("\\$\\{user\\.name\\}");
   /**
-   * Translates the given file path. Default implementation just returns
-   * the original String.
+   * Translates the given file path.
    */
   public String translateName(String pFileName) {
-    return pFileName;
+    Matcher nameMatcher = sUserNamePattern.matcher(pFileName);
+    Matcher homeMatcher = sUserHomePattern.matcher(pFileName);
+    String returnValue = nameMatcher.replaceAll(Matcher.quoteReplacement(System.getProperty("user.name")));
+    returnValue = homeMatcher.replaceAll(Matcher.quoteReplacement(System.getProperty("user.home")));
+
+    return returnValue;
   }
 
   /**

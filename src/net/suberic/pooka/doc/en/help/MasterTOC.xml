@@ -53,5 +53,6 @@
         <tocitem text="Message Text UI" target="options.folder.mtui"/>
       </tocitem>
     </tocitem>
+    <tocitem text="Key Bindings" target="keybindings"/>
   </tocitem>
 </toc>

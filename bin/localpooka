@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# Runs Pooka in a local directory.
+script_dir=`dirname $0`
+${script_dir}/pooka --root ${script_dir}/..
