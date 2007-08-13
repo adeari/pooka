@@ -4,6 +4,7 @@ import net.suberic.util.*;
 import net.suberic.pooka.ssl.*;
 import net.suberic.pooka.*;
 import javax.activation.*;
+import java.util.regex.*;
 
 /**
  * This interface defines a ResourceManager.
@@ -51,8 +52,9 @@ public abstract class ResourceManager {
    */
   public String translateName(String pFileName) {
     Matcher nameMatcher = sUserNamePattern.matcher(pFileName);
-    Matcher homeMatcher = sUserHomePattern.matcher(pFileName);
     String returnValue = nameMatcher.replaceAll(Matcher.quoteReplacement(System.getProperty("user.name")));
+
+    Matcher homeMatcher = sUserHomePattern.matcher(returnValue);
     returnValue = homeMatcher.replaceAll(Matcher.quoteReplacement(System.getProperty("user.home")));
 
     return returnValue;
