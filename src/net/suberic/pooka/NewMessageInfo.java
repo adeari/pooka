@@ -91,7 +91,8 @@ public class NewMessageInfo extends MessageInfo {
         cause = t.toString();
 
       MessagingException me = new MessagingException(cause);
-      me.initCause(t);
+      if (t instanceof Exception)
+        me.setNextException((Exception)t);
       throw me;
     }
   }

@@ -8,6 +8,6 @@ p_impdir=${pooka_home}/Imported
 pooka_cp=${p_impdir}/mail.jar:${p_impdir}/mbox.jar:${p_impdir}/jh.jar:${p_impdir}/javamaildir.jar:${pooka_home}/Build/classes:${p_impdir}/bcprov.jar:${p_impdir}/bcmail.jar:${p_impdir}/linspire_clear.jar
 pooka_cp=${pooka_cp}:${p_impdir}/htmlparser.jar
 pooka_cp=${pooka_cp}:${p_impdir}/cryptix-jce-provider.jar:${p_impdir}/cryptix-jce-api.jar:${p_impdir}/cryptix-pki-api.jar:${p_impdir}/cryptix-openpgp-provider.jar:${p_impdir}/cryptix-message-api.jar:${p_impdir}/javamail-crypto.jar
-pooka_cp=${pooka_cp}:${pooka_impdir}/providers/cryptix/Dist/javamail-crypto-cryptix-openpgp.jar:${pooka_impdir}/providers/bouncycastle/Dist/javamail-crypto-bouncycastle-smime.jar
+pooka_cp=${pooka_cp}:${p_impdir}/javamail-crypto-cryptix-openpgp.jar:${p_impdir}/javamail-crypto-bouncycastle-smime.jar
 
 java -client -Xmx128M -splash:${pooka_home}/Build/classes/net/suberic/pooka/gui/images/PookaSplashscreen.jpg -cp ${pooka_cp} net.suberic.pooka.Pooka $1 $2 $3 $4 $5 $6 $7 $8
