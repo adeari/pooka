@@ -190,13 +190,15 @@ public class NewMessageInfo extends MessageInfo {
     } catch (MessagingException me) {
       ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(null, me);
     } catch (Throwable t) {
-    	t.printStackTrace();//Liao
+      t.printStackTrace();//Liao
       String cause = t.getMessage();
       if (cause == null)
         cause = t.toString();
 
       MessagingException me = new MessagingException(cause);
-      me.initCause(t);
+      if (t instanceof Exception)
+        me.setNextException((Exception)t);
+
       ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(mailServer, me);
     }
   }
