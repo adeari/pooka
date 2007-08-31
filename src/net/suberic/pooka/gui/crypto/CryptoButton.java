@@ -1,12 +1,15 @@
 package net.suberic.pooka.gui.crypto;
 
-import net.suberic.util.gui.*;
-import net.suberic.util.VariableBundle;
-
-import javax.swing.*;
 import java.awt.Color;
-
 import java.util.Hashtable;
+
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JToolBar;
+
+import net.suberic.util.VariableBundle;
+import net.suberic.util.gui.ConfigurableUI;
 
 /**
  * This defines a UI component which may be built dynamically using a 
@@ -351,5 +354,13 @@ public class CryptoButton extends JButton implements ConfigurableUI, CryptoStatu
       parent = parent.getParent();
     return parent;
   }
+
+public int getEncryptionStatus() {
+	return currentCryptStatus;
+}
+
+public int getSignatureStatus() {
+	return currentSigStatus;
+}
 }
     

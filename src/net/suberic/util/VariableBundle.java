@@ -198,11 +198,45 @@ public abstract class VariableBundle extends Object {
    * to a java.util.List.
    */
   public static List<String> convertToList(String value) {
-    List<String> returnValue = new ArrayList<String>();
+/*    List<String> returnValue = new ArrayList<String>();
     StringTokenizer tokens = new StringTokenizer(value, ":");
     while (tokens.hasMoreElements())
       returnValue.add((String)tokens.nextElement());
     return returnValue;
+*/
+	    //Liao-
+		List tokens = new LinkedList();
+		int sQuotePos = -1, eQuotePos = -1, sPos = 0, ePos= 0;
+		while(sPos < value.length()){
+			if(value.charAt(sPos) == '"')
+				sQuotePos = sPos;
+			if(sQuotePos != -1){
+				eQuotePos = value.indexOf('"',sQuotePos+1);
+				ePos = value.indexOf(':', eQuotePos+1);
+			}else{
+				ePos = value.indexOf(':', sPos+1);
+			}
+			
+			if(ePos == -1){
+				ePos = value.length();
+			}
+			if(sPos <= ePos){
+				String token = value.substring(sPos, ePos);
+				if(token.charAt(0) == '"' && token.charAt(token.length()-1) == '"' ){
+					token = token.substring(1, token.length()-1);
+				}
+				tokens.add(token);
+				
+				sPos = ePos + 1;
+				
+				eQuotePos = -1; sQuotePos = -1;
+			}
+			else{
+				break;
+			}
+		}
+
+		return tokens;
   }
 
   /**

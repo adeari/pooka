@@ -1,10 +1,14 @@
 package net.suberic.pooka;
+import net.suberic.pooka.gui.crypto.CryptoKeySelector;
 import net.suberic.util.*;
+
+import java.security.UnrecoverableKeyException;
 import java.util.*;
 import javax.mail.*;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.InternetHeaders;
+import javax.xml.crypto.KeySelector;
 
 public class UserProfile extends Object implements ValueChangeListener, Item {
   Properties mailProperties;
@@ -415,35 +419,32 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
   /**
    * Returns the default encryption key for this profile, if any.
    */
-  public java.security.Key getEncryptionKey() {
-    return getEncryptionKey(cryptoDefaultType);
+  public java.security.Key getEncryptionKey(boolean forSignature) {
+    return getEncryptionKey(cryptoDefaultType, forSignature);
   }
 
   /**
    * Returns the default encryption key for this profile, if any.
    */
-  public java.security.Key getEncryptionKey(String type) {
+  public java.security.Key getEncryptionKey(String type, boolean forSignature) {
     String keyAlias = pgpEncryptionKeyId;
-    if (type.equalsIgnoreCase(net.suberic.crypto.EncryptionManager.SMIME)) {
+    if (net.suberic.crypto.EncryptionManager.SMIME.equalsIgnoreCase(type)) {
       keyAlias = smimeEncryptionKeyId;
     }
 
     if (keyAlias != null && keyAlias.length() > 0) {
       try {
-        if (Pooka.getCryptoManager().privateKeyAliases(type).contains(keyAlias)) {
-          try {
-            java.security.Key returnValue = Pooka.getCryptoManager().getPrivateKey(keyAlias);
-
-            return returnValue;
-          } catch (java.security.UnrecoverableKeyException uke) {
-            // we just haven't accessed the key yet.  skip.
-          }
+        if (Pooka.getCryptoManager().privateKeyAliases(type, forSignature).contains(keyAlias)) {
+        	try{
+              return Pooka.getCryptoManager().getPrivateKey(keyAlias, type);
+        	}catch(UnrecoverableKeyException uke){
+        		char[] passphrase = CryptoKeySelector.showPassphraseDialog(keyAlias);
+        		return Pooka.getCryptoManager().getPrivateKey(keyAlias, type, passphrase);
+        	}
         }
       } catch (Exception ee) {
         ee.printStackTrace();
       }
-      // FIXME
-      return null;
     }
 
     return null;

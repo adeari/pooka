@@ -1,15 +1,17 @@
 package net.suberic.pooka.crypto;
 
-import net.suberic.pooka.*;
-import net.suberic.crypto.*;
-
-import javax.mail.internet.*;
-import javax.mail.*;
-import javax.activation.DataHandler;
-
 import java.security.Key;
 
-import java.io.*;
+import javax.activation.DataHandler;
+import javax.mail.MessagingException;
+import javax.mail.internet.ContentType;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.internet.MimePart;
+
+import net.suberic.crypto.EncryptionUtils;
+import net.suberic.crypto.PGPEncryptionUtils;
+import net.suberic.pooka.Attachment;
 
 /**
  * A signed attachment.
@@ -33,10 +35,16 @@ public class SignedAttachment extends Attachment {
 
     Object content = getDataHandler().getContent();
     if (content instanceof MimeMultipart) {
-      return utils.checkSignature((MimeMultipart) content, key);
-    } else {
-      return false;
+    	MimeMultipart mp = (MimeMultipart) content;
+      return utils.checkSignature(mp, key);
+    } else if((utils instanceof PGPEncryptionUtils) && (content instanceof String)){
+    	String s = (String) content;
+    	if(s.indexOf(PGPEncryptionUtils.BEGIN_PGP_SIGNED_MESSAGE) == 0){
+    		PGPEncryptionUtils pgpUtils = (PGPEncryptionUtils) utils;
+    		return pgpUtils.checkSignature(s, key);
+    	}
     }
+    return false;
   }
 
   /**
@@ -51,13 +59,21 @@ public class SignedAttachment extends Attachment {
       // this should be exactly two parts, one the content, the other the
       // signature.
       for (int i = 0; i < mm.getCount(); i++) {
-	// return the first one found.
-	MimeBodyPart mbp = (MimeBodyPart) mm.getBodyPart(i);
-	ContentType ct = new ContentType(mbp.getContentType());
-	if (! ct.getSubType().toLowerCase().endsWith("signature")) {
-	  return mbp;
-	} 
+		// return the first one found.
+		MimeBodyPart mbp = (MimeBodyPart) mm.getBodyPart(i);
+		ContentType ct = new ContentType(mbp.getContentType());
+		if (! ct.getSubType().toLowerCase().endsWith("signature")) {
+		  return mbp;
+		} 
       }
+    } 
+    else if(content instanceof String){
+    	String s = (String) content;
+    	if(s.startsWith(PGPEncryptionUtils.BEGIN_PGP_SIGNED_MESSAGE)){
+    		MimeBodyPart mbp = new MimeBodyPart();
+    		mbp.setText(PGPEncryptionUtils.getSignedContent(s));
+    		return mbp;
+    	}    	
     }
 
     return null;
@@ -69,6 +85,14 @@ public class SignedAttachment extends Attachment {
   public DataHandler getDataHandler() {
     return super.getDataHandler();
   }
+
+public boolean isPlainText() {
+	return false;
+}
+
+public boolean isText() {
+	return false;
+}
 
 
   /**
@@ -83,4 +107,7 @@ public class SignedAttachment extends Attachment {
     }
   }
   */
+  
+  
+
 }

@@ -171,7 +171,8 @@ public class ConfigurableComboBox extends JComboBox implements ConfigurableUI {
 
     public ConfigurableComboRenderer() {
       setOpaque(true);
-      setHorizontalAlignment(CENTER);
+      setHorizontalAlignment(LEFT);
+      //setHorizontalAlignment(CENTER);
       setVerticalAlignment(CENTER);
     }
     

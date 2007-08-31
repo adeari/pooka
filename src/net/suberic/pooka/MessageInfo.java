@@ -1,13 +1,12 @@
 package net.suberic.pooka;
+import net.suberic.pooka.crypto.CryptoAttachment;
+import net.suberic.pooka.crypto.SignedAttachment;
 import net.suberic.pooka.filter.FilterAction;
 import net.suberic.pooka.gui.MessageProxy;
-import net.suberic.util.thread.*;
 import javax.mail.*;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.event.*;
-import javax.swing.*;
-import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -64,7 +63,8 @@ public class MessageInfo {
       // FIXME
       attachments = MailUtilities.parseAttachments(getMessage());
       attachmentsLoaded = true;
-      if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && cryptoInfo.isEncrypted()) {
+      if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && 
+    		  cryptoInfo.isEncrypted()) {
         UserProfile p = getDefaultProfile();
         if (p == null)
           p = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
@@ -74,7 +74,8 @@ public class MessageInfo {
         }
       }
 
-      if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") && cryptoInfo.isSigned()) {
+      if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") && 
+    		  cryptoInfo.isSigned()) {
         if (cryptoInfo.autoCheckSignature((javax.mail.internet.InternetAddress) getMessage().getFrom()[0])) {
           //attachments = MailUtilities.parseAttachments(getMessage());
         }
@@ -979,36 +980,45 @@ public class MessageInfo {
    * Returns whether or not this message has attachments.
    */
   public boolean hasAttachments() throws MessagingException {
-    if (mHasCheckedAttachments) {
-      return mHasAttachments;
-    } else {
-      if (hasLoadedAttachments()) {
-        if (getAttachments() != null && getAttachments().size() > 0)
-          mHasAttachments = true;
-
-        mHasCheckedAttachments = true;
-
-        return mHasAttachments;
-
-      } else {
-        try {
-          javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
-          if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
-            return true;
-          } else {
-            return false;
-          }
-        } catch (javax.mail.internet.ParseException pe) {
-          if (Pooka.isDebug()) {
-            System.out.println("unable to parse content-type:  " + getMessage().getContentType());
-          }
-          mHasAttachments = false;
-        }
-      }
-    }
-
-    return mHasAttachments;
+	  return hasAttachments(true);
   }
+
+  /**
+   * Returns whether or not this message has attachments.
+   */
+  public boolean hasAttachments(boolean inclusiveCryptoAttach) throws MessagingException {
+	    //if (mHasCheckedAttachments) {
+	    //  return mHasAttachments;
+	    //} else {
+	      if (hasLoadedAttachments()) {
+	    	  Vector attachs = getAttachments(inclusiveCryptoAttach);
+	    	  
+	        if (attachs != null && attachs.size() > 0)
+	          mHasAttachments = true;
+
+	        mHasCheckedAttachments = true;
+
+	        return mHasAttachments;
+
+	      } else {
+	        try {
+	          javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
+	          if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
+	            return true;
+	          } else {
+	            return false;
+	          }
+	        } catch (javax.mail.internet.ParseException pe) {
+	          if (Pooka.isDebug()) {
+	            System.out.println("unable to parse content-type:  " + getMessage().getContentType());
+	          }
+	          mHasAttachments = false;
+	        }
+	      }
+	    //}
+
+	    return mHasAttachments;
+	  }
 
   /**
    * Returns whether or not this message has encryption on it.
@@ -1027,14 +1037,35 @@ public class MessageInfo {
   /**
    * Returns the attachments for this MessageInfo.  If the attachments
    * have not yet been loaded, attempts to load the attachments.
+   * are considered.  
    */
   public Vector getAttachments() throws MessagingException {
-    if (hasLoadedAttachments())
-      return attachments.getAttachments(getMaxMessageDisplayLength());
-    else {
-      loadAttachmentInfo();
-      return attachments.getAttachments(getMaxMessageDisplayLength());
+	  return getAttachments(true);
+  }
+  
+  /**
+   * Returns the attachments for this MessageInfo.  If the attachments
+   * have not yet been loaded, attempts to load the attachments.
+   * @param inclusiveCryptoAttach: indicates whether the crypto attachments
+   * are considered.  
+   */
+  public Vector getAttachments(boolean inclusiveCryptoAttach) throws MessagingException {
+    if (!hasLoadedAttachments())
+    	loadAttachmentInfo();
+    
+    Vector atts = attachments.getAttachments(getMaxMessageDisplayLength());
+    
+    if ((!inclusiveCryptoAttach) && atts != null && atts.size() > 0) {    	
+        for (int i = 0; i < atts.size() ; i++) {
+          Attachment attach = (Attachment) atts.elementAt(i);
+          if(attach instanceof CryptoAttachment || attach instanceof SignedAttachment){
+        	  atts.remove(attach);
+        	  i--;
+          }
+        }
     }
+    
+    return atts;
 
   }
 
@@ -1136,6 +1167,16 @@ public class MessageInfo {
   public void setFetched(boolean newValue) {
     fetched = newValue;
   }
+
+  /**
+   * Returns the headerlines of the contained message 
+   */
+	public Vector getHeaderLines() throws MessagingException{
+	    if (!hasLoadedAttachments())
+	    	loadAttachmentInfo();
+	    
+		return attachments.headerLines;
+	}
 }
 
 

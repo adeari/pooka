@@ -1,4 +1,4 @@
-<project name="Pooka" default="compile" basedir=".">
+<project name="Pooka" default="usage" basedir=".">
   <property name="builddir" value="Build"/>
   <property name="classes_dir" value="${builddir}/classes"/>
   <property name="webstart_build" value="${builddir}/webstart"/>
@@ -27,11 +27,24 @@
   <property name="javahelp_dist_lib" value="${importdir}/jh.jar"/>
   <property name="icons_dist_lib" value="${importdir}/linspire_clear.jar"/>
   <property name="crypto_lib" value="${importdir}/javamail-crypto.jar"/>
-  <property name="crypto_combined_lib" value="${importdir}/cryptoproviders.jar"/>
+  <!--property name="crypto_combined_lib" value="${importdir}/cryptoproviders.jar"/>
   <property name="cryptix_message_api_lib" value="${importdir}/cryptix-message-api.jar"/>
-  <property name="cryptix_pki_api_lib" value="${importdir}/cryptix-pki-api.jar"/>
+  <property name="cryptix_pki_api_lib" value="${importdir}/cryptix-pki-api.jar"/-->
   <property name="htmlparser_lib" value="${importdir}/htmlparser.jar"/> 
+  <property name="tablelayout_lib" value="${importdir}/TableLayout.jar"/> 
 
+  <target name="usage">
+    <echo message="Supported targets are:"/>
+    <echo message=""/>
+  	<echo message="  clean      - remove any generated files"/>
+  	<echo message="  compile    - compile the sources"/>
+  	<echo message="  docs       - generate the javadoc"/>
+  	<echo message="  dist       - basic distribution" />
+  	<echo message="  dist-full  - full distribution, includes everything but crypto libraries"/>
+  	<echo message="  all        - full distribution, docs and source code"/>
+  	<echo message="  dist-crypto- full distribution, includes everything"/>
+  </target>
+	
 <!-- initialization/cleaning tasks. -->
   <target name="clean">
     <delete dir="${distdir}"/>
@@ -193,8 +206,9 @@
       <zipfileset src="${crypto_lib}"/>
       <zipfileset src="${icons_dist_lib}"/>
       <zipfileset src="${htmlparser_lib}"/>
+      <zipfileset src="${tablelayout_lib}"/>
     </jar>
-    <signjar jar="${distdir}/pooka_${today}.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <!--signjar jar="${distdir}/pooka_${today}.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/-->
   </target>
 
 <!-- builds basic distribution files -->
@@ -214,25 +228,24 @@
     </tstamp>
     <jar jarfile="${distdir}/cryptodist/pooka/pooka.jar" basedir="${classes_dir}" manifest="${importdir}/pooka_crypto.manifest"> 
       <zipfileset src="${javahelp_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
-      <zipfileset src="${mail_dist_lib}"/>
+      <zipfileset src="${mail_dist_lib}" excludes="META-INF/SUN_MICR.*"/>
       <zipfileset src="${htmlparser_lib}"/>
       <zipfileset src="${localproviders_lib}"/>
       <zipfileset src="${kunststoff_lib}"/>
       <zipfileset src="${crypto_lib}"/>
       <zipfileset src="${icons_dist_lib}"/>
+      <zipfileset src="${htmlparser_lib}"/>
+      <zipfileset src="${tablelayout_lib}"/>
     </jar>
-    <signjar jar="${distdir}/cryptodist/pooka/pooka.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <!--signjar jar="${distdir}/cryptodist/pooka/pooka.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/-->
 
     <copy todir="${distdir}/cryptodist/pooka/lib">
       <fileset dir="${importdir}">
-        <include name="bcmail-jdk14-131.jar"/>
-        <include name="bcprov-jdk14-131.jar"/>
-        <include name="cryptix-jce-provider.jar"/>
-        <include name="cryptix-openpgp-provider.jar"/>
-        <include name="cryptix-message-api.jar"/>
-        <include name="cryptix-pki-api.jar"/>
+        <include name="bcmail.jar"/>
+        <include name="bcprov.jar"/>
+        <include name="bcpg.jar"/>
         <include name="javamail-crypto-bouncycastle-smime.jar"/>
-        <include name="javamail-crypto-cryptix-openpgp.jar"/>
+        <include name="javamail-crypto-bouncycastle-openpgp.jar"/>
       </fileset>
     </copy>
     
@@ -337,10 +350,10 @@
       <fileset dir="${importdir}">
         <include name="bcmail.jar"/>
         <include name="bcprov.jar"/>
-        <include name="cryptix*.jar"/>
+        <!--include name="cryptix*.jar"/-->
         <include name="htmlparser.jar"/>
-	<include name="javamail-crypto*.jar"/>
-	<include name="javamaildir.jar"/>
+   	    <include name="javamail-crypto*.jar"/>
+	    <include name="javamaildir.jar"/>
         <include name="jh.jar"/>
         <include name="kunststoff.jar"/>
         <include name="linspire_clear.jar"/>
@@ -356,11 +369,8 @@
     <signjar jar="${webstart_build}/lib/javamaildir.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
     <signjar jar="${webstart_build}/lib/kunststoff.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
     <signjar jar="${webstart_build}/lib/javamail-crypto.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
-    <signjar jar="${webstart_build}/lib/javamail-crypto-cryptix-openpgp.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
+    <signjar jar="${webstart_build}/lib/javamail-crypto-bouncycastle-openpgp.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
     <signjar jar="${webstart_build}/lib/javamail-crypto-bouncycastle-smime.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
-    <signjar jar="${webstart_build}/lib/cryptix-openpgp-provider.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
-    <signjar jar="${webstart_build}/lib/cryptix-pki-api.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
-    <signjar jar="${webstart_build}/lib/cryptix-message-api.jar" alias="pooka" storepass="pooka_fake"  keystore="Imported/test_keystore"/>
 
     <!-- copy over main jnlp file -->
     <copy file="${webstart_source}/pooka.jnlp" todir="${webstart_build}"/>
@@ -374,7 +384,7 @@
     </copy>
 
     <replace file="${webstart_build}/lib/bouncy.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
-    <replace file="${webstart_build}/lib/cryptix.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
+    <replace file="${webstart_build}/lib/bouncypgp.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
     <replace file="${webstart_build}/lib/jaf.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
     <replace file="${webstart_build}/lib/javahelp.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
     <replace file="${webstart_build}/lib/javamail.jnlp" token="${BASE_URL}" value="${webstart_url}"/>

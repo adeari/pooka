@@ -107,11 +107,12 @@ class AttachmentBundle {
     if (! allowTextPart) {
       allAttachments.add(newAttach);
     } else {
-      if ((textPart == null || textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) && (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
+      if (textPart == null && newAttach instanceof net.suberic.pooka.crypto.CryptoAttachment) {
+            textPart = newAttach;
+            allAttachments.add(newAttach);
+       } else if ((textPart == null || textPart instanceof net.suberic.pooka.crypto.CryptoAttachment) && 
+    		  (newAttach instanceof AlternativeAttachment || ct.match("text/*"))) {
         textPart = newAttach;
-      } else if (textPart == null && newAttach instanceof net.suberic.pooka.crypto.CryptoAttachment) {
-        textPart = newAttach;
-        allAttachments.add(newAttach);
       } else {
         allAttachments.add(newAttach);
       }
@@ -176,14 +177,14 @@ class AttachmentBundle {
    */
   public Vector getAttachments(int maxLength) {
     if (textPart != null && textPart.getSize() >= maxLength) {
-      if (attachmentsAndTextPart != null)
-        return attachmentsAndTextPart;
-      else {
+      //if (attachmentsAndTextPart != null)
+      //  return attachmentsAndTextPart;
+      //else {
         attachmentsAndTextPart = new Vector();
         attachmentsAndTextPart.add(textPart);
         attachmentsAndTextPart.addAll(allAttachments);
         return new Vector(attachmentsAndTextPart);
-      }
+     // }
     } else
       return new Vector(allAttachments);
   }
@@ -192,14 +193,16 @@ class AttachmentBundle {
    * Returns all attachments, including the text part.
    */
   public Vector getAttachmentsAndTextPart() {
-    if (attachmentsAndTextPart != null)
-      return new Vector(attachmentsAndTextPart);
-    else {
+    //if (attachmentsAndTextPart != null)
+    //  return new Vector(attachmentsAndTextPart);
+    //else {
       attachmentsAndTextPart = new Vector();
-      attachmentsAndTextPart.add(textPart);
+      if(!allAttachments.contains(textPart)){
+    	  attachmentsAndTextPart.add(textPart);
+      }
       attachmentsAndTextPart.addAll(allAttachments);
       return new Vector(attachmentsAndTextPart);
-    }
+    //}
   }
 
   /**

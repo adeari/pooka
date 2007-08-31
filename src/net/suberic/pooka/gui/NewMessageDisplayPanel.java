@@ -1,27 +1,73 @@
 package net.suberic.pooka.gui;
-import net.suberic.pooka.*;
-import net.suberic.util.gui.*;
-import net.suberic.util.swing.EntryTextArea;
-import net.suberic.pooka.gui.crypto.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.Vector;
 
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.text.TextAction;
-import java.util.*;
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.InternetHeaders;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextPane;
+import javax.swing.JToggleButton;
+import javax.swing.KeyStroke;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
-import javax.swing.event.*;
-import java.io.File;
-import javax.swing.plaf.metal.*;
-import javax.swing.plaf.*;
+import javax.swing.text.TextAction;
+
+import net.suberic.pooka.NewMessageInfo;
+import net.suberic.pooka.Pooka;
+import net.suberic.pooka.UserProfile;
+import net.suberic.pooka.gui.crypto.CryptoStatusDisplay;
+//import net.suberic.pooka.gui.crypto.NewMessageCryptoDisplay;
+import net.suberic.util.gui.ConfigurableKeyBinding;
+import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.gui.IconManager;
+import net.suberic.util.swing.EntryTextArea;
 
 /**
  * A window for entering new messages.
  */
 public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemListener {
-
   JTabbedPane tabbedPane = null;
   Container headerPanel = null;
   boolean modified = false;
@@ -556,15 +602,15 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
    */
   public void addEncryptionPane() {
     cryptoPanel = new JPanel();
-    NewMessageCryptoDisplay nmcd = new NewMessageCryptoDisplay(getNewMessageProxy());
-    cryptoDisplay = nmcd;
+//    NewMessageCryptoDisplay nmcd = new NewMessageCryptoDisplay(getNewMessageProxy());
+//    cryptoDisplay = nmcd;
 
     cryptoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
     cryptoPanel.setSize(headerPanel.getSize());
 
     ((JPanel)cryptoPanel).setBorder(BorderFactory.createEtchedBorder());
 
-    cryptoPanel.add(nmcd);
+//    cryptoPanel.add(nmcd);
 
     tabbedPane.add(Pooka.getProperty("MessageWindow.EncryptionTab", "Encryption"), cryptoPanel);
   }

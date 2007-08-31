@@ -38,6 +38,17 @@ public class CryptoAttachment extends Attachment {
       signed = true;
     else if (ct.getPrimaryType().equalsIgnoreCase("application") && ct.getSubType().equalsIgnoreCase("pkcs7-mime")) {
       encrypted = true;
+    } else{
+    	try{
+	    	Object content = mp.getContent();
+	    	if(content instanceof String){
+	   	  	  if(((String) content).indexOf(PGPEncryptionUtils.BEGIN_PGP_MESSAGE) == 0){
+	   	  		  encrypted = true;
+	   	  	  }
+	    	}
+    	}catch(IOException ie){
+    		;
+    	}
     }
   }
 
@@ -88,4 +99,11 @@ public class CryptoAttachment extends Attachment {
     return (decryptedBodyPart != null);
   }
   
+  public boolean isPlainText() {
+		return false;
+	}
+
+	public boolean isText() {
+		return false;
+	}
 }

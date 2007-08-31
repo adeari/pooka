@@ -1,23 +1,50 @@
 package net.suberic.pooka.gui;
 
+import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.InternetHeaders;
+import javax.mail.internet.MimeMessage;
 
-import net.suberic.pooka.*;
-import net.suberic.crypto.*;
+import net.suberic.crypto.EncryptionKey;
+import net.suberic.crypto.EncryptionManager;
+import net.suberic.crypto.EncryptionUtils;
+import net.suberic.pooka.MessageCryptoInfo;
+import net.suberic.pooka.NewMessageInfo;
+import net.suberic.pooka.Pooka;
+import net.suberic.pooka.PookaEncryptionManager;
+import net.suberic.pooka.UserProfile;
+import net.suberic.pooka.gui.crypto.CryptoKeySelector;
+//import net.suberic.pooka.gui.crypto.NewMessageCryptoDisplay;
 
 /**
  * Encapsulates the encryption info for a new message.
  */
 public class NewMessageCryptoInfo extends MessageCryptoInfo {
-
+//Liao-
+	  int cryptoType = NO_CRYPTO;
+	   
+	  public static final int NO_CRYPTO       = 0; 
+	  public static final int SMIME_SIGN      = 1;
+	  public static final int SMIME_ENCRYPT   = 2;
+	  public static final int SMIME_BOTH      = 3;
+	  public static final int PGP_SIGN    = 4;
+	  public static final int PGP_ENCRYPT = 5;
+	  public static final int PGP_BOTH    = 6;
+	  
+	  public void setCryptoType(int type){
+		  cryptoType = type;
+	  }
+//Liao+	
+	
   List mAttachKeys = new LinkedList();
 
   List mRecipientMatches = new LinkedList();
@@ -33,7 +60,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   int mSignMessage = CRYPTO_DEFAULT;
 
   // the configured list of recipients.
-  List mRecipientInfos = new LinkedList();
+  CryptoRecipientsInfo mRecipientsInfo;
 
   /**
    * Creates a new NewMessageCryptoInfo.
@@ -48,7 +75,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   Key mSignatureKey = null;
 
   // the encryption key
-  Key mEncryptionKey = null;
+  Key[] mEncryptionKeys = null;
 
   /**
    * The Signature Key for this set of recipients.
@@ -67,15 +94,15 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   /**
    * Sets the encryption key for encrypting this message.
    */
-  public void setEncryptionKey(Key pEncryptionKey) {
-    mEncryptionKey = pEncryptionKey;
+  public void setEncryptionKeys(Key[] pEncryptionKeys) {
+    mEncryptionKeys = pEncryptionKeys;
   }
 
   /**
    * Gets the encryption key we're using for this message.
    */
-  public Key getEncryptionKey() {
-    return mEncryptionKey;
+  public Key[] getEncryptionKeys() {
+    return mEncryptionKeys;
   }
 
   // sign message.
@@ -165,22 +192,108 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   /**
    * Returns the encrypted and/or signed message(s), as appropriate.
    */
-  public Map createEncryptedMessages(MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
-    Map returnValue = new HashMap();
+  public MimeMessage createEncryptedMessage(UserProfile profile, MimeMessage mm) 
+  throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+		//Liao-
+	  if(cryptoType == NO_CRYPTO)
+		  return mm;
+	  
+    Key signKey = null;
 
-    List recipientInfoList = getCryptoRecipientInfos();
-    for (int i = 0; i < recipientInfoList.size(); i++) {
-      returnValue.put(((CryptoRecipientInfo) recipientInfoList.get(i)).handleMessage(mm),((CryptoRecipientInfo) recipientInfoList.get(i)).getAllRecipients() );
+    signKey = getSignatureKey();
+    if(signKey == null){
+	   	switch (cryptoType) {
+		case SMIME_SIGN:
+		case SMIME_BOTH:
+			signKey = profile.getEncryptionKey(EncryptionManager.SMIME, true);
+			break;
+		case PGP_SIGN:
+		case PGP_BOTH:
+			signKey = profile.getEncryptionKey(EncryptionManager.PGP, true);				
+			break;	
+		}
     }
 
-    return returnValue;
+  	PookaEncryptionManager cryptoManager = Pooka.getCryptoManager();
+  	
+  	InternetAddress from = (InternetAddress) mm.getFrom()[0];
+
+    // Find the keys to sign and encrypt the messages
+	if(signKey == null && (cryptoType == SMIME_SIGN || cryptoType == SMIME_BOTH)){
+		Key[] keys = cryptoManager.getPrivateKeysForAddress(from.getAddress(), EncryptionManager.SMIME,  true);
+		if(keys == null || keys.length == 0){
+	          getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find S/MIME signing key for " + from);
+		}
+		signKey = keys[0];
+	}
+	
+  	if(signKey == null &&  (cryptoType == PGP_SIGN || cryptoType == PGP_BOTH)){
+		Key[] keys = cryptoManager.getPrivateKeysForAddress(from.getAddress(), EncryptionManager.PGP,  true);
+		if(keys == null || keys.length == 0){
+	          getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find PGP signing key for " + from);
+		}
+		signKey = keys[0];
+	}
+	
+    List encKeys = new LinkedList();    
+    
+    //TODO: get the encKey from the available public keys    
+	if(cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH || 
+	   cryptoType == PGP_ENCRYPT || cryptoType == PGP_BOTH)
+	{
+		String type = (cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH) ?
+				EncryptionManager.SMIME : EncryptionManager.PGP;				
+	    try {
+	        // Get the public key of the senders
+	        Address[] froms = mm.getFrom();
+	        for (int i = 0; i < froms.length; i++) {
+	        	from = (InternetAddress) froms[i];
+	    		Key[] keys = cryptoManager.getPublicKeys(
+	    				from.getAddress(), type, false);
+	    		if(keys != null && keys.length > 0){
+	    			encKeys.add(keys[0]);
+	    		}
+	    	}
+
+	        // Get the public key of the receivers
+	        Address[] receivers = mm.getAllRecipients();
+	        for (int i = 0; i < receivers.length; i++) {
+	        	InternetAddress rec = (InternetAddress) receivers[i];
+	        	Key[] keys = cryptoManager.getPublicKeys(
+	        			rec.getAddress(), type, false);
+	        	if(keys != null && keys.length > 0){
+	        		encKeys.add(keys[0]);
+	        	}else{
+	        		throw new GeneralSecurityException("found no certificate for " + rec.getAddress());
+	        	}
+	        }
+	         /*Key encKey = CryptoKeySelector.selectPublicKey(
+	       		  Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt",  
+	       				  "Select key to encrypt this message."), 
+	       				  EncryptionManager.SMIME, false);
+	         */
+        } catch (Exception ex) {
+	         getMessageInfo().getMessageProxy().getMessageUI().showError(ex.getMessage(), ex);
+	    }
+	}
+	      
+	if(encKeys.size() > 0){
+	   	Key[] encKeysArray = (Key[]) encKeys.toArray(new Key[0]);   	
+	   	mRecipientsInfo.setEncryptionKeys(encKeysArray);
+	}
+    
+	if(signKey != null)
+		mRecipientsInfo.setSignatureKey(signKey);
+
+    return mRecipientsInfo.handleMessage(mm);
+
   }
 
   /**
    * Returns the configured CryptoRecipientInfos.
    */
-  public List getCryptoRecipientInfos() {
-    return mRecipientInfos;
+  public CryptoRecipientsInfo getCryptoRecipientsInfo() {
+    return mRecipientsInfo;
   }
 
   /**
@@ -215,37 +328,32 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       bccAddresses = new InternetAddress[0];
     }
 
-    Key cryptKey = null;
+    Key[] cryptKeys = null;
 
     if (getEncryptMessage() != CRYPTO_NO)
-      cryptKey = getEncryptionKey();
+      cryptKeys = getEncryptionKeys();
 
     Key sigKey = null;
     if (getSignMessage() != CRYPTO_NO)
       sigKey = getSignatureKey();
 
-    CryptoRecipientInfo info = new CryptoRecipientInfo(sigKey, cryptKey, toAddresses, ccAddresses, bccAddresses);
-
-    mRecipientInfos = new LinkedList();
-    mRecipientInfos.add(info);
+    mRecipientsInfo = new CryptoRecipientsInfo(sigKey, cryptKeys, toAddresses, ccAddresses, bccAddresses);
 
     return true;
   }
 
   // Recipient/encryption key matches.
-
   /**
    * This represents a match between a recipient set and an encryption
    * configuration.  The assumption is that all of the following recipients
    * can receive the same message.
    */
-  public class CryptoRecipientInfo {
-
+  public class CryptoRecipientsInfo {	  
     // the signature key.
     Key mSignatureKey = null;
 
     // the encryption key
-    Key mEncryptionKey = null;
+    Key[] mEncryptionKeys = null;
 
     // the recipients
     Address[] toList = null;
@@ -255,7 +363,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     /**
      * Creteas a new CryptoRecipieintInfo.
      */
-    public CryptoRecipientInfo() {
+    public CryptoRecipientsInfo() {
 
     }
 
@@ -263,9 +371,10 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
      * Creates a new CryptoRecipieintInfo with the given signatureKey,
      * encryptionKey, toList, ccList, and bccList.
      */
-    public CryptoRecipientInfo(Key pSignatureKey, Key pEncryptionKey, Address[] pToList, Address[] pCcList, Address[] pBccList) {
+    public CryptoRecipientsInfo(Key pSignatureKey, Key[] pEncryptionKeys, 
+    		Address[] pToList, Address[] pCcList, Address[] pBccList) {
 
-      setEncryptionKey(pEncryptionKey);
+      setEncryptionKeys(pEncryptionKeys);
       setSignatureKey(pSignatureKey);
 
       setRecipients(pToList, Message.RecipientType.TO);
@@ -345,15 +454,15 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     /**
      * Sets the encryption key for encrypting this message.
      */
-    public void setEncryptionKey(Key pEncryptionKey) {
-      mEncryptionKey = pEncryptionKey;
+    public void setEncryptionKeys(Key[] pEncryptionKeys) {
+      mEncryptionKeys = pEncryptionKeys;
     }
 
     /**
      * Gets the encryption key we're using for this message.
      */
-    public Key getEncryptionKey() {
-      return mEncryptionKey;
+    public Key[] getEncryptionKeys() {
+      return mEncryptionKeys;
     }
 
     /**
@@ -361,7 +470,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
      */
     public MimeMessage handleMessage(MimeMessage mm)
       throws MessagingException, java.io.IOException, java.security.GeneralSecurityException  {
-      MimeMessage returnValue = new MimeMessage(mm);
+      //MimeMessage returnValue = new MimeMessage(mm);
 
       /*
         returnValue.setRecipients(Message.RecipientType.TO, getRecipients(Message.RecipientType.TO));
@@ -370,24 +479,26 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       */
 
       Key sigKey = getSignatureKey();
-      Key cryptoKey = getEncryptionKey();
+      Key[] cryptoKeys = getEncryptionKeys();
 
-      if (sigKey instanceof EncryptionKey && cryptoKey instanceof EncryptionKey) {
+/*      if (sigKey instanceof EncryptionKey && cryptoKey instanceof EncryptionKey) {
         if (((EncryptionKey)sigKey).getType() != ((EncryptionKey)cryptoKey).getType()) {
           throw new MessagingException(Pooka.getProperty("error.NewMessage.differentEncryption", "Encryption and Signature Keys must be of same type (PGP or S/MIME)"));
         }
       }
-
+*/      
+	  PookaEncryptionManager cryptoManager = Pooka.getCryptoManager();
+	  
       if (getSignatureKey() != null) {
-        returnValue = Pooka.getCryptoManager().signMessage(returnValue, null, getSignatureKey());
-
+    	  mm = cryptoManager.signMessage(mm, null, sigKey);
+      }
+	
+      if (cryptoKeys != null) {
+    	  mm = cryptoManager.encryptMessage(mm, 
+        		  cryptoKeys);
       }
 
-      if (getEncryptionKey() != null) {
-        returnValue = Pooka.getCryptoManager().encryptMessage(returnValue, getEncryptionKey());
-      }
-
-      return returnValue;
+      return mm;
     }
   }
 

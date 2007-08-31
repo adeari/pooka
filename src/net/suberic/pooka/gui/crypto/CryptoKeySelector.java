@@ -1,11 +1,15 @@
 package net.suberic.pooka.gui.crypto;
 
-import net.suberic.pooka.*;
-import net.suberic.crypto.*;
+import java.util.Set;
+import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 
-import java.util.*;
+import net.suberic.pooka.Pooka;
 
 /**
  * Selects a Key.
@@ -15,32 +19,34 @@ public class CryptoKeySelector {
   /**
    * Selects a public key.
    */
-  public static java.security.Key selectPublicKey(String message, String type) throws java.security.GeneralSecurityException {
+  public static java.security.Key selectPublicKey(String message, String type, boolean forSignature) 
+  throws java.security.GeneralSecurityException {
 
-    Set publicKeys = Pooka.getCryptoManager().publicKeyAliases(type);
+    Set publicKeys = Pooka.getCryptoManager().publicKeyAliases(type, forSignature);
     String alias = showKeySet(publicKeys, message, Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key."));
     if (alias == null) 
       return null;
     
-    return Pooka.getCryptoManager().getPublicKey(alias);
+    return Pooka.getCryptoManager().getPublicKey(alias, type);
   }
 
   /**
    * Selects a private key.
    */
-  public static java.security.Key selectPrivateKey(String message, String type)  throws java.security.GeneralSecurityException {
+  public static java.security.Key selectPrivateKey(String message, String type, boolean forSignature)  
+  throws java.security.GeneralSecurityException {
 
-    Set privateKeys = Pooka.getCryptoManager().privateKeyAliases(type);
+    Set privateKeys = Pooka.getCryptoManager().privateKeyAliases(type, forSignature);
     String alias = showKeySet(privateKeys, message, Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key."));
     if (alias == null) 
       return null;
 
     java.security.Key returnValue = null;
     try {
-      returnValue = Pooka.getCryptoManager().getPrivateKey(alias);
+      returnValue = Pooka.getCryptoManager().getPrivateKey(alias, type);
     } catch (java.security.UnrecoverableKeyException uke) {
-      char[] password = showPassphraseDialog(alias);
-      returnValue = Pooka.getCryptoManager().getPrivateKey(alias, password);
+    	char[] passphrase = showPassphraseDialog(alias);
+    	returnValue = Pooka.getCryptoManager().getPrivateKey(alias, type, passphrase);
     }
     
     return returnValue;

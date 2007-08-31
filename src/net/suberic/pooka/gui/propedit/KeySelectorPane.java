@@ -1,14 +1,17 @@
 package net.suberic.pooka.gui.propedit;
-import net.suberic.util.gui.propedit.*;
-import net.suberic.util.VariableBundle;
-import net.suberic.pooka.gui.filechooser.*;
-import net.suberic.pooka.*;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-
+import java.awt.Dimension;
 import java.util.Set;
 import java.util.Vector;
+
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import net.suberic.crypto.EncryptionManager;
+import net.suberic.pooka.Pooka;
+import net.suberic.util.gui.propedit.LabelValuePropertyEditor;
+import net.suberic.util.gui.propedit.PropertyEditorManager;
+import net.suberic.util.gui.propedit.PropertyValueVetoException;
 
 /**
  * This displays the currently selected key (if any).
@@ -41,11 +44,13 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
 
     this.add(label);
     labelComponent = label;
-    JPanel tmpPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0,0));
-    tmpPanel.add(valueDisplay);
-    tmpPanel.setPreferredSize(new java.awt.Dimension(Math.max(150, tmpPanel.getMinimumSize().width), valueDisplay.getMinimumSize().height));
-    valueComponent = tmpPanel;
-    this.add(tmpPanel);
+    //JPanel tmpPanel = new JPanel(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT, 0,0));
+    //tmpPanel.add(valueDisplay);
+    //tmpPanel.setPreferredSize(new java.awt.Dimension(Math.max(150, tmpPanel.getMinimumSize().width), valueDisplay.getMinimumSize().height));
+    //valueComponent = tmpPanel;
+    //this.add(tmpPanel);
+    valueComponent = valueDisplay;
+    this.add(valueComponent);
 
     updateEditorEnabled();
 
@@ -58,22 +63,55 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
     if (Pooka.isDebug())
       System.out.println("creating keylist.");
 
-    String encryptionType = manager.getProperty(editorTemplate + ".encryptionType", "All");
+    String sEncryptionType = manager.getProperty(editorTemplate + ".encryptionType", "All");
 
-    if (encryptionType.equalsIgnoreCase("All"))
-      encryptionType = null;
+    String encryptionType;    
+    if(sEncryptionType.equalsIgnoreCase("S/MIME"))
+      encryptionType = EncryptionManager.SMIME;
+    else if(sEncryptionType.equalsIgnoreCase("SMIME"))
+        encryptionType = EncryptionManager.SMIME;
+    else if(sEncryptionType.equalsIgnoreCase("PGP"))
+        encryptionType = EncryptionManager.PGP;
+    else
+        encryptionType = null;
 
     String keyType = manager.getProperty(editorTemplate + ".keyType", "private");
-
+    String keyPurpose = manager.getProperty(editorTemplate + ".keyPurpose", "signature");
     Set keySet = null;
 
+    Set tmpSet = null;
     try {
-      if (keyType.equalsIgnoreCase("private"))
-        keySet = Pooka.getCryptoManager().privateKeyAliases(encryptionType);
-      else
-        keySet = Pooka.getCryptoManager().publicKeyAliases(encryptionType);
+      if (keyType.equalsIgnoreCase("private")){
+    	  if("signature".equalsIgnoreCase(keyPurpose)){
+    		  keySet = Pooka.getCryptoManager().privateKeyAliases(encryptionType, true);
+    	  }else if("encryption".equalsIgnoreCase(keyPurpose)){
+    		  keySet = Pooka.getCryptoManager().privateKeyAliases(encryptionType, false);
+    	  }else {
+    		  keySet = Pooka.getCryptoManager().privateKeyAliases(encryptionType, true);
+    		  tmpSet = Pooka.getCryptoManager().privateKeyAliases(encryptionType, true);
+    	  }
+      }
+      else{
+    	  if("signature".equalsIgnoreCase(keyPurpose)){
+    		  keySet = Pooka.getCryptoManager().publicKeyAliases(encryptionType, true);
+    	  }else if("encryption".equalsIgnoreCase(keyPurpose)){
+    		  keySet = Pooka.getCryptoManager().publicKeyAliases(encryptionType, false);
+    	  }else {
+    		  keySet = Pooka.getCryptoManager().publicKeyAliases(encryptionType, true);
+    		  tmpSet = Pooka.getCryptoManager().publicKeyAliases(encryptionType, true);
+    	  }
+      }
     } catch (java.security.KeyStoreException kse) {
       keySet = null;
+    }
+
+    if(tmpSet != null){
+	    java.util.Iterator it = tmpSet.iterator();
+	    while(it.hasNext()){
+	    	Object obj = it.next();
+	    	if(!keySet.contains(obj))
+	    		keySet.add(obj);
+	    }
     }
 
     Vector listModel = null;
@@ -84,18 +122,18 @@ public class KeySelectorPane extends LabelValuePropertyEditor {
       listModel = new Vector();
     }
 
-    if (originalValue != null && originalValue != "") {
+    /*if (originalValue != null && originalValue != "") {
       if (! listModel.contains(originalValue))
         listModel.add(originalValue);
       JComboBox returnValue = new JComboBox(listModel);
       returnValue.setSelectedItem(originalValue);
 
       return returnValue;
-    } else {
+    } else {*/
       JComboBox returnValue = new JComboBox(listModel);
 
       return returnValue;
-    }
+//    }
   }
 
   //  as defined in net.suberic.util.gui.PropertyEditorUI

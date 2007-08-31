@@ -21,6 +21,17 @@ public interface CryptoStatusDisplay {
    * Updates the encryption information.
    */
   public void cryptoUpdated(net.suberic.pooka.MessageCryptoInfo cryptoInfo);
+  
+  /** 
+   * Liao: Return the signature status
+   */
+  public int getSignatureStatus();
+
+  /** 
+   * Liao: Return the encryption status
+   */
+  public int getEncryptionStatus();
+  
 
 }
     

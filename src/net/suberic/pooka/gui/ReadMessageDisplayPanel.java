@@ -1,33 +1,54 @@
 package net.suberic.pooka.gui;
-import net.suberic.pooka.*;
-import net.suberic.util.gui.*;
-import net.suberic.util.swing.HyperlinkMouseHandler;
-import javax.mail.*;
-import javax.mail.internet.*;
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import info.clearthought.layout.TableLayout;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.Vector;
+
+import javax.mail.MessagingException;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.InputMap;
+import javax.swing.JComponent;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.text.TextAction;
-import java.util.*;
-import javax.swing.text.JTextComponent;
-import javax.swing.event.*;
-import java.io.File;
+
+import net.suberic.pooka.MessageCryptoInfo;
+import net.suberic.pooka.MessageInfo;
+import net.suberic.pooka.Pooka;
+import net.suberic.pooka.gui.crypto.CryptoPanel;
+import net.suberic.pooka.gui.crypto.CryptoStatusDisplay;
+import net.suberic.util.gui.ConfigurableKeyBinding;
+import net.suberic.util.gui.ConfigurablePopupMenu;
+import net.suberic.util.swing.HyperlinkMouseHandler;
 
 public class ReadMessageDisplayPanel extends MessageDisplayPanel {
-  
-  private JTextPane otherEditorPane = null;
-  private JScrollPane otherScrollPane = null;
-  
+  private JTextPane headerPane = null;
+  private JScrollPane headerScrollPane = null;
+	
   private Box attachmentSlot = null;
   private Box cryptoSlot = null;
 
   public boolean firstShow = true;
   
-  private static String WITH_ATTACHMENTS = "with";
-  private static String WITHOUT_ATTACHMENTS = "without";
-  
-  private String editorStatus = WITHOUT_ATTACHMENTS;
-
   private DisplayStyleComboBox displayCombo = null;
   private DisplayStyleComboBox headerCombo = null;
   private net.suberic.pooka.gui.crypto.CryptoStatusDisplay cryptoStatusDisplay = null;
@@ -42,21 +63,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
    * Creates an empty MessageDisplayPanel.
    */
   public ReadMessageDisplayPanel() {
-    super();
-    
-    this.setLayout(new CardLayout());
-    
-    this.addFocusListener(new FocusAdapter() {
-	public void focusGained(FocusEvent e) {
-	  if (editorStatus == WITHOUT_ATTACHMENTS) {
-	    if (editorPane != null)
-	      editorPane.requestFocusInWindow();
-	  } else if (editorStatus == WITH_ATTACHMENTS) {
-	    if (otherEditorPane != null)
-	      otherEditorPane.requestFocusInWindow();
-	  }
-	}
-      });
+	  this(null);
   }
   
   /**
@@ -64,20 +71,18 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
    */    
   public ReadMessageDisplayPanel(MessageUI newMsgUI) {
     super(newMsgUI);
-    
-    this.setLayout(new CardLayout());
+
+    double[] columns = {TableLayout.FILL, 30};
+    double[] rows = {120, TableLayout.FILL, 100};
+    double[][] format = {columns, rows};
+    this.setLayout(new TableLayout(format));
     
     this.addFocusListener(new FocusAdapter() {
-	public void focusGained(FocusEvent e) {
-	  if (editorStatus == WITHOUT_ATTACHMENTS) {
-	    if (editorPane != null)
+	  public void focusGained(FocusEvent e) {
 	      editorPane.requestFocusInWindow();
-	  } else if (editorStatus == WITH_ATTACHMENTS) {
-	    if (otherEditorPane != null)
-	      otherEditorPane.requestFocusInWindow();
-	  }
-	}
-      });
+      }
+    });
+    
   }
   
   /**
@@ -86,45 +91,32 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
    * from the MessageProxy.
    */
   public void configureMessageDisplay() throws MessagingException {
+	headerPane = new JTextPane();
+	headerPane.setEditable(false);
+	headerPane.setBackground(Color.LIGHT_GRAY);
+	headerPane.setContentType("text/html");
+	
+	headerScrollPane = new JScrollPane(headerPane,  
+			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+			JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
     editorPane = new JTextPane();
     editorPane.setEditable(false);
     editorPane.addHyperlinkListener(new HyperlinkDispatcher());
-    HyperlinkMouseHandler hmh = new HyperlinkMouseHandler(Integer.parseInt(Pooka.getProperty("Pooka.lineLength", "80")));
+    HyperlinkMouseHandler hmh = new HyperlinkMouseHandler(
+    		Integer.parseInt(Pooka.getProperty("Pooka.lineLength", "80")));
     editorPane.addMouseListener(hmh);
     editorPane.addMouseMotionListener(hmh);
     
-    editorScrollPane = new JScrollPane(editorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    editorScrollPane = new JScrollPane(editorPane, 
+    		JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+    		JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-    // temp
-    
-    otherEditorPane = new JTextPane();
-    otherEditorPane.setEditable(false);
-    otherEditorPane.addHyperlinkListener(new HyperlinkDispatcher());
-    otherEditorPane.addMouseListener(hmh);
-    otherEditorPane.addMouseMotionListener(hmh);
-    otherScrollPane = new JScrollPane(otherEditorPane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-    
     setDefaultFont();
     
-    splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-    
-    attachmentDisplayPanel = new JPanel();
-    attachmentDisplayPanel.setLayout(new BoxLayout(attachmentDisplayPanel, BoxLayout.X_AXIS));
-    attachmentSlot = new Box(BoxLayout.Y_AXIS);
-    cryptoSlot = new Box(BoxLayout.Y_AXIS);
-    
-    attachmentDisplayPanel.add(Box.createHorizontalStrut(5));
-    attachmentDisplayPanel.add(attachmentSlot);
-    attachmentDisplayPanel.add(Box.createHorizontalStrut(5));
-    attachmentDisplayPanel.add(cryptoSlot);
-    attachmentDisplayPanel.add(Box.createHorizontalStrut(5));
-
-    splitPane.setTopComponent(otherScrollPane);
-    splitPane.setBottomComponent(attachmentDisplayPanel);
-    
-    this.add(WITH_ATTACHMENTS, splitPane);
-    this.add(WITHOUT_ATTACHMENTS, editorScrollPane);
-    
+//    attachmentSlot = new Box(BoxLayout.Y_AXIS);
+//    cryptoSlot = new Box(BoxLayout.Y_AXIS);
+  
     keyBindings = new ConfigurableKeyBinding(this, "ReadMessageWindow.keyBindings", Pooka.getResources());
     keyBindings.setActive(getActions());
     
@@ -135,33 +127,33 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     KeyStroke rightArrowStroke = KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_RIGHT, 0);
 
     Action upArrowAction = new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
-	  jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
-	}
-      };
+	 public void actionPerformed(ActionEvent e) {
+	   JScrollBar jsb = editorScrollPane.getVerticalScrollBar();
+	   jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
+	 }
+    };
     
     Action downArrowAction = new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getVerticalScrollBar();
+	 public void actionPerformed(ActionEvent e) {
+	  JScrollBar jsb = editorScrollPane.getVerticalScrollBar();
 	  jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
-	}
-      };
+	 }
+    };
 
     Action leftArrowAction = new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getHorizontalScrollBar();
-	  if (jsb != null)
-	    jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
-	}
+		public void actionPerformed(ActionEvent e) {
+		  JScrollBar jsb = editorScrollPane.getHorizontalScrollBar();
+		  if (jsb != null)
+		    jsb.setValue(jsb.getValue() - jsb.getBlockIncrement());
+		}
       };
 
     Action rightArrowAction = new AbstractAction() {
-	public void actionPerformed(ActionEvent e) {
-	  JScrollBar jsb = getCurrentScrollPane().getHorizontalScrollBar();
-	  if (jsb != null)
-	    jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
-	}
+		public void actionPerformed(ActionEvent e) {
+		  JScrollBar jsb = editorScrollPane.getHorizontalScrollBar();
+		  if (jsb != null)
+		    jsb.setValue(jsb.getValue() + jsb.getBlockIncrement());
+		}
       };
 
     String upArrowKey = "message-scroll-up";
@@ -195,54 +187,26 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     editorPane.setInputMap(JComponent.WHEN_FOCUSED, newInputMap);
     editorPane.setActionMap(newActionMap);
 
-    // add for other panel.
-
-    newInputMap = new InputMap();
-    newActionMap = new ActionMap();
-
-    newInputMap.put(upArrowStroke, upArrowKey);
-    newActionMap.put(upArrowKey, upArrowAction);
-
-    newInputMap.put(downArrowStroke, downArrowKey);
-    newActionMap.put(downArrowKey, downArrowAction);
-
-    newInputMap.put(leftArrowStroke, leftArrowKey);
-    newActionMap.put(leftArrowKey, leftArrowAction);
-
-    newInputMap.put(rightArrowStroke, rightArrowKey);
-    newActionMap.put(rightArrowKey, rightArrowAction);
-
-    InputMap otherEditorInputMap = otherEditorPane.getInputMap();
-    ActionMap otherEditorActionMap = otherEditorPane.getActionMap();
-
-    newInputMap.setParent(otherEditorInputMap);
-    newActionMap.setParent(otherEditorActionMap);
-
-    otherEditorPane.setInputMap(JComponent.WHEN_FOCUSED, newInputMap);
-    otherEditorPane.setActionMap(newActionMap);
-
-    // </scrolling>
+   // </scrolling>
 
     editorPane.addMouseListener(new MouseAdapter() {
+		
+		public void mousePressed(MouseEvent e) {
+		  if (e.isPopupTrigger()) {
+		    showPopupMenu(editorPane, e);
+		  }
+		}
 	
-	public void mousePressed(MouseEvent e) {
-	  if (e.isPopupTrigger()) {
-	    showPopupMenu(editorPane, e);
-	  }
-	}
-
-	public void mouseReleased(MouseEvent e) {
-	  if (e.isPopupTrigger()) {
-	    showPopupMenu(editorPane, e);
-	  }
-	}
-      });
+		public void mouseReleased(MouseEvent e) {
+		  if (e.isPopupTrigger()) {
+		    showPopupMenu(editorPane, e);
+		  }
+		}
+	      }
+    );
     
     if (getMessageProxy() != null) {
       resetEditorText();
-    } else {
-      ((CardLayout)getLayout()).show(this, WITHOUT_ATTACHMENTS);
-      editorStatus = WITHOUT_ATTACHMENTS;
     }
     
   }
@@ -264,6 +228,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     // assume that we're actually on the FolderThread for now.
 
     if (getMessageProxy() != null) {
+      MessageInfo msgInfo = getMessageProxy().getMessageInfo();
+            
       StringBuffer messageText = new StringBuffer();
       
       String content = null;
@@ -276,60 +242,101 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 
       // figure out html vs. text
       if (Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true")) {
-	if (getMessageProxy().getMessageInfo().isHtml()) {
-	  if (msgDisplayMode > MessageProxy.TEXT_ONLY) 
-	    displayHtml = true;
-	  
-	} else if (getMessageProxy().getMessageInfo().containsHtml()) {
-	  if (msgDisplayMode >= MessageProxy.HTML_PREFERRED)
-	    displayHtml = true;
-	  
-	} else {
-	  // if we don't have any html, just display as text.
-	}
+		if (msgInfo.isHtml()) {
+		  if (msgDisplayMode > MessageProxy.TEXT_ONLY) 
+		    displayHtml = true;
+		  
+		} else if (msgInfo.containsHtml()) {
+		  if (msgDisplayMode >= MessageProxy.HTML_PREFERRED)
+		    displayHtml = true;
+		  
+		} else {
+		  // if we don't have any html, just display as text.
+		}
       }
 
+	  //Original was true, changed to false by Liao
+      boolean includeHeaders = false;
+      boolean showFullheaders = showFullHeaders();
+      
+      // Get the header Information
+      String header;
+      if(showFullheaders){
+    	  header = getFullHeaderInfo(msgInfo);
+      }else{
+    	  String list = Pooka.getProperty("MessageWindow.Header.DefaultHeaders", "From:To:CC:Date:Subject");
+    	  header = getHeaderInfo(msgInfo, list);
+      }
+   	  headerPane.setText(header);
+      
       // set the content
       if (msgDisplayMode == MessageProxy.RFC_822) {
-	content = getMessageProxy().getMessageInfo().getRawText();
-      } else {
-	if (displayHtml) {
-	  contentType = "text/html";
+	   content = msgInfo.getRawText();
+      }
+      else {
+	   if (displayHtml) {
+	   contentType = "text/html";
 
-	  if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	    content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
-	  } else {
-	    content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
-	  }
-	} else {
-	  if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	    // Is there only an HTML part?  Regardless, we've determined that 
-	    // we will still display it as text.
-	    if (getMessageProxy().getMessageInfo().isHtml())
-	      content = getMessageProxy().getMessageInfo().getHtmlAndTextInlines(true, showFullHeaders());
-	    else
-	      content = getMessageProxy().getMessageInfo().getTextAndTextInlines(true, showFullHeaders());
-	  } else {
-	    // Is there only an HTML part?  Regardless, we've determined that 
-	    // we will still display it as text.
-	    if (getMessageProxy().getMessageInfo().isHtml())
-	      content = getMessageProxy().getMessageInfo().getHtmlPart(true, showFullHeaders());
-	    else
-	      content = getMessageProxy().getMessageInfo().getTextPart(true, showFullHeaders());
-	  }
-	}
+	   if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	    content = msgInfo.getHtmlAndTextInlines(includeHeaders, showFullheaders);
+	   } 
+	   else {
+	    content = msgInfo.getHtmlPart(includeHeaders, showFullheaders);
+	   }
+	   
+	   } else {
+	    if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+	     // Is there only an HTML part?  Regardless, we've determined that 
+	     // we will still display it as text.
+	     if (getMessageProxy().getMessageInfo().isHtml())
+	      content = msgInfo.getHtmlAndTextInlines(includeHeaders, showFullheaders);
+	     else
+	      content = msgInfo.getTextAndTextInlines(includeHeaders, showFullheaders);
+	    }
+	    else {
+	     // Is there only an HTML part?  Regardless, we've determined that 
+	     // we will still display it as text.
+	     if (getMessageProxy().getMessageInfo().isHtml())
+	      content = msgInfo.getHtmlPart(includeHeaders, showFullheaders);
+	     else
+	      content = msgInfo.getTextPart(includeHeaders, showFullheaders);
+	    }
+	   }
       }
       
       if (content != null)
-	messageText.append(content);
+	   messageText.append(content);
 
       final String finalMessageText = messageText.toString();
       final String finalContentType = contentType;
-      final boolean hasAttachments = getMessageProxy().hasAttachments();
-      final boolean hasEncryption = (getMessageProxy().getMessageInfo() == null) ? false : getMessageProxy().getMessageInfo().hasEncryption();
+      hasAttachment = getMessageProxy().hasAttachments(false);
+      final boolean hasEncryption = (getMessageProxy().getMessageInfo() == null) ? 
+    		  false : getMessageProxy().getMessageInfo().hasEncryption();
       final boolean contentIsNull = (content == null);
 
-      SwingUtilities.invokeLater(new Runnable() {
+//    Liao-      
+      if(hasEncryption){
+          this.add(headerScrollPane, "0,0");
+	      cryptoSlot = new Box(BoxLayout.Y_AXIS);
+          this.add(cryptoSlot, "1,0");
+      }else{
+          this.add(headerScrollPane, "0,0,1,0");
+      }
+      
+      if(hasAttachment){
+	      this.add(editorScrollPane, "0,1,1,1");
+	      //this.add(attachmentDisplayPanel, "0,2");
+	      
+	      attachmentSlot = new Box(BoxLayout.Y_AXIS);
+	      this.add(attachmentSlot, "0,2,1,2");
+      }else{
+    	  this.add(editorScrollPane, "0,1,1,2");
+      }
+      this.setVisible(true);
+//  Liao+
+
+      
+   	  SwingUtilities.invokeLater(new Runnable() {
 	  public void run() {
 	    if (getDisplayCombo() != null)
 	      getDisplayCombo().styleUpdated(getMessageProxy().getDisplayMode(), getMessageProxy().getHeaderMode());
@@ -339,78 +346,41 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
 	    }
 	    
 	    if (! contentIsNull) {
-	      if (hasAttachments) {
-		try {
-		  otherEditorPane.setContentType(finalContentType);
-		  otherEditorPane.setEditable(false);
-		  otherEditorPane.setText(finalMessageText);
-		  otherEditorPane.setCaretPosition(0);
-		} catch (Exception e) {
-		  // if we can't show the html, just set the type as text/plain.
-		  otherEditorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
-		  
-		  otherEditorPane.setEditable(false);
-		  otherEditorPane.setText(finalMessageText);
-		  otherEditorPane.setCaretPosition(0);
-		}
-	      } else {
-		try {
+ 		 try {
 		  editorPane.setContentType(finalContentType);
-		  editorPane.setEditable(false);
-		  editorPane.setText(finalMessageText);
-		  editorPane.setCaretPosition(0);
-		} catch (Exception e) {
-		  // if we can't show the html, just set the type as 
-		  // text/plain.
-		  
+		 } catch (Exception e) {
+		  // if we can't show the html, just set the type as text/plain.		  
 		  editorPane.setEditorKit(new javax.swing.text.StyledEditorKit());
-		  
+		 }
 		  editorPane.setEditable(false);
 		  editorPane.setText(finalMessageText);
 		  editorPane.setCaretPosition(0);
-		  
-		}
-	      }
 	    }
 	    
-	    if (hasAttachments) {
+	    if (hasAttachment) {
 	      attachmentPanel = new AttachmentPane(getMessageProxy());
 	      fillAttachmentSlot(attachmentPanel);
-
-	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITH_ATTACHMENTS);
-	      editorStatus = WITH_ATTACHMENTS;
-	      
-	      if (splitPane != null && attachmentPanel != null) {
-		double paneHeight = splitPane.getSize().getHeight();
-		if (paneHeight <= 0)
-		  paneHeight = splitPane.getPreferredSize().getHeight();
-		splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
-	      } else {
-		splitPane.setDividerLocation(400);
-	      }
 
 	      // set the theme for the attachmentpanel.
 	      MessageUI mui = getMessageUI();
 	      if (mui instanceof net.suberic.util.swing.ThemeSupporter) {
-		try {
-		  Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, attachmentPanel, true);
-		} catch (Exception etwo) {
-		  if (Pooka.isDebug())
+           try {
+		    Pooka.getUIFactory().getPookaThemeManager().updateUI((
+		    		net.suberic.util.swing.ThemeSupporter) mui, attachmentPanel, true);
+		  } catch (Exception etwo) {
+		   if (Pooka.isDebug())
 		    System.out.println("error setting theme:  " + etwo);
-		}
-	      }
+		  }
+	     }
 	      
-	    } else {
-	      ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITHOUT_ATTACHMENTS);
-	      editorStatus = WITHOUT_ATTACHMENTS;
-	    }
-	    
+	    } 
+
 	    if (hasEncryption) {
-	      net.suberic.pooka.gui.crypto.CryptoStatusDisplay csd = new net.suberic.pooka.gui.crypto.CryptoPanel();
+	      CryptoStatusDisplay csd = new CryptoPanel();
 	      setCryptoStatusDisplay(csd);
 	      MessageCryptoInfo cryptoInfo = getMessageProxy().getMessageInfo().getCryptoInfo();
 	      if (cryptoInfo != null)
-		csd.cryptoUpdated(cryptoInfo);
+		    csd.cryptoUpdated(cryptoInfo);
 
 	      fillCryptoSlot((JComponent) csd);
 	    } else {
@@ -422,19 +392,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     } else {
       
       SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  // if getMessageProxy() == null
-	  editorPane.setEditable(false);
-	  editorPane.setText("");
-	  editorPane.setCaretPosition(0);
-	  
-	  otherEditorPane.setEditable(false);
-	  otherEditorPane.setText("");
-	  otherEditorPane.setCaretPosition(0);
-	  
-	  ((CardLayout) getLayout()).show(ReadMessageDisplayPanel.this, WITHOUT_ATTACHMENTS);
-	  editorStatus = WITHOUT_ATTACHMENTS;
-	} 
+	  public void run() {
+	   // if getMessageProxy() == null
+	   editorPane.setEditable(false);
+	   editorPane.setText("");
+	   editorPane.setCaretPosition(0);
+	 } 
 	});
     }
     
@@ -464,12 +427,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     if (attachmentSlot != null) {
       Component[] children = attachmentSlot.getComponents();
       for (int i = 0; children != null && i < children.length; i++) {
-	attachmentSlot.remove(children[i]);
+     	attachmentSlot.remove(children[i]);
       }
 
       if (component != null)
-	attachmentSlot.add(component);
-    }
+		attachmentSlot.add(component);
+      }
 
   }
 
@@ -480,12 +443,12 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     if (cryptoSlot != null) {
       Component[] children = cryptoSlot.getComponents();
       for (int i = 0; children != null && i < children.length; i++) {
-	cryptoSlot.remove(children[i]);
+        cryptoSlot.remove(children[i]);
       }
 
       if (component != null)
-	cryptoSlot.add(component);
-    }
+	   cryptoSlot.add(component);
+   }
 
   }
 
@@ -505,10 +468,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     if (attachmentPanel != null)
       attachmentPanel.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    
     editorPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
     editorScrollPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
-    if (splitPane != null)
-      splitPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    headerPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);
+    headerScrollPane.registerKeyboardAction(anAction, aCommand, aKeyStroke, aCondition);    
   }
   
   /**
@@ -525,9 +489,11 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     
     if (attachmentPanel != null)
       attachmentPanel.unregisterKeyboardAction(aKeyStroke);
+
     editorPane.unregisterKeyboardAction(aKeyStroke);
     editorScrollPane.unregisterKeyboardAction(aKeyStroke);
-    splitPane.unregisterKeyboardAction(aKeyStroke);
+    headerPane.unregisterKeyboardAction(aKeyStroke);
+    headerScrollPane.unregisterKeyboardAction(aKeyStroke);
   }
   
   /**
@@ -540,7 +506,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     MessageUI mui = getMessageUI();
     if (mui instanceof net.suberic.util.swing.ThemeSupporter) {
       try {
-	Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
+	   Pooka.getUIFactory().getPookaThemeManager().updateUI((
+			net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
       } catch (Exception etwo) {
 	if (Pooka.isDebug())
 	  System.out.println("error setting theme:  " + e);
@@ -558,21 +525,20 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     Dimension prefSize = getDefaultEditorPaneSize();
     if (editorPane != null && editorScrollPane != null) {
       JScrollBar vsb = editorScrollPane.getVerticalScrollBar();
+      
       if (vsb != null)
-	prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
+	   prefSize.setSize(prefSize.getWidth() + vsb.getPreferredSize().getWidth(), prefSize.getHeight());
+      
       editorScrollPane.setPreferredSize(prefSize);
-      if (otherScrollPane != null) {
-	otherScrollPane.setPreferredSize(prefSize);
-      }
+       
       this.setPreferredSize(prefSize);
-      if (splitPane != null && attachmentPanel != null) {
-	splitPane.setPreferredSize(prefSize);
-	double paneHeight = splitPane.getSize().getHeight();
-	if (paneHeight <= 0)
-	  paneHeight = splitPane.getPreferredSize().getHeight();
-	splitPane.setDividerLocation((int)(paneHeight - attachmentPanel.getPreferredSize().getHeight()));
-      }
-    } else {
+
+	  // Set the header pane size
+      Dimension headerSize = new Dimension((int) prefSize.getWidth(), 100);
+      headerPane.setPreferredSize(headerSize);    
+
+    }
+    else {
       this.setSize(prefSize);
     }
   }
@@ -587,9 +553,6 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
   public void setDefaultFont() {
     if (editorPane != null)
       setDefaultFont(editorPane);
-
-    if (otherEditorPane != null) 
-      setDefaultFont(otherEditorPane);
   }
 
   
@@ -630,30 +593,70 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     cryptoStatusDisplay = newDisplay;
   }
 
-  /**
-   * Returns the current EditorPane being used.
-   */
-  public JTextPane getCurrentEditorPane() {
-    if (editorStatus == WITHOUT_ATTACHMENTS) {
-      return editorPane;
-    } else {
-      return otherEditorPane;
-    }
+  
+  private Map headerLinesToMap(Vector headerLines){
+	Map map = new HashMap();
+	for (int i = 0; i < headerLines.size(); i++) {
+		String headerline = (String) headerLines.get(i);
+		int offset = headerline.indexOf(':');
+		String name = headerline.substring(0, offset).trim().toLowerCase();
+		map.put(name, headerline);
+	}
+	return map;
   }
 
-  /**
-   * Returns the current ScrollPane being used.
-   */
-  public JScrollPane getCurrentScrollPane() {
-    if (editorStatus == WITHOUT_ATTACHMENTS) {
-      return editorScrollPane;
-    } else {
-      return otherScrollPane;
-    }
+  protected String getFullHeaderInfo(MessageInfo msgInfo) 
+  throws MessagingException{
+	StringBuffer sb = new StringBuffer();
+	Vector headerlines = msgInfo.getHeaderLines();
+	
+	sb.append("<html><body><table width='100%'>");
+	
+	int offset;
+	String name, value;
+	for (int i = 0; i < headerlines.size(); i++) {
+		String headerline = (String) headerlines.get(i);
+		offset = headerline.indexOf(':');
+	    name = headerline.substring(0, offset).trim();
+		value = headerline.substring(offset+1).trim();		
+	    
+    	sb.append("<tr><td><b>" + name + "</b>: " + value + "</td></tr>");
+	}
+	sb.append("</table></body></html>");
+	
+	return sb.toString();
   }
   
-
+  protected String getHeaderInfo(MessageInfo msgInfo, String list) 
+  throws MessagingException{
+		  StringBuffer sb = new StringBuffer();
+		  Map headers = headerLinesToMap(msgInfo.getHeaderLines());
+		
+		  sb.append("<html><body><table width='100%'>");
+		
+		  int offset;
+		  String name, value;
+		
+		  StringTokenizer tokenizer = new StringTokenizer(list, ":");
+		
+		  while(tokenizer.hasMoreTokens()){
+			String token = tokenizer.nextToken();
+			String headerline = (String) headers.get(token.toLowerCase());
+			if(headerline != null){
+				offset = headerline.indexOf(':');
+			    name = headerline.substring(0, offset).trim();
+				value = headerline.substring(offset+1).trim();
+			
+		    	sb.append("<tr><td><b>" + name + "</b>: " + value + "</td></tr>");
+			}
+		}
+		
+		sb.append("</table></body></html>");
+		
+		return sb.toString();	  
+  }
   
+ 
   //------- Actions ----------//
   
   /**
@@ -667,24 +670,18 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       actionList = TextAction.augmentList(actionList, getMessageProxy().getActions());
     
     Action[] subActions = null;
-    if (editorStatus == WITHOUT_ATTACHMENTS) {
-      if (editorPane != null) {
-	subActions = editorPane.getActions();
-      } 
-    } else {
-      // if we have an attachment pane, we need to check to see if the 
-      // attachment pane is selected or not.
+    
+    // if we have an attachment pane, we need to check to see if the 
+   // attachment pane is selected or not.
 
-      Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-      if (focusOwner != null && attachmentPanel != null && SwingUtilities.isDescendingFrom(focusOwner, attachmentPanel)) {
-	subActions = attachmentPanel.getActions();
-      } else {
-	if (otherEditorPane != null) {
-	  subActions = otherEditorPane.getActions();
+    Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+    if (hasAttachment && focusOwner != null && attachmentPanel != null && SwingUtilities.isDescendingFrom(focusOwner, attachmentPanel)) {
+	   subActions = attachmentPanel.getActions();
+    } else {
+	 if (editorPane != null) {
+	  subActions = editorPane.getActions();
 	}
       } 
-
-    }
     
     if (subActions != null)
       return TextAction.augmentList(actionList, subActions);
@@ -732,7 +729,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
       searchAgain();
     }
   }
-
+  
   /**
    * Selects the Editor panel.
    */
@@ -742,13 +739,8 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     }
     
     public void actionPerformed(ActionEvent e) {
-      if (editorStatus == WITHOUT_ATTACHMENTS) {
 	if (editorPane != null)
 	  editorPane.requestFocusInWindow();
-      } else if (editorStatus == WITH_ATTACHMENTS) {
-	if (otherEditorPane != null)
-	  otherEditorPane.requestFocusInWindow();
-      }
     }
   }
 

@@ -18,7 +18,7 @@ public class NewMessageInfo extends MessageInfo {
 
   // the full map of messages to be sent, if there are different versions
   // of the message that go to different recipients.
-  Map mSendMessageMap = null;
+  Map mSendMessageMap = new HashMap();
   // the default UserProfile for this Message, if there is one.
   UserProfile mProfile = null;
 
@@ -162,16 +162,8 @@ public class NewMessageInfo extends MessageInfo {
       // sigh
 
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.encryptMessage", "Handing encryption..."));
-
-      mSendMessageMap = cryptoInfo.createEncryptedMessages((MimeMessage) getMessage());
-
-      if (mSendMessageMap.keySet().size() < 1) {
-        throw new MessagingException("failed to send message--no encrypted or unencrypted messages created.");
-      }
-
-      if (mSendMessageMap.keySet().size() == 1) {
-        message = (Message) mSendMessageMap.keySet().iterator().next();
-      }
+      message = cryptoInfo.createEncryptedMessage(profile, (MimeMessage) getMessage());
+      this.mSendMessageMap.put(message, message.getAllRecipients());
 
       boolean sent = false;
       if (mailServer != null) {
@@ -198,6 +190,7 @@ public class NewMessageInfo extends MessageInfo {
     } catch (MessagingException me) {
       ((net.suberic.pooka.gui.NewMessageProxy)getMessageProxy()).sendFailed(null, me);
     } catch (Throwable t) {
+    	t.printStackTrace();//Liao
       String cause = t.getMessage();
       if (cause == null)
         cause = t.toString();

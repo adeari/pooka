@@ -1,12 +1,17 @@
 package net.suberic.pooka.gui.crypto;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 
+import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+
+import net.suberic.pooka.Pooka;
 import net.suberic.util.VariableBundle;
 import net.suberic.util.gui.IconManager;
-import net.suberic.pooka.Pooka;
 
 /**
  * Displays the current cryptography status for this Message.
@@ -149,38 +154,38 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       currentSigStatus = newSignatureStatus;
 
       if (currentSigStatus == NOT_SIGNED) {
-	signatureButton.setIcon(notSignedIcon);
-	signatureButton.setToolTipText(notSignedTooltip);
-	if (proxy != null) {
-	  Action checkSigAction = proxy.getAction("message-signature-status");
-	  if (checkSigAction != null)
-	    updateAction(signatureButton, checkSigAction);
-	}
+		signatureButton.setIcon(notSignedIcon);
+		signatureButton.setToolTipText(notSignedTooltip);
+		if (proxy != null) {
+		  Action checkSigAction = proxy.getAction("message-signature-status");
+		  if (checkSigAction != null)
+		    updateAction(signatureButton, checkSigAction);
+		}
 
       } else if (currentSigStatus == UNCHECKED_SIGNED) {
-	if (proxy != null) {
-	  Action checkSigAction = proxy.getAction("message-check-signature");
-	  if (checkSigAction != null)
-	    updateAction(signatureButton, checkSigAction);
-	}
-	signatureButton.setIcon(uncheckedSignedIcon);
-	signatureButton.setToolTipText(uncheckedSignedTooltip);
+		if (proxy != null) {
+		  Action checkSigAction = proxy.getAction("message-check-signature");
+		  if (checkSigAction != null)
+		    updateAction(signatureButton, checkSigAction);
+		}
+		signatureButton.setIcon(uncheckedSignedIcon);
+		signatureButton.setToolTipText(uncheckedSignedTooltip);
       } else if (currentSigStatus == SIGNATURE_VERIFIED) {
-	signatureButton.setIcon(signatureVerifiedIcon);
-	signatureButton.setToolTipText(signatureVerifiedTooltip);
-	if (proxy != null) {
-	  Action checkSigAction = proxy.getAction("message-signature-status");
-	  if (checkSigAction != null)
-	    updateAction(signatureButton, checkSigAction);
-	}
+		signatureButton.setIcon(signatureVerifiedIcon);
+		signatureButton.setToolTipText(signatureVerifiedTooltip);
+		if (proxy != null) {
+		  Action checkSigAction = proxy.getAction("message-signature-status");
+		  if (checkSigAction != null)
+		    updateAction(signatureButton, checkSigAction);
+		}
       } else if (currentSigStatus == SIGNATURE_BAD) {
-	signatureButton.setIcon(signatureBadIcon);
-	signatureButton.setToolTipText(signatureBadTooltip);
-	if (proxy != null) {
-	  Action checkSigAction = proxy.getAction("message-signature-status");
-	  if (checkSigAction != null)
-	    updateAction(signatureButton, checkSigAction);
-	}
+		signatureButton.setIcon(signatureBadIcon);
+		signatureButton.setToolTipText(signatureBadTooltip);
+		if (proxy != null) {
+		  Action checkSigAction = proxy.getAction("message-signature-status");
+		  if (checkSigAction != null)
+		    updateAction(signatureButton, checkSigAction);
+		}
       }
     }
 
@@ -235,15 +240,15 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
       int cryptStatus = NOT_ENCRYPTED;
       
       if (cryptoInfo.isSigned()) {
-	if (cryptoInfo.hasCheckedSignature()) {
-	  if (cryptoInfo.isSignatureValid()) {
-	    sigStatus = SIGNATURE_VERIFIED;
-	  } else {
-	    sigStatus = SIGNATURE_BAD;
-	  }
-	} else {
-	  sigStatus = UNCHECKED_SIGNED;
-	}
+       if (cryptoInfo.hasCheckedSignature()) {
+	     if (cryptoInfo.isSignatureValid()) {
+	       sigStatus = SIGNATURE_VERIFIED;
+	     } else {
+	       sigStatus = SIGNATURE_BAD;
+	    }
+	   } else {
+	    sigStatus = UNCHECKED_SIGNED;
+	   }
       }
 
       if (cryptoInfo.isEncrypted()) {
@@ -289,12 +294,15 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
 
     IconManager iconManager = Pooka.getUIFactory().getIconManager();
     
-    notEncryptedIcon = iconManager.getIcon(Pooka.getProperty(key + ".notEncryptedIcon", "UnLock"));
+    notEncryptedIcon = new ImageIcon();
+    //notEncryptedIcon = iconManager.getIcon(Pooka.getProperty(key + ".notEncryptedIcon", "UnLock"));
     uncheckedEncryptedIcon = iconManager.getIcon(Pooka.getProperty(key + ".uncheckedEncryptedIcon", "Lock"));
     decryptedSuccessfullyIcon = iconManager.getIcon(Pooka.getProperty(key + ".decryptedSuccessfullyIcon", "OpenLock"));
     decryptedUnsuccessfullyIcon = iconManager.getIcon(Pooka.getProperty(key + ".decryptedUnsuccessfullyIcon", "Bomb"));
     uncheckedSignedIcon = iconManager.getIcon(Pooka.getProperty(key + ".uncheckedSignedIcon", "Draw"));
-    notSignedIcon = iconManager.getIcon(Pooka.getProperty(key + ".notSignedIcon", "EnvelopeOpen"));
+    
+    notSignedIcon = new ImageIcon();
+    //notSignedIcon = iconManager.getIcon(Pooka.getProperty(key + ".notSignedIcon", "EnvelopeOpen"));
     signatureVerifiedIcon = iconManager.getIcon(Pooka.getProperty(key + ".signatureVerifiedIcon", "Check"));
     signatureBadIcon = iconManager.getIcon(Pooka.getProperty(key + ".signatureBadIcon", "Caution"));
     signatureFailedVerificationIcon = iconManager.getIcon(Pooka.getProperty(key + ".signatureFailedVerificationIcon", "Caution"));
@@ -318,18 +326,27 @@ public class CryptoPanel extends JPanel implements CryptoStatusDisplay {
      */
 
 
-    notEncryptedTooltip = vars.getProperty(key + ".notEncrypted.Tooltip", "NotEncrypted");
+//    notEncryptedTooltip = vars.getProperty(key + ".notEncrypted.Tooltip", "NotEncrypted");
     
     uncheckedEncryptedTooltip = vars.getProperty(key + ".uncheckedEncrypted.Tooltip", "Encrypted Message");
     decryptedSuccessfullyTooltip = vars.getProperty(key + ".decryptedSuccessfully.Tooltip", "Message Decrypted with Key ");
     decryptedUnsuccessfullyTooltip = vars.getProperty(key + ".decryptedUnsuccessfully.Tooltip", "Message Failed Decryption");
 
-    uncheckedSignedTooltip = vars.getProperty(key + ".uncheckedSigned.Tooltip");
+//    uncheckedSignedTooltip = vars.getProperty(key + ".uncheckedSigned.Tooltip");
     notSignedTooltip = vars.getProperty(key + ".notSigned.Tooltip", "Not Signed");
     signatureVerifiedTooltip = vars.getProperty(key + ".signatureVerified.Tooltip", "Signature Verified with Key ");
     signatureBadTooltip = vars.getProperty(key + ".signatureBad.Tooltip", "Signature Failed Verification by Key ");
     signatureFailedVerificationTooltip = vars.getProperty(key + ".signatureFailedVerification.Tooltip", "Unable to Verfify Signature");
   }
+  
+  public int getEncryptionStatus() {
+		return currentCryptStatus;
+	}
+
+	public int getSignatureStatus() {
+		return currentSigStatus;
+	}
+
 
 }
     
