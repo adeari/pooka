@@ -3,6 +3,7 @@ package net.suberic.pooka.gui;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.JComponent;
 import javax.mail.*;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.StoreInfo;
@@ -300,15 +301,28 @@ public class StoreNode extends MailTreeNode {
     }
 
     public void actionPerformed(java.awt.event.ActionEvent e) {
-      if (!store.isConnected())
+      if (!store.isConnected()) {
         try {
           store.connectStore();
+
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+                folderTree.expandPath(folderTree.getSelectionPath());
+              }
+            });
+
         } catch (MessagingException me) {
-          // I should make this easier.
-          Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store."), me);
+          if (! (me instanceof OperationCancelledException)) {
+            final MessagingException newMe = me;
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                  Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store."), newMe);
+                }
+              });
+          }
         }
-      javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-      folderTree.expandPath(folderTree.getSelectionPath());
+      }
     }
   }
 
@@ -335,49 +349,51 @@ public class StoreNode extends MailTreeNode {
             final Logger storeLogger = Logger.getLogger("Store." + getStoreInfo().getStoreID());
             final Logger guiLogger = Logger.getLogger("Pooka.debug.gui.filechooser");
 
-            JFileChooser jfc =
-              new JFileChooser(getStoreInfo().getStoreID(), mfsv);
-            jfc.setMultiSelectionEnabled(true);
-            jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-            int returnValue =
-              jfc.showDialog(getParentContainer(),
-                             Pooka.getProperty("FolderEditorPane.Select",
-                                               "Select"));
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-              guiLogger.fine("got " + jfc.getSelectedFile() + " as a return value.");
+            try {
+              JFileChooser jfc = new JFileChooser(getStoreInfo().getStoreID(), mfsv);
+              jfc.setMultiSelectionEnabled(true);
+              jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+              int returnValue = jfc.showDialog(getParentContainer(), Pooka.getProperty("FolderEditorPane.Select", "Select"));
 
-              final java.io.File[] selectedFiles = jfc.getSelectedFiles();
+              if (returnValue == JFileChooser.APPROVE_OPTION) {
+                guiLogger.fine("got " + jfc.getSelectedFile() + " as a return value.");
 
-              getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
-                  public void actionPerformed(java.awt.event.ActionEvent ae) {
-                    for (int i = 0 ; selectedFiles != null && i < selectedFiles.length; i++) {
-                      net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = (net.suberic.pooka.gui.filechooser.FolderFileWrapper) selectedFiles[i];
-                      try {
-                        // if it doesn't exist, try to create it.
-                        if (! wrapper.exists()) {
-                          wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+                final java.io.File[] selectedFiles = jfc.getSelectedFiles();
+
+                getStoreInfo().getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+                    public void actionPerformed(java.awt.event.ActionEvent ae) {
+                      for (int i = 0 ; selectedFiles != null && i < selectedFiles.length; i++) {
+                        net.suberic.pooka.gui.filechooser.FolderFileWrapper wrapper = (net.suberic.pooka.gui.filechooser.FolderFileWrapper) selectedFiles[i];
+                        try {
+                          // if it doesn't exist, try to create it.
+                          if (! wrapper.exists()) {
+                            wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
+                          }
+                          String absFileName = wrapper.getAbsolutePath();
+                          int firstSlash = absFileName.indexOf('/');
+                          String normalizedFileName = absFileName;
+                          if (firstSlash >= 0)
+                            normalizedFileName = absFileName.substring(firstSlash);
+
+                          guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
+                          storeLogger.fine("adding folder " + normalizedFileName);
+
+                          getStoreInfo().subscribeFolder(normalizedFileName);
+                        } catch (MessagingException me) {
+                          final String folderName = wrapper.getName();
+                          SwingUtilities.invokeLater(new Runnable() {
+                              public void run() {
+                                Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
+                              }
+                            });
                         }
-                        String absFileName = wrapper.getAbsolutePath();
-                        int firstSlash = absFileName.indexOf('/');
-                        String normalizedFileName = absFileName;
-                        if (firstSlash >= 0)
-                          normalizedFileName = absFileName.substring(firstSlash);
-
-                        guiLogger.fine("adding folder " + normalizedFileName + "; absFileName = " + absFileName);
-                        storeLogger.fine("adding folder " + normalizedFileName);
-
-                        getStoreInfo().subscribeFolder(normalizedFileName);
-                      } catch (MessagingException me) {
-                        final String folderName = wrapper.getName();
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                              Pooka.getUIFactory().showError(Pooka.getProperty("error.creatingFolder", "Error creating folder ") + folderName);
-                            }
-                          });
                       }
                     }
-                  }
-                },  new java.awt.event.ActionEvent(this, 0, "folder-subscribe"));
+                  },  new java.awt.event.ActionEvent(this, 0, "folder-subscribe"));
+              }
+            } catch (Exception e) {
+              Pooka.getUIFactory().showError(Pooka.getProperty("error.subscribingFolder", "Error subscribing to folder."));
+
             }
 
             Pooka.getUIFactory().clearStatus();

@@ -784,6 +784,13 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
         getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  doing store.connect()");
         store.connect();
       } catch (MessagingException me) {
+        Authenticator authenticator = Pooka.getDefaultAuthenticator();
+        if (authenticator instanceof SimpleAuthenticator) {
+          if (((SimpleAuthenticator) authenticator).getCancelled()) {
+            throw new OperationCancelledException();
+          }
+        }
+
         Exception e = me.getNextException();
 
         if (e != null && e instanceof java.io.InterruptedIOException)

@@ -152,7 +152,7 @@ public class SimpleAuthenticator extends Authenticator {
   /**
    * Returns whether or not this process was cancelled.
    */
-  public boolean isCancelled() {
+  public boolean getCancelled() {
     return mCancelled;
   }
 }

@@ -1,3 +1,9 @@
+made it so cancelling out of a login no longer gives an error message.
+
+improved encryption support, particularly with associating keys with email addresses.
+
+added new header area to display panel.
+
 displayed an email in two panels: header panel and text panel
 
 better support of S/MIME and PGP

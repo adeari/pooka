@@ -448,12 +448,15 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
           }
         });
     }  catch (MessagingException me) {
-      final MessagingException newMe = me;
-      SwingUtilities.invokeLater(new Runnable() {
-          public void run() {
-            Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
-          }
-        });
+      // if we cancelled out, ignore.
+      if (! (me instanceof OperationCancelledException)) {
+        final MessagingException newMe = me;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
+            }
+          });
+      }
     }
 
   }
