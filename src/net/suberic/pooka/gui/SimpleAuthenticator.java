@@ -22,119 +22,124 @@ import javax.swing.*;
 
 public class SimpleAuthenticator extends Authenticator {
 
-    String username;
-    String password;
+  String username;
+  String password;
 
-    public SimpleAuthenticator() {
-    }
+  boolean mCancelled = false;
 
-    protected PasswordAuthentication getPasswordAuthentication() {
+  public SimpleAuthenticator() {
+  }
 
-  // given a prompt?
-  String prompt = getRequestingPrompt();
-  if (prompt == null)
+  protected PasswordAuthentication getPasswordAuthentication() {
+
+    // given a prompt?
+    String prompt = getRequestingPrompt();
+    if (prompt == null)
       prompt = "Please login...";
 
-  // protocol
-  String protocol = getRequestingProtocol();
-  if (protocol == null)
+    // protocol
+    String protocol = getRequestingProtocol();
+    if (protocol == null)
       protocol = "Unknown protocol";
 
-  // get the host
-  String host = null;
-  InetAddress inet = getRequestingSite();
-  if (inet != null)
+    // get the host
+    String host = null;
+    InetAddress inet = getRequestingSite();
+    if (inet != null)
       host = inet.getHostName();
-  if (host == null)
+    if (host == null)
       host = "Unknown host";
 
-  // port
-  String port = "";
-  int portnum = getRequestingPort();
-  if (portnum != -1)
+    // port
+    String port = "";
+    int portnum = getRequestingPort();
+    if (portnum != -1)
       port = ", port " + portnum + " ";
 
-  // Build the info string
-  String info = "Connecting to " + protocol + " mail service on host " +
-                host + port;
+    // Build the info string
+    String info = "Connecting to " + protocol + " mail service on host " +
+      host + port;
 
-  //JPanel d = new JPanel();
-  // XXX - for some reason using a JPanel here causes JOptionPane
-  // to display incorrectly, so we workaround the problem using
-  // an anonymous JComponent.
-  JComponent d = new JComponent() { };
+    //JPanel d = new JPanel();
+    // XXX - for some reason using a JPanel here causes JOptionPane
+    // to display incorrectly, so we workaround the problem using
+    // an anonymous JComponent.
+    JComponent d = new JComponent() { };
 
-  GridBagLayout gb = new GridBagLayout();
-  GridBagConstraints c = new GridBagConstraints();
-  d.setLayout(gb);
-  c.insets = new Insets(2, 2, 2, 2);
+    GridBagLayout gb = new GridBagLayout();
+    GridBagConstraints c = new GridBagConstraints();
+    d.setLayout(gb);
+    c.insets = new Insets(2, 2, 2, 2);
 
-  c.anchor = GridBagConstraints.WEST;
-  c.gridwidth = GridBagConstraints.REMAINDER;
-  c.weightx = 0.0;
-  d.add(constrain(new JLabel(info), gb, c));
-  d.add(constrain(new JLabel(prompt), gb, c));
+    c.anchor = GridBagConstraints.WEST;
+    c.gridwidth = GridBagConstraints.REMAINDER;
+    c.weightx = 0.0;
+    d.add(constrain(new JLabel(info), gb, c));
+    d.add(constrain(new JLabel(prompt), gb, c));
 
-  c.gridwidth = 1;
-  c.anchor = GridBagConstraints.EAST;
-  c.fill = GridBagConstraints.NONE;
-  c.weightx = 0.0;
-  d.add(constrain(new JLabel("Username:"), gb, c));
+    c.gridwidth = 1;
+    c.anchor = GridBagConstraints.EAST;
+    c.fill = GridBagConstraints.NONE;
+    c.weightx = 0.0;
+    d.add(constrain(new JLabel("Username:"), gb, c));
 
-  c.anchor = GridBagConstraints.EAST;
-  c.fill = GridBagConstraints.HORIZONTAL;
-  c.gridwidth = GridBagConstraints.REMAINDER;
-  c.weightx = 1.0;
-  final String user = getDefaultUserName();
-  final JTextField username = new JTextField(user, 20);
-  d.add(constrain(username, gb, c));
+    c.anchor = GridBagConstraints.EAST;
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridwidth = GridBagConstraints.REMAINDER;
+    c.weightx = 1.0;
+    final String user = getDefaultUserName();
+    final JTextField username = new JTextField(user, 20);
+    d.add(constrain(username, gb, c));
 
-  c.gridwidth = 1;
-  c.fill = GridBagConstraints.NONE;
-  c.anchor = GridBagConstraints.EAST;
-  c.weightx = 0.0;
-  d.add(constrain(new JLabel("Password:"), gb, c));
+    c.gridwidth = 1;
+    c.fill = GridBagConstraints.NONE;
+    c.anchor = GridBagConstraints.EAST;
+    c.weightx = 0.0;
+    d.add(constrain(new JLabel("Password:"), gb, c));
 
-  c.anchor = GridBagConstraints.EAST;
-  c.fill = GridBagConstraints.HORIZONTAL;
-  c.gridwidth = GridBagConstraints.REMAINDER;
-  c.weightx = 1.0;
-  final JPasswordField password = new JPasswordField("", 20);
-  d.add(constrain(password, gb, c));
+    c.anchor = GridBagConstraints.EAST;
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.gridwidth = GridBagConstraints.REMAINDER;
+    c.weightx = 1.0;
+    final JPasswordField password = new JPasswordField("", 20);
+    d.add(constrain(password, gb, c));
 
-  final JOptionPane authPane = new JOptionPane(d, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
-      public void selectInitialValue() {
-        if (user != null && user.length() > 0) {
-    password.requestFocus();
+    final JOptionPane authPane = new JOptionPane(d, JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION) {
+        public void selectInitialValue() {
+          if (user != null && user.length() > 0) {
+            password.requestFocus();
+          }
+          else {
+            username.requestFocus();
+          }
         }
-        else {
-    username.requestFocus();
-        }
-      }
-    };
+      };
 
-  final JDialog dialog = authPane.createDialog(getFrame(), "Login");
+    mCancelled = false;
 
-  authPane.selectInitialValue();
+    final JDialog dialog = authPane.createDialog(getFrame(), "Login");
 
-  dialog.setVisible(true);
+    authPane.selectInitialValue();
 
-  Object result = authPane.getValue();
+    dialog.setVisible(true);
 
-  if (result instanceof Integer) {
-    int resultInt = ((Integer) result).intValue();
-    if (resultInt == JOptionPane.OK_OPTION)
-      return new PasswordAuthentication(username.getText(),
-                new String(password.getPassword()));
+    Object result = authPane.getValue();
+
+    if (result instanceof Integer) {
+      int resultInt = ((Integer) result).intValue();
+      if (resultInt == JOptionPane.OK_OPTION)
+        return new PasswordAuthentication(username.getText(), new String(password.getPassword()));
+    }
+
+    mCancelled = true;
+
+    return null;
   }
-  return null;
-    }
 
-    private Component constrain(Component cmp,
-              GridBagLayout gb, GridBagConstraints c) {
-  gb.setConstraints(cmp, c);
-  return (cmp);
-    }
+  private Component constrain(Component cmp, GridBagLayout gb, GridBagConstraints c) {
+    gb.setConstraints(cmp, c);
+    return (cmp);
+  }
 
   public Frame getFrame() {
     MainPanel mp= net.suberic.pooka.Pooka.getMainPanel();
@@ -142,5 +147,12 @@ public class SimpleAuthenticator extends Authenticator {
       return mp.getParentFrame();
     else
       return null;
+  }
+
+  /**
+   * Returns whether or not this process was cancelled.
+   */
+  public boolean isCancelled() {
+    return mCancelled;
   }
 }

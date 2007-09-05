@@ -43,6 +43,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   public void setCryptoType(int type){
     cryptoType = type;
   }
+
   //Liao+
 
   List mAttachKeys = new LinkedList();
@@ -192,16 +193,15 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   /**
    * Returns the encrypted and/or signed message(s), as appropriate.
    */
-  public MimeMessage createEncryptedMessage(UserProfile profile, MimeMessage mm)
-    throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
+  public MimeMessage createEncryptedMessage(UserProfile profile, MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
     //Liao-
-    if(cryptoType == NO_CRYPTO)
+    if (cryptoType == NO_CRYPTO)
       return mm;
 
     Key signKey = null;
 
     signKey = getSignatureKey();
-    if(signKey == null){
+    if (signKey == null){
       switch (cryptoType) {
       case SMIME_SIGN:
       case SMIME_BOTH:
@@ -221,8 +221,11 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     // Find the keys to sign and encrypt the messages
     if(signKey == null && (cryptoType == SMIME_SIGN || cryptoType == SMIME_BOTH)){
       Key[] keys = cryptoManager.getPrivateKeysForAddress(from.getAddress(), EncryptionManager.SMIME,  true);
-      if(keys == null || keys.length == 0){
-        getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find S/MIME signing key for " + from);
+      if (keys == null || keys.length == 0) {
+        // show dialog
+        signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.SMIME, false);
+
+        //getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find S/MIME signing key for " + from);
       } else {
         signKey = keys[0];
       }
@@ -230,8 +233,10 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
 
     if(signKey == null &&  (cryptoType == PGP_SIGN || cryptoType == PGP_BOTH)){
       Key[] keys = cryptoManager.getPrivateKeysForAddress(from.getAddress(), EncryptionManager.PGP,  true);
-      if(keys == null || keys.length == 0){
-        getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find PGP signing key for " + from);
+      if (keys == null || keys.length == 0) {
+        // show dialog
+        signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.PGP, false);
+        //getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find PGP signing key for " + from);
       } else {
         signKey = keys[0];
       }
@@ -240,19 +245,15 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     List encKeys = new LinkedList();
 
     //TODO: get the encKey from the available public keys
-    if(cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH ||
-       cryptoType == PGP_ENCRYPT || cryptoType == PGP_BOTH)
-      {
-        String type = (cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH) ?
-          EncryptionManager.SMIME : EncryptionManager.PGP;
-        try {
-          // Get the public key of the senders
-          Address[] froms = mm.getFrom();
-          for (int i = 0; i < froms.length; i++) {
-            from = (InternetAddress) froms[i];
-            Key[] keys = cryptoManager.getPublicKeys(
-                                                     from.getAddress(), type, false);
-            if(keys != null && keys.length > 0){
+    if (cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH || cryptoType == PGP_ENCRYPT || cryptoType == PGP_BOTH) {
+      String type = (cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH) ? EncryptionManager.SMIME : EncryptionManager.PGP;
+      try {
+        // Get the public key of the senders
+        Address[] froms = mm.getFrom();
+        for (int i = 0; i < froms.length; i++) {
+          from = (InternetAddress) froms[i];
+          Key[] keys = cryptoManager.getPublicKeys(from.getAddress(), type, false);
+          if (keys != null && keys.length > 0) {
               encKeys.add(keys[0]);
             }
           }
@@ -261,11 +262,12 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
           Address[] receivers = mm.getAllRecipients();
           for (int i = 0; i < receivers.length; i++) {
             InternetAddress rec = (InternetAddress) receivers[i];
-            Key[] keys = cryptoManager.getPublicKeys(
-                                                     rec.getAddress(), type, false);
-            if(keys != null && keys.length > 0){
+            Key[] keys = cryptoManager.getPublicKeys(rec.getAddress(), type, false);
+            if (keys != null && keys.length > 0) {
               encKeys.add(keys[0]);
-            }else{
+            } else {
+              encKeys.add(CryptoKeySelector.selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), EncryptionManager.PGP, false));
+
               throw new GeneralSecurityException("found no certificate for " + rec.getAddress());
             }
           }

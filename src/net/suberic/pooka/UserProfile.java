@@ -435,12 +435,12 @@ public class UserProfile extends Object implements ValueChangeListener, Item {
     if (keyAlias != null && keyAlias.length() > 0) {
       try {
         if (Pooka.getCryptoManager().privateKeyAliases(type, forSignature).contains(keyAlias)) {
-        	try{
-              return Pooka.getCryptoManager().getPrivateKey(keyAlias, type);
-        	}catch(UnrecoverableKeyException uke){
-        		char[] passphrase = CryptoKeySelector.showPassphraseDialog(keyAlias);
-        		return Pooka.getCryptoManager().getPrivateKey(keyAlias, type, passphrase);
-        	}
+          try{
+            return Pooka.getCryptoManager().getPrivateKey(keyAlias, type);
+          }catch(UnrecoverableKeyException uke){
+            char[] passphrase = CryptoKeySelector.showPassphraseDialog(keyAlias);
+            return Pooka.getCryptoManager().getPrivateKey(keyAlias, type, passphrase);
+          }
         }
       } catch (Exception ee) {
         ee.printStackTrace();

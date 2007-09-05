@@ -159,9 +159,7 @@ public class AttachmentPane extends JPanel {
               }
               createPopupMenu().show(getTable(), e.getX(), e.getY());
             }
-
           }
-
         }
       });
 
