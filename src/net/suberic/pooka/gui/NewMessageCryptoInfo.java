@@ -29,7 +29,6 @@ import net.suberic.pooka.gui.crypto.CryptoKeySelector;
  * Encapsulates the encryption info for a new message.
  */
 public class NewMessageCryptoInfo extends MessageCryptoInfo {
-  //Liao-
   int cryptoType = NO_CRYPTO;
 
   public static final int NO_CRYPTO       = 0;
@@ -43,8 +42,6 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
   public void setCryptoType(int type){
     cryptoType = type;
   }
-
-  //Liao+
 
   List mAttachKeys = new LinkedList();
 
@@ -194,7 +191,6 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
    * Returns the encrypted and/or signed message(s), as appropriate.
    */
   public MimeMessage createEncryptedMessage(UserProfile profile, MimeMessage mm) throws MessagingException, java.io.IOException, java.security.GeneralSecurityException {
-    //Liao-
     if (cryptoType == NO_CRYPTO)
       return mm;
 
@@ -223,9 +219,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       Key[] keys = cryptoManager.getPrivateKeysForAddress(from.getAddress(), EncryptionManager.SMIME,  true);
       if (keys == null || keys.length == 0) {
         // show dialog
-        signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.SMIME, false);
-
-        //getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find S/MIME signing key for " + from);
+        signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.SMIME, true);
       } else {
         signKey = keys[0];
       }
@@ -235,8 +229,7 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       Key[] keys = cryptoManager.getPrivateKeysForAddress(from.getAddress(), EncryptionManager.PGP,  true);
       if (keys == null || keys.length == 0) {
         // show dialog
-        signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.PGP, false);
-        //getMessageInfo().getMessageProxy().getMessageUI().showError("Cannot find PGP signing key for " + from);
+        signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.PGP, true);
       } else {
         signKey = keys[0];
       }
@@ -266,9 +259,11 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
             if (keys != null && keys.length > 0) {
               encKeys.add(keys[0]);
             } else {
-              encKeys.add(CryptoKeySelector.selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), EncryptionManager.PGP, false));
-
-              throw new GeneralSecurityException("found no certificate for " + rec.getAddress());
+            	Key key = CryptoKeySelector.selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), EncryptionManager.PGP, false);
+            	if(key != null)
+                  encKeys.add(key);
+            	else
+            	  throw new GeneralSecurityException("found no certificate for " + rec.getAddress());
             }
           }
           /*Key encKey = CryptoKeySelector.selectPublicKey(
