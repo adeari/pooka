@@ -63,8 +63,8 @@ public class MessageInfo {
       // FIXME
       attachments = MailUtilities.parseAttachments(getMessage());
       attachmentsLoaded = true;
-      if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") && 
-    		  cryptoInfo.isEncrypted()) {
+      if (Pooka.getProperty("EncryptionManager.autoDecrypt", "false").equalsIgnoreCase("true") &&
+          cryptoInfo.isEncrypted()) {
         UserProfile p = getDefaultProfile();
         if (p == null)
           p = Pooka.getPookaManager().getUserProfileManager().getDefaultProfile();
@@ -74,8 +74,8 @@ public class MessageInfo {
         }
       }
 
-      if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") && 
-    		  cryptoInfo.isSigned()) {
+      if (Pooka.getProperty("EncryptionManager.autoCheckSig", "false").equalsIgnoreCase("true") &&
+          cryptoInfo.isSigned()) {
         if (cryptoInfo.autoCheckSignature((javax.mail.internet.InternetAddress) getMessage().getFrom()[0])) {
           //attachments = MailUtilities.parseAttachments(getMessage());
         }
@@ -237,7 +237,7 @@ public class MessageInfo {
   /**
    * Gets the Content and inline text content for the Message.
    */
-  public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+  public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException, OperationCancelledException {
     try {
       if (!hasLoadedAttachments())
         loadAttachmentInfo();
@@ -263,14 +263,14 @@ public class MessageInfo {
   /**
    * Gets the Content and inline text content for the Message.
    */
-  public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+  public String getTextAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException, OperationCancelledException  {
     return getTextAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
   }
 
   /**
    * Gets the Content and inline text content for the Message.
    */
-  public String getTextAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+  public String getTextAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException, OperationCancelledException  {
     return getTextAndTextInlines(getAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
   }
 
@@ -279,7 +279,7 @@ public class MessageInfo {
    * content is found, returns the html content.  If there's none of that,
    * either, then returns null.
    */
-  public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+  public String getTextPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException, OperationCancelledException {
     try {
       if (!hasLoadedAttachments())
         loadAttachmentInfo();
@@ -314,14 +314,14 @@ public class MessageInfo {
    * content is found, returns the html content.  If there's none of that,
    * either, then returns null.
    */
-  public String getTextPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+  public String getTextPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException, OperationCancelledException  {
     return getTextPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
   }
 
   /**
    * Gets the Html part of the Content of this Message.
    */
-  public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+  public String getHtmlPart(boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException, OperationCancelledException  {
     try {
       if (!hasLoadedAttachments())
         loadAttachmentInfo();
@@ -346,14 +346,14 @@ public class MessageInfo {
   /**
    * Gets the Html part of the Content of this Message.
    */
-  public String getHtmlPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+  public String getHtmlPart(boolean withHeaders, boolean showFullHeaders) throws MessagingException, OperationCancelledException  {
     return getHtmlPart(withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getTruncationMessage());
   }
 
   /**
    * Gets the Content and inline text content for the Message.
    */
-  public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException {
+  public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders, int maxLength, String truncationMessage) throws MessagingException, OperationCancelledException  {
     try {
       if (!hasLoadedAttachments())
         loadAttachmentInfo();
@@ -378,14 +378,14 @@ public class MessageInfo {
   /**
    * Gets the Content and inline text content for the Message.
    */
-  public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+  public String getHtmlAndTextInlines(String attachmentSeparator, boolean withHeaders, boolean showFullHeaders) throws MessagingException, OperationCancelledException  {
     return getHtmlAndTextInlines(attachmentSeparator, withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
   }
 
   /**
    * Gets the Content and inline text content for the Message.
    */
-  public String getHtmlAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException {
+  public String getHtmlAndTextInlines(boolean withHeaders, boolean showFullHeaders) throws MessagingException, OperationCancelledException  {
     return getHtmlAndTextInlines(getHtmlAttachmentSeparator(), withHeaders, showFullHeaders, getMaxMessageDisplayLength(), getHtmlTruncationMessage());
   }
 
@@ -407,7 +407,7 @@ public class MessageInfo {
   /**
    * Moves the Message into the target Folder.
    */
-  public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
+  public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException, OperationCancelledException  {
     try {
       folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
     } catch (MessagingException me) {
@@ -426,7 +426,7 @@ public class MessageInfo {
   /**
    * Copies the Message into the target Folder.
    */
-  public void copyMessage(FolderInfo targetFolder) throws MessagingException {
+  public void copyMessage(FolderInfo targetFolder) throws MessagingException, OperationCancelledException  {
     try {
       folderInfo.copyMessages(new MessageInfo[] { this }, targetFolder);
     } catch (MessagingException me) {
@@ -441,7 +441,7 @@ public class MessageInfo {
    * Pooka.autoExpunge, and then calls moveMessage(targetFolder, autoExpunge)
    * with that value.
    */
-  public void moveMessage(FolderInfo targetFolder) throws MessagingException {
+  public void moveMessage(FolderInfo targetFolder) throws MessagingException, OperationCancelledException  {
     moveMessage(targetFolder, Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
   }
 
@@ -483,7 +483,7 @@ public class MessageInfo {
    * if the autoExpunge variable is set to true, it also expunges
    * the message from the mailbox.
    */
-  public void deleteMessage(boolean autoExpunge) throws MessagingException {
+  public void deleteMessage(boolean autoExpunge) throws MessagingException, OperationCancelledException  {
     FolderInfo trashFolder = getFolderInfo().getTrashFolder();
     if ((getFolderInfo().useTrashFolder()) && (trashFolder != null) && (trashFolder != getFolderInfo())) {
       try {
@@ -512,7 +512,7 @@ public class MessageInfo {
    * Pooka.autoExpunge, and then calls deleteMessage(boolean autoExpunge)
    * with that value.
    */
-  public void deleteMessage() throws MessagingException {
+  public void deleteMessage() throws MessagingException, OperationCancelledException {
     deleteMessage(Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
   }
 
@@ -526,7 +526,7 @@ public class MessageInfo {
    * throws an Exception, it may be necessary to follow up with a call
    * to remove().
    */
-  public void remove(boolean autoExpunge) throws MessagingException {
+  public void remove(boolean autoExpunge) throws MessagingException, OperationCancelledException {
     Message m = getMessage();
     if (m != null) {
       m.setFlag(Flags.Flag.DELETED, true);
@@ -612,7 +612,7 @@ public class MessageInfo {
    * message.
    */
   public NewMessageInfo populateReply(boolean replyAll, boolean withAttachments)
-    throws MessagingException {
+    throws MessagingException, OperationCancelledException  {
     MimeMessage newMsg = (MimeMessage) getMessage().reply(replyAll);
 
     MimeMessage mMsg = (MimeMessage) getMessage();
@@ -670,7 +670,7 @@ public class MessageInfo {
    * message.
    */
   public NewMessageInfo populateReply(boolean replyAll)
-    throws MessagingException {
+    throws MessagingException, OperationCancelledException  {
     return populateReply(replyAll, false);
   }
 
@@ -679,7 +679,7 @@ public class MessageInfo {
    * current message.
    */
   public NewMessageInfo populateForward(boolean withAttachments, int method)
-    throws MessagingException {
+    throws MessagingException, OperationCancelledException  {
     MimeMessage mMsg = (MimeMessage) getMessage();
     MimeMessage newMsg = new MimeMessage(Pooka.getDefaultSession());
 
@@ -761,7 +761,7 @@ public class MessageInfo {
    * current message.
    */
   public NewMessageInfo populateForward()
-    throws MessagingException {
+    throws MessagingException, OperationCancelledException  {
     return populateForward(false, FORWARD_QUOTED);
   }
 
@@ -797,7 +797,7 @@ public class MessageInfo {
       if (removed != null && removed.size() > 0) {
         try {
           getFolderInfo().expunge();
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           // throw it away
         }
       }
@@ -980,45 +980,45 @@ public class MessageInfo {
    * Returns whether or not this message has attachments.
    */
   public boolean hasAttachments() throws MessagingException {
-	  return hasAttachments(true);
+    return hasAttachments(true);
   }
 
   /**
    * Returns whether or not this message has attachments.
    */
   public boolean hasAttachments(boolean inclusiveCryptoAttach) throws MessagingException {
-	    //if (mHasCheckedAttachments) {
-	    //  return mHasAttachments;
-	    //} else {
-	      if (hasLoadedAttachments()) {
-	    	  Vector attachs = getAttachments(inclusiveCryptoAttach);
-	    	  
-	        if (attachs != null && attachs.size() > 0)
-	          mHasAttachments = true;
+      //if (mHasCheckedAttachments) {
+      //  return mHasAttachments;
+      //} else {
+        if (hasLoadedAttachments()) {
+          Vector attachs = getAttachments(inclusiveCryptoAttach);
 
-	        mHasCheckedAttachments = true;
+          if (attachs != null && attachs.size() > 0)
+            mHasAttachments = true;
 
-	        return mHasAttachments;
+          mHasCheckedAttachments = true;
 
-	      } else {
-	        try {
-	          javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
-	          if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
-	            return true;
-	          } else {
-	            return false;
-	          }
-	        } catch (javax.mail.internet.ParseException pe) {
-	          if (Pooka.isDebug()) {
-	            System.out.println("unable to parse content-type:  " + getMessage().getContentType());
-	          }
-	          mHasAttachments = false;
-	        }
-	      }
-	    //}
+          return mHasAttachments;
 
-	    return mHasAttachments;
-	  }
+        } else {
+          try {
+            javax.mail.internet.ContentType type = new javax.mail.internet.ContentType(getMessage().getContentType());
+            if (new String("multipart").equalsIgnoreCase(type.getPrimaryType()) && ! new String("alternative").equalsIgnoreCase(type.getSubType())) {
+              return true;
+            } else {
+              return false;
+            }
+          } catch (javax.mail.internet.ParseException pe) {
+            if (Pooka.isDebug()) {
+              System.out.println("unable to parse content-type:  " + getMessage().getContentType());
+            }
+            mHasAttachments = false;
+          }
+        }
+      //}
+
+      return mHasAttachments;
+    }
 
   /**
    * Returns whether or not this message has encryption on it.
@@ -1037,34 +1037,34 @@ public class MessageInfo {
   /**
    * Returns the attachments for this MessageInfo.  If the attachments
    * have not yet been loaded, attempts to load the attachments.
-   * are considered.  
+   * are considered.
    */
   public Vector getAttachments() throws MessagingException {
-	  return getAttachments(true);
+    return getAttachments(true);
   }
-  
+
   /**
    * Returns the attachments for this MessageInfo.  If the attachments
    * have not yet been loaded, attempts to load the attachments.
    * @param inclusiveCryptoAttach: indicates whether the crypto attachments
-   * are considered.  
+   * are considered.
    */
   public Vector getAttachments(boolean inclusiveCryptoAttach) throws MessagingException {
     if (!hasLoadedAttachments())
-    	loadAttachmentInfo();
-    
+      loadAttachmentInfo();
+
     Vector atts = attachments.getAttachments(getMaxMessageDisplayLength());
-    
-    if ((!inclusiveCryptoAttach) && atts != null && atts.size() > 0) {    	
+
+    if ((!inclusiveCryptoAttach) && atts != null && atts.size() > 0) {
         for (int i = 0; i < atts.size() ; i++) {
           Attachment attach = (Attachment) atts.elementAt(i);
           if(attach instanceof CryptoAttachment || attach instanceof SignedAttachment){
-        	  atts.remove(attach);
-        	  i--;
+            atts.remove(attach);
+            i--;
           }
         }
     }
-    
+
     return atts;
 
   }
@@ -1169,14 +1169,14 @@ public class MessageInfo {
   }
 
   /**
-   * Returns the headerlines of the contained message 
+   * Returns the headerlines of the contained message
    */
-	public Vector getHeaderLines() throws MessagingException{
-	    if (!hasLoadedAttachments())
-	    	loadAttachmentInfo();
-	    
-		return attachments.headerLines;
-	}
+  public Vector getHeaderLines() throws MessagingException{
+      if (!hasLoadedAttachments())
+        loadAttachmentInfo();
+
+    return attachments.headerLines;
+  }
 }
 
 

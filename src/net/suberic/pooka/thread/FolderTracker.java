@@ -1,5 +1,6 @@
 package net.suberic.pooka.thread;
 import net.suberic.pooka.FolderInfo;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.Pooka;
 import net.suberic.util.thread.*;
 import javax.mail.*;
@@ -133,7 +134,7 @@ public class FolderTracker extends Thread {
 
     for (int i = 0 ; i < mUpdateInfos.size() ; i++)
       if (((UpdateInfo) mUpdateInfos.elementAt(i)).folder == folder)
-  mUpdateInfos.removeElementAt(i);
+        mUpdateInfos.removeElementAt(i);
   }
 
   // end folder administration
@@ -167,10 +168,10 @@ public class FolderTracker extends Thread {
     while (iter.hasNext()) {
       UpdateInfo current = (UpdateInfo) iter.next();
       if (! current.isUpdateRunning()) {
-  if (nextTime == -1)
-    nextTime = current.getNextFolderUpdate();
-  else
-    nextTime = Math.min(nextTime, current.getNextFolderUpdate());
+        if (nextTime == -1)
+          nextTime = current.getNextFolderUpdate();
+        else
+          nextTime = Math.min(nextTime, current.getNextFolderUpdate());
       }
     }
 
@@ -194,21 +195,21 @@ public class FolderTracker extends Thread {
   public void run() {
     while (true && ! mStopped) {
       try {
-  getLogger().fine("running folder tracker update.");
+        getLogger().fine("running folder tracker update.");
 
-  long currentTime = Calendar.getInstance().getTime().getTime();
-  updateFolders(currentTime);
-  long sleepTime = calculateNextUpdateTime(currentTime) - currentTime;
-  if (sleepTime > 0) {
-    getLogger().finer("sleeping for " + sleepTime + " milliseconds.");
+        long currentTime = Calendar.getInstance().getTime().getTime();
+        updateFolders(currentTime);
+        long sleepTime = calculateNextUpdateTime(currentTime) - currentTime;
+        if (sleepTime > 0) {
+          getLogger().finer("sleeping for " + sleepTime + " milliseconds.");
 
-    sleep(sleepTime);
-  } else {
-    getLogger().finer("sleep time is negative; not sleeping.");
-  }
+          sleep(sleepTime);
+        } else {
+          getLogger().finer("sleep time is negative; not sleeping.");
+        }
       } catch (InterruptedException ie) {
-  // on interrupt, just continue.
-  getLogger().finer("caught InterruptedException.");
+        // on interrupt, just continue.
+        getLogger().finer("caught InterruptedException.");
       }
     }
 
@@ -223,7 +224,7 @@ public class FolderTracker extends Thread {
     for (int i = 0; i < mUpdateInfos.size(); i++) {
       UpdateInfo info = (UpdateInfo)mUpdateInfos.elementAt(i);
       if (info.shouldUpdate(currentTime))
-  info.update();
+        info.update();
     }
   }
 
@@ -264,16 +265,17 @@ public class FolderTracker extends Thread {
     public void actionPerformed(java.awt.event.ActionEvent e) {
       UpdateInfo info = (UpdateInfo) e.getSource();
       try {
-  getLogger().fine("running checkFolder on " + info.getFolderInfo().getFolderID());
-  info.getFolderInfo().checkFolder();
+        getLogger().fine("running checkFolder on " + info.getFolderInfo().getFolderID());
+        info.getFolderInfo().checkFolder();
+      } catch (OperationCancelledException oce) {
       } catch (MessagingException me) {
-  // ignore; only show if we're debugging.
-  if (getLogger().isLoggable(Level.FINE)) {
-    getLogger().fine("caught exception checking folder " + info.getFolderInfo().getFolderID() + ":  " + me);
-    me.printStackTrace();
-  }
+        // ignore; only show if we're debugging.
+        if (getLogger().isLoggable(Level.FINE)) {
+          getLogger().fine("caught exception checking folder " + info.getFolderInfo().getFolderID() + ":  " + me);
+          me.printStackTrace();
+        }
       } finally {
-  info.newUpdateTime();
+        info.newUpdateTime();
       }
     }
   }

@@ -23,6 +23,7 @@ import javax.swing.text.TextAction;
 
 import net.suberic.pooka.MessageCryptoInfo;
 import net.suberic.pooka.MessageInfo;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.gui.crypto.CryptoPanel;
 import net.suberic.pooka.gui.crypto.CryptoStatusDisplay;
@@ -82,7 +83,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
    * the necessary panels and populating those panels with the information
    * from the MessageProxy.
    */
-  public void configureMessageDisplay() throws MessagingException {
+  public void configureMessageDisplay() throws MessagingException, OperationCancelledException {
     headerPane = new JTextPane();
     headerPane.setEditable(false);
     headerPane.setBackground(Color.LIGHT_GRAY);
@@ -219,7 +220,7 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
    *
    * Also updates the current keybindings.
    */
-  public void resetEditorText() throws MessagingException {
+  public void resetEditorText() throws MessagingException, OperationCancelledException {
     // ok.  here's how this has to go:  we need to load the information from
     // the message on the message editor thread, but then actually do the
     // display changing on the awt event thread.  seem simple enough?

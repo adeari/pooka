@@ -23,23 +23,23 @@ public class OutgoingFolderInfo extends FolderInfo {
    * Sends all available messages.
    */
   public void sendAll() throws javax.mail.MessagingException {
-    
-    Transport sendTransport = Pooka.getDefaultSession().getTransport(transportURL); 
+
+    Transport sendTransport = Pooka.getDefaultSession().getTransport(transportURL);
     try {
       sendTransport.connect();
-      
-      Message[] msgs = getFolder().getMessages();    
-      
+
+      Message[] msgs = getFolder().getMessages();
+
       try {
-	for (int i = 0; i < msgs.length; i++) {
-	  Message m = msgs[i];
-	  if (! m.isSet(Flags.Flag.DRAFT)) {
-	    sendTransport.sendMessage(m, m.getAllRecipients());
-	    m.setFlag(Flags.Flag.DELETED, true);
-	  }
-	}
+  for (int i = 0; i < msgs.length; i++) {
+    Message m = msgs[i];
+    if (! m.isSet(Flags.Flag.DRAFT)) {
+      sendTransport.sendMessage(m, m.getAllRecipients());
+      m.setFlag(Flags.Flag.DELETED, true);
+    }
+  }
       } finally {
-	getFolder().expunge();
+  getFolder().expunge();
       }
     } finally {
       sendTransport.close();
@@ -48,31 +48,31 @@ public class OutgoingFolderInfo extends FolderInfo {
 
   /**
    * Virtually sends a message.  If the current status is connected, then
-   * the message will actually be sent now.  If not, and the 
+   * the message will actually be sent now.  If not, and the
    * Message.sendImmediately setting is true, then we'll attempt to send
-   * the message anyway.  
+   * the message anyway.
    */
-  public void sendMessage(NewMessageInfo nmi, boolean connect) throws javax.mail.MessagingException {
+  public void sendMessage(NewMessageInfo nmi, boolean connect) throws javax.mail.MessagingException, OperationCancelledException {
     this.appendMessages(new MessageInfo[] { nmi });
     if (online)
       sendAll();
     else if (connect || Pooka.getProperty("Message.sendImmediately", "false").equalsIgnoreCase("true")) {
       try {
-	connect();
-	if (online)
-	  sendAll();
+  connect();
+  if (online)
+    sendAll();
       } catch (MessagingException me) {
-	System.err.println("me is a " + me);
-	online = false;
+  System.err.println("me is a " + me);
+  online = false;
       }
     }
   }
 
   /**
    * Virtually sends a message.  If the current status is connected, then
-   * the message will actually be sent now.  
+   * the message will actually be sent now.
    */
-  public void sendMessage(NewMessageInfo nmi) throws javax.mail.MessagingException {
+  public void sendMessage(NewMessageInfo nmi) throws javax.mail.MessagingException, OperationCancelledException {
     sendMessage(nmi, false);
   }
 

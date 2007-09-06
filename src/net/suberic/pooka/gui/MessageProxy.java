@@ -49,6 +49,7 @@ import net.suberic.pooka.MessageFilter;
 import net.suberic.pooka.MessageInfo;
 import net.suberic.pooka.NewMessageInfo;
 import net.suberic.pooka.NoTrashFolderException;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.RowCounter;
 import net.suberic.pooka.UserProfile;
@@ -544,7 +545,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Attempts to decrypt the given message.
    */
   public void decryptMessage() {
-	  boolean forSiganture = false;
+    boolean forSiganture = false;
     MessageInfo info = getMessageInfo();
     if (info != null) {
       try {
@@ -555,7 +556,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
           if (cInfo != null && cInfo.isEncrypted()) {
 
             java.security.Key key = getDefaultProfile().getEncryptionKey(
-            		cInfo.getEncryptionType(), forSiganture);
+                cInfo.getEncryptionType(), forSiganture);
 
             if (key != null) {
               try {
@@ -568,9 +569,9 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
             if (key == null) {
               try {
                 key = selectPrivateKey(
-                		Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."),
-                		cInfo.getEncryptionType(),
-                		forSiganture);
+                    Pooka.getProperty("Pooka.crypto.privateKey.forDecrypt", "Select key to decrypt this message."),
+                    cInfo.getEncryptionType(),
+                    forSiganture);
               } catch (Exception e) {
                 showError(Pooka.getProperty("Error.encryption.keystoreException", "Error selecting key:  "), e);
               }
@@ -593,6 +594,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
                   csd.cryptoUpdated(cInfo);
                 try {
                   ui.refreshDisplay();
+                } catch (OperationCancelledException oce) {
                 } catch (MessagingException me) {
                   showError(Pooka.getProperty("Error.encryption.decryptionFailed", "Decryption Failed:  "), me);
                 }
@@ -610,7 +612,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Attempts to check the signature on the given message.
    */
   public void checkSignature() {
-	final boolean forSignature = true; 
+  final boolean forSignature = true;
     MessageInfo info = getMessageInfo();
     if (info != null) {
       MessageCryptoInfo cInfo = info.getCryptoInfo();
@@ -624,13 +626,13 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
             fromString = ((javax.mail.internet.InternetAddress)fromAddr[0]).getAddress();
           }
           java.security.Key[] keys = Pooka.getCryptoManager().getPublicKeys(
-        		  fromString, cInfo.getEncryptionType(), true);
+              fromString, cInfo.getEncryptionType(), true);
 
           if (keys == null || keys.length < 1) {
             java.security.Key newKey = selectPublicKey(
-            		Pooka.getProperty("Pooka.crypto.publicKey.forSig", "Select key for verifying the signature on this message."), 
-            		cInfo.getEncryptionType(),
-            		forSignature);
+                Pooka.getProperty("Pooka.crypto.publicKey.forSig", "Select key for verifying the signature on this message."),
+                cInfo.getEncryptionType(),
+                forSignature);
             keys = new java.security.Key[] { newKey };
           }
 
@@ -639,7 +641,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
             for (int i = 0; (! checked) && i < keys.length; i++) {
               checked = cInfo.checkSignature(keys[i], true);
               if(checked)
-            	  break;
+                break;
             }
           }
           MessageUI ui = getMessageUI();
@@ -649,7 +651,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
           if (csd != null)
             csd.cryptoUpdated(cInfo);
-          
+
           ui.refreshDisplay();
         }
       } catch (Exception e) {
@@ -712,7 +714,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * Opens up a dialog to select a public key.
    */
-  public java.security.Key selectPublicKey(String flavorText, String type, boolean forSignature) 
+  public java.security.Key selectPublicKey(String flavorText, String type, boolean forSignature)
   throws java.security.GeneralSecurityException {
     return CryptoKeySelector.selectPublicKey(flavorText, type, forSignature);
   }
@@ -720,7 +722,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * Opens up a dialog to select a private key.
    */
-  public java.security.Key selectPrivateKey(String flavorText, String type, boolean forSignature) 
+  public java.security.Key selectPrivateKey(String flavorText, String type, boolean forSignature)
   throws java.security.GeneralSecurityException {
     return CryptoKeySelector.selectPrivateKey(flavorText, type, forSignature);
   }
@@ -743,28 +745,28 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * Returns the attachments for this Message.
    * @param inclusiveCryptoAttach: (Added by Liao) indicates whether the crypto attachments
-   * are considered. 
+   * are considered.
    */
   public List getAttachments() throws MessagingException {
     return this.getAttachments(true);
   }
-  
+
   /**
    * Returns whether or not this message has attachments.
    */
   public boolean hasAttachments() throws MessagingException {
     return messageInfo.hasAttachments(true);
   }
-  
+
   /**
    * Returns whether or not this message has attachments.
    * @param inclusiveCryptoAttach: (Added by Liao) indicates whether the crypto attachments
-   * are considered. 
+   * are considered.
    */
   public boolean hasAttachments(boolean inclusiveCryptoAttach) throws MessagingException {
     return messageInfo.hasAttachments(inclusiveCryptoAttach);
   }
- 
+
   /**
    * This gets a Flag property from the Message.
    */
@@ -822,6 +824,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         });
 
       getMessageInfo().setSeen(true);
+    } catch (OperationCancelledException oce) {
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
     }
@@ -852,6 +855,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
 
       if (removeProxy)
         deleteMessage();
+    } catch (OperationCancelledException oce) {
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.Message.openWindow", "Error opening window:  "), me);
     }
@@ -860,38 +864,27 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   /**
    * Moves the Message into the target Folder.
    */
-  public void moveMessage(FolderInfo targetFolder) {
+  public void moveMessage(FolderInfo targetFolder) throws MessagingException, OperationCancelledException {
     moveMessage(targetFolder, Pooka.getProperty("Pooka.autoExpunge", "true").equals("true"));
   }
 
   /**
    * Moves the Message into the target Folder.
    */
-  public void moveMessage(FolderInfo targetFolder, boolean expunge) {
-    try {
-      messageInfo.moveMessage(targetFolder, expunge);
-    } catch (MessagingException me) {
-      showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
-      if (Pooka.isDebug())
-        me.printStackTrace();
-    }
+  public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException, OperationCancelledException {
+    messageInfo.moveMessage(targetFolder, expunge);
   }
 
   /**
    * Copies the Message to the target Folder.
    */
-  public void copyMessage(FolderInfo targetFolder) {
-    try {
-      messageInfo.copyMessage(targetFolder);
-    } catch (MessagingException me) {
-      showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", me);
-      if (Pooka.isDebug())
-        me.printStackTrace();
-    }
+  public void copyMessage(FolderInfo targetFolder) throws MessagingException, OperationCancelledException {
+
+    messageInfo.copyMessage(targetFolder);
   }
 
   /**
-   * Creates a NewMessageInfo & Proxy for a message which is a reply
+   * Creates a NewMessageInfo &amp; Proxy for a message which is a reply
    * to the current message.  Opens a NewMessageUI for said Proxy.
    */
   private void replyToMessage(boolean replyAll, boolean withAttachments) {
@@ -949,6 +942,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
             nmui.openMessageUI();
           }
         });
+    } catch (OperationCancelledException oce) {
 
     } catch (MessagingException me) {
       if (getMessageUI() != null)
@@ -1053,6 +1047,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
       setDeleteInProgress(true);
       getMessageInfo().deleteMessage(autoExpunge);
       this.close();
+    } catch (OperationCancelledException oce) {
     } catch (MessagingException me) {
       if (me instanceof NoTrashFolderException) {
         final boolean finalAutoExpunge = autoExpunge;
@@ -1064,12 +1059,14 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
                     getMessageInfo().remove(finalAutoExpunge);
                     close();
                   }
+                } catch (OperationCancelledException oce) {
                 } catch (MessagingException mex) {
                   showError(Pooka.getProperty("error.Message.DeleteErrorMessage", "Error:  could not delete message.") +"\n", mex);
                 }
               }
             });
         } catch (Exception e) {
+          e.printStackTrace();
         }
       } else {
         final Exception mEx = me;
@@ -1224,6 +1221,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
             }
           }
         });
+    } catch (OperationCancelledException oce) {
     } catch (MessagingException e) {
       showError("error printing", e);
     }
@@ -1767,8 +1765,22 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-        fw.setBusy(true);;
-      moveMessage((FolderInfo)getValue("target"));
+        fw.setBusy(true);
+
+      final FolderInfo targetFolder = (FolderInfo) getValue("target");
+      try {
+        moveMessage(targetFolder);
+      } catch (OperationCancelledException oce) {
+
+      } catch (MessagingException me) {
+        final MessagingException fme = me;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              showError(Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", fme);
+            }
+          });
+      }
+
       if (fw != null)
         fw.setBusy(false);
       if (getMessageUI() != null)
@@ -1787,8 +1799,22 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         getMessageUI().setBusy(true);
       FolderDisplayUI fw = getFolderDisplayUI();
       if (fw != null)
-        fw.setBusy(true);;
-      copyMessage((FolderInfo)getValue("target"));
+        fw.setBusy(true);
+
+      final FolderInfo targetFolder = (FolderInfo) getValue("target");
+      try {
+        copyMessage(targetFolder);
+      } catch (OperationCancelledException oce) {
+
+      } catch (MessagingException me) {
+        final MessagingException fme = me;
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+              showError( Pooka.getProperty("error.Message.CopyErrorMessage", "Error:  could not copy messages to folder:  ") + targetFolder.toString() +"\n", fme);
+            }
+          });
+      }
+
       if (fw != null)
         fw.setBusy(false);
       if (getMessageUI() != null)
@@ -2234,25 +2260,25 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         fw.setBusy(true);;
 
       if (getMessageUI() != null){
-    	  //Liao-
-    	  MessageUI msgUI = getMessageUI();    	  
-    	  CryptoStatusDisplay cryptoLCD = msgUI.getCryptoStatusDisplay();
-    	  VariableBundle vars = Pooka.getResources();
-    	  String status = "(Encryption Status)";
-    	  switch(cryptoLCD.getEncryptionStatus()){
-    	  case CryptoStatusDisplay.UNCHECKED_ENCRYPTED:
-    		  status = vars.getProperty("CryptoPanel.uncheckedEncrypted.Tooltip", "Encrypted Message");
-    		  break;
-    	  case CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY:
-    		  status = vars.getProperty("CryptoPanel.decryptedUnsuccessfully.Tooltip", "Message Failed Decryption");
-    		  break;
-    	  case CryptoStatusDisplay.DECRYPTED_SUCCESSFULLY:
-    		  status = vars.getProperty("CryptoPanel.decryptedSuccessfully.Tooltip", "Message Decrypted with Key");
-    		  break;
-    	  } 
-    	  
-    	  //Liao+
-    	  
+        //Liao-
+        MessageUI msgUI = getMessageUI();
+        CryptoStatusDisplay cryptoLCD = msgUI.getCryptoStatusDisplay();
+        VariableBundle vars = Pooka.getResources();
+        String status = "(Encryption Status)";
+        switch(cryptoLCD.getEncryptionStatus()){
+        case CryptoStatusDisplay.UNCHECKED_ENCRYPTED:
+          status = vars.getProperty("CryptoPanel.uncheckedEncrypted.Tooltip", "Encrypted Message");
+          break;
+        case CryptoStatusDisplay.DECRYPTED_UNSUCCESSFULLY:
+          status = vars.getProperty("CryptoPanel.decryptedUnsuccessfully.Tooltip", "Message Failed Decryption");
+          break;
+        case CryptoStatusDisplay.DECRYPTED_SUCCESSFULLY:
+          status = vars.getProperty("CryptoPanel.decryptedSuccessfully.Tooltip", "Message Decrypted with Key");
+          break;
+        }
+
+        //Liao+
+
         getMessageUI().showMessageDialog(status, "Encryption Status");
       }
       else
@@ -2278,27 +2304,27 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
         fw.setBusy(true);;
 
       if (getMessageUI() != null){
-    	  //Liao-
-    	  MessageUI msgUI = getMessageUI();    	  
-    	  CryptoStatusDisplay cryptoLCD = msgUI.getCryptoStatusDisplay();
-    	  VariableBundle vars = Pooka.getResources();
-    	  String status = "(Signature Status)";
-    	  switch(cryptoLCD.getSignatureStatus()){
-    	  case CryptoStatusDisplay.UNCHECKED_SIGNED:
-    		  status = vars.getProperty("CryptoPanel.uncheckedSigned.Tooltip", "Signed");
-    		  break;
-    	  case CryptoStatusDisplay.SIGNATURE_BAD:
-    		  status = vars.getProperty("CryptoPanel.signatureBad.Tooltip", "Signature Failed Verification by Key");
-    		  break;
-    	  case CryptoStatusDisplay.SIGNATURE_VERIFIED:
-    		  status = vars.getProperty("CryptoPanel.signatureVerified.Tooltip", "Signature Verified with Key");
-    		  break;
-    	  case CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION:
-    		  status = vars.getProperty("CryptoPanel.signatureFailedVerification.Tooltip", "Unable to Verfify Signature");
-    		  break;
-    	  } 
-    	  
-    	  //Liao+
+        //Liao-
+        MessageUI msgUI = getMessageUI();
+        CryptoStatusDisplay cryptoLCD = msgUI.getCryptoStatusDisplay();
+        VariableBundle vars = Pooka.getResources();
+        String status = "(Signature Status)";
+        switch(cryptoLCD.getSignatureStatus()){
+        case CryptoStatusDisplay.UNCHECKED_SIGNED:
+          status = vars.getProperty("CryptoPanel.uncheckedSigned.Tooltip", "Signed");
+          break;
+        case CryptoStatusDisplay.SIGNATURE_BAD:
+          status = vars.getProperty("CryptoPanel.signatureBad.Tooltip", "Signature Failed Verification by Key");
+          break;
+        case CryptoStatusDisplay.SIGNATURE_VERIFIED:
+          status = vars.getProperty("CryptoPanel.signatureVerified.Tooltip", "Signature Verified with Key");
+          break;
+        case CryptoStatusDisplay.SIGNATURE_FAILED_VERIFICATION:
+          status = vars.getProperty("CryptoPanel.signatureFailedVerification.Tooltip", "Unable to Verfify Signature");
+          break;
+        }
+
+        //Liao+
         getMessageUI().showMessageDialog(status, "Signature Status");
       }
       else

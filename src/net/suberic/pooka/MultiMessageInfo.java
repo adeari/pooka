@@ -62,7 +62,7 @@ public class MultiMessageInfo extends MessageInfo {
   /**
    * Moves the Message into the target Folder.
    */
-  public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException {
+  public void moveMessage(FolderInfo targetFolder, boolean expunge) throws MessagingException, OperationCancelledException {
     if (folderInfo != null) {
       folderInfo.copyMessages(messages, targetFolder);
       folderInfo.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
@@ -77,7 +77,7 @@ public class MultiMessageInfo extends MessageInfo {
   /**
    * Copies the Message into the target Folder.
    */
-  public void copyMessage(FolderInfo targetFolder) throws MessagingException {
+  public void copyMessage(FolderInfo targetFolder) throws MessagingException, OperationCancelledException {
     if (folderInfo != null) {
       folderInfo.copyMessages(messages, targetFolder);
     } else {
@@ -89,7 +89,7 @@ public class MultiMessageInfo extends MessageInfo {
   /**
    * deletes all the messages in the MultiMessageInfo.
    */
-  public void deleteMessage(boolean expunge) throws MessagingException {
+  public void deleteMessage(boolean expunge) throws MessagingException, OperationCancelledException {
     if (folderInfo != null) {
       FolderInfo trashFolder = folderInfo.getTrashFolder();
       if ((folderInfo.useTrashFolder()) && (trashFolder != null) && (trashFolder != folderInfo)) {
@@ -118,7 +118,7 @@ public class MultiMessageInfo extends MessageInfo {
    * throws an Exception, it may be necessary to follow up with a call
    * to remove().
    */
-  public void remove(boolean autoExpunge) throws MessagingException {
+  public void remove(boolean autoExpunge) throws MessagingException, OperationCancelledException {
     if (folderInfo != null) {
       folderInfo.setFlags(messages, new Flags(Flags.Flag.DELETED), true);
       if (autoExpunge)
@@ -191,6 +191,7 @@ public class MultiMessageInfo extends MessageInfo {
       if (removed != null && removed.size() > 0) {
         try {
           getFolderInfo().expunge();
+        } catch (OperationCancelledException oce) {
         } catch (MessagingException me) {
           // throw it away
         }

@@ -5,6 +5,7 @@ import net.suberic.pooka.*;
 import net.suberic.util.swing.*;
 import java.io.IOException;
 import java.util.HashMap;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.Pooka;
 import net.suberic.util.gui.*;
 import java.awt.BorderLayout;
@@ -46,8 +47,11 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     try {
       messageDisplay.configureMessageDisplay();
+    } catch (OperationCancelledException oce) {
     } catch (javax.mail.MessagingException me) {
-      // showError();
+      if (Pooka.getUIFactory() != null) {
+        Pooka.getUIFactory().showError("Error showing message", me);
+      }
     }
 
     splitPanel = new JSplitPane(JSplitPane.VERTICAL_SPLIT, folderDisplay, messageDisplay);
@@ -60,10 +64,10 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     splitPanel.setDividerLocation(Integer.parseInt(Pooka.getProperty("Pooka.contentPanel.dividerLocation", "200")));
 
     selectionListener = new ListSelectionListener() {
-  public void valueChanged(javax.swing.event.ListSelectionEvent e) {
-    if (! e.getValueIsAdjusting())
-      selectedMessageChanged();
-  }
+        public void valueChanged(javax.swing.event.ListSelectionEvent e) {
+          if (! e.getValueIsAdjusting())
+            selectedMessageChanged();
+        }
       };
 
     this.setSavingOpenFolders(Pooka.getProperty("Pooka.saveOpenFoldersOnExit", "false").equalsIgnoreCase("true"));
@@ -72,11 +76,11 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     // the PreviewFolderPanel (by default)
 
     this.addFocusListener(new java.awt.event.FocusAdapter() {
-  public void focusGained(java.awt.event.FocusEvent e) {
-    if (current != null) {
-      current.requestFocusInWindow();
-    }
-  }
+        public void focusGained(java.awt.event.FocusEvent e) {
+          if (current != null) {
+            current.requestFocusInWindow();
+          }
+        }
       });
   }
 
@@ -94,24 +98,24 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     for (int i = 0; i < frames.length; i++) {
       if (frames[i] instanceof FolderInternalFrame) {
-  PreviewFolderPanel newPP = new PreviewFolderPanel(this, (FolderInternalFrame) frames[i]);
-  net.suberic.pooka.FolderInfo fi = newPP.getFolderInfo();
-  String folderID = fi.getFolderID();
-  fi.setFolderDisplayUI(newPP);
-  addPreviewPanel(newPP, folderID);
-  if (frames[i].isSelected()) {
-    selectedID = folderID;
-  } else if (selectedID == null) {
-    // if it gets overriden later, that's great.
-    selectedID = folderID;
-  }
+        PreviewFolderPanel newPP = new PreviewFolderPanel(this, (FolderInternalFrame) frames[i]);
+        net.suberic.pooka.FolderInfo fi = newPP.getFolderInfo();
+        String folderID = fi.getFolderID();
+        fi.setFolderDisplayUI(newPP);
+        addPreviewPanel(newPP, folderID);
+        if (frames[i].isSelected()) {
+          selectedID = folderID;
+        } else if (selectedID == null) {
+          // if it gets overriden later, that's great.
+          selectedID = folderID;
+        }
       } else if (frames[i] instanceof MessageInternalFrame) {
-  if (frames[i].isSelected()) {
-    if (frames[i] instanceof ReadMessageInternalFrame) {
-      selectedID = ((ReadMessageInternalFrame) frames[i]).getMessageProxy().getMessageInfo().getFolderInfo().getFolderID();
-    }
-  }
-  ((MessageInternalFrame) frames[i]).detachWindow();
+        if (frames[i].isSelected()) {
+          if (frames[i] instanceof ReadMessageInternalFrame) {
+            selectedID = ((ReadMessageInternalFrame) frames[i]).getMessageProxy().getMessageInfo().getFolderInfo().getFolderID();
+          }
+        }
+        ((MessageInternalFrame) frames[i]).detachWindow();
       }
     }
 
@@ -124,14 +128,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    */
   public void configureInterfaceStyle() {
     Runnable runMe = new Runnable() {
-  public void run() {
-    try {
-      Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this);
-      getMessageDisplay().setDefaultFont();
-      getMessageDisplay().sizeToDefault();
-    } catch (Exception e) {
-    }
-  }
+        public void run() {
+          try {
+            Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this);
+            getMessageDisplay().setDefaultFont();
+            getMessageDisplay().sizeToDefault();
+          } catch (Exception e) {
+          }
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
@@ -170,19 +174,19 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     // but, hey, it never hurts to check.
     if (currentTheme != null && currentTheme == theme) {
       Runnable r = new Runnable() {
-    public void run() {
-      try {
-        Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this, true);
-        getMessageDisplay().setDefaultFont();
-      } catch (Exception e) {
-      }
+          public void run() {
+            try {
+              Pooka.getUIFactory().getPookaThemeManager().updateUI(PreviewContentPanel.this, PreviewContentPanel.this, true);
+              getMessageDisplay().setDefaultFont();
+            } catch (Exception e) {
+            }
 
-    }
-  };
+          }
+        };
       if (SwingUtilities.isEventDispatchThread()) {
-  r.run();
+        r.run();
       } else {
-  SwingUtilities.invokeLater(r);
+        SwingUtilities.invokeLater(r);
       }
     }
   }
@@ -207,7 +211,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     if (fi != null) {
       String id = Pooka.getProperty(fi.getFolderProperty() + ".theme", "");
       if (id != null && ! id.equals("")) {
-  return tm.getTheme(id);
+        return tm.getTheme(id);
       }
     }
 
@@ -263,20 +267,21 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     if (current != null) {
       final MessageProxy mp = current.getFolderDisplay().getSelectedMessage();
       if (! (mp instanceof MultiMessageProxy)) {
-  if (current != null) {
-    current.getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-        public void actionPerformed(java.awt.event.ActionEvent ae) {
-    messageDisplay.setMessageUI(PreviewContentPanel.this);
-    try {
-      refreshDisplay();
-      if (mp != null && mp.getMessageInfo() != null)
-        mp.getMessageInfo().setSeen(true);
-    } catch (javax.mail.MessagingException me) {
-      //showError();
-    }
+        if (current != null) {
+          current.getFolderInfo().getFolderThread().addToQueue(new javax.swing.AbstractAction() {
+              public void actionPerformed(java.awt.event.ActionEvent ae) {
+                messageDisplay.setMessageUI(PreviewContentPanel.this);
+                try {
+                  refreshDisplay();
+                  if (mp != null && mp.getMessageInfo() != null)
+                    mp.getMessageInfo().setSeen(true);
+                } catch (OperationCancelledException oce) {
+                } catch (javax.mail.MessagingException me) {
+                  //showError();
+                }
+              }
+            },  new java.awt.event.ActionEvent(this, 0, "message-refresh"));
         }
-      },  new java.awt.event.ActionEvent(this, 0, "message-refresh"));
-  }
       }
     }
   }
@@ -308,7 +313,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     PreviewFolderPanel panel = (PreviewFolderPanel)cardTable.get(folderId);
     if (panel != null) {
       if (panel == current)
-  current = null;
+        current = null;
       folderDisplay.remove(panel);
       cardTable.remove(folderId);
     }
@@ -326,10 +331,10 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     if (folderList != null && folderList.size() > 0) {
       net.suberic.pooka.FolderInfo fInfo = Pooka.getStoreManager().getFolderById((String)folderList.elementAt(0));
       if (fInfo != null && fInfo.getFolderNode() != null) {
-  FolderNode fNode = fInfo.getFolderNode();
-  fNode.makeVisible();
-  Action a = fNode.getAction("file-open");
-  a.actionPerformed(new java.awt.event.ActionEvent(this, 0, "file-open"));
+        FolderNode fNode = fInfo.getFolderNode();
+        fNode.makeVisible();
+        Action a = fNode.getAction("file-open");
+        a.actionPerformed(new java.awt.event.ActionEvent(this, 0, "file-open"));
       }
     }
   }
@@ -427,7 +432,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public void refreshActiveMenus() {
     // does nothing; should only be called by the MainPanel.
     //if (current != null)
-      //current.getToolbar().setActive(getActions());
+    //current.getToolbar().setActive(getActions());
     //Pooka.getMainPanel().refreshActiveMenus();
   }
 
@@ -487,14 +492,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   /**
    * Refreshes the display.
    */
-  public void refreshDisplay() throws javax.mail.MessagingException {
+  public void refreshDisplay() throws javax.mail.MessagingException, OperationCancelledException {
     configureInterfaceStyle();
     messageDisplay.resetEditorText();
 
     java.awt.Component fOwner = java.awt.KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
     if (fOwner != null && messageDisplay != null && SwingUtilities.isDescendingFrom(fOwner, messageDisplay) && messageDisplay.getMessageUI() == null) {
       if (current != null) {
-  current.requestFocusInWindow();
+        current.requestFocusInWindow();
       }
     }
   }
@@ -515,14 +520,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setInt(JOptionPane.showConfirmDialog(PreviewContentPanel.this, messageText, title, type));
-  }
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(PreviewContentPanel.this, messageText, title, type));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -545,14 +550,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setInt(JOptionPane.showConfirmDialog(PreviewContentPanel.this, messageText, title, optionType, iconType));
-  }
+        public void run() {
+          fResponseWrapper.setInt(JOptionPane.showConfirmDialog(PreviewContentPanel.this, messageText, title, optionType, iconType));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -572,14 +577,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
     final String title = pTitle;
 
     Runnable runMe = new Runnable() {
-  public void run() {
-    JOptionPane.showMessageDialog(PreviewContentPanel.this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
-  }
+        public void run() {
+          JOptionPane.showMessageDialog(PreviewContentPanel.this, errorMessage, title, JOptionPane.ERROR_MESSAGE);
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -633,14 +638,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setString(JOptionPane.showInputDialog(PreviewContentPanel.this, inputMessage, title, JOptionPane.QUESTION_MESSAGE));
-  }
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(PreviewContentPanel.this, inputMessage, title, JOptionPane.QUESTION_MESSAGE));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -661,14 +666,14 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
 
     final ResponseWrapper fResponseWrapper = new ResponseWrapper();
     Runnable runMe = new Runnable() {
-  public void run() {
-    fResponseWrapper.setString(JOptionPane.showInputDialog(PreviewContentPanel.this, inputPanes, title, JOptionPane.QUESTION_MESSAGE));
-  }
+        public void run() {
+          fResponseWrapper.setString(JOptionPane.showInputDialog(PreviewContentPanel.this, inputPanes, title, JOptionPane.QUESTION_MESSAGE));
+        }
       };
 
     if (! SwingUtilities.isEventDispatchThread()) {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception e) {
       }
     } else {
@@ -692,7 +697,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
    * Gets the PookaUIFactory that should be used by this MessageUI.
    */
   public PookaUIFactory getPookaUIFactory() {
-      return Pooka.getUIFactory();
+    return Pooka.getUIFactory();
   }
 
   /**
@@ -705,7 +710,7 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
   public Action[] defaultActions = {
     new NextWindowAction(),
     new PreviousWindowAction()
-      };
+  };
 
   public Action[] getDefaultActions() {
     return defaultActions;
@@ -726,31 +731,31 @@ public class PreviewContentPanel extends JPanel implements ContentPanel, Message
       return messageDisplay.getActions();
     else {
       if (messageDisplay.getActions() != null)
-  return javax.swing.text.TextAction.augmentList(returnValue, messageDisplay.getActions());
+        return javax.swing.text.TextAction.augmentList(returnValue, messageDisplay.getActions());
       else
-  return returnValue;
+        return returnValue;
     }
   }
 
-    /**
-     * Get the default profile for the current component, if any.
-     */
-    public UserProfile getDefaultProfile() {
-  if (current != null)
+  /**
+   * Get the default profile for the current component, if any.
+   */
+  public UserProfile getDefaultProfile() {
+    if (current != null)
       return current.getDefaultProfile();
-  else if (messageDisplay != null)
+    else if (messageDisplay != null)
       return messageDisplay.getDefaultProfile();
-  else
+    else
       return null;
-    }
+  }
 
-    public HashMap getCardTable() {
-  return cardTable;
-    }
+  public HashMap getCardTable() {
+    return cardTable;
+  }
 
-    public ListSelectionListener getSelectionListener() {
-  return selectionListener;
-    }
+  public ListSelectionListener getSelectionListener() {
+    return selectionListener;
+  }
 
 
   public class NextWindowAction extends AbstractAction {

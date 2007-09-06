@@ -6,11 +6,11 @@ import java.util.List;
  * A FilterActions which deletes all of the given Messages.
  */
 public class DeleteFilterAction implements FilterAction {
-  
+
   public DeleteFilterAction() {
-    
+
   }
-  
+
   /**
    * Runs the filterAction on each MessageProxy in the filteredMessages
    * List.
@@ -28,14 +28,14 @@ public class DeleteFilterAction implements FilterAction {
       current.deleteMessage(false);
       deleted.add(current);
     }
-    
+
     return deleted;
   }
-  
+
   /**
    * Initializes the FilterAction from the sourceProperty given.
    */
-  
+
   public void initializeFilter(String sourceProperty) {
     // no initialization necessary.
   }

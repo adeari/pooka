@@ -312,6 +312,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
             public void actionPerformed(java.awt.event.ActionEvent e) {
               try {
                 getFolderInfo().delete();
+              } catch (OperationCancelledException oce) {
+                // don't show a message if we cancel.
               } catch(MessagingException me) {
                 final Exception fme = me;
                 SwingUtilities.invokeLater(new Runnable() {
@@ -368,6 +370,8 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
             public void actionPerformed(java.awt.event.ActionEvent e) {
               try {
                 getFolderInfo().createSubFolder(response, finalType);
+              } catch (OperationCancelledException oce) {
+                // don't show a message if we cancel.
               } catch (MessagingException me) {
                 final Exception fme = me;
                 SwingUtilities.invokeLater(new Runnable() {
@@ -447,16 +451,15 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
             }
           }
         });
-    }  catch (MessagingException me) {
+    } catch (OperationCancelledException oce) {
       // if we cancelled out, ignore.
-      if (! (me instanceof OperationCancelledException)) {
-        final MessagingException newMe = me;
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-              Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
-            }
-          });
-      }
+    } catch (MessagingException me) {
+      final MessagingException newMe = me;
+      SwingUtilities.invokeLater(new Runnable() {
+          public void run() {
+            Pooka.getUIFactory().showError(Pooka.getProperty("error.Folder.openFailed", "Failed to open folder") + " " + getFolderInfo().getFolderID(), newMe);
+          }
+        });
     }
 
   }

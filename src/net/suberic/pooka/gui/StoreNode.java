@@ -312,15 +312,15 @@ public class StoreNode extends MailTreeNode {
               }
             });
 
+        } catch (OperationCancelledException oce) {
+          // ignore.
         } catch (MessagingException me) {
-          if (! (me instanceof OperationCancelledException)) {
-            final MessagingException newMe = me;
+          final MessagingException newMe = me;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                   Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store."), newMe);
                 }
               });
-          }
         }
       }
     }

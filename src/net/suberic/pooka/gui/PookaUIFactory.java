@@ -1,4 +1,5 @@
 package net.suberic.pooka.gui;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.util.swing.ProgressDialog;
 import net.suberic.util.gui.ConfigurableToolbar;
 import net.suberic.util.gui.IconManager;
@@ -13,13 +14,13 @@ public interface PookaUIFactory extends ErrorHandler {
   /**
    * Creates an appropriate MessageUI object for the given MessageProxy.
    */
-  public MessageUI createMessageUI(MessageProxy mp) throws javax.mail.MessagingException;
+  public MessageUI createMessageUI(MessageProxy mp) throws javax.mail.MessagingException, OperationCancelledException;
 
   /**
    * Creates an appropriate MessageUI object for the given MessageProxy,
    * using the provided MessageUI as a guideline.
    */
-  public MessageUI createMessageUI(MessageProxy mp, MessageUI mui) throws javax.mail.MessagingException;
+  public MessageUI createMessageUI(MessageProxy mp, MessageUI mui) throws javax.mail.MessagingException, OperationCancelledException;
 
   /**
    * Opens the given MessageProxy in the default manner for this UI.

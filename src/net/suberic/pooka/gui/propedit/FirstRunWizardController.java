@@ -159,7 +159,7 @@ public class FirstRunWizardController extends NewStoreWizardController {
                     openInboxSuccess();
                   }
                 });
-            } catch (MessagingException me) {
+            } catch (Exception me) {
               Pooka.getUIFactory().clearStatus();
               me.printStackTrace();
               int continueValue = handleInvalidEntry(me.getMessage());

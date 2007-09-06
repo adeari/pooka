@@ -2,6 +2,7 @@ package net.suberic.pooka.cache;
 import javax.mail.internet.*;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.MessageInfo;
+import net.suberic.pooka.OperationCancelledException;
 import java.util.HashMap;
 import java.util.Vector;
 import java.io.*;
@@ -466,7 +467,11 @@ public class SimpleFileCache implements MessageCache {
    */
   public long[] appendMessages(MessageInfo[] msgs) throws MessagingException {
     if (getFolderInfo().shouldBeConnected()) {
-      getFolderInfo().appendMessages(msgs);
+      try {
+        getFolderInfo().appendMessages(msgs);
+      } catch (OperationCancelledException oce) {
+        throw new MessagingException("Append cancelled.");
+      }
     } else {
       LocalMimeMessage[] localMsgs = new LocalMimeMessage[msgs.length];
       for (int i = 0; i < localMsgs.length; i++) {

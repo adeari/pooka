@@ -16,6 +16,7 @@ import javax.help.*;
 import java.util.logging.Logger;
 
 import net.suberic.pooka.MailQueue;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.UserProfile;
 import net.suberic.util.gui.*;
 
@@ -621,6 +622,7 @@ public class MainPanel extends JPanel implements net.suberic.pooka.UserProfileCo
       try {
         MessageUI nmu = Pooka.getUIFactory().createMessageUI(new NewMessageProxy(new net.suberic.pooka.NewMessageInfo(new javax.mail.internet.MimeMessage(getSession()))));
         nmu.openMessageUI();
+      } catch (OperationCancelledException oce) {
       } catch (MessagingException me) {
         Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
       }

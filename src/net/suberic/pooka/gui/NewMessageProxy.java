@@ -14,6 +14,7 @@ import javax.swing.SwingUtilities;
 import net.suberic.pooka.Attachment;
 import net.suberic.pooka.FolderInfo;
 import net.suberic.pooka.NewMessageInfo;
+import net.suberic.pooka.OperationCancelledException;
 import net.suberic.pooka.OutgoingMailServer;
 import net.suberic.pooka.Pooka;
 import net.suberic.pooka.UserProfile;
@@ -169,6 +170,7 @@ public class NewMessageProxy extends MessageProxy {
                 } else if (sfd.getSaveToOutbox()) {
                   try {
                     mailServer.saveToOutbox(getNewMessageInfo());
+                  } catch (OperationCancelledException oce) {
                   } catch (MessagingException outboxException) {
                     getMessageUI().showError(Pooka.getProperty("error.MessageUI.sendFailed", "Failed to send Message.") + "\n" + outboxException.getMessage());
                   }
@@ -306,6 +308,8 @@ public class NewMessageProxy extends MessageProxy {
                 try {
                   getNewMessageInfo().saveDraft(fi, profile, headers, messageText, messageContentType);
                   saveDraftSucceeded(fi);
+                } catch (OperationCancelledException oce) {
+                  saveDraftFailed(oce);
                 } catch (MessagingException me) {
                   saveDraftFailed(me);
                 }
@@ -414,16 +418,16 @@ public class NewMessageProxy extends MessageProxy {
     new SendAction(),
     new AttachAction(),
     new SaveDraftAction(),
-//    new EncryptAction(),
-//    new ClearEncryptAction(),
-//    new SelectEncryptionKeyAction(),
-//    new SignAction(),
-//    new ClearSignAction(),
-//    new SelectSignatureKeyAction(),
-//    new AttachKeyAction(),
-//    new RemoveKeyAction()
-//Liao-
-//    ,
+    //    new EncryptAction(),
+    //    new ClearEncryptAction(),
+    //    new SelectEncryptionKeyAction(),
+    //    new SignAction(),
+    //    new ClearSignAction(),
+    //    new SelectSignatureKeyAction(),
+    //    new AttachKeyAction(),
+    //    new RemoveKeyAction()
+    //Liao-
+    //    ,
     new SelectNoCrypt(),
     new SelectSMIMESign(),
     new SelectSMIMEEncrypt(),
@@ -431,7 +435,7 @@ public class NewMessageProxy extends MessageProxy {
     new SelectPGPSign(),
     new SelectPGPEncrypt(),
     new SelectPGPBoth()
-//Liao+    
+    //Liao+
   };
 
   public Action getAction(String name) {
@@ -477,237 +481,237 @@ public class NewMessageProxy extends MessageProxy {
   }
 
 
-/*  class EncryptAction extends AbstractAction {
-    EncryptAction() {
+  /*  class EncryptAction extends AbstractAction {
+      EncryptAction() {
       super("message-encrypt");
-    }
+      }
 
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-        ((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
+      ((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
 
       final boolean forSignature = false;;
-      if (getCryptoInfo().getEncryptionKey() == null && 
-    	  getNewMessageUI().getSelectedProfile().getEncryptionKey(forSignature) == null) {
-        try {
-          java.security.Key cryptKey = selectPublicKey(
-        		  Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt",  "Select key to encrypt this message."), 
-   				  Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"),
-   				  forSignature);
-          if (cryptKey != null) {
-            if (csd instanceof NewMessageCryptoDisplay) {
-              ((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
-            }
-          }
-        } catch (Exception ex) {
-          getMessageUI().showError(ex.getMessage(), ex);
-        }
+      if (getCryptoInfo().getEncryptionKey() == null &&
+      getNewMessageUI().getSelectedProfile().getEncryptionKey(forSignature) == null) {
+      try {
+      java.security.Key cryptKey = selectPublicKey(
+      Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt",  "Select key to encrypt this message."),
+      Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"),
+      forSignature);
+      if (cryptKey != null) {
+      if (csd instanceof NewMessageCryptoDisplay) {
+      ((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
       }
-    }
-  }
-*/
-/*  class SignAction extends AbstractAction {
-    SignAction() {
+      }
+      } catch (Exception ex) {
+      getMessageUI().showError(ex.getMessage(), ex);
+      }
+      }
+      }
+      }
+  */
+  /*  class SignAction extends AbstractAction {
+      SignAction() {
       super("message-sign");
-    }
+      }
 
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-        ((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
+      ((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
 
       final boolean forSignature = true;
-      if (getCryptoInfo().getSignatureKey() == null && 
-    	  (getDefaultProfile() == null || 
-            getDefaultProfile().getEncryptionKey(forSignature) == null)) {
-        try {
-          java.security.Key signKey = selectPrivateKey(
-        		  Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."), 
-   				  Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"),
-   				  forSignature);
-          if (csd instanceof NewMessageCryptoDisplay) {
-            ((NewMessageCryptoDisplay) csd).setSignatureKey(signKey);
-          }
-        } catch (Exception ex) {
-          getMessageUI().showError(ex.getMessage(), ex);
-        }
+      if (getCryptoInfo().getSignatureKey() == null &&
+      (getDefaultProfile() == null ||
+      getDefaultProfile().getEncryptionKey(forSignature) == null)) {
+      try {
+      java.security.Key signKey = selectPrivateKey(
+      Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."),
+      Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"),
+      forSignature);
+      if (csd instanceof NewMessageCryptoDisplay) {
+      ((NewMessageCryptoDisplay) csd).setSignatureKey(signKey);
+      }
+      } catch (Exception ex) {
+      getMessageUI().showError(ex.getMessage(), ex);
+      }
 
       }
-    }
-  }
-*/
-/*  class SelectSignatureKeyAction extends AbstractAction {
-    SelectSignatureKeyAction() {
+      }
+      }
+  */
+  /*  class SelectSignatureKeyAction extends AbstractAction {
+      SelectSignatureKeyAction() {
       super("message-select-sig-key");
-    }
+      }
 
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-        ((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
+      ((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
 
       final boolean forSignature = true;
       try {
-        java.security.Key signKey = selectPrivateKey(
-        		Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."), 
-	    		Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"),
-	    		forSignature);
-        if (signKey != null) {
-          if (csd instanceof NewMessageCryptoDisplay) {
-            ((NewMessageCryptoDisplay) csd).setSignatureKey(signKey);
-          }
-        }
-      } catch (Exception ex) {
-        getMessageUI().showError(ex.getMessage(), ex);
+      java.security.Key signKey = selectPrivateKey(
+      Pooka.getProperty("Pooka.crypto.privateKey.forSig", "Select key to sign this message."),
+      Pooka.getProperty("Pooka.crypto.privateKey.title", "Select private key"),
+      forSignature);
+      if (signKey != null) {
+      if (csd instanceof NewMessageCryptoDisplay) {
+      ((NewMessageCryptoDisplay) csd).setSignatureKey(signKey);
       }
-    }
-  }
+      }
+      } catch (Exception ex) {
+      getMessageUI().showError(ex.getMessage(), ex);
+      }
+      }
+      }
 
-  class SelectEncryptionKeyAction extends AbstractAction {
-    SelectEncryptionKeyAction() {
+      class SelectEncryptionKeyAction extends AbstractAction {
+      SelectEncryptionKeyAction() {
       super("message-select-crypt-key");
-    }
+      }
 
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-        ((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
+      ((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_YES);
       }
-      
+
       final boolean forSignature = false;
       try {
-        java.security.Key cryptKey = selectPublicKey(
-        		Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), 
-                Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"),
-                forSignature);
-        if (cryptKey != null) {
-          if (csd instanceof NewMessageCryptoDisplay) {
-            ((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
-          }
-        }
+      java.security.Key cryptKey = selectPublicKey(
+      Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."),
+      Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"),
+      forSignature);
+      if (cryptKey != null) {
+      if (csd instanceof NewMessageCryptoDisplay) {
+      ((NewMessageCryptoDisplay) csd).setEncryptionKey(cryptKey);
+      }
+      }
       } catch (Exception ex) {
-        getMessageUI().showError(ex.getMessage(), ex);
+      getMessageUI().showError(ex.getMessage(), ex);
       }
-    }
-  }
+      }
+      }
 
-  class ClearEncryptAction extends AbstractAction {
-    ClearEncryptAction() {
+      class ClearEncryptAction extends AbstractAction {
+      ClearEncryptAction() {
       super("message-clear-encrypt");
-    }
+      }
 
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
       if (csd instanceof NewMessageCryptoDisplay) {
-        ((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_NO);((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
+      ((NewMessageCryptoDisplay) csd).setEncryptMessage(NewMessageCryptoInfo.CRYPTO_NO);((NewMessageCryptoDisplay) csd).setEncryptionKey(null);
       }
-    }
-  }
+      }
+      }
 
-  class ClearSignAction extends AbstractAction {
-    ClearSignAction() {
+      class ClearSignAction extends AbstractAction {
+      ClearSignAction() {
       super("message-clear-signature");
-    }
+      }
 
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
 
       if (csd instanceof NewMessageCryptoDisplay) {
-        ((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_NO);
-        ((NewMessageCryptoDisplay) csd).setSignatureKey(null);
+      ((NewMessageCryptoDisplay) csd).setSignMessage(NewMessageCryptoInfo.CRYPTO_NO);
+      ((NewMessageCryptoDisplay) csd).setSignatureKey(null);
       }
-    }
-  }
+      }
+      }
 
-  class AttachKeyAction extends AbstractAction {
-    AttachKeyAction() {
+      class AttachKeyAction extends AbstractAction {
+      AttachKeyAction() {
       super("message-attach-crypt-key");
-    }
-
-    public void actionPerformed(ActionEvent e) {
-      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();      
-      
-      if (csd instanceof NewMessageCryptoDisplay) {
-        try {
-        	String a = Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message.");
-        	String b = Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"); 
-          java.security.Key cryptKey = selectPublicKey(a,b,false);
-          if(cryptKey == null)
-        	  cryptKey = selectPublicKey(a,b,true);
-          ((NewMessageCryptoDisplay) csd).attachEncryptionKey(cryptKey);
-        } catch (Exception ex) {
-          getMessageUI().showError(ex.getMessage(), ex);
-        }
       }
-    }
-  }
 
-  class RemoveKeyAction extends AbstractAction {
-    RemoveKeyAction() {
-      super("message-remove-crypt-key");
-    }
-
-    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
       CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
 
       if (csd instanceof NewMessageCryptoDisplay) {
-        try {
-        	String a = Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message.");
-        	String b = Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key"); 
-          java.security.Key cryptKey = selectPublicKey(a,b,false);
-          if(cryptKey == null)
-        	  cryptKey = selectPublicKey(a,b,true);
-          ((NewMessageCryptoDisplay) csd).removeEncryptionKey(cryptKey);
-        } catch (Exception ex) {
-          getMessageUI().showError(ex.getMessage(), ex);
-        }
+      try {
+      String a = Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message.");
+      String b = Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key");
+      java.security.Key cryptKey = selectPublicKey(a,b,false);
+      if(cryptKey == null)
+      cryptKey = selectPublicKey(a,b,true);
+      ((NewMessageCryptoDisplay) csd).attachEncryptionKey(cryptKey);
+      } catch (Exception ex) {
+      getMessageUI().showError(ex.getMessage(), ex);
       }
-    }
-  }
-*/
-  
-//Liao-  
+      }
+      }
+      }
+
+      class RemoveKeyAction extends AbstractAction {
+      RemoveKeyAction() {
+      super("message-remove-crypt-key");
+      }
+
+      public void actionPerformed(ActionEvent e) {
+      CryptoStatusDisplay csd = getMessageUI().getCryptoStatusDisplay();
+
+      if (csd instanceof NewMessageCryptoDisplay) {
+      try {
+      String a = Pooka.getProperty("Pooka.crypto.publicKey.forAttach", "Select key to attach to message.");
+      String b = Pooka.getProperty("Pooka.crypto.publicKey.title", "Select public key");
+      java.security.Key cryptKey = selectPublicKey(a,b,false);
+      if(cryptKey == null)
+      cryptKey = selectPublicKey(a,b,true);
+      ((NewMessageCryptoDisplay) csd).removeEncryptionKey(cryptKey);
+      } catch (Exception ex) {
+      getMessageUI().showError(ex.getMessage(), ex);
+      }
+      }
+      }
+      }
+  */
+
+  //Liao-
   class SelectNoCrypt extends AbstractAction{
-	  SelectNoCrypt(){ super(NO_CRYPTO_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.NO_CRYPTO);}
+    SelectNoCrypt(){ super(NO_CRYPTO_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.NO_CRYPTO);}
   }
   class SelectSMIMESign extends AbstractAction{
-	  SelectSMIMESign(){ super(SMIME_Sign_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.SMIME_SIGN);}
+    SelectSMIMESign(){ super(SMIME_Sign_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.SMIME_SIGN);}
   }
   class SelectSMIMEEncrypt extends AbstractAction{
-	  SelectSMIMEEncrypt(){ super(SMIME_Encrypt_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.SMIME_ENCRYPT);}
-  }  
+    SelectSMIMEEncrypt(){ super(SMIME_Encrypt_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.SMIME_ENCRYPT);}
+  }
   class SelectSMIMEBoth extends AbstractAction{
-	  SelectSMIMEBoth(){ super(SMIME_Both_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.SMIME_BOTH);}
+    SelectSMIMEBoth(){ super(SMIME_Both_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.SMIME_BOTH);}
   }
 
   class SelectPGPSign extends AbstractAction{
-	  SelectPGPSign(){ super(PGP_Sign_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.PGP_SIGN);}
+    SelectPGPSign(){ super(PGP_Sign_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.PGP_SIGN);}
   }
   class SelectPGPEncrypt extends AbstractAction{
-	  SelectPGPEncrypt(){ super(PGP_Encrypt_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.PGP_ENCRYPT);}
-  }  
-  class SelectPGPBoth extends AbstractAction{
-	  SelectPGPBoth(){ super(PGP_Both_CMD); }	  
-	  public void actionPerformed(ActionEvent e) {
-		  mCryptoInfo.setCryptoType(NewMessageCryptoInfo.PGP_BOTH);}
+    SelectPGPEncrypt(){ super(PGP_Encrypt_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.PGP_ENCRYPT);}
   }
-  
+  class SelectPGPBoth extends AbstractAction{
+    SelectPGPBoth(){ super(PGP_Both_CMD); }
+    public void actionPerformed(ActionEvent e) {
+      mCryptoInfo.setCryptoType(NewMessageCryptoInfo.PGP_BOTH);}
+  }
+
   public static final String NO_CRYPTO_CMD       = "message-crypto-no";
   public static final String SMIME_Sign_CMD      = "message-crypto-smime_sign";
   public static final String SMIME_Encrypt_CMD   = "message-crypto-smime_encrypt";
@@ -716,7 +720,7 @@ public class NewMessageProxy extends MessageProxy {
   public static final String PGP_Encrypt_CMD     = "message-crypto-pgp_encrypt";
   public static final String PGP_Both_CMD        = "message-crypto-pgp_both";
 
-//Liao+
+  //Liao+
 }
 
 

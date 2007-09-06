@@ -74,7 +74,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * If the load is successful, we go to a CLOSED state.  If it isn't,
    * then we can either return to NOT_LOADED, or INVALID.
    */
-  public void loadFolder() {
+  public void loadFolder() throws OperationCancelledException {
     if (cache == null) {
       try {
         this.cache = new SimpleFileCache(this, getCacheDirectory());
@@ -210,7 +210,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * This method can also be used to reset the mode of an already
    * opened folder.
    */
-  public void openFolder(int mode, boolean pConnectStore) throws MessagingException {
+  public void openFolder(int mode, boolean pConnectStore) throws MessagingException, OperationCancelledException {
     try {
       if (getLogger().isLoggable(Level.FINE))
         getLogger().log(Level.FINE, this + ":  checking parent store.");
@@ -312,7 +312,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   /**
    * While loading messages, attempts to update the folder status.
    */
-  protected void updateFolderStatusForLoading() throws MessagingException {
+  protected void updateFolderStatusForLoading() throws MessagingException, OperationCancelledException {
     if (preferredStatus < DISCONNECTED && !(isConnected() && getParentStore().getConnection().getStatus() == NetworkConnection.CONNECTED )) {
       try {
         openFolder(Folder.READ_WRITE);
@@ -1152,7 +1152,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   /**
    * This copies the given messages to the given FolderInfo.
    */
-  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException, OperationCancelledException {
     if (isConnected())
       super.copyMessages(msgs, targetFolder);
     else
@@ -1162,7 +1162,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   /**
    * This appends the given message to the given FolderInfo.
    */
-  public void appendMessages(MessageInfo[] msgs) throws MessagingException {
+  public void appendMessages(MessageInfo[] msgs) throws MessagingException, OperationCancelledException {
     if (isAvailable()) {
       if (isConnected()) {
         super.appendMessages(msgs);
@@ -1180,7 +1180,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
   /**
    * This expunges the deleted messages from the Folder.
    */
-  public void expunge() throws MessagingException {
+  public void expunge() throws MessagingException, OperationCancelledException {
     if (isConnected())
       getFolder().expunge();
     else if (shouldBeConnected()) {
@@ -1310,7 +1310,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * returned Message objects as MessageInfos.
    */
   public MessageInfo[] search(javax.mail.search.SearchTerm term)
-    throws MessagingException {
+    throws MessagingException, OperationCancelledException {
     if (isConnected()) {
       return super.search(term);
     } else {

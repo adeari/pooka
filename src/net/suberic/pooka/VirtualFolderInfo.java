@@ -139,7 +139,7 @@ public class VirtualFolderInfo extends FolderInfo {
   /**
    * This copies the given messages to the given FolderInfo.
    */
-  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException, OperationCancelledException {
     // these should only belong to FolderInfos in the parents array.
     HashMap map = new HashMap();
     for (int i = 0; i < parents.length; i++) {
@@ -178,7 +178,7 @@ public class VirtualFolderInfo extends FolderInfo {
   /**
    * This expunges the deleted messages from the Folder.
    */
-  public void expunge() throws MessagingException {
+  public void expunge() throws MessagingException, OperationCancelledException {
     for (int i = 0; i < parents.length; i++)
       synchronized(parents[i].getFolderThread().getRunLock()) {
         parents[i].expunge();

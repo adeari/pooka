@@ -375,6 +375,7 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
         m.setMessageUI(mui);
         messageWindow = (JInternalFrame) mui;
         newMessage = true;
+      } catch (OperationCancelledException oce) {
       } catch (MessagingException me) {
         Pooka.getUIFactory().showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."), me);
       }

@@ -99,7 +99,7 @@ public class UIDFolderInfo extends FolderInfo {
    * folder.  As a brute force method, it also accesses the folder
    * at every check.  It's nasty, but it _should_ keep the Folder open..
    */
-  public void checkFolder() throws javax.mail.MessagingException {
+  public void checkFolder() throws javax.mail.MessagingException, OperationCancelledException {
     getLogger().log(Level.FINE, "checking folder " + getFolderName());
 
     // i'm taking this almost directly from ICEMail; i don't know how
@@ -146,7 +146,7 @@ public class UIDFolderInfo extends FolderInfo {
    * This synchronizes the cache with the new information from the
    * Folder.
    */
-  public void synchronizeCache() throws MessagingException {
+  public void synchronizeCache() throws MessagingException, OperationCancelledException {
     getLogger().log(Level.FINE, "synchronizing cache.");
 
     if (getFolderDisplayUI() != null)

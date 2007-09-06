@@ -32,7 +32,7 @@ public abstract class SwingUIFactory implements PookaUIFactory {
   /**
    * Creates an appropriate MessageUI object for the given MessageProxy.
    */
-  public MessageUI createMessageUI(MessageProxy mp) throws javax.mail.MessagingException {
+  public MessageUI createMessageUI(MessageProxy mp) throws javax.mail.MessagingException, OperationCancelledException {
     return createMessageUI(mp, null);
   }
 
@@ -40,7 +40,7 @@ public abstract class SwingUIFactory implements PookaUIFactory {
    * Creates an appropriate MessageUI object for the given MessageProxy,
    * using the provided MessageUI as a guideline.
    */
-  public abstract MessageUI createMessageUI(MessageProxy mp, MessageUI mui) throws javax.mail.MessagingException;
+  public abstract MessageUI createMessageUI(MessageProxy mp, MessageUI mui) throws javax.mail.MessagingException, OperationCancelledException;
 
   /**
    * Opens the given MessageProxy in the default manner for this UI.

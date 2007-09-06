@@ -118,7 +118,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
    * duties.
    */
 
-  protected abstract void configureMessageInternalFrame() throws MessagingException;
+  protected abstract void configureMessageInternalFrame() throws MessagingException, OperationCancelledException;
 
   /**
    * Configures the InterfaceStyle for this component.
@@ -452,7 +452,7 @@ public abstract class MessageInternalFrame extends JInternalFrame implements Mes
   /**
    * Refreshes the display.
    */
-  public void refreshDisplay() throws MessagingException {
+  public void refreshDisplay() throws MessagingException, OperationCancelledException {
     if (messageDisplay instanceof ReadMessageDisplayPanel)
       ((ReadMessageDisplayPanel)messageDisplay).resetEditorText();
   }

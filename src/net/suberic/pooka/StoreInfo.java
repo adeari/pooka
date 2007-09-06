@@ -736,7 +736,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * This method also calls updateChildren() to load the children of
    * the Store, if the children vector has not been loaded yet.
    */
-  public void connectStore() throws MessagingException {
+  public void connectStore() throws MessagingException, OperationCancelledException {
     getLogger().log(Level.FINE, "trying to connect store " + getStoreID());
 
     if (store.isConnected()) {
@@ -926,7 +926,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Synchronizes the locally stored subscribed folders list to the subscribed
    * folder information from the IMAP server.
    */
-  public void synchSubscribed() throws MessagingException {
+  public void synchSubscribed() throws MessagingException, OperationCancelledException {
     // require the inbox.  this is to work around a bug in which the inbox
     // doesn't show up in certain conditions.
 

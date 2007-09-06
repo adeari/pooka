@@ -88,7 +88,7 @@ public class ReadMessageInternalFrame extends MessageInternalFrame {
   /**
    * Configures the MessageInteralFrame.
    */
-  public void configureMessageInternalFrame() throws MessagingException {
+  public void configureMessageInternalFrame() throws MessagingException, OperationCancelledException {
     try {
       this.setTitle((String)msg.getMessageInfo().getMessageProperty("Subject"));
     } catch (MessagingException me) {

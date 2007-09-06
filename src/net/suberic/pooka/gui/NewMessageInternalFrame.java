@@ -110,6 +110,7 @@ public class NewMessageInternalFrame extends MessageInternalFrame implements New
 
       keyBindings = new ConfigurableKeyBinding(this, "NewMessageWindow.keyBindings", Pooka.getResources());
       keyBindings.setActive(getActions());
+    } catch (OperationCancelledException oce) {
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageInternalFrame.errorLoadingMessage.title", "Error loading message."));
       me.printStackTrace();

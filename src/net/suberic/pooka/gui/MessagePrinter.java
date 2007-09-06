@@ -9,17 +9,17 @@ import javax.swing.text.*;
 import javax.mail.MessagingException;
 
 public class MessagePrinter implements Printable {
-    
+
   private MessageInfo message;
   private int offset;
   private MessagePrinterDisplay mDisplay = null;
-  
+
   JTextPane jtp = null;
 
   int mPageCount = 0;
   double[] mPageBreaks = null;
   double mScale = 1;
-  
+
   String mContentType = null;
   StringBuffer mMessageText = null;
 
@@ -30,7 +30,7 @@ public class MessagePrinter implements Printable {
     message = mi;
     offset = newOffset;
   }
-  
+
   public MessagePrinter(MessageInfo mi) {
     this(mi, 0);
   }
@@ -48,7 +48,7 @@ public class MessagePrinter implements Printable {
    */
   public void doPageCalculation(PageFormat pageFormat) {
     double pageHeight = pageFormat.getImageableHeight();
-    double pageWidth = pageFormat.getImageableWidth(); 
+    double pageWidth = pageFormat.getImageableWidth();
 
     java.awt.Dimension minSize = jtp.getMinimumSize();
 
@@ -66,16 +66,16 @@ public class MessagePrinter implements Printable {
 
     java.awt.Dimension d = jtp.getSize();
 
-    double panelWidth = d.getWidth(); 
-    double panelHeight = d.getHeight(); 
-    
+    double panelWidth = d.getWidth();
+    double panelHeight = d.getHeight();
+
     jtp.setVisible(true);
 
     // don't scale below 1.
     mScale = Math.min(1,pageWidth/panelWidth);
 
     //mScale = 1;
-    
+
     int counter = 0;
 
     paginate(pageHeight);
@@ -89,13 +89,13 @@ public class MessagePrinter implements Printable {
   }
 
   double pageEnd = 0;
-  
+
   /**
    * Paginates.
    */
   public void paginate(double pageHeight) {
     java.util.List breakList = new java.util.ArrayList();
-    
+
     boolean pageExists = true;
     double pageStart = 0;
     pageEnd = 0;
@@ -107,13 +107,13 @@ public class MessagePrinter implements Printable {
     View view = jtp.getUI().getRootView(jtp);
 
     double pageWidth = jtp.getSize().getWidth();
-    
+
     Rectangle allocation = new Rectangle(0, 0, jtp.getSize().width, jtp.getSize().height);
 
     while (pageExists) {
       if (mDisplay != null) {
-	// update the display
-	mDisplay.setCurrentPage(breakList.size());
+        // update the display
+        mDisplay.setCurrentPage(breakList.size());
       }
 
       pageStart = pageEnd;
@@ -125,7 +125,7 @@ public class MessagePrinter implements Printable {
       pageExists = calculatePageBreak(view, allocation, currentPage);
 
       if (pageExists) {
-	breakList.add(new Double(pageStart * mScale));
+        breakList.add(new Double(pageStart * mScale));
       }
     }
 
@@ -133,7 +133,7 @@ public class MessagePrinter implements Printable {
     for (int i = 0; i < mPageBreaks.length; i++) {
       mPageBreaks[i] = (double) ((Double)breakList.get(i)).doubleValue();
     }
-    
+
   }
 
   /**
@@ -145,11 +145,11 @@ public class MessagePrinter implements Printable {
     // only check leaf views--if it's a branch, get the children.
     if (view.getViewCount() > 0) {
       for (int i = 0; i < view.getViewCount(); i++) {
-	Shape childAllocation = view.getChildAllocation(i,allocation);
+        Shape childAllocation = view.getChildAllocation(i,allocation);
         if (childAllocation != null) {
           View childView = view.getView(i);
           if (calculatePageBreak(childView,childAllocation,currentPage)) {
-	    returnValue = true;
+            returnValue = true;
           }
         }
       }
@@ -157,18 +157,18 @@ public class MessagePrinter implements Printable {
       if (allocation.getBounds().getMaxY() >= currentPage.getY()) {
         returnValue = true;
         if ((allocation.getBounds().getHeight() > currentPage.getHeight()) &&
-	    (allocation.intersects(currentPage))) {
+            (allocation.intersects(currentPage))) {
         } else {
           if (allocation.getBounds().getY() >= currentPage.getY() && allocation.getBounds().getY() < pageEnd) {
 
             if (allocation.getBounds().getMaxY() <= pageEnd) {
-	      // don't bother--we're fine.
+              // don't bother--we're fine.
             } else {
               if (allocation.getBounds().getY() < pageEnd) {
                 pageEnd = allocation.getBounds().getY();
               }
             }
-          }	  
+          }
         }
       }
     }
@@ -183,60 +183,63 @@ public class MessagePrinter implements Printable {
     try {
       // load the text if we haven't already
       if (mMessageText == null) {
-	loadText();
+        loadText();
       }
 
       // create the JTextPage if we haven't already.
       if (jtp == null) {
-	createTextPane();
+        createTextPane();
       }
 
       // paginate.
       if (mPageBreaks == null) {
-	if (mDisplay != null) {
-	  // update the display
-	  mDisplay.setStatus(MessagePrinterDisplay.PAGINATING);
-	}
-	doPageCalculation(pageFormat);
-	if (mDisplay != null) {
-	  // update the display
-	  mDisplay.setStatus(MessagePrinterDisplay.PRINTING);
-	}
+        if (mDisplay != null) {
+          // update the display
+          mDisplay.setStatus(MessagePrinterDisplay.PAGINATING);
+        }
+        doPageCalculation(pageFormat);
+        if (mDisplay != null) {
+          // update the display
+          mDisplay.setStatus(MessagePrinterDisplay.PRINTING);
+        }
       }
 
       // if we're done, we're done.
-      if(pageIndex >= mPageCount) { 
-	return Printable.NO_SUCH_PAGE;
+      if(pageIndex >= mPageCount) {
+        return Printable.NO_SUCH_PAGE;
       }
-      
+
       if (mDisplay != null) {
-	// update the display
-	mDisplay.setCurrentPage(pageIndex + 1);
+        // update the display
+        mDisplay.setCurrentPage(pageIndex + 1);
       }
-      
+
       Graphics2D g2 = (Graphics2D)graphics;
 
       // only print a single page.
       if (pageIndex + 1 < mPageCount) {
-	Rectangle origClip = g2.getClipBounds();
-	g2.clipRect(g2.getClipBounds().x, g2.getClipBounds().y, g2.getClipBounds().width, (int) (mPageBreaks[pageIndex + 1] - mPageBreaks[pageIndex]));
+        Rectangle origClip = g2.getClipBounds();
+        g2.clipRect(g2.getClipBounds().x, g2.getClipBounds().y, g2.getClipBounds().width, (int) (mPageBreaks[pageIndex + 1] - mPageBreaks[pageIndex]));
       }
-      
+
       //shift Graphic to line up with beginning of print-imageable region
       g2.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
-      
+
       //shift Graphic to line up with beginning of next page to print
       g2.translate(0f, -mPageBreaks[pageIndex]);
-      
+
       //scale the page so the width fits...
       g2.scale(mScale, mScale);
 
       jtp.print(g2);
-      
+
       return Printable.PAGE_EXISTS;
-      
+
     } catch (MessagingException me) {
       me.printStackTrace();
+      return Printable.NO_SUCH_PAGE;
+    } catch (OperationCancelledException oce) {
+      oce.printStackTrace();
       return Printable.NO_SUCH_PAGE;
     }
   }
@@ -244,63 +247,63 @@ public class MessagePrinter implements Printable {
   /**
    * Loads the text and sets the content type.
    */
-  public void loadText() throws MessagingException {
+  public void loadText() throws MessagingException, OperationCancelledException {
     mMessageText = new StringBuffer();
 
     String content = null;
-    
+
     mContentType = "text/plain";
-    
+
     boolean displayHtml = false;
-    
+
     int msgDisplayMode = message.getMessageProxy().getDisplayMode();
-    
+
     // figure out html vs. text
     if (Pooka.getProperty("Pooka.displayHtml", "").equalsIgnoreCase("true")) {
       if (message.isHtml()) {
-	if (msgDisplayMode > MessageProxy.TEXT_ONLY) 
-	  displayHtml = true;
-	
+        if (msgDisplayMode > MessageProxy.TEXT_ONLY)
+          displayHtml = true;
+
       } else if (message.containsHtml()) {
-	if (msgDisplayMode >= MessageProxy.HTML_PREFERRED)
-	  displayHtml = true;
-	
+        if (msgDisplayMode >= MessageProxy.HTML_PREFERRED)
+          displayHtml = true;
+
       } else {
-	// if we don't have any html, just display as text.
+        // if we don't have any html, just display as text.
       }
     }
-    
+
     // set the content
     if (msgDisplayMode == MessageProxy.RFC_822) {
       content = message.getRawText();
     } else {
       if (displayHtml) {
-	mContentType = "text/html";
-	
-	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	  content = message.getHtmlAndTextInlines(true, false);
-	} else {
-	  content = message.getHtmlPart(true, false);
-	}
+        mContentType = "text/html";
+
+        if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+          content = message.getHtmlAndTextInlines(true, false);
+        } else {
+          content = message.getHtmlPart(true, false);
+        }
       } else {
-	if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
-	  // Is there only an HTML part?  Regardless, we've determined that 
-	  // we will still display it as text.
-	  if (message.isHtml())
-	    content = message.getHtmlAndTextInlines(true, false);
-	  else
-	    content = message.getTextAndTextInlines(true, false);
-	} else {
-	  // Is there only an HTML part?  Regardless, we've determined that 
-	  // we will still display it as text.
-	  if (message.isHtml())
-	    content = message.getHtmlPart(true, false);
-	  else
-	    content = message.getTextPart(true, false);
-	}
+        if (Pooka.getProperty("Pooka.displayTextAttachments", "").equalsIgnoreCase("true")) {
+          // Is there only an HTML part?  Regardless, we've determined that
+          // we will still display it as text.
+          if (message.isHtml())
+            content = message.getHtmlAndTextInlines(true, false);
+          else
+            content = message.getTextAndTextInlines(true, false);
+        } else {
+          // Is there only an HTML part?  Regardless, we've determined that
+          // we will still display it as text.
+          if (message.isHtml())
+            content = message.getHtmlPart(true, false);
+          else
+            content = message.getTextPart(true, false);
+        }
       }
     }
-    
+
     if (content != null)
       mMessageText.append(content);
 
@@ -318,9 +321,9 @@ public class MessagePrinter implements Printable {
     // pull in the correct font.
     String fontName = Pooka.getProperty("MessageWindow.editorPane.printing.font.name", "monospaced");
     int fontSize = Integer.parseInt(Pooka.getProperty("MessageWindow.editorPane.printint.font.size", "10"));
-      
+
     Font f = new Font(fontName, Font.PLAIN, fontSize);
-    
+
     if (f != null)
       jtp.setFont(f);
 
@@ -334,7 +337,7 @@ public class MessagePrinter implements Printable {
     jtp.setSize(jtp.getPreferredSize());
 
     //jtp.setVisible(true);
-    
+
   }
 
   /**

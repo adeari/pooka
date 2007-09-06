@@ -105,6 +105,7 @@ public class ReadMessageFrame extends MessageFrame {
 
       keyBindings.setActive(getActions());
 
+    } catch (OperationCancelledException oce) {
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
       me.printStackTrace();

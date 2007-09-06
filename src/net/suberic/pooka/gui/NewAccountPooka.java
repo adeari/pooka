@@ -519,8 +519,8 @@ public class NewAccountPooka {
                       });
                   }
                 });
-            } catch (MessagingException me) {
-              final MessagingException error = me;
+            } catch (Exception me) {
+              final Exception error = me;
               me.printStackTrace();
               javax.swing.SwingUtilities.invokeLater( new Runnable() {
 

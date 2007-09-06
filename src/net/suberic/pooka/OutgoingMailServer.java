@@ -148,6 +148,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
         public void actionPerformed(java.awt.event.ActionEvent ae) {
           try {
             internal_sendAll();
+          } catch (OperationCancelledException oce) {
           } catch (javax.mail.MessagingException me) {
             Pooka.getUIFactory().showError(Pooka.getProperty("Error.sendingMessage", "Error sending message:  "), me);
           }
@@ -158,7 +159,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   /**
    * Sends all available messages in the outbox.
    */
-  protected synchronized void internal_sendAll() throws javax.mail.MessagingException {
+  protected synchronized void internal_sendAll() throws javax.mail.MessagingException, OperationCancelledException {
 
     try {
       sending = true;
@@ -183,7 +184,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
    * Sends all available messages in the outbox using the given, already
    * open Transport object.  Leaves the Transport object open.
    */
-  private void sendAll(Transport sendTransport) throws javax.mail.MessagingException {
+  private void sendAll(Transport sendTransport) throws javax.mail.MessagingException, OperationCancelledException {
 
     LinkedList exceptionList = new LinkedList();
 
@@ -269,6 +270,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
             saveToOutbox(nmi);
           } catch (MessagingException nme) {
             ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, nme);
+          } catch (OperationCancelledException oce) {
+            ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, new MessagingException("Connection cancelled."));
           }
         } else {
           ((net.suberic.pooka.gui.NewMessageProxy)nmi.getMessageProxy()).sendFailed(this, me);
@@ -309,8 +312,8 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
           // messages in the queue, too.
           try {
             sendAll(sendTransport);
-          } catch (MessagingException exp) {
-            final MessagingException me = exp;
+          } catch (Exception exp) {
+            final Exception me = exp;
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                   Pooka.getUIFactory().showError(Pooka.getProperty("error.OutgoingServer.outboxSendFailed", "Failed to send all messages in Outbox:  "), me);
@@ -391,7 +394,7 @@ public class OutgoingMailServer implements net.suberic.util.Item, net.suberic.ut
   /**
    * Saves the given message to the Outbox for sending later.
    */
-  public void saveToOutbox(NewMessageInfo nmi) throws MessagingException {
+  public void saveToOutbox(NewMessageInfo nmi) throws MessagingException, OperationCancelledException {
     Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("info.smtpServer.outbox.connecting", "SMTP server not available; getting outbox."));
 
     FolderInfo outbox = getOutbox();

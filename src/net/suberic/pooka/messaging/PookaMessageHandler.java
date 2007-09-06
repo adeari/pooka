@@ -14,11 +14,11 @@ import net.suberic.pooka.gui.NewMessageProxy;
 import net.suberic.pooka.gui.NewMessageFrame;
 import net.suberic.pooka.gui.MessageUI;
 
-/** 
- * This handles an already-made connection between 
+/**
+ * This handles an already-made connection between
  */
 public class PookaMessageHandler extends Thread {
-  
+
   private static int sCounter = 1;
 
   Socket mSocket = null;
@@ -27,7 +27,7 @@ public class PookaMessageHandler extends Thread {
 
   BufferedWriter mWriter = null;
   BufferedReader mReader = null;
-  
+
   /**
    * Creates a new PookaMessageHandler.
    */
@@ -37,25 +37,25 @@ public class PookaMessageHandler extends Thread {
     mSocket = pSocket;
     mParent = pParent;
   }
-  
+
   /**
    * Opens the socket and listens to it.
    */
   public void run() {
     try {
       while (! mStopped && ! mSocket.isClosed()) {
-	getLogger().log(Level.FINE, "handling messages.");
-	mReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
-	handleMessage(mReader.readLine());
+  getLogger().log(Level.FINE, "handling messages.");
+  mReader = new BufferedReader(new InputStreamReader(mSocket.getInputStream()));
+  handleMessage(mReader.readLine());
       }
     } catch (Exception e) {
       System.out.println("error in MessageHandler -- closing down.");
       e.printStackTrace();
     }
-    
+
     cleanup();
   }
-  
+
   /**
    * Handles the received message.
    */
@@ -64,13 +64,13 @@ public class PookaMessageHandler extends Thread {
 
     if (pMessage != null) {
       if (pMessage.startsWith(PookaMessagingConstants.S_NEW_MESSAGE)) {
-	handleNewEmailMessage(pMessage);
+  handleNewEmailMessage(pMessage);
       } else if (pMessage.startsWith(PookaMessagingConstants.S_CHECK_VERSION)) {
-	handleCheckVersionMessage();
+  handleCheckVersionMessage();
       } else if (pMessage.startsWith(PookaMessagingConstants.S_BYE)) {
-	handleByeMessage();
+  handleByeMessage();
       } else if (pMessage.startsWith(PookaMessagingConstants.S_START_POOKA)) {
-	handleStartPookaMessage();
+  handleStartPookaMessage();
       }
     } else {
       // bye on null.
@@ -90,12 +90,12 @@ public class PookaMessageHandler extends Thread {
       // go to the next space
       int toAddressEnd = pMessage.indexOf(' ', PookaMessagingConstants.S_NEW_MESSAGE.length() + 1);
       if (toAddressEnd == -1)
-	toAddressEnd = pMessage.length();
-      
+  toAddressEnd = pMessage.length();
+
       address = pMessage.substring(PookaMessagingConstants.S_NEW_MESSAGE.length() + 1, toAddressEnd);
       if (toAddressEnd != pMessage.length() && toAddressEnd != pMessage.length() + 1) {
-	String profileString = pMessage.substring(toAddressEnd + 1);
-	profile = Pooka.getPookaManager().getUserProfileManager().getProfile(profileString);
+  String profileString = pMessage.substring(toAddressEnd + 1);
+  profile = Pooka.getPookaManager().getUserProfileManager().getProfile(profileString);
       }
     }
     sendNewEmail(address, profile);
@@ -109,29 +109,30 @@ public class PookaMessageHandler extends Thread {
     final UserProfile fProfile = pProfile;
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	public void run() {
-	  try {
-	    getLogger().log(Level.FINE, "creating new message.");
-	    // create the template first.  this is done so the new message
-	    // opens as a top-level window.
-	    NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
-	    
-	    MimeMessage mm = new MimeMessage(Pooka.getDefaultSession());
-	    if (fAddress != null)
-	      mm.setRecipients(Message.RecipientType.TO, fAddress);
-	    
-	    NewMessageInfo info = new NewMessageInfo(mm);
-	    if (fProfile != null)
-	      info.setDefaultProfile(fProfile);
-	    
-	    NewMessageProxy proxy = new NewMessageProxy(info);
-	    
-	    MessageUI nmu = Pooka.getUIFactory().createMessageUI(proxy, template);
-	    nmu.openMessageUI();
-	  } catch (MessagingException me) {
-	    Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
-	  }
-	}
+  public void run() {
+    try {
+      getLogger().log(Level.FINE, "creating new message.");
+      // create the template first.  this is done so the new message
+      // opens as a top-level window.
+      NewMessageFrame template = new NewMessageFrame(new NewMessageProxy(new NewMessageInfo(new MimeMessage(Pooka.getDefaultSession()))));
+
+      MimeMessage mm = new MimeMessage(Pooka.getDefaultSession());
+      if (fAddress != null)
+        mm.setRecipients(Message.RecipientType.TO, fAddress);
+
+      NewMessageInfo info = new NewMessageInfo(mm);
+      if (fProfile != null)
+        info.setDefaultProfile(fProfile);
+
+      NewMessageProxy proxy = new NewMessageProxy(info);
+
+      MessageUI nmu = Pooka.getUIFactory().createMessageUI(proxy, template);
+      nmu.openMessageUI();
+    } catch (OperationCancelledException oce) {
+    } catch (MessagingException me) {
+      Pooka.getUIFactory().showError(Pooka.getProperty("error.NewMessage.errorLoadingMessage", "Error creating new message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.NewMessage.errorLoadingMessage.title", "Error creating new message."), me);
+    }
+  }
       });
   }
 
@@ -152,14 +153,14 @@ public class PookaMessageHandler extends Thread {
       Pooka.sStartupManager.startupMainPookaWindow(null);
     } else {
       javax.swing.SwingUtilities.invokeLater(new Runnable() {
-	  public void run() {
-	    net.suberic.pooka.gui.MainPanel mainPanel = Pooka.getMainPanel();
-	    if (mainPanel != null) {
-	      getLogger().log(Level.FINE, "calling toFront() on " + javax.swing.SwingUtilities.getWindowAncestor(mainPanel));
-	      javax.swing.SwingUtilities.getWindowAncestor(mainPanel).toFront();
-	    }
-	  }
-	});    
+    public void run() {
+      net.suberic.pooka.gui.MainPanel mainPanel = Pooka.getMainPanel();
+      if (mainPanel != null) {
+        getLogger().log(Level.FINE, "calling toFront() on " + javax.swing.SwingUtilities.getWindowAncestor(mainPanel));
+        javax.swing.SwingUtilities.getWindowAncestor(mainPanel).toFront();
+      }
+    }
+  });
     }
   }
 
@@ -207,16 +208,16 @@ public class PookaMessageHandler extends Thread {
   public BufferedWriter getWriter() throws java.io.IOException {
     if (mWriter == null) {
       synchronized(this) {
-	if (mWriter == null) {
-	  mWriter = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream()));
-	}
+  if (mWriter == null) {
+    mWriter = new BufferedWriter(new OutputStreamWriter(mSocket.getOutputStream()));
+  }
       }
     }
 
     return mWriter;
   }
 
-  /** 
+  /**
    * Cleans up this handler.
    */
   void cleanup() {

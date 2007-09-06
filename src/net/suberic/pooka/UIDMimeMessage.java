@@ -35,7 +35,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -89,7 +89,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -109,7 +109,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -130,7 +130,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -151,7 +151,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -172,7 +172,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -193,7 +193,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -217,7 +217,7 @@ public class UIDMimeMessage extends MimeMessage {
           System.out.println("debug:  folder should be open.  trying to re-open folder.");
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -238,7 +238,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -267,7 +267,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -296,7 +296,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -323,7 +323,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -351,7 +351,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -379,7 +379,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -415,7 +415,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -454,7 +454,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -486,7 +486,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -524,7 +524,7 @@ public class UIDMimeMessage extends MimeMessage {
         if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
           try {
             parent.openFolder(Folder.READ_WRITE);
-          } catch (MessagingException me) {
+          } catch (Exception me) {
             throw fce;
           }
 
@@ -534,7 +534,7 @@ public class UIDMimeMessage extends MimeMessage {
           throw fce;
         }
       }
-    } catch (MessagingException me) {
+    } catch (Exception me) {
       return false;
     }
   }
@@ -548,7 +548,7 @@ public class UIDMimeMessage extends MimeMessage {
       if (status == FolderInfo.CONNECTED || status == FolderInfo.LOST_CONNECTION) {
         try {
           parent.openFolder(Folder.READ_WRITE);
-        } catch (MessagingException me) {
+        } catch (Exception me) {
           throw fce;
         }
 
@@ -593,7 +593,7 @@ public class UIDMimeMessage extends MimeMessage {
             return true;
           else
             return false;
-      } catch (MessagingException me) {
+      } catch (Exception me) {
         return false;
       }
     }

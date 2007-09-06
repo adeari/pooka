@@ -420,7 +420,7 @@ public abstract class MessageFrame extends JFrame implements MessageUI, ThemeSup
   /**
    * Refreshes the display.
    */
-  public void refreshDisplay() throws MessagingException {
+  public void refreshDisplay() throws MessagingException, OperationCancelledException {
     if (messageDisplay instanceof ReadMessageDisplayPanel)
       ((ReadMessageDisplayPanel)messageDisplay).resetEditorText();
   }

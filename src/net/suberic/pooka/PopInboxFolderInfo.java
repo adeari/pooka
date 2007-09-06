@@ -111,7 +111,7 @@ public class PopInboxFolderInfo extends FolderInfo {
    * This method can also be used to reset the mode of an already
    * opened folder.
    */
-  public void openFolder(int mode, boolean pConnectStore) throws MessagingException {
+  public void openFolder(int mode, boolean pConnectStore) throws MessagingException, OperationCancelledException {
     // identical to FolderInfo.openFolder() except that we don't check
     // to make sure that the mode matches.
 
@@ -157,7 +157,7 @@ public class PopInboxFolderInfo extends FolderInfo {
    * said FolderTableModel.  This is the basic way to populate a new
    * FolderTableModel.</p>
    */
-  public synchronized void loadAllMessages() throws MessagingException {
+  public synchronized void loadAllMessages() throws MessagingException, OperationCancelledException {
     if (folderTableModel == null) {
       super.loadAllMessages();
       // let's see how bad performance is for the mbox provider.  :)

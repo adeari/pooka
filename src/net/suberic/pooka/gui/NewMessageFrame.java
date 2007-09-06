@@ -114,6 +114,8 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
       //keyBindings.setCondition(JComponent.WHEN_IN_FOCUSED_WINDOW);
 
       keyBindings.setActive(getActions());
+    } catch (OperationCancelledException oce) {
+
     } catch (MessagingException me) {
       showError(Pooka.getProperty("error.MessageFrame.errorLoadingMessage", "Error loading Message:  ") + "\n" + me.getMessage(), Pooka.getProperty("error.MessageFrame.errorLoadingMessage.title", "Error loading message."));
       me.printStackTrace();
@@ -377,7 +379,7 @@ public class NewMessageFrame extends MessageFrame implements NewMessageUI {
    * Sets this as busy or not busy.
    */
   public void setBusy(boolean newValue) {
-     super.setBusy(newValue);
+    super.setBusy(newValue);
 
     final boolean fNewValue = newValue;
     Runnable runMe = new Runnable() {

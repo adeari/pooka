@@ -259,6 +259,8 @@ public class NewMessageInfo extends MessageInfo {
                 factory.showStatusMessage(Pooka.getProperty("info.sendMessage.savingToSentFolder", "Saving message to sent folder..."));
 
                 sentFolder.getFolder().appendMessages(new Message[] {newMessage});
+              } catch (OperationCancelledException oce) {
+                // don't show a message if we cancel.
               } catch (MessagingException me) {
                 me.printStackTrace();
                 Pooka.getUIFactory().showError(Pooka.getProperty("Error.SaveFile.toSentFolder", "Error saving file to sent folder."), Pooka.getProperty("error.SaveFile.toSentFolder.title", "Error storing message."));
@@ -376,7 +378,7 @@ public class NewMessageInfo extends MessageInfo {
    * Marks the message as a draft message and then saves it to the outbox
    * folder given.
    */
-  public void saveDraft(FolderInfo outboxFolder, UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException {
+  public void saveDraft(FolderInfo outboxFolder, UserProfile profile, InternetHeaders headers, String messageText, String messageContentType) throws MessagingException, OperationCancelledException {
     net.suberic.pooka.gui.PookaUIFactory factory = Pooka.getUIFactory();
 
     MimeMessage mMsg = (MimeMessage) message;

@@ -147,6 +147,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     try {
       if (parent.isLoaded())
         loadFolder();
+    } catch (OperationCancelledException oce) {
+      // cancelled--ignore.
     } catch (MessagingException me) {
       // if we get an exception loading the folder while creating the folder
       // object, just ignore it.
@@ -192,6 +194,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     try {
       if (parent.isConnected())
         loadFolder();
+    } catch (OperationCancelledException oce) {
+      // cancelled--ignore.
     } catch (MessagingException me) {
       // if we get an exception loading the folder while creating the folder
       // object, just ignore it.
@@ -229,7 +233,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * If the load is successful, we go to a CLOSED state.  If it isn't,
    * then we can either return to NOT_LOADED, or INVALID.
    */
-  public void loadFolder() throws MessagingException {
+  public void loadFolder() throws MessagingException, OperationCancelledException {
     loadFolder(true);
   }
 
@@ -243,7 +247,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * If the load is successful, we go to a CLOSED state.  If it isn't,
    * then we can either return to NOT_LOADED, or INVALID.
    */
-  public void loadFolder(boolean pConnectStore) throws MessagingException {
+  public void loadFolder(boolean pConnectStore) throws MessagingException, OperationCancelledException {
     boolean parentIsConnected = false;
 
     if (isLoaded() || (loading && children == null))
@@ -510,7 +514,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This method can also be used to reset the mode of an already
    * opened folder.
    */
-  public void openFolder(int mode) throws MessagingException {
+  public void openFolder(int mode) throws MessagingException, OperationCancelledException {
     openFolder(mode, true);
   }
 
@@ -524,7 +528,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * This method can also be used to reset the mode of an already
    * opened folder.
    */
-  public void openFolder(int mode, boolean pConnectStore) throws MessagingException {
+  public void openFolder(int mode, boolean pConnectStore) throws MessagingException, OperationCancelledException {
     //System.err.println("timing:  opening folder " + getFolderID());
     //long currentTime = System.currentTimeMillis();
 
@@ -594,6 +598,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     try {
       openFolder(mode, false);
     } catch (MessagingException me) {
+    } catch (OperationCancelledException oce) {
     }
 
     if (children != null) {
@@ -723,7 +728,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * Synchronizes the locally stored subscribed folders list to the subscribed
    * folder information from the IMAP server.
    */
-  public void synchSubscribed() throws MessagingException {
+  public void synchSubscribed() throws MessagingException, OperationCancelledException {
 
     // if we're a namespace, then ignore.
     if (mNamespace)
@@ -866,7 +871,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   /**
    * While loading messages, attempts to update the folder status.
    */
-  protected void updateFolderStatusForLoading() throws MessagingException {
+  protected void updateFolderStatusForLoading() throws MessagingException, OperationCancelledException {
     if (! isConnected() ) {
       openFolder(Folder.READ_WRITE);
     }
@@ -958,7 +963,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * said FolderTableModel.  This is the basic way to populate a new
    * FolderTableModel.
    */
-  public synchronized void loadAllMessages() throws MessagingException {
+  public synchronized void loadAllMessages() throws MessagingException, OperationCancelledException {
     if (folderTableModel == null) {
       updateDisplay(true);
 
@@ -1190,7 +1195,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * folder.  As a brute force method, it also accesses the folder
    * at every check.  It's nasty, but it _should_ keep the Folder open..
    */
-  public void checkFolder() throws javax.mail.MessagingException {
+  public void checkFolder() throws javax.mail.MessagingException, OperationCancelledException {
     getLogger().log(Level.FINE, "checking folder " + getFolderID());
 
     // i'm taking this almost directly from ICEMail; i don't know how
@@ -1392,7 +1397,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   /**
    * This copies the given messages to the given FolderInfo.
    */
-  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException {
+  public void copyMessages(MessageInfo[] msgs, FolderInfo targetFolder) throws MessagingException, OperationCancelledException {
     if (targetFolder == null) {
       throw new MessagingException(Pooka.getProperty("error.null", "Error: null folder"));
     } else if (targetFolder.getStatus() == INVALID) {
@@ -1426,7 +1431,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   /**
    * This appends the given message to the given FolderInfo.
    */
-  public void appendMessages(MessageInfo[] msgs) throws MessagingException {
+  public void appendMessages(MessageInfo[] msgs) throws MessagingException, OperationCancelledException {
     if (! isSortaOpen())
       openFolder(Folder.READ_WRITE);
     Message[] m = new Message[msgs.length];
@@ -1440,7 +1445,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   /**
    * This expunges the deleted messages from the Folder.
    */
-  public void expunge() throws MessagingException {
+  public void expunge() throws MessagingException, OperationCancelledException {
     getFolder().expunge();
   }
 
@@ -1551,7 +1556,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * but is not of the right type, or if there is a problem in creating the
    * folder, throws an error.
    */
-  public void createSubFolder(String subFolderName, int type) throws MessagingException {
+  public void createSubFolder(String subFolderName, int type) throws MessagingException, OperationCancelledException {
     if ( ! isLoaded()) {
       loadFolder();
     }
@@ -1618,6 +1623,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       if (getLogger().isLoggable(Level.FINE))
         me.printStackTrace();
 
+    } catch (OperationCancelledException me) {
+      // if we get an exception loading a child folder while subscribing a
+      // folder object, just ignore it.
     }
 
     updateChildren();
@@ -1708,7 +1716,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
   /**
    * This deletes the underlying Folder.
    */
-  public void delete() throws MessagingException {
+  public void delete() throws MessagingException, OperationCancelledException {
     if (! isLoaded())
       loadFolder();
 
@@ -2090,6 +2098,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
 
             } catch (MessagingException me) {
               Logger.getLogger("Pooka.debug").log(Level.FINE, "caught exception " + me);
+            } catch (OperationCancelledException oce) {
             }
             cancelled = dialog.isCancelled();
           }
@@ -2133,8 +2142,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * Basically wraps the call to Folder.search(), and then wraps the
    * returned Message objects as MessageInfos.
    */
-  public MessageInfo[] search(javax.mail.search.SearchTerm term)
-    throws MessagingException {
+  public MessageInfo[] search(javax.mail.search.SearchTerm term) throws MessagingException, OperationCancelledException {
     if (folderTableModel == null)
       loadAllMessages();
 
@@ -2288,6 +2296,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (removed.size() > 0) {
       try {
         expunge();
+      } catch (OperationCancelledException oce) {
       } catch (MessagingException me) {
         me.printStackTrace();
       }
@@ -2754,6 +2763,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
       // should always be on the Folder thread.
       try {
         checkFolder();
+      } catch (OperationCancelledException oce) {
       } catch (MessagingException me) {
         final MessagingException me2 = me;
 

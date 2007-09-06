@@ -24,19 +24,19 @@ public class LoadHttpConfigPooka {
    */
   public void start() {
     Runnable runMe = new Runnable() {
-  public void run() {
-    mFrame = new JFrame();
-    java.net.Authenticator.setDefault(new HttpAuthenticator(mFrame));
-    mFrame.setVisible(true);
-    showChoices();
-  }
+        public void run() {
+          mFrame = new JFrame();
+          java.net.Authenticator.setDefault(new HttpAuthenticator(mFrame));
+          mFrame.setVisible(true);
+          showChoices();
+        }
       };
 
     if (SwingUtilities.isEventDispatchThread())
       runMe.run();
     else {
       try {
-  SwingUtilities.invokeAndWait(runMe);
+        SwingUtilities.invokeAndWait(runMe);
       } catch (Exception ie) {
       }
     }
@@ -80,31 +80,31 @@ public class LoadHttpConfigPooka {
       // given a prompt?
       String prompt = getRequestingPrompt();
       if (prompt == null) {
-  prompt = "Enter Username and Password...";
+        prompt = "Enter Username and Password...";
       }
 
       // protocol
       String protocol = getRequestingProtocol();
       if (protocol == null)
-  protocol = "Unknown protocol";
+        protocol = "Unknown protocol";
 
       // get the host
       String host = null;
       InetAddress inet = getRequestingSite();
       if (inet != null)
-  host = inet.getHostName();
+        host = inet.getHostName();
       if (host == null)
-  host = "Unknown host";
+        host = "Unknown host";
 
       // port
       String port = "";
       int portnum = getRequestingPort();
       if (portnum != -1)
-  port = ", port " + portnum + " ";
+        port = ", port " + portnum + " ";
 
       // Build the info string
       String info = "Connecting to " + protocol + " resource on host " +
-  host + port;
+        host + port;
 
       //JPanel d = new JPanel();
       // XXX - for some reason using a JPanel here causes JOptionPane
@@ -151,21 +151,21 @@ public class LoadHttpConfigPooka {
       d.add(constrain(password, gb, c));
       // XXX - following doesn't work
       if (user != null && user.length() > 0)
-  password.requestFocusInWindow();
+        password.requestFocusInWindow();
       else
-  username.requestFocusInWindow();
+        username.requestFocusInWindow();
 
       int result = JOptionPane.showConfirmDialog(frame, d, "Login", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
 
       if (result == JOptionPane.OK_OPTION)
-  return new PasswordAuthentication(username.getText(),
-            password.getPassword());
+        return new PasswordAuthentication(username.getText(),
+                                          password.getPassword());
       else
-  return null;
+        return null;
     }
 
     private Component constrain(Component cmp,
-              GridBagLayout gb, GridBagConstraints c) {
+                                GridBagLayout gb, GridBagConstraints c) {
       gb.setConstraints(cmp, c);
       return (cmp);
     }

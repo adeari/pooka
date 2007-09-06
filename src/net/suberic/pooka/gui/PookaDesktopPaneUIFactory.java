@@ -59,7 +59,7 @@ public class PookaDesktopPaneUIFactory extends SwingUIFactory {
    * Creates an appropriate MessageUI object for the given MessageProxy,
    * using the provided MessageUI as a guideline.
    */
-  public MessageUI createMessageUI(MessageProxy mp, MessageUI templateMui) throws javax.mail.MessagingException {
+  public MessageUI createMessageUI(MessageProxy mp, MessageUI templateMui) throws javax.mail.MessagingException, OperationCancelledException {
     // each MessageProxy can have exactly one MessageUI.
     if (mp.getMessageUI() != null)
       return mp.getMessageUI();
