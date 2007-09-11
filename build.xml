@@ -350,6 +350,7 @@
       <fileset dir="${importdir}">
         <include name="bcmail.jar"/>
         <include name="bcprov.jar"/>
+        <include name="bcpg.jar"/>
         <!--include name="cryptix*.jar"/-->
         <include name="htmlparser.jar"/>
    	    <include name="javamail-crypto*.jar"/>
@@ -384,11 +385,8 @@
     </copy>
 
     <replace file="${webstart_build}/lib/bouncy.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
-    <replace file="${webstart_build}/lib/bouncypgp.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
     <replace file="${webstart_build}/lib/jaf.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
     <replace file="${webstart_build}/lib/javahelp.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
     <replace file="${webstart_build}/lib/javamail.jnlp" token="${BASE_URL}" value="${webstart_url}"/>
-
-    
   </target>
 </project>

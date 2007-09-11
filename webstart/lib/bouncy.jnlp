@@ -11,8 +11,9 @@
       <all-permissions/>
     </security>
     <resources>
-        <jar href="bcmail.jar"/>
         <jar href="bcprov.jar"/>
+        <jar href="bcmail.jar"/>
+        <jar href="bcpg.jar"/>
     </resources>
     <component-desc/>
   </jnlp>

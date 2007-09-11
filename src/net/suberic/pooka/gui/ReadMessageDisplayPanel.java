@@ -350,12 +350,10 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
                 try {
                   Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, attachmentPanel, true);
                 } catch (Exception etwo) {
-                  if (Pooka.isDebug())
-                    System.out.println("error setting theme:  " + etwo);
+                  java.util.logging.Logger.getLogger("Pooka.debug.gui").fine("error setting theme:  " + etwo);
                 }
               }
 
-              System.out.println("adding attachment page.");
             }
 
             if (hasEncryption) {
@@ -466,11 +464,9 @@ public class ReadMessageDisplayPanel extends MessageDisplayPanel {
     MessageUI mui = getMessageUI();
     if (mui instanceof net.suberic.util.swing.ThemeSupporter) {
       try {
-        Pooka.getUIFactory().getPookaThemeManager().updateUI((
-                                                              net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
+        Pooka.getUIFactory().getPookaThemeManager().updateUI((net.suberic.util.swing.ThemeSupporter) mui, popupMenu, true);
       } catch (Exception etwo) {
-        if (Pooka.isDebug())
-          System.out.println("error setting theme:  " + e);
+        java.util.logging.Logger.getLogger("Pooka.debug.gui").fine("error setting theme:  " + e);
       }
     }
     popupMenu.show(component, e.getX(), e.getY());

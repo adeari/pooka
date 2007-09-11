@@ -33,14 +33,10 @@
    
    <!-- crypto -->
    <jar href="lib/javamail-crypto.jar"/>
-   <jar href="lib/javamail-crypto-cryptix-openpgp.jar"/>
+   <jar href="lib/javamail-crypto-bouncycastle-openpgp.jar"/>
    <jar href="lib/javamail-crypto-bouncycastle-smime.jar"/>
-   <jar href="lib/cryptix-openpgp-provider.jar"/>
-   <jar href="lib/cryptix-pki-api.jar"/>
-   <jar href="lib/cryptix-message-api.jar"/> 
 
    <!-- extensions -->
-   <extension name="Cryptix JCE" href="lib/cryptix.jnlp"/>
    <extension name="BouncyCastle S/MIME" href="lib/bouncy.jnlp"/>
    <extension name="JavaMail" href="lib/javamail.jnlp"/>
    <extension name="JavaHelp" href="lib/javahelp.jnlp"/>
