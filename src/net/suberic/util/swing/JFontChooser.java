@@ -67,11 +67,11 @@ public class JFontChooser extends JComponent {
    * FontChooser pane along with "OK", "Cancel", and "Reset"
    * buttons.
    */
-  public static JDialog createDialog(Component parent, String title, 
-				     boolean modal,
-				     JFontChooser chooserPane,
-				     ActionListener okListener,
-				     ActionListener cancelListener) {
+  public static JDialog createDialog(Component parent, String title,
+                                     boolean modal,
+                                     JFontChooser chooserPane,
+                                     ActionListener okListener,
+                                     ActionListener cancelListener) {
     JDialog returnValue = new JDialog( JOptionPane.getFrameForComponent(parent), title, modal);
 
     returnValue.getContentPane().setLayout(new BoxLayout(returnValue.getContentPane(), BoxLayout.Y_AXIS));
@@ -121,30 +121,30 @@ public class JFontChooser extends JComponent {
 
     if (previewTextArea != null) {
       if (newFont != null) {
-	if (fontList != null) {
-	  String fontName = newFont.getName();
-	  fontList.setSelectedValue(fontName, true);
-	}
-	
-	if (styleList != null) {
-	  String style = getFontStyle(newFont);
-	  if (style != null && style == "BoldItalic")
-	    styleList.setSelectedValue("Bold Italic", true);
-	  else 
-	    styleList.setSelectedValue(style, true);
-	}
-	
-	if (sizeList != null) {
-	  String size = Integer.toString(newFont.getSize());
-	  sizeList.setSelectedValue(size, true);
-	}
-	
-	previewTextArea.setFont(newFont);
-    
+        if (fontList != null) {
+          String fontName = newFont.getName();
+          fontList.setSelectedValue(fontName, true);
+        }
+
+        if (styleList != null) {
+          String style = getFontStyle(newFont);
+          if (style != null && style == "BoldItalic")
+            styleList.setSelectedValue("Bold Italic", true);
+          else
+            styleList.setSelectedValue(style, true);
+        }
+
+        if (sizeList != null) {
+          String size = Integer.toString(newFont.getSize());
+          sizeList.setSelectedValue(size, true);
+        }
+
+        previewTextArea.setFont(newFont);
+
       }
     }
     changing = false;
-    
+
   }
 
   /**
@@ -169,50 +169,50 @@ public class JFontChooser extends JComponent {
    * Shows a modal font-chooser dialog and blocks until the
    * dialog is hidden.  If the user presses the "OK" button, then
    * this method hides/disposes the dialog and returns the selected font.
-   * If the user presses the "Cancel" button or closes the dialog without 
+   * If the user presses the "Cancel" button or closes the dialog without
    * pressing "OK", then this method hides/disposes the dialog and returns
    * null.
    */
-    public static Font showDialog(Component component, String title, 
-				Font initialFont) {
+  public static Font showDialog(Component component, String title,
+                                Font initialFont) {
 
-      final JFontChooser jfc = new JFontChooser(initialFont);
-      ActionListener okListener = new ActionListener() {
-	  public void actionPerformed(ActionEvent e) {
-	    Font currentFont = jfc.getFont();
-	    jfc.setSelectedFont(currentFont);
-	  }
-	};
+    final JFontChooser jfc = new JFontChooser(initialFont);
+    ActionListener okListener = new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          Font currentFont = jfc.getFont();
+          jfc.setSelectedFont(currentFont);
+        }
+      };
 
-      JDialog dialog = createDialog(component, title, 
-				    true,
-				    jfc,
-				    okListener,
-				    null);
+    JDialog dialog = createDialog(component, title,
+                                  true,
+                                  jfc,
+                                  okListener,
+                                  null);
 
-      dialog.pack();
-      dialog.setVisible(true);
+    dialog.pack();
+    dialog.setVisible(true);
 
-      return jfc.getSelectedFont();
+    return jfc.getSelectedFont();
   }
 
   /**
    * Shows a modal font-chooser dialog and blocks until the
    * dialog is hidden.  If the user presses the "OK" button, then
-   * this method hides/disposes the dialog and returns the String 
+   * this method hides/disposes the dialog and returns the String
    * representation of the selected Font.
-   * If the user presses the "Cancel" button or closes the dialog without 
+   * If the user presses the "Cancel" button or closes the dialog without
    * pressing "OK", then this method hides/disposes the dialog and returns
    * null.
    */
-    public static String showStringDialog(Component component, String title, 
-				Font initialFont) {
-      Font selectedFont = showDialog(component, title, initialFont);
-      if (selectedFont != null) {
-	return encodeFont(selectedFont);
-      }
+  public static String showStringDialog(Component component, String title,
+                                        Font initialFont) {
+    Font selectedFont = showDialog(component, title, initialFont);
+    if (selectedFont != null) {
+      return encodeFont(selectedFont);
+    }
 
-      return null;
+    return null;
   }
 
   /* private functions */
@@ -239,14 +239,14 @@ public class JFontChooser extends JComponent {
     JPanel returnValue = new JPanel();
 
     ListSelectionListener changeListener = new ListSelectionListener() {
-	public void valueChanged(ListSelectionEvent lse) {
-	  if (! changing)
-	    fontSelectionChanged();
+        public void valueChanged(ListSelectionEvent lse) {
+          if (! changing)
+            fontSelectionChanged();
         }
       };
 
     Box chooser = Box.createHorizontalBox();
-    
+
     Box fontBox = Box.createVerticalBox();
     fontBox.add(new JLabel("Font"));
     fontList = new JList(getFontNames());
@@ -308,25 +308,25 @@ public class JFontChooser extends JComponent {
       okButton.addActionListener(okListener);
 
     okButton.addActionListener(new ActionListener() {
-	public void actionPerformed(ActionEvent e) {
-	  dialog.setVisible(false);
-	}	    
+        public void actionPerformed(ActionEvent e) {
+          dialog.setVisible(false);
+        }
       });
 
     JButton cancelButton = new JButton("Cancel");
     cancelButton.addActionListener(cancelListener);
 
     cancelButton.addActionListener(new ActionListener() {
-	public void actionPerformed(ActionEvent e) {
-	  dialog.setVisible(false);
-	}	    
+        public void actionPerformed(ActionEvent e) {
+          dialog.setVisible(false);
+        }
       });
 
     JButton resetButton = new JButton("Reset");
     resetButton.addActionListener(new ActionListener() {
-	public void actionPerformed(ActionEvent e) {
-	  reset();
-	}
+        public void actionPerformed(ActionEvent e) {
+          reset();
+        }
       });
 
     returnValue.add(okButton);
@@ -363,20 +363,20 @@ public class JFontChooser extends JComponent {
 
     int style = currentFont.getStyle();
     if (styleString != null) {
-      if (styleString.equalsIgnoreCase("plain")) 
-	style = Font.PLAIN;
-      else if (styleString.equalsIgnoreCase("bold")) 
-	style = Font.BOLD;
-      else if (styleString.equalsIgnoreCase("italic")) 
-	style = Font.ITALIC;
-      else if (styleString.equalsIgnoreCase("bold italic")) 
-	style = Font.BOLD + Font.ITALIC;
+      if (styleString.equalsIgnoreCase("plain"))
+        style = Font.PLAIN;
+      else if (styleString.equalsIgnoreCase("bold"))
+        style = Font.BOLD;
+      else if (styleString.equalsIgnoreCase("italic"))
+        style = Font.ITALIC;
+      else if (styleString.equalsIgnoreCase("bold italic"))
+        style = Font.BOLD + Font.ITALIC;
     }
 
     int size = currentFont.getSize();
     if (sizeString != null) {
       try {
-	size = Integer.parseInt(sizeString);
+        size = Integer.parseInt(sizeString);
       } catch (Exception e) {
       }
     }
@@ -409,7 +409,7 @@ public class JFontChooser extends JComponent {
   }
 
   /**
-   * Gets the font selected by the chooser.  if 'cancel' was pressed, 
+   * Gets the font selected by the chooser.  if 'cancel' was pressed,
    * then no font is selected.
    */
   public Font getSelectedFont() {

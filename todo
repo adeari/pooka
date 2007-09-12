@@ -1,6 +1,10 @@
-*) if you get an error choosing an encryption key, make sure send
-	fails properly.
+*) on open saved folders, we should divide the folders up by store and
+   try to open each store first.  If the store(s) fail to open, then we
+   shouldn't try opening the folders.  (assuming non-disconnected imap
+   there, of course; though for disconnected imap we should still only
+   try opening the store once.)
 
+------
 *) add to address book needs some notification that it worked.
 *) need easier way to access address book.
 *) address book sorting should be case-insensitive

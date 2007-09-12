@@ -223,6 +223,10 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       } else {
         signKey = keys[0];
       }
+
+      if (signKey == null) {
+        throw new GeneralSecurityException("No signature key selected.");
+      }
     }
 
     if(signKey == null &&  (cryptoType == PGP_SIGN || cryptoType == PGP_BOTH)){
@@ -230,8 +234,13 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
       if (keys == null || keys.length == 0) {
         // show dialog
         signKey = CryptoKeySelector.selectPrivateKey(Pooka.getProperty("Pooka.crypto.privateKey.forSign", "Select key to sign this message."), EncryptionManager.PGP, true);
+
       } else {
         signKey = keys[0];
+      }
+
+      if (signKey == null) {
+        throw new GeneralSecurityException("No signature key selected.");
       }
     }
 
@@ -240,49 +249,47 @@ public class NewMessageCryptoInfo extends MessageCryptoInfo {
     //TODO: get the encKey from the available public keys
     if (cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH || cryptoType == PGP_ENCRYPT || cryptoType == PGP_BOTH) {
       String type = (cryptoType == SMIME_ENCRYPT || cryptoType == SMIME_BOTH) ? EncryptionManager.SMIME : EncryptionManager.PGP;
-      try {
-        // Get the public key of the senders
-        Address[] froms = mm.getFrom();
-        for (int i = 0; i < froms.length; i++) {
-          from = (InternetAddress) froms[i];
-          Key[] keys = cryptoManager.getPublicKeys(from.getAddress(), type, false);
-          if (keys != null && keys.length > 0) {
-              encKeys.add(keys[0]);
-            }
-          }
-
-          // Get the public key of the receivers
-          Address[] receivers = mm.getAllRecipients();
-          for (int i = 0; i < receivers.length; i++) {
-            InternetAddress rec = (InternetAddress) receivers[i];
-            Key[] keys = cryptoManager.getPublicKeys(rec.getAddress(), type, false);
-            if (keys != null && keys.length > 0) {
-              encKeys.add(keys[0]);
-            } else {
-            	Key key = CryptoKeySelector.selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), EncryptionManager.PGP, false);
-            	if(key != null)
-                  encKeys.add(key);
-            	else
-            	  throw new GeneralSecurityException("found no certificate for " + rec.getAddress());
-            }
-          }
-          /*Key encKey = CryptoKeySelector.selectPublicKey(
-            Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt",
-            "Select key to encrypt this message."),
-            EncryptionManager.SMIME, false);
-          */
-        } catch (Exception ex) {
-          getMessageInfo().getMessageProxy().getMessageUI().showError(ex.getMessage(), ex);
+      // Get the public key of the senders
+      Address[] froms = mm.getFrom();
+      for (int i = 0; i < froms.length; i++) {
+        from = (InternetAddress) froms[i];
+        Key[] keys = cryptoManager.getPublicKeys(from.getAddress(), type, false);
+        if (keys != null && keys.length > 0) {
+          encKeys.add(keys[0]);
         }
       }
 
-    if(encKeys.size() > 0){
+      // Get the public key of the receivers
+      Address[] receivers = mm.getAllRecipients();
+      for (int i = 0; i < receivers.length; i++) {
+        InternetAddress rec = (InternetAddress) receivers[i];
+        Key[] keys = cryptoManager.getPublicKeys(rec.getAddress(), type, false);
+        if (keys != null && keys.length > 0) {
+          encKeys.add(keys[0]);
+        } else {
+          Key key = CryptoKeySelector.selectPublicKey(Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt", "Select key to encrypt this message."), EncryptionManager.PGP, false);
+          if (key != null)
+            encKeys.add(key);
+          else
+            throw new GeneralSecurityException("found no certificate for " + rec.getAddress());
+        }
+      }
+      /*Key encKey = CryptoKeySelector.selectPublicKey(
+        Pooka.getProperty("Pooka.crypto.publicKey.forEncrypt",
+        "Select key to encrypt this message."),
+        EncryptionManager.SMIME, false);
+      */
+    }
+
+    if (encKeys.size() > 0) {
       Key[] encKeysArray = (Key[]) encKeys.toArray(new Key[0]);
       mRecipientsInfo.setEncryptionKeys(encKeysArray);
     }
 
-    if(signKey != null)
+
+    if (signKey != null) {
       mRecipientsInfo.setSignatureKey(signKey);
+    }
 
     return mRecipientsInfo.handleMessage(mm);
 
