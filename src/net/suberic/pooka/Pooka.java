@@ -211,12 +211,6 @@ public class Pooka {
   }
 
   /**
-   * Gets the default authenticator for Pooka.
-   */
-  static public javax.mail.Authenticator getDefaultAuthenticator() { return sManager.getDefaultAuthenticator(); }
-
-
-  /**
    * Gets the Folder Tracker thread.  This is the thread that monitors the
    * individual folders and checks to make sure that they stay connected,
    * checks for new email, etc.

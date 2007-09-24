@@ -36,6 +36,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
     }
 
+    System.err.println(getFolderID() + ":  cacheHeadersOnly=" + getCacheHeadersOnly());
+
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".autoCache");
   }
 
@@ -99,7 +101,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
         if (getParentFolder() == null) {
           try {
             if (getLogger().isLoggable(Level.FINE))
-              System.out.println(Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
+              getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  checking parent store connection.");
 
             Store store = getParentStore().getStore();
             // first see if we're a namespace

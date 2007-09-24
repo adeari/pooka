@@ -146,5 +146,9 @@ public interface PookaUIFactory extends ErrorHandler {
    */
   public void setIconManager(net.suberic.util.gui.IconManager pIconManager);
 
+  /**
+   * Creates an AuthenticatorUI.
+   */
+  public AuthenticatorUI createAuthenticatorUI();
 
 }

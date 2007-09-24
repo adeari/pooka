@@ -87,13 +87,6 @@ public class PookaManager {
       MIME types. */
   public void setMimeTypesMap(javax.activation.MimetypesFileTypeMap pMimeTypesMap) { mMimeTypesMap = pMimeTypesMap; }
 
-  /** The defaultAuthenticator for this instance of Pooka.*/
-  javax.mail.Authenticator mDefaultAuthenticator = null;
-  /** Gets the defaultAuthenticator for this instance of Pooka.*/
-  public javax.mail.Authenticator getDefaultAuthenticator() { return mDefaultAuthenticator; }
-  /**  Sets the defaultAuthenticator for this instance of Pooka.*/
-  public void setDefaultAuthenticator(javax.mail.Authenticator pDefaultAuthenticator) { mDefaultAuthenticator = pDefaultAuthenticator; }
-
   // the DateFormatter, which we cache for convenience.
   DateFormatter mDateFormatter;
   /** Gets the dateFormatter for this instance of Pooka.*/

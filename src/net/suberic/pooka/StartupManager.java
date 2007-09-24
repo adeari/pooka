@@ -603,10 +603,9 @@ public class StartupManager {
       updateTime("created frame");
     */
 
-    mPookaManager.setDefaultAuthenticator(new SimpleAuthenticator());
     java.util.Properties sysProps = System.getProperties();
     sysProps.setProperty("mail.mbox.mailspool", mPookaManager.getResources().getProperty("Pooka.spoolDir", "/var/spool/mail"));
-    mPookaManager.setDefaultSession (javax.mail.Session.getDefaultInstance(sysProps, mPookaManager.getDefaultAuthenticator()));
+    mPookaManager.setDefaultSession (javax.mail.Session.getDefaultInstance(sysProps, null));
     if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true"))
       mPookaManager.getDefaultSession().setDebug(true);
 

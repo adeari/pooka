@@ -636,5 +636,8 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
     mIconManager = pIconManager;
   }
 
+  public AuthenticatorUI createAuthenticatorUI() {
+    return new LoginAuthenticator();
+  }
 
 }

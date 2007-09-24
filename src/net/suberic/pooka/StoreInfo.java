@@ -70,6 +70,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   // the connection listener for this store.
   private ConnectionListener connectionListener;
 
+  // the Authenticator to use for this Store.
+  private AuthenticatorUI mAuthenticator;
+
   /**
    * Creates a new StoreInfo from a Store ID.
    */
@@ -139,8 +142,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       url = new URLName(protocol, server, port, "", user, password);
     }
 
+    getLogger().fine("creating authenticator");
+    mAuthenticator = Pooka.getUIFactory().createAuthenticatorUI();
+
     try {
-      mSession = Session.getInstance(p, Pooka.getDefaultAuthenticator());
+      mSession = Session.getInstance(p, mAuthenticator);
 
       updateSessionDebug();
 
@@ -745,67 +751,93 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       connected=true;
       return;
     } else {
-      try {
-        // don't test for connections for mbox providers.
-        if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
-          NetworkConnection currentConnection = getConnection();
-          getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  checking connection.");
+      // don't test for connections for mbox providers.
+      if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
+        NetworkConnection currentConnection = getConnection();
+        getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  checking connection.");
 
-          if (currentConnection != null) {
-            if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
-              getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
+        if (currentConnection != null) {
+          if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
+            getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
 
-              currentConnection.connect(true, true);
-            }
+            currentConnection.connect(true, true);
+          }
 
-            if (connection.getStatus() != NetworkConnection.CONNECTED) {
-              throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
-            } else {
-              getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  successfully opened connection.");
+          if (connection.getStatus() != NetworkConnection.CONNECTED) {
+            throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
+          } else {
+            getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  successfully opened connection.");
 
-            }
           }
         }
+      }
 
-        // Execute the precommand if there is one
-        String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
-        if (preCommand.length() > 0) {
-          getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
+      // Execute the precommand if there is one
+      String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
+      if (preCommand.length() > 0) {
+        getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
 
-          try {
-            Process p = Runtime.getRuntime().exec(preCommand);
-            p.waitFor();
-          } catch (Exception ex) {
-            getLogger().log(Level.FINE, "Could not run precommand:");
-            ex.printStackTrace();
-          }
+        try {
+          Process p = Runtime.getRuntime().exec(preCommand);
+          p.waitFor();
+        } catch (Exception ex) {
+          getLogger().log(Level.FINE, "Could not run precommand:");
+          ex.printStackTrace();
         }
+      }
 
-        getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  doing store.connect()");
-        store.connect();
-      } catch (MessagingException me) {
-        Authenticator authenticator = Pooka.getDefaultAuthenticator();
-        if (authenticator instanceof SimpleAuthenticator) {
-          if (((SimpleAuthenticator) authenticator).getCancelled()) {
+      getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  doing store.connect()");
+      boolean connectSucceeded = false;
+      while (! connectSucceeded) {
+        try {
+          getLogger().fine("running store.connect()");
+          store.connect();
+          connectSucceeded = true;
+          getLogger().fine("done with store.connect().");
+          // if authentication is necessary, then the authenticator will
+          // show, so will need to be closed.
+          mAuthenticator.disposeAuthenticator();
+        } catch (MessagingException me) {
+          getLogger().fine("caught exception.");
+          // cases here:
+          // 1)  authenticator cancelled.
+          if (mAuthenticator.isCancelled()) {
+            getLogger().fine("operation was cancelled.");
+            mAuthenticator.disposeAuthenticator();
             throw new OperationCancelledException();
           }
-        }
 
-        Exception e = me.getNextException();
+          // 2) Interrupted IO exception -- try again.
+          Exception nextEx = me.getNextException();
 
-        if (e != null && e instanceof java.io.InterruptedIOException)
-          store.connect();
-        else {
-          if (e != null && e.toString().contains("SunCertPathBuilderException") && "tls".equalsIgnoreCase(sslSetting)) {
-            // fall back.
-            Properties p = mSession.getProperties();
-            p.setProperty("mail.imap.starttls.enable", "false");
+          if (nextEx != null && nextEx instanceof java.io.InterruptedIOException) {
+            getLogger().fine("retrying--interruptedioexception");
+          }  else {
 
-            store = mSession.getStore(url);
+            // 3) TLS exception -- fall back.
+            if (nextEx != null && nextEx.toString().contains("SunCertPathBuilderException") && "tls".equalsIgnoreCase(sslSetting)) {
+              getLogger().fine("falling back to no tls.");
+              // fall back.
+              Properties p = mSession.getProperties();
+              p.setProperty("mail.imap.starttls.enable", "false");
 
-            store.connect();
-          } else {
-            throw me;
+              store = mSession.getStore(url);
+            } else {
+              // 4)  auth failed.  show error and retry.
+              if (mAuthenticator.isShowing()) {
+                mAuthenticator.setErrorMessage(me.getMessage(), me);
+              } else {
+                // 5) must have been some other error.  throw it.
+                if (nextEx != null) {
+                  if (nextEx instanceof java.net.UnknownHostException) {
+                    throw new MessagingException(Pooka.getResources().formatMessage("error.login.unknownHostException", nextEx.getMessage()), me);
+                    //} else if (nextEx instanceof java.io.UnknownHostException) {
+
+                  }
+                }
+                throw me;
+              }
+            }
           }
         }
       }
@@ -823,7 +855,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
         }
       }
     }
+
   }
+
 
   private void doOpenFolders(FolderInfo fi) {
     if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {

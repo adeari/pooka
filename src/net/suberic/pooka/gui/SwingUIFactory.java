@@ -378,6 +378,13 @@ public abstract class SwingUIFactory implements PookaUIFactory {
   }
 
   /**
+   * Creates an AuthenticatorUI.
+   */
+  public AuthenticatorUI createAuthenticatorUI() {
+    return new LoginAuthenticator();
+  }
+
+  /**
    * This formats a display message.
    */
   public String formatMessage(String message) {

@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import net.suberic.pooka.cache.ChangeCache;
+import net.suberic.pooka.gui.AuthenticatorUI;
 import net.suberic.pooka.gui.MessageProxy;
 
 /**
@@ -18,6 +19,7 @@ import net.suberic.pooka.gui.MessageProxy;
 public class PopInboxFolderInfo extends FolderInfo {
 
   Store popStore;
+  AuthenticatorUI mAuthenticator;
   Folder popInbox;
   ChangeCache changeAdapter;
   String mailHome;
@@ -87,7 +89,8 @@ public class PopInboxFolderInfo extends FolderInfo {
         //props.setProperty("mail.pop3s.socketFactory.port", Pooka.getProperty(getParentStore().getStoreProperty() + ".SSL.port", "995"));
       }
 
-      Session session = javax.mail.Session.getInstance(props, Pooka.getDefaultAuthenticator());
+      mAuthenticator = Pooka.getUIFactory().createAuthenticatorUI();
+      Session session = javax.mail.Session.getInstance(props, mAuthenticator);
 
       if (Pooka.isDebug()) {
         System.out.println("session.getProperty(mail.mbox.inbox) = " + session.getProperty("mail.mbox.inbox"));

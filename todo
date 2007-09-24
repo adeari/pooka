@@ -1,3 +1,7 @@
+*) new login stuff.
+   *) fix layout
+      -- test w/disconnected imap.
+      -- fix below case
 *) on open saved folders, we should divide the folders up by store and
    try to open each store first.  If the store(s) fail to open, then we
    shouldn't try opening the folders.  (assuming non-disconnected imap
