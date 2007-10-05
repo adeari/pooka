@@ -879,6 +879,26 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   }
 
   /**
+   * Opens the given folders in the UI.
+   */
+  public void openFolders(List<FolderInfo> folderList) {
+
+    try {
+      connectStore();
+    } catch (MessagingException me) {
+      me.printStackTrace();
+    } catch (OperationCancelledException oce) {
+      oce.printStackTrace();
+    }
+
+    for (FolderInfo fInfo: folderList) {
+      final FolderNode fNode = fInfo.getFolderNode();
+
+      fNode.openFolder(false, false);
+    }
+  }
+
+  /**
    * This method disconnects the Store.  If you connect to the Store using
    * connectStore() (which you should), then you should use this method
    * instead of calling getStore.disconnect().  If you don't, then the

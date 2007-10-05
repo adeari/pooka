@@ -341,11 +341,38 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
    * is set.
    */
   public void openSavedFolders(Vector folderList) {
-    if (folderList != null)
+    if (folderList != null) {
+      Map<StoreInfo, java.util.List<FolderInfo>> storeFolderMap = new HashMap<StoreInfo, java.util.List<FolderInfo>>();
       for (int i = 0; i < folderList.size(); i++) {
         FolderInfo fInfo = Pooka.getStoreManager().getFolderById((String)folderList.elementAt(i));
-        if (fInfo != null && fInfo.getFolderNode() != null) {
+        if (fInfo != null) {
+          StoreInfo si = fInfo.getParentStore();
+          if (si != null) {
+            java.util.List<FolderInfo> fList = storeFolderMap.get(si);
+            if (fList == null) {
+              fList = new LinkedList<FolderInfo>();
+              storeFolderMap.put(si, fList);
+            }
+            fList.add(fInfo);
+            FolderNode fNode = fInfo.getFolderNode();
+            if (fNode != null)
+              fNode.makeVisible();
+          }
+        }
 
+        Iterator<StoreInfo> sIter = storeFolderMap.keySet().iterator();
+        while (sIter.hasNext()) {
+          final StoreInfo sInfo = sIter.next();
+          final java.util.List<FolderInfo> fList = storeFolderMap.get(sInfo);
+          sInfo.getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+              public void actionPerformed(java.awt.event.ActionEvent ae) {
+                sInfo.openFolders(fList);
+              }
+            }, new java.awt.event.ActionEvent(this, 0, "folders-open"));
+        }
+
+        /*
+        if (fInfo != null && fInfo.getFolderNode() != null) {
           final FolderNode fNode = fInfo.getFolderNode();
           fNode.makeVisible();
           //Action a = fNode.getAction("file-open");
@@ -356,7 +383,9 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
               }
             }, new java.awt.event.ActionEvent(this, 0, "message-send"));
         }
+        */
       }
+    }
   }
 
   /**

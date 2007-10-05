@@ -38,8 +38,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
     if (! isCancelled())
       showAuthenticator();
 
-    System.err.println("loginauth:  completed.");
-
     if (isCancelled()) {
       return null;
     } else {
@@ -87,7 +85,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
       mCallerThread = Thread.currentThread();
       EventQueue.invokeLater(new Runnable() {
           public void run() {
-            System.err.println("showing peristentdialog.");
             mPasswordField.requestFocusInWindow();
             setEnabled(true);
             mShowing = true;
@@ -97,7 +94,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
     } else {
       EventQueue.invokeLater(new Runnable() {
           public void run() {
-            System.err.println("restarting...");
             setEnabled(true);
           }
         });
@@ -105,12 +101,10 @@ public class LoginAuthenticator extends AuthenticatorUI {
 
     while (mDialog.isEnabled() && ! isCancelled()) {
       try {
-        System.err.println("sleeping...");
         mCallerThread.sleep(30000);
       } catch (InterruptedException ie) {
         // return on interrupt.
       }
-      System.err.println("done sleeping...");
     }
   }
 
@@ -168,7 +162,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
     JLabel passwordLabel =  new JLabel(Pooka.getProperty("Store.editor.main.password.label", "Password") + ":");
 
     Icon icon = UIManager.getIcon("OptionPane.questionIcon");
-    System.err.println("icon = " + icon);
     JLabel iconLabel = new JLabel(icon);
 
     addOkButton(Pooka.getProperty("button.login", "Login"));
@@ -199,18 +192,16 @@ public class LoginAuthenticator extends AuthenticatorUI {
     infoLabelConst.setHeight(iconInfoHeight);
     iconLabelConst.setHeight(iconInfoHeight);
 
-    layout.putConstraint(SpringLayout.WEST, mStatusDisplay, Spring.constant(5, 5, Integer.MAX_VALUE), SpringLayout.WEST, mPanel);
+    //layout.putConstraint(SpringLayout.WEST, mStatusDisplay, Spring.constant(5, 5, Integer.MAX_VALUE), SpringLayout.WEST, mPanel);
+    layout.putConstraint(SpringLayout.WEST, mStatusDisplay, 0, SpringLayout.WEST, infoLabel);
     layout.putConstraint(SpringLayout.NORTH, mStatusDisplay, 5, SpringLayout.SOUTH, infoLabel);
     layout.putConstraint(SpringLayout.EAST, mStatusDisplay, Spring.minus(layout.getConstraint(SpringLayout.WEST, mStatusDisplay)), SpringLayout.EAST, mPanel);
 
-    //Spring passwordCenterSpring = Spring.max(layout.getConstraint(SpringLayout.WEST, passwordLabel), layout.getConstraint(SpringLayout.EAST, mPasswordField));
-    layout.putConstraint(SpringLayout.WEST, passwordLabel, Spring.constant(border, border, Integer.MAX_VALUE), SpringLayout.WEST, mPanel);
-    //layout.putConstraint(SpringLayout.WEST, passwordLabel, passwordCenterSpring, SpringLayout.WEST, mPanel);
-    //layout.putConstraint(SpringLayout.EAST, passwordLabel, 2, SpringLayout.HORIZONTAL_CENTER, mPanel);
+    layout.putConstraint(SpringLayout.WEST, passwordLabel, 0, SpringLayout.WEST, infoLabel);
+    //layout.putConstraint(SpringLayout.WEST, passwordLabel, Spring.constant(border, border, Integer.MAX_VALUE), SpringLayout.WEST, mPanel);
     layout.putConstraint(SpringLayout.NORTH, passwordLabel, 10, SpringLayout.SOUTH, mStatusDisplay);
 
     layout.putConstraint(SpringLayout.WEST, mPasswordField, 5, SpringLayout.EAST, passwordLabel);
-    //layout.putConstraint(SpringLayout.WEST, mPasswordField, 2, SpringLayout.HORIZONTAL_CENTER, mPanel);
     layout.putConstraint(SpringLayout.BASELINE, mPasswordField, 0, SpringLayout.BASELINE, passwordLabel);
     layout.putConstraint(SpringLayout.EAST, mPasswordField, Spring.minus(layout.getConstraint(SpringLayout.WEST, passwordLabel)), SpringLayout.EAST, mPanel);
     //layout.putConstraint(SpringLayout.EAST, mPasswordField, passwordCenterSpring, SpringLayout.EAST, mPanel);
@@ -248,8 +239,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
 
     layout.putConstraint(SpringLayout.EAST, previousButton, -2, SpringLayout.EAST, mPanel);
     */
-
-    System.err.println("mPanel.getPreferredSize() = " + mPanel.getPreferredSize());
 
     returnValue.getContentPane().add(mPanel);
 
@@ -309,7 +298,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
   }
 
   private void okPressed(ActionEvent e) {
-    System.err.println("hit ok button.");
     mStatusDisplay.setText(Pooka.getProperty("info.login.loginInProgress", "Logging in..."));
     mStatusDisplay.setForeground(Color.BLUE);
     setEnabled(false);
@@ -345,8 +333,6 @@ public class LoginAuthenticator extends AuthenticatorUI {
     JButton cancelButton = new JButton(label);
     cancelButton.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-
-          System.err.println("cancel button pressed.");
 
           setCancelled(true);
           mDialog.setVisible(false);

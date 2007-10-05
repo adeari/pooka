@@ -221,7 +221,11 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       if (!getParentStore().isConnected() && pConnectStore) {
         if (getLogger().isLoggable(Level.FINE))
           getLogger().log(Level.FINE, this + ":  parent store isn't connected.  trying connection.");
-        getParentStore().connectStore();
+        try {
+          getParentStore().connectStore();
+        } catch (OperationCancelledException oce) {
+          getLogger().log(Level.INFO, "Login cancelled.");
+        }
       }
 
       if (getLogger().isLoggable(Level.FINE))
