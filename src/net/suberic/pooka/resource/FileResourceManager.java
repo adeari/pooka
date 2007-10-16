@@ -79,9 +79,7 @@ public class FileResourceManager extends ResourceManager {
       // check to see if we have a cacheMode value set.
       String cacheMode = Pooka.getProperty(storeProperty + ".cacheMode", "");
       if (cacheMode.equals("")) {
-        System.err.println("getting property " + storeProperty + ".cachingEnabled; value = " +Pooka.getProperty(storeProperty + ".cachingEnabled", Pooka.getProperty(storeProperty + "." + pName + ".cachingEnabled", "false")));
         if (Pooka.getProperty(storeProperty + ".cachingEnabled", Pooka.getProperty(storeProperty + "." + pName + ".cachingEnabled", "false")).equalsIgnoreCase("true") || Pooka.getProperty(storeProperty + ".cacheHeadersOnly", Pooka.getProperty(storeProperty + "." + pName + ".cacheHeadersOnly", "false")).equalsIgnoreCase("true")) {
-          System.err.println("returning cachingfolderinfo.");
           return new net.suberic.pooka.cache.CachingFolderInfo(pStore, pName);
         }
       } else {
