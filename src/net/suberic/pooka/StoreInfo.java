@@ -37,8 +37,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
   // the status indicators
   private boolean connected = false;
-  private boolean authorized = false;
   private boolean available = false;
+
+  private int mPreferredStatus = FolderInfo.CONNECTED;
 
   // if this is a pop mailbox.
   private boolean popStore = false;
@@ -87,7 +88,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    */
   public void configureStore() {
     connected = false;
-    authorized = false;
     available = false;
 
     protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
@@ -747,44 +747,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
     if (store.isConnected()) {
       getLogger().log(Level.FINE, "store " + getStoreID() + " is already connected.");
-
       connected=true;
       return;
     } else {
-      // don't test for connections for mbox providers.
-      if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
-        NetworkConnection currentConnection = getConnection();
-        getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  checking connection.");
-
-        if (currentConnection != null) {
-          if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
-            getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
-
-            currentConnection.connect(true, true);
-          }
-
-          if (connection.getStatus() != NetworkConnection.CONNECTED) {
-            throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
-          } else {
-            getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  successfully opened connection.");
-
-          }
-        }
-      }
-
-      // Execute the precommand if there is one
-      String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
-      if (preCommand.length() > 0) {
-        getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
-
-        try {
-          Process p = Runtime.getRuntime().exec(preCommand);
-          p.waitFor();
-        } catch (Exception ex) {
-          getLogger().log(Level.FINE, "Could not run precommand:");
-          ex.printStackTrace();
-        }
-      }
+      // test the connection and execute the precommand, if any.
+      testConnection();
+      executePrecommand();
 
       getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  doing store.connect()");
       boolean connectSucceeded = false;
@@ -793,6 +761,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
           getLogger().fine("running store.connect()");
           store.connect();
           connectSucceeded = true;
+          mPreferredStatus = FolderInfo.CONNECTED;
           getLogger().fine("done with store.connect().");
           // if authentication is necessary, then the authenticator will
           // show, so will need to be closed.
@@ -804,6 +773,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
           if (mAuthenticator.isCancelled()) {
             getLogger().fine("operation was cancelled.");
             mAuthenticator.disposeAuthenticator();
+            mPreferredStatus = FolderInfo.DISCONNECTED;
             throw new OperationCancelledException();
           }
 
@@ -858,10 +828,55 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
   }
 
+  /**
+   * Tests the NetworkConnection status for this store.
+   */
+  private void testConnection() throws MessagingException {
+    // don't test for connections for mbox providers.
+    if (! (protocol.equalsIgnoreCase("mbox") || protocol.equalsIgnoreCase("maildir"))) {
+      NetworkConnection currentConnection = getConnection();
+      getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  checking connection.");
 
+      if (currentConnection != null) {
+        if (currentConnection.getStatus() == NetworkConnection.DISCONNECTED) {
+          getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  connection not up.  trying to connect it..");
+
+          currentConnection.connect(true, true);
+        }
+
+        if (connection.getStatus() != NetworkConnection.CONNECTED) {
+          throw new MessagingException(Pooka.getProperty("error.connectionDown", "Connection down for Store:  ") + getItemID());
+        } else {
+          getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  successfully opened connection.");
+
+        }
+      }
+    }
+  }
+
+  /**
+   * Execute the precommand if there is one.
+   */
+  private void executePrecommand() {
+    String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
+    if (preCommand.length() > 0) {
+      getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
+
+      try {
+        Process p = Runtime.getRuntime().exec(preCommand);
+        p.waitFor();
+      } catch (Exception ex) {
+        getLogger().log(Level.FINE, "Could not run precommand:");
+          ex.printStackTrace();
+      }
+    }
+  }
+
+  /**
+   *
+   */
   private void doOpenFolders(FolderInfo fi) {
     if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
-
       final FolderInfo current = fi;
       javax.swing.AbstractAction openFoldersAction = new javax.swing.AbstractAction() {
           public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -872,8 +887,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       openFoldersAction.putValue(javax.swing.Action.NAME, "file-open");
       openFoldersAction.putValue(javax.swing.Action.SHORT_DESCRIPTION, "file-open on folder " + fi.getFolderID());
       getStoreThread().addToQueue(openFoldersAction, new java.awt.event.ActionEvent(this, 0, "open-all"), ActionThread.PRIORITY_LOW);
-    }
-    else {
+    } else {
       fi.openAllFolders(Folder.READ_WRITE);
     }
   }
@@ -882,13 +896,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Opens the given folders in the UI.
    */
   public void openFolders(List<FolderInfo> folderList) {
-
     try {
       connectStore();
     } catch (MessagingException me) {
       me.printStackTrace();
     } catch (OperationCancelledException oce) {
-      oce.printStackTrace();
+
     }
 
     for (FolderInfo fInfo: folderList) {
@@ -1057,7 +1070,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       if (realStore != null) {
         if (! realStore.isConnected()) {
           getLogger().log(Level.FINER, getStoreID() + ":  isConnected() returns false.  returning false.");
-
           return false;
         } else {
           return true;
@@ -1080,15 +1092,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     boolean infoIsConnected = isConnected();
     getLogger().log(Level.INFO, "Connected:  " + infoIsConnected);
     statusBuffer.append("Connected:  " + infoIsConnected + "\r\n");
-    /*
-      if (store != null) {
-      boolean storeIsConnected = store.isConnected();
-      getLogger().log(Level.INFO, "store.isConnected():  " + storeIsConnected);
-      statusBuffer.append("store.isConnected():  " + storeIsConnected + "\r\n");
-      } else {
-      getLogger().log(Level.INFO, "No store object.");
-      }
-    */
 
     if (storeThread != null) {
       String currentAction = storeThread.getCurrentActionName();
@@ -1117,7 +1120,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       statusBuffer.append("Stack Trace:\r\n");
       StackTraceElement[] stackTrace = storeThread.getStackTrace();
       for (StackTraceElement stackLine: stackTrace) {
-        //System.out.println(stackLine);
         statusBuffer.append("  " + stackLine + "\r\n");
       }
 
@@ -1125,7 +1127,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       getLogger().log(Level.INFO, "No Action Thread.");
       StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
       for (StackTraceElement stackLine: stackTrace) {
-        //System.out.println(stackLine);
         statusBuffer.append("  " + stackLine + "\r\n");
       }
     }
@@ -1214,10 +1215,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     return available;
   }
 
-  public boolean isAuthorized() {
-    return authorized;
-  }
-
   public UserProfile getDefaultProfile() {
     return defaultProfile;
   }
@@ -1236,6 +1233,20 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
   public FolderInfo getTrashFolder() {
     return trashFolder;
+  }
+
+  /**
+   * Returns the preferredStatus of this StoreInfo.
+   */
+  public int getPreferredStatus() {
+    return mPreferredStatus;
+  }
+
+  /**
+   * Sets the preferredStatus of this StoreInfo.
+   */
+  public void setPreferredStatus(int pPreferredStatus) {
+    mPreferredStatus = pPreferredStatus;
   }
 
   /**

@@ -1,3 +1,28 @@
+*) scenarios:
+   starting up, windows opened, no network:
+     disconnected:  should just load disconnected.
+     non-disc:  should show error
+     *) store status:  start up store status is closed.  on autowindowopen,
+        attempts to open store.  on error, sets status to closed (nondisc),
+	or disconnected (disc).
+   starting up, windows opened, network, cancel password:
+     both:  only prompt once at startup. 
+       *) done.
+     disconnected:  should just load disconnected.
+     non-disc:  nothing.
+   started, store not loaded, password available, open folder:
+     *** not working on disconnected.  both:  open up folder, store connected
+     -- open folder on caching folder maybe skips connectStore() if currently
+        'disconnected' rather than 'open'?
+   same as above, but no password and cancel pressed:
+     dis:  show disconnected folder
+     non:  do nothing.
+   same, network error:
+     dis:  show disconnected folder (?? show error ??)
+     non:  show error
+   open store, no network:
+     both: show error.
+   ?  if we had a store status, would that fix everything?  then we'd have:
 *) new login stuff.
       -- test w/disconnected imap.
       -- fix below case

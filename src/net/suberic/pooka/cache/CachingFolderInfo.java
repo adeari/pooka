@@ -36,8 +36,6 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
       autoCache =  Pooka.getProperty(getFolderProperty() + ".autoCache", Pooka.getProperty(getParentStore().getStoreProperty() + ".autoCache", Pooka.getProperty("Pooka.autoCache", "false"))).equalsIgnoreCase("true");
     }
 
-    System.err.println(getFolderID() + ":  cacheHeadersOnly=" + getCacheHeadersOnly());
-
     Pooka.getResources().addValueChangeListener(this, getFolderProperty() + ".autoCache");
   }
 
@@ -76,7 +74,7 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    * If the load is successful, we go to a CLOSED state.  If it isn't,
    * then we can either return to NOT_LOADED, or INVALID.
    */
-  public void loadFolder() throws OperationCancelledException {
+  public void loadFolder(boolean pConnectStore) throws OperationCancelledException {
     if (cache == null) {
       try {
         this.cache = new SimpleFileCache(this, getCacheDirectory());
@@ -214,13 +212,10 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
    */
   public void openFolder(int mode, boolean pConnectStore) throws MessagingException, OperationCancelledException {
     try {
-      if (getLogger().isLoggable(Level.FINE))
-        getLogger().log(Level.FINE, this + ":  checking parent store.");
+      getLogger().log(Level.FINE, this + ":  checking parent store.");
 
-
-      if (!getParentStore().isConnected() && pConnectStore) {
-        if (getLogger().isLoggable(Level.FINE))
-          getLogger().log(Level.FINE, this + ":  parent store isn't connected.  trying connection.");
+      if (!getParentStore().isConnected() && pConnectStore && getParentStore().getPreferredStatus() == FolderInfo.CONNECTED) {
+        getLogger().log(Level.FINE, this + ":  parent store isn't connected.  trying connection.");
         try {
           getParentStore().connectStore();
         } catch (OperationCancelledException oce) {
@@ -228,21 +223,15 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
         }
       }
 
-      if (getLogger().isLoggable(Level.FINE))
-        getLogger().log(Level.FINE, this + ":  loading folder.");
+      getLogger().log(Level.FINE, this + ":  loading folder.");
 
       if (! isLoaded() && status != CACHE_ONLY)
         loadFolder();
 
-      if (getLogger().isLoggable(Level.FINE))
-        getLogger().log(Level.FINE, this + ":  folder loaded.  status is " + status);
-
-      if (getLogger().isLoggable(Level.FINE))
-        getLogger().log(Level.FINE, this + ":  checked on parent store.  trying isLoaded() and isAvailable().");
+      getLogger().log(Level.FINE, this + ":  folder loaded.  status is " + status + "; checked on parent store.  trying isLoaded() and isAvailable().");
 
       if (status == CLOSED || status == LOST_CONNECTION || status == DISCONNECTED) {
-        if (getLogger().isLoggable(Level.FINE))
-          getLogger().log(Level.FINE, this + ":  isLoaded() and isAvailable().");
+        getLogger().log(Level.FINE, this + ":  isLoaded() and isAvailable().");
         if (getFolder().isOpen()) {
           if (getFolder().getMode() == mode)
             return;
@@ -354,15 +343,12 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
 
         FetchProfile uidFetchProfile = new FetchProfile();
         uidFetchProfile.add(UIDFolder.FetchProfileItem.UID);
-        if (getLogger().isLoggable(Level.FINE))
-          getLogger().log(Level.FINE, "getting messages.");
+        getLogger().log(Level.FINE, "getting messages.");
 
         Message[] messages = getFolder().getMessages();
-        if (getLogger().isLoggable(Level.FINE))
-          getLogger().log(Level.FINE, "fetching messages.");
+        getLogger().log(Level.FINE, "fetching messages.");
         getFolder().fetch(messages, uidFetchProfile);
-        if (getLogger().isLoggable(Level.FINE))
-          getLogger().log(Level.FINE, "done fetching messages.  getting uid's");
+        getLogger().log(Level.FINE, "done fetching messages.  getting uid's");
 
         long[] uids = new long[messages.length];
 

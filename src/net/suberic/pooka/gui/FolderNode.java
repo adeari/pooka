@@ -399,8 +399,13 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
    * Opens the folder.
    */
   public void openFolder(boolean pReconnect, boolean pSelectFolder) {
-
     try {
+      if (pReconnect) {
+        // in case we've not connected in the past, set the store to open.
+        StoreInfo si = getFolderInfo().getParentStore();
+        si.setPreferredStatus(FolderInfo.CONNECTED);
+      }
+
       getFolderInfo().loadAllMessages();
 
       if (! getFolderInfo().isSortaOpen() || (pReconnect && ! getFolderInfo().isConnected())) {

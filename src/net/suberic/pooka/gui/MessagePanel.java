@@ -359,32 +359,19 @@ public class MessagePanel extends JDesktopPane implements ContentPanel, ThemeSup
               fNode.makeVisible();
           }
         }
-
-        Iterator<StoreInfo> sIter = storeFolderMap.keySet().iterator();
-        while (sIter.hasNext()) {
-          final StoreInfo sInfo = sIter.next();
-          final java.util.List<FolderInfo> fList = storeFolderMap.get(sInfo);
-          sInfo.getStoreThread().addToQueue(new javax.swing.AbstractAction() {
-              public void actionPerformed(java.awt.event.ActionEvent ae) {
-                sInfo.openFolders(fList);
-              }
-            }, new java.awt.event.ActionEvent(this, 0, "folders-open"));
-        }
-
-        /*
-        if (fInfo != null && fInfo.getFolderNode() != null) {
-          final FolderNode fNode = fInfo.getFolderNode();
-          fNode.makeVisible();
-          //Action a = fNode.getAction("file-open");
-          //a.actionPerformed(new ActionEvent(this, 0, "file-open"));
-          fInfo.getFolderThread().addToQueue(new javax.swing.AbstractAction() {
-              public void actionPerformed(java.awt.event.ActionEvent ae) {
-                fNode.openFolder(false, false);
-              }
-            }, new java.awt.event.ActionEvent(this, 0, "message-send"));
-        }
-        */
       }
+
+      Iterator<StoreInfo> sIter = storeFolderMap.keySet().iterator();
+      while (sIter.hasNext()) {
+        final StoreInfo sInfo = sIter.next();
+        final java.util.List<FolderInfo> fList = storeFolderMap.get(sInfo);
+        sInfo.getStoreThread().addToQueue(new javax.swing.AbstractAction() {
+            public void actionPerformed(java.awt.event.ActionEvent ae) {
+              sInfo.openFolders(fList);
+            }
+          }, new java.awt.event.ActionEvent(this, 0, "folders-open"));
+      }
+
     }
   }
 
