@@ -318,7 +318,7 @@ public class StoreNode extends MailTreeNode {
           final MessagingException newMe = me;
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                  Pooka.getUIFactory().showError(Pooka.getProperty("error.Store.connectionFailed", "Failed to open connection to Mail Store."), newMe);
+                  Pooka.getUIFactory().showError(Pooka.getResources().formatMessage("error.Store.connecton.failed", getStoreID()), newMe);
                 }
               });
         }
