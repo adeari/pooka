@@ -18,7 +18,6 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
   protected FolderInfo folderInfo = null;
   protected boolean hasLoaded = false;
 
-
   /**
    * creates a tree node that points to a folder
    *
@@ -253,14 +252,11 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
             boolean hasUnread = fi.hasUnread();
             boolean hasNewMessages = fi.hasNewMessages();
 
-            if (currentStatus != lastFolderStatus || hasUnread != lastUnread || hasNewMessages != lastNewMessages) {
-              lastFolderStatus = currentStatus;
-              lastUnread = hasUnread;
-              lastNewMessages = hasNewMessages;
-              //getParentContainer().repaint();
-              javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-              ((DefaultTreeModel)folderTree.getModel()).nodeChanged(FolderNode.this);
-            }
+            lastFolderStatus = currentStatus;
+            lastUnread = hasUnread;
+            lastNewMessages = hasNewMessages;
+            javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
+            ((DefaultTreeModel)folderTree.getModel()).nodeChanged(FolderNode.this);
           }
         }
       });
