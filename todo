@@ -1,15 +1,24 @@
-*) build and release.
+*) getDefaultAddressBook should always return a value.
+   -- have to go to ResourceManager?
 
-*) test disconnected imap; make sure options (autoCache) work properly.
+*) build and release.
+  *)  release
+      *) write up changes
+      *) switch around webstart site
+      *) redo screenshots
 
 ------
-*) add to address book needs some notification that it worked.
-*) need easier way to access address book.
-*) address book sorting should be case-insensitive
+improve encryption support?
+ -- improve address book?
+ *) add to address book needs some notification that it worked.
+ *) need easier way to access address book.
+ *) address book sorting should be case-insensitive
+
+centralized settings repository
+ *) ldap (again?)
+
 **) make wheel scroll customizable
 *) trayicon stuff
-*) ldap (again?)
-
   trayicon support:
     *) fix close to icon
     *) fix always display for a) minimized and b) switching to always display
@@ -34,10 +43,6 @@
 *) add ssmtp support.
 
   *) email javamail-interest list re tls optional/required vs ssl
-  *)  release
-      *) write up changes
-      *) switch around webstart site
-      *) redo screenshots
 
   *) email javamail-interest list re tls optional/required vs ssl only
 
@@ -48,6 +53,8 @@
 	-- include the main editor -- you should be able to hit first letter
 		and have it scan to first match.
 	-- also on multieditorpanes, C-A should add, C-E should edit, etc.
+
+*) test disconnected imap; make sure options (autoCache) work properly.
 
 1)  clean up editors.
     -- clean up preferences. (see definition below)
@@ -612,8 +619,6 @@ icons changing?  test.
 
 *) threading of attachment actions.
 
-*) add ldap support
-
 ----------------------
 
 
@@ -734,10 +739,6 @@ doesn't change, you still resize the window.
 *) add support for external editors, such as emacs.
 
 *) address book/ldap support.
-	now:
-	1)  add ldap support
-
-	later:
 	1)  make sure the matches go with the entry--i.e. if you match the
 	    actual address, have the actual address appear first.
 	2)  make it test for valid email addresses

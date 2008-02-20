@@ -1,6 +1,7 @@
 package net.suberic.pooka.gui.propedit;
 import java.io.*;
 import java.util.*;
+import net.suberic.pooka.Pooka;
 import net.suberic.util.gui.propedit.*;
 import net.suberic.util.VariableBundle;
 
@@ -55,7 +56,7 @@ public class AddressBookWizardController extends WizardController {
    */
   public void finishWizard() throws PropertyValueVetoException {
     // check to make sure that the new file is valid.
-    String filename = getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", "");
+    String filename = Pooka.getResourceManager().translateName(getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", ""));
 
     File file = new File(filename);
     try {
