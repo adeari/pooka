@@ -144,6 +144,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
               getLogger().log(Level.FINE, "got " + tmpFolder + " as Folder for folder " + getFolderID() + ".");
 
           } catch (MessagingException me) {
+            me.printStackTrace();
+
             if (getLogger().isLoggable(Level.FINE)) {
               getLogger().log(Level.FINE, Thread.currentThread() + "loading folder " + getFolderID() + ":  caught messaging exception from parentStore getting folder: " + me);
               me.printStackTrace();
@@ -166,6 +168,8 @@ public class CachingFolderInfo extends net.suberic.pooka.UIDFolderInfo {
         }
         if (tmpFolder != null && tmpFolder.length > 0) {
           setFolder(tmpFolder[0]);
+          if (! getFolder().isSubscribed())
+            getFolder().setSubscribed(true);
           setStatus(CLOSED);
           getFolder().addMessageChangedListener(this);
         } else {

@@ -88,11 +88,9 @@ public class MailFileSystemView
     // want to call getFileByName with a relative path (in this case
     // to the root directory) always.
 
-
     getLogger().info("running createFileObject2 on filename '" + filename + "'");
 
     if (roots == null || roots.length == 0) {
-
       getLogger().info("root == null");
       return null;
     }
@@ -117,7 +115,6 @@ public class MailFileSystemView
         getLogger().info("file name is " + filePart);
       }
     } else {
-
       getLogger().info("store name is " + filename);
 
       storeName = filename;
@@ -125,14 +122,12 @@ public class MailFileSystemView
 
     FolderFileWrapper currentRoot = findRoot(storeName);
     if (currentRoot == null) {
-
       getLogger().info("found no matching store root for " + storeName + ".");
       return new File(filename);
     }
 
     File returnValue = currentRoot.getFileByName(filePart);
     return returnValue;
-
   }
 
   /**
@@ -174,8 +169,16 @@ public class MailFileSystemView
    * Gets the child for the file.
    */
   public File getChild(File parent, String filename) {
+    getLogger().fine("getting child of file " + parent + ", filename " + filename);
     if (parent instanceof FolderFileWrapper) {
-      return ((FolderFileWrapper) parent).getChildFile(filename);
+    // check for degenerate case.
+      if (parent != null && filename != null && filename.equalsIgnoreCase(parent.getAbsolutePath())) {
+        getLogger().fine("parent matches child; returning parent.");
+
+        return parent;
+      } else {
+        return ((FolderFileWrapper) parent).getChildFile(filename);
+      }
     } else {
       return new File(parent, filename);
     }

@@ -370,6 +370,7 @@ public class StoreNode extends MailTreeNode {
                             wrapper.getFolder().create(Folder.HOLDS_MESSAGES);
                           }
                           String absFileName = wrapper.getAbsolutePath();
+                          guiLogger.fine("absFileName=" + absFileName);
                           int firstSlash = absFileName.indexOf('/');
                           String normalizedFileName = absFileName;
                           if (firstSlash >= 0)
