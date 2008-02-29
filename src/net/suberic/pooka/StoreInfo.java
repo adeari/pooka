@@ -33,7 +33,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
   // Information for the StoreNode
   private StoreNode storeNode;
-  private Vector children;
+  private Vector<FolderInfo> children;
 
   // the status indicators
   private boolean connected = false;
@@ -394,23 +394,19 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
   public void updateChildren() {
 
-    Vector newChildren = new Vector();
+    Vector<FolderInfo> newChildren = new Vector<FolderInfo>();
 
-    StringTokenizer tokens = new StringTokenizer(Pooka.getProperty(getStoreProperty() + ".folderList", "INBOX"), ":");
+    List<String> newChildNames = Pooka.getResources().getPropertyAsList(getStoreProperty() + ".folderList", "INBOX");
 
-    getLogger().log(Level.FINE, "Pooka.getProperty(" + getStoreProperty() + ".folderList = " + Pooka.getProperty(getStoreProperty() + ".folderList"));
-
-    String newFolderName;
-
-    for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-      newFolderName = (String)tokens.nextToken();
+    for (String newFolderName: newChildNames) {
       FolderInfo childFolder = getChild(newFolderName);
       if (childFolder == null) {
         childFolder = Pooka.getResourceManager().createFolderInfo(this, newFolderName);
       }
 
-      newChildren.add(childFolder);
+      newChildren.add(0, childFolder);
     }
+
     children = newChildren;
     getLogger().log(Level.FINE, getStoreID() + ":  in configureStore.  children.size() = " + children.size());
 
@@ -1024,8 +1020,6 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
     Folder[] subscribedFolders = store.getDefaultFolder().list();
 
-    StringBuffer newSubscribed = new StringBuffer();
-
     ArrayList subscribedNames = new ArrayList();
 
     for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
@@ -1058,15 +1052,24 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       }
     }
 
-    for (int i = 0; i < subscribedNames.size(); i++) {
-      newSubscribed.append((String)subscribedNames.get(i)).append(':');
+    // keep the existing order when possible.
+    List<String> currentSubscribed = Pooka.getResources().getPropertyAsList(getStoreProperty() + ".folderList", "");
+    Iterator<String> currentIter = currentSubscribed.iterator();
+    while(currentIter.hasNext()) {
+      String folder = currentIter.next();
+      if (! subscribedNames.contains(folder)) {
+        System.err.println("no match for " + folder + "; removing.");
+        currentSubscribed.remove(folder);
+      } else {
+        System.err.println("found match for " + folder);
+        subscribedNames.remove(folder);
+      }
     }
 
-    if (newSubscribed.length() > 0)
-      newSubscribed.deleteCharAt(newSubscribed.length() -1);
+    currentSubscribed.addAll(subscribedNames);
 
     // this will update our children vector.
-    Pooka.setProperty(getStoreProperty() + ".folderList", newSubscribed.toString());
+    Pooka.setProperty(getStoreProperty() + ".folderList", VariableBundle.convertToString(currentSubscribed));
 
     for (int i = 0; children != null && i < children.size(); i++) {
       FolderInfo fi = (FolderInfo) children.get(i);

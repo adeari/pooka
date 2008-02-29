@@ -169,12 +169,12 @@ public class DndUtils {
     }
     return null;
     /*
-    Clipboard clipboard = (Clipboard)sun.awt.AppContext.getAppContext().get(SandboxClipboardKey);
-    if (clipboard == null) {
+      Clipboard clipboard = (Clipboard)sun.awt.AppContext.getAppContext().get(SandboxClipboardKey);
+      if (clipboard == null) {
       clipboard = new Clipboard("Sandboxed Component Clipboard");
       sun.awt.AppContext.getAppContext().put(SandboxClipboardKey, clipboard);
-    }
-    return clipboard;
+      }
+      return clipboard;
     */
   }
 
