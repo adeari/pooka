@@ -495,36 +495,11 @@ public class UIDFolderInfo extends FolderInfo {
     }
   }
 
-
   /**
-   * This updates the children of the current folder.  Generally called
-   * when the folderList property is changed.
+   * Creates a child folder.
    */
-  public void updateChildren() {
-    Vector newChildren = new Vector();
-
-    String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
-    if (childList != "") {
-      StringTokenizer tokens = new StringTokenizer(childList, ":");
-
-      String newFolderName;
-
-      for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-        newFolderName = (String)tokens.nextToken();
-        FolderInfo childFolder = getChild(newFolderName);
-        if (childFolder == null) {
-          childFolder = new UIDFolderInfo(this, newFolderName);
-          newChildren.add(childFolder);
-        } else {
-          newChildren.add(childFolder);
-        }
-      }
-
-      children = newChildren;
-
-      if (folderNode != null)
-        folderNode.loadChildren();
-    }
+  protected FolderInfo createChildFolder(String newFolderName) {
+    return new UIDFolderInfo(this, newFolderName);
   }
 
   /**

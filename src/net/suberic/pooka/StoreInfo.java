@@ -1051,6 +1051,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
           subscribedNames.add(folderName);
       }
     }
+    Collections.sort(subscribedNames);
 
     // keep the existing order when possible.
     List<String> currentSubscribed = Pooka.getResources().getPropertyAsList(getStoreProperty() + ".folderList", "");
@@ -1058,10 +1059,8 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     while(currentIter.hasNext()) {
       String folder = currentIter.next();
       if (! subscribedNames.contains(folder)) {
-        System.err.println("no match for " + folder + "; removing.");
         currentSubscribed.remove(folder);
       } else {
-        System.err.println("found match for " + folder);
         subscribedNames.remove(folder);
       }
     }

@@ -13,6 +13,7 @@ import net.suberic.pooka.gui.*;
 import net.suberic.pooka.thread.*;
 import net.suberic.pooka.event.*;
 import net.suberic.util.ValueChangeListener;
+import net.suberic.util.VariableBundle;
 import net.suberic.util.thread.ActionThread;
 
 /**
@@ -729,7 +730,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * folder information from the IMAP server.
    */
   public void synchSubscribed() throws MessagingException, OperationCancelledException {
-
     // if we're a namespace, then ignore.
     if (mNamespace)
       return;
@@ -738,30 +738,39 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     if (! isLoaded())
       loadFolder();
 
-    if ((getType() & Folder.HOLDS_FOLDERS) != 0) {
+    Folder[] subscribedFolders = folder.list();
 
-      Folder[] subscribedFolders = folder.list();
+    List<String> subscribedNames = new ArrayList<String>();
 
-      StringBuffer newSubscribed = new StringBuffer();
-
-      for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
-        // sometimes listSubscribed() doesn't work.
-        if (subscribedFolders[i].isSubscribed() || subscribedFolders[i].getName().equalsIgnoreCase("INBOX")) {
-          String folderName = subscribedFolders[i].getName();
-          newSubscribed.append(folderName).append(':');
-        }
+    for (int i = 0; subscribedFolders != null && i < subscribedFolders.length; i++) {
+      // sometimes listSubscribed() doesn't work.
+      if (subscribedFolders[i].isSubscribed() || subscribedFolders[i].getName().equalsIgnoreCase("INBOX")) {
+        String folderName = subscribedFolders[i].getName();
+        subscribedNames.add(folderName);
       }
+    }
+    Collections.sort(subscribedNames);
 
-      if (newSubscribed.length() > 0)
-        newSubscribed.deleteCharAt(newSubscribed.length() -1);
-
-      // this will update our children vector.
-      Pooka.setProperty(getFolderProperty() + ".folderList", newSubscribed.toString());
-
-      for (int i = 0; children != null && i < children.size(); i++) {
-        FolderInfo fi = (FolderInfo) children.elementAt(i);
-        fi.synchSubscribed();
+    // keep the existing order when possible.
+    List<String> currentSubscribed = Pooka.getResources().getPropertyAsList(getFolderProperty() + ".folderList", "");
+    Iterator<String> currentIter = currentSubscribed.iterator();
+    while(currentIter.hasNext()) {
+      String folder = currentIter.next();
+      if (! subscribedNames.contains(folder)) {
+        currentSubscribed.remove(folder);
+      } else {
+        subscribedNames.remove(folder);
       }
+    }
+
+    currentSubscribed.addAll(subscribedNames);
+
+    // this will update our children vector.
+    Pooka.setProperty(getFolderProperty() + ".folderList", VariableBundle.convertToString(currentSubscribed));
+
+    for (int i = 0; children != null && i < children.size(); i++) {
+      FolderInfo fi = (FolderInfo) children.elementAt(i);
+      fi.synchSubscribed();
     }
   }
 
@@ -822,7 +831,7 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
         }
 
         colnames.addElement(Pooka.getProperty(tableType + "." + tmp + ".label", tmp));
-          String value = Pooka.getProperty(getFolderProperty() + ".columnsize." + tmp + ".value", Pooka.getProperty(tableType + "." + tmp + ".value", tmp));
+        String value = Pooka.getProperty(getFolderProperty() + ".columnsize." + tmp + ".value", Pooka.getProperty(tableType + "." + tmp + ".value", tmp));
         colsizes.addElement(Pooka.getProperty(getFolderProperty() + ".columnsize." + tmp + ".value", Pooka.getProperty(tableType + "." + tmp + ".size", tmp)));
       }
       setColumnNames(colnames);
@@ -1265,30 +1274,28 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
    * Should be called on the folder thread.
    */
   public void updateChildren() {
-    Vector newChildren = new Vector();
+    Vector<FolderInfo> newChildren = new Vector();
 
-    String childList = Pooka.getProperty(getFolderProperty() + ".folderList", "");
-    if (childList != "") {
-      StringTokenizer tokens = new StringTokenizer(childList, ":");
-
-      String newFolderName;
-
-      for (int i = 0 ; tokens.hasMoreTokens() ; i++) {
-        newFolderName = (String)tokens.nextToken();
-        FolderInfo childFolder = getChild(newFolderName);
-        if (childFolder == null) {
-          childFolder = new FolderInfo(this, newFolderName);
-          newChildren.add(childFolder);
-        } else {
-          newChildren.add(childFolder);
-        }
+    List<String> newChildNames = Pooka.getResources().getPropertyAsList(getFolderProperty() + ".folderList", "");
+    for (String newFolderName: newChildNames) {
+      FolderInfo childFolder = getChild(newFolderName);
+      if (childFolder == null) {
+        childFolder = createChildFolder(newFolderName);
       }
+      newChildren.add(0, childFolder);
 
       children = newChildren;
-
-      if (folderNode != null)
-        folderNode.loadChildren();
     }
+
+    if (folderNode != null)
+      folderNode.loadChildren();
+  }
+
+  /**
+   * Creates a child folder.
+   */
+  protected FolderInfo createChildFolder(String newFolderName) {
+    return new FolderInfo(this, newFolderName);
   }
 
   /**

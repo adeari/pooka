@@ -2,9 +2,6 @@
 *) check what happens if you hit enter on a subfolder while subscribing.
 	-- see if we can make it so hitting enter opens the subfolder
 	   rather than subscribing to it. -- setApproveButtonMnemonic()?
-*) use server's subscribed folder list failing to subscribe new subfolders.
-*) ?? reorder folders ??
-   -- make it work with subscribed folder list; make sure it doesn't reorder.
 
 *) getDefaultAddressBook should always return a value.
    -- have to go to ResourceManager?
@@ -24,6 +21,8 @@ improve encryption support?
 
 centralized settings repository
  *) ldap (again?)
+
+*) ?? reorder folders ??
 
 **) make wheel scroll customizable
 *) trayicon stuff

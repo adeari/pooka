@@ -116,12 +116,15 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
    * gui thread.
    */
   private void doLoadChildren() {
-    Enumeration origChildren = super.children();
+    Enumeration origChildren = children();
     Vector origChildrenVector = new Vector();
-    while (origChildren.hasMoreElements())
-      origChildrenVector.add(origChildren.nextElement());
-
+    while (origChildren.hasMoreElements()) {
+      Object origChild = origChildren.nextElement();
+      origChildrenVector.add(origChild);
+    }
     Vector folderChildren = getFolderInfo().getChildren();
+
+    boolean changed=false;
 
     if (folderChildren != null) {
       for (int i = 0; i < folderChildren.size(); i++) {
@@ -136,11 +139,12 @@ public class FolderNode extends MailTreeNode implements MessageChangedListener, 
 
     }
 
-    removeChildren(origChildrenVector);
+    if (origChildrenVector.size() > 0) {
+      removeChildren(origChildrenVector);
+    }
 
     hasLoaded=true;
 
-    //((javax.swing.tree.DefaultTreeModel)(((FolderPanel)getParentContainer()).getFolderTree().getModel())).nodeStructureChanged(this);
   }
 
   /**

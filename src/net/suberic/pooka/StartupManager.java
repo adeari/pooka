@@ -711,7 +711,7 @@ public class StartupManager {
    * Prints the usage information.
    */
   public void printUsage() {
-    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don't open saved folders on startup.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  -open ADDRESS                sends a new message to ADDRESS.\n       [--from USER]           [from user USER].\n  --minimal                    startup to system tray only.\n  --help                       shows these options.\n"));
+    System.out.println(Pooka.getProperty("info.startup.help", "\nUsage:  net.suberic.pooka.Pooka [OPTIONS]\n\n  -nf, --noOpenSavedFolders    don\'t open saved folders on startup.\n  -r, --root DIRECTORY         use the given directory as the pooka home.\n  -rc, --rcfile FILE           use the given file as the pooka startup file.\n  --http                       runs with a configuration file loaded via http\n  -open ADDRESS                sends a new message to ADDRESS.\n       [--from USER]           [from user USER].\n  --minimal                    startup to system tray only.\n  --help                       shows these options.\n"));
   }
 
   /**

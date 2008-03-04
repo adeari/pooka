@@ -87,6 +87,8 @@ public class StoreNode extends MailTreeNode {
     while (origChildren.hasMoreElements())
       origChildrenVector.add(origChildren.nextElement());
 
+    boolean changed = false;
+
     logger.fine(getStoreInfo().getStoreID() + ":  origChildrenVector.size() = " + origChildrenVector.size());
 
     Vector storeChildren = getStoreInfo().getChildren();
@@ -101,18 +103,21 @@ public class StoreNode extends MailTreeNode {
           // we used insert here, since add() would mak
           // another recursive call to getChildCount();
           insert(node, 0);
+          changed = true;
         }
       }
 
     }
 
-    removeChildren(origChildrenVector);
+    if (origChildrenVector.size() > 0) {
+      removeChildren(origChildrenVector);
+      changed = true;
+    }
 
     hasLoaded=true;
 
-
     javax.swing.JTree folderTree = ((FolderPanel)getParentContainer()).getFolderTree();
-    if (folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
+    if (changed && folderTree != null && folderTree.getModel() instanceof javax.swing.tree.DefaultTreeModel) {
       ((javax.swing.tree.DefaultTreeModel)folderTree.getModel()).nodeStructureChanged(this);
     }
 
