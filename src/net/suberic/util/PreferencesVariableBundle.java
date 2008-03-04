@@ -69,43 +69,45 @@ public class PreferencesVariableBundle extends VariableBundle {
   public void saveProperties() {
     synchronized(this) {
       try {
-      // first go through each of the existing propreties and keep the
-      // ones that we want to keep.
-      String[] keys = mPreferences.keys();
-      for (int i = 0; i < keys.length; i++) {
-        String key = keys[i];
+        // first go through each of the existing propreties and keep the
+        // ones that we want to keep.
+        String[] keys = mPreferences.keys();
+        for (int i = 0; i < keys.length; i++) {
+          String key = keys[i];
 
-        if (!propertyIsRemoved(key)) {
-          if (writableProperties.getProperty(key, "").equals("")) {
-            // if it's not in writableProperties, leave it as it is.
+          if (!propertyIsRemoved(key)) {
+            if (writableProperties.getProperty(key, "").equals("")) {
+              // if it's not in writableProperties, leave it as it is.
+            } else {
+              // write it to the backing preferences and remove it from
+              // writableProperties.
+              mPreferences.put(key, writableProperties.getProperty(key, ""));
+
+              properties.setProperty(key, writableProperties.getProperty(key, ""));
+              writableProperties.remove(key);
+            }
           } else {
-            // write it to the backing preferences and remove it from
-            // writableProperties.
-            mPreferences.put(key, writableProperties.getProperty(key, ""));
-
-            properties.setProperty(key, writableProperties.getProperty(key, ""));
-            writableProperties.remove(key);
+            mPreferences.remove(key);
           }
-        } else {
-          mPreferences.remove(key);
         }
-      }
-      // write out the rest of the writableProperties
+        // write out the rest of the writableProperties
 
-      Set<String> propsLeft = writableProperties.stringPropertyNames();
-      List<String> propsLeftList = new ArrayList<String>(propsLeft);
-      Collections.sort(propsLeftList);
-      for (String nextKey: propsLeftList) {
-        mPreferences.put(nextKey, writableProperties.getProperty(nextKey, ""));
+        Set<String> propsLeft = writableProperties.stringPropertyNames();
+        List<String> propsLeftList = new ArrayList<String>(propsLeft);
+        Collections.sort(propsLeftList);
+        for (String nextKey: propsLeftList) {
+          mPreferences.put(nextKey, writableProperties.getProperty(nextKey, ""));
 
-        properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
-        writableProperties.remove(nextKey);
-      }
+          properties.setProperty(nextKey, writableProperties.getProperty(nextKey, ""));
+          writableProperties.remove(nextKey);
+        }
 
-      clearRemoveList();
+        clearRemoveList();
+
+        mPreferences.flush();
       } catch (BackingStoreException bse) {
         System.err.println(getProperty("VariableBundle.saveError", "Error saving properties: " + bse.getMessage()));
-          bse.printStackTrace(System.err);
+        bse.printStackTrace(System.err);
       }
     }
   }

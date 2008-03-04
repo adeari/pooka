@@ -27,6 +27,7 @@ public class StartupManager {
   public boolean mOpenFolders = true;
   public boolean mUseHttp = false;
   public boolean mUseLocalFiles = true;
+  public boolean mUseJdbc = false;
   public boolean mFullStartup = true;
   String mToAddress = null;
   String mFromProfile = null;
@@ -54,7 +55,7 @@ public class StartupManager {
 
     updateTime("args parsed.");
 
-    Pooka.loadResources(mUseLocalFiles, mUseHttp);
+    Pooka.loadResources(mUseLocalFiles, mUseHttp, mUseJdbc);
 
     mPookaManager.setLogManager(new PookaLogManager());
 
@@ -648,6 +649,9 @@ public class StartupManager {
         } else if (argv[i].equals("--http")) {
           mUseHttp = true;
           mUseLocalFiles = false;
+        } else if (argv[i].equals("--jdbc")) {
+          System.err.println("using jdbc.");
+          mUseJdbc = true;
         } else if (argv[i].equals("-open")) {
           if (argv.length < i + 2) {
             System.err.println("error:  no address specified.");

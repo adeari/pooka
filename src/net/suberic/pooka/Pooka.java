@@ -66,7 +66,7 @@ public class Pooka {
   /**
    * Loads all the resources for Pooka.
    */
-  public static void loadResources(boolean pUseLocalFiles, boolean pUseHttp) {
+  public static void loadResources(boolean pUseLocalFiles, boolean pUseHttp, boolean pUseJdbc) {
     if (sManager == null || sManager.getResources() == null) {
       System.err.println("Error starting up Pooka:  No system resource files found.");
       System.exit(-1);
@@ -78,6 +78,9 @@ public class Pooka {
 
       if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
         resourceManager = new DisklessResourceManager();
+      } else if (pUseJdbc) {
+        System.err.println("using jdbc.");
+        resourceManager = new JDBCResourceManager();
       } else {
         resourceManager = new FileResourceManager();
       }
