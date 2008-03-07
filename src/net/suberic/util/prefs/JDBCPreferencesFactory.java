@@ -12,7 +12,7 @@ public class JDBCPreferencesFactory implements PreferencesFactory {
 
   public synchronized Preferences systemRoot() {
     if (mSystemPrefs == null) {
-      mSystemPrefs = new JDBCPreferences(null, "systemPrefs");
+      mSystemPrefs = new JDBCPreferences(null, "/");
     }
 
     return mSystemPrefs;
@@ -20,7 +20,7 @@ public class JDBCPreferencesFactory implements PreferencesFactory {
 
   public synchronized Preferences userRoot() {
     if (mUserPrefs == null) {
-      mUserPrefs = new JDBCPreferences(null, "userPrefs");
+      mUserPrefs = new JDBCPreferences(null, "");
     }
 
     return mUserPrefs;
