@@ -11,9 +11,9 @@ public class JDBCPreferences extends AbstractPreferences {
   // the connection info.
   static final char sSeparator = '/';
   static final String sTableName = "jdbcpreferences";
-  static final String sPathColumn = "path";
-  static final String sKeyColumn = "key";
-  static final String sValueColumn = "value";
+  static final String sPathColumn = "jpath";
+  static final String sKeyColumn = "jkey";
+  static final String sValueColumn = "jvalue";
 
   String mPath;
   Properties mBackingProperties = new Properties();
@@ -52,15 +52,17 @@ public class JDBCPreferences extends AbstractPreferences {
       statement.setString(1, absolutePath());
       statement.executeUpdate();
 
-      connection.commit();
+      //connection.commit();
 
       mBackingProperties.clear();
     } catch (SQLException se) {
+      /*
       try {
         connection.rollback();
       } catch (SQLException rollbackEx) {
         // ignore.
       }
+      */
       throw new BackingStoreException(se);
     } finally {
       if (connection != null) {
@@ -108,7 +110,7 @@ public class JDBCPreferences extends AbstractPreferences {
     Connection connection=null;
     try {
       connection = getConnection();
-      PreparedStatement statement = connection.prepareStatement("select " + sPathColumn + " from " + sTableName + " where " + sPathColumn + " like ? and not like ? and not " + sPathColumn + " = ? group by " + sPathColumn);
+      PreparedStatement statement = connection.prepareStatement("select " + sPathColumn + " from " + sTableName + " where " + sPathColumn + " like ? and " + sPathColumn + " not like ? and not " + sPathColumn + " = ? group by " + sPathColumn);
 
       statement.setString(1, absolutePath() + '%');
       statement.setString(2, absolutePath() + '%' + sSeparator + '%');
@@ -196,14 +198,16 @@ public class JDBCPreferences extends AbstractPreferences {
         addStatement.setString(3, value);
         addStatement.executeUpdate();
 
-        connection.commit();
+        //connection.commit();
       }
     } catch (SQLException se) {
+      /*
       try {
         connection.rollback();
       } catch (SQLException rollbackEx) {
         // ignore.
       }
+      */
       throw new BackingStoreException(se);
     } finally {
       if (connection != null) {
@@ -223,9 +227,11 @@ public class JDBCPreferences extends AbstractPreferences {
     try {
       String className = System.getProperty("JDBCPreferences.driverName");
       String url = System.getProperty("JDBCPreferences.url");
-      System.out.println("className='" + className + "'; url='" + url + "'");
+      String user = System.getProperty("JDBCPreferences.user");
+      String password = System.getProperty("JDBCPreferences.password");
+      System.out.println("className='" + className + "'; url='" + url + "', user=" + user + ", password = " + password);
       Class.forName(className).newInstance();
-      Connection returnValue = DriverManager.getConnection(url);
+      Connection returnValue = DriverManager.getConnection(url, user, password);
 
       return returnValue;
     } catch (ClassNotFoundException cnfe) {

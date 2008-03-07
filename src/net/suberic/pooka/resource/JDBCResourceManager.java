@@ -19,8 +19,10 @@ public class JDBCResourceManager extends ResourceManager {
    */
   public VariableBundle createVariableBundle(String fileName, VariableBundle defaults) {
     System.err.println("using jdbc.");
-    //System.setProperty("JDBCPreferences.driverName", "com.mysql.jdbc.Driver");
-    System.setProperty("JDBCPreferences.url", "jdbc:mysql://localhost");
+    System.setProperty("JDBCPreferences.driverName", "com.mysql.jdbc.Driver");
+    System.setProperty("JDBCPreferences.url", "");
+    System.setProperty("JDBCPreferences.user", "");
+    System.setProperty("JDBCPreferences.password", "");
     System.setProperty("java.util.prefs.PreferencesFactory", "net.suberic.util.prefs.JDBCPreferencesFactory");
     try {
       return new net.suberic.util.PreferencesVariableBundle(Class.forName("net.suberic.pooka.Pooka"), defaults);
