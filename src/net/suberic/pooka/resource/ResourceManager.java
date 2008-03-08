@@ -4,6 +4,7 @@ import net.suberic.util.*;
 import net.suberic.pooka.ssl.*;
 import net.suberic.pooka.*;
 import javax.activation.*;
+import java.io.File;
 import java.util.regex.*;
 
 /**
@@ -32,6 +33,23 @@ public abstract class ResourceManager {
    */
   public abstract java.io.InputStream getInputStream(String pFileName)
     throws java.io.IOException;
+
+  /**
+   * Returns the default Pooka Root.
+   */
+  public File getDefaultPookaRoot() {
+    return new File(System.getProperty("user.home"));
+  }
+
+  /**
+   * Returns the default localrc.
+   */
+  public String getDefaultLocalrc(File pPookaRoot) {
+    if (pPookaRoot == null) {
+      pPookaRoot = getDefaultPookaRoot();
+    }
+    return new String (pPookaRoot.getAbsolutePath() + System.getProperty("file.separator") + ".pookarc");
+  }
 
   /**
    * Gets a resource for writing.  pFileName could be a URL or a file name

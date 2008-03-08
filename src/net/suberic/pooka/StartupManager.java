@@ -55,7 +55,7 @@ public class StartupManager {
 
     updateTime("args parsed.");
 
-    Pooka.loadResources(mUseLocalFiles, mUseHttp, mUseJdbc);
+    loadResources(mUseLocalFiles, mUseHttp, mUseJdbc);
 
     mPookaManager.setLogManager(new PookaLogManager());
 
@@ -75,6 +75,54 @@ public class StartupManager {
       } else {
         startupMinimal();
       }
+    }
+  }
+
+
+ /**
+   * Loads all the resources for Pooka.
+   */
+  public void loadResources(boolean pUseLocalFiles, boolean pUseHttp, boolean pUseJdbc) {
+    PookaManager manager = Pooka.getPookaManager();
+
+    if (manager == null || manager.getResources() == null) {
+      System.err.println("Error starting up Pooka:  No system resource files found.");
+      System.exit(-1);
+    }
+
+    try {
+      net.suberic.util.VariableBundle pookaDefaultBundle = manager.getResources();
+      ResourceManager resourceManager = null;
+
+      if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
+        resourceManager = new DisklessResourceManager();
+      } else if (pUseJdbc) {
+        System.err.println("using jdbc.");
+        resourceManager = new JDBCResourceManager();
+      } else {
+        resourceManager = new FileResourceManager();
+      }
+
+      manager.setResourceManager(resourceManager);
+
+      // the PookaRoot hasn't been set, use the user's home directory.
+
+      if (manager.getPookaRoot() == null) {
+        manager.setPookaRoot(resourceManager.getDefaultPookaRoot());
+      }
+
+      if (manager.getLocalrc() == null) {
+        manager.setLocalrc(resourceManager.getDefaultLocalrc(manager.getPookaRoot()));
+      }
+      manager.setResources(manager.getResourceManager().createVariableBundle(manager.getLocalrc(), pookaDefaultBundle));
+    } catch (Exception e) {
+      System.err.println("caught exception:  " + e);
+      e.printStackTrace();
+    }
+
+    if (pUseHttp || manager.getResources().getProperty("Pooka.httpConfig", "false").equalsIgnoreCase("true")) {
+      net.suberic.pooka.gui.LoadHttpConfigPooka configPooka = new net.suberic.pooka.gui.LoadHttpConfigPooka();
+      configPooka.start();
     }
   }
 

@@ -64,54 +64,6 @@ public class Pooka {
 
 
   /**
-   * Loads all the resources for Pooka.
-   */
-  public static void loadResources(boolean pUseLocalFiles, boolean pUseHttp, boolean pUseJdbc) {
-    if (sManager == null || sManager.getResources() == null) {
-      System.err.println("Error starting up Pooka:  No system resource files found.");
-      System.exit(-1);
-    }
-
-    try {
-      net.suberic.util.VariableBundle pookaDefaultBundle = sManager.getResources();
-      ResourceManager resourceManager = null;
-
-      if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
-        resourceManager = new DisklessResourceManager();
-      } else if (pUseJdbc) {
-        System.err.println("using jdbc.");
-        resourceManager = new JDBCResourceManager();
-      } else {
-        resourceManager = new FileResourceManager();
-      }
-
-      sManager.setResourceManager(resourceManager);
-
-      // the PookaRoot hasn't been set, use the user's home directory.
-
-      if (sManager.getPookaRoot() == null) {
-        sManager.setPookaRoot(new File(System.getProperty("user.home")));
-      }
-
-      // if localrc hasn't been set, use the .pookarc file in the PookaRoot
-      // directory.
-      if (sManager.getLocalrc() == null) {
-        String localrc = new String (sManager.getPookaRoot().getAbsolutePath() + System.getProperty("file.separator") + ".pookarc");
-        sManager.setLocalrc(localrc);
-      }
-      sManager.setResources(sManager.getResourceManager().createVariableBundle(sManager.getLocalrc(), pookaDefaultBundle));
-    } catch (Exception e) {
-      System.err.println("caught exception:  " + e);
-      e.printStackTrace();
-    }
-
-    if (pUseHttp || sManager.getResources().getProperty("Pooka.httpConfig", "false").equalsIgnoreCase("true")) {
-      net.suberic.pooka.gui.LoadHttpConfigPooka configPooka = new net.suberic.pooka.gui.LoadHttpConfigPooka();
-      configPooka.start();
-    }
-  }
-
-  /**
    * Exits Pooka.  Attempts to close all stores first.
    */
   public static void exitPooka(int exitValue, Object pSource) {
