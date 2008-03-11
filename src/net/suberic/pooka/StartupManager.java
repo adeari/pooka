@@ -105,6 +105,9 @@ public class StartupManager {
 
               tmpFactory.showEditorWindow(Pooka.getProperty("Pooka._jdbcWizard.label", "Load Settings"), "Pooka._jdbcWizard");
 
+              if (! "true".equals(System.getProperty("useJdbcConnection"))) {
+                System.exit(1);
+              }
               mPookaManager.setUIFactory(tmpFactory);
 
             }

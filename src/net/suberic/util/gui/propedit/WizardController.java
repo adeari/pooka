@@ -100,7 +100,7 @@ public class WizardController {
    * state to state.
    */
   public void checkStateTransition(String oldState, String newState) throws PropertyValueVetoException {
-    //editorPane.setValue(oldState);
+    getEditorPane().validateProperty(oldState);
   }
 
   /**

@@ -1,8 +1,7 @@
 *) jdbc:
-   *) fix required filter
-   *) behavior:  what happens when we cancel out?  should probably exit.
    *) fix error message -- too long
    *) put in options to prepopulate entries
+
    *) add in address book, trusted cert db, crypto keys.
    *) make sure we don't support caching.
    *) add in help????
