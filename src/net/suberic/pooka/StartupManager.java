@@ -97,7 +97,19 @@ public class StartupManager {
       if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
         resourceManager = new DisklessResourceManager();
       } else if (pUseJdbc) {
-        System.err.println("using jdbc.");
+        SwingUtilities.invokeAndWait(new Runnable() {
+            public void run() {
+              System.setProperty("java.util.prefs.PreferencesFactory", "net.suberic.util.prefs.JDBCPreferencesFactory");
+
+              PookaUIFactory tmpFactory = new PookaMinimalUIFactory();
+
+              tmpFactory.showEditorWindow(Pooka.getProperty("Pooka._jdbcWizard.label", "Load Settings"), "Pooka._jdbcWizard");
+
+              mPookaManager.setUIFactory(tmpFactory);
+
+            }
+          });
+
         resourceManager = new JDBCResourceManager();
       } else {
         resourceManager = new FileResourceManager();
@@ -124,6 +136,7 @@ public class StartupManager {
       net.suberic.pooka.gui.LoadHttpConfigPooka configPooka = new net.suberic.pooka.gui.LoadHttpConfigPooka();
       configPooka.start();
     }
+
   }
 
   /**
@@ -163,6 +176,7 @@ public class StartupManager {
       else
         mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
     } else if (Pooka.getUIFactory() instanceof net.suberic.pooka.gui.PookaMinimalUIFactory) {
+
       if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
         mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(Pooka.getUIFactory()));
       else
@@ -588,10 +602,18 @@ public class StartupManager {
     updateTime("loaded help");
 
     if (mFullStartup) {
-      if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
-        mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
-      else
-        mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+      // if there's already a MinimalUIFactory, then copy it.
+      if (mPookaManager.getUIFactory() != null) {
+        if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+          mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory(mPookaManager.getUIFactory()));
+        else
+          mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory(mPookaManager.getUIFactory()));
+      } else {
+        if (Pooka.getProperty("Pooka.guiType", "Desktop").equalsIgnoreCase("Preview"))
+          mPookaManager.setUIFactory(new PookaPreviewPaneUIFactory());
+        else
+          mPookaManager.setUIFactory(new PookaDesktopPaneUIFactory());
+      }
 
       updateTime("created ui factory");
     }
@@ -700,6 +722,13 @@ public class StartupManager {
         } else if (argv[i].equals("--jdbc")) {
           System.err.println("using jdbc.");
           mUseJdbc = true;
+          /*
+          System.setProperty("JDBCPreferences.driverName", argv[i+1]);
+          System.setProperty("JDBCPreferences.url", argv[i+2]);
+          System.setProperty("JDBCPreferences.user", argv[i+3]);
+          System.setProperty("JDBCPreferences.password", argv[i+4]);
+          i+=4;
+          */
         } else if (argv[i].equals("-open")) {
           if (argv.length < i + 2) {
             System.err.println("error:  no address specified.");

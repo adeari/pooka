@@ -124,6 +124,9 @@ public class PasswordEditorPane extends StringEditorPane {
    * This is a simple scrambler.
    */
   public static String scrambleString(String key) {
+    if (key == null || key.length() < 1) {
+      return "";
+    }
     int[] salt = new int[4];
     int keySize = key.length();
     long seed = System.currentTimeMillis();
@@ -158,6 +161,9 @@ public class PasswordEditorPane extends StringEditorPane {
    * And this is a simple descrambler.
    */
   public static String descrambleString(String value) {
+    if (value == null || value.length() < 1) {
+      return "";
+    }
     int[] salt = new int[4];
     int scrambleSize = value.length();
     char[] key = new char[(scrambleSize - 8) / 2];

@@ -75,7 +75,7 @@ public class JDBCPreferences extends AbstractPreferences {
     }
   }
 
-  protected String[] childrenNamesSpi() throws BackingStoreException {
+  protected String[] keysSpi() throws BackingStoreException {
     Connection connection=null;
     try {
       connection = getConnection();
@@ -106,7 +106,7 @@ public class JDBCPreferences extends AbstractPreferences {
     }
   }
 
-  protected String[] keysSpi() throws BackingStoreException {
+  protected String[] childrenNamesSpi() throws BackingStoreException {
     Connection connection=null;
     try {
       connection = getConnection();
@@ -152,6 +152,7 @@ public class JDBCPreferences extends AbstractPreferences {
       PreparedStatement statement = connection.prepareStatement("select " + sKeyColumn + ", " + sValueColumn + " from " + sTableName + " where " + sPathColumn + "= ?");
 
       statement.setString(1, absolutePath());
+
       ResultSet resultSet = statement.executeQuery();
 
       Properties newProps = new Properties();
@@ -229,7 +230,7 @@ public class JDBCPreferences extends AbstractPreferences {
       String url = System.getProperty("JDBCPreferences.url");
       String user = System.getProperty("JDBCPreferences.user");
       String password = System.getProperty("JDBCPreferences.password");
-      System.out.println("className='" + className + "'; url='" + url + "', user=" + user + ", password = " + password);
+      //System.out.println("className='" + className + "'; url='" + url + "', user=" + user + ", password = " + password);
       Class.forName(className).newInstance();
       Connection returnValue = DriverManager.getConnection(url, user, password);
 

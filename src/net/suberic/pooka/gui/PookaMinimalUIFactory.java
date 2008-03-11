@@ -181,14 +181,11 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    * each entry in the properties Vector.
    */
   public void showEditorWindow(String title, String property, String  template) {
-    JFrame jf = (JFrame)getEditorFactory().createEditorWindow(title, property, template);
+    JDialog jf = (JDialog)getEditorFactory().createEditorWindow(title, property, template);
     jf.pack();
     Component currentFocusedComponent = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
-    if (currentFocusedComponent != null && currentFocusedComponent instanceof JComponent) {
-      applyNewWindowLocation(jf, ((JComponent) currentFocusedComponent));
-    } else {
-      applyNewWindowLocation(jf, null);
-    }
+    applyNewWindowLocation(jf);
+
     jf.setVisible(true);
   }
 
@@ -523,6 +520,28 @@ public class PookaMinimalUIFactory implements PookaUIFactory {
    */
   public void applyNewWindowLocation(JFrame f, JComponent pParentComponent) {
     f.setLocationRelativeTo(pParentComponent);
+  }
+
+  /**
+   * Determines the location for new windows.
+   */
+  public void applyNewWindowLocation(Window f) {
+    try {
+      Point newLocation = getNewWindowLocation(f);
+      f.setLocation(newLocation);
+    } catch (Exception e) {
+    }
+  }
+
+  /**
+   * Determines the location for new windows.
+   */
+  public Point getNewWindowLocation(Window f) throws Exception {
+    Dimension mainWindowSize = java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().getBounds().getSize();
+    Dimension windowSize = f.getSize();
+    int yValue = ((mainWindowSize.height - windowSize.height) / 2);
+    int xValue = ((mainWindowSize.width - windowSize.width) / 2);
+    return new Point(xValue, yValue);
   }
 
   /**
