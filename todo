@@ -1,9 +1,11 @@
 *) jdbc:
-   *) fix error message -- too long
    *) put in options to prepopulate entries
+      -- command line?
+      -- .pookarc file?
+         -- for .pookarc file, offer a way to work offline?
 
    *) add in address book, trusted cert db, crypto keys.
-   *) make sure we don't support caching.
+   *) make sure we don't cache anything if we're trying not to.
    *) add in help????
 
 *) fix weird connection problem with 1.4.1.

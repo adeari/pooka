@@ -74,7 +74,8 @@ public class PropertyEditorFactory {
    * Shows an error message.
    */
   public void showError(Object component, String errorMessage) {
-    JOptionPane.showMessageDialog((Component) component, errorMessage);
+    String newErrorMessage = wrapText(errorMessage, 80, System.getProperty("line.separator"), 5);
+    JOptionPane.showMessageDialog((Component) component, newErrorMessage);
   }
 
   /**
@@ -287,6 +288,174 @@ public class PropertyEditorFactory {
   public HelpBroker getHelpBroker() {
     return helpBroker;
   }
+
+  /**
+   * This takes a String and word wraps it at length wrapLength.  It also will
+   * convert any alternative linebreaks (LF, CR, or CRLF) to the
+   * <code>newLine</code> given.
+   */
+  public static String wrapText(String originalText, int wrapLength, String newLine, int tabSize) {
+    if (originalText == null)
+      return null;
+
+    StringBuffer wrappedText = new StringBuffer();
+
+    // so the idea is that we'll get each entry denoted by a line break
+    // and then add soft breaks into there.
+    int currentStart = 0;
+    int nextHardBreak = nextNewLine(originalText, currentStart);
+    while (nextHardBreak != -1) {
+      // get the current string with a newline at the end.
+      String currentString = getSubstringWithNewLine(originalText, currentStart, nextHardBreak, newLine);
+
+      int nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
+      while (nextSoftBreak < currentString.length()) {
+        wrappedText.append(currentString.substring(0, nextSoftBreak));
+        wrappedText.append(newLine);
+
+        currentString = currentString.substring(nextSoftBreak);
+
+        nextSoftBreak = getBreakOffset(currentString, wrapLength, tabSize);
+      }
+      wrappedText.append(currentString);
+
+      // get the next string including the newline.
+      currentStart = afterNewLine(originalText, nextHardBreak);
+      nextHardBreak= nextNewLine(originalText, currentStart);
+    }
+
+    return wrappedText.toString();
+  }
+
+  /**
+   * Returns the next new line.
+   */
+  public static int nextNewLine(String text, int start) {
+    if (start >= text.length())
+      return -1;
+
+    // go through each character, looking for \r or \n
+    int foundIndex = -1;
+    for (int i = start; foundIndex == -1 && i < text.length(); i++) {
+      char current = text.charAt(i);
+      if (current == '\r') {
+        if (i + 1 < text.length() && text.charAt(i+1) == '\n')
+          foundIndex = i+1;
+        else
+          foundIndex = i;
+      } else if (current == '\n') {
+        foundIndex = i;
+      }
+    }
+
+    if (foundIndex == -1) {
+      return text.length();
+    } else {
+      return foundIndex;
+    }
+  }
+
+  /**
+   * Returns the position after the newline indicated by index.  If
+   * that's the end of the string, or an invalid index is given, returns
+   * an index equal to the length of text (i.e. one more than the last
+   * valid index in text).
+   */
+  public static int afterNewLine(String text, int index) {
+    // if index is invalid, or if index is the last character in the
+    // string, return
+    if (index < 0 || index >= text.length() || index == text.length() -1)
+      return text.length();
+
+    char newLineChar = text.charAt(index);
+    if (newLineChar == '\r' && text.charAt(index + 1) == '\n')
+      return index + 2;
+    else
+      return index + 1;
+  }
+
+  /**
+   * Gets the indicated substring with the given newline.
+   */
+  public static String getSubstringWithNewLine(String originalText, int start, int end, String newLine) {
+    String origSubString = originalText.substring(start,end);
+
+    if (origSubString.endsWith("\r\n")) {
+      if (newLine.equals("\r\n"))
+        return origSubString;
+      else {
+        return origSubString.substring(0, origSubString.length() - 2) + newLine;
+      }
+    } else if (origSubString.endsWith("\n")) {
+      if (newLine.equals("\n"))
+        return origSubString;
+      else
+        return origSubString.substring(0, origSubString.length() - 1) + newLine;
+    } else if (origSubString.endsWith("\r")) {
+      if (newLine.equals("\r"))
+        return origSubString;
+      else
+        return origSubString.substring(0, origSubString.length() - 1) + newLine;
+    } else {
+      return origSubString + newLine;
+    }
+  }
+
+  /**
+   * This method takes a given String offset and returns the offset
+   * position at which a line break should occur.
+   *
+   * If no break is necessary, the full buffer length is returned.
+   *
+   */
+  public static int getBreakOffset(String buffer, int breakLength, int tabSize) {
+    // what we'll do is to modify the break length to make it fit tabs.
+
+    int nextTab = buffer.indexOf('\t');
+    int tabAccumulator = 0;
+    int tabAddition = 0;
+    while (nextTab >=0 && nextTab < breakLength) {
+      tabAddition = tabSize - ((tabSize +  nextTab + tabAccumulator + 1) % tabSize);
+      breakLength=breakLength - tabAddition;
+      tabAccumulator = tabAccumulator + tabAddition;
+      if (nextTab + 1 < buffer.length())
+        nextTab = buffer.indexOf('\t', nextTab + 1);
+      else
+        nextTab = -1;
+    }
+
+
+    if ( buffer.length() <= breakLength ) {
+      return buffer.length();
+    }
+
+    int breakLocation = -1;
+    for (int caret = breakLength; breakLocation == -1 && caret >= 0; caret--) {
+      if (Character.isWhitespace(buffer.charAt(caret))) {
+        breakLocation=caret + 1;
+        if (breakLocation < buffer.length()) {
+          // check to see if the next character is a line feed of some sort.
+          char nextChar = buffer.charAt(breakLocation);
+          if (nextChar == '\n')
+            breakLocation ++;
+          else if (nextChar == '\r') {
+            if (breakLocation + 1<  buffer.length() && buffer.charAt(breakLocation + 1) == '\n') {
+              breakLocation +=2;
+            } else {
+              breakLocation ++;
+            }
+          }
+        }
+      }
+    }
+
+    if (breakLocation == -1)
+      breakLocation = breakLength;
+
+    return breakLocation;
+  }
+
+
 }
 
 

@@ -103,6 +103,12 @@ public class StartupManager {
 
               PookaUIFactory tmpFactory = new PookaMinimalUIFactory();
 
+              // preset the jdbc options if they have been provided.
+              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.driver", System.getProperty("JDBCPreferences.driverName"));
+              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.url", System.getProperty("JDBCPreferences.url"));
+              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.user", System.getProperty("JDBCPreferences.user"));
+              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.password", net.suberic.util.gui.propedit.PasswordEditorPane.scrambleString(System.getProperty("JDBCPreferences.password")));
+
               tmpFactory.showEditorWindow(Pooka.getProperty("Pooka._jdbcWizard.label", "Load Settings"), "Pooka._jdbcWizard");
 
               if (! "true".equals(System.getProperty("useJdbcConnection"))) {
@@ -723,15 +729,35 @@ public class StartupManager {
           mUseHttp = true;
           mUseLocalFiles = false;
         } else if (argv[i].equals("--jdbc")) {
-          System.err.println("using jdbc.");
           mUseJdbc = true;
-          /*
-          System.setProperty("JDBCPreferences.driverName", argv[i+1]);
-          System.setProperty("JDBCPreferences.url", argv[i+2]);
-          System.setProperty("JDBCPreferences.user", argv[i+3]);
-          System.setProperty("JDBCPreferences.password", argv[i+4]);
-          i+=4;
-          */
+        } else if (argv[i].equals("--jdriver")) {
+          if (argv.length < i + 2) {
+            System.err.println("error:  no jdbc driver specified.");
+            printUsage();
+            System.exit(-1);
+          }
+          System.setProperty("JDBCPreferences.driverName", argv[++i]);
+        } else if (argv[i].equals("--jurl")) {
+          if (argv.length < i + 2) {
+            System.err.println("error:  no jdbc url specified.");
+            printUsage();
+            System.exit(-1);
+          }
+          System.setProperty("JDBCPreferences.url", argv[++i]);
+        } else if (argv[i].equals("--juser")) {
+          if (argv.length < i + 2) {
+            System.err.println("error:  no jdbc user specified.");
+            printUsage();
+            System.exit(-1);
+          }
+          System.setProperty("JDBCPreferences.user", argv[++i]);
+        } else if (argv[i].equals("--jpassword")) {
+          if (argv.length < i + 2) {
+            System.err.println("error:  no jdbc password specified.");
+            printUsage();
+            System.exit(-1);
+          }
+          System.setProperty("JDBCPreferences.password", argv[++i]);
         } else if (argv[i].equals("-open")) {
           if (argv.length < i + 2) {
             System.err.println("error:  no address specified.");

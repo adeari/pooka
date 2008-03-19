@@ -33,9 +33,9 @@ public class JdbcWizardController extends WizardController {
       System.setProperty("JDBCPreferences.url",  getManager().getCurrentProperty("Pooka._jdbcWizard.selection.url", ""));
       System.setProperty("JDBCPreferences.user",  getManager().getCurrentProperty("Pooka._jdbcWizard.selection.user", ""));
       System.setProperty("JDBCPreferences.password",  net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(getManager().getCurrentProperty("Pooka._jdbcWizard.selection.password", "")));
-      System.setProperty("useJdbcConnection", "true");
       Preferences p = Preferences.userNodeForPackage(this.getClass());
       p.keys();
+      System.setProperty("useJdbcConnection", "true");
     } catch (Exception e) {
       throw new PropertyValueVetoException("Pooka._jdbcWizard.selection.driver", getManager().getCurrentProperty("Pooka._jdbcWizard.selection.driver", ""), e.getMessage(), null);
     }

@@ -84,6 +84,7 @@ public class WizardController {
    */
   public void next() throws PropertyValueVetoException {
     if (inEndState()) {
+      checkStateTransition(mState, "");
       finishWizard();
     } else {
       String newState = getNextState(mState);
