@@ -9,20 +9,27 @@ import javax.mail.internet.InternetAddress;
 public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
 
   public static final int SORT_BY_ADDRESS = 0;
-  
+
   public static final int SORT_BY_LAST_NAME = 1;
-  
+
   public static final int SORT_BY_FIRST_NAME = 2;
-  
+
   public static final int SORT_BY_PERSONAL_NAME = 3;
 
   public static final int SORT_BY_ID = 4;
-  
+
   Properties properties;
-  
+
   private int sortingMethod = SORT_BY_ID;
-  
+
   private InternetAddress[] addresses;
+
+  /**
+   * Creates a new Vcard.
+   */
+  public Vcard() {
+    properties = new Properties();
+  }
 
   /**
    * Creates a new Vcard from the given properties.
@@ -30,31 +37,31 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   public Vcard(Properties newProps) {
     properties = newProps;
   }
-  
+
   /**
    * Gets a property on the Vcard.
    */
   public String getProperty(String propertyName) {
     return properties.getProperty(propertyName);
   }
-  
+
   /**
    * Sets a property on the Vcard.
    */
   public void setProperty(String propertyName, String newValue) {
     properties.setProperty(propertyName, newValue);
-    
+
     // if pretty much anything changes on here, then we should probably
     // null out the address objects.
     addresses = null;
   }
-  
+
   /**
    * Gets a Properties representation of the values in the AddressBookEntry.
    */
   public java.util.Properties getProperties() {
     Properties returnValue = new Properties();
-    // we need five settings:  "personalName", "firstName", "lastName", 
+    // we need five settings:  "personalName", "firstName", "lastName",
     // "address", and "id".
 
     returnValue.setProperty("currentAddress.personalName", getPersonalName());
@@ -71,7 +78,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   public InternetAddress[] getAddresses() {
     try {
       if (addresses == null) {
-	addresses = InternetAddress.parse(properties.getProperty("email;internet"), false);
+        addresses = InternetAddress.parse(properties.getProperty("email;internet"), false);
       }
       return addresses;
     } catch (javax.mail.internet.AddressException ae) {
@@ -91,7 +98,7 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     else
       return "";
   }
-  
+
   /**
    * Sets the InternetAddress associated with this Vcard.
    */
@@ -134,8 +141,8 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String name = properties.getProperty("n");
     if (name != null) {
       int index = name.indexOf(";");
-      if (index >= 0) 
-	return name.substring(index + 1);
+      if (index >= 0)
+        return name.substring(index + 1);
     }
 
     return "";
@@ -148,10 +155,10 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String oldName = properties.getProperty("n");
     if (oldName != null) {
       int index = oldName.indexOf(";");
-      if (index > 0) 
-	properties.setProperty("n", oldName.substring(0, index) + ";" + newName);
+      if (index > 0)
+        properties.setProperty("n", oldName.substring(0, index) + ";" + newName);
       else if (index == 0) {
-	properties.setProperty("n", ";" + newName);
+        properties.setProperty("n", ";" + newName);
 
       }
     } else {
@@ -166,8 +173,8 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String name = properties.getProperty("n");
     if (name != null) {
       int index = name.indexOf(";");
-      if (index >= 0) 
-	return name.substring(0, index);
+      if (index >= 0)
+        return name.substring(0, index);
     }
 
     return "";
@@ -180,28 +187,28 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     String name = properties.getProperty("n");
     if (name != null) {
       int index = name.indexOf(";");
-      if (index >= 0) 
-	properties.setProperty("n", newName + ";" + ((index + 1 < name.length()) ? name.substring(index + 1) : ""));
+      if (index >= 0)
+        properties.setProperty("n", newName + ";" + ((index + 1 < name.length()) ? name.substring(index + 1) : ""));
     } else {
       properties.setProperty("n", newName + ";");
     }
 
   }
-  
+
   /**
    * Gets the user information, last name first.
    */
   public String getLastFirst() {
     return getLastName() + ", " + getFirstName();
   }
-  
+
   /**
    * Gets the user information, first name first.
    */
   public String getFirstLast() {
     return getFirstName() + " " + getLastName();
   }
-    
+
   /**
    * Gets the email address (as a string) associated with this Vcard.
    */
@@ -226,55 +233,55 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
   }
 
   //----  Comparable  ----//
-  
+
   /**
    * Compares this Vcard either to another Vcard, or a String which matches
-   * the Vcard.  This checks the sortingMethod setting to decide how to 
+   * the Vcard.  This checks the sortingMethod setting to decide how to
    * compare to the Vcard or String.
    *
    * @param   o the Object to be compared.
    * @return  a negative integer, zero, or a positive integer as this object
-   *		is less than, equal to, or greater than the specified object.
-   * 
+   *is less than, equal to, or greater than the specified object.
+   *
    * @throws ClassCastException if the specified object's type prevents it
    *         from being compared to this Object.
    */
-  
+
   public int compareTo(Object o) {
     if (o instanceof Vcard) {
       Vcard target = (Vcard) o;
-      
+
       switch (sortingMethod) {
-      case (SORT_BY_ADDRESS): 
-	int returnValue = getAddressString().compareTo(target.getAddressString());
-	return returnValue;
+      case (SORT_BY_ADDRESS):
+        int returnValue = getAddressString().compareTo(target.getAddressString());
+        return returnValue;
       case (SORT_BY_LAST_NAME):
-	return getLastFirst().compareTo(target.getLastFirst());
+        return getLastFirst().compareTo(target.getLastFirst());
       case (SORT_BY_FIRST_NAME):
-	return getFirstLast().compareTo(target.getFirstLast());
+        return getFirstLast().compareTo(target.getFirstLast());
       case (SORT_BY_PERSONAL_NAME):
-	return getPersonalName().compareTo(target.getPersonalName());
+        return getPersonalName().compareTo(target.getPersonalName());
       default:
-	return getID().compareTo(target.getID());
+        return getID().compareTo(target.getID());
       }
     } else if (o instanceof String) {
       String compareString = null;
       String matchString = (String) o;
-      
+
       switch (sortingMethod) {
       case (SORT_BY_ADDRESS):
-	compareString = getAddressString();
-	break;
+        compareString = getAddressString();
+        break;
       case (SORT_BY_LAST_NAME):
-	compareString = getLastFirst();
-	break;
+        compareString = getLastFirst();
+        break;
       case (SORT_BY_FIRST_NAME):
-	compareString = getFirstLast();
-	break;
+        compareString = getFirstLast();
+        break;
       default:
-	compareString = getID();
+        compareString = getID();
       }
-      
+
       // see if the string to be matched is shorter; if so, match
       // with just that length.
 
@@ -282,67 +289,67 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
       int origSize = compareString.length();
       int matchSize = matchString.length();
       if (matchSize < origSize) {
-	int returnValue =  compareString.substring(0,matchSize).compareTo(matchString);
-	return returnValue;
+        int returnValue =  compareString.substring(0,matchSize).compareTo(matchString);
+        return returnValue;
       } else {
-	int returnValue =  compareString.compareTo(matchString);
-	return returnValue;
+        int returnValue =  compareString.compareTo(matchString);
+        return returnValue;
       }
     }
-    
+
     return -1;
   }
-  
+
   //----  parser  ----//
-  
+
   /**
    * Parses a vcard from a BufferedReader.
    */
   public static Vcard parse(BufferedReader reader) throws java.text.ParseException {
-    
+
     try {
       Properties newProps = new Properties();
-      
+
       boolean isDone = false;
-      
+
       String line = getNextLine(reader);
       if (line != null) {
-	String[] current = parseLine(line);
-	if (current[0] != null && current[1] != null) {
-	  if (! (current[0].equalsIgnoreCase("begin") && current[1].equalsIgnoreCase("vcard")))
-	    throw new java.text.ParseException("No beginning", 0);
-	}
-	else {
-	  newProps.put(current[0], current[1]);
-	}
+        String[] current = parseLine(line);
+        if (current[0] != null && current[1] != null) {
+          if (! (current[0].equalsIgnoreCase("begin") && current[1].equalsIgnoreCase("vcard")))
+            throw new java.text.ParseException("No beginning", 0);
+        }
+        else {
+          newProps.put(current[0], current[1]);
+        }
       } else {
-	return null;
+        return null;
       }
-      
+
       while (!isDone) {
-	line = getNextLine(reader);
-	if (line != null) {
-	  String[] current = parseLine(line);
-	  if (current[0] != null && current[1] != null) {
-	    if (current[0].equalsIgnoreCase("end")) {
-	      if (current[1].equalsIgnoreCase("vcard")) 
-		isDone = true;
-	      else
-		throw new java.text.ParseException("incorrect end tag", 0);
-	    } else {
-	      newProps.put(current[0], current[1]);
-	    }
-	  }
-	} else {
-	  isDone = true;
-	}
+        line = getNextLine(reader);
+        if (line != null) {
+          String[] current = parseLine(line);
+          if (current[0] != null && current[1] != null) {
+            if (current[0].equalsIgnoreCase("end")) {
+              if (current[1].equalsIgnoreCase("vcard"))
+                isDone = true;
+              else
+                throw new java.text.ParseException("incorrect end tag", 0);
+            } else {
+              newProps.put(current[0], current[1]);
+            }
+          }
+        } else {
+          isDone = true;
+        }
       }
       return new Vcard(newProps);
     } catch (IOException ioe) {
       throw new java.text.ParseException(ioe.getMessage(), 0);
     }
   }
-  
+
   /**
    * Parses a name/value pair from an rfc2425 stream.
    */
@@ -351,30 +358,30 @@ public class Vcard implements Comparable, net.suberic.pooka.AddressBookEntry {
     boolean isDone = false;
     if (firstLine != null) {
       while (! isDone) {
-	reader.mark(256);
-	String nextLine = reader.readLine();
-	if (nextLine != null && nextLine.length() > 0) {
-	  if (! Character.isWhitespace(nextLine.charAt(0))) {
-	    isDone = true;
-	    reader.reset();
-	  } else {
-	    firstLine = firstLine + nextLine.substring(1);
-	  }
-	} else {
-	  isDone = true;
-	}
+        reader.mark(256);
+        String nextLine = reader.readLine();
+        if (nextLine != null && nextLine.length() > 0) {
+          if (! Character.isWhitespace(nextLine.charAt(0))) {
+            isDone = true;
+            reader.reset();
+          } else {
+            firstLine = firstLine + nextLine.substring(1);
+          }
+        } else {
+          isDone = true;
+        }
       }
-    } 
+    }
     return firstLine;
   }
-  
+
   private static String[] parseLine(String firstLine) {
     String[] returnValue = new String[2];
-    
+
     int dividerLoc = firstLine.indexOf(':');
     returnValue[0] = firstLine.substring(0, dividerLoc);
     returnValue[1] = firstLine.substring(dividerLoc + 1);
-    
+
     return returnValue;
   }
 

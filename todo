@@ -3,8 +3,12 @@
       -- command line?
       -- .pookarc file?
          -- for .pookarc file, offer a way to work offline?
+      -- consider web service jdbc driver???
 
    *) add in address book, trusted cert db, crypto keys.
+      addr book:  make addressbook subpackage.  separate out basic
+      search/sort/insert/delete code from Vcard implementation.  make
+      abstract superclass
    *) make sure we don't cache anything if we're trying not to.
    *) add in help????
 
