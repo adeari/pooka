@@ -241,10 +241,6 @@ Pooka.SSL.useSecureRandom=false
 ExternalLauncher.fileHandler./=%v; retVal=$?; rm %s; exit $retVal
 ExternalLauncher.cmdWrapper./=sh -c %v
 
-Pooka.urlHandler=netscape %s
-# for other unices
-# Pooka.urlHandler=netscape -r (openURL(%s))
-
 FolderTree.readStyle=PLAIN
 FolderTree.unreadStyle=BOLD
 FolderTree.rootIcon=FolderTree.Root
