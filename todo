@@ -1,3 +1,7 @@
+ *) add to address book needs some notification that it worked.
+ *) change 'edit preference' to 'configuration' or something.
+
+---- (jdbc)
 *) jdbc:
    *) put in options to prepopulate entries
       -- command line?
@@ -11,6 +15,7 @@
       abstract superclass
    *) make sure we don't cache anything if we're trying not to.
    *) add in help????
+---- (/jdbc)
 
 *) fix weird connection problem with 1.4.1.
 *) check what happens if you hit enter on a subfolder while subscribing.
@@ -29,12 +34,10 @@
 ------
 improve encryption support?
  -- improve address book?
- *) add to address book needs some notification that it worked.
  *) need easier way to access address book.
  *) address book sorting should be case-insensitive
 
-centralized settings repository
- *) ldap (again?)
+*) add console?
 
 *) ?? reorder folders ??
 
@@ -66,9 +69,6 @@ centralized settings repository
   *) email javamail-interest list re tls optional/required vs ssl
 
   *) email javamail-interest list re tls optional/required vs ssl only
-
-  *) fix threading for drag and drop -- just try doing a big copy into a 
-	folder with a paste operation.
 
    *)  key bindings for editors (!!)
 	-- include the main editor -- you should be able to hit first letter
@@ -523,8 +523,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	*) split out .pookarc into config and runtimes files/sections
 
 *) add "view pookarc"
-
-*) add console?
 
 *) theme bug in folder table display between preview and desktop.
 

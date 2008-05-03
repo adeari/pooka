@@ -256,15 +256,17 @@ public class VirtualFolderInfo extends FolderInfo {
 
     int tmpUnreadCount = 0;
     int tmpMessageCount = 0;
-    Enumeration msgs = messageToInfoTable.keys();
-    while (msgs.hasMoreElements()) {
-      MessageInfo mi = (MessageInfo) messageToInfoTable.get(msgs.nextElement());
+
+    Iterator<MessageInfo> msgIter = messageToInfoTable.values().iterator();
+    while (msgIter.hasNext()) {
+      MessageInfo mi = msgIter.next();
       tmpMessageCount++;
       if (! mi.isSeen())
         tmpUnreadCount++;
     }
     unreadCount = tmpUnreadCount;
     messageCount = tmpMessageCount;
+
   }
 
   public ActionThread getFolderThread() {
@@ -302,4 +304,6 @@ public class VirtualFolderInfo extends FolderInfo {
     if (newValue == null)
       this.dispose();
   }
+
+
 }

@@ -28,8 +28,9 @@ public class AddressBookManager implements ValueChangeListener {
    * refreshAddressBooks() when it gets one.
    */
   public void valueChanged(String changedValue) {
-    if (changedValue.equals("AddressBook"))
+    if (changedValue.equals("AddressBook")) {
       refreshAddressBooks();
+    }
   }
 
   /**

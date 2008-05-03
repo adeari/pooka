@@ -34,6 +34,7 @@ public class FirstRunWizardController extends NewStoreWizardController {
     getEditorPane().addDisableMask(this);
     getManager().commit();
     setupFolders();
+    createAddressBook();
     Pooka.getUIFactory().showStatusMessage(Pooka.getProperty("Pooka._firstRunWizard.status.loadingFolders", "Loading folders..."));
     Pooka.getStoreManager().loadAllSentFolders();
     Pooka.getOutgoingMailManager().loadOutboxFolders();
@@ -179,6 +180,27 @@ public class FirstRunWizardController extends NewStoreWizardController {
       thread.addToQueue(connectionAction, new java.awt.event.ActionEvent(this, 0, "connectStore"));
     }
 
+  }
+
+  /**
+   * Sets up the default address book.
+   */
+  public void createAddressBook() {
+    // FIXME should provide options for this and provide better error
+    // messages and such.
+    boolean useLocalFiles = Pooka.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("true");
+    if (useLocalFiles) {
+      Pooka.setProperty("AddressBook.Default Address Book.filename", "${pooka.root}" + File.separator + ".pooka" + File.separator + "vcardaddressbook");
+      Pooka.setProperty("AddressBook.Default Address Book.type", "file");
+      Pooka.setProperty("AddressBook._default", "Default Address Book");
+      try {
+        File addressFile  = new File(Pooka.getResourceManager().translateName(Pooka.getProperty("AddressBook.Default Address Book.filename", "${pooka.root}" + File.separator + ".pooka" + File.separator + "vcardaddressbook")));
+        addressFile.createNewFile();
+      } catch (java.io.IOException ioe) {
+        ioe.printStackTrace();
+      }
+      Pooka.setProperty("AddressBook", "Default Address Book");
+    }
   }
 
   private void openInboxSuccess() {

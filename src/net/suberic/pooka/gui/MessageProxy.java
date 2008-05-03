@@ -1493,16 +1493,28 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    * Sets the deleteInProgress flag.
    */
   public void setDeleteInProgress(boolean newValue) {
-    boolean orig = mDeleteInProgress;
-    mDeleteInProgress = newValue;
-    if (orig != mDeleteInProgress) {
-      setRefresh(true);
-      try {
-        refreshMessage();
-      } catch ( MessagingException me ) {
-        me.printStackTrace();
+    final boolean fNewValue = newValue;
+    ActionThread folderThread = messageInfo.getFolderInfo().getFolderThread();
+    javax.swing.AbstractAction deleteInProgressAction = new javax.swing.AbstractAction() {
+        public void actionPerformed(java.awt.event.ActionEvent ae) {
+          boolean orig = mDeleteInProgress;
+          mDeleteInProgress = fNewValue;
+          if (orig != mDeleteInProgress) {
+            setRefresh(true);
+            try {
+              refreshMessage();
+            } catch ( MessagingException me ) {
+              me.printStackTrace();
+            }
+          }
+        }
+      };
+
+      if (Thread.currentThread() != folderThread) {
+        folderThread.addToQueue(deleteInProgressAction, new java.awt.event.ActionEvent(this, 0, "message-bounce"));
+      } else {
+        deleteInProgressAction.actionPerformed(null);
       }
-    }
   }
 
   /**
