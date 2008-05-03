@@ -5,6 +5,9 @@ package net.suberic.pooka;
  */
 public interface AddressBook {
 
+  /**
+   * Configures the given address book.
+   */
   public void configureAddressBook(String id);
 
   /**

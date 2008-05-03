@@ -2088,9 +2088,16 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
           // get the default Address Book.
           book = Pooka.getAddressBookManager().getDefault();
         }
-        if (book != null)
-          getMessageInfo().addAddress(book, true);
-        else {
+        if (book != null) {
+          final String newAddress = getMessageInfo().addAddress(book, true);
+          final String bookName = book.getAddressBookID();
+
+          SwingUtilities.invokeLater(new Runnable() {
+              public void run() {
+                getMessageUI().showMessageDialog(Pooka.getResources().formatMessage("info.AddressBook.add", newAddress, bookName), Pooka.getProperty("info.AddressBook.add.title", "Address Added"));
+              }
+            });
+        } else {
           SwingUtilities.invokeLater(new Runnable() {
               public void run() {
                 getMessageUI().showError(Pooka.getProperty("error.noAddressBook", "No Address Book set as default."));

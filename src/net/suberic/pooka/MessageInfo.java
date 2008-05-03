@@ -847,7 +847,8 @@ public class MessageInfo {
   /**
    * Adds the sender of the message to the current AddressBook, if any.
    */
-  public void addAddress(AddressBook book, boolean useVcard) throws MessagingException {
+  public String addAddress(AddressBook book, boolean useVcard) throws MessagingException {
+    String returnValue = null;
     boolean found = false;
     if (useVcard) {
       Attachment vcard = null;
@@ -868,6 +869,8 @@ public class MessageInfo {
             BufferedReader reader = new BufferedReader(new StringReader(vcardText));
             net.suberic.pooka.vcard.Vcard addressEntry = net.suberic.pooka.vcard.Vcard.parse(reader);
             book.addAddress(addressEntry);
+            returnValue = addressEntry.getID();
+
             found = true;
           } catch (Exception e) {
             // if we get any exceptions parsing the Vcard, just fall back to
@@ -894,7 +897,10 @@ public class MessageInfo {
       entry.setPersonalName(personalName);
       entry.setAddress(addr);
       book.addAddress(entry);
+      returnValue = entry.getID();
     }
+
+    return returnValue;
   }
 
   /**

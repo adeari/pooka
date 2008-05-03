@@ -1,6 +1,3 @@
- *) add to address book needs some notification that it worked.
- *) change 'edit preference' to 'configuration' or something.
-
 ---- (jdbc)
 *) jdbc:
    *) put in options to prepopulate entries
