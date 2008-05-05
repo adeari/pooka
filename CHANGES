@@ -1,3 +1,6 @@
+080505 release
+--------------
+
 made it so cancelling out of a login no longer gives an error message.
 
 improved encryption support, particularly with associating keys with email addresses.
