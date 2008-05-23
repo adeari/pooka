@@ -1,3 +1,7 @@
+*) build systen
+  *)  make sure all changes are written to the pooka.jar file for jnlp--
+      so, for instance, we actually get the correct build date.
+
 ---- (jdbc)
 *) jdbc:
    *) put in options to prepopulate entries
@@ -7,34 +11,86 @@
       -- consider web service jdbc driver???
 
    *) add in address book, trusted cert db, crypto keys.
-      addr book:  make addressbook subpackage.  separate out basic
-      search/sort/insert/delete code from Vcard implementation.  make
-      abstract superclass
+      addr book:  fix wizard.  test it out.
    *) make sure we don't cache anything if we're trying not to.
    *) add in help????
 ---- (/jdbc)
+*) editor:  fix newaddresswizard so that it resizes the dialog when you
+   switch from file to jdbc.
 
-*) fix weird connection problem with 1.4.1.
 *) check what happens if you hit enter on a subfolder while subscribing.
 	-- see if we can make it so hitting enter opens the subfolder
 	   rather than subscribing to it. -- setApproveButtonMnemonic()?
 
-*) getDefaultAddressBook should always return a value.
-   -- have to go to ResourceManager?
-
-*) build and release.
-  *)  release
-      *) write up changes
-      *) switch around webstart site
-      *) redo screenshots
-
-------
 improve encryption support?
  -- improve address book?
  *) need easier way to access address book.
  *) address book sorting should be case-insensitive
+*) change the keybinding for the address book.  otherwise you get address book
+	entries while you're navigating the to field.
+
+*) address book/ldap support.
+	1)  make sure the matches go with the entry--i.e. if you match the
+	    actual address, have the actual address appear first.
+	2)  make it test for valid email addresses
+	3)  make it add an extension to incomplete and unmatched addresses
+	    (i.e. change 'allen' to 'allen@somehostname.org')
+	4)  change the UI so that matched address aliases display differently
+		(bold, in a different color, or some such).  that way a
+		user can tell if the entered address is a proper alias or not.
+
+
+*) encryption improvements.
+   *) if no keystore named, don't try loading?  test.
+	-- we still get errors there.  fix.
+   *) make keystores get updated if you change them while running.  in other
+	words, don't require a restart for encryption the first time.
+	  -- done.  make update only happen once per change, though.
+   *) add documentation
+	*) need to document versions, including webstart cryptix info
+	*) need to document unlimited strength jce info
+   *) test autodecrypt/auto sig check.  requires keys synched to email address.
+	test
+   *) test auto sign/auto encrypt.
+	test
+   *) key management
+	  - make sure you can use alternate keys even if one is set for
+		the default user.
+   *) fix keyboard focus on passphrase entry (make textfield have focus).
+   *) encryption action should offer key list if no default key for address.
+	-- figure out timing of that.
+   *) make sure UI shows up for auto-encrypted messages.
+   *) when selecting a key, have options for encryption (always use this key,
+	etc.)
+   *) fix threading on encryption actions.
+     *) !!! we're parsing each message on load now. !!!
 
 *) add console?
+
+*) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
+	-- antialiasing yes.  opengl probably not unless as a special option.
+
+*) new attachment display w/icons?
+
+*) redo attachment display
+
+*) configure trash folder as default.
+
+
+*) make sure non-ascii characters work in email text. -- and especially
+	non-iso8859.
+
+*) fix non-plaintext-password support with imap (logindisabled)
+
+
+---------------------------
+
+*) fix weird connection problem with 1.4.1.
+
+*) getDefaultAddressBook should always return a value.
+   -- have to go to ResourceManager?
+
+------
 
 *) ?? reorder folders ??
 
@@ -55,6 +111,14 @@ improve encryption support?
 	*) fix new message notification on folders if you read a message
 		from the Open Message menu from the TrayIcon.
 	*) focus problem.  fix.
+*) add taskbar support on gnome, windows, and mac?
+  add start / bring up pooka
+	-- change 2xclick action (?)
+	should go:
+	  connected:  1xclick=show status?  2xclick = bring to front?
+	  	      rightclick=show menu
+	  disconnected:  1xclick=show status?  2xclick=start up?
+		      rightclick=show menu?
 
 ---------
 
@@ -209,9 +273,6 @@ improve encryption support?
 	      opening a new large folder will take a while even if we're
 	      just getting the headers and flags.
 
-*) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
-	-- antialiasing yes.  opengl probably not unless as a special option.
-
 *) (??) add in option to open html-only messages as parsed html instead
 	of 'real' html (??)
 
@@ -241,12 +302,6 @@ java.lang.IllegalStateException: Can't overwrite cause
 
 *) fix behavior when other mail client is connected; make sure we handle
 deleted messages, etc. gracefully.
-
-*) new attachment display w/icons?
-
-*) redo attachment display
-
-*) configure trash folder as default.
 
 *) add a way to show update information when the webstart version is
 	upgraded.
@@ -292,11 +347,7 @@ online:
 		*) check:  listeners on VariableBundle.
 		*) check:  listeners on KeyboardManager (IN_FOCUSED_WINDOW).
 
-2.0 version
------------
 *) fix 'failed to open folder' message in v. 2.0.
-
-*) add ldap support
 
 *) icon manipulation
  *) new splashscreen
@@ -313,22 +364,6 @@ online:
 
 *) change Item and ItemManager to using generics.
 
-*) add taskbar support on gnome, windows, and mac?
-  add start / bring up pooka
-	-- change 2xclick action (?)
-	should go:
-	  connected:  1xclick=show status?  2xclick = bring to front?
-	  	      rightclick=show menu
-	  disconnected:  1xclick=show status?  2xclick=start up?
-		      rightclick=show menu?
-  add preferences dialog
-  add in open message support?
-	make the display nice?
-  add support for showing disconnection messages?
-  add disconnect/offline mode to right-click menu
-	-- sort of done.
-  figure out virtual desktop support???
-
 *) update locking code with new mechanism.
 -----------
 
@@ -340,15 +375,10 @@ online:
 
 *) add plugin for spam checker?
 
-*) make sure non-ascii characters work in email text. -- and especially
-	non-iso8859.
-
 *) fix tableinfos so that you after a disconnect/reconnect you don't
 	have to re-fetch the headers, only the flags.
 
 *) add an option to build.xml for compiling with deprecation enabled.
-
-*) fix non-plaintext-password support with imap (logindisabled)
 
 *) add support for running without any local files.
    *) big tasks:  
@@ -369,17 +399,6 @@ online:
 			-- gives error on startup. -- still does.  sigh.
 		*) encryption key files
 			-- gives error.
-  *) add support for running off of removable media (run from directory; cache/
-	config files relative to config file)
-	*) startup
-	   - needs to ask where to get configuration file.  either can be 
-	     http: or local file
-	   - configuration file needs to support relative directories to
-	     configuration file--so if conf file is in z:\pooka\pookarc,
-	     then .\.pooka should map to z:\pooka\.pooka.
-	*) usage
-	   - export for http usage needs to be put in the correct place
-		and tested.
   *) file list:  pgp/smime files, signature file, address book, ssl cert file,
 	mbox file (n/a).
    -- also:  pooka home, mailcap file, pookarc file
@@ -399,9 +418,6 @@ online:
 
 *) consider:  move stuff from the bottom status area to the toolbar area.  or
    at least figure out something to use all that space for.
-
-*) test w/gnu javamail -- ???
-*) test w/javamail 1.3.2.
 
 *) add a real debug system.
 
@@ -447,20 +463,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 *) ?? change reply-all binding?
 
-*) outgoing mailserver improvements:
-	*) network connections - come up with a way to autotest that doesn't
-		take lots of time.
-	*) sending mail should try to autodetect mailserver to use
-		*) each server has a connection list, or 'any'
-		*) each user has a connection list, or 'any'
-		*) each server for the user checks the connections in order.
-		*) try to use the first available server
-	*) on failure to send
-		*) show error first.  save to outbox default?  work offine?
-		*) offer to save to outbox if available
-		*) -- don't offer to save to outbox if not available.
-	*) offline setting???
-
 *) check:  if a folder realizes that it has become disconnected, it should
 	test to see if the store in general has disconnected.
 	-- see what happens when the network goes down and then we try to
@@ -478,32 +480,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 
 -----
 
-*) encryption improvements.
-   *) if no keystore named, don't try loading?  test.
-	-- we still get errors there.  fix.
-   *) make keystores get updated if you change them while running.  in other
-	words, don't require a restart for encryption the first time.
-	  -- done.  make update only happen once per change, though.
-   *) add documentation
-	*) need to document versions, including webstart cryptix info
-	*) need to document unlimited strength jce info
-   *) test autodecrypt/auto sig check.  requires keys synched to email address.
-	test
-   *) test auto sign/auto encrypt.
-	test
-   *) key management
-	  - make sure you can use alternate keys even if one is set for
-		the default user.
-   *) fix keyboard focus on passphrase entry (make textfield have focus).
-   *) encryption action should offer key list if no default key for address.
-	-- figure out timing of that.
-   *) make sure UI shows up for auto-encrypted messages.
-   *) when selecting a key, have options for encryption (always use this key,
-	etc.)
-   *) fix threading on encryption actions.
-     *) !!! we're parsing each message on load now. !!!
-
-
 *) fix error in encoded stream problem.
 	-- just better error (?)  or maybe print out as far as it goes.
 	-- see pooka_problems from plc
@@ -513,20 +489,11 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 *) modify built-in java display code to show download dialog for showing
 	attachments.
 
-*) change the keybinding for the address book.  otherwise you get address book
-	entries while you're navigating the to field.
-
-*) make VariableBundle support #include, or something like it.
-	*) split out .pookarc into config and runtimes files/sections
-
 *) add "view pookarc"
 
 *) theme bug in folder table display between preview and desktop.
 
 ------
-
-*) add mrpostman support(?)
-
 *) printing
 	*) better layout of printer frame.  center things?
 
@@ -584,9 +551,6 @@ javax.mail.MessagingException: Error:  could not copy messages to folder:  net.s
 	*) add feature to NewMessage
 	*) add replace feature
 		-- check the caret location, too.
-	
-*) fix connection failed message for ssl stores -- only fixable by sun?
-	-- test under 1.3.2.
 
 *) check for memory leaks
  -- especially w/preview pane mode?
@@ -622,8 +586,6 @@ icons changing?  test.
 	     it read. -- ?? test.  seems to work.
 	*)  add:  autocache up to a certain size.
 
-*) editors:  add listeners:  intFilter, enabledIfOtherFilter.  requiredFilter.
-
 *) umm, implement tile and cascade.  :)
 
 *) make it so you can add to the address book from the selection
@@ -633,26 +595,12 @@ icons changing?  test.
 
 ----------------------
 
-
-*) add support for jdk1.4
-	-- new focus architecture
-	-- new keybinding architecture
-	-- InputVerifier
-
 *) add a keybinding to bring up the address book selector.
 
 *) spam filtering
 
-*) forward to all.
- 
-*) fix the network connection test so that it doesn't hang if the
-	network is up, but the test host is unreachable.
-
 *) make sure that if you close a store, it doesn't reopen it.
 	-- ?? should work.  look for testcase.
-
-*) ?? add a notification to a message which has been deleted while fastDelete
-	is enabled, but hasn't yet actually been removed.
 
 *) come up with a wrapper for spawning external editors on windows.
 
@@ -700,9 +648,6 @@ specifications in the html itself.
 *) check to see what happens when we lose our connection before all of
 	the messages are loaded (esp. before the tableinfos are loaded)
 
-*) we're getting a weird flash of 'loading', probably when we're caching
-	the message.
-
 *) each loading of the FolderTableInfo rechecks the unread message
 	count, which sucks for performance.  improvements with new
 	caching system???
@@ -713,16 +658,6 @@ not very efficient.
 *) reply to an email from you should go to the recipient.
 
 ---
-
-*)  check all of my actions and make sure that they are threading 
-properly--both that the email work is being done on the proper thread,
-and that all the gui updates are happening on the EventDispatcher thread.
-
-*) bug:  make sure all of the showError, etc. methods are on the AWTEventThread
-rather than the calling thread.
-
-*)  all MessagingExceptions should be handled correctly, not ignored.  there
-should only be a few of these left.
 
 *) mail import?
 
@@ -750,21 +685,6 @@ doesn't change, you still resize the window.
 
 *) add support for external editors, such as emacs.
 
-*) address book/ldap support.
-	1)  make sure the matches go with the entry--i.e. if you match the
-	    actual address, have the actual address appear first.
-	2)  make it test for valid email addresses
-	3)  make it add an extension to incomplete and unmatched addresses
-	    (i.e. change 'allen' to 'allen@somehostname.org')
-	4)  change the UI so that matched address aliases display differently
-		(bold, in a different color, or some such).  that way a
-		user can tell if the entered address is a proper alias or not.
-
-
-*) fix the launcher (specifically the html launcher, but maybe all of them)
-to use "'s correctly.  works for now with opera, which should be good 
-enough...
-
 error:  filterfoldercellrenderer has problems with search forms.
 
 *) check:  see how outgoing and incoming mail handle tab characters.
@@ -785,21 +705,10 @@ error:  filterfoldercellrenderer has problems with search forms.
 
 *) set priority (?)
 
-*) expand an unopened store in the folder tree that has folders and
-	subfolders.  connect to the store.  the subfolders close back up.
-	-- i think that happens when you have 'sync with subscribed folders'		  set.
-
 *) loadMessageTracker?  it doesn't seem to show up anymore.
 
 *)  make it so file->exit gives you the option for expunging deleted messages
     from your mailboxes.
-
-*) bug:  if you go into the multi configuration editors and it's empty, you
-should more or less be forced to create a new entity.  otherwise you'll start
-typing in information and then be surprised when add clears it out.
-
-*) bug:  trying to go to a folder editor when there aren't any folders
-or stores configured is a big problem.
 
 *) a nested message which is of type text/html doesn't get shown on the
 	display.
@@ -818,16 +727,9 @@ alternate signature methods.
 *) make the scrolling work properly for all border cases, such as a single new
 window at -5, -5.
 
-*) add interfaces for all the rest of the features.  :)
-
 *) add 'edit message as new' for normal messages.
 
 *) add support for flowed text
-
-*) add ability to edit received messages, so you can do things like remove
-attachments that you don't want to keep (?) -- and change the subject.
-
-*) name all of your threads.
 
 *) customize settings on folder window--headers, window size.
 
@@ -838,5 +740,3 @@ attachments that you don't want to keep (?) -- and change the subject.
 	imapd connection open for each folder.
 
 the Spice is life
-
-

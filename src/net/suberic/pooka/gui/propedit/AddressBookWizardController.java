@@ -55,22 +55,33 @@ public class AddressBookWizardController extends WizardController {
    * Finsihes the wizard.
    */
   public void finishWizard() throws PropertyValueVetoException {
-    // check to make sure that the new file is valid.
-    String filename = Pooka.getResourceManager().translateName(getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", ""));
+    if (getManager().getCurrentProperty("AddressBook._newValueWizard.type.bookType", "file").equalsIgnoreCase("file")) {
+      // configure file address book.
 
-    File file = new File(filename);
-    try {
-      if (! file.exists()) {
-        file.createNewFile();
+      // check to make sure that the new file is valid.
+      String filename = Pooka.getResourceManager().translateName(getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", ""));
+
+      File file = new File(filename);
+      try {
+        if (! file.exists()) {
+          file.createNewFile();
+        }
+        if (! file.canRead()) {
+          throw new PropertyValueVetoException("AddressBook._newValueWizard.config.filename", filename, getManager().getProperty("error.cannotReadFile", "Can not read file."), null);
+        }
+      } catch (java.io.IOException ioe) {
+        throw new PropertyValueVetoException("AddressBook._newValueWizard.config.filename", filename, ioe.getMessage(), null);
       }
-      if (! file.canRead()) {
-        throw new PropertyValueVetoException("AddressBook._newValueWizard.config.filename", filename, getManager().getProperty("error.cannotReadFile", "Can not read file."), null);
-      }
-    } catch (java.io.IOException ioe) {
-      throw new PropertyValueVetoException("AddressBook._newValueWizard.config.filename", filename, ioe.getMessage(), null);
+      saveProperties();
+      getEditorPane().getWizardContainer().closeWizard();
+    } else if (getManager().getCurrentProperty("AddressBook._newValueWizard.type.bookType", "file").equalsIgnoreCase("jdbc")) {
+      // configure jdbc address book.
+
+      // FIXME just save it for now.
+      saveProperties();
+      getEditorPane().getWizardContainer().closeWizard();
+
     }
-    saveProperties();
-    getEditorPane().getWizardContainer().closeWizard();
   }
 
   /**
@@ -82,10 +93,17 @@ public class AddressBookWizardController extends WizardController {
     String addressBookName = getManager().getCurrentProperty("AddressBook._newValueWizard.name.bookName", "");
 
     String type = getManager().getCurrentProperty("AddressBook._newValueWizard.type.bookType", "");
-    String filename = getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", "");
-
     returnValue.setProperty("AddressBook." + addressBookName + ".type", type);
-    returnValue.setProperty("AddressBook." + addressBookName + ".filename", filename);
+    if ("file".equalsIgnoreCase(type)) {
+      String filename = getManager().getCurrentProperty("AddressBook._newValueWizard.config.filename", "");
+
+      returnValue.setProperty("AddressBook." + addressBookName + ".filename", filename);
+    } else if ("jdbc".equalsIgnoreCase(type)) {
+      returnValue.setProperty("AddressBook." + addressBookName + ".jdbc.driver", getManager().getCurrentProperty("AddressBook._newValueWizard.config.jdbc.driver", ""));
+      returnValue.setProperty("AddressBook." + addressBookName + ".jdbc.url", getManager().getCurrentProperty("AddressBook._newValueWizard.config.jdbc.url", ""));
+      returnValue.setProperty("AddressBook." + addressBookName + ".jdbc.user", getManager().getCurrentProperty("AddressBook._newValueWizard.config.jdbc.user", ""));
+      returnValue.setProperty("AddressBook." + addressBookName + ".jdbc.password", getManager().getCurrentProperty("AddressBook._newValueWizard.config.jdbc.password", ""));
+    }
 
     return returnValue;
   }
