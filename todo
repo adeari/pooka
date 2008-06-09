@@ -22,6 +22,8 @@
 	-- see if we can make it so hitting enter opens the subfolder
 	   rather than subscribing to it. -- setApproveButtonMnemonic()?
 
+*) editing a display filter on a folder should update the display on save.
+
 improve encryption support?
  -- improve address book?
  *) need easier way to access address book.
