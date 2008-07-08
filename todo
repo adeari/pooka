@@ -1,6 +1,6 @@
-*) build systen
-  *)  make sure all changes are written to the pooka.jar file for jnlp--
-      so, for instance, we actually get the correct build date.
+*) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
+   -- opengl shouldn't be necessary as of jdk1.6_u10.  check antialiasing.
+      also check why the internalframes are moving so slowly.
 
 ---- (jdbc)
 *) jdbc:
@@ -21,8 +21,6 @@
 *) check what happens if you hit enter on a subfolder while subscribing.
 	-- see if we can make it so hitting enter opens the subfolder
 	   rather than subscribing to it. -- setApproveButtonMnemonic()?
-
-*) editing a display filter on a folder should update the display on save.
 
 improve encryption support?
  -- improve address book?
@@ -69,15 +67,11 @@ improve encryption support?
 
 *) add console?
 
-*) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
-	-- antialiasing yes.  opengl probably not unless as a special option.
-
 *) new attachment display w/icons?
 
 *) redo attachment display
 
 *) configure trash folder as default.
-
 
 *) make sure non-ascii characters work in email text. -- and especially
 	non-iso8859.

@@ -1,3 +1,7 @@
+fixed displayfilters so they update on change rather than requiring a restart.
+
+fixed the About page so it lists more current values.
+
 080505 release
 --------------
 

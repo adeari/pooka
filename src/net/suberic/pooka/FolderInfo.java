@@ -1143,11 +1143,6 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
         mp.unloadTableInfo();
       }
 
-      /*
-        if (loaderThread != null)
-        loaderThread.loadMessages(allProxies);
-      */
-
       if (mMessageLoader != null)
         mMessageLoader.loadMessages(allProxies);
 
@@ -1165,14 +1160,8 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
         mp.clearMatchedFilters();
       }
 
-      /*
-        if (loaderThread != null)
-        loaderThread.loadMessages(allProxies);
-      */
-
       if (mMessageLoader != null)
         mMessageLoader.loadMessages(allProxies);
-
     }
   }
 
@@ -2203,8 +2192,9 @@ public class FolderInfo implements MessageCountListener, ValueChangeListener, Us
     }
 
     tmpDisplayFilters = new MessageFilter[foundFilters.size()];
-    for (int i = 0; i < foundFilters.size(); i++)
+    for (int i = 0; i < foundFilters.size(); i++) {
       tmpDisplayFilters[i] = (MessageFilter) foundFilters.elementAt(i);
+    }
 
     displayFilters = tmpDisplayFilters;
 

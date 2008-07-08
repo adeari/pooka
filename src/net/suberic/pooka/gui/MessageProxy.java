@@ -1378,6 +1378,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
   public synchronized void unloadTableInfo() {
     loaded=false;
     filtersMatched=false;
+    setRefresh(true);
   }
 
   /**
@@ -1386,6 +1387,7 @@ public class MessageProxy implements java.awt.datatransfer.ClipboardOwner {
    */
   public void clearMatchedFilters() {
     filtersMatched = false;
+    setRefresh(true);
   }
 
   /**
