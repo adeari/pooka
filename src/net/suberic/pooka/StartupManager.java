@@ -94,34 +94,32 @@ public class StartupManager {
       net.suberic.util.VariableBundle pookaDefaultBundle = manager.getResources();
       ResourceManager resourceManager = null;
 
+      //
       if (! pUseLocalFiles || pookaDefaultBundle.getProperty("Pooka.useLocalFiles", "true").equalsIgnoreCase("false")) {
         resourceManager = new DisklessResourceManager();
       } else if (pUseJdbc) {
-        SwingUtilities.invokeAndWait(new Runnable() {
-            public void run() {
-              System.setProperty("java.util.prefs.PreferencesFactory", "net.suberic.util.prefs.JDBCPreferencesFactory");
+        // preset the jdbc options if they have been provided.
+        Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.driver", System.getProperty("JDBCPreferences.driverName"));
+        Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.url", System.getProperty("JDBCPreferences.url"));
+        Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.user", System.getProperty("JDBCPreferences.user"));
+        Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.password", net.suberic.util.gui.propedit.PasswordEditorPane.scrambleString(System.getProperty("JDBCPreferences.password")));
 
-              PookaUIFactory tmpFactory = new PookaMinimalUIFactory();
-
-              // preset the jdbc options if they have been provided.
-              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.driver", System.getProperty("JDBCPreferences.driverName"));
-              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.url", System.getProperty("JDBCPreferences.url"));
-              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.user", System.getProperty("JDBCPreferences.user"));
-              Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.password", net.suberic.util.gui.propedit.PasswordEditorPane.scrambleString(System.getProperty("JDBCPreferences.password")));
-
-              tmpFactory.showEditorWindow(Pooka.getProperty("Pooka._jdbcWizard.label", "Load Settings"), "Pooka._jdbcWizard");
-
-              if (! "true".equals(System.getProperty("useJdbcConnection"))) {
-                System.exit(1);
-              }
-              mPookaManager.setUIFactory(tmpFactory);
-
-            }
-          });
-
-        resourceManager = new JDBCResourceManager();
+        resourceManager = configureJDBCManager();
       } else {
         resourceManager = new FileResourceManager();
+
+        String localRc = resourceManager.getDefaultLocalrc(resourceManager.getDefaultPookaRoot() == null ? resourceManager.getDefaultPookaRoot() : manager.getPookaRoot());
+
+        VariableBundle tmpVarBundle = resourceManager.createVariableBundle(localRc, pookaDefaultBundle);
+
+        if (tmpVarBundle.getProperty("Pooka.useJdbc", "false").equalsIgnoreCase("true")) {
+          Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.driver", tmpVarBundle.getProperty("Pooka._jdbcWizard.selection.driver", ""));
+          Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.url",  tmpVarBundle.getProperty("Pooka._jdbcWizard.selection.url", ""));
+          Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.user",  tmpVarBundle.getProperty("Pooka._jdbcWizard.selection.user", ""));
+          Pooka.getResources().setProperty("Pooka._jdbcWizard.selection.password", tmpVarBundle.getProperty("Pooka._jdbcWizard.selection.password", ""));
+
+          resourceManager = configureJDBCManager();
+        }
       }
 
       manager.setResourceManager(resourceManager);
@@ -146,6 +144,30 @@ public class StartupManager {
       configPooka.start();
     }
 
+  }
+
+  /**
+   * Configures a JDBC manager.
+   *
+   */
+  private ResourceManager configureJDBCManager() throws InterruptedException, java.lang.reflect.InvocationTargetException  {
+    SwingUtilities.invokeAndWait(new Runnable() {
+        public void run() {
+          System.setProperty("java.util.prefs.PreferencesFactory", "net.suberic.util.prefs.JDBCPreferencesFactory");
+
+          PookaUIFactory tmpFactory = new PookaMinimalUIFactory();
+
+          tmpFactory.showEditorWindow(Pooka.getProperty("Pooka._jdbcWizard.label", "Load Settings"), "Pooka._jdbcWizard");
+
+          if (! "true".equals(System.getProperty("useJdbcConnection"))) {
+            System.exit(1);
+          }
+          mPookaManager.setUIFactory(tmpFactory);
+
+        }
+      });
+
+    return new JDBCResourceManager();
   }
 
   /**

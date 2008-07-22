@@ -1,6 +1,7 @@
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
    -- opengl shouldn't be necessary as of jdk1.6_u10.  check antialiasing.
       also check why the internalframes are moving so slowly.
+*) look at jdk6u10 updates--particularly nimbus l&f
 
 ---- (jdbc)
 *) jdbc:
