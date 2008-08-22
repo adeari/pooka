@@ -939,6 +939,19 @@ public class FolderInternalFrame extends JInternalFrame implements FolderDisplay
     }
   }
 
+  // FIXME - working around JDK bug; remove when fixed.
+
+  public void restoreSubcomponentFocus() {
+    Component lLastFocusOwner = getMostRecentFocusOwner();
+    if (lLastFocusOwner == null) {
+      // Make sure focus is restored somewhere, so that
+      // we don't leave a focused component in another frame while
+      // this frame is selected.
+      lLastFocusOwner = getContentPane();
+    }
+    lLastFocusOwner.requestFocusInWindow();
+  }
+
 }
 
 
