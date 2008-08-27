@@ -1,5 +1,4 @@
-*) fix focus problem--we're only trying to get focus in the window, not
-   global focus.
+*) ?? adding a new store removes the new message display filters on open stores?
 
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
    -- opengl shouldn't be necessary as of jdk1.6_u10.  check antialiasing.
