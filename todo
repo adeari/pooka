@@ -1,3 +1,4 @@
+   global focus. -- sort of fixe.d
 *) ?? adding a new store removes the new message display filters on open stores?
 
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).

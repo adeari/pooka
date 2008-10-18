@@ -517,10 +517,7 @@ public class NewMessageDisplayPanel extends MessageDisplayPanel implements ItemL
           value = value.replaceAll("\n", " ");
         }
 
-        // don't set it if it's blank.
-        if (value != null && value.length() > 0) {
-          returnValue.setHeader(header, value);
-        }
+        returnValue.setHeader(header, value);
       }
     }
 

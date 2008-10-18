@@ -48,7 +48,12 @@ public class NewMessageInfo extends MessageInfo {
       Enumeration individualHeaders = headers.getAllHeaders();
       while(individualHeaders.hasMoreElements()) {
         Header currentHeader = (Header) individualHeaders.nextElement();
-        mMsg.setHeader(currentHeader.getName(), currentHeader.getValue());
+        String currentValue =  currentHeader.getValue();
+        if (currentValue == null || currentValue.length() == 0) {
+          mMsg.removeHeader(currentHeader.getName());
+        } else {
+          mMsg.setHeader(currentHeader.getName(), currentValue);
+        }
       }
 
       mMsg.setHeader("X-Mailer", Pooka.getProperty("Pooka.xmailer", "Pooka"));
@@ -57,7 +62,6 @@ public class NewMessageInfo extends MessageInfo {
         messageText=net.suberic.pooka.MailUtilities.wrapText(messageText);
 
       // move this to another thread now.
-
       factory.showStatusMessage(Pooka.getProperty("info.sendMessage.changingThreads", "Sending to message thread..."));
 
       final UserProfile sProfile = profile;
