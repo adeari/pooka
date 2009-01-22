@@ -1,4 +1,8 @@
-   global focus. -- sort of fixe.d
+*) make cut and paste of messages give some sort of visual notification. 
+   right now, if you select 20 messages, ^C, then go to another folder and
+   ^V, it appears that nothing happens until suddenly the messages appear.
+
+   global focus. -- sort of fixed.
 *) ?? adding a new store removes the new message display filters on open stores?
 
 *) add in opengl acceleration & antialiasing in 1.5/1.6 (??).
