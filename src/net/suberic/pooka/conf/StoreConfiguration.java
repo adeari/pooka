@@ -1,5 +1,7 @@
 package net.suberic.pooka.conf;
 
+import java.util.List;
+
 /**
  * Configures a StoreInfo.
  */
@@ -30,5 +32,40 @@ public interface StoreConfiguration {
   public int getPort();
   public void setPort(int port);
 
+  public String getServer();
+  public void setServer(String server);
+
+  public String getSSL();
+  public void setSSL(String ssl);
+
+  public List<String> getFolderList();
+  public void setFolderList(List<String> folderList);
+
+  public boolean getUseSubscribed();
+  public void setUseSubscribed(boolean useSubscribed);
+
+  public String getDefaultProfile();
+  public void setDefaultProfile(String defaultProfile);
+
+  public String getTrashFolder();
+  public void setTrashFolder(String trashFolder);
+
+  public String getConnectionTimeout();
+  public void setConnectionTimeout(String connectionTimeout);
+
+  public String getTimeout();
+  public void setTimeout(String timeout);
+
+  public String getSSLFallback();
+  public void setSSLFallback(String ssl);
+
+  public String getMailDir();
+  public void setMailDir(String mailDir);
+
+  public String getDefaultMailSubDir();
+  public void setDefaultMailSubDir(String defaultMailSubDir);
+
+  public String getSubFolderName();
+  public void setSubFolderName(String SubFolderName);
 
 }

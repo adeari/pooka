@@ -128,13 +128,14 @@ public class SimpleFileCache implements MessageCache {
         MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
         return mm;
       } catch (Exception e) {
+        e.printStackTrace();
         return null;
       } finally {
         if (fis != null) {
           try {
             fis.close();
           } catch (Exception e) {
-
+            e.printStackTrace();
           }
         }
       }
@@ -604,13 +605,14 @@ public class SimpleFileCache implements MessageCache {
         DataHandler dh = new DataHandler(source);
         return dh;
       } catch (Exception e) {
+        e.printStackTrace();
         return null;
       } finally {
         if (fis != null) {
           try {
             fis.close();
           } catch (Exception e) {
-
+            e.printStackTrace();
           }
         }
       }
@@ -688,7 +690,7 @@ public class SimpleFileCache implements MessageCache {
           cachedFlags.put(new Long(uid), newFlags);
           return newFlags;
         } catch (FileNotFoundException fnfe) {
-          System.out.println("caught filenotfoundexception.");
+          System.out.println("caught filenotfoundexception (" + fnfe + ")");
           fnfe.printStackTrace();
           return null;
         } catch (IOException ioe) {

@@ -114,16 +114,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
       if (!password.equals(""))
         password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
-      server = Pooka.getProperty("Store." + storeID + ".server", "");
+      server = config.getServer();
 
-      sslSetting = Pooka.getProperty(getStoreProperty() + ".SSL", "none");
-      if (sslSetting.equalsIgnoreCase("true")) {
-        Pooka.setProperty(getStoreProperty() + ".SSL", "ssl");
-        sslSetting = "ssl";
-      } else if (sslSetting.equalsIgnoreCase("false")) {
-        Pooka.setProperty(getStoreProperty() + ".SSL", "none");
-        sslSetting = "none";
-      }
+      sslSetting = config.getSSL();
 
       if (sslSetting.equals("ssl")) {
         if (protocol.equals("imap"))
@@ -132,7 +125,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
 
 
-    Properties p = loadProperties();
+    Properties p = loadProperties(config);
 
     if (protocol.equalsIgnoreCase("maildir")) {
       url = new URLName(protocol, server, port, p.getProperty("mail.store.maildir.baseDir"), user, password);
@@ -157,11 +150,14 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
     // don't allow a StoreInfo to get created with an empty folderList.
 
-    if (Pooka.getProperty("Store." + storeID + ".folderList", "").equals(""))
-      Pooka.setProperty("Store." + storeID + ".folderList", "INBOX");
+    if (config.getFolderList().isEmpty()) {
+      List<String> newFlist = new ArrayList<String>();
+      newFlist.add("INBOX");
+      config.setFolderList(newFlist);
+    }
 
     // check to see if we're using the subscribed property.
-    useSubscribed = Pooka.getProperty(getStoreProperty() + ".useSubscribed", "false").equalsIgnoreCase("true");
+    useSubscribed = config.getUseSubscribed();
 
     Pooka.getResources().addValueChangeListener(this, getStoreProperty());
     Pooka.getResources().addValueChangeListener(this, getStoreProperty() + ".folderList");
@@ -230,13 +226,15 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       storeThread.start();
     }
 
-    String defProfileString = Pooka.getProperty(getStoreProperty() + ".defaultProfile", "");
+    String defProfileString = config.getDefaultProfile();
     if (defProfileString.length() < 1 || defProfileString.equalsIgnoreCase(UserProfile.S_DEFAULT_PROFILE_KEY)) {
       defaultProfile = null;
     } else {
       defaultProfile = Pooka.getPookaManager().getUserProfileManager().getProfile(defProfileString);
     }
 
+    connection = Pooka.getConnectionManager().getDefaultConnection();
+    /* FIXME if we want to keep this.
     connection = Pooka.getConnectionManager().getConnection(Pooka.getProperty(getStoreProperty() + ".connection", ""));
     if (connection == null) {
       connection = Pooka.getConnectionManager().getDefaultConnection();
@@ -245,10 +243,11 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (connection != null) {
       connection.addConnectionListener(this);
     }
+    */
 
     updateChildren();
 
-    String trashFolderName = Pooka.getProperty(getStoreProperty() + ".trashFolder", "");
+    String trashFolderName = config.getTrashFolder();
     if (trashFolderName.length() > 0) {
       trashFolder = getChild(trashFolderName);
       if (trashFolder != null)
@@ -260,31 +259,26 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * This loads in the default session properties for this Store's
    * Session.
    */
-  public Properties loadProperties() {
+  public Properties loadProperties(StoreConfiguration config) {
     Properties p = new Properties(System.getProperties());
 
-    String realProtocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
+    String realProtocol = config.getProtocol();
 
     if (realProtocol.equalsIgnoreCase("imap")) {
-      loadImapProperties(p);
+      loadImapProperties(p, config);
     } else if (realProtocol.equalsIgnoreCase("pop3")) {
-      loadPop3Properties(p);
-      String useMaildir = Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset");
+      loadPop3Properties(p, config);
+      boolean useMaildir = config.getUseMaildir();
 
-      if (useMaildir.equals("unset")) {
-        Pooka.setProperty(getStoreProperty() + ".useMaildir", "false");
-        useMaildir="false";
-      }
-
-      if ( useMaildir.equalsIgnoreCase("false")) {
-        loadMboxProperties(p);
+      if ( ! useMaildir) {
+        loadMboxProperties(p, config);
       } else {
-        loadMaildirProperties(p);
+        loadMaildirProperties(p, config);
       }
     } else if (realProtocol.equalsIgnoreCase("maildir")) {
-      loadMaildirProperties(p);
+      loadMaildirProperties(p, config);
     } else if (realProtocol.equalsIgnoreCase("mbox")) {
-      loadMboxProperties(p);
+      loadMboxProperties(p, config);
     }
     return p;
   }
@@ -292,16 +286,16 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   /**
    * Load all IMAP properties.
    */
-  void loadImapProperties(Properties p) {
-    p.setProperty("mail.imap.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
-    p.setProperty("mail.imap.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
+  void loadImapProperties(Properties p, StoreConfiguration config) {
+    p.setProperty("mail.imap.timeout", config.getTimeout());
+    p.setProperty("mail.imap.connectiontimeout", config.getConnectionTimeout());
 
-    p.setProperty("mail.imaps.timeout", Pooka.getProperty(getStoreProperty() + ".timeout", Pooka.getProperty("Pooka.timeout", "-1")));
-    p.setProperty("mail.imaps.connectiontimeout", Pooka.getProperty(getStoreProperty() + ".connectionTimeout", Pooka.getProperty("Pooka.connectionTimeout", "-1")));
+    p.setProperty("mail.imaps.timeout", config.getTimeout());
+    p.setProperty("mail.imaps.connectiontimeout", config.getConnectionTimeout());
 
     // set up ssl
     if (sslSetting.equals("ssl")) {
-      p.setProperty("mail.imaps.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
+      p.setProperty("mail.imaps.socketFactory.fallback", config.getSSLFallback());
     } else if (sslSetting.equals("tlsrequired")) {
       p.setProperty("mail.imap.starttls.enable", "true");
     } else if (sslSetting.equals("tls")) {
@@ -317,10 +311,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   /**
    * Load all POP3 properties.
    */
-  void loadPop3Properties(Properties p) {
-    if (Pooka.getProperty(getStoreProperty() + ".SSL", "false").equalsIgnoreCase("true")) {
+  void loadPop3Properties(Properties p, StoreConfiguration config) {
+    if (config.getSSL().equalsIgnoreCase("true")) {
       //p.setProperty("mail.pop3s.socketFactory.class", "net.suberic.pooka.ssl.PookaSSLSocketFactory");
-      p.setProperty("mail.pop3s.socketFactory.fallback", Pooka.getProperty(getStoreProperty() + ".SSL.fallback", "false"));
+      p.setProperty("mail.pop3s.socketFactory.fallback", config.getSSLFallback());
       //p.setProperty("mail.pop3.socketFactory.port", Pooka.getProperty(getStoreProperty() + ".SSL.port", "995"));
     }
   }
@@ -328,18 +322,18 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   /**
    * Load all Maildir properties.
    */
-  void loadMaildirProperties(Properties p) {
+  void loadMaildirProperties(Properties p, StoreConfiguration config) {
 
-    String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
+    String mailHome = config.getMailDir();
     if (mailHome.equals("")) {
-      mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+      mailHome = config.getDefaultMailSubDir();
       if (mailHome.equals(""))
         mailHome = Pooka.getPookaManager().getPookaRoot().getAbsolutePath() + java.io.File.separator + ".pooka";
 
       mailHome = mailHome + java.io.File.separator + storeID;
     }
 
-    String userHomeName = Pooka.getPookaManager().getResourceManager().translateName(mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders"));
+    String userHomeName = Pooka.getPookaManager().getResourceManager().translateName(mailHome + java.io.File.separator + config.getSubFolderName());
 
     //p.setProperty("mail.store.maildir.imapEmulation", "true");
     p.setProperty("mail.store.maildir.baseDir", userHomeName);
@@ -349,7 +343,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   /**
    * Load all Mbox properties.
    */
-  void loadMboxProperties(Properties p) {
+  void loadMboxProperties(Properties p, StoreConfiguration config) {
     /*
      * set the properties for mbox folders, and for the mbox backend of
      * a pop3 mailbox.  properties set are:
@@ -359,9 +353,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
      *   for mbox stores, this should be the local inbox file.
      * mail.mbox.userhome:  the location of all subfolders.
      */
-    String mailHome = Pooka.getProperty(getStoreProperty() + ".mailDir", "");
+    String mailHome = config.getMailDir();
     if (mailHome.equals("")) {
-      mailHome = Pooka.getProperty("Pooka.defaultMailSubDir", "");
+      mailHome = config.getDefaultMailSubDir();
       if (mailHome.equals(""))
         mailHome = Pooka.getPookaManager().getPookaRoot().getAbsolutePath() + java.io.File.separator + ".pooka";
 
@@ -371,7 +365,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     mailHome = Pooka.getPookaManager().getResourceManager().translateName(mailHome);
 
     String inboxFileName;
-    if (Pooka.getProperty(getStoreProperty() + ".protocol", "imap").equalsIgnoreCase("pop3")) {
+    if (config.getProtocol().equalsIgnoreCase("pop3")) {
       inboxFileName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");
     } else {
       inboxFileName = Pooka.getProperty(getStoreProperty() + ".inboxLocation", "/var/spool/mail/" + System.getProperty("user.name"));

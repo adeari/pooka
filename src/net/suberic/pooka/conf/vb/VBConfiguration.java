@@ -2,6 +2,8 @@ package net.suberic.pooka.conf.vb;
 
 import net.suberic.util.*;
 
+import java.util.List;
+
 /**
  * A VariableBundle-based Configuration.
  */
@@ -63,4 +65,16 @@ public class VBConfiguration {
     setString(property, Integer.toString(value));
   }
 
+  /**
+   * Gets a List<String> value.
+   */
+  public List<String> getList(String property, String defaultValue) {
+    return getVariableBundle().getPropertyAsList(property, defaultValue);
+  }
+  /**
+   * Sets a List<String>.
+   */
+  public void setList(String property, List<String> value) {
+    getVariableBundle().setProperty(property, VariableBundle.convertToString(value));
+  }
 }
