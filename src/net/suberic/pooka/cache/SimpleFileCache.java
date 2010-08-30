@@ -122,12 +122,21 @@ public class SimpleFileCache implements MessageCache {
 
     File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
     if (f.exists()) {
+      FileInputStream fis = null;
       try {
-        FileInputStream fis = new FileInputStream(f);
+        fis = new FileInputStream(f);
         MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
         return mm;
       } catch (Exception e) {
         return null;
+      } finally {
+        if (fis != null) {
+          try {
+            fis.close();
+          } catch (Exception e) {
+
+          }
+        }
       }
     } else {
       if (getFolderInfo().shouldBeConnected()) {
@@ -587,14 +596,23 @@ public class SimpleFileCache implements MessageCache {
   protected DataHandler getHandlerFromCache(long uid) {
     File f = new File(cacheDir, uid + DELIMETER + CONTENT_EXT);
     if (f.exists()) {
+      FileInputStream fis = null;
       try {
-        FileInputStream fis = new FileInputStream(f);
+        fis = new FileInputStream(f);
         MimeMessage mm = new MimeMessage(net.suberic.pooka.Pooka.getDefaultSession(), fis);
         javax.activation.DataSource source = new WrappedMimePartDataSource (mm, this, uid);
         DataHandler dh = new DataHandler(source);
         return dh;
       } catch (Exception e) {
         return null;
+      } finally {
+        if (fis != null) {
+          try {
+            fis.close();
+          } catch (Exception e) {
+
+          }
+        }
       }
       //return new DataHandler(new FileDataSource(f));
     } else
@@ -612,20 +630,24 @@ public class SimpleFileCache implements MessageCache {
     } else {
 
       File f = new File(cacheDir, uid +DELIMETER + HEADER_EXT);
-      if (f.exists())
+      if (f.exists()) {
+        FileInputStream fis = null;
         try {
-          FileInputStream fis = new FileInputStream(f);
+          fis = new FileInputStream(f);
           returnValue = new InternetHeaders(fis);
           cachedHeaders.put(new Long(uid), returnValue);
-          try {
-            fis.close();
-          } catch (java.io.IOException ioe) {
-          }
           return returnValue;
         } catch (FileNotFoundException fnfe) {
           throw new MessagingException(fnfe.getMessage(), fnfe);
+        } finally {
+          if (fis != null) {
+            try {
+              fis.close();
+            } catch (java.io.IOException ioe) {
+            }
+          }
         }
-      else
+      } else
         return null;
     }
   }
@@ -641,9 +663,10 @@ public class SimpleFileCache implements MessageCache {
     } else {
       File f = new File(cacheDir, uid + DELIMETER + FLAG_EXT);
       if (f.exists()) {
+        BufferedReader in = null;
         try {
           Flags newFlags = new Flags();
-          BufferedReader in = new BufferedReader(new FileReader(f));
+          in = new BufferedReader(new FileReader(f));
           for (String currentLine = in.readLine(); currentLine != null; currentLine = in.readLine()) {
 
             if (currentLine.equalsIgnoreCase("Deleted"))
@@ -666,10 +689,19 @@ public class SimpleFileCache implements MessageCache {
           return newFlags;
         } catch (FileNotFoundException fnfe) {
           System.out.println("caught filenotfoundexception.");
+          fnfe.printStackTrace();
           return null;
         } catch (IOException ioe) {
           System.out.println("caught ioexception.");
           return null;
+        } finally {
+          if (in != null) {
+            try {
+              in.close();
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
         }
       }
 
@@ -749,8 +781,9 @@ public class SimpleFileCache implements MessageCache {
 
     File msgListFile = new File(cacheDir, "messageList");
     if (msgListFile.exists()) {
+      BufferedReader in = null;
       try {
-        BufferedReader in = new BufferedReader(new FileReader(msgListFile));
+        in = new BufferedReader(new FileReader(msgListFile));
         for (String nextLine = in.readLine(); nextLine != null; nextLine = in.readLine()) {
           Long l = new Long(nextLine);
           cachedMessages.add(l);
@@ -760,24 +793,51 @@ public class SimpleFileCache implements MessageCache {
           //getFlagsFromCache(l.longValue());
           //getHeadersFromCache(l.longValue());
         }
-      } catch (Exception e) { }
+      } catch (Exception e) {
+      } finally {
+        if (in != null) {
+          try {
+            in.close();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
     }
 
     File validityFile = new File(cacheDir, "validity");
     if (validityFile.exists()) {
+      BufferedReader in = null;
       try {
-        BufferedReader in = new BufferedReader(new FileReader(validityFile));
+        in = new BufferedReader(new FileReader(validityFile));
         uidValidity = Long.parseLong(in.readLine());
       } catch (Exception e) {
+      } finally {
+        if (in != null) {
+          try {
+            in.close();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
       }
     }
 
     File localMsgFile = new File(cacheDir, "lastLocal");
     if (localMsgFile.exists()) {
+      BufferedReader in = null;
       try {
-        BufferedReader in = new BufferedReader(new FileReader(localMsgFile));
+        in = new BufferedReader(new FileReader(localMsgFile));
         lastLocalUID = Long.parseLong(in.readLine());
       } catch (Exception e) {
+      } finally {
+        if (in != null) {
+          try {
+            in.close();
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
       }
     }
 

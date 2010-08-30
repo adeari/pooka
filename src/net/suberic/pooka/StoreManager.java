@@ -2,6 +2,7 @@ package net.suberic.pooka;
 
 import javax.mail.*;
 import java.util.*;
+import net.suberic.pooka.conf.vb.VBStoreConfiguration;
 import net.suberic.util.*;
 
 /**
@@ -205,7 +206,7 @@ public class StoreManager implements ItemCreator, ItemListChangeListener {
    * As defined by interface net.suberic.util.ItemCreator.
    */
   public Item createItem(VariableBundle sourceBundle, String resourceString, String itemID) {
-    return new StoreInfo(itemID);
+    return new StoreInfo(itemID, new VBStoreConfiguration(itemID, sourceBundle));
   }
 
   //---------------------------

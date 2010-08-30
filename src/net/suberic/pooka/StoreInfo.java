@@ -7,11 +7,13 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import net.suberic.pooka.conf.StoreConfiguration;
 import net.suberic.pooka.gui.*;
 import net.suberic.util.ValueChangeListener;
 import net.suberic.util.thread.ActionThread;
 import net.suberic.util.VariableBundle;
 import net.suberic.util.Item;
+
 
 /**
  * This class does all of the work for a Store.  It keeps track of the
@@ -74,29 +76,31 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
   // the Authenticator to use for this Store.
   private AuthenticatorUI mAuthenticator;
 
+  private StoreConfiguration mStoreConfiguration;
+
   /**
    * Creates a new StoreInfo from a Store ID.
    */
-  public StoreInfo(String sid) {
+  public StoreInfo(String sid, StoreConfiguration config) {
     setStoreID(sid);
-
-    configureStore();
+    mStoreConfiguration = config;
+    configureStore(config);
   }
 
   /**
    * This configures the store from the property information.
    */
-  public void configureStore() {
+  public void configureStore(StoreConfiguration config) {
     connected = false;
     available = false;
 
-    protocol = Pooka.getProperty("Store." + storeID + ".protocol", "");
+    protocol = config.getProtocol();
 
     if (protocol.equalsIgnoreCase("pop3")) {
       user = "";
       password = "";
       server = "localhost";
-      if (Pooka.getProperty(getStoreProperty() + ".useMaildir", "unset").equalsIgnoreCase("true"))
+      if (config.getUseMaildir())
         protocol = "maildir";
       else
         protocol = "mbox";
@@ -104,16 +108,10 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
       popStore = true;
     } else {
       popStore = false;
-      user = Pooka.getProperty("Store." + storeID + ".user", "");
-      password = Pooka.getProperty("Store." + storeID + ".password", "");
-      String portValue = Pooka.getProperty("Store." + storeID + ".port", "");
-      port = -1;
-      if (!portValue.equals("")) {
-        try {
-          port = Integer.parseInt(portValue);
-        } catch (Exception e) {
-        }
-      }
+      user = config.getUser();
+      password = config.getPassword();
+      port = config.getPort();
+
       if (!password.equals(""))
         password = net.suberic.util.gui.propedit.PasswordEditorPane.descrambleString(password);
       server = Pooka.getProperty("Store." + storeID + ".server", "");
@@ -542,7 +540,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
               getLogger().log(Level.FINE, "calling configureStore()");
 
-              configureStore();
+              configureStore(mStoreConfiguration);
             } else if (changedValue.equals(getStoreProperty() + ".connection")) {
               connection.removeConnectionListener(StoreInfo.this);
 
