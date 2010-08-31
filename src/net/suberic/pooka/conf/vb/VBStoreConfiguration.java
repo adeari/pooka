@@ -216,12 +216,74 @@ public class VBStoreConfiguration extends VBConfiguration implements StoreConfig
 
   @Override
   public String getSubFolderName() {
-    return getString("Pooka.subFolderName", "");
+    return getString("Pooka.subFolderName", "folders");
   }
   @Override
   public void setSubFolderName(String SubFolderName) {
     setString("Pooka.subFolderName", SubFolderName);
   }
 
+  @Override
+  public String getInboxLocation() {
+    return getString(getStoreProperty() + ".inboxLocation", "/var/spool/mail/" + System.getProperty("user.name"));
+  }
+  @Override
+  public void setInboxLocation(String inboxLocation) {
+    setString(getStoreProperty() + ".inboxLocation", inboxLocation);
+  }
+
+  @Override
+  public String getInboxFileName() {
+    return getString(getStoreProperty() + ".inboxFileName", "INBOX");
+  }
+  @Override
+  public void setInboxFileName(String inboxFileName) {
+    setString(getStoreProperty() + ".inboxFileName", inboxFileName);
+  }
+
+  @Override
+  public boolean getOpenFoldersOnConnect() {
+    return getBoolean("Pooka.openFoldersOnConnect", true);
+  }
+  @Override
+  public void setOpenFoldersOnConnect(boolean openFoldersOnConnect) {
+    setBoolean("Pooka.openFoldersOnConnect", openFoldersOnConnect);
+  }
+
+  @Override
+  public boolean getOpenFoldersInBackground() {
+    return getBoolean("Pooka.openFoldersInBackground", false);
+  }
+  @Override
+  public void setOpenFoldersInBackground(boolean openFoldersInBackground) {
+    setBoolean("Pooka.openFoldersInBackground", openFoldersInBackground);
+  }
+
+  @Override
+  public boolean getUseTrashFolder() {
+    return getBoolean(getStoreProperty() + ".useTrashFolder", getVariableBundle().getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
+  }
+  @Override
+  public void setUseTrashFolder(boolean useTrashFolder) {
+    setBoolean(getStoreProperty() + ".useTrashFolder", useTrashFolder);
+  }
+
+  @Override
+  public boolean getSessionDebug() {
+    return getBoolean(getStoreProperty() + ".sessionDebug", false);
+  }
+  @Override
+  public void setSessionDebug(boolean sessionDebug) {
+    setBoolean(getStoreProperty() + ".sessionDebug", sessionDebug);
+  }
+
+  @Override
+  public String getSessionDebugLogLevel() {
+    return getString(getStoreProperty() + ".sessionDebugLogLevel", "OFF");
+  }
+  @Override
+  public void setSessionDebugLogLevel(String sessionDebugLogLevel) {
+    setString(getStoreProperty() + ".sessionDebugLogLevel", sessionDebugLogLevel);
+  }
 
 }

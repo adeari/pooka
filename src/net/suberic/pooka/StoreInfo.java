@@ -366,12 +366,12 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
 
     String inboxFileName;
     if (config.getProtocol().equalsIgnoreCase("pop3")) {
-      inboxFileName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.inboxName", "INBOX");
+      inboxFileName = mailHome + java.io.File.separator + config.getInboxFileName();
     } else {
-      inboxFileName = Pooka.getProperty(getStoreProperty() + ".inboxLocation", "/var/spool/mail/" + System.getProperty("user.name"));
+      inboxFileName = config.getInboxLocation();
     }
 
-    String userHomeName = mailHome + java.io.File.separator + Pooka.getProperty("Pooka.subFolderName", "folders");
+    String userHomeName = mailHome + java.io.File.separator + config.getSubFolderName();
 
     getLogger().log(Level.FINE, "for store " + getStoreID() + ", inboxFileName = " + inboxFileName + "; userhome = " + userHomeName);
 
@@ -509,7 +509,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
             if (changedValue.equals(getStoreProperty() + ".folderList")) {
               updateChildren();
             } else if (changedValue.equals(getStoreProperty() + ".defaultProfile")) {
-              String defProfileString = Pooka.getProperty(getStoreProperty() + ".defaultProfile", "");
+              String defProfileString = mStoreConfiguration.getDefaultProfile();
               if (defProfileString.length() < 1 || defProfileString.equalsIgnoreCase(UserProfile.S_DEFAULT_PROFILE_KEY)) {
                 defaultProfile = null;
               } else {
@@ -650,11 +650,9 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     }
 
     if (!found) {
-      String currentValue = Pooka.getProperty(getStoreProperty() + ".folderList");
-      if (currentValue.equals(""))
-        Pooka.setProperty(getStoreProperty() + ".folderList", addFolderName);
-      else
-        Pooka.setProperty(getStoreProperty() + ".folderList", currentValue + ":" + addFolderName);
+      List<String> currentValue = mStoreConfiguration.getFolderList();
+      currentValue.add(addFolderName);
+      mStoreConfiguration.setFolderList(currentValue);
     }
 
   }
@@ -807,7 +805,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
         synchSubscribed();
       }
 
-      if (Pooka.getProperty("Pooka.openFoldersOnConnect", "true").equalsIgnoreCase("true")) {
+      if (mStoreConfiguration.getOpenFoldersOnConnect()) {
         for (int i = 0; i < children.size(); i++) {
           doOpenFolders((FolderInfo) children.elementAt(i));
         }
@@ -846,6 +844,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Execute the precommand if there is one.
    */
   private void executePrecommand() {
+    /* FIXME remove?
     String preCommand = Pooka.getProperty(getStoreProperty() + ".precommand", "");
     if (preCommand.length() > 0) {
       getLogger().log(Level.FINE, "connect store " + getStoreID() + ":  executing precommand.");
@@ -858,13 +857,14 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
           ex.printStackTrace();
       }
     }
+    */
   }
 
   /**
    *
    */
   private void doOpenFolders(FolderInfo fi) {
-    if (Pooka.getProperty("Pooka.openFoldersInBackground", "false").equalsIgnoreCase("true")) {
+    if (mStoreConfiguration.getOpenFoldersInBackground()) {
       final FolderInfo current = fi;
       javax.swing.AbstractAction openFoldersAction = new javax.swing.AbstractAction() {
           public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -1046,7 +1046,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     Collections.sort(subscribedNames);
 
     // keep the existing order when possible.
-    List<String> currentSubscribed = Pooka.getResources().getPropertyAsList(getStoreProperty() + ".folderList", "");
+    List<String> currentSubscribed = mStoreConfiguration.getFolderList();
     Iterator<String> currentIter = currentSubscribed.iterator();
     while(currentIter.hasNext()) {
       String folder = currentIter.next();
@@ -1275,12 +1275,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
     if (getTrashFolder() == null)
       return false;
 
-    String prop = Pooka.getProperty(getStoreProperty() + ".useTrashFolder", "");
-    if (!prop.equals(""))
-      return (! prop.equalsIgnoreCase("false"));
-    else
-      return (! Pooka.getProperty("Pooka.useTrashFolder", "true").equalsIgnoreCase("true"));
-
+    return mStoreConfiguration.getUseTrashFolder();
   }
 
 
@@ -1302,7 +1297,7 @@ public class StoreInfo implements ValueChangeListener, Item, NetworkConnectionLi
    * Updates the debug status on the session.
    */
   void updateSessionDebug() {
-    if (Pooka.getProperty("Pooka.sessionDebug", "false").equalsIgnoreCase("true") || (! Pooka.getProperty(getStoreProperty() + ".sessionDebug.logLevel", "OFF").equalsIgnoreCase("OFF"))) {
+    if (mStoreConfiguration.getSessionDebug()|| (! mStoreConfiguration.getSessionDebugLogLevel().equalsIgnoreCase("OFF"))) {
       mSession.setDebug(true);
     } else {
       mSession.setDebug(false);

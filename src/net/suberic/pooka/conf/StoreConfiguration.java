@@ -68,4 +68,26 @@ public interface StoreConfiguration {
   public String getSubFolderName();
   public void setSubFolderName(String SubFolderName);
 
+  public String getInboxLocation();
+  public void setInboxLocation(String inboxLocation);
+
+  public String getInboxFileName();
+  public void setInboxFileName(String inboxFileName);
+
+  public boolean getOpenFoldersOnConnect();
+  public void setOpenFoldersOnConnect(boolean openFoldersOnConnect);
+
+  public boolean getOpenFoldersInBackground();
+  public void setOpenFoldersInBackground(boolean openFoldersInBackground);
+
+  public boolean getUseTrashFolder();
+  public void setUseTrashFolder(boolean useTrashFolder);
+
+  public boolean getSessionDebug();
+  public void setSessionDebug(boolean sessionDebug);
+
+  public String getSessionDebugLogLevel();
+  public void setSessionDebugLogLevel(String sessionDebugLogLevel);
+
+
 }
