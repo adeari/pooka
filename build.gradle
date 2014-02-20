@@ -1,0 +1,17 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'net.suberic.pooka.Pooka'
+repositories {
+       mavenCentral()
+}
+version = '2.0'
+dependencies {
+  compile group: 'javax.mail', name: 'mail', version: '1.5.0-b01'
+  compile group: 'javax.help', name: 'javahelp', version: '2.0.05'
+  compile group: 'org.htmlparser', name: 'htmlparser', version: '2.1'
+  compile group: 'net.sourceforge.cardme', name: 'cardme', version: '0.4.0'
+  compile group: 'com.github.lookfirst', name: 'sardine', version: '5.0.3'
+  compile files('Imported/javamail-crypto.jar', 'Imported/javamail-crypto-bouncycastle-openpgp.jar', 'Imported/javamail-crypto-bouncycastle-smime.jar')
+  compile files('Imported/linspire_clear.jar')
+}
